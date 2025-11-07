@@ -1,0 +1,88 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        xmlns:createDatabase1="clr-namespace:Valt.UI.Views.Main.Modals.CreateDatabase"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
+        MaxWidth="600"
+        MaxHeight="400"
+        x:Class="Valt.UI.Views.Main.Modals.CreateDatabase.CreateDatabaseView"
+        Title="{x:Static local:language.CreateDatabaseTitle}"
+        x:DataType="createDatabase1:CreateDatabaseViewModel"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseEmptyCommand}" />
+    </Window.KeyBindings>
+    <Border>
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="{x:Static local:language.CreateDatabaseTitle}"
+                                         TitleBarPressed="InputElement_OnPointerPressed"
+                                         CloseClick="CustomTitleBar_OnCloseClick" />
+            <Border Classes="form-fields-area">
+                <StackPanel Spacing="15" Margin="15">
+                    <StackPanel Spacing="15">
+                        <TextBlock TextWrapping="Wrap">
+                            <TextBlock Text="{x:Static local:language.CreateDatabase_TextLine1}"></TextBlock>
+                            <LineBreak />
+                            <TextBlock Text="{x:Static local:language.CreateDatabase_TextLine2}"></TextBlock>
+                            <LineBreak />
+                            <LineBreak />
+                            <TextBlock Text="{x:Static local:language.CreateDatabase_TextLine3}"></TextBlock>
+                        </TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Spacing="20">
+                        <!-- File path Field -->
+                        <DockPanel>
+                            <TextBlock Width="150" TextAlignment="Right" Margin="0,0,5,0"
+                                       VerticalAlignment="Center"
+                                       Text="{x:Static local:language.CreateDatabase_FilePath}"
+                                       TextWrapping="Wrap" />
+                            <DockPanel VerticalAlignment="Center">
+                                <Button DockPanel.Dock="Right" Command="{Binding SaveDatabaseFileCommand}">
+                                    <Label Classes="icon" Content="&#xE2C8;" />
+                                </Button>
+                                <TextBox Text="{Binding Path}" />
+                            </DockPanel>
+                        </DockPanel>
+
+                        <!-- Password Field -->
+                        <DockPanel>
+                            <TextBlock Width="150" TextAlignment="Right" Margin="0,0,5,0"
+                                       VerticalAlignment="Center"
+                                       Text="{x:Static local:language.CreateDatabase_Password}"
+                                       TextWrapping="Wrap" />
+                            <TextBox PasswordChar="*" Text="{Binding Password}" VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <!-- Confirm Password Field -->
+                        <DockPanel>
+                            <TextBlock Width="150" TextAlignment="Right" Margin="0,0,5,0"
+                                       VerticalAlignment="Center"
+                                       Text="{x:Static local:language.CreateDatabase_ConfirmPassword}"
+                                       TextWrapping="Wrap" />
+                            <TextBox PasswordChar="*" Text="{Binding ConfirmPassword}"
+                                     VerticalAlignment="Center" />
+                        </DockPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            <!-- Buttons -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10"
+                        Margin="0, 0, 0, 10">
+                <Button Width="100" HorizontalContentAlignment="Center"
+                        Content="{x:Static local:language.OkButton}" Command="{Binding OkCommand}"
+                        IsDefault="False">
+                </Button>
+                <Button Width="100" HorizontalContentAlignment="Center"
+                        Content="{x:Static local:language.CancelButton}" Command="{Binding CancelCommand}"
+                        IsCancel="True">
+                </Button>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

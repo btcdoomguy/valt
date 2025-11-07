@@ -1,0 +1,67 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        xmlns:settings1="clr-namespace:Valt.UI.Views.Main.Modals.Settings"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Views.Main.Modals.Settings.SettingsView"
+        x:DataType="settings1:SettingsViewModel"
+        Title="{x:Static local:language.Settings_Title}"
+        WindowStartupLocation="CenterOwner"
+        d:DesignWidth="450"
+        d:DesignHeight="400"
+        MaxWidth="450"
+        MaxHeight="400"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <settings1:SettingsViewModel />
+    </Design.DataContext>
+    <Border>
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="{x:Static local:language.Settings_Title}"
+                                         TitleBarPressed="InputElement_OnPointerPressed"
+                                         CloseClick="CustomTitleBar_OnCloseClick" />
+            <Border Classes="form-fields-area" Height="320">
+                <StackPanel Orientation="Vertical" Spacing="20">
+                    <DockPanel>
+                        <TextBlock Width="150" TextAlignment="Right" Margin="0,0,5,0"
+                                   VerticalAlignment="Center"
+                                   Text="{x:Static local:language.Settings_MainFiatCurrency}" TextWrapping="Wrap" />
+                        <ComboBox ItemsSource="{Binding AvailableFiatCurrencies}"
+                                  SelectedItem="{Binding MainFiatCurrency}" Width="200" />
+
+                    </DockPanel>
+                    <DockPanel>
+                        <TextBlock Width="150" TextAlignment="Right" Margin="0,0,5,0"
+                                   VerticalAlignment="Center"
+                                   Text="{x:Static local:language.Settings_Culture}" TextWrapping="Wrap" />
+                        <ComboBox ItemsSource="{Binding Cultures}"
+                                  DisplayMemberBinding="{Binding Text}"
+                                  SelectedValueBinding="{Binding Value}"
+                                  SelectedValue="{Binding CurrentCulture}" Width="200" />
+                    </DockPanel>
+                    <DockPanel>
+                        <TextBlock Width="150" TextAlignment="Right" Margin="0,0,5,0"
+                                   VerticalAlignment="Center"
+                                   Text="{x:Static local:language.Settings_ShowHiddenAccounts}" TextWrapping="Wrap" />
+                        <CheckBox IsChecked="{Binding ShowHiddenAccounts}"></CheckBox>
+                    </DockPanel>
+                    <Button HorizontalAlignment="Center" Classes="transparent link" Command="{Binding ClearAccountCacheCommand}" Content="{x:Static local:language.Settings_ClearAccountTotalsCache}" />
+                    <Button HorizontalAlignment="Center" Classes="transparent link" Command="{Binding ProcessTransactionTermCacheCommand}"  Content="{x:Static local:language.Settings_ClearTransactionTermCache}" />
+                    <Button HorizontalAlignment="Center" Classes="transparent link" Command="{Binding ChangeDatabasePasswordCommand}"  Content="{x:Static local:language.Settings_ChangeDatabasePassword}" />
+                </StackPanel>
+            </Border>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10"
+                        Margin="0, 0, 0, 0">
+                <Button Width="100" Content="{x:Static local:language.OkButton}" HorizontalContentAlignment="Center" Command="{Binding OkCommand}"></Button>
+                <Button Width="100" Content="{x:Static local:language.CancelButton}" HorizontalContentAlignment="Center"
+                        Command="{Binding CancelCommand}">
+                </Button>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

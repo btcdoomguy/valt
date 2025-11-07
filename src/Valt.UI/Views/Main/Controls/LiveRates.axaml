@@ -1,0 +1,77 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:Valt.UI.Views.Main.Controls"
+             mc:Ignorable="d" d:DesignWidth="250" d:DesignHeight="90"
+             x:Class="Valt.UI.Views.Main.Controls.LiveRates"
+             x:DataType="controls:LiveRatesViewModel">
+    <Design.DataContext>
+        <controls:LiveRatesViewModel />
+    </Design.DataContext>
+    <Border Background="{DynamicResource Background900Brush}"
+            BorderBrush="{DynamicResource Background700Brush}"
+            BorderThickness="3"
+            CornerRadius="5"
+            Margin="0, 0, 0, 0">
+        <Grid ColumnDefinitions="*, 2*, *" RowDefinitions="*, *, *" Margin="2, 3, 0, 0">
+            <Grid IsVisible="{Binding HasDatabaseOpen}"
+                  Grid.Row="0" Grid.Column="0">
+                <Label HorizontalContentAlignment="Left" VerticalContentAlignment="Center"
+                       Foreground="{DynamicResource Background300Color}">
+                    BTC/USD
+                </Label>
+            </Grid>
+            <Grid IsVisible="{Binding HasDatabaseOpen}"
+                  Grid.Row="0" Grid.Column="1">
+                <Label VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                       Content="{Binding BtcUsdText}" />
+            </Grid>
+            <Grid IsVisible="{Binding HasDatabaseOpen}"
+                  Grid.Row="0" Grid.Column="2">
+                <Label VerticalContentAlignment="Center" HorizontalContentAlignment="Right"
+                       Padding="0, 0, 5, 0"
+                       Foreground="{Binding BtcUsdVariationBrush}"
+                       Content="{Binding BtcUsdVariationText}" />
+            </Grid>
+            <Grid IsVisible="{Binding ShowUsdFiatLabels}"
+                  Grid.Row="1" Grid.Column="0">
+                <Label HorizontalContentAlignment="Left" VerticalContentAlignment="Center"
+                       Foreground="{DynamicResource Background300Color}"
+                       Content="{Binding UsdWithPairText}">
+                </Label>
+            </Grid>
+            <Grid IsVisible="{Binding ShowUsdFiatLabels}"
+                  Grid.Row="1" Grid.Column="1">
+                <Label VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                       Content="{Binding UsdText}">
+                </Label>
+            </Grid>
+            <Grid IsVisible="{Binding ShowUsdFiatLabels}"
+                  Grid.Row="1" Grid.Column="2">
+                <Label VerticalContentAlignment="Center" HorizontalContentAlignment="Right"
+                       Padding="0, 0, 5, 0"
+                       Foreground="{Binding UsdVariationBrush}" Content="{Binding UsdVariationText}" />
+            </Grid>
+            <Grid IsVisible="{Binding ShowUsdFiatLabels}"
+                  Grid.Row="2" Grid.Column="0">
+                <Label HorizontalContentAlignment="Left" VerticalContentAlignment="Center"
+                       Foreground="{DynamicResource Background300Color}"
+                       Content="{Binding BtcFiatPairText}">
+                </Label>
+            </Grid>
+            <Grid IsVisible="{Binding ShowUsdFiatLabels}"
+                  Grid.Row="2" Grid.Column="1">
+                <Label VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                       Content="{Binding BtcFiatText}">
+                </Label>
+            </Grid>
+            <Grid IsVisible="{Binding ShowUsdFiatLabels}"
+                  Grid.Row="2" Grid.Column="2">
+                <Label VerticalContentAlignment="Center" HorizontalContentAlignment="Right"
+                       Padding="0, 0, 5, 0"
+                       Foreground="{Binding BtcFiatVariationBrush}" Content="{Binding BtcFiatVariationText}" />
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

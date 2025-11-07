@@ -1,0 +1,243 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:lang="clr-namespace:Valt.UI.Lang"
+        xmlns:fixedExpenseEditor="clr-namespace:Valt.UI.Views.Main.Modals.FixedExpenseEditor"
+        xmlns:transactionTerms="clr-namespace:Valt.Infra.TransactionTerms;assembly=Valt.Infra"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Views.Main.Modals.FixedExpenseEditor.FixedExpenseEditorView"
+        Title="{Binding WindowTitle}"
+        x:DataType="fixedExpenseEditor:FixedExpenseEditorViewModel"
+        d:DesignWidth="700"
+        d:DesignHeight="720"
+        MaxWidth="550"
+        MaxHeight="720"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <fixedExpenseEditor:FixedExpenseEditorViewModel />
+    </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" />
+    </Window.KeyBindings>
+    <Border>
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="{Binding WindowTitle}" TitleBarPressed="InputElement_OnPointerPressed"
+                                         CloseClick="CustomTitleBar_OnCloseClick" />
+            <Border Classes="form-fields-area" Height="640" Padding="0">
+                <Grid RowDefinitions="70, 70, 5, 100, 5, 70, 70, 1, 140, 50, 50">
+                    <Grid Grid.Row="0" Margin="0" Grid.ColumnDefinitions="*">
+                        <StackPanel Grid.Column="0" Margin="5">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Name}" />
+                                <AutoCompleteBox x:Name="AutoCompleteTransactionNameBox"
+                                                 Text="{Binding Name, Mode=TwoWay}"
+                                                 SelectedItem="{Binding TransactionTermResult, Mode=TwoWay}">
+                                    <AutoCompleteBox.ItemTemplate>
+                                        <DataTemplate DataType="transactionTerms:TransactionTermResult">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                                                <TextBlock Text="{Binding CategoryName}" FontStyle="Italic" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </AutoCompleteBox.ItemTemplate>
+                                </AutoCompleteBox>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Grid.Row="1" Margin="0" ColumnDefinitions="2*, *">
+                        <StackPanel Grid.Column="0" Margin="5">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Category}" />
+                                <ComboBox ItemsSource="{Binding AvailableCategories}"
+                                          SelectedItem="{Binding Category}"
+                                          HorizontalAlignment="Stretch"
+                                          IsTextSearchEnabled="True"
+                                          Height="34">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock
+                                                    FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
+                                                    Text="{Binding Unicode}"
+                                                    Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}">
+                                                </TextBlock>
+                                                <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}">
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                    <Separator Grid.Row="2" Height="1" Margin="0 ,10,0 ,0"></Separator>
+                    <Grid Grid.Row="3" Margin="0" Grid.ColumnDefinitions="*, *, *">
+                        <StackPanel Grid.Column="0" Margin="5">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_CurrencyDefinition}" />
+                                <RadioButton GroupName="CurrencyDefinition" Content="{x:Static lang:language.ManageFixedExpenses_CurrencyDefinition_AttachedToDefaultAccount}"
+                                             IsChecked="{Binding IsAttachedToDefaultAccount}"></RadioButton>
+                                <RadioButton GroupName="CurrencyDefinition" Content="{x:Static lang:language.ManageFixedExpenses_CurrencyDefinition_AttachedToCurrency}"
+                                             IsChecked="{Binding IsAttachedToCurrency}"></RadioButton>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="5" IsVisible="{Binding !IsDefaultAccountSelectorVisible}">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Currency}" />
+                                <ComboBox ItemsSource="{Binding AvailableCurrencies}"
+                                          SelectedItem="{Binding Currency}"
+                                          HorizontalAlignment="Stretch"
+                                          IsTextSearchEnabled="True"
+                                          Height="34">
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="5" IsVisible="{Binding IsDefaultAccountSelectorVisible}">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_DefaultAccount}" />
+                                <ComboBox ItemsSource="{Binding AvailableAccounts}"
+                                          SelectedItem="{Binding DefaultAccount}"
+                                          HorizontalAlignment="Stretch"
+                                          IsTextSearchEnabled="True"
+                                          Height="34">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock
+                                                    FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
+                                                    Text="{Binding Unicode}"
+                                                    Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}">
+                                                </TextBlock>
+                                                <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}">
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                    <Separator Grid.Row="4" Height="1" Margin="0 ,10,0 ,0"></Separator>
+                    <Grid Grid.Row="5" Margin="0" Grid.ColumnDefinitions="*, *">
+                        <StackPanel Grid.Column="0" Margin="5">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_PeriodRange}" />
+                                <ComboBox ItemsSource="{Binding AvailablePeriods}"
+                                          SelectedValue="{Binding Period}"
+                                          DisplayMemberBinding="{Binding Text}"
+                                          SelectedValueBinding="{Binding Value}"
+                                          HorizontalAlignment="Stretch"
+                                          IsTextSearchEnabled="True"
+                                          Height="34">
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="5" IsVisible="{Binding DisplayDaySelector}">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Day}" />
+                                <NumericUpDown Increment="1" Minimum="1" Maximum="31" Value="{Binding Day}"
+                                               HorizontalContentAlignment="Stretch">
+                                </NumericUpDown>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="5" IsVisible="{Binding !DisplayDaySelector}">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_DayOfWeek}" />
+                                <ComboBox ItemsSource="{Binding AvailableDaysOfWeek}"
+                                          SelectedValue="{Binding AdaptedDay}"
+                                          DisplayMemberBinding="{Binding Text}"
+                                          SelectedValueBinding="{Binding Value}"
+                                          HorizontalAlignment="Stretch"
+                                          IsTextSearchEnabled="True"
+                                          Height="34">
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Grid.Row="6" Grid.ColumnDefinitions="*">
+                        <StackPanel Grid.Column="0" Margin="5">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_StartPeriod}" />
+                                <DatePicker HorizontalAlignment="Left"
+                                            DayFormat="ddd dd"
+                                            MonthFormat="MMMM"
+                                            YearFormat="yyy"
+                                            Height="34"
+                                            SelectedDate="{Binding PeriodStart}">
+                                </DatePicker>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                    <Separator Grid.Row="7" Height="1" Margin="0 ,10,0 ,0"></Separator>
+                    <Grid Grid.Row="8" Margin="0" Grid.ColumnDefinitions="*, 2*">
+                        <StackPanel Grid.Column="0" Margin="5">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_AmountDefinition}" />
+                                <RadioButton GroupName="AmountDefinition" Content="{x:Static lang:language.ManageFixedExpenses_AmountDefinition_Fixed}"
+                                             IsChecked="{Binding IsFixedAmount}"></RadioButton>
+                                <RadioButton GroupName="AmountDefinition" Content="{x:Static lang:language.ManageFixedExpenses_AmountDefinition_Variable}"
+                                             IsChecked="{Binding IsVariableAmount}"></RadioButton>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="5" IsVisible="{Binding IsFixedSelectorVisible}">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Amount_Fixed}" />
+                                <userControls:FiatInput
+                                    FiatValue="{Binding FixedAmount, Mode=TwoWay}"
+                                    Width="200"
+                                    HorizontalAlignment="Left">
+                                </userControls:FiatInput>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="5" IsVisible="{Binding !IsFixedSelectorVisible}">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Amount_From}" />
+                                <userControls:FiatInput
+                                    FiatValue="{Binding RangedAmountMin, Mode=TwoWay}"
+                                    Width="200"
+                                    HorizontalAlignment="Left">
+                                </userControls:FiatInput>
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Amount_To}" />
+                                <userControls:FiatInput
+                                    FiatValue="{Binding RangedAmountMax, Mode=TwoWay}"
+                                    Width="200"
+                                    HorizontalAlignment="Left">
+                                </userControls:FiatInput>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                    <StackPanel Grid.Row="9" Height="80">
+                        <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_AmountDefinition_Hint}"
+                                   FontSize="12"
+                                   Padding="10"
+                                   TextWrapping="Wrap"
+                                   Height="80">
+                        </TextBlock>
+                    </StackPanel>
+                    <StackPanel Grid.Row="10" Height="50">
+                        <CheckBox Margin="10, 0,0, 0" Content="{x:Static lang:language.ManageFixedExpenses_Enabled}"
+                                  IsChecked="{Binding Enabled}">
+                        </CheckBox>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            <!-- Buttons -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10"
+                        Margin="0, 0, 0, 0">
+                <Button Width="100" Content="{x:Static lang:language.OkButton}"
+                        HorizontalContentAlignment="Center"
+                        Command="{Binding OkCommand}">
+                </Button>
+                <Button Width="100" Content="{x:Static lang:language.CancelButton}"
+                        HorizontalContentAlignment="Center"
+                        Command="{Binding CancelCommand}">
+                </Button>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

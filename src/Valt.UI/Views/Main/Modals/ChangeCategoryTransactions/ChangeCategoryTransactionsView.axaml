@@ -1,0 +1,51 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:transactionTerms="clr-namespace:Valt.Infra.TransactionTerms;assembly=Valt.Infra"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        xmlns:changeCategoryTransactions="clr-namespace:Valt.UI.Views.Main.Modals.ChangeCategoryTransactions"
+        mc:Ignorable="d" d:DesignWidth="350" d:DesignHeight="180"
+        MaxWidth="350"
+        MaxHeight="180"
+        x:Class="Valt.UI.Views.Main.Modals.ChangeCategoryTransactions.ChangeCategoryTransactionsView"
+        x:DataType="changeCategoryTransactions:ChangeCategoryTransactionsViewModel"
+        Title="{x:Static local:language.ChangeCategoryTransactionTitle}"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CancelCommand}" />
+    </Window.KeyBindings>
+    <Border>
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="{x:Static local:language.ChangeCategoryTransactionTitle}" TitleBarPressed="InputElement_OnPointerPressed"
+                                         CloseClick="CustomTitleBar_OnCloseClick" />
+            <Border Classes="form-fields-area" Height="95">
+                <StackPanel Classes="form-field">
+                    <TextBlock Text="{x:Static local:language.ChangeCategoryTransactionTitle}">
+                    </TextBlock>
+                    <AutoCompleteBox x:Name="NameBox"
+                             Margin="0, 10, 0, 0"
+                             Text="{Binding Name, Mode=TwoWay}">
+                        <AutoCompleteBox.ItemTemplate>
+                            <DataTemplate DataType="transactionTerms:TransactionTermResult">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Name}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </AutoCompleteBox.ItemTemplate>
+                    </AutoCompleteBox>
+                </StackPanel>
+            </Border>
+            <!-- Buttons -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10"
+                        Margin="0, 0, 0, 0">
+                <Button Width="100" Content="{x:Static local:language.OkButton}" HorizontalContentAlignment="Center" Command="{Binding OkCommand}" IsDefault="True"></Button>
+                <Button Width="100" Content="{x:Static local:language.CancelButton}" HorizontalContentAlignment="Center" Command="{Binding CancelCommand}" IsCancel="True"></Button>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

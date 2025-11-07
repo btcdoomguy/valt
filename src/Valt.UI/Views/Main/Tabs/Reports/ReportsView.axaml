@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avalonia1="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
+             xmlns:reports1="clr-namespace:Valt.UI.Views.Main.Tabs.Reports"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="Valt.UI.Views.Main.Tabs.Reports.ReportsView"
+             x:DataType="reports1:ReportsViewModel">
+    <Design.DataContext>
+        <reports1:ReportsViewModel/>
+    </Design.DataContext>
+    
+    <avalonia1:CartesianChart
+        Series="{Binding Series}"
+        XAxes="{Binding XAxes}"
+        YAxes="{Binding YAxes}"
+        TooltipPosition="Top"  
+        LegendPosition="Right" 
+        ZoomMode="X" />        
+</UserControl>

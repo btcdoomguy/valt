@@ -1,0 +1,111 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls1="clr-namespace:Valt.UI.UserControls"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        xmlns:main1="clr-namespace:Valt.UI.Views.Main"
+        xmlns:controls="clr-namespace:Valt.UI.Views.Main.Controls"
+        mc:Ignorable="d"
+        d:DesignWidth="1024" d:DesignHeight="818"
+        MinWidth="1024" MinHeight="818"
+        WindowStartupLocation="CenterOwner"
+        x:Class="Valt.UI.Views.Main.MainView"
+        x:DataType="main1:MainViewModel"
+        Icon="/Assets/valt-icon-1.png"
+        Closing="Window_OnClosing"
+        Title="VALT"
+        SystemDecorations="BorderOnly"
+        CanResize="True"
+        TransparencyLevelHint="None"
+        ExtendClientAreaTitleBarHeightHint="30"
+        ExtendClientAreaToDecorationsHint="True">
+    <Design.DataContext>
+        <main1:MainViewModel />
+    </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="F2" Command="{Binding AddTransactionCommand}" />
+    </Window.KeyBindings>
+    <Grid RowDefinitions="30, 90, *, 30">
+        <userControls1:CustomTitleBar x:Name="CustomTitleBar" Grid.Row="0" Title="VALT"
+                                      TitleBarPressed="Window_OnPointerPressed"
+                                      CloseVisible="False" />
+        <StackPanel Grid.Row="0" x:Name="AlternateTitleBar" Background="{DynamicResource Background900Color}"
+                    IsVisible="False">
+        </StackPanel>
+        <Border Grid.Row="1" Padding="30, 0, 10, 0">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0%, 0%" EndPoint="0%, 100%">
+                    <GradientStop Offset="0" Color="{DynamicResource Background900Color}"></GradientStop>
+                    <GradientStop Offset="1" Color="{DynamicResource Background800Color}"></GradientStop>
+                </LinearGradientBrush>
+            </Border.Background>
+            <Grid ColumnDefinitions="*, 250">
+                <!--Top bar buttons-->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Height="50" Spacing="15">
+                    <Button IsVisible="False" Classes="tab" Classes.selected="{Binding IsTransactionButtonSelected}"
+                            Command="{Binding SetTransactionsTabCommand}"
+                            Margin="5,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Label Classes="icon" Content="&#xE0EE;"></Label>
+                            <Label Content="{x:Static local:language.Main_Transactions}" />
+                        </StackPanel>
+                    </Button>
+                    <Button IsVisible="False" Classes="tab" Classes.selected="{Binding IsReportButtonSelected}"
+                            Command="{Binding SetReportsTabCommand}"
+                            Margin="5,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Label Classes="icon" Content="&#xE26B;"></Label>
+                            <Label Content="{x:Static local:language.Main_Reports}" />
+                        </StackPanel>
+                    </Button>
+                    <DropDownButton Classes="icon" Content="&#xe8b8;">
+                        <DropDownButton.Flyout>
+                            <MenuFlyout>
+                                <MenuItem Header="{x:Static local:language.Main_Menu_Categories}"
+                                          Command="{Binding ManageCategoriesCommand}">
+                                </MenuItem>
+                                <MenuItem Header="{x:Static local:language.Main_Menu_Settings}"
+                                          Command="{Binding ManageSettingsCommand}">
+                                </MenuItem>
+                            </MenuFlyout>
+                        </DropDownButton.Flyout>
+                    </DropDownButton>
+                </StackPanel>
+                <!--Top bar prices-->
+                <controls:LiveRates Margin="0, 10, 0, 0" x:Name="LiveRatesControl"
+                                    DataContext="{Binding LiveRatesViewModel}" Grid.Column="1" />
+            </Grid>
+        </Border>
+        <!-- Top Bar -->
+
+        <Label Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+               HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Content="{Binding LoadingMessage}"
+               IsVisible="{Binding IsLoading}" />
+
+        <ContentControl x:Name="MainContentControl"
+                        Grid.Row="2"
+                        IsVisible="{Binding !IsLoading}"
+                        Content="{Binding SelectedTabComponent}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch" />
+
+        <!-- Footer Bar -->
+        <Border Grid.Row="3" BorderThickness="0, 1, 0, 0"
+                BorderBrush="{DynamicResource Background700Brush}">
+            <Grid
+                Classes="footer"
+                ColumnDefinitions="*, 200">
+                <StackPanel Grid.Column="0"></StackPanel>
+                <TextBlock Grid.Column="1"
+                           FontSize="12"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Margin="0, 0, 5, 0">
+                    <HyperlinkButton Foreground="{DynamicResource Text300Brush}"
+                                     Command="{Binding OpenStatusDisplayCommand}" Content="{Binding StatusDisplay}" />
+                </TextBlock>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

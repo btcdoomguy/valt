@@ -1,0 +1,111 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:lang="clr-namespace:Valt.UI.Lang"
+        xmlns:manageCategories1="clr-namespace:Valt.UI.Views.Main.Modals.ManageCategories"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Views.Main.Modals.ManageCategories.ManageCategoriesView"
+        Title="{x:Static lang:language.ManageCategories_Title}"
+        x:DataType="manageCategories1:ManageCategoriesViewModel"
+        WindowStartupLocation="CenterOwner"
+        d:DesignWidth="650"
+        d:DesignHeight="500"
+        MaxWidth="650"
+        MaxHeight="500"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <manageCategories1:ManageCategoriesViewModel />
+    </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" />
+    </Window.KeyBindings>
+    <Border>
+        <Grid RowDefinitions="Auto, *">
+            <userControls:CustomTitleBar Grid.Row="0" Title="{x:Static lang:language.ManageCategories_Title}"
+                                         TitleBarPressed="InputElement_OnPointerPressed"
+                                         CloseClick="CustomTitleBar_OnCloseClick" />
+            <Grid Grid.Row="1" ColumnDefinitions="250, *">
+                <Border Grid.Column="0"
+                        Padding="5">
+                    <TreeView x:Name="Tree" ItemsSource="{Binding NewCategories}"
+                              SelectedItem="{Binding SelectedCategory}"
+                              SelectionMode="Single"
+                              DragDrop.AllowDrop="True">
+                        <TreeView.ItemTemplate>
+                            <TreeDataTemplate ItemsSource="{Binding SubNodes}">
+                                <StackPanel Orientation="Horizontal" Height="20">
+                                    <TextBlock
+                                        Padding="0, 0, 4, 4"
+                                        FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
+                                        Text="{Binding Unicode}"
+                                        Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}">
+                                    </TextBlock>
+                                    <TextBlock Padding="0, 4, 0, 0" Text="{Binding Name}">
+                                    </TextBlock>
+                                </StackPanel>
+                            </TreeDataTemplate>
+                        </TreeView.ItemTemplate>
+                        <TreeView.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="{x:Static lang:language.ManageCategories_RemoveFromGroup}"
+                                          Command="{Binding RemoveFromGroupCommand}">
+                                </MenuItem>
+                            </ContextMenu>
+                        </TreeView.ContextMenu>
+                    </TreeView>
+                </Border>
+
+                <Border Grid.Column="0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        Padding="10"
+                        Margin="0,0,10,10">
+                    <Button Classes="rounded" Content="&#xE145;" Command="{Binding AddNewCommand}">
+                    </Button>
+                </Border>
+                <StackPanel Grid.Column="1">
+                    <Border Classes="form-fields-area">
+                        <StackPanel>
+                            <!-- Name Field -->
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.ManageCategories_Name}" />
+                                <TextBox Text="{Binding Name}" Width="300" HorizontalAlignment="Left"
+                                         VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <!-- Icon Field -->
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.ManageCategories_Icon}" />
+                                <Button Classes="icon-selector-button"
+                                        Foreground="{Binding IconUiWrapper.BrushColor}"
+                                        Content="{Binding IconUiWrapper.Unicode}"
+                                        Command="{Binding IconSelectorOpenCommand}">
+                                </Button>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button Content="{Binding SaveCaption}" Command="{Binding SaveChangesCommand}"
+                                        HorizontalContentAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        Margin="0 ,0,10,0" />
+                                <Button Content="{x:Static lang:language.ManageCategories_Delete}"
+                                        Classes="delete-button"
+                                        Command="{Binding DeleteCommand}"
+                                        IsVisible="{Binding ShowDeleteButton}"
+                                        HorizontalContentAlignment="Center"
+                                        HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Classes="form-fields-area" Height="80">
+                        <TextBlock FontStyle="Italic" Text="{x:Static lang:language.ManageCategories_Tip}" TextWrapping="Wrap" />
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

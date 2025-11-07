@@ -1,0 +1,81 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="clr-namespace:Valt.UI.Converters">
+
+    <converters:SystemDrawingColorToBrushConverter x:Key="SystemDrawingColorToBrushConverter" />
+    <converters:CanExecuteToVisibilityConverter x:Key="CanExecuteToVisibilityConverter" />
+
+    <FontFamily x:Key="Akko">/Assets/Fonts/AkkoPro-Regular.ttf#Akko Pro</FontFamily>
+    <FontFamily x:Key="Phosphor">/Assets/Fonts/Phosphor.ttf#Phosphor</FontFamily>
+    <FontFamily x:Key="Phosphor-Fill">/Assets/Fonts/Phosphor-Fill.ttf#Phosphor-Fill</FontFamily>
+    <FontFamily x:Key="MaterialDesign">/Assets/Fonts/MaterialSymbolsOutlined.ttf#Material Symbols Outlined Thin</FontFamily>
+
+    <Color x:Key="CreditBaseColor">#78DB55</Color>
+    <Color x:Key="DebtBaseColor">#FF7D7D</Color>
+    <Color x:Key="TransferBaseColor">#FFF866</Color>
+    <SolidColorBrush x:Key="CreditBaseBrush" Color="{DynamicResource CreditBaseColor}" />
+    <SolidColorBrush x:Key="DebtBaseBrush" Color="{DynamicResource DebtBaseColor}" />
+    <SolidColorBrush x:Key="TransferBaseBrush" Color="{DynamicResource TransferBaseColor}" />
+    <!--Transaction grid colors-->
+    <SolidColorBrush x:Key="TransactionAmountCredit" Color="{DynamicResource CreditBaseColor}" />
+    <SolidColorBrush x:Key="TransactionAmountDebt" Color="{DynamicResource DebtBaseColor}" />
+    <SolidColorBrush x:Key="TransactionAmountTransfer" Color="{DynamicResource TransferBaseColor}" />
+    <SolidColorBrush x:Key="RegularColor" Color="{DynamicResource Text100Color}" />
+    <SolidColorBrush x:Key="FutureColor" Color="{DynamicResource Text400Color}" />
+
+    <!--Lines on list-->
+    <SolidColorBrush x:Key="LineUnselected" Color="{DynamicResource Secondary900Color}"></SolidColorBrush>
+    <!--<SolidColorBrush x:Key="LineSelected" Color="{DynamicResource Secondary800Color}"></SolidColorBrush>-->
+    <LinearGradientBrush x:Key="LineSelected" StartPoint="0%, 0%" EndPoint="100%, 0%">
+        <GradientStop Offset="0" Color="{DynamicResource Secondary800Color}"></GradientStop>
+        <GradientStop Offset="1" Color="{DynamicResource Secondary600Color}"></GradientStop>
+    </LinearGradientBrush>
+
+    <!--Top Bar-->
+    <LinearGradientBrush x:Key="TopBarBackgroundGradient" StartPoint="0%, 0%" EndPoint="0%, 100%">
+        <GradientStop Offset="0" Color="{DynamicResource Background900Color}"></GradientStop>
+        <GradientStop Offset="1" Color="{DynamicResource Background800Color}"></GradientStop>
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="ModalTopBarBackground">#444444</SolidColorBrush>
+    <SolidColorBrush x:Key="TopBarButtonBackground">#5B3800</SolidColorBrush>
+    <SolidColorBrush x:Key="TopBarButtonBackgroundHover">#7A5500</SolidColorBrush>
+    <SolidColorBrush x:Key="TopBarButtonBackgroundSelected">#FF9E00</SolidColorBrush>
+    <SolidColorBrush x:Key="TopBarButtonForeground">Orange</SolidColorBrush>
+    <SolidColorBrush x:Key="TopBarButtonForegroundHover">#FFF</SolidColorBrush>
+    
+    <!--Footer-->
+    <LinearGradientBrush x:Key="FooterBackgroundBrush" StartPoint="0%, 0%" EndPoint="0%, 100%">
+        <GradientStop Offset="0" Color="Black"></GradientStop>
+        <GradientStop Offset="1" Color="{DynamicResource Background900Color}"></GradientStop>
+    </LinearGradientBrush>
+
+    <!--Defaults-->
+    <SolidColorBrush x:Key="IconSelectorDefaultColor">#FFF</SolidColorBrush>
+
+    <!--Debt gradient-->
+    <SolidColorBrush x:Key="DebtBar" Color="{DynamicResource DebtBaseColor}"></SolidColorBrush>
+    <LinearGradientBrush x:Key="DebtGradient" StartPoint="100%, 30%" EndPoint="100%, 0%" Opacity="0.5">
+        <GradientStop Offset="0" Color="{DynamicResource Background900Color}"></GradientStop>
+        <GradientStop Offset="1" Color="{DynamicResource SemanticNegative700Color}"></GradientStop>
+    </LinearGradientBrush>
+
+    <!--Credit gradient-->
+    <SolidColorBrush x:Key="CreditBar" Color="{DynamicResource CreditBaseColor}"></SolidColorBrush>
+    <LinearGradientBrush x:Key="CreditGradient" StartPoint="100%, 30%" EndPoint="100%, 0%" Opacity="0.5">
+        <GradientStop Offset="0" Color="{DynamicResource Background900Color}"></GradientStop>
+        <GradientStop Offset="1" Color="{DynamicResource SemanticPositive700Color}"></GradientStop>
+    </LinearGradientBrush>
+
+    <!--Transfer gradient-->
+    <SolidColorBrush x:Key="TransferBar" Color="{DynamicResource TransferBaseColor}"></SolidColorBrush>
+    <LinearGradientBrush x:Key="TransferGradient" StartPoint="100%, 30%" EndPoint="100%, 0%" Opacity="0.5">
+        <GradientStop Offset="0" Color="{DynamicResource Background900Color}"></GradientStop>
+        <GradientStop Offset="1" Color="{DynamicResource SemanticWarning700Color}"></GradientStop>
+    </LinearGradientBrush>
+    
+    <ControlTheme x:Key="DataGridCellTextBlockTheme" TargetType="TextBlock">
+        <Setter Property="Margin" Value="8,8,4,0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </ControlTheme>
+
+</ResourceDictionary>

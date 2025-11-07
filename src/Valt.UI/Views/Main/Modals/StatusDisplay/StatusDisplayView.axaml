@@ -1,0 +1,43 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:backgroundJobs="clr-namespace:Valt.Infra.BackgroundJobs;assembly=Valt.Infra"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        xmlns:statusDisplay="clr-namespace:Valt.UI.Views.Main.Modals.StatusDisplay"
+        xmlns:backgroundJobs1="clr-namespace:Valt.Infra.Kernel.BackgroundJobs;assembly=Valt.Infra"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Views.Main.Modals.StatusDisplay.StatusDisplayView"
+        Title="{x:Static local:language.StatusDisplay_Title}"
+        d:DesignWidth="450"
+        d:DesignHeight="255"
+        MaxWidth="450"
+        MaxHeight="255"
+        x:DataType="statusDisplay:StatusDisplayViewModel"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <statusDisplay:StatusDisplayViewModel />
+    </Design.DataContext>
+    <Border>
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="{x:Static local:language.StatusDisplay_Title}" TitleBarPressed="InputElement_OnPointerPressed"
+                                         CloseClick="CustomTitleBar_OnCloseClick" />
+            <Border Classes="form-fields-area" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="214">
+                <ListBox ItemsSource="{Binding Jobs}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="backgroundJobs1:JobInfo">
+                            <Grid ColumnDefinitions="5*, 3*">
+                                <TextBlock Grid.Column="0" Text="{Binding Job.Name}" HorizontalAlignment="Right" Margin="0, 0, 10, 0" />
+                                <TextBlock Grid.Column="1" Text="{Binding State}" Margin="10, 0, 0, 0" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+        </StackPanel>
+    </Border>
+</Window>

@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Valt.Core", "src\Valt.Core\Valt.Core.csproj", "{3851D26C-649E-40EC-80FE-D4363ABBAF6F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Valt.Tests", "tests\Valt.Tests\Valt.Tests.csproj", "{07DAC981-C65D-4938-BFFA-7A5310456340}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Valt.Infra", "src\Valt.Infra\Valt.Infra.csproj", "{CB5F7089-6576-47FA-9D2A-AD9E1101E84A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1-Core", "1-Core", "{17B065BD-64E5-4DA2-938F-BCC3FC41A6A7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2-Infrastructure", "2-Infrastructure", "{2A9A6EA8-6053-480D-81CA-377F9846EF6A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3-UI", "3-UI", "{D572203D-9CA8-4EC1-9DC7-CFCD32129298}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Valt.UI", "src\Valt.UI\Valt.UI.csproj", "{3ED5579C-5BA3-4AC0-BCD1-A890D08924C5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3851D26C-649E-40EC-80FE-D4363ABBAF6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3851D26C-649E-40EC-80FE-D4363ABBAF6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3851D26C-649E-40EC-80FE-D4363ABBAF6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3851D26C-649E-40EC-80FE-D4363ABBAF6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07DAC981-C65D-4938-BFFA-7A5310456340}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07DAC981-C65D-4938-BFFA-7A5310456340}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07DAC981-C65D-4938-BFFA-7A5310456340}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07DAC981-C65D-4938-BFFA-7A5310456340}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB5F7089-6576-47FA-9D2A-AD9E1101E84A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB5F7089-6576-47FA-9D2A-AD9E1101E84A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB5F7089-6576-47FA-9D2A-AD9E1101E84A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB5F7089-6576-47FA-9D2A-AD9E1101E84A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3ED5579C-5BA3-4AC0-BCD1-A890D08924C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3ED5579C-5BA3-4AC0-BCD1-A890D08924C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3ED5579C-5BA3-4AC0-BCD1-A890D08924C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3ED5579C-5BA3-4AC0-BCD1-A890D08924C5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3851D26C-649E-40EC-80FE-D4363ABBAF6F} = {17B065BD-64E5-4DA2-938F-BCC3FC41A6A7}
+		{CB5F7089-6576-47FA-9D2A-AD9E1101E84A} = {2A9A6EA8-6053-480D-81CA-377F9846EF6A}
+		{3ED5579C-5BA3-4AC0-BCD1-A890D08924C5} = {D572203D-9CA8-4EC1-9DC7-CFCD32129298}
+	EndGlobalSection
+EndGlobal

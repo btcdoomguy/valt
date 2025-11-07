@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="src/Valt.UI/App.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Resources/Colors.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Generic/AlertMessage/AlertMessageView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Controls/LiveRates.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/MainView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/MainWindow.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Modals/ChangeCategoryTransactions/ChangeCategoryTransactionsView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Modals/CreateDatabase/CreateDatabaseView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Modals/IconSelector/IconSelectorView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Modals/InitialSelection/InitialSelectionView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Modals/InitialSelection/InitialSelectionWindow.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Modals/InputPassword/InputPasswordView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Modals/InputPassword/InputPasswordWindow.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Modals/ManageAccount/ManageAccountView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Modals/ManageCategories/ManageCategoriesView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Modals/ManageCategories/ManageCategoriesWindow.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Modals/ManageTransactions/ManageTransactionsView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Modals/MathExpression/MathExpression.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Modals/MathExpression/MathExpressionView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Modals/Settings/SettingsView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Modals/Settings/SettingsWindow.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Modals/StatusDisplay/StatusDisplayView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Tabs/Overview/OverviewView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Tabs/Reports/ReportsView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Tabs/Transactions/Accounts/AccountView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Tabs/Transactions/Accounts/AccountsView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Tabs/Transactions/Controls/LiveRates.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Tabs/Transactions/TransactionList.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Tabs/Transactions/TransactionsView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Screens/Main/Views/MainWindow.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Styles/ColorResources.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Styles/CustomResources.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Styles/DefaultStyles.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Themes/DeveloperTheme.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/UserControls/BtcInput.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/UserControls/CustomTitleBar.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/UserControls/DateCalendarSelector.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/UserControls/FiatInput.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/UserControls/IconSelector.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/Controls/LiveRates.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/MainView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/Modals/Boot/BootView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/Modals/ChangeCategoryTransactions/ChangeCategoryTransactionsView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/Modals/ChangePassword/ChangePasswordView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/Modals/CreateDatabase/CreateDatabaseView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/Modals/FixedExpenseEditor/FixedExpenseEditorView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/Modals/IconSelector/IconSelectorView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/Modals/InitialSelection/InitialSelectionView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/Modals/InputPassword/InputPasswordView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/Modals/ManageAccount/ManageAccountView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/Modals/ManageCategories/ManageCategoriesView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/Modals/ManageFixedExpenses/ManageFixedExpensesView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/Modals/ManageTransactions/ManageTransactionsView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/Modals/Settings/SettingsView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/Modals/StatusDisplay/StatusDisplayView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/Modals/TransactionEditor/TransactionEditorView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/Tabs/Reports/ReportsView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/Tabs/Transactions/TransactionListView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/Tabs/Transactions/TransactionsView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/MainWindow.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Windows/MainWindow.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+      </map>
+    </option>
+  </component>
+</project>

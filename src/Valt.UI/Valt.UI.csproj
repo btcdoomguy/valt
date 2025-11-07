@@ -1,0 +1,85 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <LangVersion>13</LangVersion>
+        <ApplicationIcon>valt-icon-1.ico</ApplicationIcon>
+        <Authors>DoomLabs</Authors>
+        <Product>Valt</Product>
+        <AssemblyName>Valt</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaResource Remove="Themes\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.3.7" />
+        <PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.3.7" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.7" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.7" />
+        <PackageReference Include="Avalonia.Svg.Skia" Version="11.3.0" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.7" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.7" />
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.7" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+        <PackageReference Include="CsvHelper" Version="33.1.0" />
+        <PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-rc6" />
+        <PackageReference Include="MessageBox.Avalonia" Version="3.2.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.10" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.116.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Valt.Infra\Valt.Infra.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <AdditionalFiles Include="Views\Main\Controls\LiveRates.axaml" />
+      <AdditionalFiles Remove="Themes\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Lang\language.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+        <LastGenOutput>language.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Lang\language.pt-BR.resx">
+      </EmbeddedResource>
+      <EmbeddedResource Update="Lang\Language.resx">
+        <LastGenOutput>Language.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Lang\language.resx">
+        <LastGenOutput>language.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Remove="Themes\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Lang\language.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>language.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Lang\language.pt-BR.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>language.pt-BR.resx</DependentUpon>
+      </Compile>
+      <Compile Remove="Themes\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AvaloniaXaml Remove="Themes\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Themes\**" />
+    </ItemGroup>
+</Project>

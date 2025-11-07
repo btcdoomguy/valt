@@ -1,0 +1,97 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        xmlns:manageAccount1="clr-namespace:Valt.UI.Views.Main.Modals.ManageAccount"
+        mc:Ignorable="d"
+        d:DesignWidth="500"
+        d:DesignHeight="510"
+        MaxWidth="500"
+        MaxHeight="510"
+        x:Class="Valt.UI.Views.Main.Modals.ManageAccount.ManageAccountView"
+        x:DataType="manageAccount1:ManageAccountViewModel"
+        Title="{x:Static local:language.ManageAccount_Title}"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <manageAccount1:ManageAccountViewModel />
+    </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" />
+    </Window.KeyBindings>
+    <Border>
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="{x:Static local:language.ManageAccount_Title}" 
+                                         TitleBarPressed="InputElement_OnPointerPressed"
+                                         CloseClick="CustomTitleBar_OnCloseClick" />
+            <Border Classes="form-fields-area" Height="430">
+                <StackPanel>
+                    <!-- Name Field -->
+                    <StackPanel Classes="form-field">
+                        <TextBlock Text="{x:Static local:language.ManageAccount_Name}"
+                                   Margin="0, 8, 0, 0" />
+                        <TextBox Text="{Binding Name}" />
+                    </StackPanel>
+
+                    <!-- Icon Field -->
+                    <StackPanel Classes="form-field">
+                        <TextBlock Text="{x:Static local:language.ManageAccount_Icon}"
+                                   Margin="0, 8, 5, 0" />
+                        <Button Classes="icon-selector-button"
+                                Foreground="{Binding IconUiWrapper.BrushColor}"
+                                Content="{Binding IconUiWrapper.Unicode}"
+                                Command="{Binding IconSelectorOpenCommand}">
+                        </Button>
+                    </StackPanel>
+
+                    <!-- Visible Field -->
+                    <StackPanel Orientation="Horizontal" Classes="form-field">
+                        <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Visible}"
+                                  VerticalAlignment="Center" />
+                        <TextBlock Text="{x:Static local:language.ManageAccount_Visible}"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- Account Type Field -->
+                    <StackPanel Classes="form-field">
+                        <TextBlock Text="{x:Static local:language.ManageAccount_AccountType}" />
+                        <ComboBox ItemsSource="{Binding AvailableAccountTypes}"
+                                  IsEnabled="{Binding CanEditAccountStructure}"
+                                  SelectedItem="{Binding AccountType}" Width="200" />
+                    </StackPanel>
+
+                    <!-- Currency Field -->
+                    <StackPanel Classes="form-field" IsVisible="{Binding ShowCurrencySelector}">
+                        <TextBlock Text="{x:Static local:language.ManageAccount_Currency}" />
+                        <ComboBox ItemsSource="{Binding AvailableCurrencies}"
+                                  IsEnabled="{Binding CanEditAccountStructure}"
+                                  SelectedItem="{Binding Currency}" />
+                    </StackPanel>
+
+                    <!-- Initial Amount (Fiat) -->
+                    <StackPanel Classes="form-field" IsVisible="{Binding ShowCurrencySelector}">
+                        <TextBlock Text="{x:Static local:language.ManageAccount_InitialAmount}" />
+                        <userControls:FiatInput FiatValue="{Binding InitialFiatAmount, Mode=TwoWay}"
+                                                SymbolOnRight="{Binding SymbolOnRight}"
+                                                CurrencySymbol="{Binding Symbol}" />
+                    </StackPanel>
+
+                    <!-- Initial Amount (BTC) -->
+                    <StackPanel Classes="form-field" IsVisible="{Binding ShowBtcFields}">
+                        <TextBlock Text="{x:Static local:language.ManageAccount_InitialAmount}" />
+                        <userControls:BtcInput BtcValue="{Binding InitialBtcAmount, Mode=TwoWay}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10"
+                        Margin="0, 0, 0, 0">
+                <Button Width="100" Content="{x:Static local:language.OkButton}" HorizontalContentAlignment="Center" Command="{Binding OkCommand}"></Button>
+                <Button Width="100" Content="{x:Static local:language.CancelButton}" HorizontalContentAlignment="Center" Command="{Binding CancelCommand}"></Button>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>
