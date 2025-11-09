@@ -43,10 +43,9 @@
                                        Text="{x:Static local:language.CreateDatabase_FilePath}"
                                        TextWrapping="Wrap" />
                             <DockPanel VerticalAlignment="Center">
-                                <Button DockPanel.Dock="Right" Command="{Binding SaveDatabaseFileCommand}">
-                                    <Label Classes="icon" Content="&#xE2C8;" />
-                                </Button>
-                                <TextBox Text="{Binding Path}" />
+                                <Button DockPanel.Dock="Right" Classes="icon-only transparent" Content="&#xE2C8;"
+                                        Command="{Binding SaveDatabaseFileCommand}" />
+                                <TextBox VerticalAlignment="Center" Text="{Binding Path}" />
                             </DockPanel>
                         </DockPanel>
 

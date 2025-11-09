@@ -77,6 +77,9 @@ public static class Extensions
         services.AddSingleton<FrankfurterFiatRateProvider>();
         services.AddSingleton<IFiatPriceProvider, FrankfurterFiatRateProvider>(provider =>
             provider.GetRequiredService<FrankfurterFiatRateProvider>());
+        
+        //initial seed provider
+        services.AddSingleton<IBitcoinInitialSeedPriceProvider, BitcoinInitialSeedPriceProvider>();
 
         //historical crawlers
         services.AddSingleton<KrakenBitcoinHistoricalDataProvider>();

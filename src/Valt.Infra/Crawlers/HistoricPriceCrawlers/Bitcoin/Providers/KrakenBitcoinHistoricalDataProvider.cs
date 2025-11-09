@@ -17,7 +17,7 @@ public class KrakenBitcoinHistoricalDataProvider : IBitcoinHistoricalDataProvide
         _logger = logger;
     }
 
-    public async Task<IEnumerable<IBitcoinHistoricalDataProvider.BitcoinPriceData>> GetPricesAsync(DateOnly startDate,
+    public async Task<IEnumerable<BitcoinPriceData>> GetPricesAsync(DateOnly startDate,
         DateOnly endDate)
     {
         using var client = new HttpClient();
@@ -58,7 +58,7 @@ public class KrakenBitcoinHistoricalDataProvider : IBitcoinHistoricalDataProvide
                 .Select(KrakenBitcoinHistoricalDataProvider.ParseCandlestick)
                 .ToArray();
 
-            var allData = candlesticks.Select(candlestick => new IBitcoinHistoricalDataProvider.BitcoinPriceData(
+            var allData = candlesticks.Select(candlestick => new BitcoinPriceData(
                 DateOnly.FromDateTime(FromUnixTimestamp(candlestick.Timestamp)),
                 candlestick.ClosePrice));
 

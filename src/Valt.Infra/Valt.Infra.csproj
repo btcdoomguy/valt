@@ -21,14 +21,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="HistoricPriceCrawlers\initial-seed-price.csv"/>
-    </ItemGroup>
-
-    <ItemGroup>
       <Folder Include="Crawlers\" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Include="Crawlers\HistoricPriceCrawlers\initial-seed-price.csv" />
     </ItemGroup>
 </Project>

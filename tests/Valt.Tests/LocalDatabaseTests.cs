@@ -1,5 +1,8 @@
+using LiteDB;
+using Valt.Core.Common;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel.Time;
+using Valt.Infra.Modules.Budget.Categories;
 
 namespace Valt.Tests;
 
@@ -53,8 +56,15 @@ public class LocalDatabaseTests
         
         localDb.OpenDatabase(_dbFilePath, "123456");
         
+        localDb.GetCategories().Insert(new CategoryEntity()
+        {
+            Icon = Icon.Empty.Name,
+            Id = new ObjectId(),
+            Name = "a"
+        });
+        
         localDb.ChangeDatabasePassword("123456", "123457");
 
-        Assert.That(localDb.GetBitcoinData().Query().Count(), Is.GreaterThan(0));
+        Assert.That(localDb.GetCategories().Query().Count(), Is.GreaterThan(0));
     }
 }

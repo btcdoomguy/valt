@@ -6,6 +6,7 @@ using LiteDB;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Infra.DataAccess.LiteDBMappers;
 using Valt.Infra.Kernel;
+using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Modules.DataSources.Bitcoin;
 using Valt.Infra.Modules.DataSources.Fiat;
 
@@ -14,14 +15,16 @@ namespace Valt.Infra.DataAccess;
 internal sealed class PriceDatabase : IPriceDatabase
 {
     private readonly IClock _clock;
+    private readonly INotificationPublisher _publisher;
     private LiteDatabase? _database;
     private bool _inMemoryDb = true;
     private string? _filePath;
     public bool HasDatabaseOpen => _database != null;
 
-    public PriceDatabase(IClock clock)
+    public PriceDatabase(IClock clock, INotificationPublisher publisher)
     {
         _clock = clock;
+        _publisher = publisher;
     }
     
     public void OpenDatabase()
@@ -35,8 +38,6 @@ internal sealed class PriceDatabase : IPriceDatabase
         _database = new LiteDatabase(connectionString, CreateMapper());
         _filePath = filePath;
         _inMemoryDb = false;
-
-        StartDatabase();
 
         OnPropertyChanged(nameof(HasDatabaseOpen));
     }
@@ -62,51 +63,11 @@ internal sealed class PriceDatabase : IPriceDatabase
         OnPropertyChanged(nameof(HasDatabaseOpen));
     }
 
-    private void StartDatabase()
-    {
-        if (GetBitcoinData().Query().Count() == 0)
-        {
-            ApplyInitialSeedPrice();
-        }
-    }
-
     private BsonMapper CreateMapper()
     {
         var mapper = new BsonMapper();
         DateOnlyMapper.Register(mapper);
         return mapper;
-    }
-
-    private void ApplyInitialSeedPrice()
-    {
-        var assembly = Assembly.GetExecutingAssembly();
-        var dataResource = @"Valt.Infra.Crawlers.HistoricPriceCrawlers.initial-seed-price.csv";
-
-        var entities = new List<BitcoinDataEntity>();
-        using (var stream = assembly.GetManifestResourceStream(dataResource)!)
-        {
-            using var reader = new StreamReader(stream);
-
-            var nextLine = reader.ReadLine();
-            decimal lastValidPrice = 0;
-            while (nextLine is not null)
-            {
-                var split = nextLine.Split(',');
-
-                if (split[1] != "nan")
-                    lastValidPrice = decimal.Parse(split[1], CultureInfo.InvariantCulture);
-
-                entities.Add(new BitcoinDataEntity()
-                {
-                    Date = DateTime.Parse(split[0]),
-                    Price = lastValidPrice
-                });
-
-                nextLine = reader.ReadLine();
-            }
-        }
-
-        GetBitcoinData().InsertBulk(entities);
     }
 
     #region DataSource module

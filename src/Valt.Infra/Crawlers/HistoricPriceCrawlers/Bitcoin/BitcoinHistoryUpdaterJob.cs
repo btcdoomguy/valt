@@ -10,6 +10,7 @@ namespace Valt.Infra.Crawlers.HistoricPriceCrawlers.Bitcoin;
 internal class BitcoinHistoryUpdaterJob : IBackgroundJob
 {
     private readonly IBitcoinHistoricalDataProvider _provider;
+    private readonly IBitcoinInitialSeedPriceProvider _seedProvider;
     private readonly IPriceDatabase _priceDatabase;
     private readonly ILogger<BitcoinHistoryUpdaterJob> _logger;
 
@@ -20,10 +21,12 @@ internal class BitcoinHistoryUpdaterJob : IBackgroundJob
     public TimeSpan Interval => TimeSpan.FromSeconds(120);
 
     public BitcoinHistoryUpdaterJob(IBitcoinHistoricalDataProvider provider,
+        IBitcoinInitialSeedPriceProvider seedProvider,
         IPriceDatabase priceDatabase,
         ILogger<BitcoinHistoryUpdaterJob> logger)
     {
         _provider = provider;
+        _seedProvider = seedProvider;
         _priceDatabase = priceDatabase;
         _logger = logger;
     }
@@ -36,6 +39,17 @@ internal class BitcoinHistoryUpdaterJob : IBackgroundJob
     public async Task RunAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("[BitcoinHistoryUpdaterJob] Updating BTC history");
+        
+        if (_priceDatabase.GetBitcoinData().Query().Count() == 0)
+        {
+            _logger.LogInformation("[BitcoinHistoryUpdaterJob] Starting the prices db with the initial seed");
+            var prices = await _seedProvider.GetPricesAsync();
+            _priceDatabase.GetBitcoinData().InsertBulk(prices.Select(x => new BitcoinDataEntity()
+            {
+                Date = x.Date.ToValtDateTime(),
+                Price = x.Price
+            }));
+        }
 
         try
         {
