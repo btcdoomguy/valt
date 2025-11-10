@@ -1070,5 +1070,11 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("RemainingFixedExpenses.Title", resourceCulture);
             }
         }
+        
+        public static string Edit {
+            get {
+                return ResourceManager.GetString("Edit", resourceCulture);
+            }
+        }
     }
 }

@@ -536,4 +536,7 @@
     <data name="RemainingFixedExpenses.Title" xml:space="preserve">
         <value>Remaining:</value>
     </data>
+    <data name="Edit" xml:space="preserve">
+        <value>Edit</value>
+    </data>
 </root>

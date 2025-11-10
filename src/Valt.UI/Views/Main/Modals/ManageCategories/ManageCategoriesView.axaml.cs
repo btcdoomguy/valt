@@ -13,9 +13,8 @@ public partial class ManageCategoriesView : ValtBaseWindow
 {
     private CategoryTreeElement? _draggedItem;
     private CategoryTreeElement? _targetItem;
-    private bool _isPotentialDrag = false;
+    private bool _isPotentialDrag;
     private Point _initialPoint;
-    private TreeViewItem? _draggedTvi;
     private ScrollViewer? _scrollViewer;
     
     public ManageCategoriesView()
@@ -27,6 +26,7 @@ public partial class ManageCategoriesView : ValtBaseWindow
         Tree.AddHandler(PointerPressedEvent, TreeView_OnPointerPressed, RoutingStrategies.Bubble, handledEventsToo: true);
         Tree.AddHandler(PointerMovedEvent, TreeView_OnPointerMoved, RoutingStrategies.Bubble, true);
         Tree.AddHandler(PointerReleasedEvent, TreeView_OnPointerReleased, RoutingStrategies.Bubble, true);
+        Tree.AddHandler(PointerCaptureLostEvent, TreeView_OnPointerCaptureLost, RoutingStrategies.Bubble);
     }
 
     private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -60,18 +60,12 @@ public partial class ManageCategoriesView : ValtBaseWindow
 
         if (element is TreeViewItem tvi)
         {
-            _draggedTvi = tvi;
             _draggedItem = tvi.DataContext as CategoryTreeElement;
             if (_draggedItem != null && (_draggedItem.SubNodes is null || _draggedItem.SubNodes.Count == 0))
             {
                 _isPotentialDrag = true;
                 _initialPoint = point;
                 e.Pointer.Capture(treeView);
-                
-                var data = new DataObject();
-                data.Set("draggedItem", _draggedItem);
-                DragDrop.DoDragDrop(e, data, DragDropEffects.Move);
-                e.Handled = true;
             }
         }
     }
@@ -90,10 +84,7 @@ public partial class ManageCategoriesView : ValtBaseWindow
                 var data = new DataObject();
                 data.Set("draggedItem", _draggedItem);
                 DragDrop.DoDragDrop(e, data, DragDropEffects.Move);
-                // Reset state
-                _draggedTvi = null;
-                _draggedItem = null;
-                e.Pointer.Capture(null);
+                ResetDragState(e.Pointer);
             }
         }
     }
@@ -102,36 +93,51 @@ public partial class ManageCategoriesView : ValtBaseWindow
     {
         if (_isPotentialDrag)
         {
-            _isPotentialDrag = false;
-            _draggedTvi = null;
-            _draggedItem = null;
-            e.Pointer.Capture(null);
+            ResetDragState(e.Pointer);
         }
+    }
+    
+    private void TreeView_OnPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
+    {
+        if (_isPotentialDrag)
+        {
+            ResetDragState(e.Pointer);
+        }
+    }
+
+    private void ResetDragState(IPointer pointer)
+    {
+        _isPotentialDrag = false;
+        _draggedItem = null;
+        pointer.Capture(null);
     }
     
     private void TreeView_OnDrop(object? sender, DragEventArgs e)
     {
-        if (_draggedItem is null)
-            return;
-
         var data = e.Data.Get("draggedItem") as CategoryTreeElement;
-        if (data != _draggedItem)
+
+        if (data is null)
             return;
 
         var vm = DataContext as ManageCategoriesViewModel;
         if (vm is null)
             return;
-        
-        if (_targetItem is null || (_targetItem != null && _targetItem != _draggedItem && _targetItem.ParentId == null)) 
-            _ = vm.ChangeCategoryParent(_draggedItem.Id, _targetItem?.Id);
 
-        //reset for the next operation
-        _draggedItem = null; 
+        if (_targetItem is null || (_targetItem != null && _targetItem != data && _targetItem.ParentId == null))
+        {
+            _ = vm.ChangeCategoryParent(data.Id, _targetItem?.Id);
+        }
+
         _targetItem = null;
     }
 
     private void TreeView_OnDragOver(object? sender, DragEventArgs e)
     {
+        var data = e.Data.Get("draggedItem") as CategoryTreeElement;
+        
+        if (data is null)
+            return;
+        
         var treeView = sender as TreeView;
         var point = e.GetPosition(treeView!);
         var hitTestResult = treeView!.InputHitTest(point);
@@ -147,7 +153,7 @@ public partial class ManageCategoriesView : ValtBaseWindow
         {
             _targetItem = tvi.DataContext as CategoryTreeElement;
             //prevent dropping onto itself or in a child item
-            if (_targetItem != null && _targetItem != _draggedItem && _targetItem.ParentId == null) 
+            if (_targetItem != null && _targetItem != data && _targetItem.ParentId == null) 
             {
                 e.DragEffects = DragDropEffects.Move;
             }

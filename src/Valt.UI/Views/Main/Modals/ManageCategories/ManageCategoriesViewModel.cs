@@ -31,14 +31,25 @@ public partial class ManageCategoriesViewModel : ValtModalValidatorViewModel
 
     #region Form data
 
-    [ObservableProperty] private CategoryTreeElement? _selectedCategory;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsAdding))]
+    [NotifyPropertyChangedFor(nameof(IsViewing))]
+    [NotifyPropertyChangedFor(nameof(IsEditing))]
+    [NotifyPropertyChangedFor(nameof(EditFields))]
+    private CategoryTreeElement? _selectedCategory;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(SaveCaption))]
-    [NotifyPropertyChangedFor(nameof(ShowDeleteButton))]
+    [NotifyPropertyChangedFor(nameof(IsAdding))]
+    [NotifyPropertyChangedFor(nameof(IsViewing))]
+    [NotifyPropertyChangedFor(nameof(IsEditing))]
+    [NotifyPropertyChangedFor(nameof(EditFields))]
+    private bool _editMode;
+
+    [ObservableProperty]
     private string? _id;
 
-    [Required(ErrorMessage = "Name is required")] [ObservableProperty]
+    [ObservableProperty]
+    [Required(ErrorMessage = "Name is required")] 
     private string _name = string.Empty;
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(IconUiWrapper))] [Required(ErrorMessage = "Icon is required")]
@@ -47,8 +58,13 @@ public partial class ManageCategoriesViewModel : ValtModalValidatorViewModel
     public AvaloniaList<CategoryTreeElement> NewCategories { get; set; } = new();
     public IconUIWrapper IconUiWrapper => new(Icon);
 
-    public string SaveCaption => Id is null ? language.AddNew : language.SaveChanges;
-    public bool ShowDeleteButton => Id is not null;
+    public bool IsViewing => SelectedCategory is not null && !EditMode;
+    
+    public bool IsAdding => SelectedCategory is null;
+
+    public bool IsEditing => SelectedCategory is not null && EditMode;
+    
+    public bool EditFields => IsAdding || IsEditing;
 
     #endregion
 
@@ -210,9 +226,25 @@ public partial class ManageCategoriesViewModel : ValtModalValidatorViewModel
         }
     }
 
+    [RelayCommand]
+    private void Edit()
+    {
+        if (SelectedCategory is not null)
+        {
+            EditMode = true;
+        }
+    }
+    
+    [RelayCommand]
+    private void Cancel()
+    {
+        EditMode = false;
+    }
+
     private Task ClearSelection()
     {
         SelectedCategory = null;
+        EditMode = false;
         Id = null;
         Name = "";
         Icon = Icon.Empty;
@@ -270,9 +302,14 @@ public partial class ManageCategoriesViewModel : ValtModalValidatorViewModel
 
         category!.ChangeParent(newParentId is not null ? new CategoryId(newParentId) : null);
 
-        _categoryRepository!.SaveCategoryAsync(category).Wait();
+        await _categoryRepository!.SaveCategoryAsync(category);
 
-        Dispatcher.UIThread.Post(() => { _ = FetchCategoriesAsync(); });
+        Dispatcher.UIThread.Post(() =>
+        {
+            _ = FetchCategoriesAsync(); 
+            _ = ClearSelection();
+            SelectedCategory = NewCategories.SingleOrDefault(x => x.Id == categoryId);
+        });
     }
 
     public CategoryTreeElement? FindParent(CategoryTreeElement item)
