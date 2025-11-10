@@ -60,10 +60,17 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
                 //ignore - no data available
             }
 
-            var startDate = historicalLastDate;
+            var startDate = historicalLastDate.AddDays(1);
             var endDate = localDate.AddDays(-1);
+            
+            //skip useless calls
+            while (startDate.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
+                startDate = startDate.AddDays(1);
+            
+            while (endDate.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
+                endDate = endDate.AddDays(-1);
 
-            if (startDate >= endDate)
+            if (startDate > endDate)
                 return;
 
             _logger.LogInformation("[FiatHistoryUpdaterJob] From {0} to {1}", startDate!.ToShortDateString(),

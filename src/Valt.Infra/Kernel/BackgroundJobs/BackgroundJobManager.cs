@@ -87,6 +87,11 @@ public sealed class BackgroundJobManager : IDisposable
     {
         return _jobInfos.Any(x => x.Value.State == BackgroundJobState.Running && x.Key.JobType == jobType);
     }
+
+    public bool HasErrors(BackgroundJobTypes jobType)
+    {
+        return _jobInfos.Any(x => x.Value.State == BackgroundJobState.Error && x.Key.JobType == jobType);
+    }
 }
 
 public sealed class JobInfo : INotifyPropertyChanged, IDisposable

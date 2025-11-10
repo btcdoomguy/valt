@@ -18,7 +18,7 @@ public class BitcoinInitialSeedPriceProvider : IBitcoinInitialSeedPriceProvider
     
     public async Task<IEnumerable<BitcoinPriceData>> GetPricesAsync()
     {
-        using var client = new HttpClient();
+        using var client = new HttpClient() { Timeout = TimeSpan.FromSeconds(10) };
 
         var result = new List<BitcoinPriceData>();
         try

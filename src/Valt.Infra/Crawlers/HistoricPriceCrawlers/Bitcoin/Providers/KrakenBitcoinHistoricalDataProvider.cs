@@ -20,7 +20,7 @@ public class KrakenBitcoinHistoricalDataProvider : IBitcoinHistoricalDataProvide
     public async Task<IEnumerable<BitcoinPriceData>> GetPricesAsync(DateOnly startDate,
         DateOnly endDate)
     {
-        using var client = new HttpClient();
+        using var client = new HttpClient() { Timeout = TimeSpan.FromSeconds(10) };
 
         try
         {

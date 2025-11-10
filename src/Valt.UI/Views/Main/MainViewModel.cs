@@ -19,6 +19,7 @@ using Valt.Infra.Kernel.BackgroundJobs;
 using Valt.Infra.Modules.Budget;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
+using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
 using Valt.UI.Views.Main.Controls;
@@ -185,13 +186,13 @@ public partial class MainViewModel : ValtViewModel
             }
             catch (LiteException ex)
             {
-                await MessageBoxHelper.ShowErrorAsync("Database error", $"Error opening VALT file: {ex.Message}",
+                await MessageBoxHelper.ShowErrorAsync(language.Error, string.Format(language.ValtFile_Error, ex.Message),
                     Window!);
                 continue;
             }
             catch (Exception ex)
             {
-                await MessageBoxHelper.ShowErrorAsync("Error", $"{ex.Message}", Window!);
+                await MessageBoxHelper.ShowErrorAsync(language.Error, $"{ex.Message}", Window!);
                 continue;
             }
 
@@ -214,17 +215,40 @@ public partial class MainViewModel : ValtViewModel
     {
         try
         {
+            var forcePriceDatabase = !_priceDatabase.DatabaseFileExists();
+            if (forcePriceDatabase)
+            {
+                if (!await MessageBoxHelper.ShowOkCancelAsync(language.InstallPriceDatabase_Title,
+                        language.InstallPriceDatabase_Info,
+                        Window!))
+                {
+                    return false;
+                }
+            }
+            
             _priceDatabase!.OpenDatabase();
             
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 IsLoading = true;
-                LoadingMessage = "Initializing price database. Please wait...";
-                _backgroundJobManager!.StartAllJobs(jobType: BackgroundJobTypes.PriceDatabase);
+                LoadingMessage = language.LoadingMessage;
             });
+            
+            _backgroundJobManager!.StartAllJobs(jobType: BackgroundJobTypes.PriceDatabase);
             
             while (_backgroundJobManager.IsRunningTasksOf(BackgroundJobTypes.PriceDatabase))
                 await Task.Delay(100);
+
+            if (forcePriceDatabase)
+            {
+                //if anything went wrong, fails
+                if (_backgroundJobManager.HasErrors(jobType: BackgroundJobTypes.PriceDatabase))
+                {
+                    await MessageBoxHelper.ShowErrorAsync(language.InstallPriceDatabase_Error_Title, language.InstallPriceDatabase_Error_Info,
+                        Window!);
+                    return false;
+                }
+            }
 
             IsLoading = false;
             
@@ -232,14 +256,15 @@ public partial class MainViewModel : ValtViewModel
         }
         catch (LiteException ex)
         {
-            await MessageBoxHelper.ShowErrorAsync("Price database error",
-                $"Error opening price database file: {ex.Message}",
+            await MessageBoxHelper.ShowErrorAsync(language.Error,
+                string.Format(language.ValtPriceFile_Error, ex.Message),
                 Window!);
         }
         catch (Exception ex)
         {
-            await MessageBoxHelper.ShowErrorAsync("Error", $"{ex.Message}", Window!);
+            await MessageBoxHelper.ShowErrorAsync(language.Error, $"{ex.Message}", Window!);
         }
+        
 
         return false;
     }

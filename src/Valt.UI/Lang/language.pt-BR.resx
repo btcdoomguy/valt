@@ -534,4 +534,28 @@
     <data name="Edit" xml:space="preserve">
         <value>Editar</value>
     </data>
+    <data name="LoadingMessage" xml:space="preserve">
+        <value>Atualizando o banco de dados de preços. Por favor aguarde...</value>
+    </data>
+    <data name="Error" xml:space="preserve">
+        <value>Erro</value>
+    </data>
+    <data name="InstallPriceDatabase.Info" xml:space="preserve">
+        <value>Para finalizar o processo de instalação, Valt precisa criar sua base local de preços. Para isso, você precisa estar conectado à internet. Esse processo irá levar alguns segundos.</value>
+    </data>
+    <data name="InstallPriceDatabase.Error.Info" xml:space="preserve">
+        <value>Banco de dados de preços não pôde ser instalado. Por favor verifique sua conexão.</value>
+    </data>
+    <data name="InstallPriceDatabase.Error.Title" xml:space="preserve">
+        <value>Erro</value>
+    </data>
+    <data name="InstallPriceDatabase.Title" xml:space="preserve">
+        <value>Instalar banco de dados de preços</value>
+    </data>
+    <data name="ValtFile.Error" xml:space="preserve">
+        <value>Erro ao abrir arquivo VALT: {0}</value>
+    </data>
+    <data name="ValtPriceFile.Error" xml:space="preserve">
+        <value>Erro ao abrir arquivo de preços: {0}</value>
+    </data>
 </root>

@@ -1076,5 +1076,53 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Edit", resourceCulture);
             }
         }
+        
+        public static string LoadingMessage {
+            get {
+                return ResourceManager.GetString("LoadingMessage", resourceCulture);
+            }
+        }
+        
+        public static string InstallPriceDatabase_Title {
+            get {
+                return ResourceManager.GetString("InstallPriceDatabase.Title", resourceCulture);
+            }
+        }
+        
+        public static string Error {
+            get {
+                return ResourceManager.GetString("Error", resourceCulture);
+            }
+        }
+        
+        public static string InstallPriceDatabase_Error_Title {
+            get {
+                return ResourceManager.GetString("InstallPriceDatabase.Error.Title", resourceCulture);
+            }
+        }
+        
+        public static string InstallPriceDatabase_Error_Info {
+            get {
+                return ResourceManager.GetString("InstallPriceDatabase.Error.Info", resourceCulture);
+            }
+        }
+        
+        public static string InstallPriceDatabase_Info {
+            get {
+                return ResourceManager.GetString("InstallPriceDatabase.Info", resourceCulture);
+            }
+        }
+        
+        public static string ValtFile_Error {
+            get {
+                return ResourceManager.GetString("ValtFile.Error", resourceCulture);
+            }
+        }
+        
+        public static string ValtPriceFile_Error {
+            get {
+                return ResourceManager.GetString("ValtPriceFile.Error", resourceCulture);
+            }
+        }
     }
 }

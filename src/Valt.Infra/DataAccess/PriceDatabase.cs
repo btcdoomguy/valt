@@ -21,10 +21,18 @@ internal sealed class PriceDatabase : IPriceDatabase
     private string? _filePath;
     public bool HasDatabaseOpen => _database != null;
 
+
     public PriceDatabase(IClock clock, INotificationPublisher publisher)
     {
         _clock = clock;
         _publisher = publisher;
+    }
+    
+    public bool DatabaseFileExists()
+    {
+        var filePath = Path.Combine(ValtEnvironment.AppDataPath, "prices.db");
+        
+        return File.Exists(filePath);
     }
     
     public void OpenDatabase()

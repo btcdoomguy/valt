@@ -539,4 +539,28 @@
     <data name="Edit" xml:space="preserve">
         <value>Edit</value>
     </data>
+    <data name="LoadingMessage" xml:space="preserve">
+        <value>Updating price database. Please wait...</value>
+    </data>
+    <data name="InstallPriceDatabase.Title" xml:space="preserve">
+        <value>Install price database</value>
+    </data>
+    <data name="Error" xml:space="preserve">
+        <value>Error</value>
+    </data>
+    <data name="InstallPriceDatabase.Error.Title" xml:space="preserve">
+        <value>Error</value>
+    </data>
+    <data name="InstallPriceDatabase.Error.Info" xml:space="preserve">
+        <value>Cannot install price database. Please check the internet connection again.</value>
+    </data>
+    <data name="InstallPriceDatabase.Info" xml:space="preserve">
+        <value>To finish the install process, Valt needs to create your local price database. For that, an internet connection must be available. The process will take a few seconds.</value>
+    </data>
+    <data name="ValtFile.Error" xml:space="preserve">
+        <value>Error opening VALT file: {0}</value>
+    </data>
+    <data name="ValtPriceFile.Error" xml:space="preserve">
+        <value>Error opening price database file:  {0}</value>
+    </data>
 </root>

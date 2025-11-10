@@ -16,7 +16,7 @@ public class FrankfurterFiatHistoricalDataProvider : IFiatHistoricalDataProvider
     
     public async Task<IEnumerable<IFiatHistoricalDataProvider.FiatPriceData>> GetPricesAsync(DateOnly startDate, DateOnly endDate)
     {
-        using var client = new HttpClient();
+        using var client = new HttpClient() { Timeout = TimeSpan.FromSeconds(10) };
         try
         {
             var response = await client.GetAsync($"https://api.frankfurter.dev/v1/{startDate.ToString("yyyy-MM-dd")}..{endDate.ToString("yyyy-MM-dd")}?base=USD&symbols={string.Join(",", FiatCurrency.GetAll().Select(x => x.Code))}");
