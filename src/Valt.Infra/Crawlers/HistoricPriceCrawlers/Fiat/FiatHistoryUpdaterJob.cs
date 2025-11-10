@@ -9,8 +9,8 @@ namespace Valt.Infra.Crawlers.HistoricPriceCrawlers.Fiat;
 
 internal class FiatHistoryUpdaterJob : IBackgroundJob
 {
-    private readonly IFiatHistoricalDataProvider _provider;
     private readonly IPriceDatabase _priceDatabase;
+    private readonly IFiatHistoricalDataProvider _provider;
     private readonly ILogger<FiatHistoryUpdaterJob> _logger;
 
     public string Name => "Fiat history updater job";
@@ -20,23 +20,26 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
 
     public TimeSpan Interval => TimeSpan.FromSeconds(120);
 
-    public FiatHistoryUpdaterJob(IFiatHistoricalDataProvider provider,
-        IPriceDatabase priceDatabase,
+
+
+    public FiatHistoryUpdaterJob(IPriceDatabase priceDatabase,
+        IFiatHistoricalDataProvider provider,
         ILogger<FiatHistoryUpdaterJob> logger)
     {
-        _provider = provider;
         _priceDatabase = priceDatabase;
+        _provider = provider;
         _logger = logger;
     }
-    
-    public async Task StartAsync(CancellationToken stoppingToken)
+
+    public Task StartAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("[FiatHistoryUpdaterJob] Started");
+        _logger.LogInformation("[FiatHistoryUpdater] Starting...");
+        return Task.CompletedTask;
     }
 
     public async Task RunAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("[FiatHistoryUpdaterJob] Updating fiat history");
+        _logger.LogInformation("[FiatHistoryUpdater] Updating fiat history");
         try
         {
             var utcNow = DateTime.UtcNow;
@@ -62,18 +65,18 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
 
             var startDate = historicalLastDate.AddDays(1);
             var endDate = localDate.AddDays(-1);
-            
+
             //skip useless calls
             while (startDate.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
                 startDate = startDate.AddDays(1);
-            
+
             while (endDate.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
                 endDate = endDate.AddDays(-1);
 
             if (startDate > endDate)
                 return;
 
-            _logger.LogInformation("[FiatHistoryUpdaterJob] From {0} to {1}", startDate!.ToShortDateString(),
+            _logger.LogInformation("[FiatHistoryUpdater] From {0} to {1}", startDate!.ToShortDateString(),
                 endDate.ToShortDateString());
 
             var prices = (await _provider.GetPricesAsync(DateOnly.FromDateTime(startDate),
@@ -87,11 +90,11 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[FiatHistoryUpdaterJob] Error during execution");
+            _logger.LogError(ex, "[FiatHistoryUpdater] Error during execution");
             throw;
         }
     }
-
+    
     private void FillLocalDatabase(IEnumerable<IFiatHistoricalDataProvider.FiatPriceData> prices)
     {
         var entries = new List<FiatDataEntity>();
@@ -101,7 +104,7 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
             foreach (var currency in price.Data)
             {
                 _logger.LogInformation(
-                    "[FiatHistoryUpdaterJob] Adding price {CurrencyPrice} for {S} for {CurrencyCurrency}",
+                    "[FiatHistoryUpdater] Adding price {CurrencyPrice} for {S} for {CurrencyCurrency}",
                     currency.Price, dateToConsider.ToString("yyyy-MM-dd"), currency.Currency);
                 entries.Add(new FiatDataEntity()
                 {

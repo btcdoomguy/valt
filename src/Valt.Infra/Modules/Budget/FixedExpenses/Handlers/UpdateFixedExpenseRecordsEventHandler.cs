@@ -5,7 +5,7 @@ using Valt.Core.Modules.Budget.Transactions.Events;
 
 namespace Valt.Infra.Modules.Budget.FixedExpenses.Handlers;
 
-public class UpdateFixedExpenseRecordsEventHandler : IDomainEventHandler<TransactionBoundToFixedExpenseEvent>,
+internal class UpdateFixedExpenseRecordsEventHandler : IDomainEventHandler<TransactionBoundToFixedExpenseEvent>,
     IDomainEventHandler<TransactionUnboundFromFixedExpenseEvent>, IDomainEventHandler<FixedExpenseDeletedEvent>,
     IDomainEventHandler<TransactionDeletedEvent>
 {

@@ -5,7 +5,7 @@ using Valt.Infra.Modules.DataSources.Bitcoin;
 
 namespace Valt.Infra.Crawlers.HistoricPriceCrawlers.Bitcoin;
 
-public class BitcoinInitialSeedPriceProvider : IBitcoinInitialSeedPriceProvider
+internal class BitcoinInitialSeedPriceProvider : IBitcoinInitialSeedPriceProvider
 {
     private const string SEED_URL = "https://raw.githubusercontent.com/btcdoomguy/valt-data/refs/heads/master/initial-seed-price.csv";
     

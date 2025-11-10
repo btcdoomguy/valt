@@ -49,6 +49,16 @@ public sealed class BackgroundJobManager : IDisposable
         }
     }
 
+    public async Task TriggerJobManuallyOnCurrentThreadAsync(BackgroundJobSystemNames systemName)
+    {
+        var job = _jobInfos.Keys.SingleOrDefault(x => x.SystemName == systemName);
+        if (job is not null)
+        {
+            await job.StartAsync(CancellationToken.None);
+            await job.RunAsync(CancellationToken.None);
+        }
+    }
+
     public async Task StopAll()
     {
         foreach (var token in _ctsMap.Values)
@@ -143,7 +153,7 @@ public sealed class JobInfo : INotifyPropertyChanged, IDisposable
         //reset timer to run now
         _timer?.Change(TimeSpan.Zero, _job.Interval);
     }
-
+    
     private async Task RunJobAsync(CancellationToken token = default)
     {
         if (!await _semaphore.WaitAsync(0, token)) 

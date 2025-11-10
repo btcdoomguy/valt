@@ -1124,5 +1124,29 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("ValtPriceFile.Error", resourceCulture);
             }
         }
+        
+        public static string InstallingBitcoinPriceMessage {
+            get {
+                return ResourceManager.GetString("InstallingBitcoinPriceMessage", resourceCulture);
+            }
+        }
+        
+        public static string InstallingFiatPriceMessage {
+            get {
+                return ResourceManager.GetString("InstallingFiatPriceMessage", resourceCulture);
+            }
+        }
+        
+        public static string Transactions_Columns_Sats_Hint {
+            get {
+                return ResourceManager.GetString("Transactions.Columns.Sats.Hint", resourceCulture);
+            }
+        }
+        
+        public static string Transactions_Columns_SatsPriceToday_Hint {
+            get {
+                return ResourceManager.GetString("Transactions.Columns.SatsPriceToday.Hint", resourceCulture);
+            }
+        }
     }
 }

@@ -558,4 +558,16 @@
     <data name="ValtPriceFile.Error" xml:space="preserve">
         <value>Erro ao abrir arquivo de preços: {0}</value>
     </data>
+    <data name="InstallingBitcoinPriceMessage" xml:space="preserve">
+        <value>Baixando o histórico de preços do bitcoin...</value>
+    </data>
+    <data name="InstallingFiatPriceMessage" xml:space="preserve">
+        <value>Baixando o histórico de preços das moedas fiat...</value>
+    </data>
+    <data name="Transactions.Columns.Sats.Hint" xml:space="preserve">
+        <value>Exibe a transação precificada em sats, baseado no preço de fechamento do bitcoin naquela data</value>
+    </data>
+    <data name="Transactions.Columns.SatsPriceToday.Hint" xml:space="preserve">
+        <value>Valor fiat atual dos sats calculados na coluna sats</value>
+    </data>
 </root>
