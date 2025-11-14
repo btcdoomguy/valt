@@ -7,13 +7,13 @@
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <LangVersion>13</LangVersion>
-        <ApplicationIcon>valt-icon-1.ico</ApplicationIcon>
         <Authors>DoomLabs</Authors>
         <Product>Valt</Product>
         <AssemblyName>Valt</AssemblyName>
         <Version>0.1.0</Version>
         <AssemblyVersion>0.1.0</AssemblyVersion>
         <FileVersion>0.1.0.0</FileVersion>
+        <ApplicationIcon>Assets/valt-logo.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>

@@ -575,4 +575,40 @@
     <data name="Transactions.Columns.SatsPriceToday.Hint" xml:space="preserve">
         <value>Current fiat value of the sats calculated in the sats columns</value>
     </data>
+    <data name="BootDatabase.BtcAccount" xml:space="preserve">
+        <value>Cold Storage</value>
+    </data>
+    <data name="BootDatabase.FiatAccount" xml:space="preserve">
+        <value>Bank Account</value>
+    </data>
+    <data name="BootDatabase.Category.Food" xml:space="preserve">
+        <value>Food</value>
+    </data>
+    <data name="BootDatabase.Category.UtilityBills" xml:space="preserve">
+        <value>Utility Bills</value>
+    </data>
+    <data name="BootDatabase.Category.Services" xml:space="preserve">
+        <value>Services</value>
+    </data>
+    <data name="BootDatabase.Category.Gadgets" xml:space="preserve">
+        <value>Gadgets</value>
+    </data>
+    <data name="BootDatabase.Category.Health" xml:space="preserve">
+        <value>Health</value>
+    </data>
+    <data name="BootDatabase.Category.Transport" xml:space="preserve">
+        <value>Transportation</value>
+    </data>
+    <data name="BootDatabase.Category.Travel" xml:space="preserve">
+        <value>Travel</value>
+    </data>
+    <data name="BootDatabase.Category.Entertainment" xml:space="preserve">
+        <value>Entertainment</value>
+    </data>
+    <data name="BootDatabase.Category.Groceries" xml:space="preserve">
+        <value>Groceries</value>
+    </data>
+    <data name="BootDatabase.Category.Paycheck" xml:space="preserve">
+        <value>Paycheck</value>
+    </data>
 </root>

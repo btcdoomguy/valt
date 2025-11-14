@@ -20,7 +20,7 @@
         <Grid Grid.Row="0" Margin="10" ColumnDefinitions="*, 260, *">
             <StackPanel Grid.Column="0" Margin="10" Orientation="Horizontal">
                 <AutoCompleteBox x:Name="SearchBox"
-                                 Width="300" Watermark="{x:Static local:language.Transactions_EnterSearchTerm}"
+                                 Width="200" Watermark="{x:Static local:language.Transactions_EnterSearchTerm}"
                                  Margin="0, 14, 0, 0"
                                  Text="{Binding SearchTerm, Mode=TwoWay}"
                                  SelectionChanged="SearchBox_OnSelectionChanged"

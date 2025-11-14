@@ -1148,5 +1148,77 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Transactions.Columns.SatsPriceToday.Hint", resourceCulture);
             }
         }
+        
+        public static string BootDatabase_BtcAccount {
+            get {
+                return ResourceManager.GetString("BootDatabase.BtcAccount", resourceCulture);
+            }
+        }
+        
+        public static string BootDatabase_FiatAccount {
+            get {
+                return ResourceManager.GetString("BootDatabase.FiatAccount", resourceCulture);
+            }
+        }
+        
+        public static string BootDatabase_Category_Food {
+            get {
+                return ResourceManager.GetString("BootDatabase.Category.Food", resourceCulture);
+            }
+        }
+        
+        public static string BootDatabase_Category_UtilityBills {
+            get {
+                return ResourceManager.GetString("BootDatabase.Category.UtilityBills", resourceCulture);
+            }
+        }
+        
+        public static string BootDatabase_Category_Services {
+            get {
+                return ResourceManager.GetString("BootDatabase.Category.Services", resourceCulture);
+            }
+        }
+        
+        public static string BootDatabase_Category_Gadgets {
+            get {
+                return ResourceManager.GetString("BootDatabase.Category.Gadgets", resourceCulture);
+            }
+        }
+        
+        public static string BootDatabase_Category_Health {
+            get {
+                return ResourceManager.GetString("BootDatabase.Category.Health", resourceCulture);
+            }
+        }
+        
+        public static string BootDatabase_Category_Transport {
+            get {
+                return ResourceManager.GetString("BootDatabase.Category.Transport", resourceCulture);
+            }
+        }
+        
+        public static string BootDatabase_Category_Travel {
+            get {
+                return ResourceManager.GetString("BootDatabase.Category.Travel", resourceCulture);
+            }
+        }
+        
+        public static string BootDatabase_Category_Entertainment {
+            get {
+                return ResourceManager.GetString("BootDatabase.Category.Entertainment", resourceCulture);
+            }
+        }
+        
+        public static string BootDatabase_Category_Groceries {
+            get {
+                return ResourceManager.GetString("BootDatabase.Category.Groceries", resourceCulture);
+            }
+        }
+        
+        public static string BootDatabase_Category_Paycheck {
+            get {
+                return ResourceManager.GetString("BootDatabase.Category.Paycheck", resourceCulture);
+            }
+        }
     }
 }

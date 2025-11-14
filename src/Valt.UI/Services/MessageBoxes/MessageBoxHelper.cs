@@ -64,7 +64,7 @@ public static class MessageBoxHelper
             ContentMessage = message,
             Icon = Icon.Info,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
-            SystemDecorations = SystemDecorations.None
+            SystemDecorations = SystemDecorations.Full,
         });
 
         var result = await messageBox.ShowWindowDialogAsync(owner);

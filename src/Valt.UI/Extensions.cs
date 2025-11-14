@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Valt.Infra.Kernel.Scopes;
+using Valt.Infra.Modules.Budget.Categories;
 using Valt.UI.Base;
 using Valt.UI.Services;
 using Valt.UI.State;
@@ -78,6 +79,10 @@ public static class Extensions
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<ManageFixedExpensesViewModel>();
         services.AddTransient<FixedExpenseEditorViewModel>();
+        
+        //other
+        services.AddSingleton<IInitialCategoryNameLanguageProvider, InitialCategoryNameLanguageProvider>();
+
 
         //factory method for modals
         services.AddSingleton<Func<ApplicationModalNames, ValtBaseWindow>>(services => modalNames =>

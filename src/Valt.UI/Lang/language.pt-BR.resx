@@ -570,4 +570,40 @@
     <data name="Transactions.Columns.SatsPriceToday.Hint" xml:space="preserve">
         <value>Valor fiat atual dos sats calculados na coluna sats</value>
     </data>
+    <data name="BootDatabase.BtcAccount" xml:space="preserve">
+        <value>Carteira Fria</value>
+    </data>
+    <data name="BootDatabase.Category.Entertainment" xml:space="preserve">
+        <value>Lazer</value>
+    </data>
+    <data name="BootDatabase.Category.Food" xml:space="preserve">
+        <value>Alimentação</value>
+    </data>
+    <data name="BootDatabase.Category.Gadgets" xml:space="preserve">
+        <value>Bens de Consumo</value>
+    </data>
+    <data name="BootDatabase.Category.Groceries" xml:space="preserve">
+        <value>Supermercado</value>
+    </data>
+    <data name="BootDatabase.Category.Health" xml:space="preserve">
+        <value>Saúde</value>
+    </data>
+    <data name="BootDatabase.Category.Paycheck" xml:space="preserve">
+        <value>Salário</value>
+    </data>
+    <data name="BootDatabase.Category.Services" xml:space="preserve">
+        <value>Serviços</value>
+    </data>
+    <data name="BootDatabase.Category.Transport" xml:space="preserve">
+        <value>Transporte</value>
+    </data>
+    <data name="BootDatabase.Category.Travel" xml:space="preserve">
+        <value>Viagem</value>
+    </data>
+    <data name="BootDatabase.Category.UtilityBills" xml:space="preserve">
+        <value>Contas</value>
+    </data>
+    <data name="BootDatabase.FiatAccount" xml:space="preserve">
+        <value>Conta Bancária</value>
+    </data>
 </root>
