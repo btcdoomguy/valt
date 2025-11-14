@@ -136,9 +136,11 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
                 new DateOnly(2025, 1, 7), null, 100, null, null, FiatCurrency.Usd.Code, FixedExpenseRecordState.Paid,
                 new TransactionId()),
             new FixedExpenseProviderEntry(new FixedExpenseId().Value, "Test2", new CategoryId(),
-                new DateOnly(2025, 1, 10), null, 120, null, null, FiatCurrency.Usd.Code, FixedExpenseRecordState.ManuallyPaid, null),
+                new DateOnly(2025, 1, 10), null, 120, null, null, FiatCurrency.Usd.Code,
+                FixedExpenseRecordState.ManuallyPaid, null),
             new FixedExpenseProviderEntry(new FixedExpenseId().Value, "Test3", new CategoryId(),
-                new DateOnly(2025, 1, 15), null, 120, null, null, FiatCurrency.Usd.Code, FixedExpenseRecordState.Ignored, null),
+                new DateOnly(2025, 1, 15), null, 120, null, null, FiatCurrency.Usd.Code,
+                FixedExpenseRecordState.Ignored, null),
             new FixedExpenseProviderEntry(new FixedExpenseId().Value, "Test4", new CategoryId(),
                 new DateOnly(2025, 1, 28), null, 120, null, null, FiatCurrency.Usd.Code),
         ];
@@ -280,7 +282,9 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
         if (_fixedExpenseProvider is null) return;
 
         var value = DateOnly.FromDateTime(_filterState.MainDate);
-        var fixedExpenses = (await _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(value)).ToList();
+        var fixedExpenses = await _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(value);
+        
+        fixedExpenses = fixedExpenses.OrderBy(x => x.State).ThenBy(x => x.ReferenceDate).ToList();
 
         var minTotal = 0m;
         var maxTotal = 0m;
@@ -455,10 +459,7 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
             ApplicationModalNames.ManageFixedExpenses,
             ownerWindow, null)!;
 
-        var result = await window.ShowDialog<ManageFixedExpensesViewModel.Response?>(ownerWindow!);
-
-        if (result is null)
-            return;
+        _ = await window.ShowDialog<ManageFixedExpensesViewModel.Response?>(ownerWindow!);
 
         await _accountDisplayOrderManager!.NormalizeDisplayOrdersAsync(null);
         await FetchAccounts();

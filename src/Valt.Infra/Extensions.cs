@@ -77,6 +77,9 @@ public static class Extensions
         services.AddSingleton<FrankfurterFiatRateProvider>();
         services.AddSingleton<IFiatPriceProvider, FrankfurterFiatRateProvider>(provider =>
             provider.GetRequiredService<FrankfurterFiatRateProvider>());
+        
+        //initial seed provider
+        services.AddSingleton<IBitcoinInitialSeedPriceProvider, BitcoinInitialSeedPriceProvider>();
 
         //historical crawlers
         services.AddSingleton<KrakenBitcoinHistoricalDataProvider>();
@@ -112,7 +115,7 @@ public static class Extensions
             .AddClasses(classes => classes.Where(type =>
                 type.GetInterfaces().Any(i =>
                     i.IsGenericType &&
-                    i.GetGenericTypeDefinition() == typeof(IDomainEventHandler<>))))
+                    i.GetGenericTypeDefinition() == typeof(IDomainEventHandler<>))), publicOnly: false)
             .AsImplementedInterfaces()
             .WithScopedLifetime());
 
@@ -121,7 +124,7 @@ public static class Extensions
             .AddClasses(classes => classes.Where(type =>
                 type.GetInterfaces().Any(i =>
                     i.IsGenericType &&
-                    i.GetGenericTypeDefinition() == typeof(INotificationHandler<>))))
+                    i.GetGenericTypeDefinition() == typeof(INotificationHandler<>))), publicOnly: false)
             .AsImplementedInterfaces()
             .WithScopedLifetime());
 

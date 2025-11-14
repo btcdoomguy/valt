@@ -20,7 +20,7 @@
         <Grid Grid.Row="0" Margin="10" ColumnDefinitions="*, 260, *">
             <StackPanel Grid.Column="0" Margin="10" Orientation="Horizontal">
                 <AutoCompleteBox x:Name="SearchBox"
-                                 Width="300" Watermark="{x:Static local:language.Transactions_EnterSearchTerm}"
+                                 Width="200" Watermark="{x:Static local:language.Transactions_EnterSearchTerm}"
                                  Margin="0, 14, 0, 0"
                                  Text="{Binding SearchTerm, Mode=TwoWay}"
                                  SelectionChanged="SearchBox_OnSelectionChanged"
@@ -144,14 +144,24 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="{x:Static local:language.Transactions_Columns_Sats}"
-                                    Binding="{Binding AutoSatAmount}">
+                <DataGridTextColumn Binding="{Binding AutoSatAmount}">
+                    <DataGridTextColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <Label Content="{x:Static local:language.Transactions_Columns_Sats}" ToolTip.Tip="{x:Static local:language.Transactions_Columns_Sats_Hint}" />
+                        </DataTemplate>
+                    </DataGridTextColumn.HeaderTemplate>
                 </DataGridTextColumn>
-                <DataGridTemplateColumn Header="{x:Static local:language.Transactions_Columns_SatsPriceToday}">
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <Label Content="{x:Static local:language.Transactions_Columns_SatsPriceToday}" ToolTip.Tip="{x:Static local:language.Transactions_Columns_SatsPriceToday_Hint}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="models1:TransactionViewModel">
-                            <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal" >
                                 <TextBlock Classes="only-text" Text="{Binding AutoSatAmountCurrentPrice}"
+                                           
                                            Foreground="{Binding AutoSatLineColor}">
                                 </TextBlock>
                             </StackPanel>

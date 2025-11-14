@@ -1,6 +1,9 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using Microsoft.Extensions.Logging.Abstractions;
+using Valt.Infra;
+using Valt.Infra.Crawlers.HistoricPriceCrawlers.Bitcoin;
 using Valt.Infra.Modules.DataSources.Bitcoin;
 
 namespace Valt.Tests.HistoricPriceCrawlers;
@@ -10,34 +13,16 @@ public class FillLocalDbWithDataTests : DatabaseTest
 {
     protected override async Task SeedDatabase()
     {
-        var assembly = Assembly.Load("Valt.Infra");
-        var dataResource = @"Valt.Infra.Crawlers.HistoricPriceCrawlers.initial-seed-price.csv";
-
-        var entities = new List<BitcoinDataEntity>();
-        using (var stream = assembly.GetManifestResourceStream(dataResource)!)
+        if (_priceDatabase.GetBitcoinData().Query().Count() == 0)
         {
-            using var reader = new StreamReader(stream);
-
-            var nextLine = reader.ReadLine();
-            decimal lastValidPrice = 0;
-            while (nextLine is not null)
+            var provider = new BitcoinInitialSeedPriceProvider(NullLogger<BitcoinInitialSeedPriceProvider>.Instance);
+            var prices = await provider.GetPricesAsync();
+            _priceDatabase.GetBitcoinData().InsertBulk(prices.Select(x => new BitcoinDataEntity()
             {
-                var split = nextLine.Split(',');
-
-                if (split[1] != "nan")
-                    lastValidPrice = decimal.Parse(split[1], CultureInfo.InvariantCulture);
-
-                entities.Add(new BitcoinDataEntity()
-                {
-                    Date = DateTime.Parse(split[0]),
-                    Price = lastValidPrice
-                });
-
-                nextLine = reader.ReadLine();
-            }
+                Date = x.Date.ToValtDateTime(),
+                Price = x.Price
+            }));
         }
-
-        _priceDatabase.GetBitcoinData().InsertBulk(entities, entities.Count);
     }
 
     [Test]

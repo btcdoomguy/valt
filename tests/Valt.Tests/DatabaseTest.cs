@@ -6,6 +6,7 @@ using Valt.Core.Modules.Budget.Categories.Contracts;
 using Valt.Core.Modules.Budget.Transactions.Contracts;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
+using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Kernel.Time;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Categories;
@@ -52,7 +53,7 @@ public abstract class DatabaseTest
         _localDatabase.OpenInMemoryDatabase(_localDatabaseStream);
         
         _priceDatabaseStream = new MemoryStream();
-        _priceDatabase = new PriceDatabase(new Clock());
+        _priceDatabase = new PriceDatabase(new Clock(), Substitute.For<INotificationPublisher>());
         _priceDatabase.OpenInMemoryDatabase(_priceDatabaseStream);
 
         RefreshLocalInstances();

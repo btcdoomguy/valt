@@ -6,5 +6,5 @@ public interface IBitcoinHistoricalDataProvider
 
     Task<IEnumerable<BitcoinPriceData>> GetPricesAsync(DateOnly startDate, DateOnly endDate);
 
-    public record BitcoinPriceData(DateOnly Date, decimal Price);
+    
 }

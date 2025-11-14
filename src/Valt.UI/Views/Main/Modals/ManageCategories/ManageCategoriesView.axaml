@@ -34,6 +34,7 @@
                     <TreeView x:Name="Tree" ItemsSource="{Binding NewCategories}"
                               SelectedItem="{Binding SelectedCategory}"
                               SelectionMode="Single"
+                              IsEnabled="{Binding !IsEditing}"
                               DragDrop.AllowDrop="True">
                         <TreeView.ItemTemplate>
                             <TreeDataTemplate ItemsSource="{Binding SubNodes}">
@@ -73,29 +74,46 @@
                             <!-- Name Field -->
                             <StackPanel Classes="form-field">
                                 <TextBlock Text="{x:Static lang:language.ManageCategories_Name}" />
-                                <TextBox Text="{Binding Name}" Width="300" HorizontalAlignment="Left"
+                                <TextBox Text="{Binding Name}" IsEnabled="{Binding EditFields}" Width="300" HorizontalAlignment="Left"
                                          VerticalAlignment="Center" />
                             </StackPanel>
 
                             <!-- Icon Field -->
                             <StackPanel Classes="form-field">
                                 <TextBlock Text="{x:Static lang:language.ManageCategories_Icon}" />
-                                <Button Classes="icon-selector-button"
+                                <Button Classes="icon-selector-button" IsEnabled="{Binding EditFields}" 
                                         Foreground="{Binding IconUiWrapper.BrushColor}"
                                         Content="{Binding IconUiWrapper.Unicode}"
                                         Command="{Binding IconSelectorOpenCommand}">
                                 </Button>
                             </StackPanel>
+                            
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" IsVisible="{Binding IsAdding}">
+                                <Button Content="{x:Static lang:language.AddNew}" Command="{Binding SaveChangesCommand}"
+                                        HorizontalContentAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        Margin="0 ,0,10,0" />
+                            </StackPanel>
 
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Button Content="{Binding SaveCaption}" Command="{Binding SaveChangesCommand}"
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" IsVisible="{Binding IsEditing}">
+                                <Button Content="{x:Static lang:language.SaveChanges}" Command="{Binding SaveChangesCommand}"
+                                        HorizontalContentAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        Margin="0 ,0,10,0" />
+                                <Button Content="{x:Static lang:language.CancelButton}"
+                                        Command="{Binding CancelCommand}"
+                                        HorizontalContentAlignment="Center"
+                                        HorizontalAlignment="Center" />
+                            </StackPanel>
+                            
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" IsVisible="{Binding IsViewing}">
+                                <Button Content="{x:Static lang:language.Edit}" Command="{Binding EditCommand}"
                                         HorizontalContentAlignment="Center"
                                         HorizontalAlignment="Center"
                                         Margin="0 ,0,10,0" />
                                 <Button Content="{x:Static lang:language.ManageCategories_Delete}"
                                         Classes="delete-button"
                                         Command="{Binding DeleteCommand}"
-                                        IsVisible="{Binding ShowDeleteButton}"
                                         HorizontalContentAlignment="Center"
                                         HorizontalAlignment="Center" />
                             </StackPanel>

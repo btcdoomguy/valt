@@ -17,6 +17,7 @@ using Valt.Infra.Kernel.BackgroundJobs;
 using Valt.Infra.Settings;
 using Valt.UI.Services.LocalStorage;
 using Valt.UI.Views.Main;
+using Valt.UI.Views.Main.Tabs.Transactions.Models;
 using MainViewModel = Valt.UI.Views.Main.MainViewModel;
 
 namespace Valt.UI;
@@ -67,6 +68,8 @@ public partial class App : Application
                 DataContext = serviceProvider.GetRequiredService<MainViewModel>()
             };
         }
+        
+        TransactionGridResources.Initialize();
 
         base.OnFrameworkInitializationCompleted();
 

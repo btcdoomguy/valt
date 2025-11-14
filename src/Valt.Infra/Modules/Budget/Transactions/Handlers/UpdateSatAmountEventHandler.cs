@@ -4,7 +4,7 @@ using Valt.Infra.Kernel.BackgroundJobs;
 
 namespace Valt.Infra.Modules.Budget.Transactions.Handlers;
 
-public class UpdateSatAmountEventHandler : IDomainEventHandler<TransactionCreatedEvent>, IDomainEventHandler<TransactionDetailsChangedEvent>,
+internal class UpdateSatAmountEventHandler : IDomainEventHandler<TransactionCreatedEvent>, IDomainEventHandler<TransactionDetailsChangedEvent>,
     IDomainEventHandler<TransactionEditedEvent>
 {
     private readonly BackgroundJobManager _backgroundJobManager;

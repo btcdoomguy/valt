@@ -531,4 +531,79 @@
     <data name="RemainingFixedExpenses.Title" xml:space="preserve">
         <value>Restante:</value>
     </data>
+    <data name="Edit" xml:space="preserve">
+        <value>Editar</value>
+    </data>
+    <data name="LoadingMessage" xml:space="preserve">
+        <value>Atualizando o banco de dados de preços. Por favor aguarde...</value>
+    </data>
+    <data name="Error" xml:space="preserve">
+        <value>Erro</value>
+    </data>
+    <data name="InstallPriceDatabase.Info" xml:space="preserve">
+        <value>Para finalizar o processo de instalação, Valt precisa criar sua base local de preços. Para isso, você precisa estar conectado à internet. Esse processo irá levar alguns segundos.</value>
+    </data>
+    <data name="InstallPriceDatabase.Error.Info" xml:space="preserve">
+        <value>Banco de dados de preços não pôde ser instalado. Por favor verifique sua conexão.</value>
+    </data>
+    <data name="InstallPriceDatabase.Error.Title" xml:space="preserve">
+        <value>Erro</value>
+    </data>
+    <data name="InstallPriceDatabase.Title" xml:space="preserve">
+        <value>Instalar banco de dados de preços</value>
+    </data>
+    <data name="ValtFile.Error" xml:space="preserve">
+        <value>Erro ao abrir arquivo VALT: {0}</value>
+    </data>
+    <data name="ValtPriceFile.Error" xml:space="preserve">
+        <value>Erro ao abrir arquivo de preços: {0}</value>
+    </data>
+    <data name="InstallingBitcoinPriceMessage" xml:space="preserve">
+        <value>Baixando o histórico de preços do bitcoin...</value>
+    </data>
+    <data name="InstallingFiatPriceMessage" xml:space="preserve">
+        <value>Baixando o histórico de preços das moedas fiat...</value>
+    </data>
+    <data name="Transactions.Columns.Sats.Hint" xml:space="preserve">
+        <value>Exibe a transação precificada em sats, baseado no preço de fechamento do bitcoin naquela data</value>
+    </data>
+    <data name="Transactions.Columns.SatsPriceToday.Hint" xml:space="preserve">
+        <value>Valor fiat atual dos sats calculados na coluna sats</value>
+    </data>
+    <data name="BootDatabase.BtcAccount" xml:space="preserve">
+        <value>Carteira Fria</value>
+    </data>
+    <data name="BootDatabase.Category.Entertainment" xml:space="preserve">
+        <value>Lazer</value>
+    </data>
+    <data name="BootDatabase.Category.Food" xml:space="preserve">
+        <value>Alimentação</value>
+    </data>
+    <data name="BootDatabase.Category.Gadgets" xml:space="preserve">
+        <value>Bens de Consumo</value>
+    </data>
+    <data name="BootDatabase.Category.Groceries" xml:space="preserve">
+        <value>Supermercado</value>
+    </data>
+    <data name="BootDatabase.Category.Health" xml:space="preserve">
+        <value>Saúde</value>
+    </data>
+    <data name="BootDatabase.Category.Paycheck" xml:space="preserve">
+        <value>Salário</value>
+    </data>
+    <data name="BootDatabase.Category.Services" xml:space="preserve">
+        <value>Serviços</value>
+    </data>
+    <data name="BootDatabase.Category.Transport" xml:space="preserve">
+        <value>Transporte</value>
+    </data>
+    <data name="BootDatabase.Category.Travel" xml:space="preserve">
+        <value>Viagem</value>
+    </data>
+    <data name="BootDatabase.Category.UtilityBills" xml:space="preserve">
+        <value>Contas</value>
+    </data>
+    <data name="BootDatabase.FiatAccount" xml:space="preserve">
+        <value>Conta Bancária</value>
+    </data>
 </root>

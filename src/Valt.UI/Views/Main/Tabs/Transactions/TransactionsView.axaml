@@ -295,8 +295,7 @@
                             BorderThickness="1, 0, 1, 1"
                             CornerRadius="0, 0, 5, 5">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0, 5, 0, 0">
-                            <TextBlock FontSize="11" Padding="0, 3, 3, 0" Text="{x:Static local:language.RemainingFixedExpenses_Title}"></TextBlock>
-                            <TextBlock FontSize="11" Padding="0, 3, 20, 0" Foreground="{DynamicResource Accent200Color}"
+                            <TextBlock FontSize="12" Padding="0, 3, 20, 0" Foreground="{DynamicResource Accent200Color}"
                                        Text="{Binding RemainingFixedExpensesAmount}">
                             </TextBlock>
                         </StackPanel>

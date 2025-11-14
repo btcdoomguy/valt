@@ -13,12 +13,14 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using LiteDB;
+using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel.BackgroundJobs;
 using Valt.Infra.Modules.Budget;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
+using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
 using Valt.UI.Views.Main.Controls;
@@ -40,6 +42,7 @@ public partial class MainViewModel : ValtViewModel
     private readonly BackgroundJobManager? _backgroundJobManager;
     private readonly IDatabaseInitializer? _databaseInitializer;
     private readonly LiveRatesViewModel _liveRatesViewModel;
+    private readonly ILogger<MainViewModel> _logger;
 
     public MainView? Window { get; set; }
 
@@ -92,7 +95,8 @@ public partial class MainViewModel : ValtViewModel
         CurrencySettings currencySettings,
         BackgroundJobManager backgroundJobManager,
         IDatabaseInitializer databaseInitializer,
-        LiveRatesViewModel liveRatesViewModel)
+        LiveRatesViewModel liveRatesViewModel,
+        ILogger<MainViewModel> logger)
     {
         _pageFactory = pageFactory;
         _modalFactory = modalFactory;
@@ -102,6 +106,7 @@ public partial class MainViewModel : ValtViewModel
         _backgroundJobManager = backgroundJobManager;
         _databaseInitializer = databaseInitializer;
         _liveRatesViewModel = liveRatesViewModel;
+        _logger = logger;
 
         _localDatabase.PropertyChanged += LocalDatabaseOnPropertyChanged;
 
@@ -160,7 +165,7 @@ public partial class MainViewModel : ValtViewModel
     {
         var appLifetime =
             Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-        
+
         if (!await InitializePriceDatabaseAsync())
         {
             appLifetime!.Shutdown();
@@ -185,13 +190,14 @@ public partial class MainViewModel : ValtViewModel
             }
             catch (LiteException ex)
             {
-                await MessageBoxHelper.ShowErrorAsync("Database error", $"Error opening VALT file: {ex.Message}",
+                await MessageBoxHelper.ShowErrorAsync(language.Error,
+                    string.Format(language.ValtFile_Error, ex.Message),
                     Window!);
                 continue;
             }
             catch (Exception ex)
             {
-                await MessageBoxHelper.ShowErrorAsync("Error", $"{ex.Message}", Window!);
+                await MessageBoxHelper.ShowErrorAsync(language.Error, $"{ex.Message}", Window!);
                 continue;
             }
 
@@ -206,7 +212,10 @@ public partial class MainViewModel : ValtViewModel
             SetTransactionsTab();
 
             //this avoids some race conditions with the jobs and current UI state
-            Dispatcher.UIThread.Invoke(() => { _backgroundJobManager!.StartAllJobs(jobType: BackgroundJobTypes.ValtDatabase); });
+            Dispatcher.UIThread.Invoke(() =>
+            {
+                _backgroundJobManager!.StartAllJobs(jobType: BackgroundJobTypes.ValtDatabase);
+            });
         }
     }
 
@@ -214,34 +223,90 @@ public partial class MainViewModel : ValtViewModel
     {
         try
         {
-            _priceDatabase!.OpenDatabase();
-            
+            if (!_priceDatabase.DatabaseFileExists())
+            {
+                var installResult = await InstallProcessAsync();
+
+                if (!installResult)
+                    return false;
+            }
+
+            if (!_priceDatabase.HasDatabaseOpen)
+                _priceDatabase!.OpenDatabase();
+
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 IsLoading = true;
-                LoadingMessage = "Initializing price database. Please wait...";
-                _backgroundJobManager!.StartAllJobs(jobType: BackgroundJobTypes.PriceDatabase);
+                LoadingMessage = language.LoadingMessage;
             });
-            
+
+            _backgroundJobManager!.StartAllJobs(jobType: BackgroundJobTypes.PriceDatabase);
+
             while (_backgroundJobManager.IsRunningTasksOf(BackgroundJobTypes.PriceDatabase))
                 await Task.Delay(100);
 
             IsLoading = false;
-            
+
             return true;
         }
         catch (LiteException ex)
         {
-            await MessageBoxHelper.ShowErrorAsync("Price database error",
-                $"Error opening price database file: {ex.Message}",
+            await MessageBoxHelper.ShowErrorAsync(language.Error,
+                string.Format(language.ValtPriceFile_Error, ex.Message),
                 Window!);
         }
         catch (Exception ex)
         {
-            await MessageBoxHelper.ShowErrorAsync("Error", $"{ex.Message}", Window!);
+            await MessageBoxHelper.ShowErrorAsync(language.Error, $"{ex.Message}", Window!);
         }
 
+
         return false;
+    }
+
+    private async Task<bool> InstallProcessAsync()
+    {
+        if (!await MessageBoxHelper.ShowOkCancelAsync(language.InstallPriceDatabase_Title,
+                language.InstallPriceDatabase_Info,
+                Window!))
+        {
+            return false;
+        }
+        
+        _priceDatabase!.OpenDatabase();
+
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            IsLoading = true;
+        });
+
+        //execute the main jobs manually
+        try
+        {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                LoadingMessage = language.InstallingBitcoinPriceMessage;
+            });
+            await _backgroundJobManager.TriggerJobManuallyOnCurrentThreadAsync(BackgroundJobSystemNames
+                .BitcoinHistoryUpdater);
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                LoadingMessage = language.InstallingFiatPriceMessage;
+            });
+            await _backgroundJobManager.TriggerJobManuallyOnCurrentThreadAsync(BackgroundJobSystemNames
+                .FiatHistoryUpdater);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[InstallProcessAsync] Error during execution");
+
+            await MessageBoxHelper.ShowErrorAsync(language.InstallPriceDatabase_Error_Title,
+                language.InstallPriceDatabase_Error_Info,
+                Window!);
+            return false;
+        }
+
+        return true;
     }
 
     [RelayCommand]

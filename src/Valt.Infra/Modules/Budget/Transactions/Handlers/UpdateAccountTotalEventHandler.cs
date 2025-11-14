@@ -10,7 +10,7 @@ using Valt.Infra.Modules.Budget.Accounts;
 
 namespace Valt.Infra.Modules.Budget.Transactions.Handlers;
 
-public class UpdateAccountTotalEventHandler(ILocalDatabase localDatabase, IClock clock)
+internal class UpdateAccountTotalEventHandler(ILocalDatabase localDatabase, IClock clock)
     : IDomainEventHandler<TransactionCreatedEvent>,
         IDomainEventHandler<TransactionDeletedEvent>,
         IDomainEventHandler<TransactionDetailsChangedEvent>,

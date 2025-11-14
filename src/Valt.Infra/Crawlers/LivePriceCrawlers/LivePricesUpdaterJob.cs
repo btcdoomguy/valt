@@ -65,7 +65,7 @@ internal class LivePricesUpdaterJob : IBackgroundJob
                 refreshLastPrice = true;
             }
 
-            if (refreshLastPrice && _priceDatabase.HasDatabaseOpen)
+            if (refreshLastPrice && _priceDatabase.HasDatabaseOpen && _priceDatabase.GetBitcoinData().Query().Count() > 0)
             {
                 var lastDateParsed = _priceDatabase.GetBitcoinData().Max(x => x.Date).Date;
                 var previousPrice =

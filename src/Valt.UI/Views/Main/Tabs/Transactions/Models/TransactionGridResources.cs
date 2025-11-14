@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Media;
 using Avalonia.Styling;
@@ -6,26 +7,39 @@ namespace Valt.UI.Views.Main.Tabs.Transactions.Models;
 
 public static class TransactionGridResources
 {
-    private static SolidColorBrush? _creditResource = null;
-    private static SolidColorBrush? _debtResource = null;
-    private static SolidColorBrush? _transferResource = null;
-    private static SolidColorBrush? _futureLineResource = null;
-    private static SolidColorBrush? _regularLineResource = null;
+    private static SolidColorBrush? _creditResource;
+    private static SolidColorBrush? _debtResource;
+    private static SolidColorBrush? _transferResource;
+    private static SolidColorBrush? _futureLineResource;
+    private static SolidColorBrush? _regularLineResource;
+
+    public static void Initialize()
+    {
+        _creditResource = GetResource("TransactionAmountCredit", Colors.Gray);
+        _debtResource = GetResource("TransactionAmountDebt", Colors.Gray);
+        _transferResource = GetResource("TransactionAmountTransfer", Colors.Gray);
+        _futureLineResource = GetResource("FutureColor", Colors.Gray);
+        _regularLineResource = GetResource("RegularColor", Colors.Gray);
+    }
+
+    private static SolidColorBrush GetResource(string key, Color defaultColor)
+    {
+        if (!Application.Current!.TryGetResource(key, ThemeVariant.Default, out var resource))
+        {
+            return new SolidColorBrush(defaultColor);
+        }
+
+        return (SolidColorBrush)resource!;
+    }
 
     public static SolidColorBrush Credit
     {
         get
         {
-            if (_creditResource is not null) return _creditResource;
-
-            if (!Application.Current!.TryGetResource("TransactionAmountCredit", ThemeVariant.Default,
-                    out var color))
+            if (_creditResource is null)
             {
-                return new SolidColorBrush(Colors.Gray);
+                throw new InvalidOperationException("Resources not initialized. Call Initialize() first.");
             }
-
-            _creditResource = (SolidColorBrush)color!;
-            
             return _creditResource;
         }
     }
@@ -34,16 +48,10 @@ public static class TransactionGridResources
     {
         get
         {
-            if (_debtResource is not null) return _debtResource;
-
-            if (!Application.Current!.TryGetResource("TransactionAmountDebt", ThemeVariant.Default,
-                    out var color))
+            if (_debtResource is null)
             {
-                return new SolidColorBrush(Colors.Gray);
+                throw new InvalidOperationException("Resources not initialized. Call Initialize() first.");
             }
-
-            _debtResource = (SolidColorBrush)color!;
-            
             return _debtResource;
         }
     }
@@ -52,16 +60,10 @@ public static class TransactionGridResources
     {
         get
         {
-            if (_transferResource is not null) return _transferResource;
-
-            if (!Application.Current!.TryGetResource("TransactionAmountTransfer", ThemeVariant.Default,
-                    out var color))
+            if (_transferResource is null)
             {
-                return new SolidColorBrush(Colors.Gray);
+                throw new InvalidOperationException("Resources not initialized. Call Initialize() first.");
             }
-
-            _transferResource = (SolidColorBrush)color!;
-            
             return _transferResource;
         }
     }
@@ -70,34 +72,22 @@ public static class TransactionGridResources
     {
         get
         {
-            if (_futureLineResource is not null) return _futureLineResource;
-            
-            if (!Application.Current!.TryGetResource("FutureColor", ThemeVariant.Default,
-                    out var color))
+            if (_futureLineResource is null)
             {
-                return new SolidColorBrush(Colors.Gray);
+                throw new InvalidOperationException("Resources not initialized. Call Initialize() first.");
             }
-            
-            _futureLineResource = (SolidColorBrush)color!;
-
             return _futureLineResource;
         }
     }
-    
+
     public static SolidColorBrush RegularLine
     {
         get
         {
-            if (_regularLineResource is not null) return _regularLineResource;
-            
-            if (!Application.Current!.TryGetResource("RegularColor", ThemeVariant.Default,
-                    out var color))
+            if (_regularLineResource is null)
             {
-                return new SolidColorBrush(Colors.Gray);
+                throw new InvalidOperationException("Resources not initialized. Call Initialize() first.");
             }
-            
-            _regularLineResource = (SolidColorBrush)color!;
-
             return _regularLineResource;
         }
     }

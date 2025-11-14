@@ -42,8 +42,6 @@ internal sealed class LocalDatabase : ILocalDatabase
         _inMemoryDb = false;
         _password = password;
 
-        StartDatabase();
-
         OnPropertyChanged(nameof(HasDatabaseOpen));
     }
 
@@ -149,51 +147,11 @@ internal sealed class LocalDatabase : ILocalDatabase
         GetAccountCaches().DeleteAll();
     }
 
-    private void StartDatabase()
-    {
-        if (GetBitcoinData().Query().Count() == 0)
-        {
-            ApplyInitialSeedPrice();
-        }
-    }
-
     private BsonMapper CreateMapper()
     {
         var mapper = new BsonMapper();
         DateOnlyMapper.Register(mapper);
         return mapper;
-    }
-
-    private void ApplyInitialSeedPrice()
-    {
-        var assembly = Assembly.GetExecutingAssembly();
-        var dataResource = @"Valt.Infra.Crawlers.HistoricPriceCrawlers.initial-seed-price.csv";
-
-        var entities = new List<BitcoinDataEntity>();
-        using (var stream = assembly.GetManifestResourceStream(dataResource)!)
-        {
-            using var reader = new StreamReader(stream);
-
-            var nextLine = reader.ReadLine();
-            decimal lastValidPrice = 0;
-            while (nextLine is not null)
-            {
-                var split = nextLine.Split(',');
-
-                if (split[1] != "nan")
-                    lastValidPrice = decimal.Parse(split[1], CultureInfo.InvariantCulture);
-
-                entities.Add(new BitcoinDataEntity()
-                {
-                    Date = DateTime.Parse(split[0]),
-                    Price = lastValidPrice
-                });
-
-                nextLine = reader.ReadLine();
-            }
-        }
-
-        GetBitcoinData().InsertBulk(entities);
     }
 
     #region Budget module
@@ -278,38 +236,6 @@ internal sealed class LocalDatabase : ILocalDatabase
         
         collection.EnsureIndex(x => x.Date);
         
-        return collection;
-    }
-
-    #endregion
-
-    #region DataSource module
-
-    public ILiteCollection<BitcoinDataEntity> GetBitcoinData()
-    {
-        ArgumentNullException.ThrowIfNull(_database);
-
-        if (!HasDatabaseOpen)
-            throw new InvalidOperationException("Open a database first.");
-
-        var collection = _database.GetCollection<BitcoinDataEntity>("datasource_bitcoin");
-
-        collection.EnsureIndex(x => x.Date);
-
-        return collection;
-    }
-
-    public ILiteCollection<FiatDataEntity> GetFiatData()
-    {
-        ArgumentNullException.ThrowIfNull(_database);
-
-        if (!HasDatabaseOpen)
-            throw new InvalidOperationException("Open a database first.");
-
-        var collection = _database.GetCollection<FiatDataEntity>("datasource_fiat");
-
-        collection.EnsureIndex(x => x.Date);
-
         return collection;
     }
 

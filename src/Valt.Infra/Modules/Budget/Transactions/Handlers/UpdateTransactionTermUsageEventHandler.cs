@@ -4,7 +4,7 @@ using Valt.Infra.TransactionTerms;
 
 namespace Valt.Infra.Modules.Budget.Transactions.Handlers;
 
-public class UpdateTransactionTermUsageEventHandler : IDomainEventHandler<TransactionCreatedEvent>,
+internal class UpdateTransactionTermUsageEventHandler : IDomainEventHandler<TransactionCreatedEvent>,
     IDomainEventHandler<TransactionDeletedEvent>, IDomainEventHandler<TransactionNameAndCategoryChangedEvent>
 {
     private readonly ITransactionTermService _transactionTermService;

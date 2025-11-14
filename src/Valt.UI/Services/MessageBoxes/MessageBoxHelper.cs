@@ -54,4 +54,21 @@ public static class MessageBoxHelper
         
         return result == ButtonResult.Yes;
     }
+    
+    public static async Task<bool> ShowOkCancelAsync(string title, string message, Window owner)
+    {
+        var messageBox = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
+        {
+            ButtonDefinitions = ButtonEnum.OkCancel,
+            ContentTitle = title,
+            ContentMessage = message,
+            Icon = Icon.Info,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            SystemDecorations = SystemDecorations.Full,
+        });
+
+        var result = await messageBox.ShowWindowDialogAsync(owner);
+
+        return result == ButtonResult.Ok;
+    }
 }

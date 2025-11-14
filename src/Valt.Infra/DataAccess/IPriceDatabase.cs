@@ -12,6 +12,7 @@ public interface IPriceDatabase : INotifyPropertyChanged, IDisposable
 {
     bool HasDatabaseOpen { get; }
 
+    bool DatabaseFileExists();
     void OpenDatabase();
     void OpenInMemoryDatabase(Stream stream);
     void CloseDatabase();

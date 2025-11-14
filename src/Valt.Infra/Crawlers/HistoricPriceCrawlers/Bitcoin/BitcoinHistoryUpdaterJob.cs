@@ -10,32 +10,47 @@ namespace Valt.Infra.Crawlers.HistoricPriceCrawlers.Bitcoin;
 internal class BitcoinHistoryUpdaterJob : IBackgroundJob
 {
     private readonly IBitcoinHistoricalDataProvider _provider;
+    private readonly IBitcoinInitialSeedPriceProvider _seedProvider;
     private readonly IPriceDatabase _priceDatabase;
     private readonly ILogger<BitcoinHistoryUpdaterJob> _logger;
 
     public string Name => "Bitcoin history updater job";
     public BackgroundJobSystemNames SystemName => BackgroundJobSystemNames.BitcoinHistoryUpdater;
     public BackgroundJobTypes JobType => BackgroundJobTypes.PriceDatabase;
-    
+
     public TimeSpan Interval => TimeSpan.FromSeconds(120);
 
     public BitcoinHistoryUpdaterJob(IBitcoinHistoricalDataProvider provider,
+        IBitcoinInitialSeedPriceProvider seedProvider,
         IPriceDatabase priceDatabase,
         ILogger<BitcoinHistoryUpdaterJob> logger)
     {
         _provider = provider;
+        _seedProvider = seedProvider;
         _priceDatabase = priceDatabase;
         _logger = logger;
     }
-    
-    public async Task StartAsync(CancellationToken stoppingToken)
+
+    public Task StartAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("[BitcoinHistoryUpdaterJob] Started");
+        _logger.LogInformation("[BitcoinHistoryUpdater] Starting...");
+        return Task.CompletedTask;
     }
 
     public async Task RunAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("[BitcoinHistoryUpdaterJob] Updating BTC history");
+        _logger.LogInformation("[BitcoinHistoryUpdater] Updating BTC history");
+        
+        if (_priceDatabase.GetBitcoinData().Query().Count() == 0)
+        {
+            _logger.LogInformation("[BitcoinHistoryUpdater] Starting the prices db with the initial seed");
+            var prices = await _seedProvider.GetPricesAsync();
+            _priceDatabase.GetBitcoinData().InsertBulk(prices.Select(x => new BitcoinDataEntity()
+            {
+                Date = x.Date.ToValtDateTime(),
+                Price = x.Price
+            }));
+        }
 
         try
         {
@@ -51,7 +66,7 @@ internal class BitcoinHistoryUpdaterJob : IBackgroundJob
             if (lastStoredDate >= endDate)
                 return;
 
-            _logger.LogInformation("[BitcoinHistoryUpdaterJob] From {0} to {1}", lastStoredDate.ToShortDateString(),
+            _logger.LogInformation("[BitcoinHistoryUpdater] From {0} to {1}", lastStoredDate.ToShortDateString(),
                 endDate.ToShortDateString());
 
             var prices = await _provider.GetPricesAsync(DateOnly.FromDateTime(lastStoredDate),
@@ -63,7 +78,7 @@ internal class BitcoinHistoryUpdaterJob : IBackgroundJob
                 var dateToConsider = price.Date.ToValtDateTime();
                 if (dateToConsider <= endDate)
                 {
-                    _logger.LogInformation("[BitcoinHistoryUpdaterJob] Adding price {PricePrice} for {DateToConsider}",
+                    _logger.LogInformation("[BitcoinHistoryUpdater] Adding price {PricePrice} for {DateToConsider}",
                         price.Price, dateToConsider.ToString("yyyy-MM-dd"));
                     
                     entries.Add(new BitcoinDataEntity()
@@ -82,7 +97,7 @@ internal class BitcoinHistoryUpdaterJob : IBackgroundJob
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[BitcoinHistoryUpdaterJob] Error during execution");
+            _logger.LogError(ex, "[BitcoinHistoryUpdater] Error during execution");
             throw;
         }
     }
