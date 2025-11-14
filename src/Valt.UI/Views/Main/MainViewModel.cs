@@ -49,6 +49,10 @@ public partial class MainViewModel : ValtViewModel
     [ObservableProperty] private bool _hasDatabaseOpen;
     public bool ShowUsdFiatLabels => _currencySettings.MainFiatCurrency != FiatCurrency.Usd.Code;
 
+    public GridLength LayoutCustomTitleBarRowHeight => RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+        ? new GridLength(30)
+        : new GridLength(0);
+
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsTransactionButtonSelected))]
     private ValtViewModel? _selectedTabComponent;
 

@@ -36,11 +36,11 @@ public partial class MainView : ValtBaseWindow
     {
         base.OnOpened(e);
 
-        if (!Design.IsDesignMode)
-        {
-            ((DataContext as MainViewModel)!).Window = this;
-            _ = ((DataContext as MainViewModel)!).OpenInitialSelectionModal();
-        }
+        if (Design.IsDesignMode) 
+            return;
+        
+        ((DataContext as MainViewModel)!).Window = this;
+        _ = ((DataContext as MainViewModel)!).OpenInitialSelectionModal();
     }
 
     private void Window_OnPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -55,12 +55,11 @@ public partial class MainView : ValtBaseWindow
     {
         e.Cancel = true;
 
-        if (DataContext is MainViewModel viewModel)
-        {
-            await viewModel.OnClosingAsync();
+        if (DataContext is not MainViewModel viewModel) 
+            return;
+        
+        await viewModel.OnClosingAsync();
 
-            e.Cancel = false;
-        }
+        e.Cancel = false;
     }
-
 }

@@ -26,7 +26,13 @@
     <Window.KeyBindings>
         <KeyBinding Gesture="F2" Command="{Binding AddTransactionCommand}" />
     </Window.KeyBindings>
-    <Grid RowDefinitions="30, 90, *, 30">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{Binding LayoutCustomTitleBarRowHeight}"></RowDefinition>
+            <RowDefinition Height="90"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
+        </Grid.RowDefinitions>
         <userControls1:CustomTitleBar x:Name="CustomTitleBar" Grid.Row="0" Title="VALT"
                                       TitleBarPressed="Window_OnPointerPressed"
                                       CloseVisible="False" />
