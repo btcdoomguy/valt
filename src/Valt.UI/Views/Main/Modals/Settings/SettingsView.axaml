@@ -10,10 +10,10 @@
         x:DataType="settings1:SettingsViewModel"
         Title="{x:Static local:language.Settings_Title}"
         WindowStartupLocation="CenterOwner"
-        d:DesignWidth="450"
-        d:DesignHeight="400"
-        MaxWidth="450"
-        MaxHeight="400"
+        d:DesignWidth="550"
+        d:DesignHeight="420"
+        MaxWidth="550"
+        MaxHeight="420"
         ExtendClientAreaToDecorationsHint="True"
         SystemDecorations="None"
         ExtendClientAreaTitleBarHeightHint="0">
@@ -25,40 +25,52 @@
             <userControls:CustomTitleBar Title="{x:Static local:language.Settings_Title}"
                                          TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
-            <Border Classes="form-fields-area" Height="320">
+            <Border Classes="form-fields-area" Height="340">
                 <StackPanel Orientation="Vertical" Spacing="20">
                     <DockPanel>
-                        <TextBlock Width="150" TextAlignment="Right" Margin="0,0,5,0"
+                        <TextBlock Width="220" TextAlignment="Right" Margin="0,0,5,0"
                                    VerticalAlignment="Center"
                                    Text="{x:Static local:language.Settings_MainFiatCurrency}" TextWrapping="Wrap" />
                         <ComboBox ItemsSource="{Binding AvailableFiatCurrencies}"
-                                  SelectedItem="{Binding MainFiatCurrency}" Width="200" />
-
+                                  SelectedItem="{Binding MainFiatCurrency}" Width="100" />
                     </DockPanel>
                     <DockPanel>
-                        <TextBlock Width="150" TextAlignment="Right" Margin="0,0,5,0"
+                        <TextBlock Width="220" TextAlignment="Right" Margin="0,0,5,0"
                                    VerticalAlignment="Center"
                                    Text="{x:Static local:language.Settings_Culture}" TextWrapping="Wrap" />
-                        <ComboBox ItemsSource="{Binding Cultures}"
-                                  DisplayMemberBinding="{Binding Text}"
-                                  SelectedValueBinding="{Binding Value}"
-                                  SelectedValue="{Binding CurrentCulture}" Width="200" />
+                        <StackPanel Orientation="Vertical">
+                            <ComboBox ItemsSource="{Binding Cultures}"
+                                      DisplayMemberBinding="{Binding Text}"
+                                      SelectedValueBinding="{Binding Value}"
+                                      SelectedValue="{Binding CurrentCulture}" Width="200" />
+                            
+                            <TextBlock FontStyle="Italic" Text="{x:Static local:language.Settings_RequiresRestart}" />
+                        </StackPanel>
                     </DockPanel>
                     <DockPanel>
-                        <TextBlock Width="150" TextAlignment="Right" Margin="0,0,5,0"
+                        <TextBlock Width="220" TextAlignment="Right" Margin="0,0,5,0"
                                    VerticalAlignment="Center"
                                    Text="{x:Static local:language.Settings_ShowHiddenAccounts}" TextWrapping="Wrap" />
                         <CheckBox IsChecked="{Binding ShowHiddenAccounts}"></CheckBox>
                     </DockPanel>
-                    <Button HorizontalAlignment="Center" Classes="transparent link" Command="{Binding ClearAccountCacheCommand}" Content="{x:Static local:language.Settings_ClearAccountTotalsCache}" />
-                    <Button HorizontalAlignment="Center" Classes="transparent link" Command="{Binding ProcessTransactionTermCacheCommand}"  Content="{x:Static local:language.Settings_ClearTransactionTermCache}" />
-                    <Button HorizontalAlignment="Center" Classes="transparent link" Command="{Binding ChangeDatabasePasswordCommand}"  Content="{x:Static local:language.Settings_ChangeDatabasePassword}" />
+                    <Button HorizontalAlignment="Center" Classes="transparent link"
+                            Command="{Binding ClearAccountCacheCommand}"
+                            Content="{x:Static local:language.Settings_ClearAccountTotalsCache}" />
+                    <Button HorizontalAlignment="Center" Classes="transparent link"
+                            Command="{Binding ProcessTransactionTermCacheCommand}"
+                            Content="{x:Static local:language.Settings_ClearTransactionTermCache}" />
+                    <Button HorizontalAlignment="Center" Classes="transparent link"
+                            Command="{Binding ChangeDatabasePasswordCommand}"
+                            Content="{x:Static local:language.Settings_ChangeDatabasePassword}" />
                 </StackPanel>
             </Border>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10"
                         Margin="0, 0, 0, 0">
-                <Button Width="100" Content="{x:Static local:language.OkButton}" HorizontalContentAlignment="Center" Command="{Binding OkCommand}"></Button>
-                <Button Width="100" Content="{x:Static local:language.CancelButton}" HorizontalContentAlignment="Center"
+                <Button Width="100" Content="{x:Static local:language.OkButton}" HorizontalContentAlignment="Center"
+                        Command="{Binding OkCommand}">
+                </Button>
+                <Button Width="100" Content="{x:Static local:language.CancelButton}"
+                        HorizontalContentAlignment="Center"
                         Command="{Binding CancelCommand}">
                 </Button>
             </StackPanel>

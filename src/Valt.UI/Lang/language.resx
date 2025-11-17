@@ -620,4 +620,10 @@
     <data name="About.Title" xml:space="preserve">
         <value>About</value>
     </data>
+    <data name="About.Tip" xml:space="preserve">
+        <value>If you like the app, send me some sats:</value>
+    </data>
+    <data name="Settings.RequiresRestart" xml:space="preserve">
+        <value>(requires restart)</value>
+    </data>
 </root>
