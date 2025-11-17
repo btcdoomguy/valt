@@ -1220,5 +1220,23 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("BootDatabase.Category.Paycheck", resourceCulture);
             }
         }
+        
+        public static string Transactions_AddTransaction_ToolTip {
+            get {
+                return ResourceManager.GetString("Transactions.AddTransaction.ToolTip", resourceCulture);
+            }
+        }
+        
+        public static string Main_Menu_About {
+            get {
+                return ResourceManager.GetString("Main.Menu.About", resourceCulture);
+            }
+        }
+        
+        public static string About_Title {
+            get {
+                return ResourceManager.GetString("About.Title", resourceCulture);
+            }
+        }
     }
 }

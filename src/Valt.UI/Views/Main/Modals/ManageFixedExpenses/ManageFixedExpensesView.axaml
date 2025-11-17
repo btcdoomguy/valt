@@ -26,8 +26,8 @@
     <Border>
         <Grid RowDefinitions="Auto, 500, 80">
             <userControls:CustomTitleBar Grid.Row="0" Title="{x:Static lang:language.ManageFixedExpenses_Title}"
-                                         TitleBarPressed="InputElement_OnPointerPressed"
-                                         CloseClick="CustomTitleBar_OnCloseClick" />
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
             <DataGrid Grid.Row="1"
                       x:Name="MainGrid"
                       Margin="10, 10, 10, 0"

@@ -8,6 +8,7 @@ using Valt.UI.State;
 using Valt.UI.Views;
 using Valt.UI.Views.Main;
 using Valt.UI.Views.Main.Controls;
+using Valt.UI.Views.Main.Modals.About;
 using Valt.UI.Views.Main.Modals.ChangeCategoryTransactions;
 using Valt.UI.Views.Main.Modals.ChangePassword;
 using Valt.UI.Views.Main.Modals.CreateDatabase;
@@ -65,6 +66,7 @@ public static class Extensions
         services.AddSingleton<ITransactionTabFactory, TransactionTabFactory>();
 
         //modals
+        services.AddTransient<AboutViewModel>();
         services.AddTransient<InitialSelectionViewModel>();
         services.AddTransient<CreateDatabaseViewModel>();
         services.AddTransient<ChangePasswordViewModel>();
@@ -89,6 +91,10 @@ public static class Extensions
         {
             return modalNames switch
             {
+                ApplicationModalNames.About => new AboutView()
+                {
+                    DataContext = services.GetRequiredService<AboutViewModel>(),
+                },
                 ApplicationModalNames.InitialSelection => new InitialSelectionView()
                 {
                     DataContext = services.GetRequiredService<InitialSelectionViewModel>(),

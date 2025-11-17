@@ -19,17 +19,4 @@ public partial class InputPasswordView : ValtBaseWindow
         
         Dispatcher.UIThread.InvokeAsync(() => PasswordBox.Focus(), DispatcherPriority.ApplicationIdle);
     }
-
-    private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
-    {
-        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-        {
-            BeginMoveDrag(e);
-        }
-    }
-
-    private void CustomTitleBar_OnCloseClick(object? sender, RoutedEventArgs e)
-    {
-        Close();
-    }
 }

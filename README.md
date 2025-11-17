@@ -19,6 +19,18 @@ Valt is a simple and easy to use budget management app for bitcoiners, since all
 - Supports en-US and pt-BR languages
 - Supports a wide range of fiat ~~currencies~~
 
+## Useful Hotkeys
+
+Main window:
+- **F2**: adds a new transaction
+
+Transaction window:
+- **Ctrl + 1**: switch to Debt
+- **Ctrl + 2**: switch to Credit
+- **Ctrl + 3**: switch to Transfer
+- **Ctrl + Left Arrow**: move the date to the previous day
+- **Ctrl + Right Arrow**: move the date to the next day
+
 ## Roadmap
 
 - Reports module: generate graphical reports of your transactions, being able to filter and save filters for future use

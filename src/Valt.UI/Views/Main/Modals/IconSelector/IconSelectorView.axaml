@@ -26,15 +26,15 @@
     <Border>
         <StackPanel Orientation="Vertical">
             <userControls:CustomTitleBar Title="{x:Static local:language.IconSelector_Title}"
-                                         TitleBarPressed="InputElement_OnPointerPressed"
-                                         CloseClick="CustomTitleBar_OnCloseClick" />
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
             <!-- Name Field -->
             <DockPanel Margin="0, 10, 0, 0">
                 <TextBlock TextWrapping="Wrap" Text="{x:Static local:language.Search}" TextAlignment="Right"
                            Width="120" Margin="0, 8, 5, 0" VerticalAlignment="Center" />
                 <TextBox Text="{Binding SearchText}" />
             </DockPanel>
-            <Grid ColumnDefinitions="130, *">
+            <Grid ColumnDefinitions="130, *" Margin="2, 10, 2, 0">
                 <ListBox Grid.Column="0"
                          Classes="regularListBox"
                          ItemsSource="{Binding Categories}"

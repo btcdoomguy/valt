@@ -39,6 +39,7 @@
                                                Range="{Binding FilterRange}" />
             <StackPanel Grid.Column="2" HorizontalAlignment="Right" Orientation="Horizontal">
                 <Button Command="{Binding AddTransactionCommand}"
+                        ToolTip.Tip="{x:Static local:language.Transactions_AddTransaction_ToolTip}"
                         Content="{x:Static local:language.Transactions_AddTransaction}" />
             </StackPanel>
         </Grid>

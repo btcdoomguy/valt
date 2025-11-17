@@ -26,8 +26,8 @@
     <Border>
         <StackPanel Orientation="Vertical">
             <userControls:CustomTitleBar Title="{x:Static local:language.ManageAccount_Title}" 
-                                         TitleBarPressed="InputElement_OnPointerPressed"
-                                         CloseClick="CustomTitleBar_OnCloseClick" />
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
             <Border Classes="form-fields-area" Height="430">
                 <StackPanel>
                     <!-- Name Field -->

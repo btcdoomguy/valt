@@ -6,11 +6,9 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using Avalonia.Svg.Skia;
 using SkiaSharp;
-using Svg;
 using Valt.UI.Base;
-using SvgImage = Avalonia.Svg.Skia.SvgImage;
+
 
 namespace Valt.UI.Views.Main;
 

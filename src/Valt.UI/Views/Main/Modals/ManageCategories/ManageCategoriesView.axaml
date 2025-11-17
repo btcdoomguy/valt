@@ -26,8 +26,8 @@
     <Border>
         <Grid RowDefinitions="Auto, *">
             <userControls:CustomTitleBar Grid.Row="0" Title="{x:Static lang:language.ManageCategories_Title}"
-                                         TitleBarPressed="InputElement_OnPointerPressed"
-                                         CloseClick="CustomTitleBar_OnCloseClick" />
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
             <Grid Grid.Row="1" ColumnDefinitions="250, *">
                 <Border Grid.Column="0"
                         Padding="5">

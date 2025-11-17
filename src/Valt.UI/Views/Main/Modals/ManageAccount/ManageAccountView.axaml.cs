@@ -10,17 +10,4 @@ public partial class ManageAccountView : ValtBaseWindow
     {
         InitializeComponent();
     }
-
-    private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
-    {
-        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-        {
-            BeginMoveDrag(e);
-        }
-    }
-
-    private void CustomTitleBar_OnCloseClick(object? sender, RoutedEventArgs e)
-    {
-        Close();
-    }
 }

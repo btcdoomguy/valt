@@ -21,7 +21,6 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
     public TimeSpan Interval => TimeSpan.FromSeconds(120);
 
 
-
     public FiatHistoryUpdaterJob(IPriceDatabase priceDatabase,
         IFiatHistoricalDataProvider provider,
         ILogger<FiatHistoryUpdaterJob> logger)
@@ -47,7 +46,6 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
 
             if (!_priceDatabase.HasDatabaseOpen)
                 return;
-
 
             var historicalLastDate = new DateTime(2008, 1, 1);
             try
@@ -80,7 +78,7 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
                 endDate.ToShortDateString());
 
             var prices = (await _provider.GetPricesAsync(DateOnly.FromDateTime(startDate),
-                DateOnly.FromDateTime(endDate))).ToList();
+                DateOnly.FromDateTime(endDate)).ConfigureAwait(false)).ToList();
 
             if (prices.Count != 0)
             {
@@ -94,7 +92,7 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
             throw;
         }
     }
-    
+
     private void FillLocalDatabase(IEnumerable<IFiatHistoricalDataProvider.FiatPriceData> prices)
     {
         var entries = new List<FiatDataEntity>();

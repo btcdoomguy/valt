@@ -29,19 +29,6 @@ public partial class ManageCategoriesView : ValtBaseWindow
         Tree.AddHandler(PointerCaptureLostEvent, TreeView_OnPointerCaptureLost, RoutingStrategies.Bubble);
     }
 
-    private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
-    {
-        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-        {
-            BeginMoveDrag(e);
-        }
-    }
-
-    private void CustomTitleBar_OnCloseClick(object? sender, RoutedEventArgs e)
-    {
-        Close();
-    }
-
     private void TreeView_OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (e.GetCurrentPoint(this).Properties.IsRightButtonPressed)

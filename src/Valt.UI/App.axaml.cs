@@ -7,8 +7,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
-using LiveChartsCore;
-using LiveChartsCore.SkiaSharpView;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Valt.Core;
@@ -27,9 +25,6 @@ public partial class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
-
-        //LiveCharts initialization
-        LiveCharts.Configure(config => config.AddSkiaSharp().AddDefaultMappers());
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -70,6 +65,7 @@ public partial class App : Application
         }
         
         TransactionGridResources.Initialize();
+        FixedExpenseListResources.Initialize();
 
         base.OnFrameworkInitializationCompleted();
 

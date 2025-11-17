@@ -74,10 +74,15 @@
                                 <MenuItem Header="{x:Static local:language.Main_Menu_Settings}"
                                           Command="{Binding ManageSettingsCommand}">
                                 </MenuItem>
+                                <MenuItem Header="{x:Static local:language.Main_Menu_About}"
+                                          Command="{Binding AboutCommand}">
+                                </MenuItem>
                             </MenuFlyout>
                         </DropDownButton.Flyout>
                     </DropDownButton>
                 </StackPanel>
+                <Image Source="/Assets/Pepe/veryunhappy.webp" IsVisible="{Binding Crashing}" Grid.Column="0" HorizontalAlignment="Right" Margin="0, 5, 20, 0" Opacity="0.7"></Image>
+                <Image Source="/Assets/Pepe/veryhappy.webp" IsVisible="{Binding Pumping}" Grid.Column="0" HorizontalAlignment="Right" Margin="0, 5, 20, 0" Opacity="0.7"></Image>
                 <!--Top bar prices-->
                 <controls:LiveRates Margin="0, 10, 0, 0" x:Name="LiveRatesControl"
                                     DataContext="{Binding LiveRatesViewModel}" Grid.Column="1" />

@@ -272,6 +272,13 @@ public partial class FiatInput : UserControl
         IsInputFocused = false;
     }
     
+    protected override void OnGotFocus(GotFocusEventArgs e)
+    {
+        base.OnGotFocus(e);
+        _textBox?.Focus();
+        _textBox?.SelectAll();
+    }
+    
     #endregion
 
     private void UpdateFiatValue()

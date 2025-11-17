@@ -28,7 +28,7 @@ internal class BitcoinInitialSeedPriceProvider : IBitcoinInitialSeedPriceProvide
             var response = await client.GetAsync(url);
             response.EnsureSuccessStatusCode();
             
-            var stream = await response.Content.ReadAsStreamAsync();
+            var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
             
             using var reader = new StreamReader(stream);
 

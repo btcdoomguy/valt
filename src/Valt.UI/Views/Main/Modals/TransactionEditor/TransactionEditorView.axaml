@@ -26,8 +26,8 @@
     </Window.KeyBindings>
     <Border>
         <StackPanel Orientation="Vertical">
-            <userControls:CustomTitleBar Title="{Binding WindowTitle}" TitleBarPressed="InputElement_OnPointerPressed"
-                                         CloseClick="CustomTitleBar_OnCloseClick" />
+            <userControls:CustomTitleBar Title="{Binding WindowTitle}" TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
             <Border Classes="form-fields-area" Height="330" Padding="0">
                 <Grid RowDefinitions="50, 50, 70, 80, 70">
                     <DockPanel Grid.Row="0" Margin="0, 0, 0, 0" HorizontalAlignment="Stretch">
@@ -108,6 +108,7 @@
                             <StackPanel Classes="form-field">
                                 <TextBlock Text="{x:Static local:language.ManageTransactions_Name}" />
                                 <AutoCompleteBox x:Name="AutoCompleteTransactionNameBox"
+                                                 DropDownClosed="AutoCompleteTransactionNameBox_OnDropDownClosed"
                                                  TabIndex="0"
                                                  Text="{Binding Name, Mode=TwoWay}"
                                                  SelectedItem="{Binding TransactionTermResult, Mode=TwoWay}">
@@ -181,6 +182,7 @@
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                                     <userControls:BtcInput
                                         x:Name="FromBtc"
+                                        Focusable="True"
                                         IsVisible="{Binding FromAccountIsBtc}"
                                         IsInputFocused="{Binding IsFromBtcInputFocused, Mode=TwoWay}"
                                         BtcValue="{Binding FromAccountBtcValue, Mode=TwoWay}"
@@ -192,6 +194,7 @@
                                     </userControls:BtcInput>
                                     <userControls:FiatInput
                                         x:Name="FromFiat"
+                                        Focusable="True"
                                         IsInputFocused="{Binding IsFromFiatInputFocused, Mode=TwoWay}"
                                         IsVisible="{Binding !FromAccountIsBtc}"
                                         FiatValue="{Binding FromAccountFiatValue, Mode=TwoWay}"

@@ -23,6 +23,7 @@
                                IsVisible="{Binding !SymbolOnRight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type userControls:FiatInput}}}" />
 
                     <TextBox Grid.Column="1"
+                             x:Name="TextBoxInput"
                              Name="TextBoxInput"
                              Text="{Binding DisplayValue, Mode=TwoWay, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type userControls:FiatInput}}}"  />
 
