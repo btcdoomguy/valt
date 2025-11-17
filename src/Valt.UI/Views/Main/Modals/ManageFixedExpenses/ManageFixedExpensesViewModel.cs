@@ -6,7 +6,6 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Valt.Core.Common;
 using Valt.Core.Modules.Budget.FixedExpenses;
 using Valt.Core.Modules.Budget.FixedExpenses.Contracts;
 using Valt.Core.Modules.Budget.Transactions.Contracts;

@@ -1,5 +1,3 @@
-using Valt.Core.Common;
-
 namespace Valt.Infra.TransactionTerms;
 
 public record TransactionTermResult(

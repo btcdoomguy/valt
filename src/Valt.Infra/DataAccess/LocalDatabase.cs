@@ -1,6 +1,4 @@
 using System.ComponentModel;
-using System.Globalization;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using LiteDB;
 using Valt.Core.Kernel.Abstractions.Time;
@@ -10,8 +8,6 @@ using Valt.Infra.Modules.Budget.Categories;
 using Valt.Infra.Modules.Budget.FixedExpenses;
 using Valt.Infra.Modules.Budget.Transactions;
 using Valt.Infra.Modules.Configuration;
-using Valt.Infra.Modules.DataSources.Bitcoin;
-using Valt.Infra.Modules.DataSources.Fiat;
 using Valt.Infra.Settings;
 
 namespace Valt.Infra.DataAccess;

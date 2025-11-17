@@ -1,7 +1,5 @@
 using System.Globalization;
 using Microsoft.Extensions.Logging;
-using Valt.Infra.Kernel.Notifications;
-using Valt.Infra.Modules.DataSources.Bitcoin;
 
 namespace Valt.Infra.Crawlers.HistoricPriceCrawlers.Bitcoin;
 

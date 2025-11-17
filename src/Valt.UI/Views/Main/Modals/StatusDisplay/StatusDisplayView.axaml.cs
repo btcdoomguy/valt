@@ -1,5 +1,3 @@
-using Avalonia.Input;
-using Avalonia.Interactivity;
 using Valt.UI.Base;
 
 namespace Valt.UI.Views.Main.Modals.StatusDisplay;

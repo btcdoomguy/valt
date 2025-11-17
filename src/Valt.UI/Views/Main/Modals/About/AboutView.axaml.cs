@@ -1,9 +1,5 @@
 using System;
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
 using Valt.UI.Base;
 
 namespace Valt.UI.Views.Main.Modals.About;

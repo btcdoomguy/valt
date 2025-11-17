@@ -1,12 +1,10 @@
 using System;
-using System.Globalization;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
-using Valt.Infra.Crawlers.HistoricPriceCrawlers.Bitcoin;
 using Valt.UI.Base;
 
 namespace Valt.UI.Views.Main.Modals.About;
