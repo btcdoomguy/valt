@@ -44,6 +44,7 @@
         <entry key="src/Valt.UI/UserControls/IconSelector.axaml" value="src/Valt.UI/Valt.UI.csproj" />
         <entry key="src/Valt.UI/Views/Main/Controls/LiveRates.axaml" value="src/Valt.UI/Valt.UI.csproj" />
         <entry key="src/Valt.UI/Views/Main/MainView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
+        <entry key="src/Valt.UI/Views/Main/Modals/About/AboutView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
         <entry key="src/Valt.UI/Views/Main/Modals/Boot/BootView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
         <entry key="src/Valt.UI/Views/Main/Modals/ChangeCategoryTransactions/ChangeCategoryTransactionsView.axaml" value="src/Valt.UI/Valt.UI.csproj" />
         <entry key="src/Valt.UI/Views/Main/Modals/ChangePassword/ChangePasswordView.axaml" value="src/Valt.UI/Valt.UI.csproj" />

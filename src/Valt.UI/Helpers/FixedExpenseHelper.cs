@@ -1,6 +1,5 @@
 using System;
 using Valt.Core.Common;
-using Valt.Core.Modules.Budget.FixedExpenses;
 using Valt.Infra.Settings;
 using Valt.UI.State;
 

@@ -31,13 +31,13 @@
         <value>Criar novo banco de dados</value>
     </data>
     <data name="CreateDatabase.TextLine1" xml:space="preserve">
-        <value>Todas as suas transações serão armazenadas em um banco de dados local.</value>
+        <value>VALT utiliza um simples arquivo como banco de dados para suas informações.</value>
     </data>
     <data name="CreateDatabase.TextLine2" xml:space="preserve">
         <value>Para reforçar a segurança, adicione uma senha forte para o seu arquivo.</value>
     </data>
     <data name="CreateDatabase.TextLine3" xml:space="preserve">
-        <value>OBS: perder a senha irá acarretar na perda dos seus dados.</value>
+        <value>OBS: perder a senha irá acarretar na perda dos seus dados. Anote em algum lugar seguro!</value>
     </data>
     <data name="CreateDatabase.ConfirmPassword" xml:space="preserve">
         <value>Confirme a senha</value>
@@ -605,5 +605,14 @@
     </data>
     <data name="BootDatabase.FiatAccount" xml:space="preserve">
         <value>Conta Bancária</value>
+    </data>
+    <data name="Transactions.AddTransaction.ToolTip" xml:space="preserve">
+        <value>Você também pode pressionar F2 para adicionar uma nova transação</value>
+    </data>
+    <data name="Main.Menu.About" xml:space="preserve">
+        <value>Sobre</value>
+    </data>
+    <data name="About.Title" xml:space="preserve">
+        <value>Sobre</value>
     </data>
 </root>

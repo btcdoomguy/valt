@@ -1,6 +1,4 @@
 using System;
-using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Valt.UI.Base;
 
@@ -18,18 +16,5 @@ public partial class InputPasswordView : ValtBaseWindow
         base.OnOpened(e);
         
         Dispatcher.UIThread.InvokeAsync(() => PasswordBox.Focus(), DispatcherPriority.ApplicationIdle);
-    }
-
-    private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
-    {
-        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-        {
-            BeginMoveDrag(e);
-        }
-    }
-
-    private void CustomTitleBar_OnCloseClick(object? sender, RoutedEventArgs e)
-    {
-        Close();
     }
 }

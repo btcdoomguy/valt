@@ -42,7 +42,7 @@
                                 <ColumnDefinition Width="130"></ColumnDefinition>
                                 <ColumnDefinition Width="*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
-                            <Label Grid.Column="0" Content="{x:Static local:language.Transactions_MyStack}" />
+                            <Label Grid.Column="0" Foreground="{DynamicResource Accent200Brush}" Content="{x:Static local:language.Transactions_MyStack}" />
                             <Label Grid.Column="1" HorizontalAlignment="Right" Content="{Binding WealthInSats}"></Label>
                         </Grid>
                         <Grid>
@@ -50,7 +50,7 @@
                                 <ColumnDefinition Width="130"></ColumnDefinition>
                                 <ColumnDefinition Width="*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
-                            <Label Grid.Column="0" Content="{x:Static local:language.Transactions_MyOther}" />
+                            <Label Grid.Column="0" Foreground="{DynamicResource Accent100Brush}" Content="{x:Static local:language.Transactions_MyOther}" />
                             <Label Grid.Column="1" HorizontalAlignment="Right" Content="{Binding WealthInFiat}"></Label>
                         </Grid>
                         <Grid>
@@ -58,7 +58,7 @@
                                 <ColumnDefinition Width="130"></ColumnDefinition>
                                 <ColumnDefinition Width="*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
-                            <Label Grid.Column="0" Content="{x:Static local:language.Transactions_TotalInFiat}" />
+                            <Label Grid.Column="0" Foreground="{DynamicResource Accent100Brush}" Content="{x:Static local:language.Transactions_TotalInFiat}" />
                             <Label Grid.Column="1" HorizontalAlignment="Right" Content="{Binding AllWealthInFiat}"></Label>
                         </Grid>
                         <Grid>
@@ -66,7 +66,7 @@
                                 <ColumnDefinition Width="130"></ColumnDefinition>
                                 <ColumnDefinition Width="*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
-                            <Label Grid.Column="0" Content="{x:Static local:language.Transactions_Ratio}" />
+                            <Label Grid.Column="0" Foreground="{DynamicResource Accent100Brush}" Content="{x:Static local:language.Transactions_Ratio}" />
                             <Label Grid.Column="1" HorizontalAlignment="Right" Content="{Binding WealthInBtcRatio}"></Label>
                         </Grid>
                     </StackPanel>
@@ -226,29 +226,15 @@
                                         <Label Grid.Column="0" IsVisible="{Binding Paid}"
                                                Content="&#xe834;"
                                                FontFamily="{DynamicResource MaterialDesign}"
-                                               Foreground="{DynamicResource SemanticPositive500Brush}"
-                                               Padding="3, -2,0 ,0"
-                                               FontSize="16">
-                                        </Label>
-                                        <Label Grid.Column="0" IsVisible="{Binding MarkedAsPaid}"
-                                               Content="&#xe834;"
-                                               FontFamily="{DynamicResource MaterialDesign}"
+                                               Foreground="{Binding CheckboxPaidColor}"
                                                Padding="3, -2,0 ,0"
                                                FontSize="16">
                                         </Label>
                                         <Label Grid.Column="1" FontSize="12" Content="{Binding Name}"
-                                               IsVisible="{Binding !Ignored}">
-                                        </Label>
-                                        <Label Grid.Column="1" FontSize="12" Content="{Binding Name}"
-                                               Foreground="{DynamicResource Text500Brush}"
-                                               IsVisible="{Binding Ignored}">
+                                               Foreground="{Binding TextColor}">
                                         </Label>
                                         <Label Grid.Column="2" FontSize="12" Content="{Binding Day}"
-                                               IsVisible="{Binding !Ignored}">
-                                        </Label>
-                                        <Label Grid.Column="2" FontSize="12" Content="{Binding Day}"
-                                               Foreground="{DynamicResource Text500Brush}"
-                                               IsVisible="{Binding Ignored}">
+                                               Foreground="{Binding TextColor}">
                                         </Label>
                                     </Grid>
                                     <Border.ContextMenu>

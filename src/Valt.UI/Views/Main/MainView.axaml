@@ -26,7 +26,13 @@
     <Window.KeyBindings>
         <KeyBinding Gesture="F2" Command="{Binding AddTransactionCommand}" />
     </Window.KeyBindings>
-    <Grid RowDefinitions="30, 90, *, 30">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{Binding LayoutCustomTitleBarRowHeight}"></RowDefinition>
+            <RowDefinition Height="90"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
+        </Grid.RowDefinitions>
         <userControls1:CustomTitleBar x:Name="CustomTitleBar" Grid.Row="0" Title="VALT"
                                       TitleBarPressed="Window_OnPointerPressed"
                                       CloseVisible="False" />
@@ -68,10 +74,15 @@
                                 <MenuItem Header="{x:Static local:language.Main_Menu_Settings}"
                                           Command="{Binding ManageSettingsCommand}">
                                 </MenuItem>
+                                <MenuItem Header="{x:Static local:language.Main_Menu_About}"
+                                          Command="{Binding AboutCommand}">
+                                </MenuItem>
                             </MenuFlyout>
                         </DropDownButton.Flyout>
                     </DropDownButton>
                 </StackPanel>
+                <Image Source="/Assets/Pepe/veryunhappy.webp" IsVisible="{Binding Crashing}" Grid.Column="0" HorizontalAlignment="Right" Margin="0, 5, 20, 0" Opacity="0.7"></Image>
+                <Image Source="/Assets/Pepe/veryhappy.webp" IsVisible="{Binding Pumping}" Grid.Column="0" HorizontalAlignment="Right" Margin="0, 5, 20, 0" Opacity="0.7"></Image>
                 <!--Top bar prices-->
                 <controls:LiveRates Margin="0, 10, 0, 0" x:Name="LiveRatesControl"
                                     DataContext="{Binding LiveRatesViewModel}" Grid.Column="1" />

@@ -200,6 +200,13 @@ public partial class BtcInput : UserControl
         IsInputFocused = false;
     }
     
+    protected override void OnGotFocus(GotFocusEventArgs e)
+    {
+        base.OnGotFocus(e);
+        _inputBox?.Focus();
+        _inputBox?.SelectAll();
+    }
+    
     #endregion
 
     private void UpdateBtcValue()

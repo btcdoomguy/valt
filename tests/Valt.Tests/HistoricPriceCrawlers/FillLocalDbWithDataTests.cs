@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using System.Globalization;
-using System.Reflection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Valt.Infra;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Bitcoin;

@@ -10,8 +10,8 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
+using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Accounts.Contracts;
@@ -48,13 +48,14 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
     private readonly AccountDisplayOrderManager? _accountDisplayOrderManager;
     private readonly FilterState? _filterState;
     private readonly IFixedExpenseRecordService? _fixedExpenseRecordService;
+    private readonly IClock _clock;
     private readonly IAccountQueries? _accountQueries;
 
     //instances of the sub contents
     private readonly TransactionListViewModel _transactionListViewModel = null!;
 
     [ObservableProperty] private AvaloniaList<AccountViewModel> _accounts = new();
-    [ObservableProperty] private AvaloniaList<FixedExpenseProviderEntry> _fixedExpenseEntries = new();
+    [ObservableProperty] private AvaloniaList<FixedExpensesEntryViewModel> _fixedExpenseEntries = new();
     [ObservableProperty] private string _remainingFixedExpensesAmount = string.Empty;
 
     [ObservableProperty] private AccountViewModel? _selectedAccount;
@@ -130,19 +131,25 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
 
         SelectedAccount = Accounts.FirstOrDefault();
 
+        var currentMockedDay = 10;
+
         FixedExpenseEntries =
         [
-            new FixedExpenseProviderEntry(new FixedExpenseId().Value, "Test1", new CategoryId(),
+            new FixedExpensesEntryViewModel(new FixedExpenseProviderEntry(new FixedExpenseId().Value, "Test1",
+                new CategoryId(),
                 new DateOnly(2025, 1, 7), null, 100, null, null, FiatCurrency.Usd.Code, FixedExpenseRecordState.Paid,
-                new TransactionId()),
-            new FixedExpenseProviderEntry(new FixedExpenseId().Value, "Test2", new CategoryId(),
+                new TransactionId()), currentMockedDay),
+            new FixedExpensesEntryViewModel(new FixedExpenseProviderEntry(new FixedExpenseId().Value, "Test2",
+                new CategoryId(),
                 new DateOnly(2025, 1, 10), null, 120, null, null, FiatCurrency.Usd.Code,
-                FixedExpenseRecordState.ManuallyPaid, null),
-            new FixedExpenseProviderEntry(new FixedExpenseId().Value, "Test3", new CategoryId(),
+                FixedExpenseRecordState.ManuallyPaid, null), currentMockedDay),
+            new FixedExpensesEntryViewModel(new FixedExpenseProviderEntry(new FixedExpenseId().Value, "Test3",
+                new CategoryId(),
                 new DateOnly(2025, 1, 15), null, 120, null, null, FiatCurrency.Usd.Code,
-                FixedExpenseRecordState.Ignored, null),
-            new FixedExpenseProviderEntry(new FixedExpenseId().Value, "Test4", new CategoryId(),
-                new DateOnly(2025, 1, 28), null, 120, null, null, FiatCurrency.Usd.Code),
+                FixedExpenseRecordState.Ignored, null), currentMockedDay),
+            new FixedExpensesEntryViewModel(new FixedExpenseProviderEntry(new FixedExpenseId().Value, "Test4",
+                new CategoryId(),
+                new DateOnly(2025, 1, 28), null, 120, null, null, FiatCurrency.Usd.Code), currentMockedDay),
         ];
 
         #endregion
@@ -157,7 +164,8 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
         AccountDisplayOrderManager accountDisplayOrderManager,
         FilterState filterState,
         ITransactionTabFactory transactionTabFactory,
-        IFixedExpenseRecordService fixedExpenseRecordService)
+        IFixedExpenseRecordService fixedExpenseRecordService,
+        IClock clock)
     {
         _accountQueries = accountQueries;
         _modalFactory = modalFactory;
@@ -169,6 +177,7 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
         _accountDisplayOrderManager = accountDisplayOrderManager;
         _filterState = filterState;
         _fixedExpenseRecordService = fixedExpenseRecordService;
+        _clock = clock;
 
         _transactionListViewModel = (TransactionListViewModel)transactionTabFactory.Create(TransactionsTabNames.List);
 
@@ -283,7 +292,7 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
 
         var value = DateOnly.FromDateTime(_filterState.MainDate);
         var fixedExpenses = await _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(value);
-        
+
         fixedExpenses = fixedExpenses.OrderBy(x => x.State).ThenBy(x => x.ReferenceDate).ToList();
 
         var minTotal = 0m;
@@ -294,7 +303,7 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
         FixedExpenseEntries.Clear();
         foreach (var fixedExpense in fixedExpenses)
         {
-            FixedExpenseEntries.Add(fixedExpense);
+            FixedExpenseEntries.Add(new FixedExpensesEntryViewModel(fixedExpense, _clock.GetCurrentLocalDate().Day));
 
             if (fixedExpense.State != FixedExpenseRecordState.Empty)
                 continue;
@@ -444,10 +453,10 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
     public string FixedExpenseCurrentMonthDescription =>
         $"({DateOnly.FromDateTime(_filterState!.MainDate).ToString("MM/yyyy")})";
 
-    public FixedExpenseProviderEntry? SelectedFixedExpense
+    public FixedExpensesEntryViewModel? SelectedFixedExpense
     {
-        get => _filterState!.SelectedFixedExpense;
-        set => _filterState!.SelectedFixedExpense = value;
+        get =>  _filterState!.SelectedFixedExpense is not null ? new FixedExpensesEntryViewModel(_filterState!.SelectedFixedExpense, _clock.GetCurrentLocalDate().Day) : null;
+        set => _filterState!.SelectedFixedExpense = value?.Entry;
     }
 
     [RelayCommand]
@@ -516,7 +525,7 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
     }
 
     [RelayCommand(CanExecute = nameof(CanIgnoreFixedExpense))]
-    public async Task IgnoreFixedExpense(FixedExpenseProviderEntry? entry)
+    public async Task IgnoreFixedExpense(FixedExpensesEntryViewModel? entry)
     {
         if (entry is null)
             return;
@@ -526,11 +535,11 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
         await FetchFixedExpenses();
     }
 
-    public bool CanIgnoreFixedExpense(FixedExpenseProviderEntry? entry) =>
+    public bool CanIgnoreFixedExpense(FixedExpensesEntryViewModel? entry) =>
         entry?.State == FixedExpenseRecordState.Empty;
 
     [RelayCommand(CanExecute = nameof(CanMarkFixedExpenseAsPaid))]
-    public async Task MarkFixedExpenseAsPaid(FixedExpenseProviderEntry? entry)
+    public async Task MarkFixedExpenseAsPaid(FixedExpensesEntryViewModel? entry)
     {
         if (entry is null)
             return;
@@ -540,11 +549,11 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
         await FetchFixedExpenses();
     }
 
-    public bool CanMarkFixedExpenseAsPaid(FixedExpenseProviderEntry? entry) =>
+    public bool CanMarkFixedExpenseAsPaid(FixedExpensesEntryViewModel? entry) =>
         entry?.State is FixedExpenseRecordState.Empty or FixedExpenseRecordState.Ignored;
 
     [RelayCommand(CanExecute = nameof(CanUndoIgnoreFixedExpense))]
-    public async Task UndoIgnoreFixedExpense(FixedExpenseProviderEntry? entry)
+    public async Task UndoIgnoreFixedExpense(FixedExpensesEntryViewModel? entry)
     {
         if (entry is null)
             return;
@@ -554,11 +563,11 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
         await FetchFixedExpenses();
     }
 
-    public bool CanUndoIgnoreFixedExpense(FixedExpenseProviderEntry? entry) =>
+    public bool CanUndoIgnoreFixedExpense(FixedExpensesEntryViewModel? entry) =>
         entry?.State is FixedExpenseRecordState.Ignored;
 
     [RelayCommand(CanExecute = nameof(CanUnmarkFixedExpenseAsPaid))]
-    public async Task UnmarkFixedExpenseAsPaid(FixedExpenseProviderEntry? entry)
+    public async Task UnmarkFixedExpenseAsPaid(FixedExpensesEntryViewModel? entry)
     {
         if (entry is null)
             return;
@@ -568,7 +577,7 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
         await FetchFixedExpenses();
     }
 
-    public bool CanUnmarkFixedExpenseAsPaid(FixedExpenseProviderEntry? entry) =>
+    public bool CanUnmarkFixedExpenseAsPaid(FixedExpensesEntryViewModel? entry) =>
         entry?.State is FixedExpenseRecordState.ManuallyPaid;
 
     #endregion

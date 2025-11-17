@@ -1,16 +1,9 @@
 using System;
-using System.IO;
 using System.Runtime.InteropServices;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Media.Imaging;
-using Avalonia.Platform;
-using Avalonia.Svg.Skia;
-using SkiaSharp;
-using Svg;
 using Valt.UI.Base;
-using SvgImage = Avalonia.Svg.Skia.SvgImage;
+
 
 namespace Valt.UI.Views.Main;
 
@@ -36,11 +29,11 @@ public partial class MainView : ValtBaseWindow
     {
         base.OnOpened(e);
 
-        if (!Design.IsDesignMode)
-        {
-            ((DataContext as MainViewModel)!).Window = this;
-            _ = ((DataContext as MainViewModel)!).OpenInitialSelectionModal();
-        }
+        if (Design.IsDesignMode) 
+            return;
+        
+        ((DataContext as MainViewModel)!).Window = this;
+        _ = ((DataContext as MainViewModel)!).OpenInitialSelectionModal();
     }
 
     private void Window_OnPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -55,12 +48,11 @@ public partial class MainView : ValtBaseWindow
     {
         e.Cancel = true;
 
-        if (DataContext is MainViewModel viewModel)
-        {
-            await viewModel.OnClosingAsync();
+        if (DataContext is not MainViewModel viewModel) 
+            return;
+        
+        await viewModel.OnClosingAsync();
 
-            e.Cancel = false;
-        }
+        e.Cancel = false;
     }
-
 }

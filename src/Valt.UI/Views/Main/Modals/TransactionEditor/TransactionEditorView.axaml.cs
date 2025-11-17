@@ -11,7 +11,19 @@ public partial class TransactionEditorView : ValtBaseWindow
     public TransactionEditorView()
     {
         InitializeComponent();
+        
         this.AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Bubble, handledEventsToo: true);
+    }
+    
+    protected override void OnOpened(EventArgs e)
+    {
+        base.OnOpened(e);
+
+        var viewModel = DataContext as TransactionEditorViewModel;
+
+        AutoCompleteTransactionNameBox.AsyncPopulator = viewModel!.GetTransactionTermsAsync;
+
+        Dispatcher.UIThread.InvokeAsync(() => AutoCompleteTransactionNameBox.Focus(), DispatcherPriority.ApplicationIdle);
     }
 
     private void OnKeyDown(object? sender, KeyEventArgs e)
@@ -45,35 +57,38 @@ public partial class TransactionEditorView : ValtBaseWindow
                     viewModel.SelectTodayCommand.Execute(null);
                     e.Handled = true;
                     break;
+                case Key.Enter:
+                    viewModel.ProcessEnterCommand.Execute(null);
+                    e.Handled = true;
+                    break;
             }
         }
         else if (e.Key == Key.Enter)
         {
-            viewModel.ProcessEnterCommand.Execute(null);;
+            viewModel.ProcessEnterCommand.Execute(null);
         }
     }
 
-    protected override void OnOpened(EventArgs e)
+    private void AutoCompleteTransactionNameBox_OnDropDownClosed(object? sender, EventArgs e)
     {
-        base.OnOpened(e);
-
         var viewModel = DataContext as TransactionEditorViewModel;
 
-        AutoCompleteTransactionNameBox.AsyncPopulator = viewModel!.GetTransactionTermsAsync;
+        if (viewModel?.TransactionTermResult is null) return;
 
-        Dispatcher.UIThread.InvokeAsync(() => AutoCompleteTransactionNameBox.Focus(), DispatcherPriority.ApplicationIdle);
-    }
+        if (viewModel.FromAccount is null) return;
 
-    private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
-    {
-        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-        {
-            BeginMoveDrag(e);
-        }
-    }
-
-    private void CustomTitleBar_OnCloseClick(object? sender, RoutedEventArgs e)
-    {
-        Close();
+        Action focusAction;
+        if (viewModel.FromAccountIsBtc)
+            focusAction = () =>
+            {
+                FromBtc.Focus();
+            };
+        else
+            focusAction = () =>
+            {
+                FromFiat.Focus();
+            };
+        //call post instead of Invoke to put it on a queue and process after the UI thread is done
+        Dispatcher.UIThread.Post(focusAction, DispatcherPriority.ApplicationIdle);
     }
 }

@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Collections;
@@ -23,7 +22,10 @@ using Valt.UI.Base;
 using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
+using Valt.UI.State;
+using Valt.UI.State.Events;
 using Valt.UI.Views.Main.Controls;
+using Valt.UI.Views.Main.Modals.About;
 using Valt.UI.Views.Main.Modals.InitialSelection;
 using Valt.UI.Views.Main.Modals.ManageCategories;
 using Valt.UI.Views.Main.Modals.Settings;
@@ -42,12 +44,18 @@ public partial class MainViewModel : ValtViewModel
     private readonly BackgroundJobManager? _backgroundJobManager;
     private readonly IDatabaseInitializer? _databaseInitializer;
     private readonly LiveRatesViewModel _liveRatesViewModel;
+    private readonly LiveRateState _liveRateState;
     private readonly ILogger<MainViewModel> _logger;
 
     public MainView? Window { get; set; }
 
     [ObservableProperty] private bool _hasDatabaseOpen;
+    
     public bool ShowUsdFiatLabels => _currencySettings.MainFiatCurrency != FiatCurrency.Usd.Code;
+
+    public GridLength LayoutCustomTitleBarRowHeight => RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+        ? new GridLength(30)
+        : new GridLength(0);
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsTransactionButtonSelected))]
     private ValtViewModel? _selectedTabComponent;
@@ -62,6 +70,9 @@ public partial class MainViewModel : ValtViewModel
 
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private string _loadingMessage;
+
+    [ObservableProperty] private bool _crashing;
+    [ObservableProperty] private bool _pumping;
 
     public LiveRatesViewModel LiveRatesViewModel => _liveRatesViewModel;
     public AvaloniaList<JobInfo> Jobs { get; set; }
@@ -96,6 +107,7 @@ public partial class MainViewModel : ValtViewModel
         BackgroundJobManager backgroundJobManager,
         IDatabaseInitializer databaseInitializer,
         LiveRatesViewModel liveRatesViewModel,
+        LiveRateState liveRateState,
         ILogger<MainViewModel> logger)
     {
         _pageFactory = pageFactory;
@@ -106,6 +118,7 @@ public partial class MainViewModel : ValtViewModel
         _backgroundJobManager = backgroundJobManager;
         _databaseInitializer = databaseInitializer;
         _liveRatesViewModel = liveRatesViewModel;
+        _liveRateState = liveRateState;
         _logger = logger;
 
         _localDatabase.PropertyChanged += LocalDatabaseOnPropertyChanged;
@@ -113,6 +126,12 @@ public partial class MainViewModel : ValtViewModel
         Jobs = new AvaloniaList<JobInfo>(_backgroundJobManager.GetJobInfos());
         foreach (var job in Jobs)
             job.PropertyChanged += JobOnPropertyChanged;
+        
+        WeakReferenceMessenger.Default.Register<LivePriceUpdated>(this, (recipient, message) =>
+        {
+            Crashing = _liveRateState.BitcoinPrice / _liveRateState.PreviousBitcoinPrice.GetValueOrDefault() <= 0.95m;
+            Pumping = _liveRateState.BitcoinPrice / _liveRateState.PreviousBitcoinPrice.GetValueOrDefault() >= 1.05m;
+        });
     }
 
     [RelayCommand]
@@ -156,9 +175,19 @@ public partial class MainViewModel : ValtViewModel
     }
 
     [RelayCommand]
-    private async Task AddTransaction()
+    private async Task About()
+    {
+        var modal =
+            (AboutView)await _modalFactory.CreateAsync(ApplicationModalNames.About, Window)!;
+
+        await modal.ShowDialog(Window!);
+    }
+
+    [RelayCommand]
+    private Task AddTransaction()
     {
         WeakReferenceMessenger.Default.Send(new AddTransactionRequested());
+        return Task.CompletedTask;
     }
 
     public async Task OpenInitialSelectionModal()
@@ -259,8 +288,7 @@ public partial class MainViewModel : ValtViewModel
         {
             await MessageBoxHelper.ShowErrorAsync(language.Error, $"{ex.Message}", Window!);
         }
-
-
+        
         return false;
     }
 
@@ -287,7 +315,7 @@ public partial class MainViewModel : ValtViewModel
             {
                 LoadingMessage = language.InstallingBitcoinPriceMessage;
             });
-            await _backgroundJobManager.TriggerJobManuallyOnCurrentThreadAsync(BackgroundJobSystemNames
+            await _backgroundJobManager!.TriggerJobManuallyOnCurrentThreadAsync(BackgroundJobSystemNames
                 .BitcoinHistoryUpdater);
             await Dispatcher.UIThread.InvokeAsync(() =>
             {

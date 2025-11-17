@@ -16,6 +16,16 @@ public record FixedExpenseProviderEntry
     
     public decimal MinimumAmount => FixedAmount ?? RangedAmountMin ?? 0;
     public decimal MaximumAmount => FixedAmount ?? RangedAmountMax ?? 0;
+    
+    public string? TransactionId { get; private set; }
+    public FixedExpenseRecordState State { get; private set; }
+
+    public bool Paid => State == FixedExpenseRecordState.Paid && TransactionId != null;
+    public bool Ignored => State == FixedExpenseRecordState.Ignored;
+    public bool MarkedAsPaid => State == FixedExpenseRecordState.ManuallyPaid;
+    public bool Empty => State == FixedExpenseRecordState.Empty;
+
+    public int Day => ReferenceDate.Day;
 
     public FixedExpenseProviderEntry(string id, string name, string? categoryId, DateOnly referenceDate,
         string? defaultAccountId, decimal? fixedAmount, decimal? rangedAmountMin, decimal? rangedAmountMax, string currency)
@@ -39,16 +49,6 @@ public record FixedExpenseProviderEntry
         State = state;
         TransactionId = transactionId;
     }
-
-    public string? TransactionId { get; private set; }
-    public FixedExpenseRecordState State { get; private set; }
-
-    public bool Paid => State == FixedExpenseRecordState.Paid && TransactionId != null;
-    public bool Ignored => State == FixedExpenseRecordState.Ignored;
-    public bool MarkedAsPaid => State == FixedExpenseRecordState.ManuallyPaid;
-    public bool Empty => State == FixedExpenseRecordState.Empty;
-
-    public int Day => ReferenceDate.Day;
 
     public void Pay(string transactionId)
     {

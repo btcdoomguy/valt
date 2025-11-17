@@ -37,9 +37,10 @@ internal class LivePricesUpdaterJob : IBackgroundJob
         _localHistoricalPriceProvider = localHistoricalPriceProvider;
         _logger = logger;
     }
-    public async Task StartAsync(CancellationToken stoppingToken)
+    public Task StartAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("[LivePricesUpdaterJob] Started");
+        return Task.CompletedTask;
     }
     
     public async Task RunAsync(CancellationToken stoppingToken)
@@ -49,7 +50,7 @@ internal class LivePricesUpdaterJob : IBackgroundJob
             var fiatTask = _frankfurterFiatRateProvider.GetAsync();
             var btcTask = _coinbaseProvider.GetAsync();
 
-            await Task.WhenAll(fiatTask, btcTask);
+            await Task.WhenAll(fiatTask, btcTask).ConfigureAwait(false);
 
             var fiatResponse = fiatTask.Result;
             var btcResponse = btcTask.Result;
@@ -69,7 +70,7 @@ internal class LivePricesUpdaterJob : IBackgroundJob
             {
                 var lastDateParsed = _priceDatabase.GetBitcoinData().Max(x => x.Date).Date;
                 var previousPrice =
-                    await _localHistoricalPriceProvider.GetUsdBitcoinRateAtAsync(DateOnly.FromDateTime(lastDateParsed));
+                    await _localHistoricalPriceProvider.GetUsdBitcoinRateAtAsync(DateOnly.FromDateTime(lastDateParsed)).ConfigureAwait(false);
 
                 _lastClosingDate = DateOnly.FromDateTime(lastDateParsed);
                 _lastClosingPrice = previousPrice;

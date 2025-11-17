@@ -1,7 +1,5 @@
 using System.Globalization;
 using Microsoft.Extensions.Logging;
-using Valt.Infra.Kernel.Notifications;
-using Valt.Infra.Modules.DataSources.Bitcoin;
 
 namespace Valt.Infra.Crawlers.HistoricPriceCrawlers.Bitcoin;
 
@@ -28,7 +26,7 @@ internal class BitcoinInitialSeedPriceProvider : IBitcoinInitialSeedPriceProvide
             var response = await client.GetAsync(url);
             response.EnsureSuccessStatusCode();
             
-            var stream = await response.Content.ReadAsStreamAsync();
+            var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
             
             using var reader = new StreamReader(stream);
 

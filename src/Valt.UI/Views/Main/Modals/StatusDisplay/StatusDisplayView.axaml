@@ -24,8 +24,8 @@
     </Design.DataContext>
     <Border>
         <StackPanel Orientation="Vertical">
-            <userControls:CustomTitleBar Title="{x:Static local:language.StatusDisplay_Title}" TitleBarPressed="InputElement_OnPointerPressed"
-                                         CloseClick="CustomTitleBar_OnCloseClick" />
+            <userControls:CustomTitleBar Title="{x:Static local:language.StatusDisplay_Title}" TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
             <Border Classes="form-fields-area" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="214">
                 <ListBox ItemsSource="{Binding Jobs}">
                     <ListBox.ItemTemplate>

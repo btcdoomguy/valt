@@ -22,7 +22,7 @@ public class FrankfurterFiatHistoricalDataProvider : IFiatHistoricalDataProvider
             var response = await client.GetAsync($"https://api.frankfurter.dev/v1/{startDate.ToString("yyyy-MM-dd")}..{endDate.ToString("yyyy-MM-dd")}?base=USD&symbols={string.Join(",", FiatCurrency.GetAll().Select(x => x.Code))}");
             if (response.IsSuccessStatusCode)
             {
-                var content = await response.Content.ReadAsStringAsync();
+                var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var json = JsonDocument.Parse(content);
                 var rates = json.RootElement.GetProperty("rates");
                 

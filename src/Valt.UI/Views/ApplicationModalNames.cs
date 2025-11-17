@@ -15,5 +15,6 @@ public enum ApplicationModalNames
     ChangeCategoryTransactions = 10,
     ManageFixedExpenses = 11,
     FixedExpenseEditor = 12,
-    ChangePassword = 13
+    ChangePassword = 13,
+    About = 14
 }

@@ -26,8 +26,8 @@
     </Window.KeyBindings>
     <Border>
         <StackPanel Orientation="Vertical">
-            <userControls:CustomTitleBar Title="{Binding WindowTitle}" TitleBarPressed="InputElement_OnPointerPressed"
-                                         CloseClick="CustomTitleBar_OnCloseClick" />
+            <userControls:CustomTitleBar Title="{Binding WindowTitle}" TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
             <Border Classes="form-fields-area" Height="640" Padding="0">
                 <Grid RowDefinitions="70, 70, 5, 100, 5, 70, 70, 1, 140, 50, 50">
                     <Grid Grid.Row="0" Margin="0" Grid.ColumnDefinitions="*">

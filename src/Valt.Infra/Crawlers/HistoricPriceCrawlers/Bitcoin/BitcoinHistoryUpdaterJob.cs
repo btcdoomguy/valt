@@ -70,7 +70,7 @@ internal class BitcoinHistoryUpdaterJob : IBackgroundJob
                 endDate.ToShortDateString());
 
             var prices = await _provider.GetPricesAsync(DateOnly.FromDateTime(lastStoredDate),
-                DateOnly.FromDateTime(endDate));
+                DateOnly.FromDateTime(endDate)).ConfigureAwait(false);
 
             var entries = new List<BitcoinDataEntity>();
             foreach (var price in prices)

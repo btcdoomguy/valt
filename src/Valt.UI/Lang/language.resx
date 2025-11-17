@@ -36,13 +36,13 @@
         <value>Create new database</value>
     </data>
     <data name="CreateDatabase.TextLine1" xml:space="preserve">
-        <value>All your transactions info will be stored in a database.</value>
+        <value>VALT uses a simple database file to store your data.</value>
     </data>
     <data name="CreateDatabase.TextLine2" xml:space="preserve">
-        <value>To improve the security, please add a strong password for your DB.</value>
+        <value>Please set up a strong password to encrypt this file.</value>
     </data>
     <data name="CreateDatabase.TextLine3" xml:space="preserve">
-        <value>NOTE: losing your DB password is irreversible.</value>
+        <value>NOTE: losing your password is irreversible. Store it safely!</value>
     </data>
     <data name="CreateDatabase.FilePath" xml:space="preserve">
         <value>File path</value>
@@ -610,5 +610,14 @@
     </data>
     <data name="BootDatabase.Category.Paycheck" xml:space="preserve">
         <value>Paycheck</value>
+    </data>
+    <data name="Transactions.AddTransaction.ToolTip" xml:space="preserve">
+        <value>You can also press F2 to add a new transaction</value>
+    </data>
+    <data name="Main.Menu.About" xml:space="preserve">
+        <value>About</value>
+    </data>
+    <data name="About.Title" xml:space="preserve">
+        <value>About</value>
     </data>
 </root>
