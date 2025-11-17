@@ -29,14 +29,12 @@ jobs:
       - name: Publish for Windows
         run: |
           dotnet publish src/Valt.UI/Valt.UI.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true -o ${{ github.workspace }}/publish/win-x64
-          cd ${{ github.workspace }}/publish/win-x64
-          zip -r ${{ github.workspace }}/Valt-Windows-${{ github.ref_name }}.zip
+          zip -r ${{ github.workspace }}/Valt-Windows-${{ github.ref_name }}.zip ${{ github.workspace }}/publish/win-x64
 
       - name: Publish for Linux
         run: |
           dotnet publish src/Valt.UI/Valt.UI.csproj -c Release -r linux-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true -o ${{ github.workspace }}/publish/linux-x64
-          cd ${{ github.workspace }}/publish/linux-x64
-          zip -r ${{ github.workspace }}/Valt-Linux-${{ github.ref_name }}.zip
+          zip -r ${{ github.workspace }}/Valt-Linux-${{ github.ref_name }}.zip ${{ github.workspace }}/publish/linux-x64
 
       - name: Create Release
         id: create_release
