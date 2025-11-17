@@ -28,13 +28,17 @@ jobs:
 
       - name: Publish for Windows
         run: |
-          dotnet publish src/Valt.UI/Valt.UI.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true -o ${{ github.workspace }}/publish/win-x64
-          zip -r ${{ github.workspace }}/Valt-Windows-${{ github.ref_name }}.zip ${{ github.workspace }}/publish/win-x64
+          dotnet publish src/Valt.UI/Valt.UI.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:PublishTrimmed=true --verbosity detailed -o ${{ github.workspace }}/publish/win-x64  # Added verbosity and trimming
+          ls -la ${{ github.workspace }}/publish/win-x64 || echo "Publish directory is empty!"  # Debug listing
+          cd ${{ github.workspace }}/publish/win-x64
+          zip -r ${{ github.workspace }}/Valt-Windows-${{ github.ref_name }}.zip .  # Adjusted name to match your error
 
       - name: Publish for Linux
         run: |
-          dotnet publish src/Valt.UI/Valt.UI.csproj -c Release -r linux-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true -o ${{ github.workspace }}/publish/linux-x64
-          zip -r ${{ github.workspace }}/Valt-Linux-${{ github.ref_name }}.zip ${{ github.workspace }}/publish/linux-x64
+          dotnet publish src/Valt.UI/Valt.UI.csproj -c Release -r linux-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:PublishTrimmed=true --verbosity detailed -o ${{ github.workspace }}/publish/linux-x64  # Added verbosity and trimming
+          ls -la ${{ github.workspace }}/publish/linux-x64 || echo "Publish directory is empty!"  # Debug listing
+          cd ${{ github.workspace }}/publish/linux-x64
+          zip -r ${{ github.workspace }}/Valt-Linux-${{ github.ref_name }}.zip .  # Adjusted name to match pattern
 
       - name: Create Release
         id: create_release
