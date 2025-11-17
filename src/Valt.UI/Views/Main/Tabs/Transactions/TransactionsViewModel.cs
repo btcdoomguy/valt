@@ -131,7 +131,7 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
 
         SelectedAccount = Accounts.FirstOrDefault();
 
-        var currentMockedDay = 10;
+        var currentMockedDay = new DateOnly(2025, 1, 10);
 
         FixedExpenseEntries =
         [
@@ -303,7 +303,7 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
         FixedExpenseEntries.Clear();
         foreach (var fixedExpense in fixedExpenses)
         {
-            FixedExpenseEntries.Add(new FixedExpensesEntryViewModel(fixedExpense, _clock.GetCurrentLocalDate().Day));
+            FixedExpenseEntries.Add(new FixedExpensesEntryViewModel(fixedExpense, _clock.GetCurrentLocalDate()));
 
             if (fixedExpense.State != FixedExpenseRecordState.Empty)
                 continue;
@@ -455,7 +455,7 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
 
     public FixedExpensesEntryViewModel? SelectedFixedExpense
     {
-        get =>  _filterState!.SelectedFixedExpense is not null ? new FixedExpensesEntryViewModel(_filterState!.SelectedFixedExpense, _clock.GetCurrentLocalDate().Day) : null;
+        get =>  _filterState!.SelectedFixedExpense is not null ? new FixedExpensesEntryViewModel(_filterState!.SelectedFixedExpense, _clock.GetCurrentLocalDate()) : null;
         set => _filterState!.SelectedFixedExpense = value?.Entry;
     }
 

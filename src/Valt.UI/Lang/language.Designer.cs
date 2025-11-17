@@ -1238,5 +1238,17 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("About.Title", resourceCulture);
             }
         }
+        
+        public static string About_Tip {
+            get {
+                return ResourceManager.GetString("About.Tip", resourceCulture);
+            }
+        }
+        
+        public static string Settings_RequiresRestart {
+            get {
+                return ResourceManager.GetString("Settings.RequiresRestart", resourceCulture);
+            }
+        }
     }
 }

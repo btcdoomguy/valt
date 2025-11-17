@@ -5,7 +5,7 @@ using Valt.Infra.Modules.Budget.FixedExpenses;
 
 namespace Valt.UI.Views.Main.Tabs.Transactions.Models;
 
-public class FixedExpensesEntryViewModel(FixedExpenseProviderEntry entry, int currentDay)
+public class FixedExpensesEntryViewModel(FixedExpenseProviderEntry entry, DateOnly currentDate)
 {
     public FixedExpenseProviderEntry Entry { get; } = entry;
     public string Id => Entry.Id;
@@ -31,7 +31,7 @@ public class FixedExpensesEntryViewModel(FixedExpenseProviderEntry entry, int cu
 
     public int Day => Entry.Day;
     
-    public bool IsLateOrCurrentDay => Day <= currentDay;
+    public bool IsLateOrCurrentDay => ReferenceDate <= currentDate;
 
     public SolidColorBrush CheckboxPaidColor =>
         Paid ? FixedExpenseListResources.PaidForeground : FixedExpenseListResources.DefaultForeground;

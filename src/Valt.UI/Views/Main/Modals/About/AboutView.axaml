@@ -18,6 +18,11 @@
     <Design.DataContext>
         <about:AboutViewModel />
     </Design.DataContext>
+    <Window.Styles>
+        <Style Selector="Window">
+            <Setter Property="FontFamily" Value="Mono"></Setter>
+        </Style>
+    </Window.Styles>
     <Border>
         <StackPanel Orientation="Vertical">
             <userControls:CustomTitleBar Title="{x:Static local:language.About_Title}"
@@ -26,24 +31,25 @@
             <Grid Margin="20" RowDefinitions="200, *">
                 <Grid Grid.Row="0" ColumnDefinitions="128, *">
                     <Image Grid.Column="0" Source="/Assets/valt-logo.png" Width="128" Height="138" />
-                    <TextBlock Margin="20, 0, 0, 0" Grid.Column="1" TextWrapping="Wrap">
-                        <TextBlock Text="VALT" FontFamily="Arial" FontSize="48"></TextBlock>
+                    <TextBlock Margin="20, 0, 0, 0" Grid.Column="1" FontSize="12" TextWrapping="Wrap">
+                        <TextBlock Text="VALT" FontSize="48"></TextBlock>
                         <TextBlock Text="{Binding AppVersion}" FontSize="12" Margin="0, -24, 0, 0" />
+                        <LineBreak />
                         <LineBreak />
                         <TextBlock Text="Created by BtcDoomGuy"></TextBlock>
                         <LineBreak />
                         <LineBreak />
-                        <TextBlock Text="Find me on X: @BtcChicoFatal"></TextBlock>
+                        <HyperlinkButton NavigateUri="https://x.com/btcchicofatal">@BtcChicoFatal</HyperlinkButton>
                         <LineBreak />
                         <LineBreak />
-                        <TextBlock Text="GitHub: https://github.com/btcdoomguy/valt/"></TextBlock>
+                        <HyperlinkButton NavigateUri="https://github.com/btcdoomguy/valt/">https://github.com/btcdoomguy/valt/</HyperlinkButton>
                     </TextBlock>
                 </Grid>
                 <StackPanel Grid.Row="1">
-                    <TextBlock TextWrapping="Wrap">
-                        <TextBlock>If you like the app, send me a coffee:</TextBlock>
+                    <TextBlock FontSize="12" TextWrapping="Wrap">
+                        <TextBlock Text="{x:Static local:language.About_Tip}"></TextBlock>
                     </TextBlock>
-                    <TextBox Text="{Binding DonationAddresses}" IsReadOnly="True" Height="100" AcceptsReturn="True"
+                    <TextBox Text="{Binding DonationAddresses}" FontFamily="Mono" IsReadOnly="True" Height="100" AcceptsReturn="True"
                              TextWrapping="NoWrap" FontSize="10">
                     </TextBox>
                 </StackPanel>
