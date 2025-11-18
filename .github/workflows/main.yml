@@ -1,4 +1,4 @@
-name: Build and Release Avalonia App
+name: Valt Builder
 
 on:
   push:
@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write     # Required for softprops/action-gh-release
 
     steps:
       - name: Checkout code
@@ -18,53 +18,39 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x' 
+          dotnet-version: '9.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore src/Valt.UI/Valt.UI.csproj 
+        run: dotnet restore src/Valt.UI/Valt.UI.csproj
 
       - name: Build
-        run: dotnet build src/Valt.UI/Valt.UI.csproj --no-restore -c Release 
+        run: dotnet build src/Valt.UI/Valt.UI.csproj --no-restore -c Release
 
       - name: Publish for Windows
         run: |
-          dotnet publish src/Valt.UI/Valt.UI.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true --verbosity detailed -o ${{ github.workspace }}/publish/win-x64 
+          dotnet publish src/Valt.UI/Valt.UI.csproj -c Release -r win-x64 --self-contained true \
+            /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true \
+            --verbosity detailed -o ${{ github.workspace }}/publish/win-x64
           cd ${{ github.workspace }}/publish/win-x64
           zip -r ${{ github.workspace }}/Valt-Windows-${{ github.ref_name }}.zip .
 
       - name: Publish for Linux
         run: |
-          dotnet publish src/Valt.UI/Valt.UI.csproj -c Release -r linux-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true --verbosity detailed -o ${{ github.workspace }}/publish/linux-x64
+          dotnet publish src/Valt.UI/Valt.UI.csproj -c Release -r linux-x64 --self-contained true \
+            /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true \
+            --verbosity detailed -o ${{ github.workspace }}/publish/linux-x64
           cd ${{ github.workspace }}/publish/linux-x64
           zip -r ${{ github.workspace }}/Valt-Linux-${{ github.ref_name }}.zip .
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Release
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
           draft: false
           prerelease: false
-
-      - name: Upload Windows Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: Valt-Windows-${{ github.ref_name }}.zip
-          asset_name: Valt-Windows-${{ github.ref_name }}.zip
-          asset_content_type: application/zip
-
-      - name: Upload Linux Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: Valt-Linux-${{ github.ref_name }}.zip
-          asset_name: Valt-Linux-${{ github.ref_name }}.zip
-          asset_content_type: application/zip
+          files: |
+            Valt-Windows-${{ github.ref_name }}.zip
+            Valt-Linux-${{ github.ref_name }}.zip
