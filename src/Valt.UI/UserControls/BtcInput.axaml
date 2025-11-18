@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="50"
+             xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+             x:Class="Valt.UI.UserControls.BtcInput"
+             KeyboardNavigation.TabNavigation="Once">
+    <UserControl.Template>
+        <ControlTemplate>
+            <DataValidationErrors>
+                <Grid ColumnDefinitions="*, Auto, Auto">
+                    <TextBox Grid.Column="0" x:Name="InputBox"
+                             Text="{Binding DisplayValue, Mode=TwoWay, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type userControls:BtcInput}}}"
+                             KeyDown="InputElement_OnKeyDown">
+                    </TextBox>
+                    
+                    <Button Grid.Column="1" Classes="calculator"
+                            Command="{TemplateBinding CalculatorCommand}"
+                            CommandParameter="{TemplateBinding CalculatorCommandParameter}"
+                            IsVisible="{TemplateBinding IsCommandSet}">
+                    </Button>
+
+                    <ToggleSwitch Grid.Column="2"
+                                  IsChecked="{Binding IsBitcoin, Mode=TwoWay, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type userControls:BtcInput}}}"
+                                  OffContent="Sats"
+                                  OnContent="BTC"
+                                  Margin="5,0,0,0" />
+                </Grid>
+            </DataValidationErrors>
+        </ControlTemplate>
+    </UserControl.Template>
+</UserControl>

@@ -1,0 +1,294 @@
+<UserControl x:Name="Root"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Valt.UI.Lang"
+             xmlns:vm1="clr-namespace:Valt.UI.Views.Main.Tabs.Transactions"
+             mc:Ignorable="d" d:DesignWidth="1800" d:DesignHeight="900"
+             MinWidth="900"
+             MinHeight="700"
+             x:Class="Valt.UI.Views.Main.Tabs.Transactions.TransactionsView"
+             x:DataType="vm1:TransactionsViewModel">
+    <Design.DataContext>
+        <vm1:TransactionsViewModel />
+    </Design.DataContext>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300" MinWidth="100" /> <!-- Left Column -->
+            <ColumnDefinition Width="*" MinWidth="300" />   <!-- Center Column -->
+            <ColumnDefinition Width="2" />
+            <ColumnDefinition Width="250" MinWidth="250" />   <!-- Right Column -->
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Column -->
+        <Panel Grid.Column="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="110" />
+                    <RowDefinition Height="*" /> <!-- List -->
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0"
+                        Background="{DynamicResource Background900Brush}"
+                        BorderBrush="{DynamicResource Background700Brush}"
+                        Padding="8"
+                        BorderThickness="2"
+                        CornerRadius="5">
+                    <StackPanel Orientation="Vertical">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="130"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Foreground="{DynamicResource Accent200Brush}" Content="{x:Static local:language.Transactions_MyStack}" />
+                            <Label Grid.Column="1" HorizontalAlignment="Right" Content="{Binding WealthInSats}"></Label>
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="130"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Foreground="{DynamicResource Accent100Brush}" Content="{x:Static local:language.Transactions_MyOther}" />
+                            <Label Grid.Column="1" HorizontalAlignment="Right" Content="{Binding WealthInFiat}"></Label>
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="130"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Foreground="{DynamicResource Accent100Brush}" Content="{x:Static local:language.Transactions_TotalInFiat}" />
+                            <Label Grid.Column="1" HorizontalAlignment="Right" Content="{Binding AllWealthInFiat}"></Label>
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="130"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Foreground="{DynamicResource Accent100Brush}" Content="{x:Static local:language.Transactions_Ratio}" />
+                            <Label Grid.Column="1" HorizontalAlignment="Right" Content="{Binding WealthInBtcRatio}"></Label>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Accounts List -->
+                <Grid Grid.Row="1" RowDefinitions="30, *" Margin="0, 0, 0, 10">
+                    <StackPanel Grid.Row="0" Background="Black">
+                        <Button FontSize="12" Classes="transparent link" HorizontalAlignment="Right"
+                                HorizontalContentAlignment="Right"
+                                VerticalAlignment="Stretch" Command="{Binding SelectAllAccountsCommand}"
+                                Content="{x:Static local:language.Transactions_ViewAllAccounts}" />
+                    </StackPanel>
+                    <ListBox Grid.Row="1"
+                             Classes="accounts"
+                             ItemsSource="{Binding Accounts}"
+                             SelectedItem="{Binding SelectedAccount}"
+                             SelectionMode="Single">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <!-- Had to create a clickable area using the background transparent to proper render the contextmenu on right click otherwise clickable area doesn't work! -->
+                                <Border Padding="5" Background="Transparent">
+                                    <Grid ColumnDefinitions="60, auto">
+                                        <Label
+                                            Grid.Column="0"
+                                            Width="48"
+                                            Classes=""
+                                            FontFamily="{DynamicResource MaterialDesign}"
+                                            FontSize="32"
+                                            Content="{Binding RenderIcon.Unicode}"
+                                            Foreground="{Binding RenderIcon.Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
+                                        <StackPanel Grid.Column="1" HorizontalAlignment="Left">
+                                            <Label Width="220" FontSize="13" Content="{Binding Name}" />
+                                            <Grid ColumnDefinitions="50, *">
+                                                <Label Grid.Column="0" FontSize="13"
+                                                       Foreground="{DynamicResource Background300Brush}"
+                                                       IsVisible="{Binding !IsBtcAccount}"
+                                                       HorizontalContentAlignment="Left" Content="{Binding Currency}">
+                                                </Label>
+                                                <Label Grid.Column="0" FontSize="13"
+                                                       Foreground="{DynamicResource Accent200Brush}"
+                                                       IsVisible="{Binding IsBtcAccount}"
+                                                       HorizontalContentAlignment="Left" Content="BTC">
+                                                </Label>
+                                                <Label Grid.Column="1" FontSize="15" HorizontalContentAlignment="Right"
+                                                       VerticalContentAlignment="Bottom" Height="28"
+                                                       Content="{Binding FormattedTotal}" />
+                                                <Label Grid.Column="1" FontSize="11" HorizontalContentAlignment="Right"
+                                                       Margin="0, -32, 0, 0"
+                                                       Foreground="{DynamicResource Text400Brush}"
+                                                       VerticalContentAlignment="Bottom" Height="28"
+                                                       IsVisible="{Binding HasFutureTotal}"
+                                                       Content="{Binding FormattedFutureTotal}" />
+                                            </Grid>
+                                        </StackPanel>
+                                    </Grid>
+                                    <Border.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="{x:Static local:language.Transactions_Edit}"
+                                                      Command="{Binding ((vm1:TransactionsViewModel)DataContext).EditAccountCommand, ElementName=Root}"
+                                                      CommandParameter="{Binding .}">
+                                            </MenuItem>
+
+                                            <MenuItem Header="{x:Static local:language.Transactions_Hide}"
+                                                      Command="{Binding ((vm1:TransactionsViewModel)DataContext).HideAccountCommand, ElementName=Root}"
+                                                      CommandParameter="{Binding .}">
+                                            </MenuItem>
+                                            <MenuItem Header="{x:Static local:language.Transactions_Delete}"
+                                                      Command="{Binding ((vm1:TransactionsViewModel)DataContext).DeleteAccountCommand, ElementName=Root}"
+                                                      CommandParameter="{Binding .}">
+                                            </MenuItem>
+                                            <Separator></Separator>
+                                            <MenuItem Header="{x:Static local:language.Transactions_MoveUp}"
+                                                      Command="{Binding ((vm1:TransactionsViewModel)DataContext).MoveUpAccountCommand, ElementName=Root}"
+                                                      CommandParameter="{Binding .}">
+                                            </MenuItem>
+                                            <MenuItem Header="{x:Static local:language.Transactions_MoveDown}"
+                                                      Command="{Binding ((vm1:TransactionsViewModel)DataContext).MoveDownAccountCommand, ElementName=Root}"
+                                                      CommandParameter="{Binding .}">
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </Border.ContextMenu>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+
+                <Border Grid.Row="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        Padding="10"
+                        Margin="0,0,10,18">
+                    <Button Classes="rounded" Content="&#xE145;" Command="{Binding AddAccountCommand}">
+                    </Button>
+                </Border>
+            </Grid>
+        </Panel>
+
+        <!-- Center Column -->
+
+        <ContentControl x:Name="SubContentControl"
+                        Content="{Binding SubContent}"
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch" />
+
+        <!-- GridSplitter -->
+        <GridSplitter Grid.Column="2"
+                      Width="2"
+                      Background="{DynamicResource Background800Color}"
+                      ResizeDirection="Columns"
+                      ResizeBehavior="PreviousAndNext" />
+
+        <!-- Right Column -->
+        <Panel Grid.Column="3">
+            <Grid RowDefinitions="80, 30, *">
+                <StackPanel Grid.Row="1">
+                    <Border Background="{DynamicResource Background800Brush}"
+                            BorderBrush="{DynamicResource Background500Brush}"
+                            Margin="0, 0, 10, 0"
+                            Padding="5, 0, 0, 0"
+                            BorderThickness="1, 1, 1, 0"
+                            CornerRadius="5, 5, 0, 0">
+                        <Grid ColumnDefinitions="*, 50">
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Stretch"
+                                        Margin="0, 5, 0, 0">
+                                <TextBlock Text="{x:Static local:language.ManageFixedExpenses_Title}"></TextBlock>
+                                <TextBlock Text="{Binding FixedExpenseCurrentMonthDescription}"></TextBlock>
+
+                            </StackPanel>
+                            <Button Grid.Column="1" FontSize="18" Classes="transparent link"
+                                    HorizontalAlignment="Right"
+                                    HorizontalContentAlignment="Right"
+                                    VerticalContentAlignment="Center"
+                                    Padding="0, 0, 15, 0"
+                                    Content="&#xE745;"
+                                    FontFamily="{DynamicResource MaterialDesign}"
+                                    Height="30" Command="{Binding ManageFixedExpensesCommand}" />
+                        </Grid>
+                    </Border>
+                    <ListBox
+                        x:Name="FixedExpenseList"
+                        Classes="regularListBox"
+                        ItemsSource="{Binding FixedExpenseEntries}"
+                        SelectedItem="{Binding SelectedFixedExpense}"
+                        SelectionMode="Single"
+                        VerticalAlignment="Top"
+                        BorderBrush="{DynamicResource Background500Brush}"
+                        BorderThickness="1, 0, 1,0"
+                        Margin="0, 0, 10, 0"
+                        Height="400">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="0" Background="Transparent">
+                                    <Grid ColumnDefinitions="20, *, 30">
+                                        <Label Grid.Column="0" IsVisible="{Binding Paid}"
+                                               Content="&#xe834;"
+                                               FontFamily="{DynamicResource MaterialDesign}"
+                                               Foreground="{Binding CheckboxPaidColor}"
+                                               Padding="3, -2,0 ,0"
+                                               FontSize="16">
+                                        </Label>
+                                        <Label Grid.Column="1" FontSize="12" Content="{Binding Name}"
+                                               Foreground="{Binding TextColor}">
+                                        </Label>
+                                        <Label Grid.Column="2" FontSize="12" Content="{Binding Day}"
+                                               Foreground="{Binding TextColor}">
+                                        </Label>
+                                    </Grid>
+                                    <Border.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem
+                                                Header="{x:Static local:language.TransactionFixedExpenses_AddOrEditTransaction}"
+                                                Command="{Binding ((vm1:TransactionsViewModel)DataContext).OpenFixedExpenseCommand, ElementName=Root}"
+                                                CommandParameter="{Binding .}">
+                                            </MenuItem>
+                                            <MenuItem
+                                                Header="{x:Static local:language.TransactionFixedExpenses_IgnoreForThisMonth}"
+                                                Command="{Binding ((vm1:TransactionsViewModel)DataContext).IgnoreFixedExpenseCommand, ElementName=Root}"
+                                                CommandParameter="{Binding .}"
+                                                IsVisible="{Binding Empty}">
+                                            </MenuItem>
+                                            <MenuItem
+                                                Header="{x:Static local:language.TransactionFixedExpenses_MarkAsPaid}"
+                                                Command="{Binding ((vm1:TransactionsViewModel)DataContext).MarkFixedExpenseAsPaidCommand, ElementName=Root}"
+                                                CommandParameter="{Binding .}"
+                                                IsVisible="{Binding Empty}">
+                                            </MenuItem>
+                                            <MenuItem
+                                                Header="{x:Static local:language.TransactionFixedExpenses_UndoIgnoreForThisMonth}"
+                                                Command="{Binding ((vm1:TransactionsViewModel)DataContext).UndoIgnoreFixedExpenseCommand, ElementName=Root}"
+                                                CommandParameter="{Binding .}"
+                                                IsVisible="{Binding Ignored}">
+                                            </MenuItem>
+                                            <MenuItem
+                                                Header="{x:Static local:language.TransactionFixedExpenses_UndoMarkAsPaid}"
+                                                Command="{Binding ((vm1:TransactionsViewModel)DataContext).UnmarkFixedExpenseAsPaidCommand, ElementName=Root}"
+                                                CommandParameter="{Binding .}"
+                                                IsVisible="{Binding MarkedAsPaid}">
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </Border.ContextMenu>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <Border Background="{DynamicResource Background900Color}"
+                            BorderBrush="{DynamicResource Background500Brush}"
+                            Margin="0, 0, 10, 0"
+                            Padding="5, 0, 0, 0"
+                            BorderThickness="1, 0, 1, 1"
+                            CornerRadius="0, 0, 5, 5">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0, 5, 0, 0">
+                            <TextBlock FontSize="12" Padding="0, 3, 20, 0" Foreground="{DynamicResource Accent200Color}"
+                                       Text="{Binding RemainingFixedExpensesAmount}">
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+            </Grid>
+        </Panel>
+    </Grid>
+</UserControl>

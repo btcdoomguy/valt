@@ -1,0 +1,112 @@
+<Window
+    x:Name="Root"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+    xmlns:local="clr-namespace:Valt.UI.Lang"
+    xmlns:iconSelector="clr-namespace:Valt.UI.Views.Main.Modals.IconSelector"
+    mc:Ignorable="d"
+    d:DesignWidth="600" d:DesignHeight="470"
+    Width="600"
+    Height="470"
+    MinWidth="600"
+    MinHeight="470"
+    x:Class="Valt.UI.Views.Main.Modals.IconSelector.IconSelectorView"
+    x:DataType="iconSelector:IconSelectorViewModel"
+    WindowStartupLocation="CenterScreen"
+    ExtendClientAreaToDecorationsHint="True"
+    SystemDecorations="None"
+    ExtendClientAreaTitleBarHeightHint="0"
+    Title="{x:Static local:language.IconSelector_Title}">
+    <Design.DataContext>
+        <iconSelector:IconSelectorViewModel />
+    </Design.DataContext>
+    <Border>
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="{x:Static local:language.IconSelector_Title}"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+            <!-- Name Field -->
+            <DockPanel Margin="0, 10, 0, 0">
+                <TextBlock TextWrapping="Wrap" Text="{x:Static local:language.Search}" TextAlignment="Right"
+                           Width="120" Margin="0, 8, 5, 0" VerticalAlignment="Center" />
+                <TextBox Text="{Binding SearchText}" />
+            </DockPanel>
+            <Grid ColumnDefinitions="130, *" Margin="2, 10, 2, 0">
+                <ListBox Grid.Column="0"
+                         Classes="regularListBox"
+                         ItemsSource="{Binding Categories}"
+                         SelectedItem="{Binding SelectedCategory}"
+                         Height="300"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                </ListBox>
+                <ListBox Grid.Column="1"
+                         Classes="regularListBox"
+                         ItemsSource="{Binding Icons}"
+                         SelectedItem="{Binding SelectedIcon}"
+                         Height="300"
+                         IsVisible="{Binding !IsFiltering}"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Width="48" Height="48">
+                                <Label
+                                    Padding="0"
+                                    HorizontalAlignment="Center"
+                                    HorizontalContentAlignment="Center"
+                                    FontFamily="{DynamicResource MaterialDesign}"
+                                    FontSize="32"
+                                    Foreground="{Binding ((iconSelector:IconSelectorViewModel)DataContext).SelectedColorBrush, ElementName=Root}"
+                                    Content="{Binding Unicode}">
+                                </Label>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <TextBlock Grid.Column="1" Text="{x:Static local:language.IconSelector_Loading}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontSize="16"
+                           IsVisible="{Binding IsFiltering}" />
+            </Grid>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0, 10, 0, 0">
+                <TextBlock TextWrapping="Wrap" Text="{x:Static local:language.IconSelector_Color}"
+                           TextAlignment="Right"
+                           Width="120" Margin="0, 0, 5, 0" VerticalAlignment="Center" />
+                <ColorPicker x:Name="IconColorPicker" 
+                             Palette="{Binding IconColorPalette}"
+                             Color="{Binding SelectedColor, Mode=TwoWay}"
+                             IsAccentColorsVisible="False"
+                             IsColorSpectrumVisible="False"
+                             IsColorSpectrumSliderVisible="false"
+                             IsColorComponentsVisible="False"
+                             IsColorModelVisible="False"
+                             IsHexInputVisible="False"
+                             SelectedIndex="1"
+                             Width="200">
+                </ColorPicker>
+            </StackPanel>
+            <!-- Buttons -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10"
+                        Margin="0, 10, 0, 0">
+                <Button Width="100" HorizontalContentAlignment="Center" Content="{x:Static local:language.OkButton}"
+                        Command="{Binding OkCommand}">
+                </Button>
+                <Button Width="120" HorizontalContentAlignment="Center"
+                        Content="{x:Static local:language.IconSelector_ClearSelection}"
+                        Command="{Binding ClearCommand}">
+                </Button>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

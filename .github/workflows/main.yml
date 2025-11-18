@@ -1,0 +1,56 @@
+name: Build and Release Avalonia App
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write     # Required for softprops/action-gh-release
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore src/Valt.UI/Valt.UI.csproj
+
+      - name: Build
+        run: dotnet build src/Valt.UI/Valt.UI.csproj --no-restore -c Release
+
+      - name: Publish for Windows
+        run: |
+          dotnet publish src/Valt.UI/Valt.UI.csproj -c Release -r win-x64 --self-contained true \
+            /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true \
+            --verbosity detailed -o ${{ github.workspace }}/publish/win-x64
+          cd ${{ github.workspace }}/publish/win-x64
+          zip -r ${{ github.workspace }}/Valt-Windows-${{ github.ref_name }}.zip .
+
+      - name: Publish for Linux
+        run: |
+          dotnet publish src/Valt.UI/Valt.UI.csproj -c Release -r linux-x64 --self-contained true \
+            /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true \
+            --verbosity detailed -o ${{ github.workspace }}/publish/linux-x64
+          cd ${{ github.workspace }}/publish/linux-x64
+          zip -r ${{ github.workspace }}/Valt-Linux-${{ github.ref_name }}.zip .
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            Valt-Windows-${{ github.ref_name }}.zip
+            Valt-Linux-${{ github.ref_name }}.zip

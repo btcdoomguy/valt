@@ -1,0 +1,77 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        xmlns:initialSelection1="clr-namespace:Valt.UI.Views.Main.Modals.InitialSelection"
+        mc:Ignorable="d"
+        d:DesignWidth="500" d:DesignHeight="395"
+        MaxWidth="500"
+        MaxHeight="395"
+        x:Class="Valt.UI.Views.Main.Modals.InitialSelection.InitialSelectionView"
+        Title="{x:Static local:language.InitialSelection_Title}"
+        x:DataType="initialSelection1:InitialSelectionViewModel"
+        WindowStartupLocation="CenterOwner"
+        SystemDecorations="None"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <initialSelection1:InitialSelectionViewModel />
+    </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseEmptyCommand}" />
+    </Window.KeyBindings>
+    <Border>
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="{x:Static local:language.InitialSelection_Title}" TitleBarPressed="TitleBar_OnPointerPressed" CloseVisible="False" />
+            <!-- Main Content -->
+            <Grid Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Message -->
+                <TextBlock Grid.Row="0" Text="{x:Static local:language.InitialSelection_CreateOrLoadMessage}" FontSize="16"
+                           HorizontalAlignment="Center"
+                           Margin="0,10" Foreground="White" />
+
+                <!--Recent files -->
+                <ListBox x:Name="FileBox" Classes="regularListBox" Grid.Row="1" Height="250" ItemsSource="{Binding RecentFiles}"
+                         SelectionMode="AlwaysSelected"
+                         SelectedItem="{Binding SelectedFile, Mode=TwoWay}"
+                         KeyDown="RecentFilesList_OnKeyDown">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <!-- Had to add the background transparent to handle click properly-->
+                            <StackPanel Orientation="Horizontal" PointerPressed="TitleBar_OnPointerPressed"
+                                        Background="Transparent">
+                                <Label Content="{Binding .}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+
+                </ListBox>
+
+                <!-- Buttons -->
+                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10"
+                            Margin="0, 10, 0, 0">
+                    <Button Classes="text-and-icon" HorizontalContentAlignment="Center"  Width="100" Command="{Binding CreateNewCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <Label Classes="icon" Content="&#xEAF3;"></Label>
+                            <Label Content="{x:Static local:language.New}" />
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="text-and-icon" Width="100" HorizontalContentAlignment="Center" Command="{Binding OpenExistingCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <Label Classes="icon" Content="&#xE2C8;"></Label>
+                            <Label Content="{x:Static local:language.Open}" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </Border>
+</Window>

@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Valt.UI.UserControls.CustomTitleBar">
+    <UserControl.Styles>
+        <Style Selector="Button.titlebar.minimize">
+            <Setter Property="IsEnabled" Value="{Binding MinimizeEnabled, RelativeSource={RelativeSource AncestorType=userControls:CustomTitleBar}}"/>
+            <Setter Property="IsVisible" Value="{Binding MinimizeVisible, RelativeSource={RelativeSource AncestorType=userControls:CustomTitleBar}}"/>
+        </Style>
+        <Style Selector="Button.titlebar.maximize">
+            <Setter Property="IsEnabled" Value="{Binding MaximizeEnabled, RelativeSource={RelativeSource AncestorType=userControls:CustomTitleBar}}"/>
+            <Setter Property="IsVisible" Value="{Binding MaximizeVisible, RelativeSource={RelativeSource AncestorType=userControls:CustomTitleBar}}"/>
+        </Style>
+        <Style Selector="Button.titlebar.close">
+            <Setter Property="IsEnabled" Value="{Binding CloseEnabled, RelativeSource={RelativeSource AncestorType=userControls:CustomTitleBar}}"/>
+            <Setter Property="IsVisible" Value="{Binding CloseVisible, RelativeSource={RelativeSource AncestorType=userControls:CustomTitleBar}}"/>
+        </Style>
+    </UserControl.Styles>
+    <Border Background="{DynamicResource ModalTopBarBackground}"
+            Height="30"
+            VerticalAlignment="Center"
+            Cursor="Hand"
+            PointerPressed="Border_PointerPressed">
+        <Grid ColumnDefinitions="*, Auto">
+            <TextBlock Grid.Column="0" Classes="titlebar-text" VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       Foreground="White"
+                       Text="{Binding Title, RelativeSource={RelativeSource AncestorType=userControls:CustomTitleBar}}" />
+            <StackPanel Orientation="Horizontal" Grid.Column="1">
+                <Button Classes="titlebar minimize"
+                        IsEnabled="{Binding MinimizeEnabled, RelativeSource={RelativeSource AncestorType=userControls:CustomTitleBar}}"
+                        IsVisible="{Binding MinimizeVisible, RelativeSource={RelativeSource AncestorType=userControls:CustomTitleBar}}"
+                        Click="Minimize_OnClick"
+                        IsTabStop="False" />
+                <Button Classes="titlebar maximize"
+                        IsEnabled="{Binding MaximizeEnabled, RelativeSource={RelativeSource AncestorType=userControls:CustomTitleBar}}"
+                        IsVisible="{Binding MaximizeVisible, RelativeSource={RelativeSource AncestorType=userControls:CustomTitleBar}}"
+                        Click="Maximize_OnClick"
+                        IsTabStop="False" />
+                <Button Classes="titlebar close"
+                        IsEnabled="{Binding CloseEnabled, RelativeSource={RelativeSource AncestorType=userControls:CustomTitleBar}}"
+                        IsVisible="{Binding CloseVisible, RelativeSource={RelativeSource AncestorType=userControls:CustomTitleBar}}"
+                        Click="Close_OnClick"
+                        IsTabStop="False" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

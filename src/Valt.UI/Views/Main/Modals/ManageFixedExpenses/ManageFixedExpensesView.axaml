@@ -1,0 +1,108 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:lang="clr-namespace:Valt.UI.Lang"
+        xmlns:manageFixedExpenses="clr-namespace:Valt.UI.Views.Main.Modals.ManageFixedExpenses"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Views.Main.Modals.ManageFixedExpenses.ManageFixedExpensesView"
+        Title="{x:Static lang:language.ManageFixedExpenses_Title}"
+        x:DataType="manageFixedExpenses:ManageFixedExpensesViewModel"
+        d:DesignWidth="1200"
+        d:DesignHeight="610"
+        MaxWidth="1200"
+        MaxHeight="610"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <manageFixedExpenses:ManageFixedExpensesViewModel />
+    </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" />
+    </Window.KeyBindings>
+    <Border>
+        <Grid RowDefinitions="Auto, 500, 80">
+            <userControls:CustomTitleBar Grid.Row="0" Title="{x:Static lang:language.ManageFixedExpenses_Title}"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+            <DataGrid Grid.Row="1"
+                      x:Name="MainGrid"
+                      Margin="10, 10, 10, 0"
+                      GridLinesVisibility="All"
+                      ItemsSource="{Binding FixedExpenses}"
+                      SelectionMode="Extended"
+                      CanUserResizeColumns="True"
+                      IsReadOnly="True"
+                      SelectedItem="{Binding SelectedFixedExpense}"
+                      DoubleTapped="MainGrid_OnDoubleTapped">
+                <DataGrid.Styles>
+                    <Styles>
+                        <Style Selector="DataGridCell TextBlock">
+                            <Setter Property="FontSize" Value="13"></Setter>
+                        </Style>
+                    </Styles>
+                </DataGrid.Styles>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Name}" Width="200"
+                                        Binding="{Binding Name}">
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Category}" Width="180"
+                                        Binding="{Binding Category}">
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_DefaultAccount}"
+                                        Width="150"
+                                        Binding="{Binding DefaultAccount}">
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Currency}" Width="100"
+                                        Binding="{Binding Currency}">
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Amount}" Width="200"
+                                        Binding="{Binding Amount}">
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Period}" Width="100"
+                                        Binding="{Binding Period}">
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Day}" Width="100"
+                                        Binding="{Binding Day}">
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Enabled}"
+                                        Binding="{Binding EnabledDescription}">
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="{x:Static lang:language.Transactions_Menu_Edit}"
+                                  Command="{Binding EditFixedExpenseCommand}">
+                        </MenuItem>
+                        <MenuItem Header="{x:Static lang:language.Transactions_Menu_Delete}"
+                                  Command="{Binding DeleteFixedExpenseCommand}">
+                        </MenuItem>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+            </DataGrid>
+            <Border Grid.Row="1"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    Padding="10"
+                    Margin="0,0,10,10">
+                <Button Classes="rounded" Content="&#xE145;" Command="{Binding AddFixedExpenseCommand}">
+                </Button>
+            </Border>
+            <Border Grid.Row="2"
+                    Classes="form-fields-area"
+                    VerticalAlignment="Stretch"
+                    Margin="10" 
+                    Padding="0">
+                <Grid ColumnDefinitions="650, *" RowDefinitions="30, 30">
+                    <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" Foreground="{DynamicResource Accent200Color}" Content="{x:Static lang:language.ManageFixedExpenses_MonthlyExpenses}" />
+                    <Label Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Content="{Binding MonthlyExpenses}" />
+                    <Label Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" Foreground="{DynamicResource Accent200Color}" Content="{x:Static lang:language.ManageFixedExpenses_YearlyExpenses}" />
+                    <Label Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Content="{Binding YearlyExpenses}" />
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

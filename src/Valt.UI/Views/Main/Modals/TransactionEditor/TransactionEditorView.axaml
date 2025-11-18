@@ -1,0 +1,310 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:transactionTerms="clr-namespace:Valt.Infra.TransactionTerms;assembly=Valt.Infra"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        xmlns:manageTransactions1="clr-namespace:Valt.UI.Views.Main.Modals.TransactionEditor"
+        mc:Ignorable="d"
+        d:DesignWidth="600"
+        d:DesignHeight="440"
+        MaxWidth="600"
+        MaxHeight="440"
+        x:Class="Valt.UI.Views.Main.Modals.TransactionEditor.TransactionEditorView"
+        x:DataType="manageTransactions1:TransactionEditorViewModel"
+        Title="{Binding WindowTitle}"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <manageTransactions1:TransactionEditorViewModel />
+    </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" />
+    </Window.KeyBindings>
+    <Border>
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="{Binding WindowTitle}" TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+            <Border Classes="form-fields-area" Height="330" Padding="0">
+                <Grid RowDefinitions="50, 50, 70, 80, 70">
+                    <DockPanel Grid.Row="0" Margin="0, 0, 0, 0" HorizontalAlignment="Stretch">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
+                            <Button Classes="transaction-option debt"
+                                    Width="100"
+                                    IsTabStop="False"
+                                    Classes.selected="{Binding DebtSelected}"
+                                    Command="{Binding SwitchToDebtCommand}">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Label Classes="icon" Content="&#xE15B;"></Label>
+                                    <Label Content="{x:Static local:language.ManageTransactions_Debt}" />
+                                </StackPanel>
+                            </Button>
+                            <Button Classes="transaction-option credit"
+                                    Width="100"
+                                    IsTabStop="False"
+                                    Classes.selected="{Binding CreditSelected}"
+                                    Command="{Binding SwitchToCreditCommand}">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Label Classes="icon" Content="&#xE145;"></Label>
+                                    <Label Content="{x:Static local:language.ManageTransactions_Credit}" />
+                                </StackPanel>
+                            </Button>
+                            <Button Classes="transaction-option transfer"
+                                    Width="100"
+                                    IsTabStop="False"
+                                    Classes.selected="{Binding TransferSelected}"
+                                    Command="{Binding SwitchToTransferCommand}">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Label Classes="icon" Content="&#xEB70;"></Label>
+                                    <Label Content="{x:Static local:language.ManageTransactions_Transfer}" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </DockPanel>
+
+                    <StackPanel Grid.Row="1" Margin="0, 10, 0, 0" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Grid ColumnDefinitions="30, 300, 30">
+                            <Button Grid.Column="0"
+                                    FontFamily="{DynamicResource MaterialDesign}"
+                                    Content="&#xE5DE;"
+                                    FontWeight="Bold"
+                                    IsTabStop="False"
+                                    FontSize="28"
+                                    Padding="0"
+                                    Command="{Binding PreviousDayCommand} " />
+                            <DatePicker HorizontalAlignment="Stretch" Grid.Column="1"
+                                        DayFormat="ddd dd"
+                                        MonthFormat="MMMM"
+                                        YearFormat="yyy"
+                                        TabIndex="10"
+                                        Height="36"
+                                        SelectedDate="{Binding Date}">
+                                <DatePicker.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="{x:Static local:language.ManageTransactions_SelectToday}"
+                                                  Command="{Binding SelectTodayCommand}">
+                                        </MenuItem>
+                                    </ContextMenu>
+                                </DatePicker.ContextMenu>
+                            </DatePicker>
+                            <Button
+                                Grid.Column="2"
+                                FontFamily="{DynamicResource MaterialDesign}"
+                                Content="&#xE5DF;"
+                                FontWeight="Bold"
+                                IsTabStop="False"
+                                FontSize="28"
+                                Margin="1,0, 0, 0"
+                                Padding="0"
+                                Command="{Binding NextDayCommand}" />
+                        </Grid>
+                    </StackPanel>
+
+                    <Grid Grid.Row="2" Margin="0" Grid.ColumnDefinitions="2*, *">
+                        <StackPanel Grid.Column="0" Margin="5">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static local:language.ManageTransactions_Name}" />
+                                <AutoCompleteBox x:Name="AutoCompleteTransactionNameBox"
+                                                 DropDownClosed="AutoCompleteTransactionNameBox_OnDropDownClosed"
+                                                 TabIndex="0"
+                                                 Text="{Binding Name, Mode=TwoWay}"
+                                                 SelectedItem="{Binding TransactionTermResult, Mode=TwoWay}">
+                                    <AutoCompleteBox.ItemTemplate>
+                                        <DataTemplate DataType="transactionTerms:TransactionTermResult">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                                                <TextBlock Text="{Binding CategoryName}" FontStyle="Italic" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </AutoCompleteBox.ItemTemplate>
+                                </AutoCompleteBox>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="5">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static local:language.ManageTransactions_Category}" />
+                                <ComboBox ItemsSource="{Binding AvailableCategories}"
+                                          SelectedItem="{Binding Category}"
+                                          HorizontalAlignment="Stretch"
+                                          IsTextSearchEnabled="True"
+                                          Height="34"
+                                          TabIndex="1">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock
+                                                    FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
+                                                    Text="{Binding Unicode}"
+                                                    Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}">
+                                                </TextBlock>
+                                                <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}">
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Grid.Row="3" Margin="0" Grid.ColumnDefinitions="*, 2*">
+                        <StackPanel Grid.Column="0" Margin="5">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static local:language.ManageTransactions_From}" />
+                                <ComboBox ItemsSource="{Binding AvailableAccounts}"
+                                          SelectedItem="{Binding FromAccount}"
+                                          IsTextSearchEnabled="True"
+                                          HorizontalAlignment="Stretch"
+                                          Height="34"
+                                          TabIndex="2">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock
+                                                    FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
+                                                    Text="{Binding Unicode}"
+                                                    Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}">
+                                                </TextBlock>
+                                                <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}">
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="5">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static local:language.ManageTransactions_Amount}" />
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                                    <userControls:BtcInput
+                                        x:Name="FromBtc"
+                                        Focusable="True"
+                                        IsVisible="{Binding FromAccountIsBtc}"
+                                        IsInputFocused="{Binding IsFromBtcInputFocused, Mode=TwoWay}"
+                                        BtcValue="{Binding FromAccountBtcValue, Mode=TwoWay}"
+                                        TabIndex="3"
+                                        CalculatorCommand="{Binding OpenCalculatorCommand}"
+                                        CalculatorCommandParameter="FromBtc"
+                                        Width="370"
+                                        HorizontalAlignment="Stretch">
+                                    </userControls:BtcInput>
+                                    <userControls:FiatInput
+                                        x:Name="FromFiat"
+                                        Focusable="True"
+                                        IsInputFocused="{Binding IsFromFiatInputFocused, Mode=TwoWay}"
+                                        IsVisible="{Binding !FromAccountIsBtc}"
+                                        FiatValue="{Binding FromAccountFiatValue, Mode=TwoWay}"
+                                        TabIndex="4"
+                                        CalculatorCommand="{Binding OpenCalculatorCommand}"
+                                        CalculatorCommandParameter="FromFiat"
+                                        Width="370"
+                                        HorizontalAlignment="Stretch">
+                                    </userControls:FiatInput>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Grid.Row="4" Margin="0" Grid.ColumnDefinitions="*, 2*">
+                        <StackPanel Grid.Column="0" Margin="5" Classes="form-field"
+                                    IsVisible="{Binding TransferSelected}">
+                            <TextBlock Text="To" />
+                            <ComboBox ItemsSource="{Binding AvailableAccounts}"
+                                      SelectedItem="{Binding ToAccount}"
+                                      HorizontalAlignment="Stretch"
+                                      IsTextSearchEnabled="True"
+                                      Height="34"
+                                      TabIndex="5">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock
+                                                FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
+                                                Text="{Binding Unicode}"
+                                                Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}">
+                                            </TextBlock>
+                                            <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}">
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Margin="5" Classes="form-field"
+                                    IsVisible="{Binding ShowTransferValueField}">
+                            <TextBlock Text="{x:Static local:language.ManageTransactions_Amount}" />
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                                <userControls:BtcInput
+                                    x:Name="ToBtc"
+                                    IsVisible="{Binding ToAccountIsBtc}"
+                                    IsInputFocused="{Binding IsToBtcInputFocused, Mode=TwoWay}"
+                                    BtcValue="{Binding ToAccountBtcValue, Mode=TwoWay}"
+                                    TabIndex="6"
+                                    CalculatorCommand="{Binding OpenCalculatorCommand}"
+                                    CalculatorCommandParameter="ToBtc"
+                                    Width="370"
+                                    HorizontalAlignment="Stretch">
+                                </userControls:BtcInput>
+                                <userControls:FiatInput
+                                    x:Name="ToFiat"
+                                    HorizontalAlignment="Stretch"
+                                    TabIndex="7"
+                                    IsVisible="{Binding !ToAccountIsBtc}"
+                                    IsInputFocused="{Binding IsToFiatInputFocused, Mode=TwoWay}"
+                                    FiatValue="{Binding ToAccountFiatValue, Mode=TwoWay}"
+                                    CalculatorCommand="{Binding OpenCalculatorCommand}"
+                                    Width="370"
+                                    CalculatorCommandParameter="ToFiat">
+                                </userControls:FiatInput>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <Border Grid.Column="1"
+                                IsVisible="{Binding ShowTransferValueField}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Top"
+                                Margin="0, -8, 0, 0">
+                            <StackPanel Orientation="Horizontal">
+                                <Label FontFamily="{DynamicResource MaterialDesign}" FontSize="18" Classes="icon"
+                                       Content="&#xEB70;">
+                                </Label>
+                                <Label Margin="0, 4, 0, 0" Content="{Binding TransferRate}" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <Border Classes="form-fields-area" Height="20" Padding="0" Background="{DynamicResource Background900Brush}">
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal" Margin="0, 0, 20, 0" IsVisible="{Binding IsBoundToFixedExpense}">
+                        <Label FontSize="11" Foreground="{DynamicResource Accent200Color}" HorizontalContentAlignment="Right" Content="{x:Static local:language.ManageTransactions_Properties_BoundToFixedExpense}" />
+                        <Label FontSize="11" Content="{Binding BoundToFixedExpenseCaption}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0, 0, 20, 0" IsVisible="{Binding IsAutoSatAmount}">
+                        <Label FontSize="11" Foreground="{DynamicResource Accent200Color}" HorizontalContentAlignment="Right">Price in sats:</Label>
+                        <Label FontSize="11" Content="{Binding SatAmountStateDescription}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Buttons -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10"
+                        Margin="0, 0, 0, 0">
+                <Button Width="100" TabIndex="11" Content="{x:Static local:language.OkButton}"
+                        HorizontalContentAlignment="Center"
+                        Command="{Binding OkCommand}">
+                </Button>
+                <Button Width="100" TabIndex="12" Content="{x:Static local:language.CancelButton}"
+                        HorizontalContentAlignment="Center"
+                        Command="{Binding CancelCommand}">
+                </Button>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

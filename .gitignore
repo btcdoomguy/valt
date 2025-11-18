@@ -1,0 +1,39 @@
+# User-specific files
+*.suo
+*.user
+*.sln.docstates
+
+# Build results
+
+.vs/
+[Dd]ebug/
+[Rr]elease/
+x64/
+[Bb]in/
+[Oo]bj/
+
+# Build scripts folder
+[Aa]pp[Bb]uild/
+[Oo]ut/
+
+# Visual Studio Code files
+.vscode/
+
+# Others
+sql/
+*.Cache
+ClientBin/
+[Ss]tyle[Cc]op.*
+~$*
+*~
+*.dbmdl
+*.[Pp]ublish.xml
+*.pfx
+*.publishsettings.idea/
+*.iml
+
+## Rider / IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr

@@ -1,0 +1,59 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:about="clr-namespace:Valt.UI.Views.Main.Modals.About"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="400"
+        MaxWidth="500"
+        MaxHeight="400"
+        x:Class="Valt.UI.Views.Main.Modals.About.AboutView"
+        x:DataType="about:AboutViewModel"
+        WindowStartupLocation="CenterScreen"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0"
+        Title="AboutView">
+    <Design.DataContext>
+        <about:AboutViewModel />
+    </Design.DataContext>
+    <Window.Styles>
+        <Style Selector="Window">
+            <Setter Property="FontFamily" Value="Mono"></Setter>
+        </Style>
+    </Window.Styles>
+    <Border>
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="{x:Static local:language.About_Title}"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+            <Grid Margin="20" RowDefinitions="200, *">
+                <Grid Grid.Row="0" ColumnDefinitions="128, *">
+                    <Image Grid.Column="0" Source="/Assets/valt-logo.png" Width="128" Height="138" />
+                    <TextBlock Margin="20, 0, 0, 0" Grid.Column="1" FontSize="12" TextWrapping="Wrap">
+                        <TextBlock Text="VALT" FontSize="48"></TextBlock>
+                        <TextBlock Text="{Binding AppVersion}" FontSize="12" Margin="0, -24, 0, 0" />
+                        <LineBreak />
+                        <LineBreak />
+                        <TextBlock Text="Created by BtcDoomGuy"></TextBlock>
+                        <LineBreak />
+                        <LineBreak />
+                        <HyperlinkButton NavigateUri="https://x.com/btcchicofatal">@BtcChicoFatal</HyperlinkButton>
+                        <LineBreak />
+                        <LineBreak />
+                        <HyperlinkButton NavigateUri="https://github.com/btcdoomguy/valt/">https://github.com/btcdoomguy/valt/</HyperlinkButton>
+                    </TextBlock>
+                </Grid>
+                <StackPanel Grid.Row="1">
+                    <TextBlock FontSize="12" TextWrapping="Wrap">
+                        <TextBlock Text="{x:Static local:language.About_Tip}"></TextBlock>
+                    </TextBlock>
+                    <TextBox Text="{Binding DonationAddresses}" FontFamily="Mono" IsReadOnly="True" Height="100" AcceptsReturn="True"
+                             TextWrapping="NoWrap" FontSize="10">
+                    </TextBox>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </Border>
+</Window>

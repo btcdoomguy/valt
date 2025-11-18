@@ -1,0 +1,208 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Valt.UI.Lang"
+             xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+             xmlns:transactionTerms="clr-namespace:Valt.Infra.TransactionTerms;assembly=Valt.Infra"
+             xmlns:transactions1="clr-namespace:Valt.UI.Views.Main.Tabs.Transactions"
+             xmlns:models1="clr-namespace:Valt.UI.Views.Main.Tabs.Transactions.Models"
+             mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="700"
+             x:Class="Valt.UI.Views.Main.Tabs.Transactions.TransactionListView"
+             x:DataType="transactions1:TransactionListViewModel">
+    <Design.DataContext>
+        <transactions1:TransactionListViewModel />
+    </Design.DataContext>
+    <UserControl.KeyBindings>
+        <KeyBinding Gesture="F2" Command="{Binding AddTransactionCommand}" />
+    </UserControl.KeyBindings>
+    <Grid RowDefinitions="100, *">
+        <Grid Grid.Row="0" Margin="10" ColumnDefinitions="*, 260, *">
+            <StackPanel Grid.Column="0" Margin="10" Orientation="Horizontal">
+                <AutoCompleteBox x:Name="SearchBox"
+                                 Width="200" Watermark="{x:Static local:language.Transactions_EnterSearchTerm}"
+                                 Margin="0, 14, 0, 0"
+                                 Text="{Binding SearchTerm, Mode=TwoWay}"
+                                 SelectionChanged="SearchBox_OnSelectionChanged"
+                                 TextChanged="SearchBox_OnTextChanged">
+                    <AutoCompleteBox.ItemTemplate>
+                        <DataTemplate DataType="transactionTerms:TransactionTermResult">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Name}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </AutoCompleteBox.ItemTemplate>
+                </AutoCompleteBox>
+            </StackPanel>
+            <userControls:DateCalendarSelector Grid.Column="1"
+                                               Date="{Binding FilterMainDate}"
+                                               Range="{Binding FilterRange}" />
+            <StackPanel Grid.Column="2" HorizontalAlignment="Right" Orientation="Horizontal">
+                <Button Command="{Binding AddTransactionCommand}"
+                        ToolTip.Tip="{x:Static local:language.Transactions_AddTransaction_ToolTip}"
+                        Content="{x:Static local:language.Transactions_AddTransaction}" />
+            </StackPanel>
+        </Grid>
+        <DataGrid Grid.Row="1"
+                  x:Name="MainGrid"
+                  Margin="10"
+                  GridLinesVisibility="All"
+                  ItemsSource="{Binding Transactions}"
+                  SelectionMode="Extended"
+                  CanUserResizeColumns="True"
+                  IsReadOnly="True"
+                  SelectedItem="{Binding SelectedTransaction}"
+                  SelectionChanged="MainGrid_OnSelectionChanged">
+            <DataGrid.Styles>
+                <Styles>
+                    <Style Selector="DataGridCell TextBlock">
+                        <Setter Property="FontSize" Value="13"></Setter>
+                    </Style>
+                    <Style Selector="TextBlock.icon">
+                        <Setter Property="Padding" Value="8, 4, 4, 0" />
+                        <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
+                        <Setter Property="FontSize" Value="16" />
+                    </Style>
+                    <Style Selector="TextBlock.icon-text">
+                        <Setter Property="Padding" Value="0, 10, 0, 0" />
+                    </Style>
+                    <Style Selector="TextBlock.only-text">
+                        <Setter Property="Padding" Value="8, 10, 8, 0" />
+                    </Style>
+                </Styles>
+            </DataGrid.Styles>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="{x:Static local:language.Transactions_Columns_Date}"
+                                        SortMemberPath="Date">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="models1:TransactionViewModel">
+                            <TextBlock Classes="only-text" Text="{Binding Date}" Foreground="{Binding LineColor}"></TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="{x:Static local:language.Transactions_Columns_Description}"
+                                        SortMemberPath="Name">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="models1:TransactionViewModel">
+                            <TextBlock Classes="only-text" Text="{Binding Name}" Foreground="{Binding LineColor}"></TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="{x:Static local:language.Transactions_Columns_Category}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="models1:TransactionViewModel">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock
+                                    Classes="icon"
+                                    Text="{Binding CategoryIcon.Unicode}"
+                                    Foreground="{Binding CategoryIcon.Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}">
+                                </TextBlock>
+                                <TextBlock Classes="icon-text" Text="{Binding CategoryName}"
+                                           Foreground="{Binding LineColor}">
+                                </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="{Binding AmountHeader}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="models1:TransactionViewModel">
+                            <TextBlock Classes="only-text" Text="{Binding FormattedSummarizedAmount}"
+                                       Foreground="{Binding AmountColor}">
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="{x:Static local:language.Transactions_Columns_OriginAccount}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="models1:TransactionViewModel">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock
+                                    Classes="icon"
+                                    Text="{Binding FromAccountIcon.Unicode}"
+                                    Foreground="{Binding FromAccountIcon.Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}">
+                                </TextBlock>
+                                <TextBlock Classes="icon-text" Text="{Binding FromAccountName}"
+                                           Foreground="{Binding LineColor}">
+                                </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="{x:Static local:language.Transactions_Columns_TargetAccount}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="models1:TransactionViewModel">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock
+                                    Classes="icon"
+                                    Text="{Binding ToAccountIcon.Unicode}"
+                                    Foreground="{Binding ToAccountIcon.Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}">
+                                </TextBlock>
+                                <TextBlock Classes="icon-text" Text="{Binding ToAccountName}"
+                                           Foreground="{Binding LineColor}">
+                                </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding AutoSatAmount}">
+                    <DataGridTextColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <Label Content="{x:Static local:language.Transactions_Columns_Sats}" ToolTip.Tip="{x:Static local:language.Transactions_Columns_Sats_Hint}" />
+                        </DataTemplate>
+                    </DataGridTextColumn.HeaderTemplate>
+                </DataGridTextColumn>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <Label Content="{x:Static local:language.Transactions_Columns_SatsPriceToday}" ToolTip.Tip="{x:Static local:language.Transactions_Columns_SatsPriceToday_Hint}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="models1:TransactionViewModel">
+                            <StackPanel Orientation="Horizontal" >
+                                <TextBlock Classes="only-text" Text="{Binding AutoSatAmountCurrentPrice}"
+                                           
+                                           Foreground="{Binding AutoSatLineColor}">
+                                </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="{x:Static local:language.Transactions_Menu_Edit}"
+                              IsVisible="{Binding IsSingleItemSelected}"
+                              Command="{Binding EditTransactionCommand}"
+                              CommandParameter="{Binding SelectedTransaction}">
+                    </MenuItem>
+                    <MenuItem Header="{x:Static local:language.Transactions_Menu_Copy}"
+                              IsVisible="{Binding IsSingleItemSelected}"
+                              Command="{Binding CopyTransactionCommand}"
+                              CommandParameter="{Binding SelectedTransaction}">
+                    </MenuItem>
+                    <MenuItem Header="{x:Static local:language.Transactions_Menu_RenameAll}"
+                              IsVisible="{Binding !IsSingleItemSelected}"
+                              Command="{Binding RenameAllCommand}">
+                    </MenuItem>
+                    <MenuItem Header="{x:Static local:language.Transactions_Menu_Delete}"
+                              Command="{Binding DeleteTransactionCommand}"
+                              CommandParameter="{Binding SelectedTransaction}">
+                    </MenuItem>
+                    <MenuItem Header="{Binding BindToFixedExpenseCaption}"
+                              IsVisible="{Binding CanBindToFixedExpense}"
+                              Command="{Binding BindToFixedExpenseCommand}"
+                              CommandParameter="{Binding SelectedTransaction}">
+                    </MenuItem>
+                    <MenuItem Header="{Binding UnbindToFixedExpenseCaption}"
+                              IsVisible="{Binding CanUnbindFromFixedExpense}"
+                              Command="{Binding UnbindFromFixedExpenseCommand}"
+                              CommandParameter="{Binding SelectedTransaction}">
+                    </MenuItem>
+
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+        </DataGrid>
+    </Grid>
+</UserControl>

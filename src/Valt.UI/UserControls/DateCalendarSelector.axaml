@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:data="clr-namespace:Valt.UI.UserControls"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="300"
+             x:Class="Valt.UI.UserControls.DateCalendarSelector"
+             x:Name="root">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="30" /> <!-- Left Column -->
+            <ColumnDefinition Width="200" /> <!-- Left Column -->
+            <ColumnDefinition Width="30" /> <!-- Left Column -->
+        </Grid.ColumnDefinitions>
+        <Button Grid.Column="0"
+                FontFamily="{DynamicResource MaterialDesign}"
+                Content="&#xE5DE;"
+                FontWeight="Bold"
+                FontSize="28"
+                Padding="0"
+                Command="{Binding PreviousPeriodCommand, RelativeSource={RelativeSource AncestorType=data:DateCalendarSelector}}" />
+        <StackPanel Orientation="Horizontal"
+                    Height="33"
+                    Background="{DynamicResource Background900Brush}"
+                    HorizontalAlignment="Stretch" Grid.Column="1">
+            <Label 
+                   HorizontalAlignment="Stretch"
+                   VerticalAlignment="Center"
+                   HorizontalContentAlignment="Center"
+                   Content="{Binding DisplayValue, RelativeSource={RelativeSource AncestorType=data:DateCalendarSelector}}"
+                   Background="{DynamicResource Background900Brush}"
+                   Foreground="White"
+                   Width="160"
+                   Margin="0, 1, 0, 0"
+                   Padding="7" />
+            <DropDownButton Background="{DynamicResource Background900Brush}" 
+                            Height="33"
+                            Margin="0, 0, 0, 0">
+                <DropDownButton.Flyout>
+                    <MenuFlyout Placement="Bottom">
+                        <MenuItem Header="Day" 
+                                  Command="{Binding ChangeSelectorModeCommand, ElementName=root}"
+                                  CommandParameter="{x:Static data:DateCalendarSelectorMode.Day}" />
+                        <MenuItem Header="Week" 
+                                  Command="{Binding ChangeSelectorModeCommand, ElementName=root}"
+                                  CommandParameter="{x:Static data:DateCalendarSelectorMode.Week}" />
+                        <MenuItem Header="Month"
+                                  Command="{Binding ChangeSelectorModeCommand, ElementName=root}"
+                                  CommandParameter="{x:Static data:DateCalendarSelectorMode.Month}" />
+                        <MenuItem Header="Year" 
+                                  Command="{Binding ChangeSelectorModeCommand, ElementName=root}"
+                                  CommandParameter="{x:Static data:DateCalendarSelectorMode.Year}" />
+                        <MenuItem Header="All" 
+                                  Command="{Binding ChangeSelectorModeCommand, ElementName=root}"
+                                  CommandParameter="{x:Static data:DateCalendarSelectorMode.All}" />
+                        <Separator></Separator>
+                        <MenuItem Header="Reset date"
+                                  Command="{Binding ResetDateCommand, ElementName=root}" />
+                    </MenuFlyout>
+                </DropDownButton.Flyout>
+            </DropDownButton>
+        </StackPanel>
+        
+        <Button
+            Grid.Column="2"
+            FontFamily="{DynamicResource MaterialDesign}"
+            Content="&#xE5DF;"
+            FontWeight="Bold"
+            FontSize="28"
+            Padding="0"
+            Command="{Binding NextPeriodCommand, RelativeSource={RelativeSource AncestorType=data:DateCalendarSelector}}" />
+    </Grid>
+</UserControl>

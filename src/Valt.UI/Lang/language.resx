@@ -1,0 +1,629 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="OkButton" xml:space="preserve">
+        <value>OK</value>
+    </data>
+    <data name="CancelButton" xml:space="preserve">
+        <value>Cancel</value>
+    </data>
+    <data name="ChangeCategoryTransactionTitle" xml:space="preserve">
+        <value>New Name</value>
+    </data>
+    <data name="CreateDatabaseTitle" xml:space="preserve">
+        <value>Create new database</value>
+    </data>
+    <data name="CreateDatabase.TextLine1" xml:space="preserve">
+        <value>VALT uses a simple database file to store your data.</value>
+    </data>
+    <data name="CreateDatabase.TextLine2" xml:space="preserve">
+        <value>Please set up a strong password to encrypt this file.</value>
+    </data>
+    <data name="CreateDatabase.TextLine3" xml:space="preserve">
+        <value>NOTE: losing your password is irreversible. Store it safely!</value>
+    </data>
+    <data name="CreateDatabase.FilePath" xml:space="preserve">
+        <value>File path</value>
+    </data>
+    <data name="CreateDatabase.Password" xml:space="preserve">
+        <value>Password</value>
+    </data>
+    <data name="CreateDatabase.ConfirmPassword" xml:space="preserve">
+        <value>Confirm password</value>
+    </data>
+    <data name="IconSelector.ClearSelection" xml:space="preserve">
+        <value>Clear Selection</value>
+    </data>
+    <data name="IconSelector.Color" xml:space="preserve">
+        <value>Color</value>
+    </data>
+    <data name="IconSelector.Loading" xml:space="preserve">
+        <value>Loading...</value>
+    </data>
+    <data name="IconSelector.Title" xml:space="preserve">
+        <value>Select icon</value>
+    </data>
+    <data name="Search" xml:space="preserve">
+        <value>Search</value>
+    </data>
+    <data name="New" xml:space="preserve">
+        <value>New</value>
+    </data>
+    <data name="Open" xml:space="preserve">
+        <value>Open</value>
+    </data>
+    <data name="InitialSelection.Title" xml:space="preserve">
+        <value>Welcome to Valt!</value>
+    </data>
+    <data name="InitialSelection.CreateOrLoadMessage" xml:space="preserve">
+        <value>Create or load a database file:</value>
+    </data>
+    <data name="InputPassword.DatabasePassword" xml:space="preserve">
+        <value>Database password</value>
+    </data>
+    <data name="InputPassword.Password" xml:space="preserve">
+        <value>Password</value>
+    </data>
+    <data name="ManageAccount.Title" xml:space="preserve">
+        <value>Add/edit account</value>
+    </data>
+    <data name="ManageAccount.Name" xml:space="preserve">
+        <value>Name</value>
+    </data>
+    <data name="ManageAccount.Icon" xml:space="preserve">
+        <value>Icon</value>
+    </data>
+    <data name="ManageAccount.Visible" xml:space="preserve">
+        <value>Visible</value>
+    </data>
+    <data name="ManageAccount.AccountType" xml:space="preserve">
+        <value>Account Type</value>
+    </data>
+    <data name="ManageAccount.Currency" xml:space="preserve">
+        <value>Currency</value>
+    </data>
+    <data name="ManageAccount.InitialAmount" xml:space="preserve">
+        <value>Initial Amount</value>
+    </data>
+    <data name="ManageCategories.Title" xml:space="preserve">
+        <value>Categories</value>
+    </data>
+    <data name="ManageCategories.Name" xml:space="preserve">
+        <value>Name</value>
+    </data>
+    <data name="ManageCategories.Icon" xml:space="preserve">
+        <value>Icon</value>
+    </data>
+    <data name="ManageCategories.Delete" xml:space="preserve">
+        <value>Delete</value>
+    </data>
+    <data name="ManageCategories.Tip" xml:space="preserve">
+        <value>TIP: drag and drop a category inside another to group them.</value>
+    </data>
+    <data name="ManageTransactions.Debt" xml:space="preserve">
+        <value>Debt</value>
+    </data>
+    <data name="ManageTransactions.Credit" xml:space="preserve">
+        <value>Credit</value>
+    </data>
+    <data name="ManageTransactions.Transfer" xml:space="preserve">
+        <value>Transfer</value>
+    </data>
+    <data name="ManageTransactions.Name" xml:space="preserve">
+        <value>Name</value>
+    </data>
+    <data name="ManageTransactions.Category" xml:space="preserve">
+        <value>Category</value>
+    </data>
+    <data name="ManageTransactions.From" xml:space="preserve">
+        <value>From</value>
+    </data>
+    <data name="ManageTransactions.Amount" xml:space="preserve">
+        <value>Amount</value>
+    </data>
+    <data name="ManageTransactions.To" xml:space="preserve">
+        <value>To</value>
+    </data>
+    <data name="AddNew" xml:space="preserve">
+        <value>Add New</value>
+    </data>
+    <data name="SaveChanges" xml:space="preserve">
+        <value>Save Changes</value>
+    </data>
+    <data name="MathExpression.Title" xml:space="preserve">
+        <value>Calculate expression</value>
+    </data>
+    <data name="MathExpression.Description" xml:space="preserve">
+        <value>Enter your expression below (123+456):</value>
+    </data>
+    <data name="Settings.Title" xml:space="preserve">
+        <value>Settings</value>
+    </data>
+    <data name="Settings.MainFiatCurrency" xml:space="preserve">
+        <value>Main fiat currency</value>
+    </data>
+    <data name="Settings.ShowHiddenAccounts" xml:space="preserve">
+        <value>Show hidden accounts</value>
+    </data>
+    <data name="Settings.ClearAccountTotalsCache" xml:space="preserve">
+        <value>Clear account totals cache</value>
+    </data>
+    <data name="Settings.ClearTransactionTermCache" xml:space="preserve">
+        <value>Clear transaction term cache</value>
+    </data>
+    <data name="StatusDisplay.Title" xml:space="preserve">
+        <value>Service status</value>
+    </data>
+    <data name="Transactions.Ratio" xml:space="preserve">
+        <value>Wealth in BTC</value>
+    </data>
+    <data name="Transactions.TotalInFiat" xml:space="preserve">
+        <value>Total</value>
+    </data>
+    <data name="Transactions.Total" xml:space="preserve">
+        <value>Total in BTC</value>
+    </data>
+    <data name="Transactions.ViewAllAccounts" xml:space="preserve">
+        <value>View all accounts</value>
+    </data>
+    <data name="Transactions.Edit" xml:space="preserve">
+        <value>Edit</value>
+    </data>
+    <data name="Transactions.Hide" xml:space="preserve">
+        <value>Hide</value>
+    </data>
+    <data name="Transactions.Delete" xml:space="preserve">
+        <value>Delete</value>
+    </data>
+    <data name="Transactions.MoveUp" xml:space="preserve">
+        <value>Move Up</value>
+    </data>
+    <data name="Transactions.MoveDown" xml:space="preserve">
+        <value>Move Down</value>
+    </data>
+    <data name="Transactions.EnterSearchTerm" xml:space="preserve">
+        <value>Enter search term...</value>
+    </data>
+    <data name="Transactions.AddTransaction" xml:space="preserve">
+        <value>+ Add transaction</value>
+    </data>
+    <data name="Transactions.Columns.Date" xml:space="preserve">
+        <value>Date</value>
+    </data>
+    <data name="Transactions.Columns.Description" xml:space="preserve">
+        <value>Description</value>
+    </data>
+    <data name="Transactions.Columns.Category" xml:space="preserve">
+        <value>Category</value>
+    </data>
+    <data name="Transactions.Columns.OriginAccount" xml:space="preserve">
+        <value>Origin Account</value>
+    </data>
+    <data name="Transactions.Columns.TargetAccount" xml:space="preserve">
+        <value>Target Account</value>
+    </data>
+    <data name="Transactions.Columns.Sats" xml:space="preserve">
+        <value>Sats</value>
+    </data>
+    <data name="Transactions.Columns.SatsPriceToday" xml:space="preserve">
+        <value>Current Sats Price</value>
+    </data>
+    <data name="Transactions.Menu.Edit" xml:space="preserve">
+        <value>Edit</value>
+    </data>
+    <data name="Transactions.Menu.Copy" xml:space="preserve">
+        <value>Copy</value>
+    </data>
+    <data name="Transactions.Menu.RenameAll" xml:space="preserve">
+        <value>Rename all</value>
+    </data>
+    <data name="Transactions.Menu.Delete" xml:space="preserve">
+        <value>Delete</value>
+    </data>
+    <data name="Main.Transactions" xml:space="preserve">
+        <value>Transactions</value>
+    </data>
+    <data name="Main.Reports" xml:space="preserve">
+        <value>Reports</value>
+    </data>
+    <data name="Main.Menu" xml:space="preserve">
+        <value>Manage</value>
+    </data>
+    <data name="Main.Menu.Categories" xml:space="preserve">
+        <value>Categories</value>
+    </data>
+    <data name="Main.Menu.Settings" xml:space="preserve">
+        <value>Settings</value>
+    </data>
+    <data name="Transactions.MyStack" xml:space="preserve">
+        <value>BTC</value>
+    </data>
+    <data name="Transactions.MyOther" xml:space="preserve">
+        <value>Fiat</value>
+    </data>
+    <data name="ManageTransactions.SelectToday" xml:space="preserve">
+        <value>Reset Date</value>
+    </data>
+    <data name="ManageTransactions.AddTitle" xml:space="preserve">
+        <value>Add transaction</value>
+    </data>
+    <data name="ManageTransactions.EditTitle" xml:space="preserve">
+        <value>Edit transaction</value>
+    </data>
+    <data name="ManageTransactions.CopyTitle" xml:space="preserve">
+        <value>Copy transaction</value>
+    </data>
+    <data name="Settings.Culture" xml:space="preserve">
+        <value>Language and display format</value>
+    </data>
+    <data name="ManageCategories.RemoveFromGroup" xml:space="preserve">
+        <value>Remove from group</value>
+    </data>
+    <data name="ManageTransactions.FixedExpense" xml:space="preserve">
+        <value>Related to fixed expense</value>
+    </data>
+    <data name="ManageFixedExpenses.Title" xml:space="preserve">
+        <value>Fixed Expenses</value>
+    </data>
+    <data name="FixedExpenses.Columns.Name" xml:space="preserve">
+        <value>Name</value>
+    </data>
+    <data name="FixedExpenses.Columns.Category" xml:space="preserve">
+        <value>Category</value>
+    </data>
+    <data name="FixedExpenses.Columns.DefaultAccount" xml:space="preserve">
+        <value>Default Account</value>
+    </data>
+    <data name="FixedExpenses.Columns.Currency" xml:space="preserve">
+        <value>Currency</value>
+    </data>
+    <data name="FixedExpenses.Columns.AmountType" xml:space="preserve">
+        <value>Type</value>
+    </data>
+    <data name="FixedExpenses.Columns.FixedAmount" xml:space="preserve">
+        <value>Fixed Amount</value>
+    </data>
+    <data name="FixedExpenses.Columns.RangedAmountMin" xml:space="preserve">
+        <value>Minimum Amount</value>
+    </data>
+    <data name="FixedExpenses.Columns.RangedAmountMax" xml:space="preserve">
+        <value>Maximum Amount</value>
+    </data>
+    <data name="FixedExpenses.Columns.Period" xml:space="preserve">
+        <value>Frequency</value>
+    </data>
+    <data name="FixedExpenses.Columns.Day" xml:space="preserve">
+        <value>Day</value>
+    </data>
+    <data name="FixedExpenses.Columns.Enabled" xml:space="preserve">
+        <value>Enabled</value>
+    </data>
+    <data name="FixedExpenses.Columns.Amount" xml:space="preserve">
+        <value>Amount</value>
+    </data>
+    <data name="FixedExpenses.Period.Monthly" xml:space="preserve">
+        <value>Monthly</value>
+    </data>
+    <data name="FixedExpenses.Period.Yearly" xml:space="preserve">
+        <value>Yearly</value>
+    </data>
+    <data name="Transactions.ManageFixedExpenses" xml:space="preserve">
+        <value>Manage</value>
+    </data>
+    <data name="FixedExpensesEditor.EditTitle" xml:space="preserve">
+        <value>Edit Fixed Expense</value>
+    </data>
+    <data name="FixedExpensesEditor.AddTitle" xml:space="preserve">
+        <value>Add Fixed Expense</value>
+    </data>
+    <data name="ManageFixedExpenses.Name" xml:space="preserve">
+        <value>Name</value>
+    </data>
+    <data name="ManageFixedExpenses.Category" xml:space="preserve">
+        <value>Category</value>
+    </data>
+    <data name="ManageFixedExpenses.CurrencyDefinition" xml:space="preserve">
+        <value>Currency Definition</value>
+    </data>
+    <data name="ManageFixedExpenses.CurrencyDefinition.AttachedToDefaultAccount" xml:space="preserve">
+        <value>From default account</value>
+    </data>
+    <data name="ManageFixedExpenses.CurrencyDefinition.AttachedToCurrency" xml:space="preserve">
+        <value>Direct set</value>
+    </data>
+    <data name="ManageFixedExpenses.DefaultAccount" xml:space="preserve">
+        <value>Default Account</value>
+    </data>
+    <data name="ManageFixedExpenses.Currency" xml:space="preserve">
+        <value>Currency</value>
+    </data>
+    <data name="ManageFixedExpenses.AmountDefinition" xml:space="preserve">
+        <value>Amount Definition</value>
+    </data>
+    <data name="ManageFixedExpenses.AmountDefinition.Fixed" xml:space="preserve">
+        <value>Fixed</value>
+    </data>
+    <data name="ManageFixedExpenses.AmountDefinition.Variable" xml:space="preserve">
+        <value>Variable</value>
+    </data>
+    <data name="ManageFixedExpenses.AmountDefinition.Hint" xml:space="preserve">
+        <value>Use Fixed Amount if the recurring expense has a fixed value (like internet provider services). Use Variable Amount if the amount changes (like electricity bills). You must define a range of the variable amount to better estimate your yearly expenses.</value>
+    </data>
+    <data name="ManageFixedExpenses.Amount.Fixed" xml:space="preserve">
+        <value>Value</value>
+    </data>
+    <data name="ManageFixedExpenses.Amount.From" xml:space="preserve">
+        <value>From</value>
+    </data>
+    <data name="ManageFixedExpenses.Amount.To" xml:space="preserve">
+        <value>To</value>
+    </data>
+    <data name="ManageFixedExpenses.PeriodRange" xml:space="preserve">
+        <value>Frequency</value>
+    </data>
+    <data name="ManageFixedExpenses.PeriodRange.Monthly" xml:space="preserve">
+        <value>Monthly</value>
+    </data>
+    <data name="ManageFixedExpenses.PeriodRange.Yearly" xml:space="preserve">
+        <value>Yearly</value>
+    </data>
+    <data name="ManageFixedExpenses.Day" xml:space="preserve">
+        <value>Day of the month</value>
+    </data>
+    <data name="ManageFixedExpenses.StartPeriod" xml:space="preserve">
+        <value>Starts In</value>
+    </data>
+    <data name="ManageFixedExpenses.Enabled" xml:space="preserve">
+        <value>Enabled</value>
+    </data>
+    <data name="ManageFixedExpenses.CurrencyMode" xml:space="preserve">
+        <value>Mode</value>
+    </data>
+    <data name="FixedExpenseEditor.Validation.DefaultAccountRequired" xml:space="preserve">
+        <value>Select a default account</value>
+    </data>
+    <data name="FixedExpenseEditor.Validation.CurrencyRequired" xml:space="preserve">
+        <value>Select the currency</value>
+    </data>
+    <data name="FixedExpenseEditor.Validation.FixedAmountRequired" xml:space="preserve">
+        <value>Set a valid amount</value>
+    </data>
+    <data name="FixedExpenseEditor.Validation.RangedAmountMinRequired" xml:space="preserve">
+        <value>Set a valid minimum amount</value>
+    </data>
+    <data name="FixedExpenseEditor.Validation.RangedAmountMaxRequired" xml:space="preserve">
+        <value>Set a valid maximum amount</value>
+    </data>
+    <data name="FixedExpenseEditor.Validation.InvalidRangedAmountMinMax" xml:space="preserve">
+        <value>Invalid range</value>
+    </data>
+    <data name="ManageFixedExpenses.Delete.Alert" xml:space="preserve">
+        <value>Delete Fixed Expense</value>
+    </data>
+    <data name="ManageFixedExpenses.Delete.Message" xml:space="preserve">
+        <value>By deleting the fixed expense, all transactions bound to it will lose the binding. Do you wish to proceed?</value>
+    </data>
+    <data name="Yes" xml:space="preserve">
+        <value>Yes</value>
+    </data>
+    <data name="No" xml:space="preserve">
+        <value>No</value>
+    </data>
+    <data name="ManageFixedExpenses.MonthlyExpenses" xml:space="preserve">
+        <value>Monthly fixed expenses:</value>
+    </data>
+    <data name="ManageFixedExpenses.YearlyExpenses" xml:space="preserve">
+        <value>Yearly fixed expenses:</value>
+    </data>
+    <data name="Transactions.Columns.Amount" xml:space="preserve">
+        <value>Amount</value>
+    </data>
+    <data name="Transactions.Menu.BindToFixedExpenseCaption" xml:space="preserve">
+        <value>Bind to</value>
+    </data>
+    <data name="Transactions.Menu.UnbindToFixedExpenseCaption" xml:space="preserve">
+        <value>Unbind from</value>
+    </data>
+    <data name="ManageTransactions.Properties.BoundToFixedExpense" xml:space="preserve">
+        <value>Bound to:</value>
+    </data>
+    <data name="TransactionFixedExpenses.AddTransaction" xml:space="preserve">
+        <value>Create transaction</value>
+    </data>
+    <data name="TransactionFixedExpenses.EditTransaction" xml:space="preserve">
+        <value>Edit transaction</value>
+    </data>
+    <data name="TransactionFixedExpenses.IgnoreForThisMonth" xml:space="preserve">
+        <value>Ignore for this date</value>
+    </data>
+    <data name="TransactionFixedExpenses.MarkAsPaid" xml:space="preserve">
+        <value>Mark as paid</value>
+    </data>
+    <data name="TransactionFixedExpenses.UndoIgnoreForThisMonth" xml:space="preserve">
+        <value>Undo ignore</value>
+    </data>
+    <data name="TransactionFixedExpenses.UndoMarkAsPaid" xml:space="preserve">
+        <value>Unmark as paid</value>
+    </data>
+    <data name="TransactionFixedExpenses.AddOrEditTransaction" xml:space="preserve">
+        <value>Create/open transaction</value>
+    </data>
+    <data name="FixedExpenseEditor.Validation.InvalidRangePeriodStart" xml:space="preserve">
+        <value>Cannot set the new range period start below the last record</value>
+    </data>
+    <data name="FixedExpenses.Period.Weekly" xml:space="preserve">
+        <value>Weekly</value>
+    </data>
+    <data name="FixedExpenses.Period.Biweekly" xml:space="preserve">
+        <value>Biweekly</value>
+    </data>
+    <data name="DaysOfWeek.Sunday" xml:space="preserve">
+        <value>Sunday</value>
+    </data>
+    <data name="DaysOfWeek.Monday" xml:space="preserve">
+        <value>Monday</value>
+    </data>
+    <data name="DaysOfWeek.Tuesday" xml:space="preserve">
+        <value>Tuesday</value>
+    </data>
+    <data name="DaysOfWeek.Wednesday" xml:space="preserve">
+        <value>Wednesday</value>
+    </data>
+    <data name="DaysOfWeek.Thursday" xml:space="preserve">
+        <value>Thursday</value>
+    </data>
+    <data name="DaysOfWeek.Friday" xml:space="preserve">
+        <value>Friday</value>
+    </data>
+    <data name="DaysOfWeek.Saturday" xml:space="preserve">
+        <value>Saturday</value>
+    </data>
+    <data name="ManageFixedExpenses.DayOfWeek" xml:space="preserve">
+        <value>Day of week</value>
+    </data>
+    <data name="ManageFixedExpenses.PeriodRange.Weekly" xml:space="preserve">
+        <value>Weekly</value>
+    </data>
+    <data name="ManageFixedExpenses.PeriodRange.Biweekly" xml:space="preserve">
+        <value>Biweekly</value>
+    </data>
+    <data name="Empty" xml:space="preserve">
+        <value>-</value>
+    </data>
+    <data name="ManageTransactions.Properties.PriceInSats" xml:space="preserve">
+        <value>Price in sats:</value>
+    </data>
+    <data name="ChangePasswordTitle" xml:space="preserve">
+        <value>Change password</value>
+    </data>
+    <data name="ChangePassword.OldPassword" xml:space="preserve">
+        <value>Old password</value>
+    </data>
+    <data name="ChangePassword.Password" xml:space="preserve">
+        <value>New password</value>
+    </data>
+    <data name="ChangePassword.ConfirmPassword" xml:space="preserve">
+        <value>Confirm new password</value>
+    </data>
+    <data name="Settings.ChangeDatabasePassword" xml:space="preserve">
+        <value>Change database password</value>
+    </data>
+    <data name="ChangePassword.TextLine1" xml:space="preserve">
+        <value>Changing the password will recreate the database file. A backup will be generated on the same folder.</value>
+    </data>
+    <data name="RemainingFixedExpenses.Title" xml:space="preserve">
+        <value>Remaining:</value>
+    </data>
+    <data name="Edit" xml:space="preserve">
+        <value>Edit</value>
+    </data>
+    <data name="LoadingMessage" xml:space="preserve">
+        <value>Updating price database. Please wait...</value>
+    </data>
+    <data name="InstallPriceDatabase.Title" xml:space="preserve">
+        <value>Install price database</value>
+    </data>
+    <data name="Error" xml:space="preserve">
+        <value>Error</value>
+    </data>
+    <data name="InstallPriceDatabase.Error.Title" xml:space="preserve">
+        <value>Error</value>
+    </data>
+    <data name="InstallPriceDatabase.Error.Info" xml:space="preserve">
+        <value>Cannot install price database. Please check the internet connection again.</value>
+    </data>
+    <data name="InstallPriceDatabase.Info" xml:space="preserve">
+        <value>To finish the install process, Valt needs to create your local price database. For that, an internet connection must be available. The process will take a few seconds.</value>
+    </data>
+    <data name="ValtFile.Error" xml:space="preserve">
+        <value>Error opening VALT file: {0}</value>
+    </data>
+    <data name="ValtPriceFile.Error" xml:space="preserve">
+        <value>Error opening price database file:  {0}</value>
+    </data>
+    <data name="InstallingBitcoinPriceMessage" xml:space="preserve">
+        <value>Downloading bitcoin history price...</value>
+    </data>
+    <data name="InstallingFiatPriceMessage" xml:space="preserve">
+        <value>Download fiat currencies history price...</value>
+    </data>
+    <data name="Transactions.Columns.Sats.Hint" xml:space="preserve">
+        <value>Shows the transaction priced in sats, based on the closing price of bitcoin on that date</value>
+    </data>
+    <data name="Transactions.Columns.SatsPriceToday.Hint" xml:space="preserve">
+        <value>Current fiat value of the sats calculated in the sats columns</value>
+    </data>
+    <data name="BootDatabase.BtcAccount" xml:space="preserve">
+        <value>Cold Storage</value>
+    </data>
+    <data name="BootDatabase.FiatAccount" xml:space="preserve">
+        <value>Bank Account</value>
+    </data>
+    <data name="BootDatabase.Category.Food" xml:space="preserve">
+        <value>Food</value>
+    </data>
+    <data name="BootDatabase.Category.UtilityBills" xml:space="preserve">
+        <value>Utility Bills</value>
+    </data>
+    <data name="BootDatabase.Category.Services" xml:space="preserve">
+        <value>Services</value>
+    </data>
+    <data name="BootDatabase.Category.Gadgets" xml:space="preserve">
+        <value>Gadgets</value>
+    </data>
+    <data name="BootDatabase.Category.Health" xml:space="preserve">
+        <value>Health</value>
+    </data>
+    <data name="BootDatabase.Category.Transport" xml:space="preserve">
+        <value>Transportation</value>
+    </data>
+    <data name="BootDatabase.Category.Travel" xml:space="preserve">
+        <value>Travel</value>
+    </data>
+    <data name="BootDatabase.Category.Entertainment" xml:space="preserve">
+        <value>Entertainment</value>
+    </data>
+    <data name="BootDatabase.Category.Groceries" xml:space="preserve">
+        <value>Groceries</value>
+    </data>
+    <data name="BootDatabase.Category.Paycheck" xml:space="preserve">
+        <value>Paycheck</value>
+    </data>
+    <data name="Transactions.AddTransaction.ToolTip" xml:space="preserve">
+        <value>You can also press F2 to add a new transaction</value>
+    </data>
+    <data name="Main.Menu.About" xml:space="preserve">
+        <value>About</value>
+    </data>
+    <data name="About.Title" xml:space="preserve">
+        <value>About</value>
+    </data>
+    <data name="About.Tip" xml:space="preserve">
+        <value>If you like the app, send me some sats:</value>
+    </data>
+    <data name="Settings.RequiresRestart" xml:space="preserve">
+        <value>(requires restart)</value>
+    </data>
+</root>
