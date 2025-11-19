@@ -62,3 +62,4 @@ jobs:
           files: |
             Valt-Windows-${{ github.ref_name }}.zip
             Valt-Linux-${{ github.ref_name }}.zip
+            Valt-MacOS-experimental-${{ github.ref_name }}.zip
