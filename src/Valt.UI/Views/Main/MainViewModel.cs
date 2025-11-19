@@ -7,6 +7,8 @@ using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -44,7 +46,6 @@ public partial class MainViewModel : ValtViewModel
     private readonly BackgroundJobManager? _backgroundJobManager;
     private readonly IDatabaseInitializer? _databaseInitializer;
     private readonly LiveRatesViewModel _liveRatesViewModel;
-    private readonly LiveRateState _liveRateState;
     private readonly ILogger<MainViewModel> _logger;
 
     public MainView? Window { get; set; }
@@ -71,8 +72,15 @@ public partial class MainViewModel : ValtViewModel
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private string _loadingMessage;
 
+    [ObservableProperty] private bool _showPepe;
     [ObservableProperty] private bool _crashing;
     [ObservableProperty] private bool _pumping;
+    [ObservableProperty] private bool _up;
+    [ObservableProperty] private bool _down;
+    [ObservableProperty]
+    private Bitmap? _pepeMoodImage;
+
+    [ObservableProperty] private bool _isOffline;
 
     public LiveRatesViewModel LiveRatesViewModel => _liveRatesViewModel;
     public AvaloniaList<JobInfo> Jobs { get; set; }
@@ -118,7 +126,6 @@ public partial class MainViewModel : ValtViewModel
         _backgroundJobManager = backgroundJobManager;
         _databaseInitializer = databaseInitializer;
         _liveRatesViewModel = liveRatesViewModel;
-        _liveRateState = liveRateState;
         _logger = logger;
 
         _localDatabase.PropertyChanged += LocalDatabaseOnPropertyChanged;
@@ -129,8 +136,16 @@ public partial class MainViewModel : ValtViewModel
         
         WeakReferenceMessenger.Default.Register<LivePriceUpdated>(this, (recipient, message) =>
         {
-            Crashing = _liveRateState.BitcoinPrice / _liveRateState.PreviousBitcoinPrice.GetValueOrDefault() <= 0.95m;
-            Pumping = _liveRateState.BitcoinPrice / _liveRateState.PreviousBitcoinPrice.GetValueOrDefault() >= 1.05m;
+            var percentage = liveRateState.BitcoinPrice / liveRateState.PreviousBitcoinPrice.GetValueOrDefault();
+            
+            Crashing = percentage <= 0.95m;
+            Down = percentage <= 0.97m && !Crashing;
+            Pumping = percentage >= 1.05m;
+            Up = percentage >= 1.03m && !Pumping;
+            
+            UpdatePepeImage();
+
+            IsOffline = liveRateState.IsOffline;
         });
     }
 
@@ -378,5 +393,28 @@ public partial class MainViewModel : ValtViewModel
             return;
 
         await _backgroundJobManager.StopAll();
+    }
+    
+    private void UpdatePepeImage()
+    {
+        var assetName = (Pumping, Crashing, Up, Down) switch
+        {
+            (true,  _,     _,     _) => "veryhappy.webp",
+            (_,     true,  _,     _) => "veryunhappy.webp",
+            (_,     _,     true,  _) => "happy.webp",
+            (_,     _,     _,     true) => "unhappy.webp",
+            _ => null
+        };
+
+        if (assetName is null)
+        {
+            ShowPepe = false;
+            PepeMoodImage = null;
+            return;
+        }
+
+        ShowPepe = true;
+        var uri = new Uri($"avares://Valt/Assets/Pepe/{assetName}");
+        PepeMoodImage = new Bitmap(AssetLoader.Open(uri));
     }
 }

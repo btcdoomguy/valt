@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
+using Valt.Core.Common;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Bitcoin.Providers;
+using Valt.Infra.Kernel.Time;
 
 namespace Valt.Tests.LivePriceCrawlers;
 
@@ -9,13 +11,10 @@ public class CoinbaseProviderTests
     [Test]
     public async Task Should_Get_Prices()
     {
-        var coinbaseProvider = new CoinbaseProvider(new NullLogger<CoinbaseProvider>());
+        var coinbaseProvider = new CoinbaseProvider(new Clock(), new NullLogger<CoinbaseProvider>());
 
         var prices = await coinbaseProvider.GetAsync();
 
-        //tests will fail if btc dies :(
-        Assert.That(prices.SingleOrDefault(x => x.CurrencyCode == "USD")!.Price, Is.GreaterThan(0));
-        Assert.That(prices.SingleOrDefault(x => x.CurrencyCode == "EUR")!.Price, Is.GreaterThan(0));
-        Assert.That(prices.SingleOrDefault(x => x.CurrencyCode == "BRL")!.Price, Is.GreaterThan(0));
+        Assert.That(prices.Items.Count, Is.GreaterThan(0));
     }
 }

@@ -1250,5 +1250,17 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Settings.RequiresRestart", resourceCulture);
             }
         }
+        
+        public static string Offline_Line1 {
+            get {
+                return ResourceManager.GetString("Offline.Line1", resourceCulture);
+            }
+        }
+        
+        public static string Offline_Line2 {
+            get {
+                return ResourceManager.GetString("Offline.Line2", resourceCulture);
+            }
+        }
     }
 }

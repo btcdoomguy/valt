@@ -36,6 +36,8 @@ public partial class LiveRateState : ObservableObject, IRecipient<LivePriceUpdat
     [ObservableProperty] private decimal _fiatBtcPrice;
     [ObservableProperty] private decimal _previousFiatBtcPrice;
     
+    [ObservableProperty] private bool _isOffline;
+    
     public LiveRateState(CurrencySettings currencySettings,
         ILocalDatabase localDatabase,
         IPriceDatabase priceDatabase,
@@ -55,7 +57,9 @@ public partial class LiveRateState : ObservableObject, IRecipient<LivePriceUpdat
     {
         try
         {
-            var usdPrice = message.BtcPrices.SingleOrDefault(x => x.CurrencyCode == "USD");
+            IsOffline = !message.IsUpToDate;
+            
+            var usdPrice = message.Btc.Items.SingleOrDefault(x => x.CurrencyCode == FiatCurrency.Usd.Code);
 
             if (usdPrice is null)
                 return;
@@ -66,7 +70,7 @@ public partial class LiveRateState : ObservableObject, IRecipient<LivePriceUpdat
                 PreviousBitcoinPrice = usdPrice.PreviousPrice;
 
             var mainFiatPrice =
-                message.FiatPrices.SingleOrDefault(x => x.CurrencyCode == _currencySettings.MainFiatCurrency);
+                message.Fiat.Items.SingleOrDefault(x => x.CurrencyCode == _currencySettings.MainFiatCurrency);
 
             if (mainFiatPrice is null)
             {

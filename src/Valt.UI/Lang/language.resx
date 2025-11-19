@@ -626,4 +626,10 @@
     <data name="Settings.RequiresRestart" xml:space="preserve">
         <value>(requires restart)</value>
     </data>
+    <data name="Offline.Line1" xml:space="preserve">
+        <value>Rates are offline.</value>
+    </data>
+    <data name="Offline.Line2" xml:space="preserve">
+        <value>You are seeing the last recorded prices.</value>
+    </data>
 </root>

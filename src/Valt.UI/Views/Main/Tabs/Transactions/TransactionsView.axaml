@@ -208,6 +208,7 @@
                                     Height="30" Command="{Binding ManageFixedExpensesCommand}" />
                         </Grid>
                     </Border>
+                    <!-- Fixed Expense List -->
                     <ListBox
                         x:Name="FixedExpenseList"
                         Classes="regularListBox"
@@ -274,20 +275,20 @@
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
-                    <Border Background="{DynamicResource Background900Color}"
+                    <Border Background="{DynamicResource Background800Color}"
                             BorderBrush="{DynamicResource Background500Brush}"
                             Margin="0, 0, 10, 0"
                             Padding="5, 0, 0, 0"
                             BorderThickness="1, 0, 1, 1"
                             CornerRadius="0, 0, 5, 5">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0, 5, 0, 0">
-                            <TextBlock FontSize="12" Padding="0, 3, 20, 0" Foreground="{DynamicResource Accent200Color}"
+                            <TextBlock FontSize="12" Text="{x:Static local:language.RemainingFixedExpenses_Title}" />
+                            <TextBlock FontSize="12" Padding="0, 3, 5, 0" Foreground="{DynamicResource Accent200Color}"
                                        Text="{Binding RemainingFixedExpensesAmount}">
                             </TextBlock>
                         </StackPanel>
                     </Border>
                 </StackPanel>
-
             </Grid>
         </Panel>
     </Grid>

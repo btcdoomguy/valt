@@ -41,8 +41,8 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<LivePrice
 
     public void Receive(LivePriceUpdateMessage message)
     {
-        BitcoinPrice = message.BtcPrices.SingleOrDefault(x => x.CurrencyCode == "USD")!.Price;
-        FiatRates = message.FiatPrices.ToDictionary(x => x.CurrencyCode, x => x.Price);
+        BitcoinPrice = message.Btc.Items.SingleOrDefault(x => x.CurrencyCode == FiatCurrency.Usd.Code)!.Price;
+        FiatRates = message.Fiat.Items.ToDictionary(x => x.CurrencyCode, x => x.Price);
     }
 
     public void Receive(AccountSummariesDTO message)

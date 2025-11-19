@@ -56,7 +56,7 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
 
     [ObservableProperty] private AvaloniaList<AccountViewModel> _accounts = new();
     [ObservableProperty] private AvaloniaList<FixedExpensesEntryViewModel> _fixedExpenseEntries = new();
-    [ObservableProperty] private string _remainingFixedExpensesAmount = string.Empty;
+    [ObservableProperty] private string _remainingFixedExpensesAmount = "R$ 12345,67 - R$ 23456,78";
 
     [ObservableProperty] private AccountViewModel? _selectedAccount;
 

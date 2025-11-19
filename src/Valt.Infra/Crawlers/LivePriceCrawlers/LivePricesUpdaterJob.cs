@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
+using Valt.Core.Common;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Bitcoin.Providers;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Fiat.Providers;
@@ -11,50 +12,72 @@ namespace Valt.Infra.Crawlers.LivePriceCrawlers;
 
 internal class LivePricesUpdaterJob : IBackgroundJob
 {
-    private readonly FrankfurterFiatRateProvider _frankfurterFiatRateProvider;
-    private readonly CoinbaseProvider _coinbaseProvider;
+    private readonly IFiatPriceProvider _fiatPriceProvider;
+    private readonly IBitcoinPriceProvider _bitcoinPriceProvider;
     private readonly IPriceDatabase _priceDatabase;
     private readonly ILocalHistoricalPriceProvider _localHistoricalPriceProvider;
     private readonly ILogger<LivePricesUpdaterJob> _logger;
-    
+
     private decimal? _lastClosingPrice;
     private DateOnly? _lastClosingDate;
-    
+
+    private FiatUsdPrice? _fiatUsdPrice;
+    private BtcPrice? _btcPrice;
+
     public string Name => "Live prices updater job";
     public BackgroundJobSystemNames SystemName => BackgroundJobSystemNames.LivePricesUpdater;
     public BackgroundJobTypes JobType => BackgroundJobTypes.PriceDatabase;
     public TimeSpan Interval => TimeSpan.FromSeconds(30);
 
-    public LivePricesUpdaterJob(FrankfurterFiatRateProvider frankfurterFiatRateProvider,
-        CoinbaseProvider coinbaseProvider,
+    public LivePricesUpdaterJob(IFiatPriceProvider fiatPriceProvider,
+        IBitcoinPriceProvider bitcoinPriceProvider,
         IPriceDatabase priceDatabase,
         ILocalHistoricalPriceProvider localHistoricalPriceProvider,
         ILogger<LivePricesUpdaterJob> logger)
     {
-        _frankfurterFiatRateProvider = frankfurterFiatRateProvider;
-        _coinbaseProvider = coinbaseProvider;
+        _fiatPriceProvider = fiatPriceProvider;
+        _bitcoinPriceProvider = bitcoinPriceProvider;
         _priceDatabase = priceDatabase;
         _localHistoricalPriceProvider = localHistoricalPriceProvider;
         _logger = logger;
     }
+
     public Task StartAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("[LivePricesUpdaterJob] Started");
         return Task.CompletedTask;
     }
-    
+
     public async Task RunAsync(CancellationToken stoppingToken)
     {
+        var isUpToDate = false;
         try
         {
-            var fiatTask = _frankfurterFiatRateProvider.GetAsync();
-            var btcTask = _coinbaseProvider.GetAsync();
+            var fiatTask = _fiatPriceProvider.GetAsync();
+            var btcTask = _bitcoinPriceProvider.GetAsync();
 
             await Task.WhenAll(fiatTask, btcTask).ConfigureAwait(false);
 
-            var fiatResponse = fiatTask.Result;
-            var btcResponse = btcTask.Result;
+            _fiatUsdPrice = fiatTask.Result;
+            _btcPrice = btcTask.Result;
             
+            isUpToDate = _fiatUsdPrice.UpToDate && _btcPrice.UpToDate;
+        }
+        catch (Exception ex)
+        {
+            //error on crawlers - possibly internet connection issue or external issues - fallback to last known prices
+            _logger.LogError(ex,
+                "[LivePricesUpdaterJob] Error during crawling prices - falling back to last known prices");
+
+            if (_fiatUsdPrice is null || _btcPrice is null)
+            {
+                await LastKnownPricesAsync();
+                return;
+            }
+        }
+
+        try
+        {
             var utcNow = DateTime.UtcNow;
             var localDate = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, 0, 0, 0, DateTimeKind.Local);
             var yesterday = localDate.AddDays(-1);
@@ -66,11 +89,13 @@ internal class LivePricesUpdaterJob : IBackgroundJob
                 refreshLastPrice = true;
             }
 
-            if (refreshLastPrice && _priceDatabase.HasDatabaseOpen && _priceDatabase.GetBitcoinData().Query().Count() > 0)
+            if (refreshLastPrice && _priceDatabase.HasDatabaseOpen &&
+                _priceDatabase.GetBitcoinData().Query().Count() > 0)
             {
                 var lastDateParsed = _priceDatabase.GetBitcoinData().Max(x => x.Date).Date;
                 var previousPrice =
-                    await _localHistoricalPriceProvider.GetUsdBitcoinRateAtAsync(DateOnly.FromDateTime(lastDateParsed)).ConfigureAwait(false);
+                    await _localHistoricalPriceProvider.GetUsdBitcoinRateAtAsync(DateOnly.FromDateTime(lastDateParsed))
+                        .ConfigureAwait(false);
 
                 _lastClosingDate = DateOnly.FromDateTime(lastDateParsed);
                 _lastClosingPrice = previousPrice;
@@ -78,15 +103,45 @@ internal class LivePricesUpdaterJob : IBackgroundJob
 
             if (_lastClosingPrice is not null)
             {
-                btcResponse.SingleOrDefault(x => x.CurrencyCode == "USD")!.SetPreviousPrice(_lastClosingPrice.GetValueOrDefault());
+                _btcPrice.Items.SingleOrDefault(x => x.CurrencyCode == FiatCurrency.Usd.Code)!.SetPreviousPrice(
+                    _lastClosingPrice.GetValueOrDefault());
             }
 
-            WeakReferenceMessenger.Default.Send(new LivePriceUpdateMessage(btcResponse, fiatResponse));
+            WeakReferenceMessenger.Default.Send(new LivePriceUpdateMessage(_btcPrice, _fiatUsdPrice, isUpToDate));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "[LivePricesUpdaterJob] Error during execution");
             throw;
         }
+    }
+    
+    private async Task LastKnownPricesAsync()
+    {
+        if (!_priceDatabase.HasDatabaseOpen)
+        {
+            _logger.LogError("[LivePricesUpdaterJob] Price database not open to load last known prices");
+            return;
+        }
+
+        if (_priceDatabase.GetBitcoinData().Query().Count() == 0)
+        {
+            _logger.LogError("[LivePricesUpdaterJob] Bitcoin history not loaded");
+            return;
+        }
+
+        var btcLastDateStored = DateOnly.FromDateTime(_priceDatabase.GetBitcoinData().Max(x => x.Date).Date);
+        var btcLastPriceStored =
+            await _localHistoricalPriceProvider.GetUsdBitcoinRateAtAsync(btcLastDateStored).ConfigureAwait(false)!;
+
+        var fiatLastDateStored = DateOnly.FromDateTime(_priceDatabase.GetFiatData().Max(x => x.Date).Date);
+        var fiatLastPricesStored = await _localHistoricalPriceProvider.GetAllFiatRatesAtAsync(fiatLastDateStored)
+            .ConfigureAwait(false);
+
+        WeakReferenceMessenger.Default.Send(new LivePriceUpdateMessage(
+            new BtcPrice(btcLastDateStored.ToDateTime(TimeOnly.MinValue, DateTimeKind.Local), false,
+                new[] { new BtcPrice.Item(FiatCurrency.Usd.Code, btcLastPriceStored.Value, btcLastPriceStored.Value) }),
+            new FiatUsdPrice(fiatLastDateStored.ToDateTime(TimeOnly.MinValue, DateTimeKind.Local), false,
+                fiatLastPricesStored.Select(x => new FiatUsdPrice.Item(x.Currency.Code, x.Rate))), false));
     }
 }

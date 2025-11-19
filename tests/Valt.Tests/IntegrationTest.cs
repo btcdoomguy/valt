@@ -1,11 +1,18 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NSubstitute;
 using Valt.Core;
 using Valt.Core.Kernel.Factories;
 using Valt.Infra;
+using Valt.Infra.Crawlers.LivePriceCrawlers;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
+using Valt.Infra.Kernel.Notifications;
+using Valt.Infra.Kernel.Time;
 using Valt.UI;
+using Valt.UI.Base;
+using Valt.UI.Views;
+using Valt.UI.Views.Main;
 
 namespace Valt.Tests;
 
@@ -14,8 +21,12 @@ namespace Valt.Tests;
 /// </summary>
 public abstract class IntegrationTest
 {
-    private MemoryStream _stream;
+    protected MemoryStream _localDatabaseStream;
     protected ILocalDatabase _localDatabase;
+    protected MemoryStream _priceDatabaseStream;
+    protected IPriceDatabase _priceDatabase;
+
+    protected IServiceCollection _serviceCollection;
     protected IServiceProvider _serviceProvider;
 
     protected IntegrationTest()
@@ -25,20 +36,46 @@ public abstract class IntegrationTest
 
     private void RegisterDependencies()
     {
-        var collection = new ServiceCollection();
+        _serviceCollection = new ServiceCollection();
         
-        collection.AddLogging(loggingBuilder =>
+        _serviceCollection.AddLogging(loggingBuilder =>
         {
             loggingBuilder.AddConsole();
             loggingBuilder.SetMinimumLevel(LogLevel.Information);
         });
 
-        collection
+        _serviceCollection
             .AddValtCore()
             .AddValtInfrastructure()
             .AddValtUI();
         
-        var serviceProvider = collection.BuildServiceProvider();
+        //some extra dependencies for testing purposes
+        _serviceCollection.AddSingleton<LivePricesUpdaterJob>();
+        
+        var serviceProvider = _serviceCollection.BuildServiceProvider();
+
+        //register the current service provider as the universal provider
+        serviceProvider.SetAsContextScope();
+
+        _serviceProvider = serviceProvider;
+    }
+    
+    public void ReplaceService<T>(T implementation)
+    {
+        var descriptor = new ServiceDescriptor(typeof(T), implementation);
+        
+        var existing = _serviceCollection.FirstOrDefault(s => s.ServiceType == typeof(T));
+        if (existing != null)
+            _serviceCollection.Remove(existing);
+            
+        _serviceCollection.Add(descriptor);
+        
+        RebuildServiceProvider();
+    }
+
+    protected void RebuildServiceProvider()
+    {
+        var serviceProvider = _serviceCollection.BuildServiceProvider();
 
         //register the current service provider as the universal provider
         serviceProvider.SetAsContextScope();
@@ -51,10 +88,19 @@ public abstract class IntegrationTest
     {
         RegisterDependencies();
         
-        _stream = new MemoryStream();
+        _localDatabaseStream = new MemoryStream();
 
         _localDatabase = _serviceProvider.GetRequiredService<ILocalDatabase>();
-        _localDatabase.OpenInMemoryDatabase(_stream);
+        _localDatabase.OpenInMemoryDatabase(_localDatabaseStream);
+        
+        ReplaceService(_localDatabase);
+        
+        _priceDatabaseStream = new MemoryStream();
+        
+        _priceDatabase = new PriceDatabase(new Clock(), Substitute.For<INotificationPublisher>());
+        _priceDatabase.OpenInMemoryDatabase(_priceDatabaseStream);
+        
+        ReplaceService(_priceDatabase);
         
         await SeedDatabase();
     }
@@ -75,6 +121,9 @@ public abstract class IntegrationTest
     {
         _localDatabase.CloseDatabase();
         _localDatabase.Dispose();
-        await _stream.DisposeAsync();
+        _priceDatabase.CloseDatabase();
+        _priceDatabase.Dispose();
+        await _localDatabaseStream.DisposeAsync();
+        await _priceDatabaseStream.DisposeAsync();
     }
 }

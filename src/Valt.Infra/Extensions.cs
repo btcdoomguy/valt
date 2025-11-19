@@ -69,14 +69,10 @@ public static class Extensions
         services.AddSingleton<UISettings>();
 
         //price crawlers bitcoin
-        services.AddSingleton<CoinbaseProvider>();
-        services.AddSingleton<IBitcoinPriceProvider, CoinbaseProvider>(provider =>
-            provider.GetRequiredService<CoinbaseProvider>());
+        services.AddSingleton<IBitcoinPriceProvider, CoinbaseProvider>();
 
-        //price crawlers coins
-        services.AddSingleton<FrankfurterFiatRateProvider>();
-        services.AddSingleton<IFiatPriceProvider, FrankfurterFiatRateProvider>(provider =>
-            provider.GetRequiredService<FrankfurterFiatRateProvider>());
+        //price crawlers fiat
+        services.AddSingleton<IFiatPriceProvider, FrankfurterFiatRateProvider>();
         
         //initial seed provider
         services.AddSingleton<IBitcoinInitialSeedPriceProvider, BitcoinInitialSeedPriceProvider>();
@@ -91,7 +87,7 @@ public static class Extensions
             provider.GetRequiredService<FrankfurterFiatHistoricalDataProvider>());
 
         //local historical provider
-        services.AddSingleton<ILocalHistoricalPriceProvider, LocalHistoricalPriceProvider>();
+        services.AddSingleton<ILocalHistoricalPriceProvider, LivePricesUpdaterJob>();
 
         //background jobs
         services.AddSingleton<BackgroundJobManager>();

@@ -66,6 +66,7 @@
                                     FontFamily="{DynamicResource MaterialDesign}"
                                     FontSize="32"
                                     Foreground="{Binding ((iconSelector:IconSelectorViewModel)DataContext).SelectedColorBrush, ElementName=Root}"
+                                    ToolTip.Tip="{Binding Name}"
                                     Content="{Binding Unicode}">
                                 </Label>
                             </StackPanel>

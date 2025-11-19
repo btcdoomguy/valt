@@ -28,9 +28,4 @@
         <ProjectReference Include="..\..\src\Valt.Infra\Valt.Infra.csproj"/>
         <ProjectReference Include="..\..\src\Valt.UI\Valt.UI.csproj"/>
     </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="UI\Services\"/>
-        <Folder Include="UseCases\Budget\Categories\"/>
-    </ItemGroup>
 </Project>
