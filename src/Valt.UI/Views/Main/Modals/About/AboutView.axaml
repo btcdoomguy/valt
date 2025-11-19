@@ -10,7 +10,7 @@
         MaxHeight="400"
         x:Class="Valt.UI.Views.Main.Modals.About.AboutView"
         x:DataType="about:AboutViewModel"
-        WindowStartupLocation="CenterScreen"
+        WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
         SystemDecorations="None"
         ExtendClientAreaTitleBarHeightHint="0"

@@ -124,7 +124,7 @@ public static class LocalStorageHelper
 
     public class ValtSettings
     {
-        public string Culture { get; set; } = "en-US";
+        public string Culture { get; set; } = CultureInfo.CurrentCulture.Name;
         public DataGridColumnSettings DataGridSettings { get; set; } = new();
         public List<string> RecentFiles { get; set; } = new();
     }
