@@ -15,7 +15,7 @@ public class LivePricesUpdaterJob : ILocalHistoricalPriceProvider
     public Task<decimal?> GetFiatRateAtAsync(DateOnly date, FiatCurrency currency)
     {
         var finalDate = date.ToValtDateTime();
-        var startDate = finalDate.AddDays(-5);
+        var startDate = finalDate.AddDays(-5); //considers 5 days to grab because of holidays and weekends
         var currencyCode = currency.Code;
 
         var entry = _priceDatabase.GetFiatData()

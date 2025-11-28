@@ -35,6 +35,8 @@ using Valt.Infra.Modules.Budget.Transactions;
 using Valt.Infra.Modules.Budget.Transactions.Queries;
 using Valt.Infra.Modules.Budget.Transactions.Services;
 using Valt.Infra.Modules.Configuration;
+using Valt.Infra.Modules.Reports;
+using Valt.Infra.Modules.Reports.AllTimeHigh;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
 
@@ -88,6 +90,10 @@ public static class Extensions
 
         //local historical provider
         services.AddSingleton<ILocalHistoricalPriceProvider, LivePricesUpdaterJob>();
+        
+        //reports
+        services.AddSingleton<IAllTimeHighReport, AllTimeHighReport>();
+        services.AddSingleton<IMonthlyTotalsReport, MonthlyTotalsReport>();
 
         //background jobs
         services.AddSingleton<BackgroundJobManager>();

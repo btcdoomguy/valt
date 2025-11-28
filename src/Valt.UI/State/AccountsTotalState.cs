@@ -50,6 +50,7 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<LivePrice
         AccountSummaries = message;
     }
 
+    //TODO: test this urgently
     private Wealth CalculateCurrentWealth()
     {
         lock (_calculationLock)

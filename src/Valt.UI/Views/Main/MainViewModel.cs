@@ -16,9 +16,11 @@ using CommunityToolkit.Mvvm.Messaging;
 using LiteDB;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
+using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel.BackgroundJobs;
 using Valt.Infra.Modules.Budget;
+using Valt.Infra.Modules.Reports.AllTimeHigh;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
 using Valt.UI.Lang;
@@ -46,6 +48,8 @@ public partial class MainViewModel : ValtViewModel
     private readonly BackgroundJobManager? _backgroundJobManager;
     private readonly IDatabaseInitializer? _databaseInitializer;
     private readonly LiveRatesViewModel _liveRatesViewModel;
+    private readonly IAllTimeHighReport _allTimeHighReport;
+    private readonly IClock _clock;
     private readonly ILogger<MainViewModel> _logger;
 
     public MainView? Window { get; set; }
@@ -58,14 +62,16 @@ public partial class MainViewModel : ValtViewModel
         ? new GridLength(30)
         : new GridLength(0);
 
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsTransactionButtonSelected))]
-    private ValtViewModel? _selectedTabComponent;
+    [ObservableProperty] 
+    [NotifyPropertyChangedFor(nameof(IsTransactionButtonSelected))]
+    [NotifyPropertyChangedFor(nameof(IsReportButtonSelected))]
+    private ValtTabViewModel? _selectedTabComponent;
 
     public bool IsTransactionButtonSelected =>
-        SelectedTabComponent?.PageName == MainViewTabNames.TransactionsPageContent;
+        SelectedTabComponent?.TabName == MainViewTabNames.TransactionsPageContent;
 
     public bool IsReportButtonSelected =>
-        SelectedTabComponent?.PageName == MainViewTabNames.ReportsPageContent;
+        SelectedTabComponent?.TabName == MainViewTabNames.ReportsPageContent;
 
     [ObservableProperty] private string _statusDisplay;
 
@@ -105,6 +111,7 @@ public partial class MainViewModel : ValtViewModel
 
         HasDatabaseOpen = true;
         _currencySettings.MainFiatCurrency = FiatCurrency.Brl.Code;
+        SelectedTabComponent = _pageFactory.Create(MainViewTabNames.TransactionsPageContent);
     }
 
     public MainViewModel(IPageFactory pageFactory,
@@ -116,6 +123,8 @@ public partial class MainViewModel : ValtViewModel
         IDatabaseInitializer databaseInitializer,
         LiveRatesViewModel liveRatesViewModel,
         LiveRateState liveRateState,
+        IAllTimeHighReport allTimeHighReport,
+        IClock clock,
         ILogger<MainViewModel> logger)
     {
         _pageFactory = pageFactory;
@@ -126,6 +135,8 @@ public partial class MainViewModel : ValtViewModel
         _backgroundJobManager = backgroundJobManager;
         _databaseInitializer = databaseInitializer;
         _liveRatesViewModel = liveRatesViewModel;
+        _allTimeHighReport = allTimeHighReport;
+        _clock = clock;
         _logger = logger;
 
         _localDatabase.PropertyChanged += LocalDatabaseOnPropertyChanged;
@@ -152,22 +163,12 @@ public partial class MainViewModel : ValtViewModel
     [RelayCommand]
     private void SetTransactionsTab()
     {
-        if (SelectedTabComponent != null)
-        {
-            SelectedTabComponent = null;
-        }
-
         SelectedTabComponent = _pageFactory.Create(MainViewTabNames.TransactionsPageContent);
     }
 
     [RelayCommand]
     private void SetReportsTab()
     {
-        if (SelectedTabComponent != null)
-        {
-            SelectedTabComponent = null;
-        }
-
         SelectedTabComponent = _pageFactory.Create(MainViewTabNames.ReportsPageContent);
     }
 
@@ -359,6 +360,15 @@ public partial class MainViewModel : ValtViewModel
             (StatusDisplayView)await _modalFactory.CreateAsync(ApplicationModalNames.StatusDisplay, Window)!;
 
         await modal.ShowDialog(Window!);
+    }
+
+    [RelayCommand]
+    private async Task TestAllTimeHighCalculation()
+    {
+        var report = await _allTimeHighReport.GetAsync(FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency));
+
+        await MessageBoxHelper.ShowAlertAsync("eae", $"Seu ath foi em {report.Date} com R${report.Value.Value} - queda de {report.DeclineFromAth}",
+            Window!);
     }
 
     private void JobOnPropertyChanged(object? sender, PropertyChangedEventArgs e)

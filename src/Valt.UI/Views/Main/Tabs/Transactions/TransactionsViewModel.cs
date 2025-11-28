@@ -37,7 +37,7 @@ using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
 namespace Valt.UI.Views.Main.Tabs.Transactions;
 
-public partial class TransactionsViewModel : ValtViewModel, IDisposable
+public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 {
     private readonly IModalFactory? _modalFactory;
     private readonly IAccountRepository? _accountRepository;
@@ -595,4 +595,6 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
         WeakReferenceMessenger.Default.Unregister<FilterDateRangeChanged>(this);
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
     }
+
+    public override MainViewTabNames TabName => MainViewTabNames.TransactionsPageContent;
 }

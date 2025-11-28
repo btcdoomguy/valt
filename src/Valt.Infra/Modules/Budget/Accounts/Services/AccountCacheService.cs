@@ -91,10 +91,17 @@ internal class AccountCacheService : IAccountCacheService
         }
     }
 
+    /// <summary>
+    /// Updates the cache with the current total (for the current day) vs the future totals
+    /// </summary>
+    /// <param name="accountId"></param>
+    /// <param name="today"></param>
+    /// <returns></returns>
     private Task RefreshCurrentTotalForAccountAsync(ObjectId accountId, DateOnly today)
     {
         var accountCache = _localDatabase.GetAccountCaches().FindById(accountId);
 
+        //only refresh if cache exists or is not up to date
         if (accountCache is null || DateOnly.FromDateTime(accountCache.CurrentDate) >= today)
             return Task.CompletedTask;
 

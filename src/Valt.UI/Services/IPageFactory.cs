@@ -5,5 +5,5 @@ namespace Valt.UI.Services;
 
 public interface IPageFactory
 {
-    ValtViewModel Create(MainViewTabNames pageName);
+    ValtTabViewModel Create(MainViewTabNames pageName);
 }

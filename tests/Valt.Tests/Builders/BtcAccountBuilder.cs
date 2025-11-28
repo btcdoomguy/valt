@@ -7,7 +7,7 @@ namespace Valt.Tests.Builders;
 
 public class BtcAccountBuilder
 {
-    public AccountId Id { get; set; }
+    public AccountId Id { get; set; } = new();
     public AccountName Name { get; set; }
     public Icon Icon = Icon.Empty;
     public BtcValue Value { get; set; }

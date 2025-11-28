@@ -6,12 +6,12 @@ namespace Valt.UI.Services;
 
 public class PageFactory : IPageFactory
 {
-    private readonly Func<MainViewTabNames, ValtViewModel> _factoryMethod;
+    private readonly Func<MainViewTabNames, ValtTabViewModel> _factoryMethod;
 
-    public PageFactory(Func<MainViewTabNames, ValtViewModel> factoryMethod)
+    public PageFactory(Func<MainViewTabNames, ValtTabViewModel> factoryMethod)
     {
         _factoryMethod = factoryMethod;
     }
 
-    public ValtViewModel Create(MainViewTabNames pageName) => _factoryMethod.Invoke(pageName);
+    public ValtTabViewModel Create(MainViewTabNames pageName) => _factoryMethod.Invoke(pageName);
 }

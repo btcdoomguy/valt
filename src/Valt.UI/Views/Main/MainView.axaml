@@ -49,22 +49,6 @@
             <Grid ColumnDefinitions="*, 250">
                 <!--Top bar buttons-->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Height="50" Spacing="15">
-                    <Button IsVisible="False" Classes="tab" Classes.selected="{Binding IsTransactionButtonSelected}"
-                            Command="{Binding SetTransactionsTabCommand}"
-                            Margin="5,0">
-                        <StackPanel Orientation="Horizontal">
-                            <Label Classes="icon" Content="&#xE0EE;"></Label>
-                            <Label Content="{x:Static local:language.Main_Transactions}" />
-                        </StackPanel>
-                    </Button>
-                    <Button IsVisible="False" Classes="tab" Classes.selected="{Binding IsReportButtonSelected}"
-                            Command="{Binding SetReportsTabCommand}"
-                            Margin="5,0">
-                        <StackPanel Orientation="Horizontal">
-                            <Label Classes="icon" Content="&#xE26B;"></Label>
-                            <Label Content="{x:Static local:language.Main_Reports}" />
-                        </StackPanel>
-                    </Button>
                     <DropDownButton Classes="icon" Content="&#xe8b8;">
                         <DropDownButton.Flyout>
                             <MenuFlyout>
@@ -77,9 +61,26 @@
                                 <MenuItem Header="{x:Static local:language.Main_Menu_About}"
                                           Command="{Binding AboutCommand}">
                                 </MenuItem>
+                                <MenuItem Header="Testar ath" Command="{Binding TestAllTimeHighCalculationCommand}"></MenuItem>
                             </MenuFlyout>
                         </DropDownButton.Flyout>
                     </DropDownButton>
+                    <Button Classes="tab" Classes.selected="{Binding IsTransactionButtonSelected}"
+                            Command="{Binding SetTransactionsTabCommand}"
+                            Margin="5,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Label Classes="icon" Content="&#xE0EE;"></Label>
+                            <Label Content="{x:Static local:language.Main_Transactions}" />
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="tab" Classes.selected="{Binding IsReportButtonSelected}"
+                            Command="{Binding SetReportsTabCommand}"
+                            Margin="5,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Label Classes="icon" Content="&#xE26B;"></Label>
+                            <Label Content="{x:Static local:language.Main_Reports}" />
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
                 <TextBlock Grid.Column="0" IsVisible="{Binding IsOffline}" Margin="0, 30, 50, 0"
                            HorizontalAlignment="Right">

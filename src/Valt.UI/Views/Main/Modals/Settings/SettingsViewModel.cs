@@ -27,7 +27,14 @@ public partial class SettingsViewModel : ValtModalViewModel
     [ObservableProperty] private string _mainFiatCurrency;
     [ObservableProperty] private bool _showHiddenAccounts;
     [ObservableProperty] private string _currentCulture;
-    public static List<string> AvailableFiatCurrencies => FiatCurrency.GetAll().Select(x => x.Code).ToList();
+
+    public static List<ComboBoxValue> AvailableFiatCurrencies
+    {
+        get
+        {
+            return FiatCurrency.GetAll().Select(x => new ComboBoxValue($"{x.Code} ({x.Symbol})", x.Code)).ToList();
+        }
+    }
 
     public static List<ComboBoxValue> Cultures
     {
