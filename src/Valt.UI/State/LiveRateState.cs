@@ -15,72 +15,76 @@ namespace Valt.UI.State;
 /// <summary>
 /// State object for the live prices
 /// </summary>
-public partial class LiveRateState : ObservableObject, IRecipient<LivePriceUpdateMessage>, IDisposable
+public partial class LiveRateState : ObservableObject, IRecipient<RatesUpdated>, IDisposable
 {
     private decimal? _lastFiatClosingPrice;
     private DateOnly? _lastFiatClosingDate;
     private string? _lastFiatCurrency;
-    
+
     private readonly CurrencySettings _currencySettings;
     private readonly ILocalDatabase _localDatabase;
     private readonly IPriceDatabase _priceDatabase;
     private readonly ILocalHistoricalPriceProvider _localHistoricalPriceProvider;
+    private readonly RatesState _ratesState;
     private readonly ILogger<LiveRateState> _logger;
 
     [ObservableProperty] private decimal _bitcoinPrice;
     [ObservableProperty] private decimal? _previousBitcoinPrice;
-    
+
     [ObservableProperty] private decimal _usdPrice;
     [ObservableProperty] private decimal _previousUsdPrice;
 
     [ObservableProperty] private decimal _fiatBtcPrice;
     [ObservableProperty] private decimal _previousFiatBtcPrice;
-    
+
     [ObservableProperty] private bool _isOffline;
-    
+
     public LiveRateState(CurrencySettings currencySettings,
         ILocalDatabase localDatabase,
         IPriceDatabase priceDatabase,
         ILocalHistoricalPriceProvider localHistoricalPriceProvider,
+        RatesState ratesState,
         ILogger<LiveRateState> logger)
     {
         _currencySettings = currencySettings;
         _localDatabase = localDatabase;
         _priceDatabase = priceDatabase;
         _localHistoricalPriceProvider = localHistoricalPriceProvider;
+        _ratesState = ratesState;
         _logger = logger;
 
-        WeakReferenceMessenger.Default.Register(this);
+        WeakReferenceMessenger.Default.Register<RatesUpdated>(this);
     }
-    
-    public void Receive(LivePriceUpdateMessage message)
+
+    public void Receive(RatesUpdated message)
     {
         try
         {
-            IsOffline = !message.IsUpToDate;
-            
-            var usdPrice = message.Btc.Items.SingleOrDefault(x => x.CurrencyCode == FiatCurrency.Usd.Code);
+            IsOffline = !_ratesState.IsUpToDate;
+
+            var usdPrice = _ratesState.BitcoinPrice;
+            var previousUsdPrice = _ratesState.PreviousBitcoinPrice;
 
             if (usdPrice is null)
                 return;
 
-            if (usdPrice.Price != BitcoinPrice)
-                BitcoinPrice = usdPrice.Price;
-            if (usdPrice.PreviousPrice != PreviousBitcoinPrice)
-                PreviousBitcoinPrice = usdPrice.PreviousPrice;
+            if (usdPrice != BitcoinPrice)
+                BitcoinPrice = usdPrice.Value;
+            if (previousUsdPrice != PreviousBitcoinPrice)
+                PreviousBitcoinPrice = previousUsdPrice;
 
-            var mainFiatPrice =
-                message.Fiat.Items.SingleOrDefault(x => x.CurrencyCode == _currencySettings.MainFiatCurrency);
-
-            if (mainFiatPrice is null)
+            if (_ratesState.FiatRates is null)
+                return;
+            
+            if (!_ratesState.FiatRates.TryGetValue(_currencySettings.MainFiatCurrency, out var mainFiatPrice))
             {
                 UsdPrice = 0;
                 PreviousUsdPrice = 0;
                 return;
             }
 
-            if (mainFiatPrice.Price != UsdPrice)
-                UsdPrice = mainFiatPrice.Price;
+            if (mainFiatPrice != UsdPrice)
+                UsdPrice = mainFiatPrice;
 
             if (!_localDatabase.HasDatabaseOpen)
             {
@@ -157,6 +161,6 @@ public partial class LiveRateState : ObservableObject, IRecipient<LivePriceUpdat
 
     public void Dispose()
     {
-        WeakReferenceMessenger.Default.Unregister<LivePriceUpdateMessage>(this);
+        WeakReferenceMessenger.Default.Unregister<RatesUpdated>(this);
     }
 }

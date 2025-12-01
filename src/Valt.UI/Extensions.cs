@@ -157,6 +157,7 @@ public static class Extensions
         services.AddSingleton<IModalFactory, ModalFactory>();
 
         //state objects
+        services.AddSingleton<RatesState>();
         services.AddSingleton<AccountsTotalState>();
         services.AddSingleton<FilterState>();
         services.AddSingleton<LiveRateState>();

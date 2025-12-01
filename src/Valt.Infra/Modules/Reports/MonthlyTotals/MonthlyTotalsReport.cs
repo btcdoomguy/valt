@@ -195,6 +195,8 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
                     monthlyTotalsBitcoin[currentMonthYear] = bitcoinCurrentScanDateTotals;
                 }
             }
+            
+            var lastYear = new DateOnly(_monthYear.Year - 1, 12, 1);
 
             return new MonthlyTotalsData
             {
@@ -203,14 +205,14 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
                 {
                     BtcTotal = monthlyTotalsBitcoin[_monthYear],
                     VariationFromPreviousMonth = Math.Round(monthlyTotalsBitcoin[_monthYear] / monthlyTotalsBitcoin[_monthYear.AddMonths(-1)] - 1, 4),
-                    VariationFromPreviousYear = Math.Round(monthlyTotalsBitcoin[_monthYear] / monthlyTotalsBitcoin[_monthYear.AddYears(-1)] - 1, 4),
+                    VariationFromPreviousYear = Math.Round(monthlyTotalsBitcoin[_monthYear] / monthlyTotalsBitcoin[lastYear] - 1, 4),
                 },
                 Fiat = new MonthlyTotalsData.FiatData()
                 {
                     MainCurrency = _currency,
                     FiatTotal = monthlyTotalsFiat[_monthYear],
                     VariationFromPreviousMonth = Math.Round(monthlyTotalsFiat[_monthYear] / monthlyTotalsFiat[_monthYear.AddMonths(-1)] - 1, 4),
-                    VariationFromPreviousYear = Math.Round(monthlyTotalsFiat[_monthYear] / monthlyTotalsFiat[_monthYear.AddYears(-1)] - 1, 4),
+                    VariationFromPreviousYear = Math.Round(monthlyTotalsFiat[_monthYear] / monthlyTotalsFiat[lastYear] - 1, 4),
                 }
             };
         }

@@ -26,8 +26,10 @@ public partial class ReportsViewModel : ValtTabViewModel
     private readonly CurrencySettings _currencySettings;
     private readonly FilterState _filterState;
     private readonly IClock _clock;
+    
     [ObservableProperty] private DashboardData _allTimeHighData;
-    [ObservableProperty] private DashboardData _monthlyTotalsData;
+    [ObservableProperty] private DashboardData _monthlyTotalsFiatData;
+    [ObservableProperty] private DashboardData _monthlyTotalsBitcoinData;
     
     #region Filter proxy
 
@@ -55,9 +57,16 @@ public partial class ReportsViewModel : ValtTabViewModel
                 new("Decline from ATH:", "-30%")
             ]);
 
-            MonthlyTotalsData = new DashboardData("Monthly totals", [
-                new("Total (R$):", "R$ 100.000,00"),
-                new("BTC Stack:", "0.10000000")
+            MonthlyTotalsFiatData = new DashboardData("Fiat totals", [
+                new("Total", "R$ 100.000,00"),
+                new("From last month", "1.20%"),
+                new("From last year", "3.61%")
+            ]);
+            
+            MonthlyTotalsBitcoinData = new DashboardData("Bitcoin totals", [
+                new("Stack", "1.89120012"),
+                new("From last month", "1.20%"),
+                new("From last year", "3.61%")
             ]);
         }
     }
@@ -112,11 +121,15 @@ public partial class ReportsViewModel : ValtTabViewModel
         
         Dispatcher.UIThread.Post(() =>
         {
-            MonthlyTotalsData = new DashboardData("Monthly totals", new ObservableCollection<RowItem>()
+            MonthlyTotalsFiatData = new DashboardData("Fiat totals", new ObservableCollection<RowItem>()
             {
                 new("Total", $"R$ {monthlyTotalsData.Fiat.FiatTotal}"),
                 new("From last month", monthlyTotalsData.Fiat.VariationFromPreviousMonth.ToString("0.00%")),
                 new("From last year", monthlyTotalsData.Fiat.VariationFromPreviousYear.ToString("0.00%")),
+            });
+
+            MonthlyTotalsBitcoinData = new DashboardData("Bitcoin totals", new ObservableCollection<RowItem>()
+            {
                 new("BTC", monthlyTotalsData.Bitcoin.BtcTotal.ToString("0.00000000")),
                 new("From last month", monthlyTotalsData.Bitcoin.VariationFromPreviousMonth.ToString("0.00%")),
                 new("From last year", monthlyTotalsData.Bitcoin.VariationFromPreviousYear.ToString("0.00%")),

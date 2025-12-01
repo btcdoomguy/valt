@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Valt.UI.Views.Main.Tabs.Reports"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Valt.UI.Views.Main.Tabs.Reports.DashboardDataUserControl"
+             x:DataType="vm:DashboardData">
+    <Border BorderThickness="1"
+            Background="{DynamicResource Background800Brush}"
+            BorderBrush="{DynamicResource Background500Brush}">
+        
+        <StackPanel Orientation="Vertical">
+            <Label HorizontalContentAlignment="Center"
+                   Content="{Binding Title}"
+                   Background="{DynamicResource Background800Brush}" />
+
+            <ItemsControl ItemsSource="{Binding Rows}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Padding="8,4"
+                                BorderBrush="#E0E0E0"
+                                BorderThickness="0,0,0,1"
+                                Background="{DynamicResource Background900Brush}">
+                            <DockPanel LastChildFill="True">
+                                <TextBlock Text="{Binding LeftText}"
+                                           FontSize="12"
+                                           DockPanel.Dock="Left"
+                                           VerticalAlignment="Center"/>
+
+                                <TextBlock Text="{Binding RightText}"
+                                           FontSize="12"
+                                           DockPanel.Dock="Right"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"/>
+                            </DockPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </Border>
+</UserControl>

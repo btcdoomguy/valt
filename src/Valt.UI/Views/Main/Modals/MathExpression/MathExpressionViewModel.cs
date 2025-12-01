@@ -10,8 +10,7 @@ namespace Valt.UI.Views.Main.Modals.MathExpression;
 public partial class MathExpressionViewModel : ValtModalViewModel
 {
     [ObservableProperty] private string _expression = string.Empty;
-
-
+    
     [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(OkCommand))]
     private decimal? _previewResult;
 
@@ -23,9 +22,11 @@ public partial class MathExpressionViewModel : ValtModalViewModel
     }
 
     [RelayCommand(CanExecute = nameof(CanOk))]
-    private async Task Ok()
+    private Task Ok()
     {
-        CloseDialog?.Invoke(new Response(PreviewResult));
+        var cleanResult = PreviewResult < 0 ? PreviewResult * -1 : PreviewResult;
+        CloseDialog?.Invoke(new Response(cleanResult));
+        return Task.CompletedTask;
     }
 
     [RelayCommand]
@@ -39,6 +40,7 @@ public partial class MathExpressionViewModel : ValtModalViewModel
         try
         {
             var total = value.Eval();
+            
             PreviewResult = Convert.ToDecimal(total);
         }
         catch (Exception)

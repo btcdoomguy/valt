@@ -19,57 +19,11 @@
         </Grid.ColumnDefinitions>
         <Panel Grid.Row="0">
             <StackPanel Orientation="Vertical" Spacing="10" Margin="10">
-                <Border CornerRadius="5" BorderThickness="1" Background="{DynamicResource Background800Brush}" BorderBrush="{DynamicResource Background500Brush}">
-                    <StackPanel Orientation="Vertical">
-                        <Label HorizontalContentAlignment="Center" Content="{Binding AllTimeHighData.Title}" Background="{DynamicResource Background800Brush}" ></Label>
-                        <ItemsControl ItemsSource="{Binding AllTimeHighData.Rows}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Padding="8,4" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1" Background="{DynamicResource Background900Brush}">
-                                        <DockPanel LastChildFill="True">
-                                            <TextBlock Text="{Binding LeftText}"
-                                                       FontSize="12"
-                                                       DockPanel.Dock="Left"
-                                                       VerticalAlignment="Center" />
-
-                                            <TextBlock Text="{Binding RightText}"
-                                                       FontSize="12"
-                                                       DockPanel.Dock="Right"
-                                                       VerticalAlignment="Center"
-                                                       HorizontalAlignment="Right" />
-                                        </DockPanel>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </Border>
                 
-                <Border CornerRadius="5" BorderThickness="1" Background="{DynamicResource Background800Brush}" BorderBrush="{DynamicResource Background500Brush}">
-                    <StackPanel Orientation="Vertical">
-                        <Label HorizontalContentAlignment="Center" Content="{Binding MonthlyTotalsData.Title}" Background="{DynamicResource Background800Brush}"></Label>
-                        <ItemsControl ItemsSource="{Binding MonthlyTotalsData.Rows}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Padding="8,4" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1" Background="{DynamicResource Background900Brush}">
-                                        <DockPanel LastChildFill="True">
-                                            <TextBlock Text="{Binding LeftText}"
-                                                       FontSize="12"
-                                                       DockPanel.Dock="Left"
-                                                       VerticalAlignment="Center" />
-
-                                            <TextBlock Text="{Binding RightText}"
-                                                       FontSize="12"
-                                                       DockPanel.Dock="Right"
-                                                       VerticalAlignment="Center"
-                                                       HorizontalAlignment="Right" />
-                                        </DockPanel>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </Border>
+                <reports1:DashboardDataUserControl DataContext="{Binding AllTimeHighData}"></reports1:DashboardDataUserControl>
+                <reports1:DashboardDataUserControl DataContext="{Binding MonthlyTotalsFiatData}"></reports1:DashboardDataUserControl>
+                <reports1:DashboardDataUserControl DataContext="{Binding MonthlyTotalsBitcoinData}"></reports1:DashboardDataUserControl>
+                
             </StackPanel>
         </Panel>
         <Panel Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center">
