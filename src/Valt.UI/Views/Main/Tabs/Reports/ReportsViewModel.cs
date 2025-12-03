@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
+using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
 using Valt.UI.Services.LocalStorage;
@@ -26,48 +28,165 @@ public partial class ReportsViewModel : ValtTabViewModel
     private readonly CurrencySettings _currencySettings;
     private readonly FilterState _filterState;
     private readonly IClock _clock;
-    
+
     [ObservableProperty] private DashboardData _allTimeHighData;
-    [ObservableProperty] private DashboardData _monthlyTotalsFiatData;
-    [ObservableProperty] private DashboardData _monthlyTotalsBitcoinData;
-    
-    #region Filter proxy
-
-    public DateTime FilterMainDate
-    {
-        get => _filterState.MainDate;
-        set => _filterState.MainDate = value;
-    }
-
-    public DateRange FilterRange
-    {
-        get => _filterState.Range;
-        set => _filterState.Range = value;
-    }
-
-    #endregion
+    [ObservableProperty] private MonthlyTotalsData _monthlyTotalsData;
+    [ObservableProperty] private MonthlyTotalsChartData _monthlyTotalsChartData = new();
+    [ObservableProperty] private DateTime _filterMainDate;
+    [ObservableProperty] private DateRange _filterRange;
 
     public ReportsViewModel()
     {
         if (Design.IsDesignMode)
         {
+            FilterMainDate = DateTime.UtcNow.Date;
+            FilterRange = new DateRange(DateTime.UtcNow.Date.AddYears(-1), DateTime.UtcNow.Date);
+            
             AllTimeHighData = new DashboardData("My all-time high", [
                 new("ATH (R$):", "R$ 100.000,00"),
                 new("Date:", "10/06/2025"),
                 new("Decline from ATH:", "-30%")
             ]);
 
-            MonthlyTotalsFiatData = new DashboardData("Fiat totals", [
-                new("Total", "R$ 100.000,00"),
-                new("From last month", "1.20%"),
-                new("From last year", "3.61%")
-            ]);
-            
-            MonthlyTotalsBitcoinData = new DashboardData("Bitcoin totals", [
-                new("Stack", "1.89120012"),
-                new("From last month", "1.20%"),
-                new("From last year", "3.61%")
-            ]);
+            MonthlyTotalsData = new MonthlyTotalsData()
+            {
+                MainCurrency = FiatCurrency.Usd,
+                Items = new List<MonthlyTotalsData.Item>
+                {
+                    new MonthlyTotalsData.Item()
+                    {
+                        MonthYear = new DateOnly(2025, 01, 1),
+                        BtcTotal = 12.34567890m,
+                        BtcMonthlyChange = 0.01m,
+                        BtcYearlyChange = 0.01m,
+                        FiatTotal = 550035.51m,
+                        FiatMonthlyChange = 0.03m,
+                        FiatYearlyChange = 0.03m
+                    },
+                    new MonthlyTotalsData.Item()
+                    {
+                        MonthYear = new DateOnly(2025, 02, 1),
+                        BtcTotal = 6.34567890m,
+                        BtcMonthlyChange = 0.01m,
+                        BtcYearlyChange = 0.01m,
+                        FiatTotal = 250035.51m,
+                        FiatMonthlyChange = 0.03m,
+                        FiatYearlyChange = 0.03m
+                    },
+                    new MonthlyTotalsData.Item()
+                    {
+                        MonthYear = new DateOnly(2025, 03, 1),
+                        BtcTotal = 8.34567890m,
+                        BtcMonthlyChange = 0.01m,
+                        BtcYearlyChange = 0.01m,
+                        FiatTotal = 350035.51m,
+                        FiatMonthlyChange = 0.03m,
+                        FiatYearlyChange = 0.03m
+                    },
+                    new MonthlyTotalsData.Item()
+                    {
+                        MonthYear = new DateOnly(2025, 3, 1),
+                        BtcTotal = 15.34567890m,
+                        BtcMonthlyChange = 0.01m,
+                        BtcYearlyChange = 0.01m,
+                        FiatTotal = 700035.51m,
+                        FiatMonthlyChange = 0.03m,
+                        FiatYearlyChange = 0.03m
+                    },
+                    new MonthlyTotalsData.Item()
+                    {
+                        MonthYear = new DateOnly(2025, 4, 1),
+                        BtcTotal = 17.34567890m,
+                        BtcMonthlyChange = 0.01m,
+                        BtcYearlyChange = 0.01m,
+                        FiatTotal = 850035.51m,
+                        FiatMonthlyChange = 0.03m,
+                        FiatYearlyChange = 0.03m
+                    },
+                    new MonthlyTotalsData.Item()
+                    {
+                        MonthYear = new DateOnly(2025, 5, 1),
+                        BtcTotal = 9.34567890m,
+                        BtcMonthlyChange = 0.01m,
+                        BtcYearlyChange = 0.01m,
+                        FiatTotal = 200000.51m,
+                        FiatMonthlyChange = 0.03m,
+                        FiatYearlyChange = 0.03m
+                    },
+                    new MonthlyTotalsData.Item()
+                    {
+                        MonthYear = new DateOnly(2025, 6, 1),
+                        BtcTotal = 12.34567890m,
+                        BtcMonthlyChange = 0.01m,
+                        BtcYearlyChange = 0.01m,
+                        FiatTotal = 550035.51m,
+                        FiatMonthlyChange = 0.03m,
+                        FiatYearlyChange = 0.03m
+                    },
+                    new MonthlyTotalsData.Item()
+                    {
+                        MonthYear = new DateOnly(2025, 7, 1),
+                        BtcTotal = 14.34567890m,
+                        BtcMonthlyChange = 0.01m,
+                        BtcYearlyChange = 0.01m,
+                        FiatTotal = 650035.51m,
+                        FiatMonthlyChange = 0.03m,
+                        FiatYearlyChange = 0.03m
+                    },
+                    new MonthlyTotalsData.Item()
+                    {
+                        MonthYear = new DateOnly(2025, 8, 1),
+                        BtcTotal = 12.34567890m,
+                        BtcMonthlyChange = 0.01m,
+                        BtcYearlyChange = 0.01m,
+                        FiatTotal = 550035.51m,
+                        FiatMonthlyChange = 0.03m,
+                        FiatYearlyChange = 0.03m
+                    },
+                    new MonthlyTotalsData.Item()
+                    {
+                        MonthYear = new DateOnly(2025, 9, 1),
+                        BtcTotal = 3.34567890m,
+                        BtcMonthlyChange = 0.01m,
+                        BtcYearlyChange = 0.01m,
+                        FiatTotal = 100000.51m,
+                        FiatMonthlyChange = 0.03m,
+                        FiatYearlyChange = 0.03m
+                    },
+                    new MonthlyTotalsData.Item()
+                    {
+                        MonthYear = new DateOnly(2025, 10, 1),
+                        BtcTotal = 5.34567890m,
+                        BtcMonthlyChange = 0.01m,
+                        BtcYearlyChange = 0.01m,
+                        FiatTotal = 250000.51m,
+                        FiatMonthlyChange = 0.03m,
+                        FiatYearlyChange = 0.03m
+                    },
+                    new MonthlyTotalsData.Item()
+                    {
+                        MonthYear = new DateOnly(2025, 11, 1),
+                        BtcTotal = 12.34567890m,
+                        BtcMonthlyChange = 0.01m,
+                        BtcYearlyChange = 0.01m,
+                        FiatTotal = 550035.51m,
+                        FiatMonthlyChange = 0.03m,
+                        FiatYearlyChange = 0.03m
+                    },
+                    new MonthlyTotalsData.Item()
+                    {
+                        MonthYear = new DateOnly(2025, 12, 1),
+                        BtcTotal = 19.34567890m,
+                        BtcMonthlyChange = 0.01m,
+                        BtcYearlyChange = 0.01m,
+                        FiatTotal = 950035.51m,
+                        FiatMonthlyChange = 0.03m,
+                        FiatYearlyChange = 0.03m
+                    },
+                }
+            };
+
+            MonthlyTotalsChartData.RefreshChart(MonthlyTotalsData);
         }
     }
 
@@ -83,25 +202,33 @@ public partial class ReportsViewModel : ValtTabViewModel
         _filterState = filterState;
         _clock = clock;
 
+        FilterMainDate = _clock.GetCurrentDateTimeUtc();
+        FilterRange = new DateRange(new DateTime(FilterMainDate.Year, 1, 1), new DateTime(FilterMainDate.Year, 12, 31));
+
         _ = InitializeAsync();
-        
+
         WeakReferenceMessenger.Default.Register<FilterDateRangeChanged>(this, OnFilterDataRangeChanged);
     }
-    
+
     private void OnFilterDataRangeChanged(object recipient, FilterDateRangeChanged message)
     {
         OnPropertyChanged(nameof(FilterMainDate));
         OnPropertyChanged(nameof(FilterRange));
-        _ = MonthlyTotalsFetchAsync();
+        _ = FetchMonthlyTotalsAsync();
     }
 
     private async Task InitializeAsync()
+    {
+        _ = FetchAllTimeHighDataAsync();
+        _ = FetchMonthlyTotalsAsync();
+    }
+
+    private async Task FetchAllTimeHighDataAsync()
     {
         var cultureInfo = CultureInfo.GetCultureInfo(LocalStorageHelper.LoadCulture());
 
         var allTimeHighData =
             await _allTimeHighReport.GetAsync(FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency));
-        _ = MonthlyTotalsFetchAsync();
 
         Dispatcher.UIThread.Post(() =>
         {
@@ -114,12 +241,17 @@ public partial class ReportsViewModel : ValtTabViewModel
         });
     }
 
-    private async Task MonthlyTotalsFetchAsync()
+    private async Task FetchMonthlyTotalsAsync()
     {
         var monthlyTotalsData = await _monthlyTotalsReport.GetAsync(DateOnly.FromDateTime(FilterMainDate),
+            new DateOnlyRange(DateOnly.FromDateTime(FilterRange.Start), DateOnly.FromDateTime(FilterRange.End)),
             FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency));
-        
-        Dispatcher.UIThread.Post(() =>
+
+        MonthlyTotalsData = monthlyTotalsData;
+
+        MonthlyTotalsChartData.RefreshChart(monthlyTotalsData);
+
+        /*Dispatcher.UIThread.Post(() =>
         {
             MonthlyTotalsFiatData = new DashboardData("Fiat totals", new ObservableCollection<RowItem>()
             {
@@ -134,7 +266,7 @@ public partial class ReportsViewModel : ValtTabViewModel
                 new("From last month", monthlyTotalsData.Bitcoin.VariationFromPreviousMonth.ToString("0.00%")),
                 new("From last year", monthlyTotalsData.Bitcoin.VariationFromPreviousYear.ToString("0.00%")),
             });
-        });
+        });*/
     }
 
     public override MainViewTabNames TabName => MainViewTabNames.ReportsPageContent;

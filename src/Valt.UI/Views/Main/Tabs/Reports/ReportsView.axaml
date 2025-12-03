@@ -4,6 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:reports1="clr-namespace:Valt.UI.Views.Main.Tabs.Reports"
              xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+             xmlns:avalonia="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
+             xmlns:draw="clr-namespace:LiveChartsCore.SkiaSharpView.Drawing.Geometries;assembly=LiveChartsCore.SkiaSharpView"
+             xmlns:skiaSharp="clr-namespace:SkiaSharp;assembly=SkiaSharp"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:immutable="clr-namespace:System.Collections.Immutable;assembly=System.Collections.Immutable"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
              MinWidth="900"
              MinHeight="700"
@@ -12,24 +17,81 @@
     <Design.DataContext>
         <reports1:ReportsViewModel />
     </Design.DataContext>
-    <Grid>
+    <UserControl.Resources>
+        <x:String x:Key="Fiat">#0566e9</x:String>
+        <x:String x:Key="Bitcoin">#ffa122</x:String>
+    </UserControl.Resources>
+    <ScrollViewer>
+        <StackPanel>
+            <!--Summary-->
+            <Label>Summary</Label>
+            <StackPanel Orientation="Vertical" Spacing="10" Margin="10">
+                <reports1:DashboardDataUserControl DataContext="{Binding AllTimeHighData}"></reports1:DashboardDataUserControl>
+            </StackPanel>
+
+            <!--Monthly totals-->
+            <Label>Monthly Totals</Label>
+            <userControls:DateCalendarSelector HorizontalContentAlignment="Center"
+                                               Date="{Binding FilterMainDate}"
+                                               Range="{Binding FilterRange}">
+                <userControls:DateCalendarSelector.AllowedSelectorModes>
+                    <userControls:DateCalendarSelectorMode>All</userControls:DateCalendarSelectorMode>
+                    <userControls:DateCalendarSelectorMode>Year</userControls:DateCalendarSelectorMode>
+                </userControls:DateCalendarSelector.AllowedSelectorModes>
+            </userControls:DateCalendarSelector>
+            <avalonia:CartesianChart
+                XAxes="{Binding MonthlyTotalsChartData.XAxes}"
+                YAxes="{Binding MonthlyTotalsChartData.YAxes}"
+                LegendPosition="Top"
+                Height="400">
+                <avalonia:CartesianChart.Series>
+                    <avalonia:XamlLineSeries
+                        SeriesName="Fiat"
+                        Values="{Binding MonthlyTotalsChartData.FiatValues}"
+                        Stroke="{avalonia:SolidColorPaint Color={StaticResource Fiat}}"
+                        GeometryStroke="{avalonia:SolidColorPaint Color={StaticResource Fiat}}"
+                        GeometryFill="{avalonia:SolidColorPaint Color={StaticResource Fiat}}"
+                        GeometrySize="20" />
+                    <avalonia:XamlLineSeries
+                        SeriesName="Bitcoin"
+                        Values="{Binding MonthlyTotalsChartData.BtcValues}"
+                        Stroke="{avalonia:SolidColorPaint Color={StaticResource Bitcoin}}"
+                        GeometryStroke="{avalonia:SolidColorPaint Color={StaticResource Bitcoin}}"
+                        GeometryFill="{avalonia:SolidColorPaint Color={StaticResource Bitcoin}}"
+                        GeometrySize="20"
+                        ScalesYAt="1" />
+                </avalonia:CartesianChart.Series>
+            </avalonia:CartesianChart>
+            <DataGrid
+                x:Name="MonthlyTotalsGrid"
+                Margin="10, 10, 10, 0"
+                GridLinesVisibility="All"
+                ItemsSource="{Binding MonthlyTotalsData.Items}"
+                AutoGenerateColumns="True"
+                IsReadOnly="True">
+                <DataGrid.Styles>
+                    <Styles>
+                        <Style Selector="DataGridCell TextBlock">
+                            <Setter Property="FontSize" Value="13"></Setter>
+                        </Style>
+                    </Styles>
+                </DataGrid.Styles>
+            </DataGrid>
+        </StackPanel>
+    </ScrollViewer>
+
+    <!--<Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Panel Grid.Row="0">
-            <StackPanel Orientation="Vertical" Spacing="10" Margin="10">
-                
-                <reports1:DashboardDataUserControl DataContext="{Binding AllTimeHighData}"></reports1:DashboardDataUserControl>
-                <reports1:DashboardDataUserControl DataContext="{Binding MonthlyTotalsFiatData}"></reports1:DashboardDataUserControl>
-                <reports1:DashboardDataUserControl DataContext="{Binding MonthlyTotalsBitcoinData}"></reports1:DashboardDataUserControl>
-                
-            </StackPanel>
+           
         </Panel>
         <Panel Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center">
             <userControls:DateCalendarSelector
                                                Date="{Binding FilterMainDate}"
                                                Range="{Binding FilterRange}" />
         </Panel>
-    </Grid>
+    </Grid>-->
 </UserControl>

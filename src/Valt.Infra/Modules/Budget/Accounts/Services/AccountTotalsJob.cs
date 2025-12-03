@@ -1,9 +1,8 @@
 using Microsoft.Extensions.Logging;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Infra.Kernel.BackgroundJobs;
-using Valt.Infra.Modules.Budget.Accounts.Services;
 
-namespace Valt.Infra.BackgroundJobs.AccountTotalsCalculator;
+namespace Valt.Infra.Modules.Budget.Accounts.Services;
 
 internal class AccountTotalsJob : IBackgroundJob
 {

@@ -1,6 +1,7 @@
 using System.Collections.Frozen;
 using System.Collections.Immutable;
 using LiteDB;
+using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Infra.DataAccess;
@@ -8,33 +9,35 @@ using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Transactions;
 using Valt.Infra.Modules.DataSources.Bitcoin;
 using Valt.Infra.Modules.DataSources.Fiat;
-using Valt.Infra.Modules.Reports.AllTimeHigh;
 
-namespace Valt.Infra.Modules.Reports;
+namespace Valt.Infra.Modules.Reports.MonthlyTotals;
 
 public class MonthlyTotalsReport : IMonthlyTotalsReport
 {
     private readonly IPriceDatabase _priceDatabase;
     private readonly ILocalDatabase _localDatabase;
     private readonly IClock _clock;
+    private readonly ILogger<MonthlyTotalsReport> _logger;
 
-    public MonthlyTotalsReport(IPriceDatabase priceDatabase, ILocalDatabase localDatabase, IClock clock)
+    public MonthlyTotalsReport(IPriceDatabase priceDatabase, ILocalDatabase localDatabase, IClock clock,
+        ILogger<MonthlyTotalsReport> logger)
     {
         _priceDatabase = priceDatabase;
         _localDatabase = localDatabase;
         _clock = clock;
+        _logger = logger;
     }
-    
-    public async Task<MonthlyTotalsData> GetAsync(DateOnly baseDate, FiatCurrency currency)
+
+    public async Task<MonthlyTotalsData> GetAsync(DateOnly baseDate, DateOnlyRange displayRange, FiatCurrency currency)
     {
         var monthYear = new DateOnly(baseDate.Year, baseDate.Month, 1);
         //loads all in-memory
         var accounts = _localDatabase.GetAccounts().FindAll().ToImmutableList();
         var transactions = _localDatabase.GetTransactions().FindAll().ToImmutableList();
-        
+
         if (transactions.Count == 0)
             throw new ApplicationException("No transactions found");
-        
+
         var minDate = transactions.Min(x => x.Date);
         var maxDate = new DateOnly(monthYear.Year, monthYear.Month, 1).AddMonths(1).AddDays(-1).ToValtDateTime();
 
@@ -48,12 +51,20 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
             .ToImmutableList();
         var fiatRates = _priceDatabase.GetFiatData().Find(x => x.Date >= minDate && x.Date <= maxDate)
             .ToImmutableList();
-        
-        var calculator = new Calculator(currency, monthYear, accounts, transactions, btcRates, fiatRates, minDate, maxDate);
 
-        return await calculator.CalculateAsync();
+        var calculator = new Calculator(currency, monthYear, accounts, transactions, btcRates, fiatRates, minDate,
+            maxDate, displayRange);
+
+        try
+        {
+            return await calculator.CalculateAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error while calculating monthly totals");
+            throw;
+        }
     }
-    
 
     private class Calculator
     {
@@ -63,6 +74,7 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
         private readonly ImmutableList<TransactionEntity> _transactions;
         private readonly DateTime _startDate;
         private readonly DateTime _endDate;
+        private readonly DateOnlyRange _displayRange;
         private readonly FrozenDictionary<DateTime, BitcoinDataEntity> _btcRates;
         private readonly FrozenDictionary<DateTime, ImmutableList<FiatDataEntity>> _fiatRates;
 
@@ -76,7 +88,8 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
             ImmutableList<BitcoinDataEntity> btcRates,
             ImmutableList<FiatDataEntity> fiatRates,
             DateTime startDate,
-            DateTime endDate)
+            DateTime endDate,
+            DateOnlyRange displayRange)
         {
             _currency = currency;
             _monthYear = monthYear;
@@ -84,6 +97,7 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
             _transactions = transactions;
             _startDate = startDate;
             _endDate = endDate;
+            _displayRange = displayRange;
             _btcRates = btcRates.ToFrozenDictionary(x => x.Date);
             _fiatRates = fiatRates.GroupBy(x => x.Date).ToFrozenDictionary(x => x.Key, x => x.ToImmutableList());
 
@@ -101,12 +115,11 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
 
         public async Task<MonthlyTotalsData> CalculateAsync()
         {
-            var monthlyTotalsFiat = new Dictionary<DateOnly, decimal>();
-            var monthlyTotalsBitcoin = new Dictionary<DateOnly, decimal>();
-            
+            var monthlyTotals = new Dictionary<DateOnly, MonthlyTotal>();
+
             var accountCurrentScanDateTotals = new Dictionary<ObjectId, decimal>();
             var bitcoinCurrentScanDateTotals = 0m;
-            
+
             var currentScanDate = _startDate.AddDays(-1);
             while (currentScanDate < _endDate)
             {
@@ -123,7 +136,7 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
                                 account.AccountEntityType == AccountEntityType.Fiat
                                     ? account.InitialAmount
                                     : account.InitialAmount / 100_000_000m;
-                            
+
                             if (account.AccountEntityType == AccountEntityType.Bitcoin)
                                 bitcoinCurrentScanDateTotals += accountCurrentScanDateTotals[accountId];
                         }
@@ -150,10 +163,11 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
                         }
                     }
                 }
-                
+
                 //only calculate totals for last day of month
 
-                if (currentScanDate.Day == DateTime.DaysInMonth(currentScanDate.Year, currentScanDate.Month) || currentScanDate == _endDate)
+                if (currentScanDate.Day == DateTime.DaysInMonth(currentScanDate.Year, currentScanDate.Month) ||
+                    currentScanDate == _endDate)
                 {
                     var monthlyValueChange = 0m;
                     foreach (var account in _accounts.Values)
@@ -188,32 +202,60 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
                             }
                         }
                     }
-                    
+
                     var currentMonthYear = new DateOnly(currentScanDate.Year, currentScanDate.Month, 1);
 
-                    monthlyTotalsFiat[currentMonthYear] = Math.Round(monthlyValueChange, 2);
-                    monthlyTotalsBitcoin[currentMonthYear] = bitcoinCurrentScanDateTotals;
+                    monthlyTotals[currentMonthYear] =
+                        new MonthlyTotal(Math.Round(monthlyValueChange, 2), bitcoinCurrentScanDateTotals);
                 }
             }
-            
+
             var lastYear = new DateOnly(_monthYear.Year - 1, 12, 1);
 
-            return new MonthlyTotalsData
+            var resultSet = monthlyTotals.Select(monthlyTotal =>
             {
-                MonthYear = _monthYear,
-                Bitcoin = new MonthlyTotalsData.BitcoinData()
+                var previousMonth = monthlyTotal.Key.AddMonths(-1);
+
+                var btcMonthlyChange = 0m;
+                var fiatMonthlyChange = 0m;
+                var btcYearlyChange = 0m;
+                var fiatYearlyChange = 0m;
+                if (monthlyTotals.TryGetValue(previousMonth, out var previousMonthData))
                 {
-                    BtcTotal = monthlyTotalsBitcoin[_monthYear],
-                    VariationFromPreviousMonth = Math.Round(monthlyTotalsBitcoin[_monthYear] / monthlyTotalsBitcoin[_monthYear.AddMonths(-1)] - 1, 4),
-                    VariationFromPreviousYear = Math.Round(monthlyTotalsBitcoin[_monthYear] / monthlyTotalsBitcoin[lastYear] - 1, 4),
-                },
-                Fiat = new MonthlyTotalsData.FiatData()
-                {
-                    MainCurrency = _currency,
-                    FiatTotal = monthlyTotalsFiat[_monthYear],
-                    VariationFromPreviousMonth = Math.Round(monthlyTotalsFiat[_monthYear] / monthlyTotalsFiat[_monthYear.AddMonths(-1)] - 1, 4),
-                    VariationFromPreviousYear = Math.Round(monthlyTotalsFiat[_monthYear] / monthlyTotalsFiat[lastYear] - 1, 4),
+                    btcMonthlyChange =
+                        FinancialCalculator.CalculateImprovementPercentage(previousMonthData.Bitcoin,
+                            monthlyTotal.Value.Bitcoin);
+                    fiatMonthlyChange =
+                        FinancialCalculator.CalculateImprovementPercentage(previousMonthData.Fiat,
+                            monthlyTotal.Value.Fiat);
                 }
+
+                if (monthlyTotals.TryGetValue(lastYear, out var lastYearData))
+                {
+                    btcYearlyChange = FinancialCalculator.CalculateImprovementPercentage(lastYearData.Bitcoin, monthlyTotal.Value.Bitcoin);
+                    fiatYearlyChange = FinancialCalculator.CalculateImprovementPercentage(lastYearData.Fiat, monthlyTotal.Value.Fiat);
+                }
+
+                return new MonthlyTotalsData.Item()
+                {
+                    MonthYear = monthlyTotal.Key,
+                    BtcTotal = monthlyTotal.Value.Bitcoin,
+                    BtcMonthlyChange = btcMonthlyChange,
+                    BtcYearlyChange = btcYearlyChange,
+                    FiatTotal = monthlyTotal.Value.Fiat,
+                    FiatMonthlyChange = fiatMonthlyChange,
+                    FiatYearlyChange = fiatYearlyChange
+                };
+            }).ToList();
+            
+            //grab only the data of the display range filter
+            
+            resultSet = resultSet.Where(x => x.MonthYear >= _displayRange.Start && x.MonthYear <= _displayRange.End).ToList();
+
+            return new MonthlyTotalsData()
+            {
+                MainCurrency = _currency,
+                Items = resultSet
             };
         }
 
@@ -221,14 +263,14 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
         {
             if (currency == FiatCurrency.Usd)
                 return 1;
-            
-            var scanDate = date.Date; 
+
+            var scanDate = date.Date;
             var currencyCode = currency.Code;
 
             while (scanDate > date.AddDays(-5)) //considers 5 days to grab because of holidays and weekends
             {
                 _ = _fiatRates.TryGetValue(scanDate, out var rates);
-                
+
                 var entry = rates?.SingleOrDefault(x => x.Currency == currencyCode);
 
                 if (entry is not null)
@@ -255,4 +297,6 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
             throw new ApplicationException($"Could not find btc rate on {date}");
         }
     }
+
+    private record MonthlyTotal(decimal Fiat, decimal Bitcoin);
 }

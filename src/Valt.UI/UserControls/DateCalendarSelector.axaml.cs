@@ -1,8 +1,15 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
 using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Data;
 using CommunityToolkit.Mvvm.Input;
+using Valt.UI.Converters;
 
 namespace Valt.UI.UserControls;
 
@@ -13,6 +20,8 @@ public partial class DateCalendarSelector : UserControl
     private DateTime _baseDate = DateTime.Now.Date;
 
     private DateRange _range = new(DateTime.MinValue, DateTime.MinValue);
+
+    public ObservableCollection<object> SelectorMenuItems { get; } = new();
 
     public static readonly DirectProperty<DateCalendarSelector, DateCalendarSelectorMode> SelectorModeProperty =
         AvaloniaProperty.RegisterDirect<DateCalendarSelector, DateCalendarSelectorMode>(
@@ -42,6 +51,90 @@ public partial class DateCalendarSelector : UserControl
             o => o.Range,
             (o, v) => o.Range = v,
             defaultBindingMode: BindingMode.OneWayToSource);
+
+    public static readonly StyledProperty<AvaloniaList<DateCalendarSelectorMode>> AllowedSelectorModesProperty =
+        AvaloniaProperty.Register<DateCalendarSelector, AvaloniaList<DateCalendarSelectorMode>>(
+            nameof(AllowedSelectorModes),
+            defaultValue: new AvaloniaList<DateCalendarSelectorMode>
+            {
+                DateCalendarSelectorMode.All,
+                DateCalendarSelectorMode.Year,
+                DateCalendarSelectorMode.Month,
+                DateCalendarSelectorMode.Week,
+                DateCalendarSelectorMode.Day
+            });
+
+    static DateCalendarSelector()
+    {
+        AllowedSelectorModesProperty.Changed.AddClassHandler<DateCalendarSelector>((instance, e) =>
+        {
+            if (e.OldValue is IAvaloniaList<DateCalendarSelectorMode> oldList)
+            {
+                oldList.CollectionChanged -= instance.OnAllowedModesCollectionChanged;
+            }
+
+            if (e.NewValue is IAvaloniaList<DateCalendarSelectorMode> newList)
+            {
+                newList.CollectionChanged += instance.OnAllowedModesCollectionChanged;
+            
+                instance.RebuildMenuItems();
+
+                if (newList.Count > 0 && !newList.Contains(instance.SelectorMode))
+                {
+                    instance.SelectorMode = newList[0];
+                }
+            }
+        });
+    }
+    private void OnAllowedModesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        RebuildMenuItems();
+
+        if (AllowedSelectorModes.Count > 0 && !AllowedSelectorModes.Contains(SelectorMode))
+        {
+            SelectorMode = AllowedSelectorModes[0];
+        }
+    }
+
+    public AvaloniaList<DateCalendarSelectorMode> AllowedSelectorModes
+    {
+        get => GetValue(AllowedSelectorModesProperty);
+        set => SetValue(AllowedSelectorModesProperty, value);
+    }
+
+    private void RebuildMenuItems()
+    {
+        SelectorMenuItems.Clear();
+
+        foreach (var mode in AllowedSelectorModes)
+        {
+            SelectorMenuItems.Add(new MenuItem
+            {
+                Header = mode.ToString(),
+                Command = ChangeSelectorModeCommand,
+                CommandParameter = mode,
+                // Optional: show checkmark on current mode
+                [!MenuItem.IsCheckedProperty] = new Binding
+                {
+                    Source = this,
+                    Path = nameof(SelectorMode),
+                    Converter = new EnumEqualityConverter(),
+                    ConverterParameter = mode
+                }
+            });
+        }
+
+        if (AllowedSelectorModes.Any())
+        {
+            SelectorMenuItems.Add(new Separator());
+        }
+
+        SelectorMenuItems.Add(new MenuItem
+        {
+            Header = "Reset date",
+            Command = ResetDateCommand
+        });
+    }
 
 
     public DateCalendarSelectorMode SelectorMode
@@ -79,7 +172,7 @@ public partial class DateCalendarSelector : UserControl
     public DateCalendarSelector()
     {
         InitializeComponent();
-
+        RebuildMenuItems();
         UpdateDisplayValue();
     }
 

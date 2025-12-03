@@ -4,7 +4,7 @@ using Valt.Core.Modules.Budget.FixedExpenses.Contracts;
 using Valt.Core.Modules.Budget.Transactions;
 using Valt.Infra.DataAccess;
 
-namespace Valt.Infra.Modules.Budget.FixedExpenses;
+namespace Valt.Infra.Modules.Budget.FixedExpenses.Services;
 
 public class FixedExpenseRecordService : IFixedExpenseRecordService
 {

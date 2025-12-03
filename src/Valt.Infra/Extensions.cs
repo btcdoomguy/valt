@@ -31,12 +31,14 @@ using Valt.Infra.Modules.Budget.Categories;
 using Valt.Infra.Modules.Budget.Categories.Queries;
 using Valt.Infra.Modules.Budget.FixedExpenses;
 using Valt.Infra.Modules.Budget.FixedExpenses.Queries;
+using Valt.Infra.Modules.Budget.FixedExpenses.Services;
 using Valt.Infra.Modules.Budget.Transactions;
 using Valt.Infra.Modules.Budget.Transactions.Queries;
 using Valt.Infra.Modules.Budget.Transactions.Services;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
+using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
 

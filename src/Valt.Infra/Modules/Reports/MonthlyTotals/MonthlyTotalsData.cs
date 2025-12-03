@@ -1,6 +1,6 @@
 using Valt.Core.Common;
 
-namespace Valt.Infra.Modules.Reports;
+namespace Valt.Infra.Modules.Reports.MonthlyTotals;
 
 
 /// <summary>
@@ -8,22 +8,18 @@ namespace Valt.Infra.Modules.Reports;
 /// </summary>
 public record MonthlyTotalsData
 {
-    public required DateOnly MonthYear { get; init; }
-    public required BitcoinData Bitcoin { get; init; }
-    public required FiatData Fiat { get; init; }
+    public required FiatCurrency MainCurrency { get; init; }
+    public required IReadOnlyList<Item> Items { get; init; }
     
-    public record BitcoinData
+    public record Item
     {
+        public required DateOnly MonthYear { get; init; }
         public required decimal BtcTotal { get; init; }
-        public required decimal VariationFromPreviousMonth { get; init; }
-        public required decimal VariationFromPreviousYear { get; init; }
-    }
+        public required decimal BtcMonthlyChange { get; init; }
+        public required decimal BtcYearlyChange { get; init; }
 
-    public record FiatData
-    {
-        public required FiatCurrency MainCurrency { get; init; }
         public required decimal FiatTotal { get; init; }
-        public required decimal VariationFromPreviousMonth { get; init; }
-        public required decimal VariationFromPreviousYear { get; init; }
+        public required decimal FiatMonthlyChange { get; init; }
+        public required decimal FiatYearlyChange { get; init; }
     }
 }

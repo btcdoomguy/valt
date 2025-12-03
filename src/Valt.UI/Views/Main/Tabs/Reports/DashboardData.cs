@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using LiveChartsCore.Kernel;
 
 namespace Valt.UI.Views.Main.Tabs.Reports;
 
