@@ -38,6 +38,7 @@
                             Margin="0, 0, 0, 0">
                 <DropDownButton.Flyout>
                     <MenuFlyout Placement="Bottom"
+                                Opening="PopupFlyoutBase_OnOpening"
                                 ItemsSource="{Binding SelectorMenuItems, ElementName=root}" />
                 </DropDownButton.Flyout>
             </DropDownButton>

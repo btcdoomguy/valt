@@ -35,8 +35,8 @@
                                                Date="{Binding FilterMainDate}"
                                                Range="{Binding FilterRange}">
                 <userControls:DateCalendarSelector.AllowedSelectorModes>
-                    <userControls:DateCalendarSelectorMode>All</userControls:DateCalendarSelectorMode>
-                    <userControls:DateCalendarSelectorMode>Year</userControls:DateCalendarSelectorMode>
+                        <userControls:DateCalendarSelectorMode>All</userControls:DateCalendarSelectorMode>
+                        <userControls:DateCalendarSelectorMode>Year</userControls:DateCalendarSelectorMode>
                 </userControls:DateCalendarSelector.AllowedSelectorModes>
             </userControls:DateCalendarSelector>
             <avalonia:CartesianChart

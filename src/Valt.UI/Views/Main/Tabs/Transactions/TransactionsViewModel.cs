@@ -212,8 +212,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
             }
         });
     }
-
-
+    
     private void OnCurrentDateRangeChangedReceive(object recipient, FilterDateRangeChanged message)
     {
         _ = FetchFixedExpenses();

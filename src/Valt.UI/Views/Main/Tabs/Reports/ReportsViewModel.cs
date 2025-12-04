@@ -26,7 +26,6 @@ public partial class ReportsViewModel : ValtTabViewModel
     private readonly IAllTimeHighReport _allTimeHighReport;
     private readonly IMonthlyTotalsReport _monthlyTotalsReport;
     private readonly CurrencySettings _currencySettings;
-    private readonly FilterState _filterState;
     private readonly IClock _clock;
 
     [ObservableProperty] private DashboardData _allTimeHighData;
@@ -35,6 +34,8 @@ public partial class ReportsViewModel : ValtTabViewModel
     [ObservableProperty] private DateTime _filterMainDate;
     [ObservableProperty] private DateRange _filterRange;
 
+    #region Design-time constructor
+    
     public ReportsViewModel()
     {
         if (Design.IsDesignMode)
@@ -189,37 +190,33 @@ public partial class ReportsViewModel : ValtTabViewModel
             MonthlyTotalsChartData.RefreshChart(MonthlyTotalsData);
         }
     }
+    
+    #endregion
 
     public ReportsViewModel(IAllTimeHighReport allTimeHighReport,
         IMonthlyTotalsReport monthlyTotalsReport,
         CurrencySettings currencySettings,
-        FilterState filterState,
         IClock clock)
     {
         _allTimeHighReport = allTimeHighReport;
         _monthlyTotalsReport = monthlyTotalsReport;
         _currencySettings = currencySettings;
-        _filterState = filterState;
         _clock = clock;
 
         FilterMainDate = _clock.GetCurrentDateTimeUtc();
         FilterRange = new DateRange(new DateTime(FilterMainDate.Year, 1, 1), new DateTime(FilterMainDate.Year, 12, 31));
 
         _ = InitializeAsync();
-
-        WeakReferenceMessenger.Default.Register<FilterDateRangeChanged>(this, OnFilterDataRangeChanged);
-    }
-
-    private void OnFilterDataRangeChanged(object recipient, FilterDateRangeChanged message)
-    {
-        OnPropertyChanged(nameof(FilterMainDate));
-        OnPropertyChanged(nameof(FilterRange));
-        _ = FetchMonthlyTotalsAsync();
     }
 
     private async Task InitializeAsync()
     {
         _ = FetchAllTimeHighDataAsync();
+        _ = FetchMonthlyTotalsAsync();
+    }
+
+    partial void OnFilterRangeChanged(DateRange value)
+    {
         _ = FetchMonthlyTotalsAsync();
     }
 
@@ -250,23 +247,6 @@ public partial class ReportsViewModel : ValtTabViewModel
         MonthlyTotalsData = monthlyTotalsData;
 
         MonthlyTotalsChartData.RefreshChart(monthlyTotalsData);
-
-        /*Dispatcher.UIThread.Post(() =>
-        {
-            MonthlyTotalsFiatData = new DashboardData("Fiat totals", new ObservableCollection<RowItem>()
-            {
-                new("Total", $"R$ {monthlyTotalsData.Fiat.FiatTotal}"),
-                new("From last month", monthlyTotalsData.Fiat.VariationFromPreviousMonth.ToString("0.00%")),
-                new("From last year", monthlyTotalsData.Fiat.VariationFromPreviousYear.ToString("0.00%")),
-            });
-
-            MonthlyTotalsBitcoinData = new DashboardData("Bitcoin totals", new ObservableCollection<RowItem>()
-            {
-                new("BTC", monthlyTotalsData.Bitcoin.BtcTotal.ToString("0.00000000")),
-                new("From last month", monthlyTotalsData.Bitcoin.VariationFromPreviousMonth.ToString("0.00%")),
-                new("From last year", monthlyTotalsData.Bitcoin.VariationFromPreviousYear.ToString("0.00%")),
-            });
-        });*/
     }
 
     public override MainViewTabNames TabName => MainViewTabNames.ReportsPageContent;
