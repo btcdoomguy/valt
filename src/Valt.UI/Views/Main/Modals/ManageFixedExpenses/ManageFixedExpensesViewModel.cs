@@ -30,7 +30,7 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
     private readonly ITransactionRepository _transactionRepository;
     private readonly IFixedExpenseRepository _fixedExpenseRepository;
     private readonly IModalFactory _modalFactory;
-    private readonly AccountsTotalState _accountsTotalState;
+    private readonly RatesState _ratesState;
     private readonly CurrencySettings _currencySettings;
 
     public AvaloniaList<FixedExpenseListItemViewModel> FixedExpenses { get; set; } = new();
@@ -63,14 +63,14 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
         ITransactionRepository transactionRepository,
         IFixedExpenseRepository fixedExpenseRepository,
         IModalFactory modalFactory,
-        AccountsTotalState accountsTotalState,
+        RatesState ratesState,
         CurrencySettings currencySettings)
     {
         _fixedExpenseQueries = fixedExpenseQueries;
         _transactionRepository = transactionRepository;
         _fixedExpenseRepository = fixedExpenseRepository;
         _modalFactory = modalFactory;
-        _accountsTotalState = accountsTotalState;
+        _ratesState = ratesState;
         _currencySettings = currencySettings;
 
         _ = InitializeAsync();
@@ -126,13 +126,13 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
 
     private async Task RefreshTotalsAsync(IReadOnlyList<FixedExpenseDto> fixedExpensesQueryResult)
     {
-        if (_accountsTotalState.FiatRates is null)
+        if (_ratesState.FiatRates is null)
             return;
 
         var minTotal = 0m;
         var maxTotal = 0m;
 
-        var fixedExpenseHelper = new FixedExpenseHelper(_accountsTotalState, _currencySettings);
+        var fixedExpenseHelper = new FixedExpenseHelper(_ratesState, _currencySettings);
 
         foreach (var fixedExpenseDTO in fixedExpensesQueryResult)
         {

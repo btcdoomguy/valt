@@ -7,7 +7,7 @@ namespace Valt.Tests.Builders;
 
 public class FiatAccountBuilder
 {
-    public AccountId Id { get; set; }
+    public AccountId Id { get; set; } = new();
     public AccountName Name { get; set; }
     public FiatCurrency FiatCurrency { get; set; }
     public Icon Icon { get; set; } = Icon.Empty;

@@ -1,8 +1,16 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
 using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Data;
+using Avalonia.LogicalTree;
 using CommunityToolkit.Mvvm.Input;
+using Valt.UI.Converters;
 
 namespace Valt.UI.UserControls;
 
@@ -13,6 +21,8 @@ public partial class DateCalendarSelector : UserControl
     private DateTime _baseDate = DateTime.Now.Date;
 
     private DateRange _range = new(DateTime.MinValue, DateTime.MinValue);
+
+    public ObservableCollection<object> SelectorMenuItems { get; } = new();
 
     public static readonly DirectProperty<DateCalendarSelector, DateCalendarSelectorMode> SelectorModeProperty =
         AvaloniaProperty.RegisterDirect<DateCalendarSelector, DateCalendarSelectorMode>(
@@ -43,7 +53,89 @@ public partial class DateCalendarSelector : UserControl
             (o, v) => o.Range = v,
             defaultBindingMode: BindingMode.OneWayToSource);
 
+    public static readonly StyledProperty<AvaloniaList<DateCalendarSelectorMode>> AllowedSelectorModesProperty =
+        AvaloniaProperty.Register<DateCalendarSelector, AvaloniaList<DateCalendarSelectorMode>>(
+            nameof(AllowedSelectorModes));
 
+    static DateCalendarSelector()
+    {
+        AllowedSelectorModesProperty.Changed.AddClassHandler<DateCalendarSelector>(OnAllowedSelectorModesChanged);
+    }
+    
+    private static void OnAllowedSelectorModesChanged(DateCalendarSelector instance, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.OldValue is IAvaloniaList<DateCalendarSelectorMode> oldList)
+        {
+            oldList.CollectionChanged -= instance.OnAllowedModesCollectionChanged;
+        }
+
+        if (e.NewValue is IAvaloniaList<DateCalendarSelectorMode> newList)
+        {
+            newList.CollectionChanged += instance.OnAllowedModesCollectionChanged;
+            instance.RebuildMenuItems();
+
+            // Adjust SelectorMode if invalid (like in Aura.UI CardControl)
+            if (newList.Count > 0 && !newList.Contains(instance.SelectorMode))
+            {
+                instance.SelectorMode = newList[0];
+            }
+        }
+    }
+    
+    private void OnAllowedModesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        RebuildMenuItems();
+
+        if (AllowedSelectorModes.Count > 0 && !AllowedSelectorModes.Contains(SelectorMode))
+        {
+            SelectorMode = AllowedSelectorModes[0];
+        }
+    }
+
+    public AvaloniaList<DateCalendarSelectorMode> AllowedSelectorModes
+    {
+        get => GetValue(AllowedSelectorModesProperty);
+        set => SetValue(AllowedSelectorModesProperty, value);
+    }
+
+    private void RebuildMenuItems()
+    {
+        SelectorMenuItems.Clear();
+
+        var modes = AllowedSelectorModes ?? new AvaloniaList<DateCalendarSelectorMode>();  // Safe fallback
+
+        // Optional: Dedupe modes to prevent any navigation glitches
+        var uniqueModes = modes.Distinct().ToArray();
+
+        foreach (var mode in uniqueModes)
+        {
+            SelectorMenuItems.Add(new MenuItem
+            {
+                Header = mode.ToString(),
+                Command = ChangeSelectorModeCommand,
+                CommandParameter = mode,
+                [!MenuItem.IsCheckedProperty] = new Binding
+                {
+                    Source = this,
+                    Path = nameof(SelectorMode),
+                    Converter = new EnumEqualityConverter(),
+                    ConverterParameter = mode
+                }
+            });
+        }
+
+        if (uniqueModes.Any())
+        {
+            SelectorMenuItems.Add(new Separator());
+        }
+
+        SelectorMenuItems.Add(new MenuItem
+        {
+            Header = "Reset date",
+            Command = ResetDateCommand
+        });
+    }
+    
     public DateCalendarSelectorMode SelectorMode
     {
         get => _selectorMode;
@@ -79,8 +171,30 @@ public partial class DateCalendarSelector : UserControl
     public DateCalendarSelector()
     {
         InitializeComponent();
-
+        
+        AllowedSelectorModes = new AvaloniaList<DateCalendarSelectorMode>();
+        
         UpdateDisplayValue();
+    }
+
+    protected override void OnAttachedToLogicalTree(LogicalTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToLogicalTree(e);
+
+        // Populate defaults ONLY if no custom modes were added by XAML
+        if (AllowedSelectorModes.Count == 0)
+        {
+            AllowedSelectorModes.AddRange(new[]
+            {
+                DateCalendarSelectorMode.All,
+                DateCalendarSelectorMode.Year,
+                DateCalendarSelectorMode.Month,
+                DateCalendarSelectorMode.Week,
+                DateCalendarSelectorMode.Day
+            });
+        }
+        
+        RebuildMenuItems();
     }
 
     [RelayCommand]
@@ -193,6 +307,11 @@ public partial class DateCalendarSelector : UserControl
         var endOfWeek = startOfWeek.AddDays(6);
         // Format as "8/10/25 - 8/16/25" (adjust format as needed)
         return $"{startOfWeek:M/d/yy} - {endOfWeek:M/d/yy}";
+    }
+
+    private void PopupFlyoutBase_OnOpening(object? sender, EventArgs e)
+    {
+        RebuildMenuItems();
     }
 }
 

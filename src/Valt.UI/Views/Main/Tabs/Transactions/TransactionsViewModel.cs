@@ -10,6 +10,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Kernel.Factories;
@@ -37,18 +38,20 @@ using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
 namespace Valt.UI.Views.Main.Tabs.Transactions;
 
-public partial class TransactionsViewModel : ValtViewModel, IDisposable
+public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 {
     private readonly IModalFactory? _modalFactory;
     private readonly IAccountRepository? _accountRepository;
     private readonly IFixedExpenseProvider? _fixedExpenseProvider;
     private readonly AccountsTotalState? _accountsTotalState;
+    private readonly RatesState _ratesState;
     private readonly CurrencySettings? _currencySettings;
     private readonly DisplaySettings? _displaySettings;
     private readonly AccountDisplayOrderManager? _accountDisplayOrderManager;
     private readonly FilterState? _filterState;
     private readonly IFixedExpenseRecordService? _fixedExpenseRecordService;
     private readonly IClock _clock;
+    private readonly ILogger<TransactionsViewModel> _logger;
     private readonly IAccountQueries? _accountQueries;
 
     //instances of the sub contents
@@ -59,6 +62,7 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
     [ObservableProperty] private string _remainingFixedExpensesAmount = "R$ 12345,67 - R$ 23456,78";
 
     [ObservableProperty] private AccountViewModel? _selectedAccount;
+    [ObservableProperty] private FixedExpensesEntryViewModel? _selectedFixedExpense;
 
     [ObservableProperty] private string _allWealthInSats = "12.34567890";
     [ObservableProperty] private string _wealthInBtcRatio = "65.3%";
@@ -159,25 +163,29 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
         IModalFactory modalFactory, IAccountRepository accountRepository,
         IFixedExpenseProvider fixedExpenseProvider,
         AccountsTotalState accountsTotalState,
+        RatesState ratesState,
         CurrencySettings currencySettings,
         DisplaySettings displaySettings,
         AccountDisplayOrderManager accountDisplayOrderManager,
         FilterState filterState,
         ITransactionTabFactory transactionTabFactory,
         IFixedExpenseRecordService fixedExpenseRecordService,
-        IClock clock)
+        IClock clock,
+        ILogger<TransactionsViewModel> logger)
     {
         _accountQueries = accountQueries;
         _modalFactory = modalFactory;
         _accountRepository = accountRepository;
         _fixedExpenseProvider = fixedExpenseProvider;
         _accountsTotalState = accountsTotalState;
+        _ratesState = ratesState;
         _currencySettings = currencySettings;
         _displaySettings = displaySettings;
         _accountDisplayOrderManager = accountDisplayOrderManager;
         _filterState = filterState;
         _fixedExpenseRecordService = fixedExpenseRecordService;
         _clock = clock;
+        _logger = logger;
 
         _transactionListViewModel = (TransactionListViewModel)transactionTabFactory.Create(TransactionsTabNames.List);
 
@@ -204,8 +212,7 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
             }
         });
     }
-
-
+    
     private void OnCurrentDateRangeChangedReceive(object recipient, FilterDateRangeChanged message)
     {
         _ = FetchFixedExpenses();
@@ -290,39 +297,46 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
         if (_filterState is null) return;
         if (_fixedExpenseProvider is null) return;
 
-        var value = DateOnly.FromDateTime(_filterState.MainDate);
-        var fixedExpenses = await _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(value);
-
-        fixedExpenses = fixedExpenses.OrderBy(x => x.State).ThenBy(x => x.ReferenceDate).ToList();
-
-        var minTotal = 0m;
-        var maxTotal = 0m;
-
-        var fixedExpenseHelper = new FixedExpenseHelper(_accountsTotalState, _currencySettings);
-
-        FixedExpenseEntries.Clear();
-        foreach (var fixedExpense in fixedExpenses)
+        try
         {
-            FixedExpenseEntries.Add(new FixedExpensesEntryViewModel(fixedExpense, _clock.GetCurrentLocalDate()));
+            var value = DateOnly.FromDateTime(_filterState.MainDate);
+            var fixedExpenses = await _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(value);
 
-            if (fixedExpense.State != FixedExpenseRecordState.Empty)
-                continue;
+            fixedExpenses = fixedExpenses.OrderBy(x => x.State).ThenBy(x => x.ReferenceDate).ToList();
 
-            var (fixedAmountMin, fixedAmountMax) = fixedExpenseHelper.CalculateFixedExpenseRange(
-                fixedExpense.FixedAmount,
-                fixedExpense.RangedAmountMin, fixedExpense.RangedAmountMax,
-                fixedExpense.Currency);
+            var minTotal = 0m;
+            var maxTotal = 0m;
 
-            minTotal += fixedAmountMin;
-            maxTotal += fixedAmountMax;
+            var fixedExpenseHelper = new FixedExpenseHelper(_ratesState, _currencySettings);
+
+            FixedExpenseEntries.Clear();
+            foreach (var fixedExpense in fixedExpenses)
+            {
+                FixedExpenseEntries.Add(new FixedExpensesEntryViewModel(fixedExpense, _clock.GetCurrentLocalDate()));
+
+                if (fixedExpense.State != FixedExpenseRecordState.Empty)
+                    continue;
+
+                var (fixedAmountMin, fixedAmountMax) = fixedExpenseHelper.CalculateFixedExpenseRange(
+                    fixedExpense.FixedAmount,
+                    fixedExpense.RangedAmountMin, fixedExpense.RangedAmountMax,
+                    fixedExpense.Currency);
+
+                minTotal += fixedAmountMin;
+                maxTotal += fixedAmountMax;
+            }
+
+            if (minTotal == maxTotal)
+                RemainingFixedExpensesAmount =
+                    $"{CurrencyDisplay.FormatFiat(minTotal, _currencySettings.MainFiatCurrency)}";
+            else
+                RemainingFixedExpensesAmount =
+                    $"{CurrencyDisplay.FormatFiat(minTotal, _currencySettings.MainFiatCurrency)} - {CurrencyDisplay.FormatFiat(maxTotal, _currencySettings.MainFiatCurrency)}";
         }
-
-        if (minTotal == maxTotal)
-            RemainingFixedExpensesAmount =
-                $"{CurrencyDisplay.FormatFiat(minTotal, _currencySettings.MainFiatCurrency)}";
-        else
-            RemainingFixedExpensesAmount =
-                $"{CurrencyDisplay.FormatFiat(minTotal, _currencySettings.MainFiatCurrency)} - {CurrencyDisplay.FormatFiat(maxTotal, _currencySettings.MainFiatCurrency)}";
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching fixed expenses");
+        }
     }
 
     #region Account operations
@@ -453,12 +467,6 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
     public string FixedExpenseCurrentMonthDescription =>
         $"({DateOnly.FromDateTime(_filterState!.MainDate).ToString("MM/yyyy")})";
 
-    public FixedExpensesEntryViewModel? SelectedFixedExpense
-    {
-        get =>  _filterState!.SelectedFixedExpense is not null ? new FixedExpensesEntryViewModel(_filterState!.SelectedFixedExpense, _clock.GetCurrentLocalDate()) : null;
-        set => _filterState!.SelectedFixedExpense = value?.Entry;
-    }
-
     [RelayCommand]
     private async Task ManageFixedExpenses()
     {
@@ -586,6 +594,11 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
     {
         WeakReferenceMessenger.Default.Send(new AccountSelectedChanged(value));
     }
+    
+    partial void OnSelectedFixedExpenseChanged(FixedExpensesEntryViewModel? value)
+    {
+        WeakReferenceMessenger.Default.Send(new FixedExpenseChanged(value));
+    }
 
     public void Dispose()
     {
@@ -595,4 +608,6 @@ public partial class TransactionsViewModel : ValtViewModel, IDisposable
         WeakReferenceMessenger.Default.Unregister<FilterDateRangeChanged>(this);
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
     }
+
+    public override MainViewTabNames TabName => MainViewTabNames.TransactionsPageContent;
 }

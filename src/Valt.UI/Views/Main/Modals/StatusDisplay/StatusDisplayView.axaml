@@ -3,7 +3,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:userControls="clr-namespace:Valt.UI.UserControls"
-        xmlns:backgroundJobs="clr-namespace:Valt.Infra.BackgroundJobs;assembly=Valt.Infra"
         xmlns:local="clr-namespace:Valt.UI.Lang"
         xmlns:statusDisplay="clr-namespace:Valt.UI.Views.Main.Modals.StatusDisplay"
         xmlns:backgroundJobs1="clr-namespace:Valt.Infra.Kernel.BackgroundJobs;assembly=Valt.Infra"

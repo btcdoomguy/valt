@@ -11,15 +11,15 @@ public partial class FilterState :  ObservableObject
 {
     [ObservableProperty] private DateTime _mainDate = DateTime.MinValue;
     [ObservableProperty] private DateRange _range = new(DateTime.MinValue, DateTime.MinValue);
-    [ObservableProperty] private FixedExpenseProviderEntry? _selectedFixedExpense;
+    //[ObservableProperty] private FixedExpenseProviderEntry? _selectedFixedExpense;
     
     partial void OnRangeChanged(DateRange value)
     {
         WeakReferenceMessenger.Default.Send(new FilterDateRangeChanged());
     }
     
-    partial void OnSelectedFixedExpenseChanged(FixedExpenseProviderEntry? value)
+    /*partial void OnSelectedFixedExpenseChanged(FixedExpenseProviderEntry? value)
     {
         WeakReferenceMessenger.Default.Send(new FilterFixedExpenseChanged());
-    }
+    }*/
 }

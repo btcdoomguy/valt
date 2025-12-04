@@ -52,6 +52,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     private DateTime _dateForTransaction = DateTime.Now;
 
     [ObservableProperty] private AccountViewModel? _selectedAccount;
+    [ObservableProperty] private FixedExpensesEntryViewModel? _selectedFixedExpense;
     public AvaloniaList<TransactionViewModel> Transactions { get; set; } = new();
     [ObservableProperty] private TransactionViewModel? _selectedTransaction;
     [ObservableProperty] private List<TransactionViewModel>? _selectedTransactions;
@@ -194,7 +195,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
 
         WeakReferenceMessenger.Default.Register<AutoSatAmountRefreshed>(this, OnAutoSatAmountRefreshed);
         WeakReferenceMessenger.Default.Register<FilterDateRangeChanged>(this, OnFilterDataRangeChanged);
-        WeakReferenceMessenger.Default.Register<FilterFixedExpenseChanged>(this, OnFilterFixedExpenseChanged);
+        WeakReferenceMessenger.Default.Register<FixedExpenseChanged>(this, OnFixedExpenseChanged);
         WeakReferenceMessenger.Default.Register<AccountSelectedChanged>(this, OnAccountSelectedChanged);
         WeakReferenceMessenger.Default.Register<AddTransactionRequested>(this, OnAddTransactionRequested);
 
@@ -374,13 +375,13 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     #region Fixed Expenses - Transaction List Context Options
 
     public string BindToFixedExpenseCaption =>
-        SelectedTransaction is not null && SelectedTransaction.FixedExpenseRecordId is null && _filterState.SelectedFixedExpense is not null
-            ? $"{language.Transactions_Menu_BindToFixedExpenseCaption} {_filterState.SelectedFixedExpense.Name}"
+        SelectedTransaction is not null && SelectedTransaction.FixedExpenseRecordId is null && SelectedFixedExpense is not null
+            ? $"{language.Transactions_Menu_BindToFixedExpenseCaption} {SelectedFixedExpense.Name}"
             : string.Empty;
 
     public bool CanBindToFixedExpense => SelectedTransaction is not null &&
                                          SelectedTransaction.FixedExpenseRecordId is null &&
-                                         _filterState.SelectedFixedExpense is not null;
+                                         SelectedFixedExpense is not null;
     
     public string UnbindToFixedExpenseCaption =>
         SelectedTransaction is not null && SelectedTransaction.FixedExpenseRecordId is not null
@@ -404,7 +405,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
         //TODO: move to a specific app layer
         var transaction = await _transactionRepository.GetTransactionByIdAsync(new TransactionId(selectedTransaction.Id));
         
-        transaction.SetFixedExpense(new TransactionFixedExpenseReference(_filterState.SelectedFixedExpense.Id, _filterState.SelectedFixedExpense.ReferenceDate));
+        transaction.SetFixedExpense(new TransactionFixedExpenseReference(SelectedFixedExpense.Id, SelectedFixedExpense.ReferenceDate));
         
         await _transactionRepository.SaveTransactionAsync(transaction);
         WeakReferenceMessenger.Default.Send(new TransactionListChanged());
@@ -552,6 +553,12 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         SelectedAccount = message.Value;
     }
+    
+    private void OnFixedExpenseChanged(object recipient, FixedExpenseChanged message)
+    {
+        SelectedFixedExpense = message.Value;
+        RefreshFixedExpensesContextProperties();
+    }
 
     private void OnFilterDataRangeChanged(object recipient, FilterDateRangeChanged message)
     {
@@ -565,10 +572,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
         RefreshFixedExpensesContextProperties();
     }
     
-    private void OnFilterFixedExpenseChanged(object recipient, FilterFixedExpenseChanged message)
-    {
-        RefreshFixedExpensesContextProperties();
-    }
+
 
     #endregion
 
@@ -576,7 +580,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         WeakReferenceMessenger.Default.Unregister<AccountSelectedChanged>(this);
         WeakReferenceMessenger.Default.Unregister<FilterDateRangeChanged>(this);
-        WeakReferenceMessenger.Default.Unregister<FilterFixedExpenseChanged>(this);
+        WeakReferenceMessenger.Default.Unregister<FixedExpenseChanged>(this);
         WeakReferenceMessenger.Default.Unregister<AutoSatAmountRefreshed>(this);
         WeakReferenceMessenger.Default.Unregister<AddTransactionRequested>(this);
     }

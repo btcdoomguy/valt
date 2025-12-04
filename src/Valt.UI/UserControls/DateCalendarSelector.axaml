@@ -37,26 +37,9 @@
                             Height="33"
                             Margin="0, 0, 0, 0">
                 <DropDownButton.Flyout>
-                    <MenuFlyout Placement="Bottom">
-                        <MenuItem Header="Day" 
-                                  Command="{Binding ChangeSelectorModeCommand, ElementName=root}"
-                                  CommandParameter="{x:Static data:DateCalendarSelectorMode.Day}" />
-                        <MenuItem Header="Week" 
-                                  Command="{Binding ChangeSelectorModeCommand, ElementName=root}"
-                                  CommandParameter="{x:Static data:DateCalendarSelectorMode.Week}" />
-                        <MenuItem Header="Month"
-                                  Command="{Binding ChangeSelectorModeCommand, ElementName=root}"
-                                  CommandParameter="{x:Static data:DateCalendarSelectorMode.Month}" />
-                        <MenuItem Header="Year" 
-                                  Command="{Binding ChangeSelectorModeCommand, ElementName=root}"
-                                  CommandParameter="{x:Static data:DateCalendarSelectorMode.Year}" />
-                        <MenuItem Header="All" 
-                                  Command="{Binding ChangeSelectorModeCommand, ElementName=root}"
-                                  CommandParameter="{x:Static data:DateCalendarSelectorMode.All}" />
-                        <Separator></Separator>
-                        <MenuItem Header="Reset date"
-                                  Command="{Binding ResetDateCommand, ElementName=root}" />
-                    </MenuFlyout>
+                    <MenuFlyout Placement="Bottom"
+                                Opening="PopupFlyoutBase_OnOpening"
+                                ItemsSource="{Binding SelectorMenuItems, ElementName=root}" />
                 </DropDownButton.Flyout>
             </DropDownButton>
         </StackPanel>

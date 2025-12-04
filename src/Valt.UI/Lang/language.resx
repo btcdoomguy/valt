@@ -632,4 +632,34 @@
     <data name="Offline.Line2" xml:space="preserve">
         <value>You are seeing the last recorded prices.</value>
     </data>
+    <data name="Reports.Summary" xml:space="preserve">
+        <value>Summary</value>
+    </data>
+    <data name="Reports.MonthlyTotals" xml:space="preserve">
+        <value>Monthly Totals</value>
+    </data>
+    <data name="Reports.MonthlyTotals.TotalWealth" xml:space="preserve">
+        <value>Total wealth</value>
+    </data>
+    <data name="Reports.MonthlyTotals.Date" xml:space="preserve">
+        <value>Date</value>
+    </data>
+    <data name="Reports.MonthlyTotals.PreviousMonth" xml:space="preserve">
+        <value>% from previous month</value>
+    </data>
+    <data name="Reports.MonthlyTotals.PreviousYear" xml:space="preserve">
+        <value>% from previous year</value>
+    </data>
+    <data name="Reports.AllTimeHigh.Title" xml:space="preserve">
+        <value>Your all-time high</value>
+    </data>
+    <data name="Reports.AllTimeHigh.AllTimeHigh" xml:space="preserve">
+        <value>All-time high</value>
+    </data>
+    <data name="Reports.AllTimeHigh.Date" xml:space="preserve">
+        <value>Date</value>
+    </data>
+    <data name="Reports.AllTimeHigh.DeclineFromAth" xml:space="preserve">
+        <value>Current difference</value>
+    </data>
 </root>

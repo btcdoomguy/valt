@@ -7,12 +7,12 @@ namespace Valt.UI.Helpers;
 
 public class FixedExpenseHelper
 {
-    private readonly AccountsTotalState _accountsTotalState;
+    private readonly RatesState _ratesState;
     private readonly CurrencySettings _currencySettings;
 
-    public FixedExpenseHelper(AccountsTotalState accountsTotalState, CurrencySettings currencySettings)
+    public FixedExpenseHelper(RatesState ratesState, CurrencySettings currencySettings)
     {
-        _accountsTotalState = accountsTotalState;
+        _ratesState = ratesState;
         _currencySettings = currencySettings;
     }
 
@@ -35,28 +35,28 @@ public class FixedExpenseHelper
         if (displayCurrency == FiatCurrency.Usd.Code &&
             _currencySettings.MainFiatCurrency != FiatCurrency.Usd.Code)
         {
-            if (!_accountsTotalState.FiatRates.ContainsKey(_currencySettings.MainFiatCurrency))
+            if (!_ratesState.FiatRates.ContainsKey(_currencySettings.MainFiatCurrency))
                 throw new ApplicationException("Currency not found");
 
-            fixedAmountMin = _accountsTotalState.FiatRates[_currencySettings.MainFiatCurrency] *
+            fixedAmountMin = _ratesState.FiatRates[_currencySettings.MainFiatCurrency] *
                              fixedAmountMin;
-            fixedAmountMax = _accountsTotalState.FiatRates[_currencySettings.MainFiatCurrency] *
+            fixedAmountMax = _ratesState.FiatRates[_currencySettings.MainFiatCurrency] *
                              fixedAmountMax;
         }
         else if (displayCurrency != _currencySettings.MainFiatCurrency)
         {
-            if (!_accountsTotalState.FiatRates.ContainsKey(displayCurrency))
+            if (!_ratesState.FiatRates.ContainsKey(displayCurrency))
                 throw new ApplicationException("Currency not found");
 
             //convert to usd then back
             var fixedAmountMinConvertedToUsd =
-                fixedAmountMin / _accountsTotalState.FiatRates[displayCurrency];
-            fixedAmountMin = _accountsTotalState.FiatRates[_currencySettings.MainFiatCurrency] *
+                fixedAmountMin / _ratesState.FiatRates[displayCurrency];
+            fixedAmountMin = _ratesState.FiatRates[_currencySettings.MainFiatCurrency] *
                              fixedAmountMinConvertedToUsd;
 
             var fixedAmountMaxConvertedToUsd =
-                fixedAmountMax / _accountsTotalState.FiatRates[displayCurrency];
-            fixedAmountMax = _accountsTotalState.FiatRates[_currencySettings.MainFiatCurrency] *
+                fixedAmountMax / _ratesState.FiatRates[displayCurrency];
+            fixedAmountMax = _ratesState.FiatRates[_currencySettings.MainFiatCurrency] *
                              fixedAmountMaxConvertedToUsd;
         }
 

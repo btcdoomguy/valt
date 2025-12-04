@@ -9,52 +9,49 @@ using Valt.Core.Common;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Messages;
 using Valt.Infra.Modules.Budget.Accounts.Queries.DTOs;
 using Valt.Infra.Settings;
+using Valt.UI.State.Events;
 
 namespace Valt.UI.State;
 
-public partial class AccountsTotalState : ObservableObject, IRecipient<LivePriceUpdateMessage>,
+public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpdated>,
     IRecipient<AccountSummariesDTO>, IDisposable
 {
     private readonly Lock _calculationLock = new();
     
     private readonly CurrencySettings _currencySettings;
+    private readonly RatesState _ratesState;
     private readonly ILogger<AccountsTotalState> _logger;
-
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(CurrentWealth))]
-    private decimal? _bitcoinPrice;
-
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(CurrentWealth))]
-    private IReadOnlyDictionary<string, decimal>? _fiatRates;
-
+    
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(CurrentWealth))]
     private AccountSummariesDTO? _accountSummaries;
 
     public Wealth CurrentWealth => CalculateCurrentWealth();
 
-    public AccountsTotalState(CurrencySettings currencySettings, ILogger<AccountsTotalState> logger)
+    public AccountsTotalState(CurrencySettings currencySettings, RatesState ratesState, ILogger<AccountsTotalState> logger)
     {
         _currencySettings = currencySettings;
+        _ratesState = ratesState;
         _logger = logger;
-        WeakReferenceMessenger.Default.Register<LivePriceUpdateMessage>(this);
+        WeakReferenceMessenger.Default.Register<RatesUpdated>(this);
         WeakReferenceMessenger.Default.Register<AccountSummariesDTO>(this);
-    }
-
-    public void Receive(LivePriceUpdateMessage message)
-    {
-        BitcoinPrice = message.Btc.Items.SingleOrDefault(x => x.CurrencyCode == FiatCurrency.Usd.Code)!.Price;
-        FiatRates = message.Fiat.Items.ToDictionary(x => x.CurrencyCode, x => x.Price);
     }
 
     public void Receive(AccountSummariesDTO message)
     {
         AccountSummaries = message;
     }
+    
+    public void Receive(RatesUpdated message)
+    {
+        OnPropertyChanged(nameof(CurrentWealth));
+    }
 
+    //TODO: test this urgently
     private Wealth CalculateCurrentWealth()
     {
         lock (_calculationLock)
         {
-            if (BitcoinPrice is null || FiatRates is null || AccountSummaries is null)
+            if (_ratesState.BitcoinPrice is null || _ratesState.FiatRates is null || AccountSummaries is null)
             {
                 _logger.LogWarning("[AccountsTotalState] Bitcoin price, fiat rates or account summaries not set");
                 return Wealth.Empty;
@@ -76,19 +73,19 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<LivePrice
                     if (fiatAccount.Currency == FiatCurrency.Usd.Code)
                     {
                         wealthInMainFiatCurrency +=
-                            FiatRates[_currencySettings.MainFiatCurrency] * fiatAccount.FiatTotal.GetValueOrDefault();
+                            _ratesState.FiatRates[_currencySettings.MainFiatCurrency] * fiatAccount.FiatTotal.GetValueOrDefault();
                         allWealthPricedInSats += BtcPriceCalculator
-                            .CalculateBtcAmountOfFiat(fiatAccount.FiatTotal.GetValueOrDefault(), 1, BitcoinPrice.Value);
+                            .CalculateBtcAmountOfFiat(fiatAccount.FiatTotal.GetValueOrDefault(), 1, _ratesState.BitcoinPrice.Value);
                     }
                     else
                     {
-                        if (!FiatRates.ContainsKey(fiatAccount.Currency))
+                        if (!_ratesState.FiatRates.ContainsKey(fiatAccount.Currency))
                             throw new ApplicationException(
                                 $"Error calculating total in sats. Fiat rate not found for {fiatAccount.Currency}.");
 
                         allWealthPricedInSats += BtcPriceCalculator
                             .CalculateBtcAmountOfFiat(fiatAccount.FiatTotal.GetValueOrDefault(),
-                                FiatRates[fiatAccount.Currency], BitcoinPrice.Value);
+                                _ratesState.FiatRates[fiatAccount.Currency], _ratesState.BitcoinPrice.Value);
 
                         if (fiatAccount.Currency == _currencySettings.MainFiatCurrency)
                         {
@@ -98,9 +95,9 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<LivePrice
                         {
                             //convert it to dollar, then convert back to main fiat currency
                             var fiatConvertedToUsd =
-                                fiatAccount.FiatTotal.GetValueOrDefault() / FiatRates[fiatAccount.Currency];
+                                fiatAccount.FiatTotal.GetValueOrDefault() / _ratesState.FiatRates[fiatAccount.Currency];
                             wealthInMainFiatCurrency +=
-                                FiatRates[_currencySettings.MainFiatCurrency] * fiatConvertedToUsd;
+                                _ratesState.FiatRates[_currencySettings.MainFiatCurrency] * fiatConvertedToUsd;
                         }
                     }
                 }
@@ -109,7 +106,7 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<LivePrice
 
                 var currentWealthInFiat =
                     Math.Round(
-                        allWealthPricedInBtc.Btc * BitcoinPrice.Value * FiatRates[_currencySettings.MainFiatCurrency],
+                        allWealthPricedInBtc.Btc * _ratesState.BitcoinPrice.Value * _ratesState.FiatRates[_currencySettings.MainFiatCurrency],
                         2);
 
                 var wealthInBtcRatio = 0m;
@@ -139,7 +136,7 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<LivePrice
 
     public void Dispose()
     {
-        WeakReferenceMessenger.Default.Unregister<LivePriceUpdateMessage>(this);
+        WeakReferenceMessenger.Default.Unregister<RatesUpdated>(this);
         WeakReferenceMessenger.Default.Unregister<AccountSummariesDTO>(this);
     }
 }

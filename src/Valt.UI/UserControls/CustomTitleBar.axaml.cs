@@ -109,6 +109,4 @@ public partial class CustomTitleBar : UserControl
     {
         AvaloniaXamlLoader.Load(this);
     }
-
-
 }

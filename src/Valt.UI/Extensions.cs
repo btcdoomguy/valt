@@ -41,7 +41,7 @@ public static class Extensions
         services.AddSingleton<TransactionsViewModel>();
         services.AddSingleton<ReportsViewModel>();
         //factory method for pages
-        services.AddSingleton<Func<MainViewTabNames, ValtViewModel>>(services => pageNames =>
+        services.AddSingleton<Func<MainViewTabNames, ValtTabViewModel>>(services => pageNames =>
         {
             return pageNames switch
             {
@@ -157,6 +157,7 @@ public static class Extensions
         services.AddSingleton<IModalFactory, ModalFactory>();
 
         //state objects
+        services.AddSingleton<RatesState>();
         services.AddSingleton<AccountsTotalState>();
         services.AddSingleton<FilterState>();
         services.AddSingleton<LiveRateState>();

@@ -32,7 +32,9 @@
                                    VerticalAlignment="Center"
                                    Text="{x:Static local:language.Settings_MainFiatCurrency}" TextWrapping="Wrap" />
                         <ComboBox ItemsSource="{Binding AvailableFiatCurrencies}"
-                                  SelectedItem="{Binding MainFiatCurrency}" Width="100" />
+                                  DisplayMemberBinding="{Binding Text}"
+                                  SelectedValueBinding="{Binding Value}"
+                                  SelectedValue="{Binding MainFiatCurrency}" Width="100" />
                     </DockPanel>
                     <DockPanel>
                         <TextBlock Width="220" TextAlignment="Right" Margin="0,0,5,0"
