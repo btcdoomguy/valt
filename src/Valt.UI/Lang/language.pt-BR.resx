@@ -627,4 +627,34 @@
     <data name="Offline.Line2" xml:space="preserve">
         <value>Você está vendo os últimos preços disponíveis.</value>
     </data>
+    <data name="Reports.Summary" xml:space="preserve">
+        <value>Resumo</value>
+    </data>
+    <data name="Reports.MonthlyTotals" xml:space="preserve">
+        <value>Totais por mês</value>
+    </data>
+    <data name="Reports.MonthlyTotals.TotalWealth" xml:space="preserve">
+        <value>Patrimônio total</value>
+    </data>
+    <data name="Reports.MonthlyTotals.PreviousMonth" xml:space="preserve">
+        <value>% do último mês</value>
+    </data>
+    <data name="Reports.MonthlyTotals.PreviousYear" xml:space="preserve">
+        <value>% do último ano</value>
+    </data>
+    <data name="Reports.MonthlyTotals.Date" xml:space="preserve">
+        <value>Data</value>
+    </data>
+    <data name="Reports.AllTimeHigh.Title" xml:space="preserve">
+        <value>Sua máxima histórica</value>
+    </data>
+    <data name="Reports.AllTimeHigh.AllTimeHigh" xml:space="preserve">
+        <value>Máxima histórica</value>
+    </data>
+    <data name="Reports.AllTimeHigh.Date" xml:space="preserve">
+        <value>Data</value>
+    </data>
+    <data name="Reports.AllTimeHigh.DeclineFromAth" xml:space="preserve">
+        <value>Diferença atual</value>
+    </data>
 </root>

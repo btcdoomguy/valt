@@ -19,7 +19,7 @@ public static class FinancialCalculator
 
         var baseForPercentage = Math.Abs(previousValue);
 
-        var percentage = (change / baseForPercentage) * 100m;
+        var percentage = Math.Round((change / baseForPercentage) * 100m, 2);
 
         return percentage;
     }

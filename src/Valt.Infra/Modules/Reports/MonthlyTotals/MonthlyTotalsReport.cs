@@ -209,17 +209,17 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
                         new MonthlyTotal(Math.Round(monthlyValueChange, 2), bitcoinCurrentScanDateTotals);
                 }
             }
-
-            var lastYear = new DateOnly(_monthYear.Year - 1, 12, 1);
-
+            
             var resultSet = monthlyTotals.Select(monthlyTotal =>
             {
                 var previousMonth = monthlyTotal.Key.AddMonths(-1);
+                var previousYear = new DateOnly(monthlyTotal.Key.Year - 1, 12, 1);
 
                 var btcMonthlyChange = 0m;
                 var fiatMonthlyChange = 0m;
                 var btcYearlyChange = 0m;
                 var fiatYearlyChange = 0m;
+                
                 if (monthlyTotals.TryGetValue(previousMonth, out var previousMonthData))
                 {
                     btcMonthlyChange =
@@ -230,7 +230,7 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
                             monthlyTotal.Value.Fiat);
                 }
 
-                if (monthlyTotals.TryGetValue(lastYear, out var lastYearData))
+                if (monthlyTotals.TryGetValue(previousYear, out var lastYearData))
                 {
                     btcYearlyChange = FinancialCalculator.CalculateImprovementPercentage(lastYearData.Bitcoin, monthlyTotal.Value.Bitcoin);
                     fiatYearlyChange = FinancialCalculator.CalculateImprovementPercentage(lastYearData.Fiat, monthlyTotal.Value.Fiat);

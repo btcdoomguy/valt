@@ -1262,5 +1262,65 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Offline.Line2", resourceCulture);
             }
         }
+        
+        public static string Reports_Summary {
+            get {
+                return ResourceManager.GetString("Reports.Summary", resourceCulture);
+            }
+        }
+        
+        public static string Reports_MonthlyTotals {
+            get {
+                return ResourceManager.GetString("Reports.MonthlyTotals", resourceCulture);
+            }
+        }
+        
+        public static string Reports_MonthlyTotals_TotalWealth {
+            get {
+                return ResourceManager.GetString("Reports.MonthlyTotals.TotalWealth", resourceCulture);
+            }
+        }
+        
+        public static string Reports_MonthlyTotals_Date {
+            get {
+                return ResourceManager.GetString("Reports.MonthlyTotals.Date", resourceCulture);
+            }
+        }
+        
+        public static string Reports_MonthlyTotals_PreviousMonth {
+            get {
+                return ResourceManager.GetString("Reports.MonthlyTotals.PreviousMonth", resourceCulture);
+            }
+        }
+        
+        public static string Reports_MonthlyTotals_PreviousYear {
+            get {
+                return ResourceManager.GetString("Reports.MonthlyTotals.PreviousYear", resourceCulture);
+            }
+        }
+        
+        public static string Reports_AllTimeHigh_Title {
+            get {
+                return ResourceManager.GetString("Reports.AllTimeHigh.Title", resourceCulture);
+            }
+        }
+        
+        public static string Reports_AllTimeHigh_AllTimeHigh {
+            get {
+                return ResourceManager.GetString("Reports.AllTimeHigh.AllTimeHigh", resourceCulture);
+            }
+        }
+        
+        public static string Reports_AllTimeHigh_Date {
+            get {
+                return ResourceManager.GetString("Reports.AllTimeHigh.Date", resourceCulture);
+            }
+        }
+        
+        public static string Reports_AllTimeHigh_DeclineFromAth {
+            get {
+                return ResourceManager.GetString("Reports.AllTimeHigh.DeclineFromAth", resourceCulture);
+            }
+        }
     }
 }

@@ -13,7 +13,7 @@
         <StackPanel Orientation="Vertical">
             <Label HorizontalContentAlignment="Center"
                    Content="{Binding Title}"
-                   Background="{DynamicResource Background800Brush}" />
+                   Background="{DynamicResource Background800Brush}" FontSize="18" />
 
             <ItemsControl ItemsSource="{Binding Rows}">
                 <ItemsControl.ItemTemplate>
@@ -24,12 +24,12 @@
                                 Background="{DynamicResource Background900Brush}">
                             <DockPanel LastChildFill="True">
                                 <TextBlock Text="{Binding LeftText}"
-                                           FontSize="12"
+                                           FontSize="14"
                                            DockPanel.Dock="Left"
                                            VerticalAlignment="Center"/>
 
                                 <TextBlock Text="{Binding RightText}"
-                                           FontSize="12"
+                                           FontSize="14"
                                            DockPanel.Dock="Right"
                                            HorizontalAlignment="Right"
                                            VerticalAlignment="Center"/>

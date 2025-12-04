@@ -29,12 +29,12 @@ internal class DatabaseInitializer : IDatabaseInitializer
 
     public async Task InitializeAsync()
     {
-        var fiatAccount = FiatAccount.New(_initialCategoryNameLanguageProvider.Get(InitialCategoryNames.BtcAccount),
+        var fiatAccount = FiatAccount.New(_initialCategoryNameLanguageProvider.Get(InitialCategoryNames.FiatAccount),
             true, new Icon("MaterialSymbolsOutlined", "account_balanced", '\ue84f', Color.FromArgb(-16731500)),
             FiatCurrency.Brl, FiatValue.Empty);
         await _accountRepository.SaveAccountAsync(fiatAccount);
 
-        var btcAccount = BtcAccount.New(_initialCategoryNameLanguageProvider.Get(InitialCategoryNames.FiatAccount), true,
+        var btcAccount = BtcAccount.New(_initialCategoryNameLanguageProvider.Get(InitialCategoryNames.BtcAccount), true,
             new Icon("MaterialSymbolsOutlined", "currency_bitcoin", '\uebc5', Color.FromArgb(-33532)), BtcValue.Empty);
         await _accountRepository.SaveAccountAsync(btcAccount);
 

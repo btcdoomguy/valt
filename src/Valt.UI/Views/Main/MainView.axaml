@@ -61,7 +61,6 @@
                                 <MenuItem Header="{x:Static local:language.Main_Menu_About}"
                                           Command="{Binding AboutCommand}">
                                 </MenuItem>
-                                <MenuItem Header="Testar ath" Command="{Binding TestAllTimeHighCalculationCommand}"></MenuItem>
                             </MenuFlyout>
                         </DropDownButton.Flyout>
                     </DropDownButton>

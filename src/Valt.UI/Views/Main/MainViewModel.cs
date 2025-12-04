@@ -361,16 +361,7 @@ public partial class MainViewModel : ValtViewModel
 
         await modal.ShowDialog(Window!);
     }
-
-    [RelayCommand]
-    private async Task TestAllTimeHighCalculation()
-    {
-        var report = await _allTimeHighReport.GetAsync(FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency));
-
-        await MessageBoxHelper.ShowAlertAsync("eae", $"Seu ath foi em {report.Date} com R${report.Value.Value} - queda de {report.DeclineFromAth}",
-            Window!);
-    }
-
+    
     private void JobOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (Jobs.All(x => x.State == BackgroundJobState.Ok))

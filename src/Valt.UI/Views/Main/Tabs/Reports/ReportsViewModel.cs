@@ -2,21 +2,26 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
+using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
+using Valt.UI.Lang;
 using Valt.UI.Services.LocalStorage;
 using Valt.UI.State;
 using Valt.UI.UserControls;
+using Valt.UI.Views.Main.Tabs.Reports.Models;
 using Valt.UI.Views.Main.Tabs.Transactions;
 
 namespace Valt.UI.Views.Main.Tabs.Reports;
@@ -30,20 +35,21 @@ public partial class ReportsViewModel : ValtTabViewModel
 
     [ObservableProperty] private DashboardData _allTimeHighData;
     [ObservableProperty] private MonthlyTotalsData _monthlyTotalsData;
+    [ObservableProperty] private AvaloniaList<MonthlyReportItemViewModel> _monthlyReportItems = new();
     [ObservableProperty] private MonthlyTotalsChartData _monthlyTotalsChartData = new();
     [ObservableProperty] private DateTime _filterMainDate;
     [ObservableProperty] private DateRange _filterRange;
 
     #region Design-time constructor
-    
+
     public ReportsViewModel()
     {
         if (Design.IsDesignMode)
         {
             FilterMainDate = DateTime.UtcNow.Date;
             FilterRange = new DateRange(DateTime.UtcNow.Date.AddYears(-1), DateTime.UtcNow.Date);
-            
-            AllTimeHighData = new DashboardData("My all-time high", [
+
+            AllTimeHighData = new DashboardData("Your all-time high", [
                 new("ATH (R$):", "R$ 100.000,00"),
                 new("Date:", "10/06/2025"),
                 new("Decline from ATH:", "-30%")
@@ -51,7 +57,7 @@ public partial class ReportsViewModel : ValtTabViewModel
 
             MonthlyTotalsData = new MonthlyTotalsData()
             {
-                MainCurrency = FiatCurrency.Usd,
+                MainCurrency = FiatCurrency.Brl,
                 Items = new List<MonthlyTotalsData.Item>
                 {
                     new MonthlyTotalsData.Item()
@@ -188,9 +194,12 @@ public partial class ReportsViewModel : ValtTabViewModel
             };
 
             MonthlyTotalsChartData.RefreshChart(MonthlyTotalsData);
+
+            MonthlyReportItems.AddRange(
+                MonthlyTotalsData.Items.Select(x => new MonthlyReportItemViewModel(FiatCurrency.Brl, x)));
         }
     }
-    
+
     #endregion
 
     public ReportsViewModel(IAllTimeHighReport allTimeHighReport,
@@ -207,6 +216,17 @@ public partial class ReportsViewModel : ValtTabViewModel
         FilterRange = new DateRange(new DateTime(FilterMainDate.Year, 1, 1), new DateTime(FilterMainDate.Year, 12, 31));
 
         _ = InitializeAsync();
+        
+        WeakReferenceMessenger.Default.Register<SettingsChangedMessage>(this, (recipient, message) =>
+        {
+            switch (message.Value)
+            {
+                case nameof(CurrencySettings.MainFiatCurrency):
+                    _ = FetchAllTimeHighDataAsync();
+                    _ = FetchMonthlyTotalsAsync();
+                    break;
+            }
+        });
     }
 
     private async Task InitializeAsync()
@@ -222,18 +242,18 @@ public partial class ReportsViewModel : ValtTabViewModel
 
     private async Task FetchAllTimeHighDataAsync()
     {
-        var cultureInfo = CultureInfo.GetCultureInfo(LocalStorageHelper.LoadCulture());
+        var fiatCurrency = FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency);
 
         var allTimeHighData =
             await _allTimeHighReport.GetAsync(FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency));
 
         Dispatcher.UIThread.Post(() =>
         {
-            AllTimeHighData = new DashboardData("My all-time high", new ObservableCollection<RowItem>()
+            AllTimeHighData = new DashboardData(language.Reports_AllTimeHigh_Title, new ObservableCollection<RowItem>()
             {
-                new("All-time high", $"R$ {allTimeHighData.Value.Value.ToString(cultureInfo)}"),
-                new("Date", allTimeHighData.Date.ToString()),
-                new("Decline from ATH", $"{allTimeHighData.DeclineFromAth}%")
+                new(language.Reports_AllTimeHigh_AllTimeHigh, $"{CurrencyDisplay.FormatFiat(allTimeHighData.Value, fiatCurrency.Code)}"),
+                new(language.Reports_AllTimeHigh_Date, allTimeHighData.Date.ToString()),
+                new(language.Reports_AllTimeHigh_DeclineFromAth, $"{allTimeHighData.DeclineFromAth}%")
             });
         });
     }
@@ -247,6 +267,11 @@ public partial class ReportsViewModel : ValtTabViewModel
         MonthlyTotalsData = monthlyTotalsData;
 
         MonthlyTotalsChartData.RefreshChart(monthlyTotalsData);
+
+        MonthlyReportItems.Clear();
+
+        MonthlyReportItems.AddRange(monthlyTotalsData.Items.Select(x =>
+            new MonthlyReportItemViewModel(FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency), x)));
     }
 
     public override MainViewTabNames TabName => MainViewTabNames.ReportsPageContent;

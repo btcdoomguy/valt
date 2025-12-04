@@ -17,22 +17,24 @@ namespace Valt.UI.Views.Main.Tabs.Reports;
 public class MonthlyTotalsChartData
 {
     public FiatCurrency FiatCurrency { get; set; }
-    public ObservableCollection<DateTimePoint> FiatValues { get; } = new();
-    public ObservableCollection<DateTimePoint> BtcValues  { get; } = new();
-    
+    public ObservableCollection<ObservablePoint> FiatValues { get; } = new();
+    public ObservableCollection<ObservablePoint> BtcValues { get; } = new();
+    private ObservableCollection<string> MonthLabels { get; } = new();
+
     public Axis[] XAxes { get; } = new Axis[1];
 
     public Axis[] YAxes { get; } = new Axis[2];
 
     public MonthlyTotalsChartData()
     {
-
         XAxes[0] =
-            new DateTimeAxis(TimeSpan.FromDays(27), date => date.ToString("MMM yyyy"))
+            new Axis
             {
-                MinStep = 27, // Enforces min 27-day step (approx. 1 month) as double (days)
+                ForceStepToMin = true,
+                MinStep = 1,
                 SeparatorsPaint = new SolidColorPaint(SKColors.LightSlateGray.WithAlpha(90)) { StrokeThickness = 1 },
-                Position = AxisPosition.End
+                Position = AxisPosition.End,
+                Labels = MonthLabels
             };
 
         YAxes[0] = new Axis
@@ -42,7 +44,7 @@ public class MonthlyTotalsChartData
             Labeler = FiatLabeler,
             SeparatorsPaint = new SolidColorPaint(SKColors.LightGray) { StrokeThickness = 1 }
         };
-        
+
         YAxes[1] = new Axis
         {
             Name = "Bitcoin",
@@ -60,7 +62,7 @@ public class MonthlyTotalsChartData
 
     private string FiatLabeler(double arg)
     {
-        return CurrencyDisplay.FormatFiat((decimal) arg, FiatCurrency.Code);
+        return CurrencyDisplay.FormatFiat((decimal)arg, FiatCurrency?.Code ?? FiatCurrency.Usd.Code);
     }
 
     public void RefreshChart(MonthlyTotalsData monthlyTotalsData)
@@ -68,13 +70,15 @@ public class MonthlyTotalsChartData
         FiatCurrency = monthlyTotalsData.MainCurrency;
         FiatValues.Clear();
         BtcValues.Clear();
+        MonthLabels.Clear();
 
-        foreach (var item in monthlyTotalsData.Items)
+        for (var index = 0; index < monthlyTotalsData.Items.Count; index++)
         {
-            var date = item.MonthYear.ToDateTime(new TimeOnly(0, 0));
-
-            FiatValues.Add(new DateTimePoint(date, (double)item.FiatTotal));
-            BtcValues.Add(new DateTimePoint(date, (double)item.BtcTotal));
+            var item = monthlyTotalsData.Items[index];
+            
+            MonthLabels.Add(item.MonthYear.ToString("MMM yyyy", CultureInfo.InvariantCulture));
+            FiatValues.Add(new ObservablePoint(index, (double)item.FiatTotal));
+            BtcValues.Add(new ObservablePoint(index, (double)item.BtcTotal));
         }
     }
 }
