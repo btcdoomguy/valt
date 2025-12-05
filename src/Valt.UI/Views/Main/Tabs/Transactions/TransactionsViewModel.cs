@@ -236,16 +236,10 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
             if (_accountsTotalState is null) return;
             if (_currencySettings is null) return;
 
-            AllWealthInSats =
-                (Convert.ToDecimal(_accountsTotalState.CurrentWealth.AllWealthInSats) / 100_000_000m).ToString(
-                    CultureInfo.InvariantCulture);
-            WealthInSats =
-                (Convert.ToDecimal(_accountsTotalState.CurrentWealth.WealthInSats) / 100_000_000m).ToString(CultureInfo
-                    .InvariantCulture);
-            WealthNotInSats =
-                (Convert.ToDecimal(_accountsTotalState.CurrentWealth.AllWealthInSats -
-                                   _accountsTotalState.CurrentWealth.WealthInSats) / 100_000_000m).ToString(CultureInfo
-                    .InvariantCulture);
+            AllWealthInSats = CurrencyDisplay.FormatSatsAsBitcoin(_accountsTotalState.CurrentWealth.AllWealthInSats);
+            WealthInSats = CurrencyDisplay.FormatSatsAsBitcoin(_accountsTotalState.CurrentWealth.WealthInSats);
+            WealthNotInSats =CurrencyDisplay.FormatSatsAsBitcoin(_accountsTotalState.CurrentWealth.AllWealthInSats -
+                                                                 _accountsTotalState.CurrentWealth.WealthInSats);
             AllWealthInFiat = CurrencyDisplay.FormatFiat(_accountsTotalState.CurrentWealth.AllWealthInMainFiatCurrency,
                 _currencySettings.MainFiatCurrency);
             WealthInFiat = CurrencyDisplay.FormatFiat(_accountsTotalState.CurrentWealth.WealthInMainFiatCurrency,

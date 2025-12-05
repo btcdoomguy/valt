@@ -112,6 +112,7 @@ public partial class MainViewModel : ValtViewModel
         HasDatabaseOpen = true;
         _currencySettings.MainFiatCurrency = FiatCurrency.Brl.Code;
         SelectedTabComponent = _pageFactory.Create(MainViewTabNames.TransactionsPageContent);
+        IsOffline = true;
     }
 
     public MainViewModel(IPageFactory pageFactory,

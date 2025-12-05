@@ -55,7 +55,7 @@ public partial class LiveRatesViewModel : ObservableObject, IDisposable
     [NotifyPropertyChangedFor(nameof(BtcFiatVariationBrush))]
     private decimal? _previousBtcFiatPrice;
     [ObservableProperty] private bool _hasDatabaseOpen;
-    public string BtcUsdText => $"{BtcUsdPrice.ToString("C", CurrencyDisplay.NumberFormat)}";
+    public string BtcUsdText => $"{CurrencyDisplay.FormatFiat(BtcUsdPrice, FiatCurrency.Usd.Code)}";
     public bool ShowUsdFiatLabels => _currencySettings.MainFiatCurrency != FiatCurrency.Usd.Code;
 
     public string BtcUsdVariationText
@@ -114,7 +114,7 @@ public partial class LiveRatesViewModel : ObservableObject, IDisposable
     }
     
     public string UsdWithPairText => $"USD/{_currencySettings.MainFiatCurrency}";
-    public string UsdText => $"{UsdPrice.ToString("C", CurrencyDisplay.NumberFormat)}";
+    public string UsdText => $"{CurrencyDisplay.FormatFiat(UsdPrice, _currencySettings.MainFiatCurrency)}";
     
     public string UsdVariationText
     {
