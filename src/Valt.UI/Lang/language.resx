@@ -662,4 +662,7 @@
     <data name="Reports.AllTimeHigh.DeclineFromAth" xml:space="preserve">
         <value>Current difference</value>
     </data>
+    <data name="Reports.MonthlyTotals.Obs" xml:space="preserve">
+        <value>* latest totals are calculated based on yesterday amounts</value>
+    </data>
 </root>

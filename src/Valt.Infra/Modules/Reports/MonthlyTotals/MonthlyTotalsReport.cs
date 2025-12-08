@@ -120,6 +120,11 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
             var accountCurrentScanDateTotals = new Dictionary<ObjectId, decimal>();
             var bitcoinCurrentScanDateTotals = 0m;
 
+            var accountIncomeTotals = new Dictionary<ObjectId, decimal>();
+            var accountExpenseTotals = new Dictionary<ObjectId, decimal>();
+            var accountPurchaseTotals = new Dictionary<ObjectId, decimal>();
+            var accountSoldTotals = new Dictionary<ObjectId, decimal>();
+
             var currentScanDate = _startDate.AddDays(-1);
             while (currentScanDate < _endDate)
             {
@@ -141,6 +146,15 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
                                 bitcoinCurrentScanDateTotals += accountCurrentScanDateTotals[accountId];
                         }
 
+                        if (!accountIncomeTotals.ContainsKey(accountId))
+                            accountIncomeTotals[accountId] = 0;
+                        if (!accountExpenseTotals.ContainsKey(accountId))
+                            accountExpenseTotals[accountId] = 0;
+                        if (!accountPurchaseTotals.ContainsKey(accountId))
+                            accountPurchaseTotals[accountId] = 0;
+                        if (!accountSoldTotals.ContainsKey(accountId))
+                            accountSoldTotals[accountId] = 0;
+
                         var transactionsOfDate = _transactionsByDate[currentScanDate];
 
                         var fromAccount = transactionsOfDate.Where(x => x.FromAccountId == accountId);
@@ -153,13 +167,40 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
 
                             accountCurrentScanDateTotals[accountId] += change;
                             bitcoinCurrentScanDateTotals += change;
+
+                            var incomeValue = fromAccount
+                                .Where(x => x.Type == TransactionEntityType.Bitcoin && x.FromSatAmount > 0)
+                                .Sum(x => x.FromSatAmount.GetValueOrDefault() / 100_000_000m);
+                            var expenseValue = fromAccount
+                                .Where(x => x.Type == TransactionEntityType.Bitcoin && x.FromSatAmount < 0)
+                                .Sum(x => x.FromSatAmount.GetValueOrDefault() / 100_000_000m);
+                            var purchaseValue = toAccount
+                                .Where(x => x.Type == TransactionEntityType.FiatToBitcoin && x.ToSatAmount > 0)
+                                .Sum(x => x.ToSatAmount.GetValueOrDefault() / 100_000_000m);
+                            var soldValue = fromAccount
+                                .Where(x => x.Type == TransactionEntityType.BitcoinToFiat && x.FromSatAmount < 0)
+                                .Sum(x => x.FromSatAmount.GetValueOrDefault() / 100_000_000m);
+                            
+                            accountIncomeTotals[accountId] += incomeValue;
+                            accountExpenseTotals[accountId] += expenseValue;
+                            accountPurchaseTotals[accountId] += purchaseValue;
+                            accountSoldTotals[accountId] += soldValue;
                         }
                         else
                         {
                             var change = fromAccount.Sum(x => x.FromFiatAmount.GetValueOrDefault());
                             change += toAccount.Sum(x => x.ToFiatAmount.GetValueOrDefault());
-
                             accountCurrentScanDateTotals[accountId] += change;
+
+                            var incomeValue = fromAccount
+                                .Where(x => x.Type == TransactionEntityType.Fiat && x.FromFiatAmount > 0)
+                                .Sum(x => x.FromFiatAmount.GetValueOrDefault());
+                            var expenseValue = fromAccount
+                                .Where(x => x.Type == TransactionEntityType.Fiat && x.FromFiatAmount < 0)
+                                .Sum(x => x.FromFiatAmount.GetValueOrDefault());
+                            
+                            accountIncomeTotals[accountId] += incomeValue;
+                            accountExpenseTotals[accountId] += expenseValue;
                         }
                     }
                 }
@@ -170,6 +211,12 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
                     currentScanDate == _endDate)
                 {
                     var monthlyValueChange = 0m;
+                    var monthlyIncomeChange = 0m;
+                    var monthlyExpenseChange = 0m;
+                    var monthlyBitcoinIncomeChange = 0m;
+                    var monthlyBitcoinExpenseChange = 0m;
+                    var monthlyBitcoinPurchaseChange = 0m;
+                    var monthlyBitcoinSoldChange = 0m;
                     foreach (var account in _accounts.Values)
                     {
                         if (!accountCurrentScanDateTotals.ContainsKey(account.Id))
@@ -178,38 +225,56 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
                         if (account.AccountEntityType == AccountEntityType.Bitcoin)
                         {
                             //convert it to dollar, then convert back to main fiat currency
-                            var valueOnUsd =
-                                accountCurrentScanDateTotals[account.Id] * GetUsdBitcoinPriceAt(currentScanDate);
-
                             monthlyValueChange +=
-                                GetFiatRateAt(currentScanDate, _currency) * valueOnUsd;
+                                GetFiatRateAt(currentScanDate, _currency) * (accountCurrentScanDateTotals[account.Id] *
+                                                                             GetUsdBitcoinPriceAt(currentScanDate));
+
+                            monthlyBitcoinIncomeChange += accountIncomeTotals[account.Id];
+                            monthlyBitcoinExpenseChange += accountExpenseTotals[account.Id];
+                            monthlyBitcoinPurchaseChange += accountPurchaseTotals[account.Id];
+                            monthlyBitcoinSoldChange += accountSoldTotals[account.Id];
                         }
                         else
                         {
                             if (account.Currency == _currency.Code)
                             {
                                 monthlyValueChange += accountCurrentScanDateTotals[account.Id];
+                                monthlyIncomeChange += accountIncomeTotals[account.Id];
+                                monthlyExpenseChange += accountExpenseTotals[account.Id];
                             }
                             else
                             {
                                 //convert it to dollar, then convert back to main fiat currency
-                                var valueOnUsd =
-                                    accountCurrentScanDateTotals[account.Id] / GetFiatRateAt(currentScanDate,
-                                        FiatCurrency.GetFromCode(account.Currency!));
-
+                                var rate = GetFiatRateAt(currentScanDate,
+                                    FiatCurrency.GetFromCode(account.Currency!));
                                 monthlyValueChange +=
-                                    GetFiatRateAt(currentScanDate, _currency) * valueOnUsd;
+                                    GetFiatRateAt(currentScanDate, _currency) *
+                                    (accountCurrentScanDateTotals[account.Id] / rate);
+
+                                monthlyIncomeChange += GetFiatRateAt(currentScanDate, _currency) *
+                                                       (accountIncomeTotals[account.Id] / rate);
+                                monthlyExpenseChange += GetFiatRateAt(currentScanDate, _currency) *
+                                                        (accountExpenseTotals[account.Id] / rate);
                             }
                         }
+
+                        accountIncomeTotals[account.Id] = 0;
+                        accountExpenseTotals[account.Id] = 0;
+                        accountPurchaseTotals[account.Id] = 0;
+                        accountSoldTotals[account.Id] = 0;
                     }
 
                     var currentMonthYear = new DateOnly(currentScanDate.Year, currentScanDate.Month, 1);
 
                     monthlyTotals[currentMonthYear] =
-                        new MonthlyTotal(Math.Round(monthlyValueChange, 2), bitcoinCurrentScanDateTotals);
+                        new MonthlyTotal(Math.Round(monthlyValueChange, 2), bitcoinCurrentScanDateTotals,
+                            Math.Round(monthlyIncomeChange, 2), Math.Round(monthlyExpenseChange, 2),
+                            Math.Round(monthlyBitcoinIncomeChange, 8), Math.Round(monthlyBitcoinExpenseChange, 8),
+                            Math.Round(monthlyBitcoinPurchaseChange, 8), Math.Round(monthlyBitcoinSoldChange, 8)
+                        );
                 }
             }
-            
+
             var resultSet = monthlyTotals.Select(monthlyTotal =>
             {
                 var previousMonth = monthlyTotal.Key.AddMonths(-1);
@@ -219,7 +284,7 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
                 var fiatMonthlyChange = 0m;
                 var btcYearlyChange = 0m;
                 var fiatYearlyChange = 0m;
-                
+
                 if (monthlyTotals.TryGetValue(previousMonth, out var previousMonthData))
                 {
                     btcMonthlyChange =
@@ -232,8 +297,11 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
 
                 if (monthlyTotals.TryGetValue(previousYear, out var lastYearData))
                 {
-                    btcYearlyChange = FinancialCalculator.CalculateImprovementPercentage(lastYearData.Bitcoin, monthlyTotal.Value.Bitcoin);
-                    fiatYearlyChange = FinancialCalculator.CalculateImprovementPercentage(lastYearData.Fiat, monthlyTotal.Value.Fiat);
+                    btcYearlyChange =
+                        FinancialCalculator.CalculateImprovementPercentage(lastYearData.Bitcoin,
+                            monthlyTotal.Value.Bitcoin);
+                    fiatYearlyChange =
+                        FinancialCalculator.CalculateImprovementPercentage(lastYearData.Fiat, monthlyTotal.Value.Fiat);
                 }
 
                 return new MonthlyTotalsData.Item()
@@ -244,13 +312,20 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
                     BtcYearlyChange = btcYearlyChange,
                     FiatTotal = monthlyTotal.Value.Fiat,
                     FiatMonthlyChange = fiatMonthlyChange,
-                    FiatYearlyChange = fiatYearlyChange
+                    FiatYearlyChange = fiatYearlyChange,
+                    BitcoinExpenses = monthlyTotal.Value.BitcoinExpense,
+                    BitcoinIncome = monthlyTotal.Value.BitcoinIncome,
+                    BitcoinPurchased = monthlyTotal.Value.BitcoinPurchased,
+                    BitcoinSold = monthlyTotal.Value.BitcoinSold,
+                    Income = monthlyTotal.Value.Income,
+                    Expenses = monthlyTotal.Value.Expenses,
                 };
             }).ToList();
-            
+
             //grab only the data of the display range filter
-            
-            resultSet = resultSet.Where(x => x.MonthYear >= _displayRange.Start && x.MonthYear <= _displayRange.End).ToList();
+
+            resultSet = resultSet.Where(x => x.MonthYear >= _displayRange.Start && x.MonthYear <= _displayRange.End)
+                .ToList();
 
             return new MonthlyTotalsData()
             {
@@ -298,5 +373,13 @@ public class MonthlyTotalsReport : IMonthlyTotalsReport
         }
     }
 
-    private record MonthlyTotal(decimal Fiat, decimal Bitcoin);
+    private record MonthlyTotal(
+        decimal Fiat,
+        decimal Bitcoin,
+        decimal Income,
+        decimal Expenses,
+        decimal BitcoinIncome,
+        decimal BitcoinExpense,
+        decimal BitcoinPurchased,
+        decimal BitcoinSold);
 }

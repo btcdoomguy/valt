@@ -11,7 +11,7 @@
              xmlns:immutable="clr-namespace:System.Collections.Immutable;assembly=System.Collections.Immutable"
              xmlns:models="clr-namespace:Valt.UI.Views.Main.Tabs.Reports.Models"
              xmlns:lang="clr-namespace:Valt.UI.Lang"
-             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="1200"
              MinWidth="900"
              MinHeight="700"
              x:Class="Valt.UI.Views.Main.Tabs.Reports.ReportsView"
@@ -73,6 +73,7 @@
                                 ScalesYAt="1" />
                         </avalonia:CartesianChart.Series>
                     </avalonia:CartesianChart>
+                    <TextBlock HorizontalAlignment="Right" FontStyle="Italic" Text="{x:Static lang:language.Reports_MonthlyTotals_Obs}" />
                     <DataGrid
                         x:Name="MonthlyTotalsGrid"
                         Margin="0, 10, 0, 0"
@@ -125,6 +126,54 @@
                                     <DataTemplate DataType="models:MonthlyReportItemViewModel">
                                         <TextBlock Classes="only-text" Text="{Binding FiatYearlyChangeFormatted}"
                                                    Foreground="{Binding FiatYearlyChangeColor}">
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Income">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate DataType="models:MonthlyReportItemViewModel">
+                                        <TextBlock Classes="only-text" Text="{Binding IncomeFormatted}">
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Expenses">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate DataType="models:MonthlyReportItemViewModel">
+                                        <TextBlock Classes="only-text" Text="{Binding ExpensesFormatted}">
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Bitcoin Purchased">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate DataType="models:MonthlyReportItemViewModel">
+                                        <TextBlock Classes="only-text" Text="{Binding BitcoinPurchasedFormatted}">
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Bitcoin Sold">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate DataType="models:MonthlyReportItemViewModel">
+                                        <TextBlock Classes="only-text" Text="{Binding BitcoinSoldFormatted}">
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Bitcoin Income">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate DataType="models:MonthlyReportItemViewModel">
+                                        <TextBlock Classes="only-text" Text="{Binding BitcoinIncomeFormatted}">
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Bitcoin Expenses">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate DataType="models:MonthlyReportItemViewModel">
+                                        <TextBlock Classes="only-text" Text="{Binding BitcoinExpensesFormatted}">
                                         </TextBlock>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>

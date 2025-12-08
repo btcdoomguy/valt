@@ -1322,5 +1322,11 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.AllTimeHigh.DeclineFromAth", resourceCulture);
             }
         }
+        
+        public static string Reports_MonthlyTotals_Obs {
+            get {
+                return ResourceManager.GetString("Reports.MonthlyTotals.Obs", resourceCulture);
+            }
+        }
     }
 }
