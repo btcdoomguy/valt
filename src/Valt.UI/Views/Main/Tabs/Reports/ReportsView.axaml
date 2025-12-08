@@ -73,7 +73,6 @@
                                 ScalesYAt="1" />
                         </avalonia:CartesianChart.Series>
                     </avalonia:CartesianChart>
-                    <TextBlock HorizontalAlignment="Right" FontStyle="Italic" Text="{x:Static lang:language.Reports_MonthlyTotals_Obs}" />
                     <DataGrid
                         x:Name="MonthlyTotalsGrid"
                         Margin="0, 10, 0, 0"
@@ -91,7 +90,7 @@
                             </Styles>
                         </DataGrid.Styles>
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="{x:Static lang:language.Reports_MonthlyTotals_Date}" Binding="{Binding MonthYear}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="{x:Static lang:language.Reports_MonthlyTotals_Date}" Binding="{Binding MonthYearFormatted}"></DataGridTextColumn>
                             <DataGridTextColumn Header="Bitcoin" Binding="{Binding BtcTotal}"></DataGridTextColumn>
                             <DataGridTemplateColumn Header="{x:Static lang:language.Reports_MonthlyTotals_PreviousMonth}">
                                 <DataGridTemplateColumn.CellTemplate>

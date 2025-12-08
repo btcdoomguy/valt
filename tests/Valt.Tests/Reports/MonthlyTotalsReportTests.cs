@@ -130,6 +130,24 @@ public class MonthlyTotalsReportTests : DatabaseTest
 
             currentDate = currentDate.AddDays(1);
         }
+        
+        //some transfers
+        _localDatabase.GetTransactions().Insert(new TransactionBuilder()
+        {
+            CategoryId = _categoryId,
+            Date = DateOnly.FromDateTime(new DateTime(2024, 12, 01)),
+            Name = "BTC to USD Transfer",
+            TransactionDetails = new BitcoinToFiatDetails(_btcAccount.Id.ToString(), _usdAccount.Id.ToString(),
+                BtcValue.ParseSats(10000), FiatValue.New(1000m))
+        }.Build());
+        _localDatabase.GetTransactions().Insert(new TransactionBuilder()
+        {
+            CategoryId = _categoryId,
+            Date = DateOnly.FromDateTime(new DateTime(2025, 1, 01)),
+            Name = "USD to BTC Transfer",
+            TransactionDetails = new FiatToBitcoinDetails(_usdAccount.Id.ToString(), _btcAccount.Id.ToString(),
+                FiatValue.New(1000m), BtcValue.ParseSats(10000))
+        }.Build());
 
         return base.SeedDatabase();
     }
@@ -154,24 +172,24 @@ public class MonthlyTotalsReportTests : DatabaseTest
         Assert.That(result2024.Items[0].Income, Is.EqualTo(1383.33m));
         Assert.That(result2024.Items[0].Expenses, Is.EqualTo(-415m));
         
-        Assert.That(result2024.Items[11].BtcTotal, Is.EqualTo(1.000846m));
-        Assert.That(result2024.Items[11].FiatTotal, Is.EqualTo(576001.63m));
-        Assert.That(result2024.Items[11].BtcMonthlyChange, Is.EqualTo(0.01m));
+        Assert.That(result2024.Items[11].BtcTotal, Is.EqualTo(1.000746m));
+        Assert.That(result2024.Items[11].FiatTotal, Is.EqualTo(581446.63m));
+        Assert.That(result2024.Items[11].BtcMonthlyChange, Is.EqualTo(0.00m));
         Assert.That(result2024.Items[11].BtcYearlyChange, Is.Zero);
         Assert.That(result2024.Items[11].Income, Is.EqualTo(1383.33m));
         Assert.That(result2024.Items[11].Expenses, Is.EqualTo(-415m));
         
         Assert.That(result2025.Items[0].BtcTotal, Is.EqualTo(1.000916m));
         Assert.That(result2025.Items[0].FiatTotal, Is.EqualTo(577008.47m));
-        Assert.That(result2025.Items[0].BtcMonthlyChange, Is.EqualTo(0.01m));
-        Assert.That(result2025.Items[0].BtcYearlyChange, Is.EqualTo(0.01m));
+        Assert.That(result2025.Items[0].BtcMonthlyChange, Is.EqualTo(0.02m));
+        Assert.That(result2025.Items[0].BtcYearlyChange, Is.EqualTo(0.02m));
         Assert.That(result2025.Items[0].Income, Is.EqualTo(1383.33m));
         Assert.That(result2025.Items[0].Expenses, Is.EqualTo(-415m));
         
         Assert.That(result2025.Items[11].BtcTotal, Is.EqualTo(1.001693m));
         Assert.That(result2025.Items[11].FiatTotal, Is.EqualTo(588184.32m));
         Assert.That(result2025.Items[11].BtcMonthlyChange, Is.EqualTo(0.01m));
-        Assert.That(result2025.Items[11].BtcYearlyChange, Is.EqualTo(0.08m));
+        Assert.That(result2025.Items[11].BtcYearlyChange, Is.EqualTo(0.09m));
         Assert.That(result2025.Items[11].Income, Is.EqualTo(1383.33m));
         Assert.That(result2025.Items[11].Expenses, Is.EqualTo(-415m));
     }

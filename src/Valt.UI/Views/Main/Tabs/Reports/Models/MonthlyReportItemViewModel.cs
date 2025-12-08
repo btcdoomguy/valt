@@ -32,6 +32,7 @@ public class MonthlyReportItemViewModel : ObservableObject
     public FiatCurrency Currency { get; init; }
 
     public DateOnly MonthYear { get; init; }
+    public string MonthYearFormatted => MonthYear.ToString("MMMM yyyy");
     public decimal BtcTotal { get; init; }
 
     public decimal BtcMonthlyChange { get; init; }
