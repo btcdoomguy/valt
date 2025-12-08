@@ -49,30 +49,33 @@
                             <userControls:DateCalendarSelectorMode>All</userControls:DateCalendarSelectorMode>
                         </userControls:DateCalendarSelector.AllowedSelectorModes>
                     </userControls:DateCalendarSelector>
-                    <avalonia:CartesianChart
-                        XAxes="{Binding MonthlyTotalsChartData.XAxes}"
-                        YAxes="{Binding MonthlyTotalsChartData.YAxes}"
-                        LegendPosition="Top"
-                        ZoomMode="X"
-                        Height="500">
-                        <avalonia:CartesianChart.Series>
-                            <avalonia:XamlLineSeries
-                                SeriesName="{x:Static lang:language.Reports_MonthlyTotals_TotalWealth}"
-                                Values="{Binding MonthlyTotalsChartData.FiatValues}"
-                                Stroke="{avalonia:SolidColorPaint Color={StaticResource Fiat}}"
-                                GeometryStroke="{avalonia:SolidColorPaint Color={StaticResource Fiat}}"
-                                GeometryFill="{avalonia:SolidColorPaint Color={StaticResource Fiat}}"
-                                GeometrySize="20" />
-                            <avalonia:XamlLineSeries
-                                SeriesName="Bitcoin"
-                                Values="{Binding MonthlyTotalsChartData.BtcValues}"
-                                Stroke="{avalonia:SolidColorPaint Color={StaticResource Bitcoin}}"
-                                GeometryStroke="{avalonia:SolidColorPaint Color={StaticResource Bitcoin}}"
-                                GeometryFill="{avalonia:SolidColorPaint Color={StaticResource Bitcoin}}"
-                                GeometrySize="20"
-                                ScalesYAt="1" />
-                        </avalonia:CartesianChart.Series>
-                    </avalonia:CartesianChart>
+                    <Panel Background="Black">
+                        <avalonia:CartesianChart
+                            XAxes="{Binding MonthlyTotalsChartData.XAxes}"
+                            YAxes="{Binding MonthlyTotalsChartData.YAxes}"
+                            LegendPosition="Top"
+                            ZoomMode="X"
+                            Height="500"
+                            Margin="50, 0, 50, 0">
+                            <avalonia:CartesianChart.Series>
+                                <avalonia:XamlLineSeries
+                                    SeriesName="{x:Static lang:language.Reports_MonthlyTotals_TotalWealth}"
+                                    Values="{Binding MonthlyTotalsChartData.FiatValues}"
+                                    Stroke="{avalonia:SolidColorPaint Color={StaticResource Fiat}}"
+                                    GeometryStroke="{avalonia:SolidColorPaint Color={StaticResource Fiat}}"
+                                    GeometryFill="{avalonia:SolidColorPaint Color={StaticResource Fiat}}"
+                                    GeometrySize="20" />
+                                <avalonia:XamlLineSeries
+                                    SeriesName="Bitcoin"
+                                    Values="{Binding MonthlyTotalsChartData.BtcValues}"
+                                    Stroke="{avalonia:SolidColorPaint Color={StaticResource Bitcoin}}"
+                                    GeometryStroke="{avalonia:SolidColorPaint Color={StaticResource Bitcoin}}"
+                                    GeometryFill="{avalonia:SolidColorPaint Color={StaticResource Bitcoin}}"
+                                    GeometrySize="20"
+                                    ScalesYAt="1" />
+                            </avalonia:CartesianChart.Series>
+                        </avalonia:CartesianChart>
+                    </Panel>
                     <DataGrid
                         x:Name="MonthlyTotalsGrid"
                         Margin="0, 10, 0, 0"

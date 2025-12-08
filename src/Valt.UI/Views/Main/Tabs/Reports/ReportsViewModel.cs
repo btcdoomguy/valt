@@ -83,7 +83,7 @@ public partial class ReportsViewModel : ValtTabViewModel
         var fiatCurrency = FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency);
 
         var allTimeHighData =
-            await _allTimeHighReport.GetAsync(FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency));
+            await _allTimeHighReport.GetAsync(fiatCurrency);
 
         Dispatcher.UIThread.Post(() =>
         {
