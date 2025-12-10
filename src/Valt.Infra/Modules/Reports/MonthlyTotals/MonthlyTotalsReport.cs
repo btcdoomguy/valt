@@ -12,7 +12,7 @@ using Valt.Infra.Modules.DataSources.Fiat;
 
 namespace Valt.Infra.Modules.Reports.MonthlyTotals;
 
-public class MonthlyTotalsReport : IMonthlyTotalsReport
+internal class MonthlyTotalsReport : IMonthlyTotalsReport
 {
     private readonly IPriceDatabase _priceDatabase;
     private readonly ILocalDatabase _localDatabase;

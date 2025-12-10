@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Avalonia.Controls;
 using Valt.Core.Common;
+using Valt.Core.Kernel.Factories;
+using Valt.Core.Modules.Budget.Categories;
+using Valt.Infra.Modules.Reports.ExpensesByCategory;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Tabs.Reports.Models;
@@ -13,11 +16,13 @@ public partial class ReportsViewModel
 {
     public ReportsViewModel()
     {
-        if (!Design.IsDesignMode) 
+        if (!Design.IsDesignMode)
             return;
-        
-        FilterMainDate = DateTime.UtcNow.Date;
+
+        FilterMainDate = CategoryFilterMainDate = DateTime.UtcNow.Date;
         FilterRange = new DateRange(DateTime.UtcNow.Date.AddYears(-1), DateTime.UtcNow.Date);
+        CategoryFilterRange = new DateRange(new DateTime(CategoryFilterMainDate.Year, CategoryFilterMainDate.Month, 1),
+            new DateTime(CategoryFilterMainDate.Year, CategoryFilterMainDate.Month, 1).AddMonths(1).AddDays(-1));
 
         AllTimeHighData = new DashboardData("Your all-time high", [
             new("ATH (R$):", "R$ 100.000,00"),
@@ -245,5 +250,29 @@ public partial class ReportsViewModel
 
         MonthlyReportItems.AddRange(
             MonthlyTotalsData.Items.Select(x => new MonthlyReportItemViewModel(FiatCurrency.Brl, x)));
+        
+        ExpensesByCategoryChartData.RefreshChart(new ExpensesByCategoryData()
+        {
+            MainCurrency = FiatCurrency.Brl,
+            Items = new List<ExpensesByCategoryData.Item>()
+            {
+                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Refeição", FiatTotal = 123.45m },
+                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Lazer", FiatTotal = 123.45m },
+                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Outros", FiatTotal = 123.45m },
+                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Teste", FiatTotal = 123.45m },
+                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Refeição", FiatTotal = 123.45m },
+                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Lazer", FiatTotal = 123.45m },
+                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Outros", FiatTotal = 123.45m },
+                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Teste", FiatTotal = 123.45m },
+                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Refeição", FiatTotal = 123.45m },
+                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Lazer", FiatTotal = 123.45m },
+                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Outros", FiatTotal = 123.45m },
+                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Teste", FiatTotal = 123.45m },
+            }
+        });
+
+        IsAllTimeHighLoading = false;
+        IsMonthlyTotalsLoading = false;
+        IsSpendingByCategoriesLoading = false;
     }
 }

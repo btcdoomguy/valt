@@ -38,6 +38,7 @@ using Valt.Infra.Modules.Budget.Transactions.Services;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
+using Valt.Infra.Modules.Reports.ExpensesByCategory;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
@@ -95,6 +96,7 @@ public static class Extensions
         
         //reports
         services.AddSingleton<IAllTimeHighReport, AllTimeHighReport>();
+        services.AddSingleton<IExpensesByCategoryReport, ExpensesByCategoryReport>();
         services.AddSingleton<IMonthlyTotalsReport, MonthlyTotalsReport>();
 
         //background jobs

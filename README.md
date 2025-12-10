@@ -17,7 +17,9 @@ Valt is a *simple and easy-to-use* budget management app designed specifically f
 - 📅 **Fixed Expenses**: Add and track all your recurring expenses to avoid missing payments!
 - 🌐 **Real-Time Prices**: Displays the current bitcoin price and your favorite fiat currency in real time.
 - 🌍 **Language Support**: Available in en-US and pt-BR.
-- 💱 **Fiat Currency Support**: Supports a wide range of fiat ~~currencies~~.
+- 💱 **Fiat Currencies Support**: Supports a wide range of fiat ~~currencies~~.
+
+With Valt, you can easily keep track of your finances and stay in control of your spending. You can also use it to track historical data about each bitcoin purchase or spending, getting the price of bitcoin on each historical date and checking the evolution of your wealth.
 
 ## Useful Hotkeys ⌨️
 
