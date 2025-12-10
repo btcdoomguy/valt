@@ -227,7 +227,7 @@
                             <userControls:DateCalendarSelectorMode>All</userControls:DateCalendarSelectorMode>
                         </userControls:DateCalendarSelector.AllowedSelectorModes>
                     </userControls:DateCalendarSelector>
-                    <Grid MinHeight="600">
+                    <Panel MinHeight="600">
                         <StackPanel Orientation="Vertical" IsVisible="{Binding !IsSpendingByCategoriesLoading}"
                                     HorizontalAlignment="Stretch" Background="Black">
                             <avalonia:PieChart x:Name="CategoryPieChart"
@@ -240,7 +240,7 @@
                         </StackPanel>
                         <TextBlock Text="{x:Static lang:language.Loading}" FontSize="16" HorizontalAlignment="Center"
                                    VerticalAlignment="Center" IsVisible="{Binding IsMonthlyTotalsLoading}" />
-                    </Grid>
+                    </Panel>
                 </StackPanel>
             </Expander>
         </StackPanel>
