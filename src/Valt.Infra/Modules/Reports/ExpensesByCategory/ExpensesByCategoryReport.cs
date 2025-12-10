@@ -184,7 +184,7 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
                     CategoryId = new CategoryId(x.Key.ToString()),
                     CategoryName = _categories[x.Key].Name,
                     FiatTotal = x.Value * -1
-                }).ToList()
+                }).OrderBy(x => x.CategoryName).ToList()
             };
         }
         

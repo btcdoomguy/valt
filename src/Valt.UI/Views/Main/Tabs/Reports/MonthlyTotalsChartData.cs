@@ -16,9 +16,9 @@ namespace Valt.UI.Views.Main.Tabs.Reports;
 public class MonthlyTotalsChartData
 {
     public FiatCurrency FiatCurrency { get; set; }
-    public ObservableCollection<ObservablePoint> FiatValues { get; } = new();
-    public ObservableCollection<ObservablePoint> BtcValues { get; } = new();
-    private ObservableCollection<string> MonthLabels { get; } = new();
+    public ObservableCollection<ObservablePoint> FiatValues { get; private set; } = new();
+    public ObservableCollection<ObservablePoint> BtcValues { get; private set; } = new();
+    public ObservableCollection<string> MonthLabels { get; private set; } = new();
 
     public Axis[] XAxes { get; } = new Axis[1];
 

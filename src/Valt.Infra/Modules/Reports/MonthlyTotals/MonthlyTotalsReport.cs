@@ -128,47 +128,45 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
             {
                 currentDate = currentDate.AddDays(1);
 
-                if (!_accountsByDate.TryGetValue(currentDate, out var accountsForDate))
+                _accountsByDate.TryGetValue(currentDate, out var accountsForDate);
+
+                _transactionsByDate.TryGetValue(currentDate, out var transactionsForDate);
+
+                if (accountsForDate is not null && transactionsForDate is not null)
                 {
-                    continue;
-                }
-
-                if (!_transactionsByDate.TryGetValue(currentDate, out var transactionsForDate))
-                {
-                    continue;
-                }
-
-                foreach (var accountId in accountsForDate)
-                {
-                    var account = _accounts[accountId];
-                    InitializeAccountTotalsIfNeeded(account, accountBalances, ref bitcoinDailyTotal, accountIncomes,
-                        accountExpenses, accountBitcoinPurchases, accountBitcoinSales);
-
-                    var fromTransactions = transactionsForDate.Where(x => x.FromAccountId == accountId);
-                    var toTransactions = transactionsForDate.Where(x => x.ToAccountId == accountId);
-
-                    if (account.AccountEntityType == AccountEntityType.Bitcoin)
+                    foreach (var accountId in accountsForDate)
                     {
-                        UpdateBitcoinAccountTotals(accountBalances, ref bitcoinDailyTotal, accountIncomes,
-                            accountExpenses, accountBitcoinPurchases, accountBitcoinSales, accountId, fromTransactions,
-                            toTransactions);
-                    }
-                    else
-                    {
-                        UpdateFiatAccountTotals(accountBalances, accountIncomes, accountExpenses, accountId,
-                            fromTransactions, toTransactions);
+                        var account = _accounts[accountId];
+                        InitializeAccountTotalsIfNeeded(account, accountBalances, ref bitcoinDailyTotal, accountIncomes,
+                            accountExpenses, accountBitcoinPurchases, accountBitcoinSales);
+
+                        var fromTransactions = transactionsForDate.Where(x => x.FromAccountId == accountId);
+                        var toTransactions = transactionsForDate.Where(x => x.ToAccountId == accountId);
+
+                        if (account.AccountEntityType == AccountEntityType.Bitcoin)
+                        {
+                            UpdateBitcoinAccountTotals(accountBalances, ref bitcoinDailyTotal, accountIncomes,
+                                accountExpenses, accountBitcoinPurchases, accountBitcoinSales, accountId,
+                                fromTransactions,
+                                toTransactions);
+                        }
+                        else
+                        {
+                            UpdateFiatAccountTotals(accountBalances, accountIncomes, accountExpenses, accountId,
+                                fromTransactions, toTransactions);
+                        }
                     }
                 }
 
-                if (IsEndOfMonth(currentDate) || currentDate == _endDate)
-                {
-                    var monthlyData = CalculateMonthlyData(currentDate, accountBalances, accountIncomes,
-                        accountExpenses, accountBitcoinPurchases, accountBitcoinSales, ref bitcoinDailyTotal);
-                    var monthYear = new DateOnly(currentDate.Year, currentDate.Month, 1);
-                    monthlyTotals[monthYear] = monthlyData;
+                if (!IsEndOfMonth(currentDate) && currentDate != _endDate) 
+                    continue;
+                
+                var monthlyData = CalculateMonthlyData(currentDate, accountBalances, accountIncomes,
+                    accountExpenses, accountBitcoinPurchases, accountBitcoinSales, ref bitcoinDailyTotal);
+                var monthYear = new DateOnly(currentDate.Year, currentDate.Month, 1);
+                monthlyTotals[monthYear] = monthlyData;
 
-                    ResetMonthlyChanges(accountIncomes, accountExpenses, accountBitcoinPurchases, accountBitcoinSales);
-                }
+                ResetMonthlyChanges(accountIncomes, accountExpenses, accountBitcoinPurchases, accountBitcoinSales);
             }
 
             var resultItems = BuildResultItems(monthlyTotals);

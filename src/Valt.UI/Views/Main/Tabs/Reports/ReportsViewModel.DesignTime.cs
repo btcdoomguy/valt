@@ -30,7 +30,7 @@ public partial class ReportsViewModel
             new("Decline from ATH:", "-30%")
         ]);
 
-        MonthlyTotalsData = new MonthlyTotalsData()
+        var monthlyTotalsData = new MonthlyTotalsData()
         {
             MainCurrency = FiatCurrency.Brl,
             Items = new List<MonthlyTotalsData.Item>
@@ -246,10 +246,10 @@ public partial class ReportsViewModel
             }
         };
 
-        MonthlyTotalsChartData.RefreshChart(MonthlyTotalsData);
+        MonthlyTotalsChartData.RefreshChart(monthlyTotalsData);
 
         MonthlyReportItems.AddRange(
-            MonthlyTotalsData.Items.Select(x => new MonthlyReportItemViewModel(FiatCurrency.Brl, x)));
+            monthlyTotalsData.Items.Select(x => new MonthlyReportItemViewModel(FiatCurrency.Brl, x)));
         
         ExpensesByCategoryChartData.RefreshChart(new ExpensesByCategoryData()
         {

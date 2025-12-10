@@ -9,6 +9,7 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Infra.Kernel;
@@ -34,9 +35,9 @@ public partial class ReportsViewModel : ValtTabViewModel
     private readonly IExpensesByCategoryReport _expensesByCategoryReport;
     private readonly CurrencySettings _currencySettings;
     private readonly IClock _clock;
+    private readonly ILogger<ReportsViewModel> _logger;
 
     [ObservableProperty] private DashboardData _allTimeHighData;
-    [ObservableProperty] private MonthlyTotalsData _monthlyTotalsData;
     [ObservableProperty] private AvaloniaList<MonthlyReportItemViewModel> _monthlyReportItems = new();
     [ObservableProperty] private MonthlyTotalsChartData _monthlyTotalsChartData = new();
     [ObservableProperty] private ExpensesByCategoryChartData _expensesByCategoryChartData = new();
@@ -55,13 +56,15 @@ public partial class ReportsViewModel : ValtTabViewModel
         IMonthlyTotalsReport monthlyTotalsReport,
         IExpensesByCategoryReport expensesByCategoryReport,
         CurrencySettings currencySettings,
-        IClock clock)
+        IClock clock,
+        ILogger<ReportsViewModel> logger)
     {
         _allTimeHighReport = allTimeHighReport;
         _monthlyTotalsReport = monthlyTotalsReport;
         _expensesByCategoryReport = expensesByCategoryReport;
         _currencySettings = currencySettings;
         _clock = clock;
+        _logger = logger;
 
         FilterMainDate = CategoryFilterMainDate = _clock.GetCurrentDateTimeUtc();
         FilterRange = new DateRange(new DateTime(FilterMainDate.Year, 1, 1), new DateTime(FilterMainDate.Year, 12, 31));
@@ -88,9 +91,9 @@ public partial class ReportsViewModel : ValtTabViewModel
 
     public void Initialize()
     {
-        _ = FetchAllTimeHighDataAsync();
         _ = FetchMonthlyTotalsAsync();
         _ = FetchExpensesByCategoryAsync();
+        _ = FetchAllTimeHighDataAsync();
     }
 
     partial void OnFilterRangeChanged(DateRange value)
@@ -109,92 +112,85 @@ public partial class ReportsViewModel : ValtTabViewModel
         _ = FetchExpensesByCategoryAsync();
     }
 
-    private Task FetchAllTimeHighDataAsync()
+    private async Task FetchAllTimeHighDataAsync()
     {
-        return Task.Run(async () =>
+        try
         {
-            try
-            {
-                var fiatCurrency = FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency);
+            var fiatCurrency = FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency);
 
-                var allTimeHighData = await _allTimeHighReport.GetAsync(fiatCurrency);
+            var allTimeHighData = await _allTimeHighReport.GetAsync(fiatCurrency);
 
-                await Dispatcher.UIThread.InvokeAsync(() =>
+            AllTimeHighData = new DashboardData(
+                language.Reports_AllTimeHigh_Title,
+                new ObservableCollection<RowItem>
                 {
-                    AllTimeHighData = new DashboardData(
-                        language.Reports_AllTimeHigh_Title,
-                        new ObservableCollection<RowItem>
-                        {
-                            new(language.Reports_AllTimeHigh_AllTimeHigh,
-                                $"{CurrencyDisplay.FormatFiat(allTimeHighData.Value, fiatCurrency.Code)}"),
-                            new(language.Reports_AllTimeHigh_Date, allTimeHighData.Date.ToString()),
-                            new(language.Reports_AllTimeHigh_DeclineFromAth, $"{allTimeHighData.DeclineFromAth}%")
-                        });
-
-                    IsAllTimeHighLoading = false;
+                    new(language.Reports_AllTimeHigh_AllTimeHigh,
+                        $"{CurrencyDisplay.FormatFiat(allTimeHighData.Value, fiatCurrency.Code)}"),
+                    new(language.Reports_AllTimeHigh_Date, allTimeHighData.Date.ToString()),
+                    new(language.Reports_AllTimeHigh_DeclineFromAth, $"{allTimeHighData.DeclineFromAth}%")
                 });
-            }
-            catch
-            {
-                await Dispatcher.UIThread.InvokeAsync(() => IsAllTimeHighLoading = false);
-            }
-        });
+
+            IsAllTimeHighLoading = false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching all time high data");
+        }
+        finally
+        {
+            IsAllTimeHighLoading = false;
+        }
     }
 
-    private Task FetchExpensesByCategoryAsync()
+    private async Task FetchExpensesByCategoryAsync()
     {
-        return Task.Run(async () =>
+        try
         {
-            try
+            var expensesByCategoryData = await _expensesByCategoryReport.GetAsync(
+                DateOnly.FromDateTime(CategoryFilterMainDate),
+                new DateOnlyRange(DateOnly.FromDateTime(CategoryFilterRange.Start),
+                    DateOnly.FromDateTime(CategoryFilterRange.End)),
+                FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency));
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                var expensesByCategoryData = await _expensesByCategoryReport.GetAsync(
-                    DateOnly.FromDateTime(CategoryFilterMainDate),
-                    new DateOnlyRange(DateOnly.FromDateTime(CategoryFilterRange.Start),
-                        DateOnly.FromDateTime(CategoryFilterRange.End)),
-                    FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency));
-                
-                await Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    ExpensesByCategoryChartData.RefreshChart(expensesByCategoryData);
-                    IsSpendingByCategoriesLoading = false;
-                });
-            }
-            catch
-            {
-                await Dispatcher.UIThread.InvokeAsync(() => IsSpendingByCategoriesLoading = false);
-            }
-        });
+                ExpensesByCategoryChartData.RefreshChart(expensesByCategoryData);
+                IsSpendingByCategoriesLoading = false;
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching expenses by category");
+            await Dispatcher.UIThread.InvokeAsync(() => { IsSpendingByCategoriesLoading = false; });
+        }
     }
 
-    private Task FetchMonthlyTotalsAsync()
+    private async Task FetchMonthlyTotalsAsync()
     {
-        return Task.Run(async () =>
+        try
         {
-            try
+            var monthlyTotalsData = await _monthlyTotalsReport.GetAsync(
+                DateOnly.FromDateTime(FilterMainDate),
+                new DateOnlyRange(DateOnly.FromDateTime(FilterRange.Start), DateOnly.FromDateTime(FilterRange.End)),
+                FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency));
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                var monthlyTotalsData = await _monthlyTotalsReport.GetAsync(
-                    DateOnly.FromDateTime(FilterMainDate),
-                    new DateOnlyRange(DateOnly.FromDateTime(FilterRange.Start), DateOnly.FromDateTime(FilterRange.End)),
-                    FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency));
+                MonthlyTotalsChartData.RefreshChart(monthlyTotalsData);
 
-                await Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    MonthlyTotalsData = monthlyTotalsData;
-                    MonthlyTotalsChartData.RefreshChart(monthlyTotalsData);
+                MonthlyReportItems.Clear();
+                MonthlyReportItems.AddRange(monthlyTotalsData.Items.Select(x =>
+                    new MonthlyReportItemViewModel(FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency),
+                        x)));
 
-                    MonthlyReportItems.Clear();
-                    MonthlyReportItems.AddRange(monthlyTotalsData.Items.Select(x =>
-                        new MonthlyReportItemViewModel(FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency),
-                            x)));
-
-                    IsMonthlyTotalsLoading = false;
-                });
-            }
-            catch
-            {
-                await Dispatcher.UIThread.InvokeAsync(() => IsMonthlyTotalsLoading = false);
-            }
-        });
+                IsMonthlyTotalsLoading = false;
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching monthly totals");
+            await Dispatcher.UIThread.InvokeAsync(() => { IsMonthlyTotalsLoading = false; });
+        }
     }
 
     public override MainViewTabNames TabName => MainViewTabNames.ReportsPageContent;

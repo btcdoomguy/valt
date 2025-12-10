@@ -37,9 +37,9 @@ public class ExpensesByCategoryChartData
                 DataLabelsPosition = PolarLabelsPosition.Outer,
 
                 DataLabelsFormatter = point =>
-                    $"{x.CategoryName} • {formattedValue}",
+                    $"{formattedValue}",
                 
-                ToolTipLabelFormatter = point => $"{x.CategoryName} • {formattedValue}"
+                ToolTipLabelFormatter = point => $"{formattedValue}"
             } as ISeries;
         }).ToList();
         
