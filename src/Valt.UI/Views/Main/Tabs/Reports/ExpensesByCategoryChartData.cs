@@ -27,10 +27,14 @@ public class ExpensesByCategoryChartData
             var currencyCode = expensesByCategoryData.MainCurrency.Code;
             var formattedValue = CurrencyDisplay.FormatFiat(fiatTotal, currencyCode);
 
+            var iconColor = x.Icon.Color;
+            var skColor = new SKColor(iconColor.R, iconColor.G, iconColor.B, iconColor.A);
+
             return new PieSeries<double>
             {
                 Values = new List<double> { Convert.ToDouble(fiatTotal) },
                 Name = x.CategoryName,
+                Fill = new SolidColorPaint(skColor),
 
                 DataLabelsPaint = new SolidColorPaint(SKColors.White),
                 DataLabelsSize = 15,
@@ -38,11 +42,11 @@ public class ExpensesByCategoryChartData
 
                 DataLabelsFormatter = point =>
                     $"{formattedValue}",
-                
+
                 ToolTipLabelFormatter = point => $"{formattedValue}"
             } as ISeries;
         }).ToList();
-        
+
         foreach (var series in data)
             Series.Add(series);
     }

@@ -250,24 +250,63 @@ public partial class ReportsViewModel
 
         MonthlyReportItems.AddRange(
             monthlyTotalsData.Items.Select(x => new MonthlyReportItemViewModel(FiatCurrency.Brl, x)));
-        
+
         ExpensesByCategoryChartData.RefreshChart(new ExpensesByCategoryData()
         {
             MainCurrency = FiatCurrency.Brl,
             Items = new List<ExpensesByCategoryData.Item>()
             {
-                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Refeição", FiatTotal = 123.45m },
-                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Lazer", FiatTotal = 123.45m },
-                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Outros", FiatTotal = 123.45m },
-                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Teste", FiatTotal = 123.45m },
-                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Refeição", FiatTotal = 123.45m },
-                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Lazer", FiatTotal = 123.45m },
-                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Outros", FiatTotal = 123.45m },
-                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Teste", FiatTotal = 123.45m },
-                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Refeição", FiatTotal = 123.45m },
-                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Lazer", FiatTotal = 123.45m },
-                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Outros", FiatTotal = 123.45m },
-                new() { CategoryId = IdGenerator.Generate(), CategoryName = "Teste", FiatTotal = 123.45m },
+                new()
+                {
+                    CategoryId = IdGenerator.Generate(), Icon = Icon.Empty, CategoryName = "Refeição",
+                    FiatTotal = 123.45m
+                },
+                new()
+                {
+                    CategoryId = IdGenerator.Generate(), Icon = Icon.Empty, CategoryName = "Lazer", FiatTotal = 123.45m
+                },
+                new()
+                {
+                    CategoryId = IdGenerator.Generate(), Icon = Icon.Empty, CategoryName = "Outros", FiatTotal = 123.45m
+                },
+                new()
+                {
+                    CategoryId = IdGenerator.Generate(), Icon = Icon.Empty, CategoryName = "Teste", FiatTotal = 123.45m
+                },
+                new()
+                {
+                    CategoryId = IdGenerator.Generate(), Icon = Icon.Empty, CategoryName = "Refeição",
+                    FiatTotal = 123.45m
+                },
+                new()
+                {
+                    CategoryId = IdGenerator.Generate(), Icon = Icon.Empty, CategoryName = "Lazer", FiatTotal = 123.45m
+                },
+                new()
+                {
+                    CategoryId = IdGenerator.Generate(), Icon = Icon.Empty, CategoryName = "Outros", FiatTotal = 123.45m
+                },
+                new()
+                {
+                    CategoryId = IdGenerator.Generate(), Icon = Icon.Empty, CategoryName = "Teste", FiatTotal = 123.45m
+                },
+                new()
+                {
+                    CategoryId = IdGenerator.Generate(), Icon = Icon.Empty, CategoryName = "Refeição",
+                    FiatTotal = 123.45m
+                },
+                new()
+                {
+                    CategoryId = IdGenerator.Generate(), Icon = Icon.Empty, CategoryName = "Lazer", FiatTotal = 123.45m
+                },
+                new()
+                {
+                    CategoryId = IdGenerator.Generate(), Icon = Icon.Empty, CategoryName = "Outros", FiatTotal = 123.45m
+                },
+                new()
+                {
+                    CategoryId = IdGenerator.Generate(), Icon = Icon.Empty, CategoryName = "Teste", FiatTotal = 123.45m
+                },
             }
         });
 

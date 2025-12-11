@@ -238,6 +238,7 @@
                                                    Width="750"
                                                    Height="800"
                                                    LegendPosition="Right"
+                                                   LegendTextSize="12"
                                                    Series="{Binding ExpensesByCategoryChartData.Series}">
                                 </avalonia:PieChart>
                             </Panel>

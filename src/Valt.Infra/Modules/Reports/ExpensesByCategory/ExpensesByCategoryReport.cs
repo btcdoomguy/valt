@@ -192,12 +192,20 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
                 Items = categoryFiatTotals.Select(x => new ExpensesByCategoryData.Item()
                 {
                     CategoryId = new CategoryId(x.Key.ToString()),
-                    CategoryName = _categories[x.Key].Name,
+                    Icon = Icon.RestoreFromId(_categories[x.Key].Icon!),
+                    CategoryName = BuildCategoryName(x.Key),
                     FiatTotal = x.Value * -1
                 }).OrderBy(x => x.CategoryName).ToList()
             };
         }
-        
+
+        private string BuildCategoryName(ObjectId id)
+        {
+            var category = _categories[id];
+
+            return category.ParentId is not null ? $"{_categories[category.ParentId].Name} >> {category.Name}" : $"{category.Name}";
+        }
+
         private decimal GetFiatRateAt(DateTime date, FiatCurrency currency)
         {
             if (currency == FiatCurrency.Usd)

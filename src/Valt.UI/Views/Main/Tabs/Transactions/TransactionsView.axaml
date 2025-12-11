@@ -222,21 +222,45 @@
                         Height="400">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Border Padding="0" Background="Transparent">
-                                    <Grid ColumnDefinitions="20, *, 30">
-                                        <Label Grid.Column="0" IsVisible="{Binding Paid}"
-                                               Content="&#xe834;"
-                                               FontFamily="{DynamicResource MaterialDesign}"
-                                               Foreground="{Binding CheckboxPaidColor}"
-                                               Padding="3, -2,0 ,0"
-                                               FontSize="16">
-                                        </Label>
-                                        <Label Grid.Column="1" FontSize="12" Content="{Binding Name}"
-                                               Foreground="{Binding TextColor}">
-                                        </Label>
-                                        <Label Grid.Column="2" FontSize="12" Content="{Binding Day}"
-                                               Foreground="{Binding TextColor}">
-                                        </Label>
+                                <Border Padding="2, 4" Background="Transparent">
+                                    <Grid ColumnDefinitions="40, *, 24">
+                                        <!-- Calendar icon with day number overlay -->
+                                        <Grid Grid.Column="0" Width="36" Height="36" Margin="0, -12, 0, 0">
+                                            <TextBlock Text="&#xE935;"
+                                                       FontFamily="{DynamicResource MaterialDesign}"
+                                                       FontSize="32"
+                                                       Foreground="{Binding TextColor}"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding DayFormatted}"
+                                                       FontSize="11"
+                                                       Width="16"
+                                                       FontWeight="Bold"
+                                                       Foreground="{Binding TextColor}"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       Margin="0, 16, 0, 0" />
+                                        </Grid>
+                                        <!-- Name and amount (two lines) -->
+                                        <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" Margin="4, 0, 0, 0">
+                                            <TextBlock FontSize="13"
+                                                       Text="{Binding Name}"
+                                                       Foreground="{Binding TextColor}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock FontSize="11"
+                                                       Text="{Binding AmountDisplay}"
+                                                       Foreground="{Binding TextColor}"
+                                                       Opacity="0.7" />
+                                        </StackPanel>
+                                        <!-- Paid checkbox -->
+                                        <TextBlock Grid.Column="2"
+                                                   IsVisible="{Binding Paid}"
+                                                   Text="&#xe834;"
+                                                   FontFamily="{DynamicResource MaterialDesign}"
+                                                   Foreground="{Binding CheckboxPaidColor}"
+                                                   FontSize="20"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
                                     </Grid>
                                     <Border.ContextMenu>
                                         <ContextMenu>

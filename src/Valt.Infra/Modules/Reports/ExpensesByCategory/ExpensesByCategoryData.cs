@@ -11,6 +11,7 @@ public record ExpensesByCategoryData
     public record Item
     {
         public required CategoryId CategoryId { get; init; }
+        public required Icon Icon { get; init; }
         public required string CategoryName { get; init; }
         public required decimal FiatTotal { get; init; }
     }
