@@ -20,10 +20,6 @@
     <Design.DataContext>
         <reports1:ReportsViewModel />
     </Design.DataContext>
-    <UserControl.Resources>
-        <x:String x:Key="Fiat">#0566e9</x:String>
-        <x:String x:Key="Bitcoin">#ffa122</x:String>
-    </UserControl.Resources>
     <ScrollViewer>
         <StackPanel Margin="10">
             <!--Summary-->
@@ -56,32 +52,18 @@
                     </userControls:DateCalendarSelector>
                     <Grid MinHeight="600">
                         <StackPanel Orientation="Vertical" IsVisible="{Binding !IsMonthlyTotalsLoading}">
-                            <Panel Background="Black">
+                            <Panel Background="{DynamicResource Background900Brush}">
                                 <avalonia:CartesianChart
                                     x:Name="MonthlyChart"
+                                    Series="{Binding MonthlyTotalsChartData.Series}"
                                     XAxes="{Binding MonthlyTotalsChartData.XAxes}"
                                     YAxes="{Binding MonthlyTotalsChartData.YAxes}"
                                     LegendPosition="Top"
+                                    LegendTextSize="14"
+                                    TooltipTextSize="12"
                                     ZoomMode="X"
                                     Height="500"
-                                    Margin="50, 0, 50, 0">
-                                    <avalonia:CartesianChart.Series>
-                                        <avalonia:XamlLineSeries
-                                            SeriesName="{x:Static lang:language.Reports_MonthlyTotals_TotalWealth}"
-                                            Values="{Binding MonthlyTotalsChartData.FiatValues}"
-                                            Stroke="{avalonia:SolidColorPaint Color={StaticResource Fiat}}"
-                                            GeometryStroke="{avalonia:SolidColorPaint Color={StaticResource Fiat}}"
-                                            GeometryFill="{avalonia:SolidColorPaint Color={StaticResource Fiat}}"
-                                            GeometrySize="20" />
-                                        <avalonia:XamlLineSeries
-                                            SeriesName="Bitcoin"
-                                            Values="{Binding MonthlyTotalsChartData.BtcValues}"
-                                            Stroke="{avalonia:SolidColorPaint Color={StaticResource Bitcoin}}"
-                                            GeometryStroke="{avalonia:SolidColorPaint Color={StaticResource Bitcoin}}"
-                                            GeometryFill="{avalonia:SolidColorPaint Color={StaticResource Bitcoin}}"
-                                            GeometrySize="20"
-                                            ScalesYAt="1" />
-                                    </avalonia:CartesianChart.Series>
+                                    Margin="30, 10, 30, 20">
                                 </avalonia:CartesianChart>
                             </Panel>
                             <DataGrid
@@ -233,7 +215,7 @@
                                     ItemsSource="{Binding AvailableCategories}"
                                     SelectedItems="{Binding SelectedCategories}" />
                             </StackPanel>
-                            <Panel Grid.Column="1" Background="Black">
+                            <Panel Grid.Column="1" Background="{DynamicResource Background900Brush}">
                                 <avalonia:PieChart x:Name="CategoryPieChart"
                                                    Width="750"
                                                    Height="800"
