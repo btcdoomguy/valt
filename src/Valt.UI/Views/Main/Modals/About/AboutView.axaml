@@ -10,6 +10,7 @@
         MaxHeight="400"
         x:Class="Valt.UI.Views.Main.Modals.About.AboutView"
         x:DataType="about:AboutViewModel"
+        Classes="about"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
         SystemDecorations="None"
@@ -18,11 +19,6 @@
     <Design.DataContext>
         <about:AboutViewModel />
     </Design.DataContext>
-    <Window.Styles>
-        <Style Selector="Window">
-            <Setter Property="FontFamily" Value="Mono"></Setter>
-        </Style>
-    </Window.Styles>
     <Border>
         <StackPanel Orientation="Vertical">
             <userControls:CustomTitleBar Title="{x:Static local:language.About_Title}"
