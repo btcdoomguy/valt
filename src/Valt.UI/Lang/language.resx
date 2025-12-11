@@ -689,4 +689,10 @@
     <data name="Reports.SpendingByCategories.Title" xml:space="preserve">
         <value>Spending by categories</value>
     </data>
+    <data name="Reports.SpendingByCategories.Accounts" xml:space="preserve">
+        <value>Accounts</value>
+    </data>
+    <data name="Reports.SpendingByCategories.Categories" xml:space="preserve">
+        <value>Categories</value>
+    </data>
 </root>

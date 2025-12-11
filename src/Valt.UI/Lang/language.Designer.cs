@@ -1376,5 +1376,17 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.SpendingByCategories.Title", resourceCulture);
             }
         }
+
+        public static string Reports_SpendingByCategories_Accounts {
+            get {
+                return ResourceManager.GetString("Reports.SpendingByCategories.Accounts", resourceCulture);
+            }
+        }
+
+        public static string Reports_SpendingByCategories_Categories {
+            get {
+                return ResourceManager.GetString("Reports.SpendingByCategories.Categories", resourceCulture);
+            }
+        }
     }
 }

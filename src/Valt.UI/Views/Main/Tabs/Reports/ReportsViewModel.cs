@@ -1,8 +1,11 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
@@ -12,7 +15,12 @@ using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
+using Valt.Core.Modules.Budget.Accounts;
+using Valt.Core.Modules.Budget.Categories;
+using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
+using Valt.Infra.Modules.Budget.Accounts;
+using Valt.Infra.Modules.Budget.Categories;
 using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
 using Valt.Infra.Modules.Reports.ExpensesByCategory;
@@ -34,6 +42,7 @@ public partial class ReportsViewModel : ValtTabViewModel
     private readonly IMonthlyTotalsReport _monthlyTotalsReport;
     private readonly IExpensesByCategoryReport _expensesByCategoryReport;
     private readonly CurrencySettings _currencySettings;
+    private readonly ILocalDatabase _localDatabase;
     private readonly IClock _clock;
     private readonly ILogger<ReportsViewModel> _logger;
 
@@ -50,12 +59,22 @@ public partial class ReportsViewModel : ValtTabViewModel
     [ObservableProperty] private bool _isMonthlyTotalsLoading = true;
     [ObservableProperty] private bool _isSpendingByCategoriesLoading = true;
 
+    // Pie chart filter collections
+    [ObservableProperty] private AvaloniaList<SelectItem> _availableAccounts = new();
+    [ObservableProperty] private AvaloniaList<SelectItem> _selectedAccounts = new();
+    [ObservableProperty] private AvaloniaList<SelectItem> _availableCategories = new();
+    [ObservableProperty] private AvaloniaList<SelectItem> _selectedCategories = new();
+
+    private CancellationTokenSource? _filterDebounceTokenSource;
+    private const int FilterDebounceDelayMs = 300;
+
     private bool _ready;
 
     public ReportsViewModel(IAllTimeHighReport allTimeHighReport,
         IMonthlyTotalsReport monthlyTotalsReport,
         IExpensesByCategoryReport expensesByCategoryReport,
         CurrencySettings currencySettings,
+        ILocalDatabase localDatabase,
         IClock clock,
         ILogger<ReportsViewModel> logger)
     {
@@ -63,6 +82,7 @@ public partial class ReportsViewModel : ValtTabViewModel
         _monthlyTotalsReport = monthlyTotalsReport;
         _expensesByCategoryReport = expensesByCategoryReport;
         _currencySettings = currencySettings;
+        _localDatabase = localDatabase;
         _clock = clock;
         _logger = logger;
 
@@ -70,6 +90,11 @@ public partial class ReportsViewModel : ValtTabViewModel
         FilterRange = new DateRange(new DateTime(FilterMainDate.Year, 1, 1), new DateTime(FilterMainDate.Year, 12, 31));
         var currentMonth = new DateTime(CategoryFilterMainDate.Year, CategoryFilterMainDate.Month, 1);
         CategoryFilterRange = new DateRange(currentMonth, currentMonth.AddMonths(1).AddDays(-1));
+
+        PrepareAccountsAndCategoriesList();
+
+        SelectedAccounts.CollectionChanged += OnSelectedFiltersChanged;
+        SelectedCategories.CollectionChanged += OnSelectedFiltersChanged;
 
         WeakReferenceMessenger.Default.Register<SettingsChangedMessage>(this, (recipient, message) =>
         {
@@ -96,6 +121,30 @@ public partial class ReportsViewModel : ValtTabViewModel
         _ = FetchAllTimeHighDataAsync();
     }
 
+    private void PrepareAccountsAndCategoriesList()
+    {
+        var accounts = _localDatabase.GetAccounts().FindAll().OrderByDescending(x => x.Visible).ThenBy(x => x.DisplayOrder)
+            .Select(x => new SelectItem(x.Id.ToString(), x.Name));
+        
+        AvailableAccounts.AddRange(accounts);
+        SelectedAccounts.AddRange(AvailableAccounts);
+
+        var categories = _localDatabase.GetCategories().FindAll().ToDictionary(x => x.Id.ToString());
+
+        var parsedCategories = new List<SelectItem>();
+        foreach (var category in categories)
+        {
+            var name = category.Value.Name;
+            if (category.Value.ParentId is not null)
+                name = categories[category.Value.ParentId.ToString()].Name + " >> " +  name;
+            
+            parsedCategories.Add(new SelectItem(category.Key, name));
+        }
+
+        AvailableCategories.AddRange(parsedCategories.OrderBy(x => x.Name));
+        SelectedCategories.AddRange(AvailableCategories);
+    }
+
     partial void OnFilterRangeChanged(DateRange value)
     {
         if (!_ready) return;
@@ -110,6 +159,31 @@ public partial class ReportsViewModel : ValtTabViewModel
 
         IsSpendingByCategoriesLoading = true;
         _ = FetchExpensesByCategoryAsync();
+    }
+
+    private void OnSelectedFiltersChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (!_ready) return;
+
+        // Cancel any pending debounced fetch
+        _filterDebounceTokenSource?.Cancel();
+        _filterDebounceTokenSource = new CancellationTokenSource();
+
+        IsSpendingByCategoriesLoading = true;
+        _ = DebouncedFetchExpensesByCategoryAsync(_filterDebounceTokenSource.Token);
+    }
+
+    private async Task DebouncedFetchExpensesByCategoryAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(FilterDebounceDelayMs, cancellationToken);
+            await FetchExpensesByCategoryAsync();
+        }
+        catch (TaskCanceledException)
+        {
+            // Debounce cancelled, ignore
+        }
     }
 
     private async Task FetchAllTimeHighDataAsync()
@@ -146,11 +220,16 @@ public partial class ReportsViewModel : ValtTabViewModel
     {
         try
         {
+            var filter = new IExpensesByCategoryReport.Filter(
+                SelectedAccounts.Select(x => new AccountId(x.Id.ToString())).ToList(),
+                SelectedCategories.Select(x => new CategoryId(x.Id.ToString())).ToList());
+
             var expensesByCategoryData = await _expensesByCategoryReport.GetAsync(
                 DateOnly.FromDateTime(CategoryFilterMainDate),
                 new DateOnlyRange(DateOnly.FromDateTime(CategoryFilterRange.Start),
                     DateOnly.FromDateTime(CategoryFilterRange.End)),
-                FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency));
+                FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency),
+                filter);
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
@@ -194,4 +273,6 @@ public partial class ReportsViewModel : ValtTabViewModel
     }
 
     public override MainViewTabNames TabName => MainViewTabNames.ReportsPageContent;
+
+    public record SelectItem(string Id, string Name);
 }

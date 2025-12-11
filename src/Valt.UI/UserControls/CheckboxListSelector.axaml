@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+             mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="300"
+             x:Class="Valt.UI.UserControls.CheckboxListSelector"
+             x:Name="Root">
+    <Border Background="{DynamicResource Background900Brush}"
+            BorderBrush="{DynamicResource Background700Brush}"
+            BorderThickness="1"
+            CornerRadius="3"
+            Padding="5">
+        <Grid RowDefinitions="Auto, *">
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0, 0, 0, 5">
+                <TextBlock Text="{Binding Title, ElementName=Root}"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"
+                           Margin="5, 0, 0, 0" />
+                <Button Classes="transparent link"
+                        Content="Select All"
+                        FontSize="12"
+                        HorizontalAlignment="Right"
+                        Margin="10, 0, 0, 0"
+                        Command="{Binding SelectAllCommand, ElementName=Root}" />
+            </StackPanel>
+            <ScrollViewer Grid.Row="1" MaxHeight="{Binding MaxListHeight, ElementName=Root}">
+                <ItemsControl ItemsSource="{Binding InternalItems, ElementName=Root}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="userControls:CheckboxListItem">
+                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                      Content="{Binding DisplayText}"
+                                      Margin="2" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+    </Border>
+</UserControl>

@@ -4,6 +4,7 @@ using LiteDB;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
+using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Categories;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Modules.Budget.Accounts;
@@ -32,7 +33,7 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
         _logger = logger;
     }
     
-    public Task<ExpensesByCategoryData> GetAsync(DateOnly baseDate, DateOnlyRange displayRange, FiatCurrency currency)
+    public Task<ExpensesByCategoryData> GetAsync(DateOnly baseDate, DateOnlyRange displayRange, FiatCurrency currency, IExpensesByCategoryReport.Filter filter)
     {
         var accounts = _localDatabase.GetAccounts().FindAll().ToImmutableList();
         var categories = _localDatabase.GetCategories().FindAll().ToImmutableList();
@@ -52,7 +53,7 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
         var fiatRates = _priceDatabase.GetFiatData().Find(x => x.Date >= minDate.AddDays(-5) && x.Date <= maxDate)
             .ToImmutableList();
         
-        var calculator = new Calculator(currency, accounts, categories, transactions, btcRates, fiatRates, minDate, maxDate);
+        var calculator = new Calculator(currency, accounts, categories, transactions, btcRates, fiatRates, minDate, maxDate, filter);
 
         try
         {
@@ -75,6 +76,7 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
         private readonly FrozenDictionary<ObjectId, CategoryEntity> _categories;
         private readonly DateTime _startDate;
         private readonly DateTime _endDate;
+        private readonly IExpensesByCategoryReport.Filter _filter;
         private readonly FrozenDictionary<DateTime, BitcoinDataEntity> _btcRates;
         private readonly FrozenDictionary<DateTime, ImmutableList<FiatDataEntity>> _fiatRates;
         private readonly FrozenDictionary<DateTime, ImmutableList<TransactionEntity>> _transactionsByDate;
@@ -88,13 +90,15 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
             ImmutableList<BitcoinDataEntity> btcRates,
             ImmutableList<FiatDataEntity> fiatRates,
             DateTime startDate,
-            DateTime endDate)
+            DateTime endDate,
+            IExpensesByCategoryReport.Filter filter)
         {
             _currency = currency;
             _categories = categories.ToFrozenDictionary(x => x.Id);
             _accounts = accounts.ToFrozenDictionary(x => x.Id);
             _startDate = startDate;
             _endDate = endDate;
+            _filter = filter;
             _btcRates = btcRates.ToFrozenDictionary(x => x.Date);
             _fiatRates = fiatRates.GroupBy(x => x.Date).ToFrozenDictionary(x => x.Key, x => x.ToImmutableList());
 
@@ -129,12 +133,18 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
 
                 foreach (var accountId in accountsForDate)
                 {
+                    if (!_filter.AccountIds.Contains(new AccountId(accountId.ToString())))
+                        continue;
+                    
                     var account = _accounts[accountId];
 
                     var transactions = transactionsForDate.Where(x => x.FromAccountId == accountId && (x.Type == TransactionEntityType.Fiat || x.Type == TransactionEntityType.Bitcoin));
                     
                     foreach (var transaction in transactions)
                     {
+                        if (!_filter.CategoryIds.Contains(new CategoryId(transaction.CategoryId.ToString())))
+                            continue;
+                        
                         if (account.AccountEntityType == AccountEntityType.Bitcoin)
                         {
                             //only spending

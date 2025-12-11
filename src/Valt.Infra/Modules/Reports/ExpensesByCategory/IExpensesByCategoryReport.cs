@@ -1,8 +1,13 @@
 using Valt.Core.Common;
+using Valt.Core.Modules.Budget.Accounts;
+using Valt.Core.Modules.Budget.Categories;
+using Valt.Infra.Modules.Budget.Accounts;
 
 namespace Valt.Infra.Modules.Reports.ExpensesByCategory;
 
 public interface IExpensesByCategoryReport
 {
-    Task<ExpensesByCategoryData> GetAsync(DateOnly baseDate, DateOnlyRange displayRange, FiatCurrency currency);
+    Task<ExpensesByCategoryData> GetAsync(DateOnly baseDate, DateOnlyRange displayRange, FiatCurrency currency, Filter filter);
+
+    public record Filter(IEnumerable<AccountId> AccountIds, IEnumerable<CategoryId> CategoryIds);
 }
