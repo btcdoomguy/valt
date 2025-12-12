@@ -24,7 +24,7 @@
         <main1:MainViewModel />
     </Design.DataContext>
     <Window.KeyBindings>
-        <KeyBinding Gesture="F2" Command="{Binding AddTransactionCommand}" />
+        <KeyBinding Gesture="F2" Command="{Binding SendF2Command}" />
     </Window.KeyBindings>
     <Grid>
         <Grid.RowDefinitions>
@@ -46,7 +46,7 @@
                     <GradientStop Offset="1" Color="{DynamicResource Background800Color}"></GradientStop>
                 </LinearGradientBrush>
             </Border.Background>
-            <Grid ColumnDefinitions="*, 250">
+            <Grid ColumnDefinitions="*, *, 250">
                 <!--Top bar buttons-->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Height="50" Spacing="15">
                     <DropDownButton Classes="icon" Content="&#xe8b8;">
@@ -81,39 +81,41 @@
                         </StackPanel>
                     </Button>
                 </StackPanel>
-                <TextBlock Grid.Column="0" IsVisible="{Binding IsOffline}" Margin="0, 30, 50, 0"
-                           HorizontalAlignment="Right">
-                    <TextBlock FontFamily="{DynamicResource MaterialDesign}"
-                               FontSize="32"
-                               Foreground="{DynamicResource Accent300Brush}"
-                               Text="&#xE002;">
-                    </TextBlock>
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock Foreground="{DynamicResource Accent100Brush}"
-                                   Text="{x:Static local:language.Offline_Line1}" />
-                        <TextBlock FontSize="12" Foreground="{DynamicResource Accent100Brush}"
-                                   Text="{x:Static local:language.Offline_Line1}" />
-                    </StackPanel>
-                </TextBlock>
-                <Border Grid.Column="0" IsVisible="{Binding ShowPepe}" HorizontalAlignment="Right" Margin="0, 10, 4, 0"
-                        Width="100" Height="80"
-                        ClipToBounds="True"
-                        Background="{DynamicResource Background900Brush}"
-                        BorderBrush="{DynamicResource Background700Brush}"
-                        BorderThickness="3"
-                        CornerRadius="5">
-                    <Border ClipToBounds="True">
-                        <StackPanel Margin="0, -18, 0, 0">
-                            <Image Source="{Binding PepeMoodImage}" Width="120"
-                                   Height="120"
-                                   HorizontalAlignment="Right" Margin="0, 5, 20, 0" Opacity="0.8">
-                            </Image>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock IsVisible="{Binding IsOffline}" Margin="0, 30, 50, 0"
+                               HorizontalAlignment="Right">
+                        <TextBlock FontFamily="{DynamicResource MaterialDesign}"
+                                   FontSize="32"
+                                   Foreground="{DynamicResource Accent300Brush}"
+                                   Text="&#xE002;">
+                        </TextBlock>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Foreground="{DynamicResource Accent100Brush}"
+                                       Text="{x:Static local:language.Offline_Line1}" />
+                            <TextBlock FontSize="12" Foreground="{DynamicResource Accent100Brush}"
+                                       Text="{x:Static local:language.Offline_Line2}" />
                         </StackPanel>
+                    </TextBlock>
+                    <Border IsVisible="{Binding ShowPepe}" HorizontalAlignment="Right" Margin="0, 10, 4, 0"
+                            Width="100" Height="80"
+                            ClipToBounds="True"
+                            Background="{DynamicResource Background900Brush}"
+                            BorderBrush="{DynamicResource Background700Brush}"
+                            BorderThickness="3"
+                            CornerRadius="5">
+                        <Border ClipToBounds="True">
+                            <StackPanel Margin="0, -18, 0, 0">
+                                <Image Source="{Binding PepeMoodImage}" Width="120"
+                                       Height="120"
+                                       HorizontalAlignment="Right" Margin="0, 5, 20, 0" Opacity="0.8">
+                                </Image>
+                            </StackPanel>
+                        </Border>
                     </Border>
-                </Border>
-
+                </StackPanel>
+                
                 <!--Top bar prices-->
-                <controls:LiveRates Grid.Column="1" Margin="0, 10, 0, 0" x:Name="LiveRatesControl"
+                <controls:LiveRates Grid.Column="2" Margin="0, 10, 0, 0" x:Name="LiveRatesControl"
                                     DataContext="{Binding LiveRatesViewModel}" />
             </Grid>
         </Border>

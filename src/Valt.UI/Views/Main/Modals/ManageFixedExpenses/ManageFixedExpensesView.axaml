@@ -38,13 +38,6 @@
                       IsReadOnly="True"
                       SelectedItem="{Binding SelectedFixedExpense}"
                       DoubleTapped="MainGrid_OnDoubleTapped">
-                <DataGrid.Styles>
-                    <Styles>
-                        <Style Selector="DataGridCell TextBlock">
-                            <Setter Property="FontSize" Value="13"></Setter>
-                        </Style>
-                    </Styles>
-                </DataGrid.Styles>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Name}" Width="200"
                                         Binding="{Binding Name}">

@@ -13,9 +13,6 @@
     <Design.DataContext>
         <transactions1:TransactionListViewModel />
     </Design.DataContext>
-    <UserControl.KeyBindings>
-        <KeyBinding Gesture="F2" Command="{Binding AddTransactionCommand}" />
-    </UserControl.KeyBindings>
     <Grid RowDefinitions="100, *">
         <Grid Grid.Row="0" Margin="10" ColumnDefinitions="*, 260, *">
             <StackPanel Grid.Column="0" Margin="10" Orientation="Horizontal">
@@ -53,24 +50,6 @@
                   IsReadOnly="True"
                   SelectedItem="{Binding SelectedTransaction}"
                   SelectionChanged="MainGrid_OnSelectionChanged">
-            <DataGrid.Styles>
-                <Styles>
-                    <Style Selector="DataGridCell TextBlock">
-                        <Setter Property="FontSize" Value="13"></Setter>
-                    </Style>
-                    <Style Selector="TextBlock.icon">
-                        <Setter Property="Padding" Value="8, 4, 4, 0" />
-                        <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
-                        <Setter Property="FontSize" Value="16" />
-                    </Style>
-                    <Style Selector="TextBlock.icon-text">
-                        <Setter Property="Padding" Value="0, 10, 0, 0" />
-                    </Style>
-                    <Style Selector="TextBlock.only-text">
-                        <Setter Property="Padding" Value="8, 10, 8, 0" />
-                    </Style>
-                </Styles>
-            </DataGrid.Styles>
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="{x:Static local:language.Transactions_Columns_Date}"
                                         SortMemberPath="Date">

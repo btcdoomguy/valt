@@ -11,7 +11,8 @@
              xmlns:immutable="clr-namespace:System.Collections.Immutable;assembly=System.Collections.Immutable"
              xmlns:models="clr-namespace:Valt.UI.Views.Main.Tabs.Reports.Models"
              xmlns:lang="clr-namespace:Valt.UI.Lang"
-             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+             xmlns:painting="clr-namespace:LiveChartsCore.SkiaSharpView.Painting;assembly=LiveChartsCore.SkiaSharpView"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="1200"
              MinWidth="900"
              MinHeight="700"
              x:Class="Valt.UI.Views.Main.Tabs.Reports.ReportsView"
@@ -19,10 +20,6 @@
     <Design.DataContext>
         <reports1:ReportsViewModel />
     </Design.DataContext>
-    <UserControl.Resources>
-        <x:String x:Key="Fiat">#0566e9</x:String>
-        <x:String x:Key="Bitcoin">#ffa122</x:String>
-    </UserControl.Resources>
     <ScrollViewer>
         <StackPanel Margin="10">
             <!--Summary-->
@@ -30,9 +27,13 @@
                 <Expander.Header>
                     <TextBlock FontSize="18" Text="{x:Static lang:language.Reports_Summary}" />
                 </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="10" Margin="10">
-                    <reports1:DashboardDataUserControl DataContext="{Binding AllTimeHighData}"></reports1:DashboardDataUserControl>
-                </StackPanel>
+                <Grid Margin="10">
+                    <StackPanel Orientation="Vertical" Spacing="10" IsVisible="{Binding !IsAllTimeHighLoading}">
+                        <reports1:DashboardDataUserControl DataContext="{Binding AllTimeHighData}"></reports1:DashboardDataUserControl>
+                    </StackPanel>
+                    <TextBlock Text="{x:Static lang:language.Loading}" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               IsVisible="{Binding IsAllTimeHighLoading}" />
+                </Grid>
             </Expander>
             <!--Monthly totals-->
             <Expander VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsExpanded="True" CornerRadius="3">
@@ -49,88 +50,184 @@
                             <userControls:DateCalendarSelectorMode>All</userControls:DateCalendarSelectorMode>
                         </userControls:DateCalendarSelector.AllowedSelectorModes>
                     </userControls:DateCalendarSelector>
-                    <avalonia:CartesianChart
-                        XAxes="{Binding MonthlyTotalsChartData.XAxes}"
-                        YAxes="{Binding MonthlyTotalsChartData.YAxes}"
-                        LegendPosition="Top"
-                        ZoomMode="X"
-                        Height="500">
-                        <avalonia:CartesianChart.Series>
-                            <avalonia:XamlLineSeries
-                                SeriesName="{x:Static lang:language.Reports_MonthlyTotals_TotalWealth}"
-                                Values="{Binding MonthlyTotalsChartData.FiatValues}"
-                                Stroke="{avalonia:SolidColorPaint Color={StaticResource Fiat}}"
-                                GeometryStroke="{avalonia:SolidColorPaint Color={StaticResource Fiat}}"
-                                GeometryFill="{avalonia:SolidColorPaint Color={StaticResource Fiat}}"
-                                GeometrySize="20" />
-                            <avalonia:XamlLineSeries
-                                SeriesName="Bitcoin"
-                                Values="{Binding MonthlyTotalsChartData.BtcValues}"
-                                Stroke="{avalonia:SolidColorPaint Color={StaticResource Bitcoin}}"
-                                GeometryStroke="{avalonia:SolidColorPaint Color={StaticResource Bitcoin}}"
-                                GeometryFill="{avalonia:SolidColorPaint Color={StaticResource Bitcoin}}"
-                                GeometrySize="20"
-                                ScalesYAt="1" />
-                        </avalonia:CartesianChart.Series>
-                    </avalonia:CartesianChart>
-                    <DataGrid
-                        x:Name="MonthlyTotalsGrid"
-                        Margin="0, 10, 0, 0"
-                        GridLinesVisibility="All"
-                        ItemsSource="{Binding MonthlyReportItems}"
-                        IsReadOnly="True">
-                        <DataGrid.Styles>
-                            <Styles>
-                                <Style Selector="DataGridCell TextBlock">
-                                    <Setter Property="FontSize" Value="13"></Setter>
-                                </Style>
-                                <Style Selector="TextBlock.only-text">
-                                    <Setter Property="Padding" Value="8, 12, 8, 0" />
-                                </Style>
-                            </Styles>
-                        </DataGrid.Styles>
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="{x:Static lang:language.Reports_MonthlyTotals_Date}" Binding="{Binding MonthYear}"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Bitcoin" Binding="{Binding BtcTotal}"></DataGridTextColumn>
-                            <DataGridTemplateColumn Header="{x:Static lang:language.Reports_MonthlyTotals_PreviousMonth}">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate DataType="models:MonthlyReportItemViewModel">
-                                        <TextBlock Classes="only-text" Text="{Binding BtcMonthlyChangeFormatted}"
-                                                   Foreground="{Binding BtcMonthlyChangeColor}">
-                                        </TextBlock>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="{x:Static lang:language.Reports_MonthlyTotals_PreviousYear}">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate DataType="models:MonthlyReportItemViewModel">
-                                        <TextBlock Classes="only-text" Text="{Binding BtcYearlyChangeFormatted}"
-                                                   Foreground="{Binding BtcYearlyChangeColor}">
-                                        </TextBlock>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="{x:Static lang:language.Reports_MonthlyTotals_TotalWealth}" Binding="{Binding FiatTotalFormatted}"></DataGridTextColumn>
-                            <DataGridTemplateColumn Header="{x:Static lang:language.Reports_MonthlyTotals_PreviousMonth}">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate DataType="models:MonthlyReportItemViewModel">
-                                        <TextBlock Classes="only-text" Text="{Binding FiatMonthlyChangeFormatted}"
-                                                   Foreground="{Binding FiatMonthlyChangeColor}">
-                                        </TextBlock>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="{x:Static lang:language.Reports_MonthlyTotals_PreviousYear}">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate DataType="models:MonthlyReportItemViewModel">
-                                        <TextBlock Classes="only-text" Text="{Binding FiatYearlyChangeFormatted}"
-                                                   Foreground="{Binding FiatYearlyChangeColor}">
-                                        </TextBlock>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                    <Grid MinHeight="600">
+                        <StackPanel Orientation="Vertical" IsVisible="{Binding !IsMonthlyTotalsLoading}">
+                            <Panel Background="{DynamicResource Background900Brush}">
+                                <avalonia:CartesianChart
+                                    x:Name="MonthlyChart"
+                                    Series="{Binding MonthlyTotalsChartData.Series}"
+                                    XAxes="{Binding MonthlyTotalsChartData.XAxes}"
+                                    YAxes="{Binding MonthlyTotalsChartData.YAxes}"
+                                    LegendPosition="Top"
+                                    LegendTextSize="14"
+                                    TooltipTextSize="12"
+                                    ZoomMode="X"
+                                    Height="500"
+                                    Margin="30, 10, 30, 20">
+                                </avalonia:CartesianChart>
+                            </Panel>
+                            <DataGrid
+                                x:Name="MonthlyTotalsGrid"
+                                Margin="0, 10, 0, 0"
+                                GridLinesVisibility="All"
+                                ItemsSource="{Binding MonthlyReportItems}"
+                                IsReadOnly="True">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="{x:Static lang:language.Reports_MonthlyTotals_Date}"
+                                                        Binding="{Binding MonthYearFormatted}">
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn Header="Bitcoin" Binding="{Binding BtcTotal}"></DataGridTextColumn>
+                                    <DataGridTemplateColumn
+                                        Header="{x:Static lang:language.Reports_MonthlyTotals_PreviousMonth}">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate DataType="models:MonthlyReportItemViewModel">
+                                                <TextBlock Classes="only-text"
+                                                           Text="{Binding BtcMonthlyChangeFormatted}"
+                                                           Foreground="{Binding BtcMonthlyChangeColor}">
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn
+                                        Header="{x:Static lang:language.Reports_MonthlyTotals_PreviousYear}">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate DataType="models:MonthlyReportItemViewModel">
+                                                <TextBlock Classes="only-text"
+                                                           Text="{Binding BtcYearlyChangeFormatted}"
+                                                           Foreground="{Binding BtcYearlyChangeColor}">
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn
+                                        Header="{x:Static lang:language.Reports_MonthlyTotals_TotalWealth}"
+                                        Binding="{Binding FiatTotalFormatted}">
+                                    </DataGridTextColumn>
+                                    <DataGridTemplateColumn
+                                        Header="{x:Static lang:language.Reports_MonthlyTotals_PreviousMonth}">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate DataType="models:MonthlyReportItemViewModel">
+                                                <TextBlock Classes="only-text"
+                                                           Text="{Binding FiatMonthlyChangeFormatted}"
+                                                           Foreground="{Binding FiatMonthlyChangeColor}">
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn
+                                        Header="{x:Static lang:language.Reports_MonthlyTotals_PreviousYear}">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate DataType="models:MonthlyReportItemViewModel">
+                                                <TextBlock Classes="only-text"
+                                                           Text="{Binding FiatYearlyChangeFormatted}"
+                                                           Foreground="{Binding FiatYearlyChangeColor}">
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="{x:Static lang:language.Reports_MonthlyTotals_Income}">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate DataType="models:MonthlyReportItemViewModel">
+                                                <TextBlock Classes="only-text" Text="{Binding IncomeFormatted}">
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="{x:Static lang:language.Reports_MonthlyTotals_Expenses}">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate DataType="models:MonthlyReportItemViewModel">
+                                                <TextBlock Classes="only-text" Text="{Binding ExpensesFormatted}">
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="{x:Static lang:language.Reports_MonthlyTotals_BitcoinPurchased}">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate DataType="models:MonthlyReportItemViewModel">
+                                                <TextBlock Classes="only-text"
+                                                           Text="{Binding BitcoinPurchasedFormatted}">
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="{x:Static lang:language.Reports_MonthlyTotals_BitcoinSold}">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate DataType="models:MonthlyReportItemViewModel">
+                                                <TextBlock Classes="only-text" Text="{Binding BitcoinSoldFormatted}">
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="{x:Static lang:language.Reports_MonthlyTotals_BitcoinIncome}">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate DataType="models:MonthlyReportItemViewModel">
+                                                <TextBlock Classes="only-text" Text="{Binding BitcoinIncomeFormatted}">
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="{x:Static lang:language.Reports_MonthlyTotals_BitcoinExpenses}">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate DataType="models:MonthlyReportItemViewModel">
+                                                <TextBlock Classes="only-text"
+                                                           Text="{Binding BitcoinExpensesFormatted}">
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="16" HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" IsVisible="{Binding IsMonthlyTotalsLoading}" />
+                    </Grid>
+                </StackPanel>
+            </Expander>
+            <!--Categories-->
+            <Expander VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsExpanded="True" CornerRadius="3">
+                <Expander.Header>
+                    <TextBlock FontSize="18" Text="{x:Static lang:language.Reports_SpendingByCategories_Title}" />
+                </Expander.Header>
+                <StackPanel Orientation="Vertical">
+                    <userControls:DateCalendarSelector HorizontalContentAlignment="Center"
+                                                       Height="60"
+                                                       Date="{Binding CategoryFilterMainDate}"
+                                                       Range="{Binding CategoryFilterRange}">
+                        <userControls:DateCalendarSelector.AllowedSelectorModes>
+                            <userControls:DateCalendarSelectorMode>Month</userControls:DateCalendarSelectorMode>
+                            <userControls:DateCalendarSelectorMode>Year</userControls:DateCalendarSelectorMode>
+                            <userControls:DateCalendarSelectorMode>All</userControls:DateCalendarSelectorMode>
+                        </userControls:DateCalendarSelector.AllowedSelectorModes>
+                    </userControls:DateCalendarSelector>
+                    <Panel MinHeight="600">
+                        <Grid ColumnDefinitions="300, *" IsVisible="{Binding !IsSpendingByCategoriesLoading}">
+                            <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="10" Margin="0, 10, 10, 0">
+                                <userControls:CheckboxListSelector
+                                    Title="{x:Static lang:language.Reports_SpendingByCategories_Accounts}"
+                                    DisplayMemberPath="Name"
+                                    MaxListHeight="200"
+                                    ItemsSource="{Binding AvailableAccounts}"
+                                    SelectedItems="{Binding SelectedAccounts}" />
+                                <userControls:CheckboxListSelector
+                                    Title="{x:Static lang:language.Reports_SpendingByCategories_Categories}"
+                                    DisplayMemberPath="Name"
+                                    MaxListHeight="300"
+                                    ItemsSource="{Binding AvailableCategories}"
+                                    SelectedItems="{Binding SelectedCategories}" />
+                            </StackPanel>
+                            <Panel Grid.Column="1" Background="{DynamicResource Background900Brush}">
+                                <avalonia:PieChart x:Name="CategoryPieChart"
+                                                   Width="750"
+                                                   Height="800"
+                                                   LegendPosition="Right"
+                                                   LegendTextSize="12"
+                                                   Series="{Binding ExpensesByCategoryChartData.Series}">
+                                </avalonia:PieChart>
+                            </Panel>
+                        </Grid>
+                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="16" HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" IsVisible="{Binding IsSpendingByCategoriesLoading}" />
+                    </Panel>
                 </StackPanel>
             </Expander>
         </StackPanel>

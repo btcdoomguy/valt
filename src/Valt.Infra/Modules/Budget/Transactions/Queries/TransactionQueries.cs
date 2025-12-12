@@ -140,7 +140,7 @@ public class TransactionQueries : ITransactionQueries
     private static string? FormatAmount(long? satAmount, decimal? fiatAmount, string? currency)
     {
         if (satAmount is not null)
-            return CurrencyDisplay.FormatAsBitcoin(satAmount.Value);
+            return CurrencyDisplay.FormatSatsAsBitcoin(satAmount.Value);
 
         if (fiatAmount is not null && currency is not null)
             return CurrencyDisplay.FormatFiat(fiatAmount.Value, currency);

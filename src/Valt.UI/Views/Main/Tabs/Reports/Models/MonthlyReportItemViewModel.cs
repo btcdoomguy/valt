@@ -21,11 +21,18 @@ public class MonthlyReportItemViewModel : ObservableObject
         FiatTotal = item.FiatTotal;
         FiatMonthlyChange = item.FiatMonthlyChange;
         FiatYearlyChange = item.FiatYearlyChange;
+        Income = item.Income;
+        Expenses = item.Expenses;
+        BitcoinPurchased = item.BitcoinPurchased;
+        BitcoinSold = item.BitcoinSold;
+        BitcoinIncome = item.BitcoinIncome;
+        BitcoinExpenses = item.BitcoinExpenses;
     }
     
     public FiatCurrency Currency { get; init; }
 
     public DateOnly MonthYear { get; init; }
+    public string MonthYearFormatted => MonthYear.ToString("MMMM yyyy");
     public decimal BtcTotal { get; init; }
 
     public decimal BtcMonthlyChange { get; init; }
@@ -47,6 +54,21 @@ public class MonthlyReportItemViewModel : ObservableObject
     public decimal FiatYearlyChange { get; init; }
     public string FiatYearlyChangeFormatted => FiatYearlyChange >= 0 ? $"+{FiatYearlyChange}%" : $"{FiatYearlyChange}%";
     public SolidColorBrush FiatYearlyChangeColor => Process(FiatYearlyChange);
+    
+    public decimal Income { get; init; }
+    public string IncomeFormatted => CurrencyDisplay.FormatFiat(Income, Currency.Code);
+    public decimal Expenses { get; init; }
+    public string ExpensesFormatted => CurrencyDisplay.FormatFiat(Expenses, Currency.Code);
+        
+    public decimal BitcoinPurchased { get; init; }
+    public string BitcoinPurchasedFormatted => CurrencyDisplay.FormatAsBitcoin(BitcoinPurchased);
+    public decimal BitcoinSold { get; init; }
+    public string BitcoinSoldFormatted => CurrencyDisplay.FormatAsBitcoin(BitcoinSold);
+        
+    public decimal BitcoinIncome { get; init; }
+    public string BitcoinIncomeFormatted => CurrencyDisplay.FormatAsBitcoin(BitcoinIncome);
+    public decimal BitcoinExpenses { get; init; }
+    public string BitcoinExpensesFormatted => CurrencyDisplay.FormatAsBitcoin(BitcoinExpenses);
 
     private SolidColorBrush Process(decimal percentage)
     {

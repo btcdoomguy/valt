@@ -13,7 +13,7 @@
         <StackPanel Orientation="Vertical">
             <Label HorizontalContentAlignment="Center"
                    Content="{Binding Title}"
-                   Background="{DynamicResource Background800Brush}" FontSize="18" />
+                   Background="{DynamicResource Background800Brush}" FontSize="16" />
 
             <ItemsControl ItemsSource="{Binding Rows}">
                 <ItemsControl.ItemTemplate>

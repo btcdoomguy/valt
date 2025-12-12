@@ -23,5 +23,14 @@ public record MonthlyTotalsData
         
         public required decimal FiatMonthlyChange { get; init; }
         public required decimal FiatYearlyChange { get; init; }
+        
+        public required decimal Income { get; init; }
+        public required decimal Expenses { get; init; }
+        
+        public required decimal BitcoinPurchased { get; init; }
+        public required decimal BitcoinSold { get; init; }
+        
+        public required decimal BitcoinIncome { get; init; }
+        public required decimal BitcoinExpenses { get; init; }
     }
 }

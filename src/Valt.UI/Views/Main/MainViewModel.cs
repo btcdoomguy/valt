@@ -112,6 +112,7 @@ public partial class MainViewModel : ValtViewModel
         HasDatabaseOpen = true;
         _currencySettings.MainFiatCurrency = FiatCurrency.Brl.Code;
         SelectedTabComponent = _pageFactory.Create(MainViewTabNames.TransactionsPageContent);
+        IsOffline = true;
     }
 
     public MainViewModel(IPageFactory pageFactory,
@@ -200,9 +201,11 @@ public partial class MainViewModel : ValtViewModel
     }
 
     [RelayCommand]
-    private Task AddTransaction()
+    private Task SendF2()
     {
-        WeakReferenceMessenger.Default.Send(new AddTransactionRequested());
+        if (SelectedTabComponent?.TabName == MainViewTabNames.TransactionsPageContent)
+            WeakReferenceMessenger.Default.Send(new AddTransactionRequested());
+        
         return Task.CompletedTask;
     }
 

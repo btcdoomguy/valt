@@ -657,4 +657,37 @@
     <data name="Reports.AllTimeHigh.DeclineFromAth" xml:space="preserve">
         <value>Diferença atual</value>
     </data>
+    <data name="Reports.MonthlyTotals.Obs" xml:space="preserve">
+        <value>* o total atual é baseado nos valores do dia anterior</value>
+    </data>
+    <data name="Loading" xml:space="preserve">
+        <value>Carregando...</value>
+    </data>
+    <data name="Reports.MonthlyTotals.BitcoinExpenses" xml:space="preserve">
+        <value>Saídas em BTC</value>
+    </data>
+    <data name="Reports.MonthlyTotals.BitcoinIncome" xml:space="preserve">
+        <value>Entradas em BTC</value>
+    </data>
+    <data name="Reports.MonthlyTotals.BitcoinPurchased" xml:space="preserve">
+        <value>BTC Comprados</value>
+    </data>
+    <data name="Reports.MonthlyTotals.BitcoinSold" xml:space="preserve">
+        <value>BTC Vendidos</value>
+    </data>
+    <data name="Reports.MonthlyTotals.Expenses" xml:space="preserve">
+        <value>Despesas</value>
+    </data>
+    <data name="Reports.MonthlyTotals.Income" xml:space="preserve">
+        <value>Saídas</value>
+    </data>
+    <data name="Reports.SpendingByCategories.Title" xml:space="preserve">
+        <value>Gastos por categorias</value>
+    </data>
+    <data name="Reports.SpendingByCategories.Accounts" xml:space="preserve">
+        <value>Contas</value>
+    </data>
+    <data name="Reports.SpendingByCategories.Categories" xml:space="preserve">
+        <value>Categorias</value>
+    </data>
 </root>

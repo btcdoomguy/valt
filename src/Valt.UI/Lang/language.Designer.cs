@@ -123,6 +123,12 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string Loading {
+            get {
+                return ResourceManager.GetString("Loading", resourceCulture);
+            }
+        }
+        
         public static string IconSelector_Title {
             get {
                 return ResourceManager.GetString("IconSelector.Title", resourceCulture);
@@ -1320,6 +1326,66 @@ namespace Valt.UI.Lang {
         public static string Reports_AllTimeHigh_DeclineFromAth {
             get {
                 return ResourceManager.GetString("Reports.AllTimeHigh.DeclineFromAth", resourceCulture);
+            }
+        }
+        
+        public static string Reports_MonthlyTotals_Obs {
+            get {
+                return ResourceManager.GetString("Reports.MonthlyTotals.Obs", resourceCulture);
+            }
+        }
+        
+        public static string Reports_MonthlyTotals_Income {
+            get {
+                return ResourceManager.GetString("Reports.MonthlyTotals.Income", resourceCulture);
+            }
+        }
+        
+        public static string Reports_MonthlyTotals_Expenses {
+            get {
+                return ResourceManager.GetString("Reports.MonthlyTotals.Expenses", resourceCulture);
+            }
+        }
+        
+        public static string Reports_MonthlyTotals_BitcoinPurchased {
+            get {
+                return ResourceManager.GetString("Reports.MonthlyTotals.BitcoinPurchased", resourceCulture);
+            }
+        }
+        
+        public static string Reports_MonthlyTotals_BitcoinSold {
+            get {
+                return ResourceManager.GetString("Reports.MonthlyTotals.BitcoinSold", resourceCulture);
+            }
+        }
+        
+        public static string Reports_MonthlyTotals_BitcoinIncome {
+            get {
+                return ResourceManager.GetString("Reports.MonthlyTotals.BitcoinIncome", resourceCulture);
+            }
+        }
+        
+        public static string Reports_MonthlyTotals_BitcoinExpenses {
+            get {
+                return ResourceManager.GetString("Reports.MonthlyTotals.BitcoinExpenses", resourceCulture);
+            }
+        }
+        
+        public static string Reports_SpendingByCategories_Title {
+            get {
+                return ResourceManager.GetString("Reports.SpendingByCategories.Title", resourceCulture);
+            }
+        }
+
+        public static string Reports_SpendingByCategories_Accounts {
+            get {
+                return ResourceManager.GetString("Reports.SpendingByCategories.Accounts", resourceCulture);
+            }
+        }
+
+        public static string Reports_SpendingByCategories_Categories {
+            get {
+                return ResourceManager.GetString("Reports.SpendingByCategories.Categories", resourceCulture);
             }
         }
     }

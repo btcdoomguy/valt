@@ -1,6 +1,7 @@
 using System;
 using Avalonia.Media;
 using Valt.Core.Modules.Budget.FixedExpenses;
+using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Budget.FixedExpenses;
 
 namespace Valt.UI.Views.Main.Tabs.Transactions.Models;
@@ -31,7 +32,23 @@ public class FixedExpensesEntryViewModel(FixedExpenseProviderEntry entry, DateOn
 
     public int Day => Entry.Day;
     
+    public string DayFormatted => Entry.Day.ToString().PadLeft(2, '0');
+
     public bool IsLateOrCurrentDay => ReferenceDate <= currentDate;
+
+    public string AmountDisplay
+    {
+        get
+        {
+            if (FixedAmount.HasValue)
+                return CurrencyDisplay.FormatFiat(FixedAmount.Value, Currency);
+
+            if (RangedAmountMin.HasValue && RangedAmountMax.HasValue)
+                return $"{CurrencyDisplay.FormatFiat(RangedAmountMin.Value, Currency)} - {CurrencyDisplay.FormatFiat(RangedAmountMax.Value, Currency)}";
+
+            return string.Empty;
+        }
+    }
 
     public SolidColorBrush CheckboxPaidColor =>
         Paid ? FixedExpenseListResources.PaidForeground : FixedExpenseListResources.DefaultForeground;

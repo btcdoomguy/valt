@@ -30,7 +30,7 @@
                         <Label>Transactions</Label>
                     </StackPanel>
                 </Button>
-                
+
                 <Button Classes="transaction-option">
                     <StackPanel Orientation="Horizontal">
                         <Label Classes="icon" Content="&#xE15B;"></Label>
@@ -86,29 +86,64 @@
                 <Button Classes="transparent link">View all</Button>
                 <userControls:CustomTitleBar Title="Testing" />
             </StackPanel>
-           
+
         </Border>
     </Design.PreviewWith>
 
-    <!-- check the official github to understand the color definitions -->
-    <!-- https://github.com/AvaloniaUI/Avalonia/blob/master/src/Avalonia.Themes.Fluent/Controls/ListBoxItem.xaml -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         GLOBAL / WINDOW STYLES
+         Reference: https://github.com/AvaloniaUI/Avalonia/blob/master/src/Avalonia.Themes.Fluent/Controls/
+         ═══════════════════════════════════════════════════════════════════════════════ -->
 
-    <!-- Global Styling -->
     <Style Selector="Window">
-        <Setter Property="BorderThickness" Value="5"></Setter>
-        <Setter Property="BorderBrush" Value="{DynamicResource Background600Brush}"></Setter>
-        <Setter Property="FontFamily" Value="{DynamicResource Akko}"></Setter>
-        <Setter Property="Background" Value="{DynamicResource Background800Brush}"></Setter>
-        <Setter Property="Padding" Value="0"></Setter>
+        <Setter Property="BorderThickness" Value="5" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background600Brush}" />
+        <Setter Property="FontFamily" Value="{DynamicResource Akko}" />
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+        <Setter Property="Padding" Value="0" />
     </Style>
 
-    <!-- Window borders -->
     <Style Selector="Window > Border">
-        <Setter Property="BorderThickness" Value="1"></Setter>
-        <Setter Property="BorderBrush" Value="{DynamicResource Background900Brush}"></Setter>
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background900Brush}" />
     </Style>
-    
-    <!-- Style for DataValidationErrorsPresenter -->
+
+    <!-- About window uses Mono font -->
+    <Style Selector="Window.about">
+        <Setter Property="FontFamily" Value="Mono" />
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         TYPOGRAPHY
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="TextBlock">
+        <Setter Property="Padding" Value="2" />
+    </Style>
+
+    <Style Selector="TextBlock.titlebar-text">
+        <Setter Property="Padding" Value="0, 4, 0, 0" />
+    </Style>
+
+    <!-- Material Design icon styling for TextBlocks -->
+    <Style Selector="TextBlock.icon">
+        <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Padding" Value="8, 4, 4, 0" />
+    </Style>
+
+    <Style Selector="TextBlock.icon-text">
+        <Setter Property="Padding" Value="0, 10, 0, 0" />
+    </Style>
+
+    <Style Selector="TextBlock.only-text">
+        <Setter Property="Padding" Value="8, 10, 8, 0" />
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         DATA VALIDATION
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
     <Style Selector="DataValidationErrors">
         <Setter Property="Template">
             <ControlTemplate>
@@ -131,7 +166,7 @@
         </Setter>
         <Setter Property="ErrorTemplate">
             <DataTemplate x:DataType="{x:Type x:Object}">
-                <Canvas Width="14" Height="14" Margin="4 0 1 0" 
+                <Canvas Width="14" Height="14" Margin="4 0 1 0"
                         Background="Transparent">
                     <Canvas.Styles>
                         <Style Selector="ToolTip">
@@ -142,22 +177,288 @@
                     <ToolTip.Tip>
                         <ItemsControl ItemsSource="{Binding}"/>
                     </ToolTip.Tip>
-                    <Path Data="M14,7 A7,7 0 0,0 0,7 M0,7 A7,7 0 1,0 14,7 M7,3l0,5 M7,9l0,2" 
-                          Stroke="{DynamicResource SemanticWarning200Brush}" 
+                    <Path Data="M14,7 A7,7 0 0,0 0,7 M0,7 A7,7 0 1,0 14,7 M7,3l0,5 M7,9l0,2"
+                          Stroke="{DynamicResource SemanticWarning200Brush}"
                           StrokeThickness="2"/>
                 </Canvas>
             </DataTemplate>
         </Setter>
     </Style>
 
-    <!-- Data grid -->
-    <Style Selector="DataGrid">
-        <Setter Property="Background" Value="{DynamicResource Background900Brush}"></Setter>
-        <!--<Setter Property="RowBackground" Value="{DynamicResource Background800Brush}"></Setter>-->
-        <Setter Property="BorderBrush" Value="{DynamicResource Background900Brush}"></Setter>
-        <Setter Property="BorderThickness" Value="1"></Setter>
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         BUTTONS - Base Styles
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="Button">
+        <Setter Property="Padding" Value="6, 8, 6, 0" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Background" Value="{DynamicResource Accent600Brush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        <Style Selector="^ /template/ ContentPresenter">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.1" />
+                    <BrushTransition Property="Foreground" Duration="0:0:0.1" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Accent700Brush}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        </Style>
     </Style>
 
+    <!-- Transparent button modifier -->
+    <Style Selector="Button.transparent">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="Button.transparent:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <!-- Link-style button -->
+    <Style Selector="Button.link">
+        <Setter Property="Foreground" Value="{DynamicResource Text300Brush}" />
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        </Style>
+    </Style>
+
+    <!-- Delete button (destructive action) -->
+    <Style Selector="Button.delete-button">
+        <Setter Property="Background" Value="{DynamicResource SemanticNegative500Brush}" />
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SemanticNegative700Brush}" />
+        </Style>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         BUTTONS - Icon Variants
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="Button.icon-only">
+        <Setter Property="FontSize" Value="28" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
+    </Style>
+
+    <Style Selector="Button.calculator">
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Content" Value="&#xEA5F;" />
+    </Style>
+
+    <Style Selector="Button.text-and-icon">
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Background" Value="{DynamicResource Accent600Brush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        <Style Selector="^ Label">
+            <Setter Property="Margin" Value="0, 8, 0 ,0" />
+        </Style>
+        <Style Selector="^ Label.icon">
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
+            <Setter Property="Margin" Value="0, 2, 0 ,0" />
+        </Style>
+    </Style>
+
+    <Style Selector="Button.rounded">
+        <Setter Property="Padding" Value="4, 2, 0, 0" />
+        <Setter Property="Background" Value="#49FFFFFF" />
+        <Setter Property="FontSize" Value="30" />
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="CornerRadius" Value="20" />
+        <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
+        <Style Selector="^ /template/ ContentPresenter">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0" />
+                </Transitions>
+            </Setter>
+        </Style>
+    </Style>
+
+    <Style Selector="Button.icon-selector-button">
+        <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
+        <Setter Property="FontSize" Value="28" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="LightGray" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Width" Value="42" />
+        <Setter Property="Height" Value="42" />
+        <Style Selector="^ /template/ ContentPresenter">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Black" />
+            <Setter Property="BorderBrush" Value="White" />
+        </Style>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         BUTTONS - Navigation Tabs
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="Button.tab">
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="Background" Value="Transparent" />
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Background600Brush}" />
+        </Style>
+        <Style Selector="^.selected">
+            <Setter Property="Background" Value="{DynamicResource Background600Brush}" />
+        </Style>
+        <Style Selector="^ Label">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="Margin" Value="0, 5 0, 0" />
+        </Style>
+        <Style Selector="^ Label.icon">
+            <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
+            <Setter Property="FontSize" Value="22" />
+            <Setter Property="Margin" Value="0" />
+        </Style>
+        <Style Selector="^ /template/ ContentPresenter">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.5" />
+                    <BrushTransition Property="Foreground" Duration="0:0:0" />
+                </Transitions>
+            </Setter>
+        </Style>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         BUTTONS - Transaction Type Options (Debt/Credit/Transfer)
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="Button.transaction-option">
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="Background" Value="Transparent" />
+        <Style Selector="^ Label">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Margin" Value="0, 5, 0, 0" />
+        </Style>
+        <Style Selector="^ Label.icon">
+            <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="Margin" Value="0" />
+        </Style>
+        <Style Selector="^ /template/ ContentPresenter">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <!-- Default (untyped) states -->
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+        </Style>
+        <Style Selector="^.selected">
+            <Setter Property="Background" Value="{DynamicResource Background900Brush}" />
+        </Style>
+        <!-- Credit variant -->
+        <Style Selector="^.credit:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource CreditBaseBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text900Brush}" />
+        </Style>
+        <Style Selector="^.credit.selected">
+            <Setter Property="Background" Value="{DynamicResource CreditBaseBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text900Brush}" />
+        </Style>
+        <!-- Debt variant -->
+        <Style Selector="^.debt:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource DebtBaseBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text900Brush}" />
+        </Style>
+        <Style Selector="^.debt.selected">
+            <Setter Property="Background" Value="{DynamicResource DebtBaseBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text900Brush}" />
+        </Style>
+        <!-- Transfer variant -->
+        <Style Selector="^.transfer:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource TransferBaseBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text900Brush}" />
+        </Style>
+        <Style Selector="^.transfer.selected">
+            <Setter Property="Background" Value="{DynamicResource TransferBaseBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text900Brush}" />
+        </Style>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         BUTTONS - Title Bar
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="Button.titlebar">
+        <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Width" Value="30" />
+        <Setter Property="Padding" Value="6, 0, 0, 0" />
+        <Style Selector="^ /template/ ContentPresenter">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.1" />
+                    <BrushTransition Property="Foreground" Duration="0:0:0.1" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="^:disabled /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource WhiteBrush}" />
+        </Style>
+    </Style>
+
+    <Style Selector="Button.titlebar.close">
+        <Setter Property="Content" Value="&#xE5CD;" />
+    </Style>
+
+    <Style Selector="Button.titlebar.maximize">
+        <Setter Property="Content" Value="&#xEB54;" />
+    </Style>
+
+    <Style Selector="Button.titlebar.minimize">
+        <Setter Property="Content" Value="&#xE931;" />
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         DROP DOWN BUTTONS
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="DropDownButton.icon">
+        <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
+        <Setter Property="FontSize" Value="22" />
+        <Setter Property="Margin" Value="0" />
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         DATA GRID
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="DataGrid">
+        <Setter Property="Background" Value="{DynamicResource Background900Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background900Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <!-- Alternating row colors -->
     <Style Selector="DataGridRow:nth-child(odd)">
         <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
     </Style>
@@ -165,310 +466,43 @@
         <Setter Property="Background" Value="{DynamicResource Background900Brush}" />
     </Style>
 
+    <!-- Row hover state -->
     <Style Selector="DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
         <Setter Property="Fill" Value="{DynamicResource Background700Brush}" />
     </Style>
 
-    <Style Selector="DataGridRow:selected">
-        <Style Selector="^ /template/ Rectangle#BackgroundRectangle">
-            <Setter Property="Fill" Value="{DynamicResource Secondary600Brush}" />
-            <Setter Property="Opacity" Value="{DynamicResource DataGridRowSelectedUnfocusedBackgroundOpacity}" />
-        </Style>
-        <Style Selector="^:pointerover /template/ Rectangle#BackgroundRectangle">
-            <Setter Property="Fill" Value="{DynamicResource Secondary600Brush}" />
-            <Setter Property="Opacity" Value="{DynamicResource DataGridRowSelectedHoveredUnfocusedBackgroundOpacity}" />
-        </Style>
-        <Style Selector="^:focus /template/ Rectangle#BackgroundRectangle">
-            <Setter Property="Fill" Value="{DynamicResource Secondary600Brush}" />
-            <Setter Property="Opacity" Value="{DynamicResource DataGridRowSelectedBackgroundOpacity}" />
-        </Style>
-        <Style Selector="^:pointerover:focus /template/ Rectangle#BackgroundRectangle">
-            <Setter Property="Fill" Value="{DynamicResource Secondary600Brush}" />
-            <Setter Property="Opacity" Value="{DynamicResource DataGridRowSelectedHoveredBackgroundOpacity}" />
-        </Style>
+    <!-- Row selection states -->
+    <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+        <Setter Property="Fill" Value="{DynamicResource Secondary600Brush}" />
+        <Setter Property="Opacity" Value="{DynamicResource DataGridRowSelectedUnfocusedBackgroundOpacity}" />
     </Style>
-    
-    <!--Drop down button-->
-    <Style Selector="DropDownButton.icon">
-        <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}"></Setter>
-        <Setter Property="FontSize" Value="22" />
-        <Setter Property="Margin" Value="0, 0, 0, 0"></Setter>
+    <Style Selector="DataGridRow:selected:pointerover /template/ Rectangle#BackgroundRectangle">
+        <Setter Property="Fill" Value="{DynamicResource Secondary600Brush}" />
+        <Setter Property="Opacity" Value="{DynamicResource DataGridRowSelectedHoveredUnfocusedBackgroundOpacity}" />
+    </Style>
+    <Style Selector="DataGridRow:selected:focus /template/ Rectangle#BackgroundRectangle">
+        <Setter Property="Fill" Value="{DynamicResource Secondary600Brush}" />
+        <Setter Property="Opacity" Value="{DynamicResource DataGridRowSelectedBackgroundOpacity}" />
+    </Style>
+    <Style Selector="DataGridRow:selected:pointerover:focus /template/ Rectangle#BackgroundRectangle">
+        <Setter Property="Fill" Value="{DynamicResource Secondary600Brush}" />
+        <Setter Property="Opacity" Value="{DynamicResource DataGridRowSelectedHoveredBackgroundOpacity}" />
     </Style>
 
-    <!--Button-->
-    <Style Selector="Button">
-        <Setter Property="Padding" Value="6, 8, 6, 0"></Setter>
-        <Setter Property="FontSize" Value="16"></Setter>
-        <Setter Property="Background" Value="{DynamicResource Accent600Brush}"></Setter>
-        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}"></Setter>
-        <Style Selector="^ /template/ ContentPresenter">
-            <Setter Property="Transitions">
-                <Transitions>
-                    <BrushTransition Property="Background" Duration="0:0:0.1"></BrushTransition>
-                    <BrushTransition Property="Foreground" Duration="0:0:0.1"></BrushTransition>
-                </Transitions>
-            </Setter>
-        </Style>
-        <Style Selector="^:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource Accent700Brush}"></Setter>
-            <Setter Property="Foreground" Value="{DynamicResource Text100Brush}"></Setter>
-        </Style>
+    <!-- DataGrid cell text styling (consolidated from views) -->
+    <Style Selector="DataGridCell TextBlock">
+        <Setter Property="FontSize" Value="13" />
     </Style>
 
-    <Style Selector="Button.text-and-icon">
-        <Setter Property="Padding" Value="2" />
-        <Setter Property="FontSize" Value="16" />
-        <Setter Property="Background" Value="{DynamicResource Accent600Brush}"></Setter>
-        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}"></Setter>
-        <Style Selector="^ Label">
-            <Setter Property="Margin" Value="0, 8, 0 ,0"></Setter>
-        </Style>
-        <Style Selector="^ Label.icon">
-            <Setter Property="FontSize" Value="20" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}"></Setter>
-            <Setter Property="Margin" Value="0, 2, 0 ,0"></Setter>
-        </Style>
-    </Style>
-    <Style Selector="Button.tab">
-        <Setter Property="Padding" Value="2" />
-        <Setter Property="Background" Value="Transparent" />
-        <Style Selector="^:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource Background600Brush}"></Setter>
-        </Style>
-        <Style Selector="^.selected">
-            <Setter Property="Background" Value="{DynamicResource Background600Brush}"></Setter>
-        </Style>
-        <Style Selector="^ Label">
-            <Setter Property="FontSize" Value="18" />
-            <Setter Property="Margin" Value="0, 5 0, 0"></Setter>
-        </Style>
-        <Style Selector="^ Label.icon">
-            <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}"></Setter>
-            <Setter Property="FontSize" Value="22" />
-            <Setter Property="Margin" Value="0, 0, 0, 0"></Setter>
-        </Style>
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         DATE PICKER
+         ═══════════════════════════════════════════════════════════════════════════════ -->
 
-        <Style Selector="^ /template/ ContentPresenter">
-            <Setter Property="Transitions">
-                <Transitions>
-                    <BrushTransition Property="Background" Duration="0:0:0.5"></BrushTransition>
-                    <BrushTransition Property="Foreground" Duration="0:0:0"></BrushTransition>
-                </Transitions>
-            </Setter>
-        </Style>
-    </Style>
-
-    <Style Selector="Button.transparent">
-        <Setter Property="Background" Value="Transparent"></Setter>
-    </Style>
-    <Style Selector="Button.transparent:pointerover /template/ ContentPresenter">
-        <Setter Property="Background" Value="Transparent"></Setter>
-    </Style>
-    <Style Selector="Button.link">
-        <Setter Property="Foreground" Value="{DynamicResource Text300Brush}"></Setter>
-        <Style Selector="^:pointerover /template/ ContentPresenter">
-            <Setter Property="Foreground" Value="{DynamicResource Text100Brush}"></Setter>
-        </Style>
-    </Style>
-    
-    <Style Selector="Button.transaction-option">
-        <Setter Property="Padding" Value="2" />
-        <Setter Property="Background" Value="Transparent" />
-        <Style Selector="^:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource Background700Brush}"></Setter>
-        </Style>
-        <Style Selector="^.selected">
-            <Setter Property="Background" Value="{DynamicResource Background900Brush}"></Setter>
-        </Style>
-        <Style Selector="^.credit">
-            <Style Selector="^:pointerover /template/ ContentPresenter">
-                <Setter Property="Background" Value="{DynamicResource CreditBaseBrush}"></Setter>
-                <Setter Property="Foreground" Value="{DynamicResource Text900Brush}"></Setter>
-            </Style>
-            <Style Selector="^.selected">
-                <Setter Property="Background" Value="{DynamicResource CreditBaseBrush}"></Setter>
-                <Setter Property="Foreground" Value="{DynamicResource Text900Brush}"></Setter>
-            </Style>
-        </Style>
-        <Style Selector="^.debt">
-            <Style Selector="^:pointerover /template/ ContentPresenter">
-                <Setter Property="Background" Value="{DynamicResource DebtBaseBrush}"></Setter>
-                <Setter Property="Foreground" Value="{DynamicResource Text900Brush}"></Setter>
-            </Style>
-            <Style Selector="^.selected">
-                <Setter Property="Background" Value="{DynamicResource DebtBaseBrush}"></Setter>
-                <Setter Property="Foreground" Value="{DynamicResource Text900Brush}"></Setter>
-            </Style>
-        </Style>
-        <Style Selector="^.transfer">
-            <Style Selector="^:pointerover /template/ ContentPresenter">
-                <Setter Property="Background" Value="{DynamicResource TransferBaseBrush}"></Setter>
-                <Setter Property="Foreground" Value="{DynamicResource Text900Brush}"></Setter>
-            </Style>
-            <Style Selector="^.selected">
-                <Setter Property="Background" Value="{DynamicResource TransferBaseBrush}"></Setter>
-                <Setter Property="Foreground" Value="{DynamicResource Text900Brush}"></Setter>
-            </Style>
-        </Style>
-        <Style Selector="^ Label">
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="Margin" Value="0, 5 0, 0"></Setter>
-        </Style>
-        <Style Selector="^ Label.icon">
-            <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}"></Setter>
-            <Setter Property="FontSize" Value="20" />
-            <Setter Property="Margin" Value="0, 0, 0, 0"></Setter>
-        </Style>
-
-        <Style Selector="^ /template/ ContentPresenter">
-            <Setter Property="Transitions">
-                <Transitions>
-                    <BrushTransition Property="Background" Duration="0:0:0"></BrushTransition>
-                </Transitions>
-            </Setter>
-        </Style>
-    </Style>
-    <Style Selector="Button.rounded">
-        <Setter Property="Padding" Value="4, 2, 0,0" />
-        <Setter Property="Background" Value="#49FFFFFF" />
-        <Setter Property="FontSize">30</Setter>
-        <Setter Property="Width">40</Setter>
-        <Setter Property="Height">40</Setter>
-        <Setter Property="CornerRadius">20</Setter>
-        <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}"></Setter>
-        <Style Selector="^ /template/ ContentPresenter">
-            <Setter Property="Transitions">
-                <Transitions>
-                    <BrushTransition Property="Background" Duration="0:0:0"></BrushTransition>
-                </Transitions>
-            </Setter>
-        </Style>
-    </Style>
-
-    <Style Selector="Button.icon-only">
-        <Setter Property="FontSize" Value="28"></Setter>
-        <Setter Property="Padding" Value="0"></Setter>
-        <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}"></Setter>
-    </Style>
-
-    <Style Selector="Button.calculator">
-        <Setter Property="FontSize" Value="20"></Setter>
-        <Setter Property="Padding" Value="0"></Setter>
-        <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}"></Setter>
-        <Setter Property="Background" Value="Transparent"></Setter>
-        <Setter Property="Content" Value="&#xEA5F;"></Setter>
-    </Style>
-
-    <Style Selector="Button.icon-selector-button">
-        <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}"></Setter>
-        <Setter Property="FontSize" Value="28"></Setter>
-        <Setter Property="Background" Value="Transparent"></Setter>
-        <Setter Property="BorderBrush" Value="LightGray"></Setter>
-        <Setter Property="HorizontalContentAlignment" Value="Center"></Setter>
-        <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
-        <Setter Property="Margin" Value="0"></Setter>
-        <Setter Property="Padding" Value="0"></Setter>
-        <Setter Property="Width" Value="42"></Setter>
-        <Setter Property="Height" Value="42"></Setter>
-        <Style Selector="^ /template/ ContentPresenter">
-            <Setter Property="Transitions">
-                <Transitions>
-                    <BrushTransition Property="Background" Duration="0:0:0"></BrushTransition>
-                </Transitions>
-            </Setter>
-        </Style>
-        <Style Selector="^:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="Black"></Setter>
-            <Setter Property="BorderBrush" Value="White"></Setter>
-        </Style>
-    </Style>
-
-    <Style Selector="Button.delete-button">
-        <Setter Property="Background" Value="{DynamicResource SemanticNegative500Brush}" />
-        <Style Selector="^ /template/ ContentPresenter">
-            <Setter Property="Transitions">
-                <Transitions>
-                    <BrushTransition Property="Background" Duration="0:0:0.1"></BrushTransition>
-                    <BrushTransition Property="Foreground" Duration="0:0:0.1"></BrushTransition>
-                </Transitions>
-            </Setter>
-        </Style>
-        <Style Selector="^:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource SemanticNegative700Brush}"></Setter>
-        </Style>
-    </Style>
-    
-    <!-- Title bar buttons -->
-    <Style Selector="TextBlock.titlebar-text">
-        <Setter Property="Padding" Value="0, 4, 0, 0"></Setter>
-    </Style>
-    <Style Selector="Button.titlebar">
-        <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}"></Setter>
-        <Setter Property="FontSize" Value="18"></Setter>
-        <Setter Property="Background" Value="Transparent"></Setter>
-        <Setter Property="Height" Value="24"></Setter>
-        <Setter Property="Width" Value="30"></Setter>
-        <Setter Property="Padding" Value="6, 0, 0, 0"></Setter>
-        <Style Selector="^ /template/ ContentPresenter">
-            <Setter Property="Transitions">
-                <Transitions>
-                    <BrushTransition Property="Background" Duration="0:0:0.1"></BrushTransition>
-                    <BrushTransition Property="Foreground" Duration="0:0:0.1"></BrushTransition>
-                </Transitions>
-            </Setter>
-        </Style>
-        <Style Selector="^:disabled /template/ ContentPresenter">
-            <Setter Property="Background" Value="Transparent"></Setter>
-        </Style>
-        <Style Selector="^:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="Transparent"></Setter>
-            <Setter Property="Foreground" Value="{DynamicResource WhiteBrush}"></Setter>
-        </Style>
-    </Style>
-    <Style Selector="Button.close">
-        <Setter Property="Content" Value="&#xE5CD;"></Setter>
-    </Style>
-    <Style Selector="Button.maximize">
-        <Setter Property="Content" Value="&#xEB54;"></Setter>
-    </Style>
-    <Style Selector="Button.minimize">
-        <Setter Property="Content" Value="&#xE931;"></Setter>
-    </Style>
-
-    <!-- Footer -->
-    <Style Selector="Grid.footer">
-        <Setter Property="Background" Value="{DynamicResource FooterBackgroundBrush}"></Setter>
-    </Style>
-
-    <!-- Forms -->
-    <Style Selector=".form">
-
-    </Style>
-
-    <Style Selector="Border.form-fields-area">
-        <Setter Property="Background" Value="{DynamicResource Background800Brush}"></Setter>
-        <Setter Property="Margin" Value="5"></Setter>
-        <Setter Property="Padding" Value="10"></Setter>
-        <Setter Property="BorderThickness" Value="1"></Setter>
-        <Setter Property="BorderBrush" Value="{DynamicResource Background600Brush}"></Setter>
-    </Style>
-
-    <Style Selector="StackPanel.form-field">
-        <Setter Property="Margin" Value="0, 5, 0, 5"></Setter>
-    </Style>
-
-    <Style Selector=".form-field > TextBlock">
-        <Setter Property="Margin" Value="0, 0, 0, 5"></Setter>
-    </Style>
-    
-    <!-- Date Pickers -->
-    <!-- Base style for DatePicker -->
     <Style Selector="DatePicker /template/ TextBlock#PART_DayTextBlock">
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Margin" Value="0,0,4,0" />
-        <Setter Property="FontSize" Value="14" /> 
+        <Setter Property="FontSize" Value="14" />
     </Style>
 
     <Style Selector="DatePicker /template/ TextBlock#PART_MonthTextBlock">
@@ -492,20 +526,19 @@
     <Style Selector="DatePicker /template/ Rectangle#PART_SecondSpacer">
         <Setter Property="Width" Value="8" />
     </Style>
-    
-    <Style Selector="TextBlock">
-        <Setter Property="Padding" Value="2"></Setter>
-    </Style>
 
-    <!-- List Boxes -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         LIST BOX
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
     <Style Selector="ListBox.regularListBox">
         <Setter Property="Background" Value="{DynamicResource Background900Brush}" />
         <Style Selector="^ ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource Secondary700Color}"></Setter>
+            <Setter Property="Background" Value="{DynamicResource Secondary700Color}" />
         </Style>
         <Style Selector="^ ListBoxItem">
-            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
-            <Setter Property="Padding" Value="5, 5, 5, 0"></Setter>
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Padding" Value="5, 5, 5, 0" />
         </Style>
     </Style>
 
@@ -514,28 +547,59 @@
         <Style Selector="^ ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Transitions">
                 <Transitions>
-                    <BrushTransition Property="Background" Duration="0:0:0.3"></BrushTransition>
+                    <BrushTransition Property="Background" Duration="0:0:0.3" />
                 </Transitions>
             </Setter>
-            <Setter Property="Background" Value="{DynamicResource LineSelected}"></Setter>
+            <Setter Property="Background" Value="{DynamicResource LineSelected}" />
         </Style>
         <Style Selector="^ ListBoxItem">
-            <Setter Property="Padding" Value="5, 5, 5, 0"></Setter>
+            <Setter Property="Padding" Value="5, 5, 5, 0" />
         </Style>
     </Style>
 
-    <!-- Tree views -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         TREE VIEW
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
     <Style Selector="TreeView">
         <Setter Property="Background" Value="{DynamicResource Background900Brush}" />
     </Style>
 
     <Style Selector="TreeViewItem">
-        <Setter Property="Padding" Value="5"></Setter>
+        <Setter Property="Padding" Value="5" />
         <Style Selector="^ /template/ Border#SelectionBorder:pointerover">
-            <Setter Property="Background" Value="{DynamicResource Secondary800Color}"></Setter>
+            <Setter Property="Background" Value="{DynamicResource Secondary800Color}" />
         </Style>
         <Style Selector="^:selected /template/ Border#SelectionBorder">
             <Setter Property="Background" Value="{DynamicResource Secondary600Color}" />
         </Style>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         FORMS
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="Border.form-fields-area">
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+        <Setter Property="Margin" Value="5" />
+        <Setter Property="Padding" Value="10" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background600Brush}" />
+    </Style>
+
+    <Style Selector="StackPanel.form-field">
+        <Setter Property="Margin" Value="0, 5, 0, 5" />
+    </Style>
+
+    <Style Selector=".form-field > TextBlock">
+        <Setter Property="Margin" Value="0, 0, 0, 5" />
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         LAYOUT - Footer
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="Grid.footer">
+        <Setter Property="Background" Value="{DynamicResource FooterBackgroundBrush}" />
     </Style>
 </Styles>

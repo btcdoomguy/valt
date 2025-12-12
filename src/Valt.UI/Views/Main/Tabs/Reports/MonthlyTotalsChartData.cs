@@ -1,4 +1,3 @@
-using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
@@ -16,10 +15,27 @@ namespace Valt.UI.Views.Main.Tabs.Reports;
 
 public class MonthlyTotalsChartData
 {
+    // Color palette - Fiat (Blue shades from Secondary)
+    private static readonly SKColor FiatPrimary = SKColor.Parse("#0566e9");      // Secondary500
+    private static readonly SKColor FiatLight = SKColor.Parse("#559dff");        // Secondary300
+    private static readonly SKColor FiatDark = SKColor.Parse("#0951b2");         // Secondary600
+    private static readonly SKColor FiatFill = SKColor.Parse("#0566e9").WithAlpha(40);
+
+    // Color palette - Bitcoin (Orange shades from Accent)
+    private static readonly SKColor BtcPrimary = SKColor.Parse("#ffa122");       // Accent400
+    private static readonly SKColor BtcLight = SKColor.Parse("#ffcc88");         // Accent200
+    private static readonly SKColor BtcDark = SKColor.Parse("#e98805");          // Accent500
+    private static readonly SKColor BtcFill = SKColor.Parse("#ffa122").WithAlpha(40);
+
+    // Grid and text colors
+    private static readonly SKColor GridColor = SKColor.Parse("#4d4d4d");        // Background700
+    private static readonly SKColor TextColor = SKColor.Parse("#a8a6a4");        // Text400
+    private static readonly SKColor AxisNameColor = SKColor.Parse("#cfccc9");    // Text300
+
     public FiatCurrency FiatCurrency { get; set; }
-    public ObservableCollection<ObservablePoint> FiatValues { get; } = new();
-    public ObservableCollection<ObservablePoint> BtcValues { get; } = new();
-    private ObservableCollection<string> MonthLabels { get; } = new();
+    public ObservableCollection<ObservablePoint> FiatValues { get; private set; } = new();
+    public ObservableCollection<ObservablePoint> BtcValues { get; private set; } = new();
+    public ObservableCollection<string> MonthLabels { get; private set; } = new();
 
     public Axis[] XAxes { get; } = new Axis[1];
 
@@ -32,28 +48,69 @@ public class MonthlyTotalsChartData
             {
                 ForceStepToMin = true,
                 MinStep = 1,
-                SeparatorsPaint = new SolidColorPaint(SKColors.LightSlateGray.WithAlpha(90)) { StrokeThickness = 1 },
+                SeparatorsPaint = new SolidColorPaint(GridColor.WithAlpha(60)) { StrokeThickness = 1 },
+                LabelsPaint = new SolidColorPaint(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) },
+                TextSize = 12,
                 Position = AxisPosition.End,
-                Labels = MonthLabels
+                Labels = MonthLabels,
+                LabelsRotation = -45
             };
 
         YAxes[0] = new Axis
         {
             Name = "Fiat",
-            NamePadding = new LiveChartsCore.Drawing.Padding(0, 15),
+            NamePaint = new SolidColorPaint(FiatPrimary),
+            NameTextSize = 13,
+            NamePadding = new LiveChartsCore.Drawing.Padding(0, 10),
             Labeler = FiatLabeler,
-            SeparatorsPaint = new SolidColorPaint(SKColors.LightGray) { StrokeThickness = 1 }
+            LabelsPaint = new SolidColorPaint(FiatLight) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) },
+            TextSize = 12,
+            SeparatorsPaint = new SolidColorPaint(GridColor.WithAlpha(40)) { StrokeThickness = 1 },
+            MinLimit = 0
         };
 
         YAxes[1] = new Axis
         {
             Name = "Bitcoin",
-            NamePadding = new LiveChartsCore.Drawing.Padding(0, 15),
+            NamePaint = new SolidColorPaint(BtcPrimary),
+            NameTextSize = 13,
+            NamePadding = new LiveChartsCore.Drawing.Padding(0, 10),
             Labeler = BitcoinLabeler,
-            SeparatorsPaint = new SolidColorPaint(SKColors.LightGray) { StrokeThickness = 1 },
-            Position = AxisPosition.End
+            LabelsPaint = new SolidColorPaint(BtcLight) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) },
+            TextSize = 12,
+            SeparatorsPaint = null, // Don't duplicate grid lines
+            Position = AxisPosition.End,
+            MinLimit = 0
         };
     }
+
+    // Series definitions with enhanced styling
+    public LineSeries<ObservablePoint> FiatSeries => new()
+    {
+        Name = "Total Wealth",
+        Values = FiatValues,
+        Stroke = new SolidColorPaint(FiatPrimary) { StrokeThickness = 2.5f },
+        GeometryStroke = new SolidColorPaint(FiatDark) { StrokeThickness = 2 },
+        GeometryFill = new SolidColorPaint(FiatLight),
+        GeometrySize = 8,
+        Fill = new SolidColorPaint(FiatFill),
+        LineSmoothness = 0.3
+    };
+
+    public LineSeries<ObservablePoint> BtcSeries => new()
+    {
+        Name = "Bitcoin",
+        Values = BtcValues,
+        Stroke = new SolidColorPaint(BtcPrimary) { StrokeThickness = 2.5f },
+        GeometryStroke = new SolidColorPaint(BtcDark) { StrokeThickness = 2 },
+        GeometryFill = new SolidColorPaint(BtcLight),
+        GeometrySize = 8,
+        Fill = new SolidColorPaint(BtcFill),
+        LineSmoothness = 0.3,
+        ScalesYAt = 1
+    };
+
+    public ObservableCollection<ISeries> Series { get; } = new();
 
     private string BitcoinLabeler(double arg)
     {
@@ -71,14 +128,19 @@ public class MonthlyTotalsChartData
         FiatValues.Clear();
         BtcValues.Clear();
         MonthLabels.Clear();
+        Series.Clear();
 
         for (var index = 0; index < monthlyTotalsData.Items.Count; index++)
         {
             var item = monthlyTotalsData.Items[index];
-            
+
             MonthLabels.Add(item.MonthYear.ToString("MMM yyyy", CultureInfo.InvariantCulture));
             FiatValues.Add(new ObservablePoint(index, (double)item.FiatTotal));
             BtcValues.Add(new ObservablePoint(index, (double)item.BtcTotal));
         }
+
+        // Add series after data is populated
+        Series.Add(FiatSeries);
+        Series.Add(BtcSeries);
     }
 }
