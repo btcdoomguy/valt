@@ -201,9 +201,11 @@ public partial class MainViewModel : ValtViewModel
     }
 
     [RelayCommand]
-    private Task AddTransaction()
+    private Task SendF2()
     {
-        WeakReferenceMessenger.Default.Send(new AddTransactionRequested());
+        if (SelectedTabComponent?.TabName == MainViewTabNames.TransactionsPageContent)
+            WeakReferenceMessenger.Default.Send(new AddTransactionRequested());
+        
         return Task.CompletedTask;
     }
 

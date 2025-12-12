@@ -24,7 +24,7 @@
         <main1:MainViewModel />
     </Design.DataContext>
     <Window.KeyBindings>
-        <KeyBinding Gesture="F2" Command="{Binding AddTransactionCommand}" />
+        <KeyBinding Gesture="F2" Command="{Binding SendF2Command}" />
     </Window.KeyBindings>
     <Grid>
         <Grid.RowDefinitions>

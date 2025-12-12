@@ -3,75 +3,141 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:Valt.UI.Views.Main.Controls"
-             mc:Ignorable="d" d:DesignWidth="250" d:DesignHeight="90"
+             mc:Ignorable="d" d:DesignWidth="280" d:DesignHeight="80"
              x:Class="Valt.UI.Views.Main.Controls.LiveRates"
              x:DataType="controls:LiveRatesViewModel">
     <Design.DataContext>
         <controls:LiveRatesViewModel />
     </Design.DataContext>
-    <Border Background="{DynamicResource Background900Brush}"
-            BorderBrush="{DynamicResource Background700Brush}"
-            BorderThickness="3"
-            CornerRadius="5"
-            Margin="0, 0, 0, 0">
-        <Grid ColumnDefinitions="*, 2*, *" RowDefinitions="*, *, *" Margin="2, 3, 0, 0">
-            <Grid IsVisible="{Binding HasDatabaseOpen}"
-                  Grid.Row="0" Grid.Column="0">
-                <Label HorizontalContentAlignment="Left" VerticalContentAlignment="Center"
-                       Foreground="{DynamicResource Background300Color}">
-                    BTC/USD
-                </Label>
-            </Grid>
-            <Grid IsVisible="{Binding HasDatabaseOpen}"
-                  Grid.Row="0" Grid.Column="1">
-                <Label VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                       Content="{Binding BtcUsdText}" />
-            </Grid>
-            <Grid IsVisible="{Binding HasDatabaseOpen}"
-                  Grid.Row="0" Grid.Column="2">
-                <Label VerticalContentAlignment="Center" HorizontalContentAlignment="Right"
-                       Padding="0, 0, 5, 0"
-                       Foreground="{Binding BtcUsdVariationBrush}"
-                       Content="{Binding BtcUsdVariationText}" />
-            </Grid>
-            <Grid IsVisible="{Binding ShowUsdFiatLabels}"
-                  Grid.Row="1" Grid.Column="0">
-                <Label HorizontalContentAlignment="Left" VerticalContentAlignment="Center"
-                       Foreground="{DynamicResource Background300Color}"
-                       Content="{Binding UsdWithPairText}">
-                </Label>
-            </Grid>
-            <Grid IsVisible="{Binding ShowUsdFiatLabels}"
-                  Grid.Row="1" Grid.Column="1">
-                <Label VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                       Content="{Binding UsdText}">
-                </Label>
-            </Grid>
-            <Grid IsVisible="{Binding ShowUsdFiatLabels}"
-                  Grid.Row="1" Grid.Column="2">
-                <Label VerticalContentAlignment="Center" HorizontalContentAlignment="Right"
-                       Padding="0, 0, 5, 0"
-                       Foreground="{Binding UsdVariationBrush}" Content="{Binding UsdVariationText}" />
-            </Grid>
-            <Grid IsVisible="{Binding ShowUsdFiatLabels}"
-                  Grid.Row="2" Grid.Column="0">
-                <Label HorizontalContentAlignment="Left" VerticalContentAlignment="Center"
-                       Foreground="{DynamicResource Background300Color}"
-                       Content="{Binding BtcFiatPairText}">
-                </Label>
-            </Grid>
-            <Grid IsVisible="{Binding ShowUsdFiatLabels}"
-                  Grid.Row="2" Grid.Column="1">
-                <Label VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                       Content="{Binding BtcFiatText}">
-                </Label>
-            </Grid>
-            <Grid IsVisible="{Binding ShowUsdFiatLabels}"
-                  Grid.Row="2" Grid.Column="2">
-                <Label VerticalContentAlignment="Center" HorizontalContentAlignment="Right"
-                       Padding="0, 0, 5, 0"
-                       Foreground="{Binding BtcFiatVariationBrush}" Content="{Binding BtcFiatVariationText}" />
-            </Grid>
+
+    <UserControl.Styles>
+        <!-- Monospace font for numeric values -->
+        <Style Selector="TextBlock.mono">
+            <Setter Property="FontFamily" Value="JetBrains Mono, Cascadia Code, Consolas, monospace" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style Selector="TextBlock.pair-label">
+            <Setter Property="FontFamily" Value="JetBrains Mono, Cascadia Code, Consolas, monospace" />
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="LetterSpacing" Value="1" />
+        </Style>
+        <Style Selector="TextBlock.price">
+            <Setter Property="FontFamily" Value="JetBrains Mono, Cascadia Code, Consolas, monospace" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+        <Style Selector="TextBlock.variation">
+            <Setter Property="FontFamily" Value="JetBrains Mono, Cascadia Code, Consolas, monospace" />
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="FontWeight" Value="Medium" />
+        </Style>
+    </UserControl.Styles>
+
+    <Border Background="#0D0D0D"
+            BorderThickness="1"
+            CornerRadius="8"
+            Padding="10, 4">
+        <Border.BorderBrush>
+            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Color="#2A2A2A" Offset="0" />
+                <GradientStop Color="#1A1A1A" Offset="0.5" />
+                <GradientStop Color="#2A2A2A" Offset="1" />
+            </LinearGradientBrush>
+        </Border.BorderBrush>
+
+        <!-- Main container with vertical centering for single row mode -->
+        <Grid VerticalAlignment="Center">
+            <StackPanel Spacing="2" IsVisible="{Binding HasDatabaseOpen}">
+
+                <!-- BTC/USD Row (always visible) -->
+                <Grid ColumnDefinitions="Auto, *, Auto" Height="20">
+                    <TextBlock Grid.Column="0"
+                               Classes="pair-label"
+                               Text="BTC/USD"
+                               Foreground="{DynamicResource Accent300Brush}"
+                               VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Column="1"
+                               Classes="price"
+                               Text="{Binding BtcUsdText}"
+                               Foreground="{DynamicResource Text100Brush}"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               Margin="12, 0" />
+
+                    <Border Grid.Column="2"
+                            Background="#1A1A1A"
+                            CornerRadius="3"
+                            Padding="5, 1"
+                            MinWidth="54">
+                        <TextBlock Classes="variation"
+                                   Text="{Binding BtcUsdVariationText}"
+                                   Foreground="{Binding BtcUsdVariationBrush}"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Center" />
+                    </Border>
+                </Grid>
+
+                <!-- USD/Fiat Row -->
+                <Grid ColumnDefinitions="Auto, *, Auto" Height="20" IsVisible="{Binding ShowUsdFiatLabels}">
+                    <TextBlock Grid.Column="0"
+                               Classes="pair-label"
+                               Text="{Binding UsdWithPairText}"
+                               Foreground="{DynamicResource Secondary200Brush}"
+                               VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Column="1"
+                               Classes="price"
+                               Text="{Binding UsdText}"
+                               Foreground="{DynamicResource Text200Brush}"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               Margin="12, 0" />
+
+                    <Border Grid.Column="2"
+                            Background="#1A1A1A"
+                            CornerRadius="3"
+                            Padding="5, 1"
+                            MinWidth="54">
+                        <TextBlock Classes="variation"
+                                   Text="{Binding UsdVariationText}"
+                                   Foreground="{Binding UsdVariationBrush}"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Center" />
+                    </Border>
+                </Grid>
+
+                <!-- BTC/Fiat Row -->
+                <Grid ColumnDefinitions="Auto, *, Auto" Height="20" IsVisible="{Binding ShowUsdFiatLabels}">
+                    <TextBlock Grid.Column="0"
+                               Classes="pair-label"
+                               Text="{Binding BtcFiatPairText}"
+                               Foreground="{DynamicResource Accent300Brush}"
+                               VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Column="1"
+                               Classes="price"
+                               Text="{Binding BtcFiatText}"
+                               Foreground="{DynamicResource Text100Brush}"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               Margin="12, 0" />
+
+                    <Border Grid.Column="2"
+                            Background="#1A1A1A"
+                            CornerRadius="3"
+                            Padding="5, 1"
+                            MinWidth="54">
+                        <TextBlock Classes="variation"
+                                   Text="{Binding BtcFiatVariationText}"
+                                   Foreground="{Binding BtcFiatVariationBrush}"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Center" />
+                    </Border>
+                </Grid>
+
+            </StackPanel>
         </Grid>
     </Border>
 </UserControl>

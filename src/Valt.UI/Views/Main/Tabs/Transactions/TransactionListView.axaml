@@ -13,9 +13,6 @@
     <Design.DataContext>
         <transactions1:TransactionListViewModel />
     </Design.DataContext>
-    <UserControl.KeyBindings>
-        <KeyBinding Gesture="F2" Command="{Binding AddTransactionCommand}" />
-    </UserControl.KeyBindings>
     <Grid RowDefinitions="100, *">
         <Grid Grid.Row="0" Margin="10" ColumnDefinitions="*, 260, *">
             <StackPanel Grid.Column="0" Margin="10" Orientation="Horizontal">
