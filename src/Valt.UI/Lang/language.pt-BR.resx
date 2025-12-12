@@ -664,7 +664,7 @@
         <value>Carregando...</value>
     </data>
     <data name="Reports.MonthlyTotals.BitcoinExpenses" xml:space="preserve">
-        <value>Despesas em BTC</value>
+        <value>Saídas em BTC</value>
     </data>
     <data name="Reports.MonthlyTotals.BitcoinIncome" xml:space="preserve">
         <value>Entradas em BTC</value>
@@ -679,7 +679,7 @@
         <value>Despesas</value>
     </data>
     <data name="Reports.MonthlyTotals.Income" xml:space="preserve">
-        <value>Entradas</value>
+        <value>Saídas</value>
     </data>
     <data name="Reports.SpendingByCategories.Title" xml:space="preserve">
         <value>Gastos por categorias</value>
