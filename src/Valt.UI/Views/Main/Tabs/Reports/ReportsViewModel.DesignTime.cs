@@ -243,6 +243,15 @@ public partial class ReportsViewModel
                     BitcoinPurchased = 0.03m,
                     BitcoinSold = 0.01m
                 },
+            },
+            Total = new MonthlyTotalsData.Totals()
+            {
+                BitcoinExpenses = 1000000m,
+                BitcoinIncome = 1000000m,
+                BitcoinPurchased = 1000000m,
+                BitcoinSold = 1000000m,
+                Income = 20312.31m,
+                Expenses = 12345.67m,
             }
         };
 

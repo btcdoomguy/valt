@@ -22,5 +22,6 @@
 
     <ItemGroup>
       <Folder Include="Crawlers\" />
+      <Folder Include="Modules\AvgPrice\Queries\DTOs\" />
     </ItemGroup>
 </Project>

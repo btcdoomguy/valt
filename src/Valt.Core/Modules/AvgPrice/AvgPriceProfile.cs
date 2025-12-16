@@ -1,6 +1,7 @@
 using Valt.Core.Common;
 using Valt.Core.Kernel;
 using Valt.Core.Modules.AvgPrice.CalculationStrategies;
+using Valt.Core.Modules.AvgPrice.Events;
 
 namespace Valt.Core.Modules.AvgPrice;
 
@@ -37,7 +38,8 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
     public IReadOnlyCollection<AvgPriceLine> AvgPriceLines => _avgPriceLines;
 
     private AvgPriceProfile(AvgPriceProfileId id, AvgPriceProfileName name, bool visible, Icon icon,
-        FiatCurrency currency, AvgPriceCalculationMethod calculationMethod, IEnumerable<AvgPriceLine> avgPriceLines)
+        FiatCurrency currency, AvgPriceCalculationMethod calculationMethod, IEnumerable<AvgPriceLine> avgPriceLines,
+        int version)
     {
         Id = id;
         Name = name;
@@ -45,14 +47,26 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
         Icon = icon;
         Currency = currency;
         CalculationMethod = calculationMethod;
+        Version = version;
 
         _avgPriceLines = new HashSet<AvgPriceLine>(avgPriceLines);
+
+        if (Version == 0)
+            AddEvent(new AvgPriceProfileCreatedEvent(this));
     }
 
     public static AvgPriceProfile Create(AvgPriceProfileId id, AvgPriceProfileName name, bool visible, Icon icon,
-        FiatCurrency currency, AvgPriceCalculationMethod calculationMethod, IEnumerable<AvgPriceLine> avgPriceLines)
+        FiatCurrency currency, AvgPriceCalculationMethod calculationMethod, IEnumerable<AvgPriceLine> avgPriceLines,
+        int version)
     {
-        return new AvgPriceProfile(id, name, visible, icon, currency, calculationMethod, avgPriceLines);
+        return new AvgPriceProfile(id, name, visible, icon, currency, calculationMethod, avgPriceLines, version);
+    }
+
+    public static AvgPriceProfile New(AvgPriceProfileName name, bool visible, Icon icon, FiatCurrency currency,
+        AvgPriceCalculationMethod calculationMethod)
+    {
+        return new AvgPriceProfile(new AvgPriceProfileId(), name, visible, icon, currency, calculationMethod,
+            Enumerable.Empty<AvgPriceLine>(), 0);
     }
 
     public void AddLine(DateOnly date, int displayOrder, AvgPriceLineTypes type, BtcValue btcValue, FiatValue fiatValue,
@@ -68,6 +82,8 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
         Recalculate(orderedList);
 
         _avgPriceLines.Add(newLine);
+        
+        AddEvent(new AvgPriceLineCreatedEvent(newLine));
     }
 
     public void RemoveLine(AvgPriceLine line)
@@ -77,6 +93,8 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
         var orderedList = _avgPriceLines.OrderBy(x => x.Date).ThenBy(x => x.DisplayOrder).ToList();
 
         Recalculate(orderedList);
+        
+        AddEvent(new AvgPriceLineDeletedEvent(line));
     }
 
     private void Recalculate(IEnumerable<AvgPriceLine> orderedList)

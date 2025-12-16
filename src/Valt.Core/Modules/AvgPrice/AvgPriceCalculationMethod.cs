@@ -2,5 +2,5 @@ namespace Valt.Core.Modules.AvgPrice;
 
 public enum AvgPriceCalculationMethod
 {
-    BrazilianRule
+    BrazilianRule = 0
 }

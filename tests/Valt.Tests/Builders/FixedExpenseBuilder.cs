@@ -9,6 +9,7 @@ namespace Valt.Tests.Builders;
 /// <summary>
 /// Builder for creating FixedExpense test data.
 /// FixedExpense represents a recurring expense with fixed or ranged amounts.
+/// Supports both fluent API (preferred) and property initialization syntax.
 /// </summary>
 public class FixedExpenseBuilder
 {
@@ -21,6 +22,17 @@ public class FixedExpenseBuilder
     private DateOnly? _lastFixedExpenseRecordDate;
     private bool _enabled = true;
     private int _version = 0;
+
+    // Public properties for backward compatibility with property initializer syntax
+    public FixedExpenseId Id { get => _id; set => _id = value; }
+    public FixedExpenseName Name { get => _name; set => _name = value; }
+    public AccountId? DefaultAccountId { get => _defaultAccountId; set => _defaultAccountId = value; }
+    public CategoryId CategoryId { get => _categoryId; set => _categoryId = value; }
+    public FiatCurrency? Currency { get => _currency; set => _currency = value; }
+    public List<FixedExpenseRange> Ranges { get => _ranges; set => _ranges = value; }
+    public DateOnly? LastFixedExpenseRecordDate { get => _lastFixedExpenseRecordDate; set => _lastFixedExpenseRecordDate = value; }
+    public bool Enabled { get => _enabled; set => _enabled = value; }
+    public int Version { get => _version; set => _version = value; }
 
     public static FixedExpenseBuilder AFixedExpense() => new();
 

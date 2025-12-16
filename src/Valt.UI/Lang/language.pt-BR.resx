@@ -679,7 +679,7 @@
         <value>Despesas</value>
     </data>
     <data name="Reports.MonthlyTotals.Income" xml:space="preserve">
-        <value>Saídas</value>
+        <value>Entradas</value>
     </data>
     <data name="Reports.SpendingByCategories.Title" xml:space="preserve">
         <value>Gastos por categorias</value>
@@ -689,5 +689,8 @@
     </data>
     <data name="Reports.SpendingByCategories.Categories" xml:space="preserve">
         <value>Categorias</value>
+    </data>
+    <data name="Total" xml:space="preserve">
+        <value>Total</value>
     </data>
 </root>

@@ -76,7 +76,7 @@
                                     <DataGridTextColumn Header="{x:Static lang:language.Reports_MonthlyTotals_Date}"
                                                         Binding="{Binding MonthYearFormatted}">
                                     </DataGridTextColumn>
-                                    <DataGridTextColumn Header="Bitcoin" Binding="{Binding BtcTotal}"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Bitcoin" Binding="{Binding BtcTotalFormatted}"></DataGridTextColumn>
                                     <DataGridTemplateColumn
                                         Header="{x:Static lang:language.Reports_MonthlyTotals_PreviousMonth}">
                                         <DataGridTemplateColumn.CellTemplate>
@@ -199,23 +199,24 @@
                             <userControls:DateCalendarSelectorMode>All</userControls:DateCalendarSelectorMode>
                         </userControls:DateCalendarSelector.AllowedSelectorModes>
                     </userControls:DateCalendarSelector>
-                    <Panel MinHeight="600">
-                        <Grid ColumnDefinitions="300, *" IsVisible="{Binding !IsSpendingByCategoriesLoading}">
-                            <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="10" Margin="0, 10, 10, 0">
-                                <userControls:CheckboxListSelector
-                                    Title="{x:Static lang:language.Reports_SpendingByCategories_Accounts}"
-                                    DisplayMemberPath="Name"
-                                    MaxListHeight="200"
-                                    ItemsSource="{Binding AvailableAccounts}"
-                                    SelectedItems="{Binding SelectedAccounts}" />
-                                <userControls:CheckboxListSelector
-                                    Title="{x:Static lang:language.Reports_SpendingByCategories_Categories}"
-                                    DisplayMemberPath="Name"
-                                    MaxListHeight="300"
-                                    ItemsSource="{Binding AvailableCategories}"
-                                    SelectedItems="{Binding SelectedCategories}" />
-                            </StackPanel>
-                            <Panel Grid.Column="1" Background="{DynamicResource Background900Brush}">
+                    <Grid ColumnDefinitions="300, *" MinHeight="600">
+                        <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="10" Margin="0, 10, 10, 0">
+                            <userControls:CheckboxListSelector
+                                Title="{x:Static lang:language.Reports_SpendingByCategories_Accounts}"
+                                DisplayMemberPath="Name"
+                                MaxListHeight="200"
+                                ItemsSource="{Binding AvailableAccounts}"
+                                SelectedItems="{Binding SelectedAccounts}" />
+                            <userControls:CheckboxListSelector
+                                Title="{x:Static lang:language.Reports_SpendingByCategories_Categories}"
+                                DisplayMemberPath="Name"
+                                MaxListHeight="300"
+                                ItemsSource="{Binding AvailableCategories}"
+                                SelectedItems="{Binding SelectedCategories}" />
+                        </StackPanel>
+                        <Panel Grid.Column="1">
+                            <Panel Background="{DynamicResource Background900Brush}"
+                                   IsVisible="{Binding !IsSpendingByCategoriesLoading}">
                                 <avalonia:PieChart x:Name="CategoryPieChart"
                                                    Width="750"
                                                    Height="800"
@@ -224,10 +225,10 @@
                                                    Series="{Binding ExpensesByCategoryChartData.Series}">
                                 </avalonia:PieChart>
                             </Panel>
-                        </Grid>
-                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="16" HorizontalAlignment="Center"
-                                   VerticalAlignment="Center" IsVisible="{Binding IsSpendingByCategoriesLoading}" />
-                    </Panel>
+                            <TextBlock Text="{x:Static lang:language.Loading}" FontSize="16" HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" IsVisible="{Binding IsSpendingByCategoriesLoading}" />
+                        </Panel>
+                    </Grid>
                 </StackPanel>
             </Expander>
         </StackPanel>

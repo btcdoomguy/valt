@@ -695,4 +695,7 @@
     <data name="Reports.SpendingByCategories.Categories" xml:space="preserve">
         <value>Categories</value>
     </data>
+    <data name="Total" xml:space="preserve">
+        <value>Total</value>
+    </data>
 </root>

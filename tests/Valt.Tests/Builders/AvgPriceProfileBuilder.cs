@@ -12,6 +12,7 @@ public class AvgPriceProfileBuilder
     private FiatCurrency _currency = FiatCurrency.Usd;
     private AvgPriceCalculationMethod _calculationMethod = AvgPriceCalculationMethod.BrazilianRule;
     private List<AvgPriceLine> _avgPriceLines = new();
+    private int _version = 0;
 
     public AvgPriceProfileBuilder WithId(AvgPriceProfileId id)
     {
@@ -61,12 +62,18 @@ public class AvgPriceProfileBuilder
         return this;
     }
 
-    public AvgPriceProfile Build()
+    public AvgPriceProfileBuilder WithVersion(int version)
     {
-        return AvgPriceProfile.Create(_id, _name, _visible, _icon, _currency, _calculationMethod, _avgPriceLines);
+        _version = version;
+        return this;
     }
 
-    public static AvgPriceProfileBuilder AProfile() => new AvgPriceProfileBuilder();
+    public AvgPriceProfile Build()
+    {
+        return AvgPriceProfile.Create(_id, _name, _visible, _icon, _currency, _calculationMethod, _avgPriceLines, _version);
+    }
+
+    public static AvgPriceProfileBuilder AProfile() => new();
 
     public static AvgPriceProfileBuilder ABrazilianRuleProfile() =>
         new AvgPriceProfileBuilder()

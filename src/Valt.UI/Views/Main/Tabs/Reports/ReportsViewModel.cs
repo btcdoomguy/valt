@@ -90,7 +90,7 @@ public partial class ReportsViewModel : ValtTabViewModel
         FilterRange = new DateRange(new DateTime(FilterMainDate.Year, 1, 1), new DateTime(FilterMainDate.Year, 12, 31));
         var currentMonth = new DateTime(CategoryFilterMainDate.Year, CategoryFilterMainDate.Month, 1);
         CategoryFilterRange = new DateRange(currentMonth, currentMonth.AddMonths(1).AddDays(-1));
-
+        
         PrepareAccountsAndCategoriesList();
 
         SelectedAccounts.CollectionChanged += OnSelectedFiltersChanged;
@@ -116,6 +116,11 @@ public partial class ReportsViewModel : ValtTabViewModel
 
     public void Initialize()
     {
+        if (Design.IsDesignMode)
+            return;
+        
+        PrepareAccountsAndCategoriesList();
+        
         _ = FetchMonthlyTotalsAsync();
         _ = FetchExpensesByCategoryAsync();
         _ = FetchAllTimeHighDataAsync();
@@ -123,6 +128,11 @@ public partial class ReportsViewModel : ValtTabViewModel
 
     private void PrepareAccountsAndCategoriesList()
     {
+        AvailableAccounts.Clear();
+        SelectedAccounts.Clear();
+        AvailableCategories.Clear();
+        SelectedCategories.Clear();
+        
         var accounts = _localDatabase.GetAccounts().FindAll().OrderByDescending(x => x.Visible).ThenBy(x => x.DisplayOrder)
             .Select(x => new SelectItem(x.Id.ToString(), x.Name));
         
@@ -257,11 +267,14 @@ public partial class ReportsViewModel : ValtTabViewModel
             {
                 MonthlyTotalsChartData.RefreshChart(monthlyTotalsData);
 
+                var currency = FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency);
+
                 MonthlyReportItems.Clear();
                 MonthlyReportItems.AddRange(monthlyTotalsData.Items.Select(x =>
-                    new MonthlyReportItemViewModel(FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency),
-                        x)));
-
+                    new MonthlyReportItemViewModel(currency, x)));
+                
+                MonthlyReportItems.Add(new MonthlyReportItemViewModel(currency, monthlyTotalsData.Total));
+                
                 IsMonthlyTotalsLoading = false;
             });
         }

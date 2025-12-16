@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using LiteDB;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Infra.DataAccess.LiteDBMappers;
+using Valt.Infra.Modules.AvgPrice;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Categories;
 using Valt.Infra.Modules.Budget.FixedExpenses;
@@ -149,6 +150,36 @@ internal sealed class LocalDatabase : ILocalDatabase
         DateOnlyMapper.Register(mapper);
         return mapper;
     }
+
+    #region AvgPrice module
+
+    public ILiteCollection<AvgPriceProfileEntity> GetAvgPriceProfiles()
+    {
+        ArgumentNullException.ThrowIfNull(_database);
+
+        if (!HasDatabaseOpen)
+            throw new InvalidOperationException("Open a database first.");
+
+        return _database.GetCollection<AvgPriceProfileEntity>("avgprice_profile");
+    }
+    
+    public ILiteCollection<AvgPriceLineEntity> GetAvgPriceLines()
+    {
+        ArgumentNullException.ThrowIfNull(_database);
+
+        if (!HasDatabaseOpen)
+            throw new InvalidOperationException("Open a database first.");
+        
+        var collection = _database.GetCollection<AvgPriceLineEntity>("avgprice_line");
+        
+        collection.EnsureIndex(x => x.ProfileId);
+        collection.EnsureIndex(x => x.Date);
+        collection.EnsureIndex(x => x.DisplayOrder);
+
+        return collection;
+    }
+
+    #endregion
 
     #region Budget module
 

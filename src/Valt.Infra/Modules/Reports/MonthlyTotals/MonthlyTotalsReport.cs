@@ -172,13 +172,16 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
             var resultItems = BuildResultItems(monthlyTotals);
             var filteredItems = resultItems
                 .Where(x => x.MonthYear >= _displayRange.Start && x.MonthYear <= _displayRange.End).ToList();
+            var totals = BuildTotals(filteredItems);
 
             return new MonthlyTotalsData
             {
                 MainCurrency = _currency,
-                Items = filteredItems
+                Items = filteredItems,
+                Total = totals
             };
         }
+
 
         private static void InitializeAccountTotalsIfNeeded(
             AccountEntity account,
@@ -402,6 +405,20 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
                     Expenses = monthly.Value.Expenses
                 };
             }).ToList();
+        }
+        
+        
+        private MonthlyTotalsData.Totals BuildTotals(List<MonthlyTotalsData.Item> resultItems)
+        {
+            return new MonthlyTotalsData.Totals()
+            {
+                BitcoinExpenses = resultItems.Sum(x => x.BitcoinExpenses),
+                BitcoinIncome = resultItems.Sum(x => x.BitcoinIncome),
+                BitcoinPurchased = resultItems.Sum(x => x.BitcoinPurchased),
+                BitcoinSold = resultItems.Sum(x => x.BitcoinSold),
+                Income = resultItems.Sum(x => x.Income),
+                Expenses = resultItems.Sum(x => x.Expenses)
+            };
         }
 
         private static bool IsEndOfMonth(DateTime date)

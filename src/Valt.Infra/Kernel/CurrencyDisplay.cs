@@ -37,10 +37,18 @@ public static class CurrencyDisplay
     private static string FormatSats(long sats)
     {
         const long SatoshiFactor = 100_000_000L;
+        
+        var prefix = "";
+
+        if (sats < 0)
+        {
+            sats *= -1;
+            prefix = "-";
+        }
 
         var integerPart = sats / SatoshiFactor;
         var fractionalSats = sats % SatoshiFactor;
-
+        
         if (integerPart > 0)
         {
             var integerStr = integerPart.ToString();
@@ -49,12 +57,12 @@ public static class CurrencyDisplay
             var fractionalStr = fractionalSats.ToString("D8");
             var formattedFractional = $"{fractionalStr.Substring(0, 2)} {fractionalStr.Substring(2, 3)} {fractionalStr.Substring(5, 3)}";
 
-            return $"{formattedInteger}.{formattedFractional}";
+            return $"{prefix}{formattedInteger}.{formattedFractional}";
         }
         else
         {
             var fractionalStr = fractionalSats.ToString();
-            return fractionalStr == "0" ? "0" : FormatWithGroups(fractionalStr);
+            return fractionalStr == "0" ? "0" : $"{prefix}{FormatWithGroups(fractionalStr)}";
         }
     }
 
