@@ -148,7 +148,7 @@ public class FixedExpenseProvider : IFixedExpenseProvider
         if (orderedRanges.Length == 0)
             return result;
         
-        for (var index = 0; index < orderedRanges.Length - 2; index++)
+        for (var index = 0; index < orderedRanges.Length - 1; index++)
         {
             result.Add(new FixedExpenseRangeWithEnd(orderedRanges[index], orderedRanges[index + 1].PeriodStart));
         }
