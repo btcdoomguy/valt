@@ -9,7 +9,7 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
 {
     private HashSet<AvgPriceLine> _avgPriceLines = new();
     private AvgPriceCalculationMethod _calculationMethod;
-    private IAvgPriceCalculationStrategy? _calculationStrategy;
+    private IAvgPriceCalculationStrategy _calculationStrategy;
 
     public AvgPriceProfileName Name { get; protected set; }
     public bool Visible { get; protected set; }
@@ -26,9 +26,8 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
             switch (_calculationMethod)
             {
                 case AvgPriceCalculationMethod.BrazilianRule:
-                    _calculationStrategy = new BrazilianRuleCalculationStrategy();
+                    _calculationStrategy = new BrazilianRuleCalculationStrategy(this);
                     break;
-                    ;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -96,7 +95,16 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
         
         AddEvent(new AvgPriceLineDeletedEvent(line));
     }
-
+    
+    public void ChangeLineTotals(AvgPriceLine line, LineTotals lineTotals)
+    {
+        if (line.Totals == lineTotals) 
+            return;
+        
+        line.SetLineTotals(lineTotals);
+        AddEvent(new AvgPriceLineUpdatedEvent(line));
+    }
+    
     private void Recalculate(IEnumerable<AvgPriceLine> orderedList)
     {
         _calculationStrategy.CalculateTotals(orderedList);

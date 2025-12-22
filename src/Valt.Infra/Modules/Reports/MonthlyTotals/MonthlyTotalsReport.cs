@@ -284,6 +284,8 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
             var bitcoinExpenseTotal = 0m;
             var bitcoinPurchaseTotal = 0m;
             var bitcoinSaleTotal = 0m;
+            var allIncomeInFiat = 0m;
+            var allExpensesInFiat = 0m;
 
             foreach (var account in _accounts.Values)
             {
@@ -302,6 +304,8 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
                     bitcoinExpenseTotal += accountExpenses[accountId];
                     bitcoinPurchaseTotal += accountBitcoinPurchases[accountId];
                     bitcoinSaleTotal += accountBitcoinSales[accountId];
+                    allIncomeInFiat += GetFiatRateAt(currentDate, _currency) * (accountIncomes[accountId] * usdBitcoinPrice);
+                    allExpensesInFiat += GetFiatRateAt(currentDate, _currency) * (accountExpenses[accountId] * usdBitcoinPrice);
                 }
                 else
                 {
@@ -313,6 +317,8 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
                         fiatTotal += accountBalances[accountId];
                         incomeTotal += accountIncomes[accountId];
                         expenseTotal += accountExpenses[accountId];
+                        allIncomeInFiat += accountIncomes[accountId];
+                        allExpensesInFiat += accountExpenses[accountId];
                     }
                     else
                     {
@@ -323,6 +329,10 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
                                        (accountIncomes[accountId] / accountRateToUsd);
                         expenseTotal += GetFiatRateAt(currentDate, _currency) *
                                         (accountExpenses[accountId] / accountRateToUsd);
+                        allIncomeInFiat += GetFiatRateAt(currentDate, _currency) *
+                                           (accountIncomes[accountId] / accountRateToUsd);
+                        allExpensesInFiat += GetFiatRateAt(currentDate, _currency) *
+                                             (accountExpenses[accountId] / accountRateToUsd);
                     }
                 }
             }
@@ -335,7 +345,9 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
                 bitcoinIncomeTotal,
                 bitcoinExpenseTotal,
                 bitcoinPurchaseTotal,
-                bitcoinSaleTotal);
+                bitcoinSaleTotal,
+                allIncomeInFiat, 
+                allExpensesInFiat);
         }
 
         private static void ResetMonthlyChanges(
@@ -402,7 +414,9 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
                     BitcoinPurchased = monthly.Value.BitcoinPurchased,
                     BitcoinSold = monthly.Value.BitcoinSold,
                     Income = monthly.Value.Income,
-                    Expenses = monthly.Value.Expenses
+                    Expenses = monthly.Value.Expenses,
+                    AllExpensesInFiat = monthly.Value.AllExpensesInFiat,
+                    AllIncomeInFiat = monthly.Value.AllIncomeInFiat
                 };
             }).ToList();
         }
@@ -417,7 +431,9 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
                 BitcoinPurchased = resultItems.Sum(x => x.BitcoinPurchased),
                 BitcoinSold = resultItems.Sum(x => x.BitcoinSold),
                 Income = resultItems.Sum(x => x.Income),
-                Expenses = resultItems.Sum(x => x.Expenses)
+                Expenses = resultItems.Sum(x => x.Expenses),
+                AllExpensesInFiat = resultItems.Sum(x => x.AllExpensesInFiat),
+                AllIncomeInFiat = resultItems.Sum(x => x.AllIncomeInFiat)
             };
         }
 
@@ -479,5 +495,7 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
         decimal BitcoinIncome,
         decimal BitcoinExpense,
         decimal BitcoinPurchased,
-        decimal BitcoinSold);
+        decimal BitcoinSold,
+        decimal AllIncomeInFiat,
+        decimal AllExpensesInFiat);
 }

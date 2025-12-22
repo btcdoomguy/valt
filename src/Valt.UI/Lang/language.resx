@@ -669,10 +669,10 @@
         <value>* latest totals are calculated based on yesterday amounts</value>
     </data>
     <data name="Reports.MonthlyTotals.Income" xml:space="preserve">
-        <value>Income</value>
+        <value>Income (Fiat)</value>
     </data>
     <data name="Reports.MonthlyTotals.Expenses" xml:space="preserve">
-        <value>Expenses</value>
+        <value>Expenses (Fiat)</value>
     </data>
     <data name="Reports.MonthlyTotals.BitcoinPurchased" xml:space="preserve">
         <value>BTC Purchased</value>
@@ -697,5 +697,14 @@
     </data>
     <data name="Total" xml:space="preserve">
         <value>Total</value>
+    </data>
+    <data name="Main.AvgPrice" xml:space="preserve">
+        <value>Average Price</value>
+    </data>
+    <data name="Reports.MonthlyTotals.AllIncomeInFiat" xml:space="preserve">
+        <value>Total Income</value>
+    </data>
+    <data name="Reports.MonthlyTotals.AllExpensesInFiat" xml:space="preserve">
+        <value>Total Expenses</value>
     </data>
 </root>

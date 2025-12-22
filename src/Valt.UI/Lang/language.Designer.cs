@@ -1394,5 +1394,23 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Total", resourceCulture);
             }
         }
+        
+        public static string Main_AvgPrice {
+            get {
+                return ResourceManager.GetString("Main.AvgPrice", resourceCulture);
+            }
+        }
+        
+        public static string Reports_MonthlyTotals_AllIncomeInFiat {
+            get {
+                return ResourceManager.GetString("Reports.MonthlyTotals.AllIncomeInFiat", resourceCulture);
+            }
+        }
+        
+        public static string Reports_MonthlyTotals_AllExpensesInFiat {
+            get {
+                return ResourceManager.GetString("Reports.MonthlyTotals.AllExpensesInFiat", resourceCulture);
+            }
+        }
     }
 }

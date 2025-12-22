@@ -2,7 +2,57 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Valt.UI.Views.Main.Tabs.AvgPrice.AvgPriceView">
-    Welcome to Avalonia!
+             xmlns:avgPrice="clr-namespace:Valt.UI.Views.Main.Tabs.AvgPrice"
+             mc:Ignorable="d" d:DesignWidth="1300" d:DesignHeight="650"
+             x:Class="Valt.UI.Views.Main.Tabs.AvgPrice.AvgPriceView"
+             x:DataType="avgPrice:AvgPriceViewModel">
+    <Design.DataContext>
+        <avgPrice:AvgPriceViewModel />
+    </Design.DataContext>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="400" />   <!-- Right Column -->
+        </Grid.ColumnDefinitions>
+        <Border Grid.Column="0" Padding="15">
+            <Grid RowDefinitions="80, *">
+                <StackPanel Grid.Row="0">
+                    <Label>Profile</Label>
+                    <StackPanel Orientation="Horizontal">
+                        <ComboBox ItemsSource="{Binding Profiles}"
+                                  SelectedItem="{Binding SelectedProfile}"
+                                  HorizontalAlignment="Stretch"
+                                  IsTextSearchEnabled="True"
+                                  Height="34"
+                                  TabIndex="0">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
+                                            Text="{Binding Unicode}"
+                                            Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}">
+                                        </TextBlock>
+                                        <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}">
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <Button>Add</Button>
+                        <Button>Edit</Button>
+                        <Button>Delete</Button>
+                    </StackPanel>
+                </StackPanel>
+                <DataGrid Grid.Row="1" ItemsSource="{Binding Lines}" AutoGenerateColumns="True">
+                    
+                </DataGrid>
+            </Grid>
+        </Border>
+        <StackPanel Grid.Column="1">
+            <DataGrid>
+                
+            </DataGrid>
+        </StackPanel>
+    </Grid>
 </UserControl>

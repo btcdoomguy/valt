@@ -125,6 +125,22 @@
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="{x:Static lang:language.Reports_MonthlyTotals_AllIncomeInFiat}">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate DataType="models:MonthlyReportItemViewModel">
+                                                <TextBlock Classes="only-text" Text="{Binding AllIncomeInFiatFormatted}">
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="{x:Static lang:language.Reports_MonthlyTotals_AllExpensesInFiat}">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate DataType="models:MonthlyReportItemViewModel">
+                                                <TextBlock Classes="only-text" Text="{Binding AllExpensesInFiatFormatted}">
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
                                     <DataGridTemplateColumn Header="{x:Static lang:language.Reports_MonthlyTotals_Income}">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate DataType="models:MonthlyReportItemViewModel">

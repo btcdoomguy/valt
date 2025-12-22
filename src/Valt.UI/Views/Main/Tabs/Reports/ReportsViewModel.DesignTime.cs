@@ -49,7 +49,9 @@ public partial class ReportsViewModel
                     BitcoinExpenses = 0.01m,
                     BitcoinIncome = 0.005m,
                     BitcoinPurchased = 0.03m,
-                    BitcoinSold = 0.01m
+                    BitcoinSold = 0.01m,
+                    AllIncomeInFiat = 25123.15m,
+                    AllExpensesInFiat = 14021.52m
                 },
                 new MonthlyTotalsData.Item()
                 {
@@ -65,7 +67,9 @@ public partial class ReportsViewModel
                     BitcoinExpenses = 0.01m,
                     BitcoinIncome = 0.005m,
                     BitcoinPurchased = 0.03m,
-                    BitcoinSold = 0.01m
+                    BitcoinSold = 0.01m,
+                    AllIncomeInFiat = 25123.15m,
+                    AllExpensesInFiat = 14021.52m
                 },
                 new MonthlyTotalsData.Item()
                 {
@@ -81,7 +85,9 @@ public partial class ReportsViewModel
                     BitcoinExpenses = 0.01m,
                     BitcoinIncome = 0.005m,
                     BitcoinPurchased = 0.03m,
-                    BitcoinSold = 0.01m
+                    BitcoinSold = 0.01m,
+                    AllIncomeInFiat = 25123.15m,
+                    AllExpensesInFiat = 14021.52m
                 },
                 new MonthlyTotalsData.Item()
                 {
@@ -97,7 +103,9 @@ public partial class ReportsViewModel
                     BitcoinExpenses = 0.01m,
                     BitcoinIncome = 0.005m,
                     BitcoinPurchased = 0.03m,
-                    BitcoinSold = 0.01m
+                    BitcoinSold = 0.01m,
+                    AllIncomeInFiat = 25123.15m,
+                    AllExpensesInFiat = 14021.52m
                 },
                 new MonthlyTotalsData.Item()
                 {
@@ -113,7 +121,9 @@ public partial class ReportsViewModel
                     BitcoinExpenses = 0.01m,
                     BitcoinIncome = 0.005m,
                     BitcoinPurchased = 0.03m,
-                    BitcoinSold = 0.01m
+                    BitcoinSold = 0.01m,
+                    AllIncomeInFiat = 25123.15m,
+                    AllExpensesInFiat = 14021.52m
                 },
                 new MonthlyTotalsData.Item()
                 {
@@ -129,7 +139,9 @@ public partial class ReportsViewModel
                     BitcoinExpenses = 0.01m,
                     BitcoinIncome = 0.005m,
                     BitcoinPurchased = 0.03m,
-                    BitcoinSold = 0.01m
+                    BitcoinSold = 0.01m,
+                    AllIncomeInFiat = 25123.15m,
+                    AllExpensesInFiat = 14021.52m
                 },
                 new MonthlyTotalsData.Item()
                 {
@@ -145,7 +157,9 @@ public partial class ReportsViewModel
                     BitcoinExpenses = 0.01m,
                     BitcoinIncome = 0.005m,
                     BitcoinPurchased = 0.03m,
-                    BitcoinSold = 0.01m
+                    BitcoinSold = 0.01m,
+                    AllIncomeInFiat = 25123.15m,
+                    AllExpensesInFiat = 14021.52m
                 },
                 new MonthlyTotalsData.Item()
                 {
@@ -161,7 +175,9 @@ public partial class ReportsViewModel
                     BitcoinExpenses = 0.01m,
                     BitcoinIncome = 0.005m,
                     BitcoinPurchased = 0.03m,
-                    BitcoinSold = 0.01m
+                    BitcoinSold = 0.01m,
+                    AllIncomeInFiat = 25123.15m,
+                    AllExpensesInFiat = 14021.52m
                 },
                 new MonthlyTotalsData.Item()
                 {
@@ -177,7 +193,9 @@ public partial class ReportsViewModel
                     BitcoinExpenses = 0.01m,
                     BitcoinIncome = 0.005m,
                     BitcoinPurchased = 0.03m,
-                    BitcoinSold = 0.01m
+                    BitcoinSold = 0.01m,
+                    AllIncomeInFiat = 25123.15m,
+                    AllExpensesInFiat = 14021.52m
                 },
                 new MonthlyTotalsData.Item()
                 {
@@ -193,7 +211,9 @@ public partial class ReportsViewModel
                     BitcoinExpenses = 0.01m,
                     BitcoinIncome = 0.005m,
                     BitcoinPurchased = 0.03m,
-                    BitcoinSold = 0.01m
+                    BitcoinSold = 0.01m,
+                    AllIncomeInFiat = 25123.15m,
+                    AllExpensesInFiat = 14021.52m
                 },
                 new MonthlyTotalsData.Item()
                 {
@@ -209,7 +229,9 @@ public partial class ReportsViewModel
                     BitcoinExpenses = 0.01m,
                     BitcoinIncome = 0.005m,
                     BitcoinPurchased = 0.03m,
-                    BitcoinSold = 0.01m
+                    BitcoinSold = 0.01m,
+                    AllIncomeInFiat = 25123.15m,
+                    AllExpensesInFiat = 14021.52m
                 },
                 new MonthlyTotalsData.Item()
                 {
@@ -225,7 +247,9 @@ public partial class ReportsViewModel
                     BitcoinExpenses = 0.01m,
                     BitcoinIncome = 0.005m,
                     BitcoinPurchased = 0.03m,
-                    BitcoinSold = 0.01m
+                    BitcoinSold = 0.01m,
+                    AllIncomeInFiat = 25123.15m,
+                    AllExpensesInFiat = 14021.52m
                 },
                 new MonthlyTotalsData.Item()
                 {
@@ -241,7 +265,9 @@ public partial class ReportsViewModel
                     BitcoinExpenses = 0.01m,
                     BitcoinIncome = 0.005m,
                     BitcoinPurchased = 0.03m,
-                    BitcoinSold = 0.01m
+                    BitcoinSold = 0.01m,
+                    AllIncomeInFiat = 25123.15m,
+                    AllExpensesInFiat = 14021.52m
                 },
             },
             Total = new MonthlyTotalsData.Totals()
@@ -252,6 +278,8 @@ public partial class ReportsViewModel
                 BitcoinSold = 1000000m,
                 Income = 20312.31m,
                 Expenses = 12345.67m,
+                AllIncomeInFiat = 25123.15m,
+                AllExpensesInFiat = 14021.52m
             }
         };
 

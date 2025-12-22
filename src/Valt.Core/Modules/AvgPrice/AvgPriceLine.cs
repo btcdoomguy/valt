@@ -40,7 +40,7 @@ public class AvgPriceLine : Entity<AvgPriceLineId>
             LineTotals.Empty);
     }
 
-    public void SetLineTotals(LineTotals totals)
+    internal void SetLineTotals(LineTotals totals)
     {
         Totals = totals;
     }

@@ -33,6 +33,9 @@ public record MonthlyTotalsData
         
         public required decimal BitcoinIncome { get; init; }
         public required decimal BitcoinExpenses { get; init; }
+        
+        public required decimal AllIncomeInFiat { get; init; }
+        public required decimal AllExpensesInFiat { get; init; }
     }
 
     public record Totals
@@ -45,5 +48,8 @@ public record MonthlyTotalsData
         
         public required decimal BitcoinIncome { get; init; }
         public required decimal BitcoinExpenses { get; init; }
+        
+        public required decimal AllIncomeInFiat { get; init; }
+        public required decimal AllExpensesInFiat { get; init; }
     }
 }

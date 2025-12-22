@@ -2,8 +2,15 @@ using Valt.Core.Common;
 
 namespace Valt.Core.Modules.AvgPrice.CalculationStrategies;
 
-public class BrazilianRuleCalculationStrategy : IAvgPriceCalculationStrategy
+internal class BrazilianRuleCalculationStrategy : IAvgPriceCalculationStrategy
 {
+    private readonly AvgPriceProfile _profile;
+
+    public BrazilianRuleCalculationStrategy(AvgPriceProfile profile)
+    {
+        _profile = profile;
+    }
+    
     public void CalculateTotals(IEnumerable<AvgPriceLine> orderedLines)
     {
         var totalCost = 0m;
@@ -34,7 +41,7 @@ public class BrazilianRuleCalculationStrategy : IAvgPriceCalculationStrategy
                 totalCost = Math.Round(btcAmount * avg, 2);
             }
 
-            line.SetLineTotals(new LineTotals(FiatValue.New(avg), totalCost, BtcValue.ParseBitcoin(btcAmount)));
+            _profile.ChangeLineTotals(line, new LineTotals(FiatValue.New(avg), totalCost, BtcValue.ParseBitcoin(btcAmount)));
         }
     }
 }

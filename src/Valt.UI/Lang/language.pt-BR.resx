@@ -676,10 +676,10 @@
         <value>BTC Vendidos</value>
     </data>
     <data name="Reports.MonthlyTotals.Expenses" xml:space="preserve">
-        <value>Despesas</value>
+        <value>Saídas (Fiat)</value>
     </data>
     <data name="Reports.MonthlyTotals.Income" xml:space="preserve">
-        <value>Entradas</value>
+        <value>Entradas (Fiat)</value>
     </data>
     <data name="Reports.SpendingByCategories.Title" xml:space="preserve">
         <value>Gastos por categorias</value>
@@ -692,5 +692,14 @@
     </data>
     <data name="Total" xml:space="preserve">
         <value>Total</value>
+    </data>
+    <data name="Main.AvgPrice" xml:space="preserve">
+        <value>Preço médio</value>
+    </data>
+    <data name="Reports.MonthlyTotals.AllIncomeInFiat" xml:space="preserve">
+        <value>Entradas (Total)</value>
+    </data>
+    <data name="Reports.MonthlyTotals.AllExpensesInFiat" xml:space="preserve">
+        <value>Saídas (Total)</value>
     </data>
 </root>

@@ -21,7 +21,14 @@ public class BrazilianRuleCalculationStrategyTests
     [SetUp]
     public void SetUp()
     {
-        _strategy = new BrazilianRuleCalculationStrategy();
+        var profile = new AvgPriceProfileBuilder()
+            .WithCalculationMethod(AvgPriceCalculationMethod.BrazilianRule)
+            .WithCurrency(FiatCurrency.Brl)
+            .WithIcon(Icon.Empty)
+            .WithName("Test")
+            .Build();
+        
+        _strategy = new BrazilianRuleCalculationStrategy(profile);
     }
 
     [Test]

@@ -21,9 +21,20 @@ public partial class TransactionEditorView : ValtBaseWindow
 
         var viewModel = DataContext as TransactionEditorViewModel;
 
+        InputElement controlToFocus = AutoCompleteTransactionNameBox;
+        
         AutoCompleteTransactionNameBox.AsyncPopulator = viewModel!.GetTransactionTermsAsync;
 
-        Dispatcher.UIThread.InvokeAsync(() => AutoCompleteTransactionNameBox.Focus(), DispatcherPriority.ApplicationIdle);
+        if (viewModel.TransactionFixedExpenseReference is not null)
+        {
+            if (viewModel.FromAccountIsBtc)
+                controlToFocus = FromBtc;
+            else
+                controlToFocus = FromFiat;
+        }
+        
+
+        Dispatcher.UIThread.InvokeAsync(() => controlToFocus.Focus(), DispatcherPriority.ApplicationIdle);
     }
 
     private void OnKeyDown(object? sender, KeyEventArgs e)

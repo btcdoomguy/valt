@@ -23,6 +23,7 @@ using Valt.UI.Views.Main.Modals.TransactionEditor;
 using Valt.UI.Views.Main.Modals.MathExpression;
 using Valt.UI.Views.Main.Modals.Settings;
 using Valt.UI.Views.Main.Modals.StatusDisplay;
+using Valt.UI.Views.Main.Tabs.AvgPrice;
 using Valt.UI.Views.Main.Tabs.Reports;
 using Valt.UI.Views.Main.Tabs.Transactions;
 
@@ -40,6 +41,7 @@ public static class Extensions
         //pages
         services.AddSingleton<TransactionsViewModel>();
         services.AddSingleton<ReportsViewModel>();
+        services.AddSingleton<AvgPriceViewModel>();
         //factory method for pages
         services.AddSingleton<Func<MainViewTabNames, ValtTabViewModel>>(services => pageNames =>
         {
@@ -47,6 +49,7 @@ public static class Extensions
             {
                 MainViewTabNames.TransactionsPageContent => services.GetRequiredService<TransactionsViewModel>(),
                 MainViewTabNames.ReportsPageContent => services.GetRequiredService<ReportsViewModel>(),
+                MainViewTabNames.AvgPricePageContent => services.GetRequiredService<AvgPriceViewModel>(),
                 _ => throw new ArgumentOutOfRangeException(nameof(pageNames), pageNames, null)
             };
         });

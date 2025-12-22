@@ -28,6 +28,8 @@ public class MonthlyReportItemViewModel : ObservableObject
         BitcoinSold = item.BitcoinSold;
         BitcoinIncome = item.BitcoinIncome;
         BitcoinExpenses = item.BitcoinExpenses;
+        AllIncomeInFiat = item.AllIncomeInFiat;
+        AllExpensesInFiat = item.AllExpensesInFiat;
     }
     
     public MonthlyReportItemViewModel(FiatCurrency currency, MonthlyTotalsData.Totals item)
@@ -39,6 +41,8 @@ public class MonthlyReportItemViewModel : ObservableObject
         BitcoinSold = item.BitcoinSold;
         BitcoinIncome = item.BitcoinIncome;
         BitcoinExpenses = item.BitcoinExpenses;
+        AllIncomeInFiat = item.AllIncomeInFiat;
+        AllExpensesInFiat = item.AllExpensesInFiat;
     }
 
     public FiatCurrency Currency { get; init; }
@@ -110,6 +114,11 @@ public class MonthlyReportItemViewModel : ObservableObject
     public string BitcoinIncomeFormatted => CurrencyDisplay.FormatAsBitcoin(BitcoinIncome);
     public decimal BitcoinExpenses { get; init; }
     public string BitcoinExpensesFormatted => CurrencyDisplay.FormatAsBitcoin(BitcoinExpenses);
+    
+    public decimal AllIncomeInFiat { get; init; }
+    public string AllIncomeInFiatFormatted => CurrencyDisplay.FormatFiat(AllIncomeInFiat, Currency.Code);
+    public decimal AllExpensesInFiat { get; init; }
+    public string AllExpensesInFiatFormatted => CurrencyDisplay.FormatFiat(AllExpensesInFiat, Currency.Code);
 
     private SolidColorBrush Process(decimal percentage)
     {

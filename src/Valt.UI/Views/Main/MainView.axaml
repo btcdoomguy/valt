@@ -80,9 +80,17 @@
                             <Label Content="{x:Static local:language.Main_Reports}" />
                         </StackPanel>
                     </Button>
+                    <Button Classes="tab" Classes.selected="{Binding IsAvgPriceButtonSelected}"
+                            Command="{Binding SetAvgPriceTabCommand}"
+                            Margin="5,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Label Classes="icon" Content="&#xE26B;"></Label>
+                            <Label Content="{x:Static local:language.Main_AvgPrice}" />
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <TextBlock IsVisible="{Binding IsOffline}" Margin="0, 30, 50, 0"
+                    <TextBlock IsVisible="{Binding IsOffline}" Margin="0, 30, 10, 0"
                                HorizontalAlignment="Right">
                         <TextBlock FontFamily="{DynamicResource MaterialDesign}"
                                    FontSize="32"
