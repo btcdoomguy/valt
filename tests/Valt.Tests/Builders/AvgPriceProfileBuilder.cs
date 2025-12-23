@@ -7,6 +7,7 @@ public class AvgPriceProfileBuilder
 {
     private AvgPriceProfileId _id = new();
     private AvgPriceProfileName _name = "Test Profile";
+    private AvgPriceAsset _asset = AvgPriceAsset.Bitcoin;
     private bool _visible = true;
     private Icon _icon = Icon.Empty;
     private FiatCurrency _currency = FiatCurrency.Usd;
@@ -23,6 +24,12 @@ public class AvgPriceProfileBuilder
     public AvgPriceProfileBuilder WithName(AvgPriceProfileName name)
     {
         _name = name;
+        return this;
+    }
+    
+    public AvgPriceProfileBuilder WithName(AvgPriceAsset asset)
+    {
+        _asset = asset;
         return this;
     }
 
@@ -70,7 +77,7 @@ public class AvgPriceProfileBuilder
 
     public AvgPriceProfile Build()
     {
-        return AvgPriceProfile.Create(_id, _name, _visible, _icon, _currency, _calculationMethod, _avgPriceLines, _version);
+        return AvgPriceProfile.Create(_id, _name, _asset, _visible, _icon, _currency, _calculationMethod, _avgPriceLines, _version);
     }
 
     public static AvgPriceProfileBuilder AProfile() => new();
@@ -79,4 +86,9 @@ public class AvgPriceProfileBuilder
         new AvgPriceProfileBuilder()
             .WithCalculationMethod(AvgPriceCalculationMethod.BrazilianRule)
             .WithCurrency(FiatCurrency.Brl);
+
+    public static AvgPriceProfileBuilder AFifoProfile() =>
+        new AvgPriceProfileBuilder()
+            .WithCalculationMethod(AvgPriceCalculationMethod.Fifo)
+            .WithCurrency(FiatCurrency.Usd);
 }

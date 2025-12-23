@@ -4,9 +4,9 @@ public record AvgPriceLineDTO(string Id,
     DateOnly Date,
     int DisplayOrder,
     int AvgPriceLineTypeId,
-    long BtcAmount,
-    decimal BtcUnitPrice,
+    decimal Quantity,
+    decimal UnitPrice,
     string Comment,
     decimal AvgCostOfAcquisition,
     decimal TotalCost,
-    long TotalBtcAmount);
+    decimal TotalQuantity);

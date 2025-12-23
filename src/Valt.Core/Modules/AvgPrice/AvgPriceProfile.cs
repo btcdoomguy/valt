@@ -12,6 +12,7 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
     private IAvgPriceCalculationStrategy _calculationStrategy;
 
     public AvgPriceProfileName Name { get; protected set; }
+    public AvgPriceAsset Asset { get; protected set; }
     public bool Visible { get; protected set; }
     public Icon Icon { get; protected set; }
     public FiatCurrency Currency { get; protected set; }
@@ -28,6 +29,9 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
                 case AvgPriceCalculationMethod.BrazilianRule:
                     _calculationStrategy = new BrazilianRuleCalculationStrategy(this);
                     break;
+                case AvgPriceCalculationMethod.Fifo:
+                    _calculationStrategy = new FifoCalculationStrategy(this);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -36,12 +40,14 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
 
     public IReadOnlyCollection<AvgPriceLine> AvgPriceLines => _avgPriceLines;
 
-    private AvgPriceProfile(AvgPriceProfileId id, AvgPriceProfileName name, bool visible, Icon icon,
+    private AvgPriceProfile(AvgPriceProfileId id, AvgPriceProfileName name, AvgPriceAsset asset, bool visible,
+        Icon icon,
         FiatCurrency currency, AvgPriceCalculationMethod calculationMethod, IEnumerable<AvgPriceLine> avgPriceLines,
         int version)
     {
         Id = id;
         Name = name;
+        Asset = asset;
         Visible = visible;
         Icon = icon;
         Currency = currency;
@@ -54,26 +60,28 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
             AddEvent(new AvgPriceProfileCreatedEvent(this));
     }
 
-    public static AvgPriceProfile Create(AvgPriceProfileId id, AvgPriceProfileName name, bool visible, Icon icon,
+    public static AvgPriceProfile Create(AvgPriceProfileId id, AvgPriceProfileName name, AvgPriceAsset asset,
+        bool visible, Icon icon,
         FiatCurrency currency, AvgPriceCalculationMethod calculationMethod, IEnumerable<AvgPriceLine> avgPriceLines,
         int version)
     {
-        return new AvgPriceProfile(id, name, visible, icon, currency, calculationMethod, avgPriceLines, version);
+        return new AvgPriceProfile(id, name, asset, visible, icon, currency, calculationMethod, avgPriceLines, version);
     }
 
-    public static AvgPriceProfile New(AvgPriceProfileName name, bool visible, Icon icon, FiatCurrency currency,
+    public static AvgPriceProfile New(AvgPriceProfileName name, AvgPriceAsset asset, bool visible, Icon icon,
+        FiatCurrency currency,
         AvgPriceCalculationMethod calculationMethod)
     {
-        return new AvgPriceProfile(new AvgPriceProfileId(), name, visible, icon, currency, calculationMethod,
+        return new AvgPriceProfile(new AvgPriceProfileId(), name, asset, visible, icon, currency, calculationMethod,
             Enumerable.Empty<AvgPriceLine>(), 0);
     }
 
-    public void AddLine(DateOnly date, int displayOrder, AvgPriceLineTypes type, BtcValue btcValue, FiatValue fiatValue,
+    public void AddLine(DateOnly date, int displayOrder, AvgPriceLineTypes type, decimal quantity, FiatValue fiatValue,
         string comment)
     {
         var copiedList = _avgPriceLines.ToList();
 
-        var newLine = AvgPriceLine.New(date, displayOrder, type, btcValue, fiatValue, comment);
+        var newLine = AvgPriceLine.New(date, displayOrder, type, quantity, fiatValue, comment);
         copiedList.Add(newLine);
 
         var orderedList = copiedList.OrderBy(x => x.Date).ThenBy(x => x.DisplayOrder).ToList();
@@ -81,7 +89,7 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
         Recalculate(orderedList);
 
         _avgPriceLines.Add(newLine);
-        
+
         AddEvent(new AvgPriceLineCreatedEvent(newLine));
     }
 
@@ -92,19 +100,19 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
         var orderedList = _avgPriceLines.OrderBy(x => x.Date).ThenBy(x => x.DisplayOrder).ToList();
 
         Recalculate(orderedList);
-        
+
         AddEvent(new AvgPriceLineDeletedEvent(line));
     }
-    
+
     public void ChangeLineTotals(AvgPriceLine line, LineTotals lineTotals)
     {
-        if (line.Totals == lineTotals) 
+        if (line.Totals == lineTotals)
             return;
-        
+
         line.SetLineTotals(lineTotals);
         AddEvent(new AvgPriceLineUpdatedEvent(line));
     }
-    
+
     private void Recalculate(IEnumerable<AvgPriceLine> orderedList)
     {
         _calculationStrategy.CalculateTotals(orderedList);

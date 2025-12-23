@@ -19,6 +19,7 @@ public class AvgPriceRepositoryTests : DatabaseTest
         // Arrange
         var profile = AvgPriceProfile.New(
             "Test Profile",
+            asset: AvgPriceAsset.Bitcoin,
             visible: true,
             Icon.Empty,
             FiatCurrency.Brl,
@@ -52,6 +53,7 @@ public class AvgPriceRepositoryTests : DatabaseTest
         // Arrange
         var profile = AvgPriceProfile.New(
             "Profile With Lines",
+            asset: AvgPriceAsset.Bitcoin,
             visible: true,
             Icon.Empty,
             FiatCurrency.Brl,
@@ -61,7 +63,7 @@ public class AvgPriceRepositoryTests : DatabaseTest
             new DateOnly(2024, 1, 15),
             displayOrder: 1,
             AvgPriceLineTypes.Buy,
-            BtcValue.ParseBitcoin(0.5m),
+            0.5m,
             FiatValue.New(50000m),
             "First buy");
 
@@ -69,7 +71,7 @@ public class AvgPriceRepositoryTests : DatabaseTest
             new DateOnly(2024, 2, 20),
             displayOrder: 2,
             AvgPriceLineTypes.Buy,
-            BtcValue.ParseBitcoin(0.3m),
+            0.3m,
             FiatValue.New(55000m),
             "Second buy");
 
@@ -93,7 +95,7 @@ public class AvgPriceRepositoryTests : DatabaseTest
         var firstLine = restoredProfile.AvgPriceLines.First(l => l.Comment == "First buy");
         Assert.That(firstLine.Date, Is.EqualTo(new DateOnly(2024, 1, 15)));
         Assert.That(firstLine.Type, Is.EqualTo(AvgPriceLineTypes.Buy));
-        Assert.That(firstLine.BtcAmount.Sats, Is.EqualTo(BtcValue.ParseBitcoin(0.5m).Sats));
+        Assert.That(firstLine.Quantity, Is.EqualTo(0.5m));
 
         var secondLine = restoredProfile.AvgPriceLines.First(l => l.Comment == "Second buy");
         Assert.That(secondLine.Date, Is.EqualTo(new DateOnly(2024, 2, 20)));
@@ -133,6 +135,7 @@ public class AvgPriceRepositoryTests : DatabaseTest
         // Arrange
         var profile = AvgPriceProfile.New(
             "Events Test Profile",
+            asset: AvgPriceAsset.Bitcoin,
             visible: true,
             Icon.Empty,
             FiatCurrency.Usd,
@@ -165,6 +168,7 @@ public class AvgPriceRepositoryTests : DatabaseTest
         // Arrange
         var profile = AvgPriceProfile.New(
             "New Profile",
+            asset: AvgPriceAsset.Bitcoin,
             visible: true,
             Icon.Empty,
             FiatCurrency.Brl,
@@ -186,6 +190,7 @@ public class AvgPriceRepositoryTests : DatabaseTest
         // Arrange
         var profile = AvgPriceProfile.New(
             "Line Events Profile",
+            asset: AvgPriceAsset.Bitcoin,
             visible: true,
             Icon.Empty,
             FiatCurrency.Brl,
@@ -218,6 +223,7 @@ public class AvgPriceRepositoryTests : DatabaseTest
         // Arrange
         var profile1 = AvgPriceProfile.New(
             "Profile One",
+            asset: AvgPriceAsset.Bitcoin,
             visible: true,
             Icon.Empty,
             FiatCurrency.Brl,
@@ -232,6 +238,7 @@ public class AvgPriceRepositoryTests : DatabaseTest
 
         var profile2 = AvgPriceProfile.New(
             "Profile Two",
+            asset: AvgPriceAsset.Bitcoin,
             visible: false,
             Icon.Empty,
             FiatCurrency.Usd,
@@ -270,6 +277,7 @@ public class AvgPriceRepositoryTests : DatabaseTest
         // Arrange
         var profile = AvgPriceProfile.New(
             "Profile To Delete",
+            asset: AvgPriceAsset.Bitcoin,
             visible: true,
             Icon.Empty,
             FiatCurrency.Brl,
@@ -322,6 +330,7 @@ public class AvgPriceRepositoryTests : DatabaseTest
         // Arrange
         var profile = AvgPriceProfile.New(
             "Multiple Line Types Profile",
+            asset: AvgPriceAsset.Bitcoin,
             visible: true,
             Icon.Empty,
             FiatCurrency.Brl,
@@ -381,6 +390,7 @@ public class AvgPriceRepositoryTests : DatabaseTest
         // Arrange
         var profile = AvgPriceProfile.New(
             "Totals Test Profile",
+            asset: AvgPriceAsset.Bitcoin,
             visible: true,
             Icon.Empty,
             FiatCurrency.Brl,
@@ -406,7 +416,7 @@ public class AvgPriceRepositoryTests : DatabaseTest
         var line = restoredProfile!.AvgPriceLines.First();
         // The totals should be calculated by the strategy
         Assert.That(line.Totals, Is.Not.Null);
-        Assert.That(line.Totals.BtcAmount.Sats, Is.GreaterThan(0));
+        Assert.That(line.Totals.Quantity, Is.GreaterThan(0));
     }
 
     #endregion
@@ -422,6 +432,7 @@ public class AvgPriceRepositoryTests : DatabaseTest
         // Arrange
         var profile = AvgPriceProfile.New(
             "Direct DB Test Profile",
+            asset: AvgPriceAsset.Bitcoin,
             visible: true,
             Icon.Empty,
             FiatCurrency.Brl,
@@ -457,6 +468,7 @@ public class AvgPriceRepositoryTests : DatabaseTest
         // Arrange
         var profile = AvgPriceProfile.New(
             "Query Test Profile",
+            asset: AvgPriceAsset.Bitcoin,
             visible: true,
             Icon.Empty,
             FiatCurrency.Brl,

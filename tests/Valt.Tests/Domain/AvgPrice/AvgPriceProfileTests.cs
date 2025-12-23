@@ -37,14 +37,14 @@ public class AvgPriceProfileTests
         // Arrange
         var line1 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
-            .WithBtcAmount(BtcValue.ParseBitcoin(1m))
-            .WithBitcoinUnitPrice(FiatValue.New(50000m))
+            .WithQuantity(1)
+            .WithUnitPrice(FiatValue.New(50000m))
             .Build();
 
         var line2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 2))
-            .WithBtcAmount(BtcValue.ParseBitcoin(0.5m))
-            .WithBitcoinUnitPrice(FiatValue.New(60000m))
+            .WithQuantity(0.5m)
+            .WithUnitPrice(FiatValue.New(60000m))
             .Build();
 
         // Act
@@ -69,7 +69,7 @@ public class AvgPriceProfileTests
             new DateOnly(2024, 1, 1),
             1,
             AvgPriceLineTypes.Buy,
-            BtcValue.ParseBitcoin(1m),
+            1m,
             FiatValue.New(50000m),
             "First buy");
 
@@ -77,7 +77,7 @@ public class AvgPriceProfileTests
         Assert.That(profile.AvgPriceLines.Count, Is.EqualTo(1));
         var firstLine = profile.AvgPriceLines.First();
         Assert.That(firstLine.Totals.TotalCost, Is.EqualTo(50000m));
-        Assert.That(firstLine.Totals.BtcAmount.Btc, Is.EqualTo(1m));
+        Assert.That(firstLine.Totals.Quantity, Is.EqualTo(1m));
         Assert.That(firstLine.Totals.AvgCostOfAcquisition.Value, Is.EqualTo(50000m));
     }
 
@@ -94,7 +94,7 @@ public class AvgPriceProfileTests
             new DateOnly(2024, 1, 2),
             1,
             AvgPriceLineTypes.Buy,
-            BtcValue.ParseBitcoin(0.5m),
+            0.5m,
             FiatValue.New(60000m),
             "Second buy");
 
@@ -102,7 +102,7 @@ public class AvgPriceProfileTests
             new DateOnly(2024, 1, 1),
             1,
             AvgPriceLineTypes.Buy,
-            BtcValue.ParseBitcoin(1m),
+            1m,
             FiatValue.New(50000m),
             "First buy");
 
@@ -114,12 +114,12 @@ public class AvgPriceProfileTests
 
         // First line (Jan 1): Total = 50000, BTC = 1, Avg = 50000
         Assert.That(orderedLines[0].Totals.TotalCost, Is.EqualTo(50000m));
-        Assert.That(orderedLines[0].Totals.BtcAmount.Btc, Is.EqualTo(1m));
+        Assert.That(orderedLines[0].Totals.Quantity, Is.EqualTo(1m));
         Assert.That(orderedLines[0].Totals.AvgCostOfAcquisition.Value, Is.EqualTo(50000m));
 
         // Second line (Jan 2): Total = 50000 + 30000 = 80000, BTC = 1.5, Avg = 53333.33
         Assert.That(orderedLines[1].Totals.TotalCost, Is.EqualTo(80000m));
-        Assert.That(orderedLines[1].Totals.BtcAmount.Btc, Is.EqualTo(1.5m));
+        Assert.That(orderedLines[1].Totals.Quantity, Is.EqualTo(1.5m));
         Assert.That(orderedLines[1].Totals.AvgCostOfAcquisition.Value, Is.EqualTo(53333.33m));
     }
 
@@ -130,15 +130,15 @@ public class AvgPriceProfileTests
         var line1 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithDisplayOrder(1)
-            .WithBtcAmount(BtcValue.ParseBitcoin(1m))
-            .WithBitcoinUnitPrice(FiatValue.New(50000m))
+            .WithQuantity(1m)
+            .WithUnitPrice(FiatValue.New(50000m))
             .Build();
 
         var line2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithDisplayOrder(1)
-            .WithBtcAmount(BtcValue.ParseBitcoin(0.5m))
-            .WithBitcoinUnitPrice(FiatValue.New(60000m))
+            .WithQuantity(0.5m)
+            .WithUnitPrice(FiatValue.New(60000m))
             .Build();
 
         var profile = AvgPriceProfileBuilder.AProfile()
@@ -155,7 +155,7 @@ public class AvgPriceProfileTests
         // New totals should be: Total = 30000, BTC = 0.5, Avg = 60000
         var remainingLine = profile.AvgPriceLines.First();
         Assert.That(remainingLine.Totals.TotalCost, Is.EqualTo(30000m));
-        Assert.That(remainingLine.Totals.BtcAmount.Btc, Is.EqualTo(0.5m));
+        Assert.That(remainingLine.Totals.Quantity, Is.EqualTo(0.5m));
         Assert.That(remainingLine.Totals.AvgCostOfAcquisition.Value, Is.EqualTo(60000m));
     }
 
@@ -172,7 +172,7 @@ public class AvgPriceProfileTests
             new DateOnly(2024, 1, 1),
             1,
             AvgPriceLineTypes.Buy,
-            BtcValue.ParseBitcoin(1m),
+            1m,
             FiatValue.New(50000m),
             "Buy");
 
@@ -181,7 +181,7 @@ public class AvgPriceProfileTests
             new DateOnly(2024, 1, 2),
             1,
             AvgPriceLineTypes.Sell,
-            BtcValue.ParseBitcoin(0.5m),
+            0.5m,
             FiatValue.New(70000m), // Sell price doesn't affect avg in Brazilian rule
             "Sell");
 
@@ -191,7 +191,7 @@ public class AvgPriceProfileTests
         var sellLine = profile.AvgPriceLines.First(x => x.Type == AvgPriceLineTypes.Sell);
         // After selling 50%: Total = 25000, BTC = 0.5, Avg = 50000 (unchanged)
         Assert.That(sellLine.Totals.TotalCost, Is.EqualTo(25000m));
-        Assert.That(sellLine.Totals.BtcAmount.Btc, Is.EqualTo(0.5m));
+        Assert.That(sellLine.Totals.Quantity, Is.EqualTo(0.5m));
         Assert.That(sellLine.Totals.AvgCostOfAcquisition.Value, Is.EqualTo(50000m));
     }
 
@@ -208,7 +208,7 @@ public class AvgPriceProfileTests
             new DateOnly(2024, 1, 1),
             2, // Second in order
             AvgPriceLineTypes.Buy,
-            BtcValue.ParseBitcoin(0.5m),
+            0.5m,
             FiatValue.New(60000m),
             "Second buy");
 
@@ -216,7 +216,7 @@ public class AvgPriceProfileTests
             new DateOnly(2024, 1, 1),
             1, // First in order
             AvgPriceLineTypes.Buy,
-            BtcValue.ParseBitcoin(1m),
+            1m,
             FiatValue.New(50000m),
             "First buy");
 
@@ -248,13 +248,13 @@ public class AvgPriceProfileTests
             new DateOnly(2024, 1, 1),
             1,
             AvgPriceLineTypes.Setup,
-            BtcValue.ParseBitcoin(2m),
+            2m,
             FiatValue.New(250000m), // 250,000 BRL avg
             "Initial position");
 
         // Assert
         var setupLine = profile.AvgPriceLines.First();
-        Assert.That(setupLine.Totals.BtcAmount.Btc, Is.EqualTo(2m));
+        Assert.That(setupLine.Totals.Quantity, Is.EqualTo(2m));
         Assert.That(setupLine.Totals.AvgCostOfAcquisition.Value, Is.EqualTo(250000m));
         Assert.That(setupLine.Totals.TotalCost, Is.EqualTo(500000m)); // 2 * 250000
     }

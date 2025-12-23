@@ -39,11 +39,11 @@ internal sealed class AvgPriceQueries : IAvgPriceQueries
         return Task.FromResult(lines.Select(x => new AvgPriceLineDTO(x.Id.ToString(), DateOnly.FromDateTime(x.Date),
             x.DisplayOrder,
             x.AvgPriceLineTypeId,
-            x.BtcAmount,
-            x.BtcUnitPrice,
+            x.Quantity,
+            x.UnitPrice,
             x.Comment,
             x.AvgCostOfAcquisition,
             x.TotalCost,
-            x.TotalBtcAmount)));
+            x.TotalQuantity)));
     }
 }

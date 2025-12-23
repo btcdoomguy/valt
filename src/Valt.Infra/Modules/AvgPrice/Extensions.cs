@@ -12,6 +12,8 @@ public static class Extensions
         {
             Id = new ObjectId(profile.Id),
             Name = profile.Name,
+            AssetName = profile.Asset.Name,
+            Precision = profile.Asset.Precision,
             Visible = profile.Visible,
             AvgPriceCalculationMethod = profile.CalculationMethod,
             Currency = profile.Currency.Code,
@@ -26,15 +28,15 @@ public static class Extensions
         {
             Id = new ObjectId(line.Id),
             AvgCostOfAcquisition = line.Totals.AvgCostOfAcquisition.Value,
-            BtcAmount = line.BtcAmount.Sats,
+            Quantity = line.Quantity,
             Comment = line.Comment,
             Date = line.Date.ToValtDateTime(),
             DisplayOrder = line.DisplayOrder,
             TotalCost = line.Totals.TotalCost,
             AvgPriceLineType = line.Type,
-            BtcUnitPrice = line.BitcoinUnitPrice.Value,
+            UnitPrice = line.UnitPrice.Value,
             ProfileId = new ObjectId(avgPriceProfileId),
-            TotalBtcAmount = line.Totals.BtcAmount.Sats
+            TotalQuantity = line.Totals.Quantity
         };
     }
 
@@ -43,6 +45,7 @@ public static class Extensions
     {
         return AvgPriceProfile.Create(entity.Id.ToString(),
             entity.Name,
+            new AvgPriceAsset(entity.AssetName, entity.Precision),
             entity.Visible,
             entity.Icon is not null ? Icon.RestoreFromId(entity.Icon) : Icon.Empty,
             FiatCurrency.GetFromCode(entity.Currency!),
@@ -51,11 +54,11 @@ public static class Extensions
                 DateOnly.FromDateTime(line.Date),
                 line.DisplayOrder,
                 line.AvgPriceLineType,
-                BtcValue.ParseSats(line.BtcAmount),
-                line.BtcUnitPrice,
+                line.Quantity,
+                line.UnitPrice,
                 line.Comment,
                 new LineTotals(line.AvgCostOfAcquisition, line.TotalCost,
-                    BtcValue.ParseSats(line.TotalBtcAmount)))),
+                    line.TotalQuantity))),
             entity.Version
         );
     }

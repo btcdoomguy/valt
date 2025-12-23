@@ -8,11 +8,13 @@ public class AvgPriceProfileEntity
     [BsonId] public ObjectId Id { get; set; } = null!;
     [BsonField("tp")] public int AvgPriceCalculationMethodId { get; set; }
     [BsonField("name")] public string Name { get; set; } = null!;
+    [BsonField("assetName")] public string AssetName { get; set; } = null!;
+    [BsonField("assetPrec")] public int Precision { get; set; }
     [BsonField("visi")] public bool Visible { get; set; }
     [BsonField("icon")] public string? Icon { get; set; }
     [BsonField("curr")] public string Currency { get; set; } = null!;
     
-    [BsonRef("avgprice_line")]
+    [BsonRef("lines")]
     public List<AvgPriceLineEntity> Lines { get; set; } = new();
     
     [BsonField("v")] public int Version { get; set; }
