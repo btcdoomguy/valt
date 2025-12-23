@@ -704,4 +704,247 @@ public class FifoCalculationStrategyTests
     }
 
     #endregion
+
+    #region Non-Bitcoin Asset Tests (Precision 2)
+
+    [Test]
+    public void Should_Calculate_Avg_Price_For_Stock_Asset_With_Precision_2()
+    {
+        // Arrange: Create a stock profile with precision 2 (e.g., NVDA stock)
+        var stockAsset = new AvgPriceAsset("NVDA", 2);
+        var profile = AvgPriceProfileBuilder.AFifoProfile()
+            .WithAsset(stockAsset)
+            .WithIcon(Icon.Empty)
+            .WithName("NVDA Stock")
+            .Build();
+
+        var strategy = new FifoCalculationStrategy(profile);
+
+        // Buy 10 shares at $500.00
+        var line = AvgPriceLineBuilder.ABuyLine()
+            .WithDate(new DateOnly(2024, 1, 1))
+            .WithQuantity(10m)
+            .WithUnitPrice(FiatValue.New(500m))
+            .Build();
+
+        var lines = new List<AvgPriceLine> { line };
+
+        // Act
+        strategy.CalculateTotals(lines);
+
+        // Assert
+        // Total cost = 10 * 500 = 5000
+        // Quantity = 10
+        // Avg = 5000 / 10 = 500
+        Assert.That(line.Totals.TotalCost, Is.EqualTo(5000m));
+        Assert.That(line.Totals.Quantity, Is.EqualTo(10m));
+        Assert.That(line.Totals.AvgCostOfAcquisition.Value, Is.EqualTo(500m));
+    }
+
+    [Test]
+    public void Should_Round_To_Precision_2_For_Stock_Assets()
+    {
+        // Arrange: Stock with precision 2
+        var stockAsset = new AvgPriceAsset("AAPL", 2);
+        var profile = AvgPriceProfileBuilder.AFifoProfile()
+            .WithAsset(stockAsset)
+            .WithIcon(Icon.Empty)
+            .WithName("AAPL Stock")
+            .Build();
+
+        var strategy = new FifoCalculationStrategy(profile);
+
+        // Buy 3 shares at $175.33
+        var buy1 = AvgPriceLineBuilder.ABuyLine()
+            .WithDate(new DateOnly(2024, 1, 1))
+            .WithQuantity(3m)
+            .WithUnitPrice(FiatValue.New(175.33m))
+            .Build();
+
+        // Buy 7 shares at $180.67
+        var buy2 = AvgPriceLineBuilder.ABuyLine()
+            .WithDate(new DateOnly(2024, 1, 2))
+            .WithQuantity(7m)
+            .WithUnitPrice(FiatValue.New(180.67m))
+            .Build();
+
+        var lines = new List<AvgPriceLine> { buy1, buy2 };
+
+        // Act
+        strategy.CalculateTotals(lines);
+
+        // Assert
+        // After buy1: Total = 3 * 175.33 = 525.99, Qty = 3, Avg = 175.33
+        Assert.That(buy1.Totals.TotalCost, Is.EqualTo(525.99m));
+        Assert.That(buy1.Totals.Quantity, Is.EqualTo(3m));
+        Assert.That(buy1.Totals.AvgCostOfAcquisition.Value, Is.EqualTo(175.33m));
+
+        // After buy2: Total = 525.99 + 1264.69 = 1790.68, Qty = 10
+        // Avg = 1790.68 / 10 = 179.068 -> rounded to 179.07
+        Assert.That(buy2.Totals.TotalCost, Is.EqualTo(1790.68m));
+        Assert.That(buy2.Totals.Quantity, Is.EqualTo(10m));
+        Assert.That(buy2.Totals.AvgCostOfAcquisition.Value, Is.EqualTo(179.07m));
+    }
+
+    [Test]
+    public void Should_Handle_Fifo_Sell_For_Stock_Assets()
+    {
+        // Arrange: Stock with precision 2
+        var stockAsset = new AvgPriceAsset("MSFT", 2);
+        var profile = AvgPriceProfileBuilder.AFifoProfile()
+            .WithAsset(stockAsset)
+            .WithIcon(Icon.Empty)
+            .WithName("MSFT Stock")
+            .Build();
+
+        var strategy = new FifoCalculationStrategy(profile);
+
+        // Buy 100 shares at $300.00 (first lot)
+        var buy1 = AvgPriceLineBuilder.ABuyLine()
+            .WithDate(new DateOnly(2024, 1, 1))
+            .WithQuantity(100m)
+            .WithUnitPrice(FiatValue.New(300m))
+            .Build();
+
+        // Buy 50 shares at $350.00 (second lot)
+        var buy2 = AvgPriceLineBuilder.ABuyLine()
+            .WithDate(new DateOnly(2024, 1, 2))
+            .WithQuantity(50m)
+            .WithUnitPrice(FiatValue.New(350m))
+            .Build();
+
+        // Sell 80 shares (should come from first lot in FIFO)
+        var sell = AvgPriceLineBuilder.ASellLine()
+            .WithDate(new DateOnly(2024, 1, 3))
+            .WithQuantity(80m)
+            .WithUnitPrice(FiatValue.New(400m)) // Sell price doesn't affect cost basis
+            .Build();
+
+        var lines = new List<AvgPriceLine> { buy1, buy2, sell };
+
+        // Act
+        strategy.CalculateTotals(lines);
+
+        // Assert
+        // After sell in FIFO:
+        // - First lot: 20 shares remain at $300 (cost = 6000)
+        // - Second lot: 50 shares at $350 (cost = 17500)
+        // Total cost = 6000 + 17500 = 23500
+        // Quantity = 70
+        // Avg = 23500 / 70 = 335.714... -> rounded to 335.71
+        Assert.That(sell.Totals.TotalCost, Is.EqualTo(23500m));
+        Assert.That(sell.Totals.Quantity, Is.EqualTo(70m));
+        Assert.That(sell.Totals.AvgCostOfAcquisition.Value, Is.EqualTo(335.71m));
+    }
+
+    [Test]
+    public void Should_Handle_Buy_Sell_Buy_Sequence_For_Stock_Assets()
+    {
+        // Arrange: Stock with precision 2
+        var stockAsset = new AvgPriceAsset("GOOG", 2);
+        var profile = AvgPriceProfileBuilder.AFifoProfile()
+            .WithAsset(stockAsset)
+            .WithIcon(Icon.Empty)
+            .WithName("GOOG Stock")
+            .Build();
+
+        var strategy = new FifoCalculationStrategy(profile);
+
+        // Buy 50 shares at $140.50
+        var buy1 = AvgPriceLineBuilder.ABuyLine()
+            .WithDate(new DateOnly(2024, 1, 1))
+            .WithQuantity(50m)
+            .WithUnitPrice(FiatValue.New(140.50m))
+            .Build();
+
+        // Sell 30 shares
+        var sell = AvgPriceLineBuilder.ASellLine()
+            .WithDate(new DateOnly(2024, 1, 2))
+            .WithQuantity(30m)
+            .WithUnitPrice(FiatValue.New(150m))
+            .Build();
+
+        // Buy 25 shares at $145.75
+        var buy2 = AvgPriceLineBuilder.ABuyLine()
+            .WithDate(new DateOnly(2024, 1, 3))
+            .WithQuantity(25m)
+            .WithUnitPrice(FiatValue.New(145.75m))
+            .Build();
+
+        var lines = new List<AvgPriceLine> { buy1, sell, buy2 };
+
+        // Act
+        strategy.CalculateTotals(lines);
+
+        // Assert
+        // After buy1: Total = 50 * 140.50 = 7025, Qty = 50, Avg = 140.50
+        Assert.That(buy1.Totals.TotalCost, Is.EqualTo(7025m));
+        Assert.That(buy1.Totals.Quantity, Is.EqualTo(50m));
+        Assert.That(buy1.Totals.AvgCostOfAcquisition.Value, Is.EqualTo(140.50m));
+
+        // After sell: 20 shares remain at $140.50
+        // Total = 20 * 140.50 = 2810, Qty = 20, Avg = 140.50
+        Assert.That(sell.Totals.TotalCost, Is.EqualTo(2810m));
+        Assert.That(sell.Totals.Quantity, Is.EqualTo(20m));
+        Assert.That(sell.Totals.AvgCostOfAcquisition.Value, Is.EqualTo(140.50m));
+
+        // After buy2:
+        // - First lot: 20 shares at $140.50 (cost = 2810)
+        // - Second lot: 25 shares at $145.75 (cost = 3643.75)
+        // Total = 2810 + 3643.75 = 6453.75, Qty = 45
+        // Avg = 6453.75 / 45 = 143.416... -> rounded to 143.42
+        Assert.That(buy2.Totals.TotalCost, Is.EqualTo(6453.75m));
+        Assert.That(buy2.Totals.Quantity, Is.EqualTo(45m));
+        Assert.That(buy2.Totals.AvgCostOfAcquisition.Value, Is.EqualTo(143.42m));
+    }
+
+    [Test]
+    public void Should_Handle_Setup_Line_For_Stock_Assets()
+    {
+        // Arrange: Stock with precision 2
+        var stockAsset = new AvgPriceAsset("AMZN", 2);
+        var profile = AvgPriceProfileBuilder.AFifoProfile()
+            .WithAsset(stockAsset)
+            .WithIcon(Icon.Empty)
+            .WithName("AMZN Stock")
+            .Build();
+
+        var strategy = new FifoCalculationStrategy(profile);
+
+        // Setup: 200 shares at $175.50 avg
+        var setup = AvgPriceLineBuilder.ASetupLine()
+            .WithDate(new DateOnly(2024, 1, 1))
+            .WithQuantity(200m)
+            .WithUnitPrice(FiatValue.New(175.50m))
+            .Build();
+
+        // Buy 50 shares at $180.25
+        var buy = AvgPriceLineBuilder.ABuyLine()
+            .WithDate(new DateOnly(2024, 1, 2))
+            .WithQuantity(50m)
+            .WithUnitPrice(FiatValue.New(180.25m))
+            .Build();
+
+        var lines = new List<AvgPriceLine> { setup, buy };
+
+        // Act
+        strategy.CalculateTotals(lines);
+
+        // Assert
+        // After setup: Total = 200 * 175.50 = 35100, Qty = 200, Avg = 175.50
+        Assert.That(setup.Totals.TotalCost, Is.EqualTo(35100m));
+        Assert.That(setup.Totals.Quantity, Is.EqualTo(200m));
+        Assert.That(setup.Totals.AvgCostOfAcquisition.Value, Is.EqualTo(175.50m));
+
+        // After buy:
+        // - Setup lot: 200 shares at $175.50 (cost = 35100)
+        // - Buy lot: 50 shares at $180.25 (cost = 9012.50)
+        // Total = 35100 + 9012.50 = 44112.50, Qty = 250
+        // Avg = 44112.50 / 250 = 176.45
+        Assert.That(buy.Totals.TotalCost, Is.EqualTo(44112.50m));
+        Assert.That(buy.Totals.Quantity, Is.EqualTo(250m));
+        Assert.That(buy.Totals.AvgCostOfAcquisition.Value, Is.EqualTo(176.45m));
+    }
+
+    #endregion
 }

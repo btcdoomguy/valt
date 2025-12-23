@@ -41,6 +41,8 @@ public class AvgPriceRepositoryTests : DatabaseTest
         Assert.That(restoredProfile, Is.Not.Null);
         Assert.That(restoredProfile!.Id, Is.EqualTo(profile.Id));
         Assert.That(restoredProfile.Name, Is.EqualTo(profile.Name));
+        Assert.That(restoredProfile.Asset.Name, Is.EqualTo(profile.Asset.Name));
+        Assert.That(restoredProfile.Asset.Precision, Is.EqualTo(profile.Asset.Precision));
         Assert.That(restoredProfile.Visible, Is.EqualTo(profile.Visible));
         Assert.That(restoredProfile.Currency, Is.EqualTo(profile.Currency));
         Assert.That(restoredProfile.CalculationMethod, Is.EqualTo(profile.CalculationMethod));
@@ -100,6 +102,98 @@ public class AvgPriceRepositoryTests : DatabaseTest
         var secondLine = restoredProfile.AvgPriceLines.First(l => l.Comment == "Second buy");
         Assert.That(secondLine.Date, Is.EqualTo(new DateOnly(2024, 2, 20)));
         Assert.That(secondLine.Type, Is.EqualTo(AvgPriceLineTypes.Buy));
+    }
+
+    [Test]
+    public async Task Save_Should_Store_And_Retrieve_Profile_With_NonBitcoin_Asset()
+    {
+        // Arrange - Create a stock profile with precision 2
+        var stockAsset = new AvgPriceAsset("NVDA", 2);
+        var profile = AvgPriceProfile.New(
+            "NVDA Stock Profile",
+            asset: stockAsset,
+            visible: true,
+            Icon.Empty,
+            FiatCurrency.Usd,
+            AvgPriceCalculationMethod.Fifo);
+
+        profile.AddLine(
+            new DateOnly(2024, 1, 15),
+            displayOrder: 1,
+            AvgPriceLineTypes.Buy,
+            100m, // 100 shares
+            FiatValue.New(500m), // $500 per share
+            "First stock buy");
+
+        var repository = new AvgPriceRepository(_localDatabase, _domainEventPublisher);
+
+        // Act
+        await repository.SaveAvgPriceProfileAsync(profile);
+
+        // Assert - Can retrieve profile with correct asset
+        var restoredProfile = await repository.GetAvgPriceProfileByIdAsync(profile.Id);
+        Assert.That(restoredProfile, Is.Not.Null);
+        Assert.That(restoredProfile!.Asset.Name, Is.EqualTo("NVDA"));
+        Assert.That(restoredProfile.Asset.Precision, Is.EqualTo(2));
+        Assert.That(restoredProfile.CalculationMethod, Is.EqualTo(AvgPriceCalculationMethod.Fifo));
+
+        // Assert - Line data is correct
+        Assert.That(restoredProfile.AvgPriceLines.Count, Is.EqualTo(1));
+        var line = restoredProfile.AvgPriceLines.First();
+        Assert.That(line.Quantity, Is.EqualTo(100m));
+        Assert.That(line.UnitPrice.Value, Is.EqualTo(500m));
+        Assert.That(line.Comment, Is.EqualTo("First stock buy"));
+    }
+
+    [Test]
+    public async Task Save_Should_Store_And_Retrieve_Profile_With_Lines_And_Totals()
+    {
+        // Arrange - Create a profile with lines that will have calculated totals
+        var profile = AvgPriceProfile.New(
+            "Profile With Totals",
+            asset: AvgPriceAsset.Bitcoin,
+            visible: true,
+            Icon.Empty,
+            FiatCurrency.Usd,
+            AvgPriceCalculationMethod.Fifo);
+
+        profile.AddLine(
+            new DateOnly(2024, 1, 1),
+            displayOrder: 1,
+            AvgPriceLineTypes.Buy,
+            1m, // 1 BTC
+            FiatValue.New(50000m),
+            "Buy BTC");
+
+        profile.AddLine(
+            new DateOnly(2024, 1, 2),
+            displayOrder: 1,
+            AvgPriceLineTypes.Buy,
+            0.5m, // 0.5 BTC
+            FiatValue.New(60000m),
+            "Buy more BTC");
+
+        var repository = new AvgPriceRepository(_localDatabase, _domainEventPublisher);
+
+        // Act
+        await repository.SaveAvgPriceProfileAsync(profile);
+
+        // Assert - Can retrieve profile with lines and calculated totals
+        var restoredProfile = await repository.GetAvgPriceProfileByIdAsync(profile.Id);
+        Assert.That(restoredProfile, Is.Not.Null);
+        Assert.That(restoredProfile!.AvgPriceLines.Count, Is.EqualTo(2));
+
+        // Verify line totals are restored correctly
+        var firstLine = restoredProfile.AvgPriceLines.OrderBy(l => l.Date).First();
+        Assert.That(firstLine.Totals.Quantity, Is.EqualTo(1m));
+        Assert.That(firstLine.Totals.TotalCost, Is.EqualTo(50000m));
+        Assert.That(firstLine.Totals.AvgCostOfAcquisition.Value, Is.EqualTo(50000m));
+
+        var secondLine = restoredProfile.AvgPriceLines.OrderBy(l => l.Date).Last();
+        Assert.That(secondLine.Totals.Quantity, Is.EqualTo(1.5m));
+        Assert.That(secondLine.Totals.TotalCost, Is.EqualTo(80000m));
+        // Avg = 80000 / 1.5 = 53333.33
+        Assert.That(secondLine.Totals.AvgCostOfAcquisition.Value, Is.EqualTo(53333.33m));
     }
 
     #endregion

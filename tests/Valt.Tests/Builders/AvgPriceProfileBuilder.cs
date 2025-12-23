@@ -27,7 +27,7 @@ public class AvgPriceProfileBuilder
         return this;
     }
     
-    public AvgPriceProfileBuilder WithName(AvgPriceAsset asset)
+    public AvgPriceProfileBuilder WithAsset(AvgPriceAsset asset)
     {
         _asset = asset;
         return this;
