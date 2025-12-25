@@ -188,8 +188,11 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     }
 
     [RelayCommand]
-    private async Task EditTransaction(TransactionViewModel selectedTransaction)
+    private async Task EditTransaction(TransactionViewModel? selectedTransaction)
     {
+        if (selectedTransaction is null)
+            return;
+        
         var ownerWindow = GetUserControlOwnerWindow()!;
 
         var modal =
@@ -209,8 +212,11 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     }
 
     [RelayCommand]
-    private async Task CopyTransaction(TransactionViewModel selectedTransaction)
+    private async Task CopyTransaction(TransactionViewModel? selectedTransaction)
     {
+        if (selectedTransaction is null)
+            return;
+        
         var ownerWindow = GetUserControlOwnerWindow()!;
 
         var modal =
@@ -231,8 +237,11 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     }
 
     [RelayCommand]
-    private async Task DeleteTransaction(TransactionViewModel selectedTransaction)
+    private async Task DeleteTransaction(TransactionViewModel? selectedTransaction)
     {
+        if (selectedTransaction is null)
+            return;
+        
         await _transactionRepository.DeleteTransactionAsync(selectedTransaction.Id);
 
         WeakReferenceMessenger.Default.Send(new TransactionListChanged());
@@ -367,6 +376,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
 
     public void UpdateSelectedItems(IList selectedItems)
     {
+        SelectedTransaction = selectedItems.OfType<TransactionViewModel>().FirstOrDefault();
         SelectedTransactions = selectedItems.OfType<TransactionViewModel>().ToList();
 
         if (SelectedAccount == null)
