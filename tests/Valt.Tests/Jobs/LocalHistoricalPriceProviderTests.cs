@@ -10,12 +10,11 @@ using Valt.Infra.Crawlers.LivePriceCrawlers.Messages;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Modules.DataSources.Bitcoin;
 using Valt.Infra.Modules.DataSources.Fiat;
-using LivePricesUpdaterJob = Valt.Infra.Crawlers.LivePriceCrawlers.LivePricesUpdaterJob;
 
 namespace Valt.Tests.Jobs;
 
 [TestFixture]
-public class LivePricesUpdaterJobTests : IntegrationTest
+public class LocalHistoricalPriceProviderTests : IntegrationTest
 {
     [Test]
     public async Task Should_Get_LivePrices_And_Send_Message()

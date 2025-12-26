@@ -665,6 +665,12 @@
     <data name="Reports.AllTimeHigh.DeclineFromAth" xml:space="preserve">
         <value>Current difference</value>
     </data>
+    <data name="Reports.AllTimeHigh.MaxDrawdownDate" xml:space="preserve">
+        <value>Max drawdown date</value>
+    </data>
+    <data name="Reports.AllTimeHigh.MaxDrawdownPercent" xml:space="preserve">
+        <value>Max drawdown</value>
+    </data>
     <data name="Reports.MonthlyTotals.Obs" xml:space="preserve">
         <value>* latest totals are calculated based on yesterday amounts</value>
     </data>

@@ -1,0 +1,139 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:manageAvgPriceProfiles="clr-namespace:Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:lang="clr-namespace:Valt.UI.Lang"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles.ManageAvgPriceProfilesView"
+        Title="ManageAvgPriceProfilesView"
+        x:DataType="manageAvgPriceProfiles:ManageAvgPriceProfilesViewModel"
+        WindowStartupLocation="CenterOwner"
+        d:DesignWidth="750"
+        d:DesignHeight="600"
+        MaxWidth="750"
+        MaxHeight="600"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <manageAvgPriceProfiles:ManageAvgPriceProfilesViewModel />
+    </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" />
+    </Window.KeyBindings>
+    <Border>
+        <Grid RowDefinitions="Auto, *">
+            <userControls:CustomTitleBar Grid.Row="0" Title="Average Price Profiles"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+            <Grid Grid.Row="1" ColumnDefinitions="250, *">
+                <Border Grid.Column="0"
+                        Padding="5">
+                    <ListBox ItemsSource="{Binding AveragePriceProfiles}"
+                             SelectedItem="{Binding SelectedAveragePriceProfile}"
+                             DisplayMemberBinding="{Binding Name}">
+                    </ListBox>
+                </Border>
+
+                <Border Grid.Column="0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        Padding="10"
+                        Margin="0,0,10,10">
+                    <Button Classes="rounded" Content="&#xE145;">
+                    </Button>
+                </Border>
+                <StackPanel Grid.Column="1">
+                    <Border Classes="form-fields-area">
+                        <StackPanel>
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="Profile Name" />
+                                <TextBox Text="{Binding Name}"
+                                         IsEnabled="{Binding EditFields}"
+                                         Width="300" HorizontalAlignment="Left"
+                                         VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="Asset Name" />
+                                <TextBox Text="{Binding AssetName}"
+                                         IsEnabled="{Binding EditFields}"
+                                         Width="300" HorizontalAlignment="Left"
+                                         VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="Decimals" />
+                                <TextBox Text="{Binding Precision}"
+                                         IsEnabled="{Binding EditFields}"
+                                         Width="300" HorizontalAlignment="Left"
+                                         VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <!-- Currency Field -->
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="Fiat Currency to use" />
+                                <ComboBox ItemsSource="{Binding AvailableCurrencies}"
+                                          SelectedItem="{Binding Currency}" />
+                            </StackPanel>
+
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="Icon"
+                                           Margin="0, 8, 5, 0" />
+                                <Button Classes="icon-selector-button"
+                                        Foreground="{Binding IconUiWrapper.BrushColor}"
+                                        Content="{Binding IconUiWrapper.Unicode}"
+                                        Command="{Binding IconSelectorOpenCommand}">
+                                </Button>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Classes="form-field">
+                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Visible}"
+                                          VerticalAlignment="Center" />
+                                <TextBlock Text="Visible?"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
+                                        IsVisible="{Binding IsAdding}">
+                                <Button Content="{x:Static lang:language.AddNew}"
+                                        Command="{Binding SaveChangesCommand}"
+                                        HorizontalContentAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        Margin="0 ,0,10,0" />
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
+                                        IsVisible="{Binding IsEditing}">
+                                <Button Content="{x:Static lang:language.SaveChanges}"
+                                        Command="{Binding SaveChangesCommand}"
+                                        HorizontalContentAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        Margin="0 ,0,10,0" />
+                                <Button Content="{x:Static lang:language.CancelButton}"
+                                        Command="{Binding CancelCommand}"
+                                        HorizontalContentAlignment="Center"
+                                        HorizontalAlignment="Center" />
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
+                                        IsVisible="{Binding IsViewing}">
+                                <Button Content="{x:Static lang:language.Edit}" Command="{Binding EditCommand}"
+                                        HorizontalContentAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        Margin="0 ,0,10,0" />
+                                <Button Content="{x:Static lang:language.ManageCategories_Delete}"
+                                        Classes="delete-button"
+                                        Command="{Binding DeleteCommand}"
+                                        HorizontalContentAlignment="Center"
+                                        HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

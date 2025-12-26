@@ -30,7 +30,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
 
         Profiles = new AvaloniaList<AvgPriceProfileListDTO>()
         {
-            new AvgPriceProfileListDTO(new AvgPriceProfileId().Value, "Test", true, Icon.Empty.Name, Icon.Empty.Unicode,
+            new AvgPriceProfileListDTO(new AvgPriceProfileId().Value, "Test", "BTC", true, Icon.Empty.Name, Icon.Empty.Unicode,
                 Icon.Empty.Color, FiatCurrency.Brl.Code, (int)AvgPriceCalculationMethod.BrazilianRule)
         };
 
@@ -39,7 +39,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
         Lines = new AvaloniaList<AvgPriceLineDTO>()
         {
             new AvgPriceLineDTO(new AvgPriceLineId().Value, new DateOnly(2025, 12, 1), 0, (int)AvgPriceLineTypes.Buy,
-                500000, 600000m, "Test", 600000m, 3000m, 500000)
+                0.5m, 600000m, "Test", 600000m, 3000m, 0.5m)
         };
     }
     

@@ -86,8 +86,4 @@
     <ItemGroup>
       <None Remove="Themes\**" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Views\Main\Modals\ManageAvgPriceProfiles\" />
-    </ItemGroup>
 </Project>

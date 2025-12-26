@@ -26,7 +26,7 @@ internal sealed class AvgPriceQueries : IAvgPriceQueries
         {
             var icon = x.Icon != null ? Icon.RestoreFromId(x.Icon) : Icon.Empty;
 
-            return new AvgPriceProfileListDTO(x.Id.ToString(), x.Name, x.Visible, icon.Name, icon.Unicode, icon.Color,
+            return new AvgPriceProfileListDTO(x.Id.ToString(), x.Name, x.AssetName, x.Visible, icon.Name, icon.Unicode, icon.Color,
                 x.Currency, x.AvgPriceCalculationMethodId);
         }));
     }

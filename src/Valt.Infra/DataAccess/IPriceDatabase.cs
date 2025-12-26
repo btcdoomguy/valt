@@ -19,4 +19,8 @@ public interface IPriceDatabase : INotifyPropertyChanged, IDisposable
     
     ILiteCollection<BitcoinDataEntity> GetBitcoinData();
     ILiteCollection<FiatDataEntity> GetFiatData();
+    
+    void BeginTransaction();
+    void CommitTransaction();
+    void RollbackTransaction();
 }

@@ -456,7 +456,7 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
             {
                 if (_fiatRates.TryGetValue(scanDate, out var rates))
                 {
-                    var entry = rates.SingleOrDefault(x => x.Currency == currencyCode);
+                    var entry = rates.FirstOrDefault(x => x.Currency == currencyCode);
                     if (entry is not null)
                     {
                         return entry.Price;

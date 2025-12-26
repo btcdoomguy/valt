@@ -106,6 +106,30 @@ internal sealed class PriceDatabase : IPriceDatabase
         return collection;
     }
 
+    public void BeginTransaction()
+    {
+        if (!HasDatabaseOpen)
+            throw new InvalidOperationException("Open a database first.");
+
+        _database!.BeginTrans();
+    }
+
+    public void CommitTransaction()
+    {
+        if (!HasDatabaseOpen)
+            throw new InvalidOperationException("Open a database first.");
+
+        _database!.Commit();
+    }
+
+    public void RollbackTransaction()
+    {
+        if (!HasDatabaseOpen)
+            throw new InvalidOperationException("Open a database first.");
+        
+        _database!.Rollback();
+    }
+
     #endregion
     
     public void Dispose()

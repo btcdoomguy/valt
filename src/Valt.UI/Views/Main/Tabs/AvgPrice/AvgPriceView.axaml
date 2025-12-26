@@ -24,6 +24,7 @@
                                   HorizontalAlignment="Stretch"
                                   IsTextSearchEnabled="True"
                                   Height="34"
+                                  Width="200"
                                   TabIndex="0">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
@@ -33,7 +34,7 @@
                                             Text="{Binding Unicode}"
                                             Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}">
                                         </TextBlock>
-                                        <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}">
+                                        <TextBlock Padding="2, 4, 0, 0" Text="{Binding DisplayName}">
                                         </TextBlock>
                                     </StackPanel>
                                 </DataTemplate>

@@ -204,15 +204,23 @@ public partial class ReportsViewModel : ValtTabViewModel
 
             var allTimeHighData = await _allTimeHighReport.GetAsync(fiatCurrency);
 
-            AllTimeHighData = new DashboardData(
-                language.Reports_AllTimeHigh_Title,
-                new ObservableCollection<RowItem>
-                {
-                    new(language.Reports_AllTimeHigh_AllTimeHigh,
-                        $"{CurrencyDisplay.FormatFiat(allTimeHighData.Value, fiatCurrency.Code)}"),
-                    new(language.Reports_AllTimeHigh_Date, allTimeHighData.Date.ToString()),
-                    new(language.Reports_AllTimeHigh_DeclineFromAth, $"{allTimeHighData.DeclineFromAth}%")
-                });
+            var rows = new ObservableCollection<RowItem>
+            {
+                new(language.Reports_AllTimeHigh_AllTimeHigh,
+                    $"{CurrencyDisplay.FormatFiat(allTimeHighData.Value, fiatCurrency.Code)}"),
+                new(language.Reports_AllTimeHigh_Date, allTimeHighData.Date.ToString()),
+                new(language.Reports_AllTimeHigh_DeclineFromAth, $"{allTimeHighData.DeclineFromAth}%")
+            };
+
+            if (allTimeHighData.MaxDrawdownDate.HasValue && allTimeHighData.MaxDrawdownPercent.HasValue)
+            {
+                rows.Add(new RowItem(language.Reports_AllTimeHigh_MaxDrawdownPercent,
+                    $"{allTimeHighData.MaxDrawdownPercent.Value}%"));
+                rows.Add(new RowItem(language.Reports_AllTimeHigh_MaxDrawdownDate,
+                    allTimeHighData.MaxDrawdownDate.Value.ToString()));
+            }
+
+            AllTimeHighData = new DashboardData(language.Reports_AllTimeHigh_Title, rows);
 
             IsAllTimeHighLoading = false;
         }

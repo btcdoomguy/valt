@@ -378,7 +378,6 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         SelectedTransaction = selectedItems.OfType<TransactionViewModel>().FirstOrDefault();
         SelectedTransactions = selectedItems.OfType<TransactionViewModel>().ToList();
-
         if (SelectedAccount == null)
         {
             AmountHeader = language.Transactions_Columns_Amount;

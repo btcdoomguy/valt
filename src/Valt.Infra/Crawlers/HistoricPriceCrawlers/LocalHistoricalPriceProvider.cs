@@ -3,11 +3,11 @@ using Valt.Infra.DataAccess;
 
 namespace Valt.Infra.Crawlers.HistoricPriceCrawlers;
 
-public class LivePricesUpdaterJob : ILocalHistoricalPriceProvider
+public class LocalHistoricalPriceProvider : ILocalHistoricalPriceProvider
 {
     private readonly IPriceDatabase _priceDatabase;
 
-    public LivePricesUpdaterJob(IPriceDatabase priceDatabase)
+    public LocalHistoricalPriceProvider(IPriceDatabase priceDatabase)
     {
         _priceDatabase = priceDatabase;
     }

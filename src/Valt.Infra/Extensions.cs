@@ -95,7 +95,7 @@ public static class Extensions
             provider.GetRequiredService<FrankfurterFiatHistoricalDataProvider>());
 
         //local historical provider
-        services.AddSingleton<ILocalHistoricalPriceProvider, LivePricesUpdaterJob>();
+        services.AddSingleton<ILocalHistoricalPriceProvider, LocalHistoricalPriceProvider>();
         
         //reports
         services.AddSingleton<IAllTimeHighReport, AllTimeHighReport>();
