@@ -16,6 +16,7 @@ using Valt.Infra.Modules.AvgPrice.Queries;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
 using Valt.UI.Services;
+using Valt.UI.Services.MessageBoxes;
 using Valt.UI.Views.Main.Modals.IconSelector;
 using Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles.Models;
 using Valt.UI.Views.Main.Modals.ManageCategories.Models;
@@ -229,7 +230,29 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
         if (SelectedAveragePriceProfile is null)
             return;
 
-        //
+        var profileId = new AvgPriceProfileId(SelectedAveragePriceProfile.Id);
+        var lines = await _avgPriceQueries.GetLinesOfProfileAsync(profileId);
+        var lineCount = lines.Count();
+
+        if (lineCount > 0)
+        {
+            var confirmed = await MessageBoxHelper.ShowQuestionAsync(
+                "Delete Profile",
+                $"This profile has {lineCount} record(s) registered. Are you sure you want to delete it? All related records will be permanently deleted.",
+                GetWindow!());
+
+            if (!confirmed)
+                return;
+        }
+
+        var profile = await _avgPriceRepository.GetAvgPriceProfileByIdAsync(profileId);
+
+        if (profile is not null)
+        {
+            await _avgPriceRepository.DeleteAvgPriceProfileAsync(profile);
+            ClearSelection();
+            await FetchAvgPriceProfiles();
+        }
     }
 
     [RelayCommand]
