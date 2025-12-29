@@ -60,6 +60,14 @@
                           CanUserSortColumns="True"
                           SelectionMode="Single"
                           Margin="0,10,0,0">
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="{x:Static lang:language.AvgPrice_Menu_Edit}"
+                                      Command="{Binding EditOperationCommand}" />
+                            <MenuItem Header="{x:Static lang:language.AvgPrice_Menu_Delete}"
+                                      Command="{Binding DeleteOperationCommand}" />
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_Date}"
                                             Binding="{Binding Date, StringFormat=\{0:yyyy-MM-dd\}}"

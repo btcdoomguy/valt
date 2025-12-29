@@ -747,6 +747,18 @@
     <data name="AvgPrice.AddOperation" xml:space="preserve">
         <value>+ Adicionar Operação</value>
     </data>
+    <data name="AvgPrice.Menu.Edit" xml:space="preserve">
+        <value>Editar</value>
+    </data>
+    <data name="AvgPrice.Menu.Delete" xml:space="preserve">
+        <value>Excluir</value>
+    </data>
+    <data name="AvgPrice.DeleteConfirm.Title" xml:space="preserve">
+        <value>Excluir Operação</value>
+    </data>
+    <data name="AvgPrice.DeleteConfirm.Message" xml:space="preserve">
+        <value>Tem certeza que deseja excluir esta operação? Esta ação não pode ser desfeita.</value>
+    </data>
     <data name="AvgPrice.Column.Date" xml:space="preserve">
         <value>Data</value>
     </data>

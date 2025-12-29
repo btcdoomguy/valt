@@ -1503,6 +1503,30 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string AvgPrice_Menu_Edit {
+            get {
+                return ResourceManager.GetString("AvgPrice.Menu.Edit", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_Menu_Delete {
+            get {
+                return ResourceManager.GetString("AvgPrice.Menu.Delete", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_DeleteConfirm_Title {
+            get {
+                return ResourceManager.GetString("AvgPrice.DeleteConfirm.Title", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_DeleteConfirm_Message {
+            get {
+                return ResourceManager.GetString("AvgPrice.DeleteConfirm.Message", resourceCulture);
+            }
+        }
+
         public static string AvgPrice_Column_Date {
             get {
                 return ResourceManager.GetString("AvgPrice.Column.Date", resourceCulture);

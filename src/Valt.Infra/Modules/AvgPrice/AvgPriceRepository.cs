@@ -36,21 +36,22 @@ internal sealed class AvgPriceRepository : IAvgPriceRepository
         foreach (var @event in avgPriceProfile.Events)
         {
             _localDatabase.GetAvgPriceProfiles().Upsert(profileEntity);
-            if (@event.GetType() == typeof(AvgPriceLineCreatedEvent))
+            if (@event is AvgPriceLineCreatedEvent createdEvent)
             {
-                var lineEntity = (@event as AvgPriceLineCreatedEvent)!.AvgPriceLine.AsEntity(avgPriceProfile.Id);
+                var lineEntity = createdEvent.AvgPriceLine.AsEntity(avgPriceProfile.Id);
 
                 _localDatabase.GetAvgPriceLines().Upsert(lineEntity);
             }
-            else if (@event.GetType() == typeof(AvgPriceLineUpdatedEvent))
+            else if (@event is AvgPriceLineUpdatedEvent updatedEvent)
             {
-                var lineEntity = (@event as AvgPriceLineUpdatedEvent)!.AvgPriceLine.AsEntity(avgPriceProfile.Id);
+                var lineEntity = updatedEvent.AvgPriceLine.AsEntity(avgPriceProfile.Id);
 
                 _localDatabase.GetAvgPriceLines().Upsert(lineEntity);
             }
-            else if (@event.GetType() == typeof(AvgPriceLineDeletedEvent))
+            else if (@event is AvgPriceLineDeletedEvent deletedEvent)
             {
-                _localDatabase.GetAvgPriceLines().Delete(new ObjectId(avgPriceProfile.Id.ToString()));
+                var id = deletedEvent.AvgPriceLine.Id;
+                _localDatabase.GetAvgPriceLines().Delete(new ObjectId(id));
             }
 
             await _domainEventPublisher.PublishAsync(@event);

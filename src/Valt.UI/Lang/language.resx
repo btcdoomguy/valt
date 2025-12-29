@@ -752,6 +752,18 @@
     <data name="AvgPrice.AddOperation" xml:space="preserve">
         <value>+ Add Operation</value>
     </data>
+    <data name="AvgPrice.Menu.Edit" xml:space="preserve">
+        <value>Edit</value>
+    </data>
+    <data name="AvgPrice.Menu.Delete" xml:space="preserve">
+        <value>Delete</value>
+    </data>
+    <data name="AvgPrice.DeleteConfirm.Title" xml:space="preserve">
+        <value>Delete Operation</value>
+    </data>
+    <data name="AvgPrice.DeleteConfirm.Message" xml:space="preserve">
+        <value>Are you sure you want to delete this operation? This action cannot be undone.</value>
+    </data>
     <data name="AvgPrice.Column.Date" xml:space="preserve">
         <value>Date</value>
     </data>

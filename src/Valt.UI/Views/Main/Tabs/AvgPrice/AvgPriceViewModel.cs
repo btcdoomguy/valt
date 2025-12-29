@@ -7,10 +7,13 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Valt.Core.Common;
 using Valt.Core.Modules.AvgPrice;
+using Valt.Core.Modules.AvgPrice.Calculations;
 using Valt.Infra.Modules.AvgPrice.Queries;
 using Valt.Infra.Modules.AvgPrice.Queries.DTOs;
 using Valt.UI.Base;
 using Valt.UI.Services;
+using Valt.UI.Lang;
+using Valt.UI.Services.MessageBoxes;
 using Valt.UI.Views.Main.Modals.AvgPriceLineEditor;
 using Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles;
 
@@ -19,6 +22,7 @@ namespace Valt.UI.Views.Main.Tabs.AvgPrice;
 public partial class AvgPriceViewModel : ValtTabViewModel
 {
     private readonly IAvgPriceQueries _avgPriceQueries;
+    private readonly IAvgPriceRepository _avgPriceRepository;
     private readonly IModalFactory _modalFactory;
 
     [ObservableProperty] private AvaloniaList<AvgPriceProfileDTO> _profiles = new();
@@ -49,9 +53,11 @@ public partial class AvgPriceViewModel : ValtTabViewModel
     }
 
     public AvgPriceViewModel(IAvgPriceQueries avgPriceQueries,
+        IAvgPriceRepository avgPriceRepository,
         IModalFactory modalFactory)
     {
         _avgPriceQueries = avgPriceQueries;
+        _avgPriceRepository = avgPriceRepository;
         _modalFactory = modalFactory;
     }
 
@@ -87,7 +93,15 @@ public partial class AvgPriceViewModel : ValtTabViewModel
 
     [ObservableProperty] private AvgPriceLineDTO? _selectedLine;
 
+    partial void OnSelectedLineChanged(AvgPriceLineDTO? value)
+    {
+        EditOperationCommand.NotifyCanExecuteChanged();
+        DeleteOperationCommand.NotifyCanExecuteChanged();
+    }
+
     public bool CanAddOperation => SelectedProfile is not null;
+    public bool CanEditOperation => SelectedProfile is not null && SelectedLine is not null;
+    public bool CanDeleteOperation => SelectedProfile is not null && SelectedLine is not null;
 
     [RelayCommand]
     private async Task ManageProfiles()
@@ -137,7 +151,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
         await FetchAvgPriceLines();
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanEditOperation))]
     private async Task EditOperation()
     {
         if (SelectedProfile is null || SelectedLine is null)
@@ -166,5 +180,56 @@ public partial class AvgPriceViewModel : ValtTabViewModel
             return;
 
         await FetchAvgPriceLines();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanDeleteOperation))]
+    private async Task DeleteOperation()
+    {
+        if (SelectedProfile is null || SelectedLine is null)
+            return;
+
+        var ownerWindow = GetUserControlOwnerWindow()!;
+
+        var confirmed = await MessageBoxHelper.ShowQuestionAsync(
+            language.AvgPrice_DeleteConfirm_Title,
+            language.AvgPrice_DeleteConfirm_Message,
+            ownerWindow);
+
+        if (!confirmed)
+            return;
+
+        try
+        {
+            var profileId = new AvgPriceProfileId(SelectedProfile.Id);
+            var profile = await _avgPriceRepository.GetAvgPriceProfileByIdAsync(profileId);
+
+            if (profile is null)
+                return;
+
+            var lineToDelete = FindLineById(profile, SelectedLine.Id);
+
+            if (lineToDelete is not null)
+            {
+                profile.RemoveLine(lineToDelete);
+                await _avgPriceRepository.SaveAvgPriceProfileAsync(profile);
+            }
+
+            await FetchAvgPriceLines();
+        }
+        catch (Exception e)
+        {
+            await MessageBoxHelper.ShowErrorAsync("Error", e.Message, ownerWindow);
+        }
+    }
+
+    private static AvgPriceLine? FindLineById(AvgPriceProfile profile, string lineId)
+    {
+        foreach (var line in profile.AvgPriceLines)
+        {
+            if (line.Id.Value == lineId)
+                return line;
+        }
+
+        return null;
     }
 }
