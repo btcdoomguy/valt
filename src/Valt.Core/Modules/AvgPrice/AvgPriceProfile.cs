@@ -76,6 +76,13 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
             Enumerable.Empty<AvgPriceLine>(), 0);
     }
 
+    private void RecalculateAll()
+    {
+        var orderedList = _avgPriceLines.OrderBy(x => x.Date).ThenBy(x => x.DisplayOrder).ToList();
+
+        Recalculate(orderedList);
+    }
+
     public void AddLine(DateOnly date, int displayOrder, AvgPriceLineTypes type, decimal quantity, FiatValue fiatValue,
         string comment)
     {
@@ -147,6 +154,8 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
 
         Asset = newAsset;
         
+        RecalculateAll();
+        
         AddEvent(new AvgPriceProfileUpdatedEvent(this));
     }
 
@@ -156,6 +165,8 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
             return;
         
         CalculationMethod = calculationMethod;
+        
+        RecalculateAll();
         
         AddEvent(new AvgPriceProfileUpdatedEvent(this));
     }
