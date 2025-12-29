@@ -52,7 +52,7 @@
                   SelectionChanged="MainGrid_OnSelectionChanged">
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="{x:Static local:language.Transactions_Columns_Date}"
-                                        SortMemberPath="Date">
+                                        SortMemberPath="Date" Tag="Date">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="models1:TransactionViewModel">
                             <TextBlock Classes="only-text" Text="{Binding Date}" Foreground="{Binding LineColor}"></TextBlock>
@@ -60,14 +60,14 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTemplateColumn Header="{x:Static local:language.Transactions_Columns_Description}"
-                                        SortMemberPath="Name">
+                                        SortMemberPath="Name" Tag="Name">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="models1:TransactionViewModel">
                             <TextBlock Classes="only-text" Text="{Binding Name}" Foreground="{Binding LineColor}"></TextBlock>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="{x:Static local:language.Transactions_Columns_Category}">
+                <DataGridTemplateColumn Header="{x:Static local:language.Transactions_Columns_Category}" Tag="Category">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="models1:TransactionViewModel">
                             <StackPanel Orientation="Horizontal">
@@ -83,7 +83,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="{Binding AmountHeader}">
+                <DataGridTemplateColumn Header="{Binding AmountHeader}" Tag="Amount">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="models1:TransactionViewModel">
                             <TextBlock Classes="only-text" Text="{Binding FormattedSummarizedAmount}"
@@ -92,7 +92,12 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="{x:Static local:language.Transactions_Columns_OriginAccount}">
+                <DataGridTemplateColumn Tag="OriginAccount">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <Label Content="{x:Static local:language.Transactions_Columns_OriginAccount}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="models1:TransactionViewModel">
                             <StackPanel Orientation="Horizontal">
@@ -108,7 +113,12 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="{x:Static local:language.Transactions_Columns_TargetAccount}">
+                <DataGridTemplateColumn Tag="TargetAccount">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <Label Content="{x:Static local:language.Transactions_Columns_TargetAccount}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="models1:TransactionViewModel">
                             <StackPanel Orientation="Horizontal">
@@ -124,14 +134,14 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding AutoSatAmount}">
+                <DataGridTextColumn Tag="Sats" Binding="{Binding AutoSatAmount}">
                     <DataGridTextColumn.HeaderTemplate>
                         <DataTemplate>
                             <Label Content="{x:Static local:language.Transactions_Columns_Sats}" ToolTip.Tip="{x:Static local:language.Transactions_Columns_Sats_Hint}" />
                         </DataTemplate>
                     </DataGridTextColumn.HeaderTemplate>
                 </DataGridTextColumn>
-                <DataGridTemplateColumn>
+                <DataGridTemplateColumn Tag="AutoSatAmountPrice">
                     <DataGridTemplateColumn.HeaderTemplate>
                         <DataTemplate>
                             <Label Content="{x:Static local:language.Transactions_Columns_SatsPriceToday}" ToolTip.Tip="{x:Static local:language.Transactions_Columns_SatsPriceToday_Hint}" />

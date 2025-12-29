@@ -11,10 +11,18 @@ public partial class TransactionsView : ValtBaseUserControl
     public TransactionsView()
     {
         InitializeComponent();
-        
+
         FixedExpenseList.AddHandler(KeyDownEvent, FixedExpenseList_KeyDown, RoutingStrategies.Tunnel, handledEventsToo: true);
         FixedExpenseList.AddHandler(DoubleTappedEvent, FixedExpenseList_DoubleTapped, RoutingStrategies.Bubble,
             handledEventsToo: true);
+    }
+
+    protected override void OnUnloaded(RoutedEventArgs e)
+    {
+        base.OnUnloaded(e);
+
+        FixedExpenseList.RemoveHandler(KeyDownEvent, FixedExpenseList_KeyDown);
+        FixedExpenseList.RemoveHandler(DoubleTappedEvent, FixedExpenseList_DoubleTapped);
     }
 
     private void FixedExpenseList_DoubleTapped(object? sender, TappedEventArgs e)

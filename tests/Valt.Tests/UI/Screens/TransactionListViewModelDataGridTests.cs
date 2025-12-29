@@ -207,9 +207,9 @@ public class TransactionListViewModelDataGridTests : DatabaseTest
 
         var columns = new List<DataGridColumnInfo>
         {
-            new() { Header = "Date", Width = 150, DisplayIndex = 0 },
-            new() { Header = "Name", Width = 200, DisplayIndex = 1 },
-            new() { Header = "Amount", Width = 100, DisplayIndex = 2 }
+            new() { Tag = "Date", Width = 150, DisplayIndex = 0 },
+            new() { Tag = "Name", Width = 200, DisplayIndex = 1 },
+            new() { Tag = "Amount", Width = 100, DisplayIndex = 2 }
         };
 
         // Act
@@ -234,9 +234,9 @@ public class TransactionListViewModelDataGridTests : DatabaseTest
 
         var columns = new List<DataGridColumnInfo>
         {
-            new() { Header = "Amount", Width = 100, DisplayIndex = 2 },
-            new() { Header = "Date", Width = 150, DisplayIndex = 0 },
-            new() { Header = "Name", Width = 200, DisplayIndex = 1 }
+            new() { Tag = "Amount", Width = 100, DisplayIndex = 2 },
+            new() { Tag = "Date", Width = 150, DisplayIndex = 0 },
+            new() { Tag = "Name", Width = 200, DisplayIndex = 1 }
         };
 
         // Act
@@ -260,7 +260,7 @@ public class TransactionListViewModelDataGridTests : DatabaseTest
 
         var columns = new List<DataGridColumnInfo>
         {
-            new() { Header = "Amount", Width = 100, DisplayIndex = 0 }
+            new() { Tag = "Amount", Width = 100, DisplayIndex = 0 }
         };
 
         // Act

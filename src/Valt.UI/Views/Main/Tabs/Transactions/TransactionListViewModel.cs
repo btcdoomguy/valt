@@ -152,8 +152,8 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
         {
             OrderedColumn = OrderedColumn,
             SortDirection = SortDirection,
-            ColumnWidths = columnList.ToDictionary(c => c.Header, c => c.Width),
-            ColumnOrder = columnList.OrderBy(c => c.DisplayIndex).Select(c => c.Header).ToList()
+            ColumnWidths = columnList.ToDictionary(c => c.Tag, c => c.Width),
+            ColumnOrder = columnList.OrderBy(c => c.DisplayIndex).Select(c => c.Tag).ToList()
         };
         _ = _localStorageService.SaveDataGridSettingsAsync(settings);
     }

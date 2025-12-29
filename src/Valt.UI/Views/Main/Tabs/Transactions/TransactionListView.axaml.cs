@@ -17,9 +17,6 @@ public partial class TransactionListView : ValtBaseUserControl
     {
         InitializeComponent();
 
-        Loaded += (s, e) => RestoreDataGridSettings();
-        Unloaded += (s, e) => SaveDataGridSettings();
-
         MainGrid.AddHandler(KeyDownEvent, MainGrid_KeyDownHandler, RoutingStrategies.Tunnel, handledEventsToo: true);
         MainGrid.AddHandler(DoubleTappedEvent, MainGrid_OnDoubleTapped, RoutingStrategies.Bubble,
             handledEventsToo: true);
@@ -32,6 +29,19 @@ public partial class TransactionListView : ValtBaseUserControl
         var viewModel = DataContext as TransactionListViewModel;
 
         SearchBox.AsyncPopulator = viewModel!.GetSearchTermsAsync;
+
+        RestoreDataGridSettings();
+    }
+
+    protected override void OnUnloaded(RoutedEventArgs e)
+    {
+        base.OnUnloaded(e);
+
+        SaveDataGridSettings();
+
+        MainGrid.RemoveHandler(KeyDownEvent, MainGrid_KeyDownHandler);
+        MainGrid.RemoveHandler(DoubleTappedEvent, MainGrid_OnDoubleTapped);
+        MainGrid.Sorting -= MainGrid_OnSorting;
     }
 
     private void RestoreDataGridSettings()
@@ -46,7 +56,7 @@ public partial class TransactionListView : ValtBaseUserControl
             for (int i = 0; i < settings.ColumnOrder.Count; i++)
             {
                 var header = settings.ColumnOrder[i];
-                var column = MainGrid.Columns.FirstOrDefault(c => c.Header?.ToString() == header);
+                var column = MainGrid.Columns.FirstOrDefault(c => c.Tag?.ToString() == header);
                 if (column != null)
                 {
                     column.DisplayIndex = i;
@@ -56,7 +66,7 @@ public partial class TransactionListView : ValtBaseUserControl
 
         foreach (var column in MainGrid.Columns)
         {
-            var columnId = column.Header?.ToString();
+            var columnId = column.Tag?.ToString();
             if (!string.IsNullOrEmpty(columnId) && settings.ColumnWidths.TryGetValue(columnId, out var width))
             {
                 column.Width = new DataGridLength(width, DataGridLengthUnitType.Pixel);
@@ -79,7 +89,7 @@ public partial class TransactionListView : ValtBaseUserControl
 
         var columns = MainGrid.Columns.Select(c => new DataGridColumnInfo
         {
-            Header = c.Header?.ToString() ?? string.Empty,
+            Tag = c.Tag?.ToString() ?? string.Empty,
             Width = c.Width.DisplayValue,
             DisplayIndex = c.DisplayIndex
         });
