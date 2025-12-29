@@ -139,6 +139,9 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
 
     public DataGridSettings GetDataGridSettings()
     {
+        if (Design.IsDesignMode) 
+            return new DataGridSettings();
+        
         var settings = _localStorageService.LoadDataGridSettings();
         OrderedColumn = settings.OrderedColumn;
         SortDirection = settings.SortDirection;
@@ -147,6 +150,9 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
 
     public void SaveDataGridSettings(IEnumerable<DataGridColumnInfo> columns)
     {
+        if (Design.IsDesignMode)
+            return;
+        
         var columnList = columns.ToList();
         var settings = new DataGridSettings
         {
