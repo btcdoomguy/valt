@@ -602,4 +602,29 @@
     <Style Selector="Grid.footer">
         <Setter Property="Background" Value="{DynamicResource FooterBackgroundBrush}" />
     </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         EXPANDER - Reports Section Headers
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="Expander.section">
+        <Setter Property="Margin" Value="0, 0, 0, 12" />
+    </Style>
+
+    <Style Selector="TextBlock.section-header">
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource Text200Brush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <Style Selector="TextBlock.section-header-icon">
+        <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="Foreground" Value="{DynamicResource Accent300Brush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0, 0, 10, 0" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
 </Styles>

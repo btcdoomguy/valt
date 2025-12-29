@@ -5,22 +5,20 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using Valt.UI.Base;
-using Valt.UI.Services.LocalStorage;
+using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
 namespace Valt.UI.Views.Main.Tabs.Transactions;
 
 public partial class TransactionListView : ValtBaseUserControl
 {
-    private string? _orderedColumn;
-    private ListSortDirection? _sortDirection;
     private bool _ignoreFirstOnSorting = false;
 
     public TransactionListView()
     {
         InitializeComponent();
-        
+
         Loaded += (s, e) => RestoreDataGridSettings();
-        Unloaded += (s, e) => LocalStorageHelper.ChangeDataGridSettings(MainGrid, _orderedColumn, _sortDirection);
+        Unloaded += (s, e) => SaveDataGridSettings();
 
         MainGrid.AddHandler(KeyDownEvent, MainGrid_KeyDownHandler, RoutingStrategies.Tunnel, handledEventsToo: true);
         MainGrid.AddHandler(DoubleTappedEvent, MainGrid_OnDoubleTapped, RoutingStrategies.Bubble,
@@ -30,7 +28,7 @@ public partial class TransactionListView : ValtBaseUserControl
     protected override void OnLoaded(RoutedEventArgs e)
     {
         base.OnLoaded(e);
-        
+
         var viewModel = DataContext as TransactionListViewModel;
 
         SearchBox.AsyncPopulator = viewModel!.GetSearchTermsAsync;
@@ -38,7 +36,10 @@ public partial class TransactionListView : ValtBaseUserControl
 
     private void RestoreDataGridSettings()
     {
-        var settings = LocalStorageHelper.LoadDataGridSettings();
+        var vm = DataContext as TransactionListViewModel;
+        if (vm is null) return;
+
+        var settings = vm.GetDataGridSettings();
 
         if (settings.ColumnOrder.Count > 0)
         {
@@ -68,12 +69,24 @@ public partial class TransactionListView : ValtBaseUserControl
             }
         }
 
-        _orderedColumn = settings.OrderedColumn;
-        _sortDirection = settings.SortDirection;
-
         MainGrid.Sorting += MainGrid_OnSorting;
     }
-    
+
+    private void SaveDataGridSettings()
+    {
+        var vm = DataContext as TransactionListViewModel;
+        if (vm is null) return;
+
+        var columns = MainGrid.Columns.Select(c => new DataGridColumnInfo
+        {
+            Header = c.Header?.ToString() ?? string.Empty,
+            Width = c.Width.DisplayValue,
+            DisplayIndex = c.DisplayIndex
+        });
+
+        vm.SaveDataGridSettings(columns);
+    }
+
     private void MainGrid_OnSorting(object? sender, DataGridColumnEventArgs e)
     {
         if (_ignoreFirstOnSorting)
@@ -82,40 +95,30 @@ public partial class TransactionListView : ValtBaseUserControl
             return;
         }
 
-        var columnId = e.Column.Header?.ToString();
-
-        //this is crappy but avalonia doesn't make life easy to indicate which sort direction was selected
-        if (_orderedColumn == columnId)
-        {
-            _sortDirection = _sortDirection == ListSortDirection.Ascending ? ListSortDirection.Descending : ListSortDirection.Ascending;
-        }
-        else
-        {
-            _orderedColumn = columnId;
-            _sortDirection = ListSortDirection.Ascending;
-        }
+        var vm = DataContext as TransactionListViewModel;
+        vm?.UpdateSortState(e.Column.Header?.ToString());
     }
 
     private void MainGrid_OnDoubleTapped(object? sender, TappedEventArgs e)
     {
         var vm = (DataContext as TransactionListViewModel)!;
-        
+
         var originalSource = e.Source as Control;
         var row = originalSource?.FindAncestorOfType<DataGridRow>();
 
         if (row is null || vm.SelectedTransaction is null) return;
-        
+
         _ = vm.EditTransactionCommand.ExecuteAsync(vm.SelectedTransaction);
         e.Handled = true;
     }
-    
+
     private void MainGrid_KeyDownHandler(object? sender, KeyEventArgs e)
     {
         if (e.Key != Key.Enter) return;
-        
+
         var vm = (DataContext as TransactionListViewModel)!;
         if (vm.SelectedTransaction is null) return;
-        
+
         _ = vm.EditTransactionCommand.ExecuteAsync(vm.SelectedTransaction);
         e.Handled = true;
     }

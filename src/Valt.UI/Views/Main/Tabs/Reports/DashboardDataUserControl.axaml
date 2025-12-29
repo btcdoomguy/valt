@@ -8,28 +8,41 @@
              x:DataType="vm:DashboardData">
     <Border BorderThickness="1"
             Background="{DynamicResource Background800Brush}"
-            BorderBrush="{DynamicResource Background500Brush}">
-        
+            BorderBrush="{DynamicResource Background700Brush}"
+            CornerRadius="4"
+            MaxWidth="450"
+            HorizontalAlignment="Left">
+
         <StackPanel Orientation="Vertical">
-            <Label HorizontalContentAlignment="Center"
-                   Content="{Binding Title}"
-                   Background="{DynamicResource Background800Brush}" FontSize="16" />
+            <Border Background="{DynamicResource Background700Brush}"
+                    Padding="12, 8"
+                    CornerRadius="4, 4, 0, 0">
+                <Label HorizontalContentAlignment="Left"
+                       Content="{Binding Title}"
+                       Foreground="{DynamicResource Accent200Brush}"
+                       FontSize="14"
+                       FontWeight="SemiBold"
+                       Padding="0" />
+            </Border>
 
             <ItemsControl ItemsSource="{Binding Rows}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Padding="8,4"
-                                BorderBrush="#E0E0E0"
-                                BorderThickness="0,0,0,1"
-                                Background="{DynamicResource Background900Brush}">
+                        <Border Padding="12, 6"
+                                BorderBrush="{DynamicResource Background700Brush}"
+                                BorderThickness="0,0,0,1">
                             <DockPanel LastChildFill="True">
                                 <TextBlock Text="{Binding LeftText}"
-                                           FontSize="14"
+                                           FontSize="13"
+                                           Foreground="{DynamicResource Text300Brush}"
                                            DockPanel.Dock="Left"
                                            VerticalAlignment="Center"/>
 
                                 <TextBlock Text="{Binding RightText}"
-                                           FontSize="14"
+                                           FontSize="13"
+                                           FontWeight="Medium"
+                                           FontFamily="JetBrains Mono, Cascadia Code, Consolas, monospace"
+                                           Foreground="{DynamicResource Text100Brush}"
                                            DockPanel.Dock="Right"
                                            HorizontalAlignment="Right"
                                            VerticalAlignment="Center"/>

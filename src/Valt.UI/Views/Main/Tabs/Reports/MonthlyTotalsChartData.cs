@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
@@ -13,7 +14,7 @@ using Valt.Infra.Modules.Reports.MonthlyTotals;
 
 namespace Valt.UI.Views.Main.Tabs.Reports;
 
-public class MonthlyTotalsChartData
+public class MonthlyTotalsChartData : IDisposable
 {
     // Color palette - Fiat (Blue shades from Secondary)
     private static readonly SKColor FiatPrimary = SKColor.Parse("#0566e9");      // Secondary500
@@ -31,8 +32,15 @@ public class MonthlyTotalsChartData
     private static readonly SKColor GridColor = SKColor.Parse("#4d4d4d");        // Background700
     private static readonly SKColor TextColor = SKColor.Parse("#a8a6a4");        // Text400
     private static readonly SKColor AxisNameColor = SKColor.Parse("#cfccc9");    // Text300
+    private static readonly SKColor LegendTextColor = SKColor.Parse("#eeebe8");  // Text200
+    private static readonly SKColor ChartBackground = SKColor.Parse("#333333");  // Background800
 
     public FiatCurrency FiatCurrency { get; set; }
+
+    // Chart styling
+    public SolidColorPaint LegendTextPaint { get; } = new(LegendTextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) };
+    public SolidColorPaint TooltipTextPaint { get; } = new(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) };
+    public SolidColorPaint TooltipBackgroundPaint { get; } = new(ChartBackground);
     public ObservableCollection<ObservablePoint> FiatValues { get; private set; } = new();
     public ObservableCollection<ObservablePoint> BtcValues { get; private set; } = new();
     public ObservableCollection<string> MonthLabels { get; private set; } = new();
@@ -84,8 +92,11 @@ public class MonthlyTotalsChartData
         };
     }
 
-    // Series definitions with enhanced styling
-    public LineSeries<ObservablePoint> FiatSeries => new()
+    // Series definitions with enhanced styling - stored as fields to enable disposal
+    private LineSeries<ObservablePoint>? _fiatSeries;
+    private LineSeries<ObservablePoint>? _btcSeries;
+
+    private LineSeries<ObservablePoint> CreateFiatSeries() => new()
     {
         Name = "Total Wealth",
         Values = FiatValues,
@@ -97,7 +108,7 @@ public class MonthlyTotalsChartData
         LineSmoothness = 0.3
     };
 
-    public LineSeries<ObservablePoint> BtcSeries => new()
+    private LineSeries<ObservablePoint> CreateBtcSeries() => new()
     {
         Name = "Bitcoin",
         Values = BtcValues,
@@ -128,6 +139,9 @@ public class MonthlyTotalsChartData
         FiatValues.Clear();
         BtcValues.Clear();
         MonthLabels.Clear();
+
+        // Dispose old series before clearing
+        DisposeSeries();
         Series.Clear();
 
         for (var index = 0; index < monthlyTotalsData.Items.Count; index++)
@@ -139,8 +153,40 @@ public class MonthlyTotalsChartData
             BtcValues.Add(new ObservablePoint(index, (double)item.BtcTotal));
         }
 
-        // Add series after data is populated
-        Series.Add(FiatSeries);
-        Series.Add(BtcSeries);
+        // Create and add new series after data is populated
+        _fiatSeries = CreateFiatSeries();
+        _btcSeries = CreateBtcSeries();
+        Series.Add(_fiatSeries);
+        Series.Add(_btcSeries);
+    }
+
+    private void DisposeSeries()
+    {
+        if (_fiatSeries is not null)
+        {
+            (_fiatSeries.Stroke as IDisposable)?.Dispose();
+            (_fiatSeries.GeometryStroke as IDisposable)?.Dispose();
+            (_fiatSeries.GeometryFill as IDisposable)?.Dispose();
+            (_fiatSeries.Fill as IDisposable)?.Dispose();
+            _fiatSeries = null;
+        }
+
+        if (_btcSeries is not null)
+        {
+            (_btcSeries.Stroke as IDisposable)?.Dispose();
+            (_btcSeries.GeometryStroke as IDisposable)?.Dispose();
+            (_btcSeries.GeometryFill as IDisposable)?.Dispose();
+            (_btcSeries.Fill as IDisposable)?.Dispose();
+            _btcSeries = null;
+        }
+    }
+
+    public void Dispose()
+    {
+        DisposeSeries();
+        Series.Clear();
+        FiatValues.Clear();
+        BtcValues.Clear();
+        MonthLabels.Clear();
     }
 }

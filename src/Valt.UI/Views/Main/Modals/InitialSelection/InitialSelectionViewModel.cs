@@ -18,30 +18,32 @@ namespace Valt.UI.Views.Main.Modals.InitialSelection;
 public partial class InitialSelectionViewModel : ValtModalViewModel
 {
     private readonly IModalFactory? _modalFactory;
+    private readonly ILocalStorageService? _localStorageService;
 
     #region Form Data
-    
+
     [ObservableProperty] private AvaloniaList<string> _recentFiles = new();
     [ObservableProperty] private string _selectedFile = string.Empty;
-    
+
     #endregion
-    
+
     /// <summary>
     /// Design-time constructor
     /// </summary>
     public InitialSelectionViewModel()
     {
         if (!Design.IsDesignMode) return;
-        
+
         RecentFiles = new AvaloniaList<string>()
         {
             @"C:\mydb\db1.valt"
         };
     }
 
-    public InitialSelectionViewModel(IModalFactory modalFactory)
+    public InitialSelectionViewModel(IModalFactory modalFactory, ILocalStorageService localStorageService)
     {
         _modalFactory = modalFactory;
+        _localStorageService = localStorageService;
     }
     
     [RelayCommand]
@@ -74,7 +76,7 @@ public partial class InitialSelectionViewModel : ValtModalViewModel
         {
             await MessageBoxHelper.ShowErrorAsync("Error", "The selected file does not exist.", thisWindow);
             RecentFiles.Remove(SelectedFile);
-            await LocalStorageHelper.ChangeRecentFiles(RecentFiles);
+            await _localStorageService!.ChangeRecentFilesAsync(RecentFiles);
             return;
         }
 
@@ -126,11 +128,12 @@ public partial class InitialSelectionViewModel : ValtModalViewModel
     }
 
     [RelayCommand]
-    private async Task LoadRecentFiles()
+    private Task LoadRecentFiles()
     {
-        var recentFiles = LocalStorageHelper.LoadRecentFiles();
+        var recentFiles = _localStorageService!.LoadRecentFiles();
         RecentFiles.Clear();
         RecentFiles.AddRange(recentFiles);
+        return Task.CompletedTask;
     }
 
     private async Task UpdateRecentFilesAsync(string lastPath)
@@ -138,7 +141,7 @@ public partial class InitialSelectionViewModel : ValtModalViewModel
         RecentFiles.Remove(lastPath);
         RecentFiles.Insert(0, lastPath);
         SelectedFile = lastPath;
-        await LocalStorageHelper.ChangeRecentFiles(RecentFiles);
+        await _localStorageService!.ChangeRecentFilesAsync(RecentFiles);
     }
 
     private static FilePickerOpenOptions CreateFilePickerOpenOptions()

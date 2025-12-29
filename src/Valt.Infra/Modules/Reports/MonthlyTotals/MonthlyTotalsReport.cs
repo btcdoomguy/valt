@@ -71,7 +71,7 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
     private class Calculator
     {
         private const decimal SatoshisPerBitcoin = 100_000_000m;
-        private const int MaxDaysToScanForRate = 5;
+        private const int MaxDaysToScanForRate = 10;
 
         private readonly FiatCurrency _currency;
         private readonly FrozenDictionary<ObjectId, AccountEntity> _accounts;

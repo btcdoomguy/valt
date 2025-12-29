@@ -76,16 +76,19 @@ internal sealed class PriceDatabase : IPriceDatabase
         return mapper;
     }
 
+    private LiteDatabase GetOpenDatabase()
+    {
+        if (!HasDatabaseOpen || _database is null)
+            throw new InvalidOperationException("Open a database first.");
+        return _database;
+    }
+
     #region DataSource module
 
     public ILiteCollection<BitcoinDataEntity> GetBitcoinData()
     {
-        ArgumentNullException.ThrowIfNull(_database);
-
-        if (!HasDatabaseOpen)
-            throw new InvalidOperationException("Open a database first.");
-
-        var collection = _database.GetCollection<BitcoinDataEntity>("datasource_bitcoin");
+        var db = GetOpenDatabase();
+        var collection = db.GetCollection<BitcoinDataEntity>("datasource_bitcoin");
 
         collection.EnsureIndex(x => x.Date);
 
@@ -94,40 +97,28 @@ internal sealed class PriceDatabase : IPriceDatabase
 
     public ILiteCollection<FiatDataEntity> GetFiatData()
     {
-        ArgumentNullException.ThrowIfNull(_database);
-
-        if (!HasDatabaseOpen)
-            throw new InvalidOperationException("Open a database first.");
-
-        var collection = _database.GetCollection<FiatDataEntity>("datasource_fiat");
+        var db = GetOpenDatabase();
+        var collection = db.GetCollection<FiatDataEntity>("datasource_fiat");
 
         collection.EnsureIndex(x => x.Date);
+        collection.EnsureIndex(x => x.Currency);
 
         return collection;
     }
 
     public void BeginTransaction()
     {
-        if (!HasDatabaseOpen)
-            throw new InvalidOperationException("Open a database first.");
-
-        _database!.BeginTrans();
+        GetOpenDatabase().BeginTrans();
     }
 
     public void CommitTransaction()
     {
-        if (!HasDatabaseOpen)
-            throw new InvalidOperationException("Open a database first.");
-
-        _database!.Commit();
+        GetOpenDatabase().Commit();
     }
 
     public void RollbackTransaction()
     {
-        if (!HasDatabaseOpen)
-            throw new InvalidOperationException("Open a database first.");
-        
-        _database!.Rollback();
+        GetOpenDatabase().Rollback();
     }
 
     #endregion
@@ -145,14 +136,6 @@ internal sealed class PriceDatabase : IPriceDatabase
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
-    {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-        field = value;
-        OnPropertyChanged(propertyName);
-        return true;
     }
 
     #endregion

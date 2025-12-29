@@ -36,7 +36,7 @@ using Valt.UI.Views.Main.Tabs.Transactions;
 
 namespace Valt.UI.Views.Main.Tabs.Reports;
 
-public partial class ReportsViewModel : ValtTabViewModel
+public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 {
     private readonly IAllTimeHighReport _allTimeHighReport;
     private readonly IMonthlyTotalsReport _monthlyTotalsReport;
@@ -296,4 +296,18 @@ public partial class ReportsViewModel : ValtTabViewModel
     public override MainViewTabNames TabName => MainViewTabNames.ReportsPageContent;
 
     public record SelectItem(string Id, string Name);
+
+    public void Dispose()
+    {
+        _filterDebounceTokenSource?.Cancel();
+        _filterDebounceTokenSource?.Dispose();
+
+        SelectedAccounts.CollectionChanged -= OnSelectedFiltersChanged;
+        SelectedCategories.CollectionChanged -= OnSelectedFiltersChanged;
+
+        WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
+
+        MonthlyTotalsChartData.Dispose();
+        ExpensesByCategoryChartData.Dispose();
+    }
 }

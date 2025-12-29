@@ -11,6 +11,7 @@ using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Kernel.Time;
 using Valt.UI;
 using Valt.UI.Base;
+using Valt.UI.Services.LocalStorage;
 using Valt.UI.Views;
 using Valt.UI.Views.Main;
 
@@ -44,11 +45,16 @@ public abstract class IntegrationTest
             loggingBuilder.SetMinimumLevel(LogLevel.Information);
         });
 
+        var localStorageService = Substitute.For<ILocalStorageService>();
+        localStorageService.LoadDataGridSettings().Returns(new DataGridSettings());
+        localStorageService.LoadRecentFiles().Returns(new List<string>());
+        localStorageService.LoadCulture().Returns("en-US");
+
         _serviceCollection
             .AddValtCore()
             .AddValtInfrastructure()
-            .AddValtUI();
-        
+            .AddValtUI(localStorageService);
+
         //some extra dependencies for testing purposes
         _serviceCollection.AddSingleton<LivePricesUpdaterJob>();
         

@@ -23,6 +23,7 @@ public partial class SettingsViewModel : ValtModalViewModel
     private readonly ILocalDatabase _localDatabase;
     private readonly ITransactionTermService _transactionTermService;
     private readonly IModalFactory _modalFactory;
+    private readonly ILocalStorageService _localStorageService;
 
     [ObservableProperty] private string _mainFiatCurrency;
     [ObservableProperty] private bool _showHiddenAccounts;
@@ -70,17 +71,19 @@ public partial class SettingsViewModel : ValtModalViewModel
         DisplaySettings displaySettings,
         ILocalDatabase localDatabase,
         ITransactionTermService transactionTermService,
-        IModalFactory modalFactory)
+        IModalFactory modalFactory,
+        ILocalStorageService localStorageService)
     {
         _currencySettings = currencySettings;
         _displaySettings = displaySettings;
         _localDatabase = localDatabase;
         _transactionTermService = transactionTermService;
         _modalFactory = modalFactory;
+        _localStorageService = localStorageService;
 
         MainFiatCurrency = _currencySettings.MainFiatCurrency;
         ShowHiddenAccounts = _displaySettings.ShowHiddenAccounts;
-        CurrentCulture = LocalStorageHelper.LoadCulture();
+        CurrentCulture = _localStorageService.LoadCulture();
     }
     
     [RelayCommand]
@@ -124,8 +127,8 @@ public partial class SettingsViewModel : ValtModalViewModel
         _displaySettings.ShowHiddenAccounts = ShowHiddenAccounts;
         _displaySettings.Save();
 
-        await LocalStorageHelper.ChangeCulture(CurrentCulture);
-        
+        await _localStorageService.ChangeCultureAsync(CurrentCulture);
+
         CloseDialog?.Invoke(new Response(true));
     }
 

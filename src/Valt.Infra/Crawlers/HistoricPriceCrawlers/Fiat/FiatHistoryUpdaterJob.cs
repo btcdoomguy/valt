@@ -95,12 +95,32 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
 
     private void FillLocalDatabase(IEnumerable<IFiatHistoricalDataProvider.FiatPriceData> prices)
     {
+        var pricesList = prices.ToList();
+        if (pricesList.Count == 0)
+            return;
+
+        var minDate = pricesList.Min(p => p.Date).ToValtDateTime();
+        var maxDate = pricesList.Max(p => p.Date).ToValtDateTime();
+
+        var existingEntries = _priceDatabase.GetFiatData()
+            .Find(x => x.Date >= minDate && x.Date <= maxDate)
+            .Select(x => (x.Date, x.Currency))
+            .ToHashSet();
+
         var entries = new List<FiatDataEntity>();
-        foreach (var price in prices)
+        foreach (var price in pricesList)
         {
             var dateToConsider = price.Date.ToValtDateTime();
             foreach (var currency in price.Data)
             {
+                if (existingEntries.Contains((dateToConsider, currency.Currency)))
+                {
+                    _logger.LogDebug(
+                        "[FiatHistoryUpdater] Skipping duplicate entry for {Date} {Currency}",
+                        dateToConsider.ToString("yyyy-MM-dd"), currency.Currency);
+                    continue;
+                }
+
                 _logger.LogInformation(
                     "[FiatHistoryUpdater] Adding price {CurrencyPrice} for {S} for {CurrencyCurrency}",
                     currency.Price, dateToConsider.ToString("yyyy-MM-dd"), currency.Currency);
@@ -113,6 +133,7 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
             }
         }
 
-        _priceDatabase.GetFiatData().Insert(entries);
+        if (entries.Count > 0)
+            _priceDatabase.GetFiatData().Insert(entries);
     }
 }

@@ -25,14 +25,16 @@ using Valt.UI.Views.Main.Modals.Settings;
 using Valt.UI.Views.Main.Modals.StatusDisplay;
 using Valt.UI.Views.Main.Tabs.AvgPrice;
 using Valt.UI.Views.Main.Tabs.Reports;
+using Valt.UI.Services.LocalStorage;
 using Valt.UI.Views.Main.Tabs.Transactions;
 
 namespace Valt.UI;
 
 public static class Extensions
 {
-    public static IServiceCollection AddValtUI(this IServiceCollection services)
+    public static IServiceCollection AddValtUI(this IServiceCollection services, ILocalStorageService localStorageService)
     {
+        services.AddSingleton(localStorageService);
         services.AddTransient<MainViewModel>();
         
         //controls

@@ -28,6 +28,7 @@ using Valt.Infra.TransactionTerms;
 using Valt.UI.Base;
 using Valt.UI.Lang;
 using Valt.UI.Services;
+using Valt.UI.Services.LocalStorage;
 using Valt.UI.State;
 using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Modals.ChangeCategoryTransactions;
@@ -47,6 +48,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     private readonly CurrencySettings _currencySettings;
     private readonly FilterState _filterState;
     private readonly IClock _clock;
+    private readonly ILocalStorageService _localStorageService;
     private readonly ILogger<TransactionListViewModel> _logger;
 
     private DateTime _dateForTransaction = DateTime.Now;
@@ -60,6 +62,13 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     [ObservableProperty] private string _amountHeader = language.Transactions_Columns_Amount;
 
     [ObservableProperty] private bool _isSingleItemSelected;
+
+    #region DataGrid State
+
+    [ObservableProperty] private string? _orderedColumn;
+    [ObservableProperty] private ListSortDirection? _sortDirection;
+
+    #endregion
 
     #region Search fields
 
@@ -78,6 +87,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
         CurrencySettings currencySettings,
         FilterState filterState,
         IClock clock,
+        ILocalStorageService localStorageService,
         ILogger<TransactionListViewModel> logger)
     {
         _modalFactory = modalFactory;
@@ -89,6 +99,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
         _currencySettings = currencySettings;
         _filterState = filterState;
         _clock = clock;
+        _localStorageService = localStorageService;
         _logger = logger;
 
         _liveRateState.PropertyChanged += LiveRateStateOnPropertyChanged;
@@ -120,6 +131,46 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         get => _filterState.Range;
         set => _filterState.Range = value;
+    }
+
+    #endregion
+
+    #region DataGrid Settings
+
+    public DataGridSettings GetDataGridSettings()
+    {
+        var settings = _localStorageService.LoadDataGridSettings();
+        OrderedColumn = settings.OrderedColumn;
+        SortDirection = settings.SortDirection;
+        return settings;
+    }
+
+    public void SaveDataGridSettings(IEnumerable<DataGridColumnInfo> columns)
+    {
+        var columnList = columns.ToList();
+        var settings = new DataGridSettings
+        {
+            OrderedColumn = OrderedColumn,
+            SortDirection = SortDirection,
+            ColumnWidths = columnList.ToDictionary(c => c.Header, c => c.Width),
+            ColumnOrder = columnList.OrderBy(c => c.DisplayIndex).Select(c => c.Header).ToList()
+        };
+        _ = _localStorageService.SaveDataGridSettingsAsync(settings);
+    }
+
+    public void UpdateSortState(string? columnHeader)
+    {
+        if (OrderedColumn == columnHeader)
+        {
+            SortDirection = SortDirection == ListSortDirection.Ascending
+                ? ListSortDirection.Descending
+                : ListSortDirection.Ascending;
+        }
+        else
+        {
+            OrderedColumn = columnHeader;
+            SortDirection = ListSortDirection.Ascending;
+        }
     }
 
     #endregion
@@ -488,6 +539,9 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
 
     public void Dispose()
     {
+        _liveRateState.PropertyChanged -= LiveRateStateOnPropertyChanged;
+        _localDatabase.PropertyChanged -= LocalDatabaseOnPropertyChanged;
+
         WeakReferenceMessenger.Default.Unregister<AccountSelectedChanged>(this);
         WeakReferenceMessenger.Default.Unregister<FilterDateRangeChanged>(this);
         WeakReferenceMessenger.Default.Unregister<FixedExpenseChanged>(this);
