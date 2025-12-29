@@ -15,26 +15,36 @@ internal sealed class AvgPriceQueries : IAvgPriceQueries
         _localDatabase = localDatabase;
     }
 
-    public Task<IEnumerable<AvgPriceProfileListDTO>> GetProfilesAsync(bool showHidden = false)
+    public Task<IEnumerable<AvgPriceProfileDTO>> GetProfilesAsync(bool showHidden = false)
     {
         var query = _localDatabase.GetAvgPriceProfiles().FindAll();
 
         if (!showHidden)
             query = query.Where(x => x.Visible);
 
-        return Task.FromResult(query.Select(x =>
-        {
-            var icon = x.Icon != null ? Icon.RestoreFromId(x.Icon) : Icon.Empty;
-
-            return new AvgPriceProfileListDTO(x.Id.ToString(), x.Name, x.AssetName, x.Visible, icon.Name, icon.Unicode, icon.Color,
-                x.Currency, x.AvgPriceCalculationMethodId);
-        }));
+        return Task.FromResult(query.Select(AsDto));
     }
 
-    public Task<IEnumerable<AvgPriceLineDTO>> GetLinesOfProfileAsync(AvgPriceProfileId avgPriceProfileId)
+    public Task<AvgPriceProfileDTO> GetProfileAsync(AvgPriceProfileId id)
+    {
+        var entity = _localDatabase.GetAvgPriceProfiles().FindById(new ObjectId(id.ToString()));
+
+        return Task.FromResult(AsDto(entity));
+    }
+
+    private AvgPriceProfileDTO AsDto(AvgPriceProfileEntity entity)
+    {
+        var icon = entity.Icon != null ? Icon.RestoreFromId(entity.Icon) : Icon.Empty;
+
+        return new AvgPriceProfileDTO(entity.Id.ToString(), entity.Name, entity.AssetName,
+            entity.Precision, entity.Visible, icon.ToString(), icon.Unicode, icon.Color,
+            entity.Currency, entity.AvgPriceCalculationMethodId);
+    }
+
+    public Task<IEnumerable<AvgPriceLineDTO>> GetLinesOfProfileAsync(AvgPriceProfileId id)
     {
         var lines = _localDatabase.GetAvgPriceLines()
-            .Find(x => x.ProfileId == new ObjectId(avgPriceProfileId.ToString()));
+            .Find(x => x.ProfileId == new ObjectId(id.ToString()));
 
         return Task.FromResult(lines.Select(x => new AvgPriceLineDTO(x.Id.ToString(), DateOnly.FromDateTime(x.Date),
             x.DisplayOrder,

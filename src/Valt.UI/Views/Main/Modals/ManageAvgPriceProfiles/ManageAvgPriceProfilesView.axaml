@@ -42,7 +42,7 @@
                         VerticalAlignment="Bottom"
                         Padding="10"
                         Margin="0,0,10,10">
-                    <Button Classes="rounded" Content="&#xE145;">
+                    <Button Classes="rounded" Content="&#xE145;" Command="{Binding AddNewCommand}">
                     </Button>
                 </Border>
                 <StackPanel Grid.Column="1">
@@ -56,27 +56,58 @@
                                          VerticalAlignment="Center" />
                             </StackPanel>
 
+                            <!-- Asset Type Radio Buttons -->
                             <StackPanel Classes="form-field">
-                                <TextBlock Text="Asset Name" />
-                                <TextBox Text="{Binding AssetName}"
-                                         IsEnabled="{Binding EditFields}"
-                                         Width="300" HorizontalAlignment="Left"
-                                         VerticalAlignment="Center" />
+                                <TextBlock Text="Asset Type" />
+                                <StackPanel Orientation="Horizontal" Spacing="20">
+                                    <RadioButton Content="Bitcoin"
+                                                 IsChecked="{Binding IsBitcoin, Mode=OneWay}"
+                                                 IsEnabled="{Binding EditFields}"
+                                                 GroupName="AssetType"
+                                                 Command="{Binding SetBitcoinCommand} "/>
+                                    <RadioButton Content="Custom Asset"
+                                                 IsChecked="{Binding IsCustomAsset, Mode=OneWay}"
+                                                 IsEnabled="{Binding EditFields}"
+                                                 GroupName="AssetType"
+                                                 Command="{Binding SetCustomAssetCommand}" />
+                                </StackPanel>
                             </StackPanel>
 
-                            <StackPanel Classes="form-field">
-                                <TextBlock Text="Decimals" />
-                                <TextBox Text="{Binding Precision}"
-                                         IsEnabled="{Binding EditFields}"
-                                         Width="300" HorizontalAlignment="Left"
-                                         VerticalAlignment="Center" />
+                            <!-- Asset Name and Decimals (only visible for Custom Asset) -->
+                            <StackPanel Classes="form-field" IsVisible="{Binding IsCustomAsset}">
+                                <TextBlock Text="Custom Asset Details" />
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <StackPanel>
+                                        <TextBlock Text="Asset Name" FontSize="12" Foreground="{DynamicResource Text400Brush}" />
+                                        <TextBox Text="{Binding AssetName}"
+                                                 IsEnabled="{Binding EditFields}"
+                                                 Width="180"
+                                                 VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="Decimals" FontSize="12" Foreground="{DynamicResource Text400Brush}" />
+                                        <TextBox Text="{Binding Precision}"
+                                                 IsEnabled="{Binding EditFields}"
+                                                 Width="100"
+                                                 VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </StackPanel>
                             </StackPanel>
 
                             <!-- Currency Field -->
                             <StackPanel Classes="form-field">
                                 <TextBlock Text="Fiat Currency to use" />
                                 <ComboBox ItemsSource="{Binding AvailableCurrencies}"
-                                          SelectedItem="{Binding Currency}" />
+                                          SelectedItem="{Binding Currency}"
+                                          IsEnabled="{Binding EditFields}"/>
+                            </StackPanel>
+                            
+                            <!--Strategy-->
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="Calculation method" />
+                                <ComboBox ItemsSource="{Binding AvailableStrategies}"
+                                          SelectedItem="{Binding SelectedStrategy}"
+                                          IsEnabled="{Binding EditFields}"/>
                             </StackPanel>
 
                             <StackPanel Classes="form-field">
@@ -85,12 +116,14 @@
                                 <Button Classes="icon-selector-button"
                                         Foreground="{Binding IconUiWrapper.BrushColor}"
                                         Content="{Binding IconUiWrapper.Unicode}"
-                                        Command="{Binding IconSelectorOpenCommand}">
+                                        Command="{Binding IconSelectorOpenCommand}"
+                                        IsEnabled="{Binding EditFields}">
                                 </Button>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Classes="form-field">
                                 <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Visible}"
+                                          IsEnabled="{Binding EditFields}"
                                           VerticalAlignment="Center" />
                                 <TextBlock Text="Visible?"
                                            VerticalAlignment="Center" />

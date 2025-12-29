@@ -117,4 +117,56 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
     {
         _calculationStrategy.CalculateTotals(orderedList);
     }
+
+    public void Rename(AvgPriceProfileName name)
+    {
+        if (Name == name)
+            return;
+        
+        Name = name;
+        
+        AddEvent(new AvgPriceProfileUpdatedEvent(this));
+    }
+
+    public void ChangeIcon(Icon icon)
+    {
+        if (Icon == icon)
+            return;
+        
+        Icon = icon;
+        
+        AddEvent(new AvgPriceProfileUpdatedEvent(this));
+    }
+
+    public void ChangeAsset(string assetName, int precision)
+    {
+        var newAsset = new AvgPriceAsset(assetName, precision);
+
+        if (Asset == newAsset)
+            return;
+
+        Asset = newAsset;
+        
+        AddEvent(new AvgPriceProfileUpdatedEvent(this));
+    }
+
+    public void ChangeCalculationMethod(AvgPriceCalculationMethod calculationMethod)
+    {
+        if (CalculationMethod == calculationMethod)
+            return;
+        
+        CalculationMethod = calculationMethod;
+        
+        AddEvent(new AvgPriceProfileUpdatedEvent(this));
+    }
+
+    public void ChangeVisibility(bool visible)
+    {
+        if (Visible == visible)
+            return;
+
+        Visible = visible;
+        
+        AddEvent(new AvgPriceProfileUpdatedEvent(this));
+    }
 }

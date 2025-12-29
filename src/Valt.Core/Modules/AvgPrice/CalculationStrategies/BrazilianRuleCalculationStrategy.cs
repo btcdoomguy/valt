@@ -10,7 +10,9 @@ internal class BrazilianRuleCalculationStrategy : IAvgPriceCalculationStrategy
     {
         _profile = profile;
     }
-    
+
+    public AvgPriceCalculationMethod Method => AvgPriceCalculationMethod.BrazilianRule;
+
     public void CalculateTotals(IEnumerable<AvgPriceLine> orderedLines)
     {
         var totalCost = 0m;

@@ -40,9 +40,7 @@
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
-                        <Button>Add</Button>
-                        <Button>Edit</Button>
-                        <Button>Delete</Button>
+                        <Button Command="{Binding ManageProfilesCommand}">Manage</Button>
                     </StackPanel>
                 </StackPanel>
                 <DataGrid Grid.Row="1" ItemsSource="{Binding Lines}" AutoGenerateColumns="True">

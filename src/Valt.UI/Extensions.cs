@@ -26,6 +26,7 @@ using Valt.UI.Views.Main.Modals.StatusDisplay;
 using Valt.UI.Views.Main.Tabs.AvgPrice;
 using Valt.UI.Views.Main.Tabs.Reports;
 using Valt.UI.Services.LocalStorage;
+using Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles;
 using Valt.UI.Views.Main.Tabs.Transactions;
 
 namespace Valt.UI;
@@ -86,6 +87,7 @@ public static class Extensions
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<ManageFixedExpensesViewModel>();
         services.AddTransient<FixedExpenseEditorViewModel>();
+        services.AddTransient<ManageAvgPriceProfilesViewModel>();
         
         //other
         services.AddSingleton<IInitialCategoryNameLanguageProvider, InitialCategoryNameLanguageProvider>();
@@ -155,6 +157,10 @@ public static class Extensions
                 ApplicationModalNames.FixedExpenseEditor => new FixedExpenseEditorView()
                 {
                     DataContext = services.GetRequiredService<FixedExpenseEditorViewModel>(),
+                },
+                ApplicationModalNames.AvgPriceProfileManager => new ManageAvgPriceProfilesView()
+                {
+                    DataContext = services.GetRequiredService<ManageAvgPriceProfilesViewModel>(),
                 },
                 _ => throw new ArgumentOutOfRangeException(nameof(modalNames), modalNames, null)
             };

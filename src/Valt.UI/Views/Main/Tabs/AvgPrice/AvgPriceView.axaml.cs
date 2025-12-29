@@ -3,11 +3,12 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+using Valt.UI.Base;
 using Valt.UI.Views.Main.Tabs.Reports;
 
 namespace Valt.UI.Views.Main.Tabs.AvgPrice;
 
-public partial class AvgPriceView : UserControl
+public partial class AvgPriceView : ValtBaseUserControl
 {
     public AvgPriceView()
     {

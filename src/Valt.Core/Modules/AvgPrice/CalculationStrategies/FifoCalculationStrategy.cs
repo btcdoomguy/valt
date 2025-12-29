@@ -11,6 +11,8 @@ internal class FifoCalculationStrategy : IAvgPriceCalculationStrategy
         _profile = profile;
     }
 
+    public AvgPriceCalculationMethod Method => AvgPriceCalculationMethod.Fifo;
+
     public void CalculateTotals(IEnumerable<AvgPriceLine> orderedLines)
     {
         // Queue of cost lots: (quantity, unitPrice)

@@ -5,6 +5,7 @@ namespace Valt.Infra.Modules.AvgPrice.Queries;
 
 public interface IAvgPriceQueries
 {
-    Task<IEnumerable<AvgPriceProfileListDTO>> GetProfilesAsync(bool showHidden = false);
-    Task<IEnumerable<AvgPriceLineDTO>> GetLinesOfProfileAsync(AvgPriceProfileId avgPriceProfileId);
+    Task<IEnumerable<AvgPriceProfileDTO>> GetProfilesAsync(bool showHidden = false);
+    Task<AvgPriceProfileDTO> GetProfileAsync(AvgPriceProfileId id);
+    Task<IEnumerable<AvgPriceLineDTO>> GetLinesOfProfileAsync(AvgPriceProfileId id);
 }
