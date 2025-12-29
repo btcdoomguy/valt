@@ -1515,6 +1515,18 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string AvgPrice_Menu_MoveUp {
+            get {
+                return ResourceManager.GetString("AvgPrice.Menu.MoveUp", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_Menu_MoveDown {
+            get {
+                return ResourceManager.GetString("AvgPrice.Menu.MoveDown", resourceCulture);
+            }
+        }
+
         public static string AvgPrice_DeleteConfirm_Title {
             get {
                 return ResourceManager.GetString("AvgPrice.DeleteConfirm.Title", resourceCulture);

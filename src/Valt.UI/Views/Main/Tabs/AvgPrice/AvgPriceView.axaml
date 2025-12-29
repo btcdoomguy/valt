@@ -66,33 +66,46 @@
                                       Command="{Binding EditOperationCommand}" />
                             <MenuItem Header="{x:Static lang:language.AvgPrice_Menu_Delete}"
                                       Command="{Binding DeleteOperationCommand}" />
+                            <Separator />
+                            <MenuItem Header="{x:Static lang:language.AvgPrice_Menu_MoveUp}"
+                                      Command="{Binding MoveUpCommand}" />
+                            <MenuItem Header="{x:Static lang:language.AvgPrice_Menu_MoveDown}"
+                                      Command="{Binding MoveDownCommand}" />
                         </ContextMenu>
                     </DataGrid.ContextMenu>
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_Date}"
                                             Binding="{Binding Date, StringFormat=\{0:yyyy-MM-dd\}}"
-                                            Width="100" />
+                                            Width="100"
+                                            CanUserSort="False" />
                         <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_Type}"
                                             Binding="{Binding AvgPriceLineTypeId, Converter={StaticResource AvgPriceLineTypeConverter}}"
-                                            Width="80" />
+                                            Width="80"
+                                            CanUserSort="False"/>
                         <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_Quantity}"
                                             Binding="{Binding Quantity, StringFormat=N8}"
-                                            Width="120" />
+                                            Width="120"
+                                            CanUserSort="False"/>
                         <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_UnitPrice}"
                                             Binding="{Binding UnitPrice, StringFormat=N2}"
-                                            Width="120" />
+                                            Width="120"
+                                            CanUserSort="False"/>
                         <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_TotalQuantity}"
                                             Binding="{Binding TotalQuantity, StringFormat=N8}"
-                                            Width="120" />
+                                            Width="120"
+                                            CanUserSort="False"/>
                         <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_TotalCost}"
                                             Binding="{Binding TotalCost, StringFormat=N2}"
-                                            Width="120" />
+                                            Width="120"
+                                            CanUserSort="False"/>
                         <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_AvgCost}"
                                             Binding="{Binding AvgCostOfAcquisition, StringFormat=N2}"
-                                            Width="120" />
+                                            Width="120"
+                                            CanUserSort="False"/>
                         <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_Comment}"
                                             Binding="{Binding Comment}"
-                                            Width="*" />
+                                            Width="*" 
+                                            CanUserSort="False"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>

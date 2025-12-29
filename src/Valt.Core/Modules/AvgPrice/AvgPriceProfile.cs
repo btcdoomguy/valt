@@ -111,6 +111,52 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
         AddEvent(new AvgPriceLineDeletedEvent(line));
     }
 
+    public void MoveLineUp(AvgPriceLine line)
+    {
+        var linesFromSameDate = _avgPriceLines.Where(x => x.Date == line.Date).OrderBy(x => x.DisplayOrder).ToList();
+
+        var indexOfLine = linesFromSameDate.IndexOf(line);
+
+        linesFromSameDate.Remove(line);
+        linesFromSameDate.Insert(indexOfLine - 1, line);
+        
+        if (RearrangeDisplayOrder(linesFromSameDate))
+            RecalculateAll();
+    }
+
+    public void MoveLineDown(AvgPriceLine line)
+    {
+        var linesFromSameDate = _avgPriceLines.Where(x => x.Date == line.Date).OrderBy(x => x.DisplayOrder).ToList();
+
+        var indexOfLine = linesFromSameDate.IndexOf(line);
+
+        linesFromSameDate.Remove(line);
+        linesFromSameDate.Insert(indexOfLine + 1, line);
+
+        if (RearrangeDisplayOrder(linesFromSameDate))
+            RecalculateAll();
+    }
+
+    private bool RearrangeDisplayOrder(IEnumerable<AvgPriceLine> lines)
+    {
+        var rearranged = false;
+        
+        var displayOrder = 0;
+        foreach (var lineFromSameDate in lines)
+        {
+            if (lineFromSameDate.DisplayOrder != displayOrder)
+            {
+                lineFromSameDate.SetDisplayOrder(displayOrder);
+                AddEvent(new AvgPriceLineUpdatedEvent(lineFromSameDate));
+                rearranged = true;
+            }
+
+            displayOrder++;
+        }
+
+        return rearranged;
+    }
+
     public void ChangeLineTotals(AvgPriceLine line, LineTotals lineTotals)
     {
         if (line.Totals == lineTotals)
@@ -129,9 +175,9 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
     {
         if (Name == name)
             return;
-        
+
         Name = name;
-        
+
         AddEvent(new AvgPriceProfileUpdatedEvent(this));
     }
 
@@ -139,9 +185,9 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
     {
         if (Icon == icon)
             return;
-        
+
         Icon = icon;
-        
+
         AddEvent(new AvgPriceProfileUpdatedEvent(this));
     }
 
@@ -153,9 +199,9 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
             return;
 
         Asset = newAsset;
-        
+
         RecalculateAll();
-        
+
         AddEvent(new AvgPriceProfileUpdatedEvent(this));
     }
 
@@ -163,11 +209,11 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
     {
         if (CalculationMethod == calculationMethod)
             return;
-        
+
         CalculationMethod = calculationMethod;
-        
+
         RecalculateAll();
-        
+
         AddEvent(new AvgPriceProfileUpdatedEvent(this));
     }
 
@@ -177,7 +223,7 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
             return;
 
         Visible = visible;
-        
+
         AddEvent(new AvgPriceProfileUpdatedEvent(this));
     }
 }

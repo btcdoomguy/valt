@@ -44,4 +44,9 @@ public class AvgPriceLine : Entity<AvgPriceLineId>
     {
         Totals = totals;
     }
+
+    public void SetDisplayOrder(int displayOrder)
+    {
+        DisplayOrder = displayOrder;
+    }
 }

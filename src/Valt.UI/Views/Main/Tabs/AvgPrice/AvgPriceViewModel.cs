@@ -68,10 +68,14 @@ public partial class AvgPriceViewModel : ValtTabViewModel
 
     private async Task FetchAvgPriceProfiles()
     {
-        var profile = await _avgPriceQueries.GetProfilesAsync(false);
+        var profiles = await _avgPriceQueries.GetProfilesAsync(false);
 
         Profiles.Clear();
-        Profiles.AddRange(profile);
+        Profiles.AddRange(profiles);
+
+        // Auto-select first profile if none selected
+        if (SelectedProfile is null && Profiles.Count > 0)
+            SelectedProfile = Profiles.First();
     }
 
     partial void OnSelectedProfileChanged(AvgPriceProfileDTO? oldValue, AvgPriceProfileDTO? newValue)
@@ -83,7 +87,10 @@ public partial class AvgPriceViewModel : ValtTabViewModel
     private async Task FetchAvgPriceLines()
     {
         if (SelectedProfile is null)
+        {
+            Lines.Clear();
             return;
+        }
 
         var lines = await _avgPriceQueries.GetLinesOfProfileAsync(SelectedProfile.Id);
 
@@ -97,11 +104,41 @@ public partial class AvgPriceViewModel : ValtTabViewModel
     {
         EditOperationCommand.NotifyCanExecuteChanged();
         DeleteOperationCommand.NotifyCanExecuteChanged();
+        MoveUpCommand.NotifyCanExecuteChanged();
+        MoveDownCommand.NotifyCanExecuteChanged();
     }
 
     public bool CanAddOperation => SelectedProfile is not null;
     public bool CanEditOperation => SelectedProfile is not null && SelectedLine is not null;
     public bool CanDeleteOperation => SelectedProfile is not null && SelectedLine is not null;
+
+    public bool CanMoveUp
+    {
+        get
+        {
+            if (SelectedProfile is null || SelectedLine is null)
+                return false;
+
+            var linesOnSameDate = Lines.Where(x => x.Date == SelectedLine.Date).OrderBy(x => x.DisplayOrder).ToList();
+
+            // Need at least 2 lines on the same date and selected line must not be first
+            return linesOnSameDate.Count > 1 && linesOnSameDate.First().Id != SelectedLine.Id;
+        }
+    }
+
+    public bool CanMoveDown
+    {
+        get
+        {
+            if (SelectedProfile is null || SelectedLine is null)
+                return false;
+
+            var linesOnSameDate = Lines.Where(x => x.Date == SelectedLine.Date).OrderBy(x => x.DisplayOrder).ToList();
+
+            // Need at least 2 lines on the same date and selected line must not be last
+            return linesOnSameDate.Count > 1 && linesOnSameDate.Last().Id != SelectedLine.Id;
+        }
+    }
 
     [RelayCommand]
     private async Task ManageProfiles()
@@ -119,6 +156,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
             return;
 
         await FetchAvgPriceProfiles();
+        await FetchAvgPriceLines();
     }
 
     [RelayCommand(CanExecute = nameof(CanAddOperation))]
@@ -231,5 +269,73 @@ public partial class AvgPriceViewModel : ValtTabViewModel
         }
 
         return null;
+    }
+
+    [RelayCommand(CanExecute = nameof(CanMoveUp))]
+    private async Task MoveUp()
+    {
+        if (SelectedProfile is null || SelectedLine is null)
+            return;
+
+        try
+        {
+            var profileId = new AvgPriceProfileId(SelectedProfile.Id);
+            var profile = await _avgPriceRepository.GetAvgPriceProfileByIdAsync(profileId);
+
+            if (profile is null)
+                return;
+
+            var lineToMove = FindLineById(profile, SelectedLine.Id);
+
+            if (lineToMove is not null)
+            {
+                profile.MoveLineUp(lineToMove);
+                await _avgPriceRepository.SaveAvgPriceProfileAsync(profile);
+            }
+
+            await FetchAvgPriceLines();
+
+            // Re-select the moved line
+            SelectedLine = Lines.FirstOrDefault(x => x.Id == SelectedLine?.Id);
+        }
+        catch (Exception e)
+        {
+            var ownerWindow = GetUserControlOwnerWindow()!;
+            await MessageBoxHelper.ShowErrorAsync("Error", e.Message, ownerWindow);
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanMoveDown))]
+    private async Task MoveDown()
+    {
+        if (SelectedProfile is null || SelectedLine is null)
+            return;
+
+        try
+        {
+            var profileId = new AvgPriceProfileId(SelectedProfile.Id);
+            var profile = await _avgPriceRepository.GetAvgPriceProfileByIdAsync(profileId);
+
+            if (profile is null)
+                return;
+
+            var lineToMove = FindLineById(profile, SelectedLine.Id);
+
+            if (lineToMove is not null)
+            {
+                profile.MoveLineDown(lineToMove);
+                await _avgPriceRepository.SaveAvgPriceProfileAsync(profile);
+            }
+
+            await FetchAvgPriceLines();
+
+            // Re-select the moved line
+            SelectedLine = Lines.FirstOrDefault(x => x.Id == SelectedLine?.Id);
+        }
+        catch (Exception e)
+        {
+            var ownerWindow = GetUserControlOwnerWindow()!;
+            await MessageBoxHelper.ShowErrorAsync("Error", e.Message, ownerWindow);
+        }
     }
 }

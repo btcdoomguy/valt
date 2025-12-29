@@ -44,7 +44,9 @@ internal sealed class AvgPriceQueries : IAvgPriceQueries
     public Task<IEnumerable<AvgPriceLineDTO>> GetLinesOfProfileAsync(AvgPriceProfileId id)
     {
         var lines = _localDatabase.GetAvgPriceLines()
-            .Find(x => x.ProfileId == new ObjectId(id.ToString()));
+            .Find(x => x.ProfileId == new ObjectId(id.ToString()))
+            .OrderBy(x => x.Date)
+            .ThenBy(x => x.DisplayOrder);
 
         return Task.FromResult(lines.Select(x => new AvgPriceLineDTO(x.Id.ToString(), DateOnly.FromDateTime(x.Date),
             x.DisplayOrder,

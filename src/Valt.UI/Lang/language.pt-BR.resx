@@ -753,6 +753,12 @@
     <data name="AvgPrice.Menu.Delete" xml:space="preserve">
         <value>Excluir</value>
     </data>
+    <data name="AvgPrice.Menu.MoveUp" xml:space="preserve">
+        <value>Mover para Cima</value>
+    </data>
+    <data name="AvgPrice.Menu.MoveDown" xml:space="preserve">
+        <value>Mover para Baixo</value>
+    </data>
     <data name="AvgPrice.DeleteConfirm.Title" xml:space="preserve">
         <value>Excluir Operação</value>
     </data>

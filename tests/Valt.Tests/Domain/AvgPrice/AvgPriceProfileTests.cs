@@ -485,6 +485,38 @@ public class AvgPriceProfileTests
     }
 
     [Test]
+    public void Should_Raise_LineUpdatedEvent_For_Lines_With_Changed_Totals_When_CalculationMethod_Changes()
+    {
+        // Arrange
+        var profile = AvgPriceProfileBuilder.AProfile()
+            .WithCalculationMethod(AvgPriceCalculationMethod.BrazilianRule)
+            .WithCurrency(FiatCurrency.Usd)
+            .Build();
+
+        // Add 3 lines
+        profile.AddLine(new DateOnly(2024, 1, 1), 1, AvgPriceLineTypes.Buy, 1m, FiatValue.New(50000m), "First buy");
+        profile.AddLine(new DateOnly(2024, 1, 2), 1, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(60000m), "Second buy");
+        profile.AddLine(new DateOnly(2024, 1, 3), 1, AvgPriceLineTypes.Sell, 0.5m, FiatValue.New(70000m), "Sell");
+
+        profile.ClearEvents();
+
+        // Act
+        profile.ChangeCalculationMethod(AvgPriceCalculationMethod.Fifo);
+
+        // Assert - Should have AvgPriceLineUpdatedEvent only for lines whose totals changed
+        // Buy lines have same totals in both strategies; only sell line differs (FIFO uses first-in cost basis)
+        var lineUpdatedEvents = profile.Events.OfType<AvgPriceLineUpdatedEvent>().ToList();
+        var profileUpdatedEvents = profile.Events.OfType<AvgPriceProfileUpdatedEvent>().ToList();
+
+        Assert.That(lineUpdatedEvents.Count, Is.GreaterThanOrEqualTo(1), "Should raise AvgPriceLineUpdatedEvent for lines with changed totals");
+        Assert.That(profileUpdatedEvents.Count, Is.EqualTo(1), "Should raise AvgPriceProfileUpdatedEvent");
+
+        // The sell line should have changed totals
+        var sellLineEvent = lineUpdatedEvents.FirstOrDefault(e => e.AvgPriceLine.Type == AvgPriceLineTypes.Sell);
+        Assert.That(sellLineEvent, Is.Not.Null, "Sell line should have AvgPriceLineUpdatedEvent");
+    }
+
+    [Test]
     public void Should_Use_New_Strategy_After_Method_Change()
     {
         // Arrange - Start with FIFO
@@ -621,6 +653,408 @@ public class AvgPriceProfileTests
 
         // Assert
         Assert.That(profile.Events.Count, Is.EqualTo(0));
+    }
+
+    #endregion
+
+    #region MoveLineUp Tests
+
+    [Test]
+    public void MoveLineUp_Should_Swap_Display_Order_With_Previous_Line()
+    {
+        // Arrange
+        var profile = AvgPriceProfileBuilder.AProfile()
+            .WithCurrency(FiatCurrency.Usd)
+            .Build();
+
+        // Add three lines on the same date with sequential display orders
+        profile.AddLine(new DateOnly(2024, 1, 1), 0, AvgPriceLineTypes.Buy, 1m, FiatValue.New(50000m), "First");
+        profile.AddLine(new DateOnly(2024, 1, 1), 1, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(60000m), "Second");
+        profile.AddLine(new DateOnly(2024, 1, 1), 2, AvgPriceLineTypes.Sell, 0.25m, FiatValue.New(70000m), "Third");
+
+        var orderedLines = profile.AvgPriceLines.OrderBy(x => x.DisplayOrder).ToList();
+        var secondLine = orderedLines[1];
+
+        profile.ClearEvents();
+
+        // Act - Move second line up
+        profile.MoveLineUp(secondLine);
+
+        // Assert - Second line should now be first (display order 0)
+        var reorderedLines = profile.AvgPriceLines.OrderBy(x => x.DisplayOrder).ToList();
+        Assert.That(reorderedLines[0].Comment, Is.EqualTo("Second"));
+        Assert.That(reorderedLines[0].DisplayOrder, Is.EqualTo(0));
+        Assert.That(reorderedLines[1].Comment, Is.EqualTo("First"));
+        Assert.That(reorderedLines[1].DisplayOrder, Is.EqualTo(1));
+        Assert.That(reorderedLines[2].Comment, Is.EqualTo("Third"));
+        Assert.That(reorderedLines[2].DisplayOrder, Is.EqualTo(2));
+    }
+
+    [Test]
+    public void MoveLineUp_Should_Recalculate_Totals_In_New_Order()
+    {
+        // Arrange
+        var profile = AvgPriceProfileBuilder.AProfile()
+            .WithCurrency(FiatCurrency.Usd)
+            .Build();
+
+        // First: Buy 1 BTC at $50,000
+        // Second: Buy 0.5 BTC at $60,000
+        // After first: Total = $50,000, BTC = 1, Avg = $50,000
+        // After second (current order): Total = $80,000, BTC = 1.5, Avg = $53,333.33
+        profile.AddLine(new DateOnly(2024, 1, 1), 0, AvgPriceLineTypes.Buy, 1m, FiatValue.New(50000m), "Big Buy");
+        profile.AddLine(new DateOnly(2024, 1, 1), 1, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(60000m), "Small Buy");
+
+        var orderedLines = profile.AvgPriceLines.OrderBy(x => x.DisplayOrder).ToList();
+        var smallBuy = orderedLines[1];
+
+        // Act - Move small buy to first position
+        profile.MoveLineUp(smallBuy);
+
+        // Assert - Now: Small Buy first, then Big Buy
+        // After small buy: Total = $30,000, BTC = 0.5, Avg = $60,000
+        // After big buy: Total = $80,000, BTC = 1.5, Avg = $53,333.33
+        var reorderedLines = profile.AvgPriceLines.OrderBy(x => x.DisplayOrder).ToList();
+
+        Assert.That(reorderedLines[0].Comment, Is.EqualTo("Small Buy"));
+        Assert.That(reorderedLines[0].Totals.TotalCost, Is.EqualTo(30000m));
+        Assert.That(reorderedLines[0].Totals.Quantity, Is.EqualTo(0.5m));
+        Assert.That(reorderedLines[0].Totals.AvgCostOfAcquisition.Value, Is.EqualTo(60000m));
+
+        Assert.That(reorderedLines[1].Comment, Is.EqualTo("Big Buy"));
+        Assert.That(reorderedLines[1].Totals.TotalCost, Is.EqualTo(80000m));
+        Assert.That(reorderedLines[1].Totals.Quantity, Is.EqualTo(1.5m));
+    }
+
+    [Test]
+    public void MoveLineUp_Should_Raise_UpdatedEvent_For_Affected_Lines()
+    {
+        // Arrange
+        var profile = AvgPriceProfileBuilder.AProfile()
+            .WithCurrency(FiatCurrency.Usd)
+            .Build();
+
+        profile.AddLine(new DateOnly(2024, 1, 1), 0, AvgPriceLineTypes.Buy, 1m, FiatValue.New(50000m), "First");
+        profile.AddLine(new DateOnly(2024, 1, 1), 1, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(60000m), "Second");
+
+        var secondLine = profile.AvgPriceLines.First(x => x.Comment == "Second");
+
+        profile.ClearEvents();
+
+        // Act
+        profile.MoveLineUp(secondLine);
+
+        // Assert - Both lines should have updated events (display order changed for both)
+        var updatedEvents = profile.Events.OfType<AvgPriceLineUpdatedEvent>().ToList();
+        Assert.That(updatedEvents.Count, Is.EqualTo(2));
+    }
+
+    [Test]
+    public void MoveLineUp_Should_Not_Change_Anything_When_Already_First()
+    {
+        // Arrange
+        var profile = AvgPriceProfileBuilder.AProfile()
+            .WithCurrency(FiatCurrency.Usd)
+            .Build();
+
+        profile.AddLine(new DateOnly(2024, 1, 1), 0, AvgPriceLineTypes.Buy, 1m, FiatValue.New(50000m), "First");
+        profile.AddLine(new DateOnly(2024, 1, 1), 1, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(60000m), "Second");
+
+        var firstLine = profile.AvgPriceLines.First(x => x.Comment == "First");
+        var originalTotals = firstLine.Totals;
+
+        profile.ClearEvents();
+
+        // Act - Try to move first line up (should fail gracefully or throw)
+        Assert.Throws<ArgumentOutOfRangeException>(() => profile.MoveLineUp(firstLine));
+    }
+
+    [Test]
+    public void MoveLineUp_Should_Only_Affect_Lines_On_Same_Date()
+    {
+        // Arrange
+        var profile = AvgPriceProfileBuilder.AProfile()
+            .WithCurrency(FiatCurrency.Usd)
+            .Build();
+
+        // Lines on different dates
+        profile.AddLine(new DateOnly(2024, 1, 1), 0, AvgPriceLineTypes.Buy, 1m, FiatValue.New(50000m), "Day1");
+        profile.AddLine(new DateOnly(2024, 1, 2), 0, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(60000m), "Day2 First");
+        profile.AddLine(new DateOnly(2024, 1, 2), 1, AvgPriceLineTypes.Buy, 0.25m, FiatValue.New(70000m), "Day2 Second");
+
+        var day2Second = profile.AvgPriceLines.First(x => x.Comment == "Day2 Second");
+        var day1Line = profile.AvgPriceLines.First(x => x.Comment == "Day1");
+        var originalDay1Order = day1Line.DisplayOrder;
+
+        profile.ClearEvents();
+
+        // Act
+        profile.MoveLineUp(day2Second);
+
+        // Assert - Day1 line should not be affected
+        Assert.That(day1Line.DisplayOrder, Is.EqualTo(originalDay1Order));
+    }
+
+    #endregion
+
+    #region MoveLineDown Tests
+
+    [Test]
+    public void MoveLineDown_Should_Swap_Display_Order_With_Next_Line()
+    {
+        // Arrange
+        var profile = AvgPriceProfileBuilder.AProfile()
+            .WithCurrency(FiatCurrency.Usd)
+            .Build();
+
+        profile.AddLine(new DateOnly(2024, 1, 1), 0, AvgPriceLineTypes.Buy, 1m, FiatValue.New(50000m), "First");
+        profile.AddLine(new DateOnly(2024, 1, 1), 1, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(60000m), "Second");
+        profile.AddLine(new DateOnly(2024, 1, 1), 2, AvgPriceLineTypes.Sell, 0.25m, FiatValue.New(70000m), "Third");
+
+        var firstLine = profile.AvgPriceLines.First(x => x.Comment == "First");
+
+        profile.ClearEvents();
+
+        // Act - Move first line down
+        profile.MoveLineDown(firstLine);
+
+        // Assert - First line should now be second (display order 1)
+        var reorderedLines = profile.AvgPriceLines.OrderBy(x => x.DisplayOrder).ToList();
+        Assert.That(reorderedLines[0].Comment, Is.EqualTo("Second"));
+        Assert.That(reorderedLines[0].DisplayOrder, Is.EqualTo(0));
+        Assert.That(reorderedLines[1].Comment, Is.EqualTo("First"));
+        Assert.That(reorderedLines[1].DisplayOrder, Is.EqualTo(1));
+        Assert.That(reorderedLines[2].Comment, Is.EqualTo("Third"));
+        Assert.That(reorderedLines[2].DisplayOrder, Is.EqualTo(2));
+    }
+
+    [Test]
+    public void MoveLineDown_Should_Recalculate_Totals_In_New_Order()
+    {
+        // Arrange
+        var profile = AvgPriceProfileBuilder.AProfile()
+            .WithCurrency(FiatCurrency.Usd)
+            .Build();
+
+        // Big Buy first, Small Buy second
+        profile.AddLine(new DateOnly(2024, 1, 1), 0, AvgPriceLineTypes.Buy, 1m, FiatValue.New(50000m), "Big Buy");
+        profile.AddLine(new DateOnly(2024, 1, 1), 1, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(60000m), "Small Buy");
+
+        var bigBuy = profile.AvgPriceLines.First(x => x.Comment == "Big Buy");
+
+        // Act - Move big buy down (to second position)
+        profile.MoveLineDown(bigBuy);
+
+        // Assert - Now: Small Buy first, then Big Buy
+        var reorderedLines = profile.AvgPriceLines.OrderBy(x => x.DisplayOrder).ToList();
+
+        Assert.That(reorderedLines[0].Comment, Is.EqualTo("Small Buy"));
+        Assert.That(reorderedLines[0].Totals.TotalCost, Is.EqualTo(30000m));
+        Assert.That(reorderedLines[0].Totals.Quantity, Is.EqualTo(0.5m));
+        Assert.That(reorderedLines[0].Totals.AvgCostOfAcquisition.Value, Is.EqualTo(60000m));
+
+        Assert.That(reorderedLines[1].Comment, Is.EqualTo("Big Buy"));
+        Assert.That(reorderedLines[1].Totals.TotalCost, Is.EqualTo(80000m));
+        Assert.That(reorderedLines[1].Totals.Quantity, Is.EqualTo(1.5m));
+    }
+
+    [Test]
+    public void MoveLineDown_Should_Raise_UpdatedEvent_For_Affected_Lines()
+    {
+        // Arrange
+        var profile = AvgPriceProfileBuilder.AProfile()
+            .WithCurrency(FiatCurrency.Usd)
+            .Build();
+
+        profile.AddLine(new DateOnly(2024, 1, 1), 0, AvgPriceLineTypes.Buy, 1m, FiatValue.New(50000m), "First");
+        profile.AddLine(new DateOnly(2024, 1, 1), 1, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(60000m), "Second");
+
+        var firstLine = profile.AvgPriceLines.First(x => x.Comment == "First");
+
+        profile.ClearEvents();
+
+        // Act
+        profile.MoveLineDown(firstLine);
+
+        // Assert - Both lines should have updated events
+        var updatedEvents = profile.Events.OfType<AvgPriceLineUpdatedEvent>().ToList();
+        Assert.That(updatedEvents.Count, Is.EqualTo(2));
+    }
+
+    [Test]
+    public void MoveLineDown_Should_Not_Change_Anything_When_Already_Last()
+    {
+        // Arrange
+        var profile = AvgPriceProfileBuilder.AProfile()
+            .WithCurrency(FiatCurrency.Usd)
+            .Build();
+
+        profile.AddLine(new DateOnly(2024, 1, 1), 0, AvgPriceLineTypes.Buy, 1m, FiatValue.New(50000m), "First");
+        profile.AddLine(new DateOnly(2024, 1, 1), 1, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(60000m), "Second");
+
+        var lastLine = profile.AvgPriceLines.First(x => x.Comment == "Second");
+
+        profile.ClearEvents();
+
+        // Act - Try to move last line down (should fail)
+        Assert.Throws<ArgumentOutOfRangeException>(() => profile.MoveLineDown(lastLine));
+    }
+
+    [Test]
+    public void MoveLineDown_Should_Only_Affect_Lines_On_Same_Date()
+    {
+        // Arrange
+        var profile = AvgPriceProfileBuilder.AProfile()
+            .WithCurrency(FiatCurrency.Usd)
+            .Build();
+
+        profile.AddLine(new DateOnly(2024, 1, 1), 0, AvgPriceLineTypes.Buy, 1m, FiatValue.New(50000m), "Day1 First");
+        profile.AddLine(new DateOnly(2024, 1, 1), 1, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(60000m), "Day1 Second");
+        profile.AddLine(new DateOnly(2024, 1, 2), 0, AvgPriceLineTypes.Buy, 0.25m, FiatValue.New(70000m), "Day2");
+
+        var day1First = profile.AvgPriceLines.First(x => x.Comment == "Day1 First");
+        var day2Line = profile.AvgPriceLines.First(x => x.Comment == "Day2");
+        var originalDay2Order = day2Line.DisplayOrder;
+
+        profile.ClearEvents();
+
+        // Act
+        profile.MoveLineDown(day1First);
+
+        // Assert - Day2 line should not be affected
+        Assert.That(day2Line.DisplayOrder, Is.EqualTo(originalDay2Order));
+    }
+
+    #endregion
+
+    #region Reordering and Recalculation Tests
+
+    [Test]
+    public void Recalculation_Should_Respect_Display_Order_For_Same_Date_Lines()
+    {
+        // Arrange
+        var profile = AvgPriceProfileBuilder.AProfile()
+            .WithCurrency(FiatCurrency.Usd)
+            .Build();
+
+        // Two buys on same day - order affects running totals
+        // First Buy: 1 BTC at $50,000 (order 0)
+        // Second Buy: 1 BTC at $60,000 (order 1)
+        profile.AddLine(new DateOnly(2024, 1, 1), 0, AvgPriceLineTypes.Buy, 1m, FiatValue.New(50000m), "First Buy");
+        profile.AddLine(new DateOnly(2024, 1, 1), 1, AvgPriceLineTypes.Buy, 1m, FiatValue.New(60000m), "Second Buy");
+
+        var orderedLines = profile.AvgPriceLines.OrderBy(x => x.DisplayOrder).ToList();
+
+        // Assert initial state - running totals show order
+        Assert.That(orderedLines[0].Totals.TotalCost, Is.EqualTo(50000m)); // Just first buy
+        Assert.That(orderedLines[1].Totals.TotalCost, Is.EqualTo(110000m)); // Both buys
+
+        var secondBuy = orderedLines[1];
+
+        // Act - Move second buy before first
+        profile.MoveLineUp(secondBuy);
+
+        // Assert - After reorder, running totals should change
+        var reorderedLines = profile.AvgPriceLines.OrderBy(x => x.DisplayOrder).ToList();
+        Assert.That(reorderedLines[0].Comment, Is.EqualTo("Second Buy"));
+        Assert.That(reorderedLines[1].Comment, Is.EqualTo("First Buy"));
+
+        // Running totals now reflect new order
+        Assert.That(reorderedLines[0].Totals.TotalCost, Is.EqualTo(60000m)); // Just second buy (now first)
+        Assert.That(reorderedLines[1].Totals.TotalCost, Is.EqualTo(110000m)); // Both buys
+    }
+
+    [Test]
+    public void Move_Should_Correctly_Recalculate_When_Reordering_Affects_Avg_Cost()
+    {
+        // Arrange - This test verifies that moving lines affects the running totals correctly
+        var profile = AvgPriceProfileBuilder.AProfile()
+            .WithCurrency(FiatCurrency.Usd)
+            .Build();
+
+        // Three buys on same day with different prices
+        // Order matters for running totals display
+        profile.AddLine(new DateOnly(2024, 1, 1), 0, AvgPriceLineTypes.Buy, 1m, FiatValue.New(50000m), "Cheap");     // Avg = 50000
+        profile.AddLine(new DateOnly(2024, 1, 1), 1, AvgPriceLineTypes.Buy, 1m, FiatValue.New(60000m), "Medium");    // Avg = 55000
+        profile.AddLine(new DateOnly(2024, 1, 1), 2, AvgPriceLineTypes.Buy, 1m, FiatValue.New(70000m), "Expensive"); // Avg = 60000
+
+        var expensiveLine = profile.AvgPriceLines.First(x => x.Comment == "Expensive");
+
+        // Initial state verification
+        var initialLines = profile.AvgPriceLines.OrderBy(x => x.DisplayOrder).ToList();
+        Assert.That(initialLines[0].Totals.AvgCostOfAcquisition.Value, Is.EqualTo(50000m));
+        Assert.That(initialLines[1].Totals.AvgCostOfAcquisition.Value, Is.EqualTo(55000m));
+        Assert.That(initialLines[2].Totals.AvgCostOfAcquisition.Value, Is.EqualTo(60000m));
+
+        // Act - Move expensive to first position (two moves up)
+        profile.MoveLineUp(expensiveLine);
+        profile.MoveLineUp(expensiveLine);
+
+        // Assert - New order: Expensive, Cheap, Medium
+        var reorderedLines = profile.AvgPriceLines.OrderBy(x => x.DisplayOrder).ToList();
+        Assert.That(reorderedLines[0].Comment, Is.EqualTo("Expensive"));
+        Assert.That(reorderedLines[1].Comment, Is.EqualTo("Cheap"));
+        Assert.That(reorderedLines[2].Comment, Is.EqualTo("Medium"));
+
+        // Verify recalculated averages
+        Assert.That(reorderedLines[0].Totals.AvgCostOfAcquisition.Value, Is.EqualTo(70000m)); // Just expensive
+        Assert.That(reorderedLines[1].Totals.AvgCostOfAcquisition.Value, Is.EqualTo(60000m)); // (70k + 50k) / 2
+        Assert.That(reorderedLines[2].Totals.AvgCostOfAcquisition.Value, Is.EqualTo(60000m)); // (70k + 50k + 60k) / 3
+    }
+
+    [Test]
+    public void Move_Should_Not_Raise_Events_When_No_Order_Change_Needed()
+    {
+        // Arrange - Single line on date, moving shouldn't change anything
+        var profile = AvgPriceProfileBuilder.AProfile()
+            .WithCurrency(FiatCurrency.Usd)
+            .Build();
+
+        profile.AddLine(new DateOnly(2024, 1, 1), 0, AvgPriceLineTypes.Buy, 1m, FiatValue.New(50000m), "Only");
+
+        var onlyLine = profile.AvgPriceLines.First();
+
+        profile.ClearEvents();
+
+        // Act - Try to move the only line (should throw since no adjacent line)
+        Assert.Throws<ArgumentOutOfRangeException>(() => profile.MoveLineUp(onlyLine));
+        Assert.Throws<ArgumentOutOfRangeException>(() => profile.MoveLineDown(onlyLine));
+    }
+
+    [Test]
+    public void RearrangeDisplayOrder_Should_Normalize_Display_Orders_To_Sequential()
+    {
+        // Arrange - Create profile with non-sequential display orders
+        var line1 = AvgPriceLineBuilder.ABuyLine()
+            .WithDate(new DateOnly(2024, 1, 1))
+            .WithDisplayOrder(5) // Non-sequential
+            .WithQuantity(1m)
+            .WithUnitPrice(FiatValue.New(50000m))
+            .Build();
+
+        var line2 = AvgPriceLineBuilder.ABuyLine()
+            .WithDate(new DateOnly(2024, 1, 1))
+            .WithDisplayOrder(10) // Non-sequential
+            .WithQuantity(0.5m)
+            .WithUnitPrice(FiatValue.New(60000m))
+            .Build();
+
+        var profile = AvgPriceProfileBuilder.AProfile()
+            .WithLines(line1, line2)
+            .Build();
+
+        // Get the line that's "second" (display order 10)
+        var secondLine = profile.AvgPriceLines.First(x => x.DisplayOrder == 10);
+
+        profile.ClearEvents();
+
+        // Act - Moving should normalize the display orders
+        profile.MoveLineUp(secondLine);
+
+        // Assert - Display orders should now be 0, 1 (normalized)
+        var orderedLines = profile.AvgPriceLines.OrderBy(x => x.DisplayOrder).ToList();
+        Assert.That(orderedLines[0].DisplayOrder, Is.EqualTo(0));
+        Assert.That(orderedLines[1].DisplayOrder, Is.EqualTo(1));
     }
 
     #endregion
