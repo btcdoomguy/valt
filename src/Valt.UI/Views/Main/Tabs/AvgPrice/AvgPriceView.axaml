@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:avgPrice="clr-namespace:Valt.UI.Views.Main.Tabs.AvgPrice"
+             xmlns:lang="clr-namespace:Valt.UI.Lang"
              mc:Ignorable="d" d:DesignWidth="1300" d:DesignHeight="650"
              x:Class="Valt.UI.Views.Main.Tabs.AvgPrice.AvgPriceView"
              x:DataType="avgPrice:AvgPriceViewModel">
@@ -15,10 +16,10 @@
             <ColumnDefinition Width="400" />   <!-- Right Column -->
         </Grid.ColumnDefinitions>
         <Border Grid.Column="0" Padding="15">
-            <Grid RowDefinitions="80, *">
-                <StackPanel Grid.Row="0">
-                    <Label>Profile</Label>
-                    <StackPanel Orientation="Horizontal">
+            <Grid RowDefinitions="50, *">
+                <!-- Header Row with Profile Selector and Add Button -->
+                <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto">
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10">
                         <ComboBox ItemsSource="{Binding Profiles}"
                                   SelectedItem="{Binding SelectedProfile}"
                                   HorizontalAlignment="Stretch"
@@ -40,17 +41,57 @@
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
-                        <Button Command="{Binding ManageProfilesCommand}">Manage</Button>
+                        <Button Command="{Binding ManageProfilesCommand}"
+                                Content="{x:Static lang:language.AvgPrice_ManageProfiles}" />
                     </StackPanel>
-                </StackPanel>
-                <DataGrid Grid.Row="1" ItemsSource="{Binding Lines}" AutoGenerateColumns="True">
-                    
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Command="{Binding AddOperationCommand}"
+                                Content="{x:Static lang:language.AvgPrice_AddOperation}" />
+                    </StackPanel>
+                </Grid>
+                <!-- Lines DataGrid -->
+                <DataGrid Grid.Row="1"
+                          ItemsSource="{Binding Lines}"
+                          SelectedItem="{Binding SelectedLine}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserReorderColumns="True"
+                          CanUserResizeColumns="True"
+                          CanUserSortColumns="True"
+                          SelectionMode="Single"
+                          Margin="0,10,0,0">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_Date}"
+                                            Binding="{Binding Date, StringFormat=\{0:yyyy-MM-dd\}}"
+                                            Width="100" />
+                        <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_Type}"
+                                            Binding="{Binding AvgPriceLineTypeId, Converter={StaticResource AvgPriceLineTypeConverter}}"
+                                            Width="80" />
+                        <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_Quantity}"
+                                            Binding="{Binding Quantity, StringFormat=N8}"
+                                            Width="120" />
+                        <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_UnitPrice}"
+                                            Binding="{Binding UnitPrice, StringFormat=N2}"
+                                            Width="120" />
+                        <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_TotalQuantity}"
+                                            Binding="{Binding TotalQuantity, StringFormat=N8}"
+                                            Width="120" />
+                        <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_TotalCost}"
+                                            Binding="{Binding TotalCost, StringFormat=N2}"
+                                            Width="120" />
+                        <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_AvgCost}"
+                                            Binding="{Binding AvgCostOfAcquisition, StringFormat=N2}"
+                                            Width="120" />
+                        <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_Comment}"
+                                            Binding="{Binding Comment}"
+                                            Width="*" />
+                    </DataGrid.Columns>
                 </DataGrid>
             </Grid>
         </Border>
         <StackPanel Grid.Column="1">
             <DataGrid>
-                
+
             </DataGrid>
         </StackPanel>
     </Grid>

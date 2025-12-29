@@ -1424,5 +1424,149 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.MonthlyTotals.AllExpensesInFiat", resourceCulture);
             }
         }
+
+        public static string AvgPriceLineEditor_AddTitle {
+            get {
+                return ResourceManager.GetString("AvgPriceLineEditor.AddTitle", resourceCulture);
+            }
+        }
+
+        public static string AvgPriceLineEditor_EditTitle {
+            get {
+                return ResourceManager.GetString("AvgPriceLineEditor.EditTitle", resourceCulture);
+            }
+        }
+
+        public static string AvgPriceLineEditor_Date {
+            get {
+                return ResourceManager.GetString("AvgPriceLineEditor.Date", resourceCulture);
+            }
+        }
+
+        public static string AvgPriceLineEditor_Type {
+            get {
+                return ResourceManager.GetString("AvgPriceLineEditor.Type", resourceCulture);
+            }
+        }
+
+        public static string AvgPriceLineEditor_Buy {
+            get {
+                return ResourceManager.GetString("AvgPriceLineEditor.Buy", resourceCulture);
+            }
+        }
+
+        public static string AvgPriceLineEditor_Sell {
+            get {
+                return ResourceManager.GetString("AvgPriceLineEditor.Sell", resourceCulture);
+            }
+        }
+
+        public static string AvgPriceLineEditor_Setup {
+            get {
+                return ResourceManager.GetString("AvgPriceLineEditor.Setup", resourceCulture);
+            }
+        }
+
+        public static string AvgPriceLineEditor_Quantity {
+            get {
+                return ResourceManager.GetString("AvgPriceLineEditor.Quantity", resourceCulture);
+            }
+        }
+
+        public static string AvgPriceLineEditor_UnitPrice {
+            get {
+                return ResourceManager.GetString("AvgPriceLineEditor.UnitPrice", resourceCulture);
+            }
+        }
+
+        public static string AvgPriceLineEditor_AvgCost {
+            get {
+                return ResourceManager.GetString("AvgPriceLineEditor.AvgCost", resourceCulture);
+            }
+        }
+
+        public static string AvgPriceLineEditor_Comment {
+            get {
+                return ResourceManager.GetString("AvgPriceLineEditor.Comment", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_ManageProfiles {
+            get {
+                return ResourceManager.GetString("AvgPrice.ManageProfiles", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_AddOperation {
+            get {
+                return ResourceManager.GetString("AvgPrice.AddOperation", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_Column_Date {
+            get {
+                return ResourceManager.GetString("AvgPrice.Column.Date", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_Column_Type {
+            get {
+                return ResourceManager.GetString("AvgPrice.Column.Type", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_Column_Quantity {
+            get {
+                return ResourceManager.GetString("AvgPrice.Column.Quantity", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_Column_UnitPrice {
+            get {
+                return ResourceManager.GetString("AvgPrice.Column.UnitPrice", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_Column_TotalQuantity {
+            get {
+                return ResourceManager.GetString("AvgPrice.Column.TotalQuantity", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_Column_TotalCost {
+            get {
+                return ResourceManager.GetString("AvgPrice.Column.TotalCost", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_Column_AvgCost {
+            get {
+                return ResourceManager.GetString("AvgPrice.Column.AvgCost", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_Column_Comment {
+            get {
+                return ResourceManager.GetString("AvgPrice.Column.Comment", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_LineType_Buy {
+            get {
+                return ResourceManager.GetString("AvgPrice.LineType.Buy", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_LineType_Sell {
+            get {
+                return ResourceManager.GetString("AvgPrice.LineType.Sell", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_LineType_Setup {
+            get {
+                return ResourceManager.GetString("AvgPrice.LineType.Setup", resourceCulture);
+            }
+        }
     }
 }

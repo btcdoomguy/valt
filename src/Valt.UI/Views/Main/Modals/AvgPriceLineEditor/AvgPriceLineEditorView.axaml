@@ -1,0 +1,122 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:lang="clr-namespace:Valt.UI.Lang"
+        xmlns:avgPriceLineEditor="clr-namespace:Valt.UI.Views.Main.Modals.AvgPriceLineEditor"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Views.Main.Modals.AvgPriceLineEditor.AvgPriceLineEditorView"
+        Title="{Binding WindowTitle}"
+        x:DataType="avgPriceLineEditor:AvgPriceLineEditorViewModel"
+        d:DesignWidth="450"
+        d:DesignHeight="400"
+        MaxWidth="450"
+        MaxHeight="400"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <avgPriceLineEditor:AvgPriceLineEditorViewModel />
+    </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" />
+    </Window.KeyBindings>
+    <Border>
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="{Binding WindowTitle}" TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+            <Border Classes="form-fields-area" Height="310" Padding="10">
+                <Grid RowDefinitions="70, 70, 70, 70">
+                    <!-- Date -->
+                    <Grid Grid.Row="0" ColumnDefinitions="*">
+                        <StackPanel Grid.Column="0" Margin="5">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.AvgPriceLineEditor_Date}" />
+                                <DatePicker HorizontalAlignment="Left"
+                                            DayFormat="ddd dd"
+                                            MonthFormat="MMMM"
+                                            YearFormat="yyyy"
+                                            Height="34"
+                                            SelectedDate="{Binding Date}">
+                                </DatePicker>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Line Type Radio Buttons -->
+                    <Grid Grid.Row="1" ColumnDefinitions="*">
+                        <StackPanel Grid.Column="0" Margin="5">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.AvgPriceLineEditor_Type}" />
+                                <StackPanel Orientation="Horizontal" Spacing="20">
+                                    <RadioButton Content="{x:Static lang:language.AvgPriceLineEditor_Buy}"
+                                                 IsChecked="{Binding IsBuy, Mode=OneWay}"
+                                                 GroupName="LineType"
+                                                 Command="{Binding SetBuyCommand}" />
+                                    <RadioButton Content="{x:Static lang:language.AvgPriceLineEditor_Sell}"
+                                                 IsChecked="{Binding IsSell, Mode=OneWay}"
+                                                 GroupName="LineType"
+                                                 Command="{Binding SetSellCommand}" />
+                                    <RadioButton Content="{x:Static lang:language.AvgPriceLineEditor_Setup}"
+                                                 IsChecked="{Binding IsSetup, Mode=OneWay}"
+                                                 GroupName="LineType"
+                                                 Command="{Binding SetSetupCommand}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Quantity and Unit Price -->
+                    <Grid Grid.Row="2" ColumnDefinitions="*, *">
+                        <StackPanel Grid.Column="0" Margin="5">
+                            <StackPanel Classes="form-field">
+                                <TextBlock>
+                                    <Run Text="{x:Static lang:language.AvgPriceLineEditor_Quantity}" />
+                                    <Run Text=" (" /><Run Text="{Binding AssetName}" /><Run Text=")" />
+                                </TextBlock>
+                                <TextBox Text="{Binding Quantity}"
+                                         Width="180"
+                                         HorizontalAlignment="Left" />
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="5">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{Binding UnitPriceLabel}" />
+                                <userControls:FiatInput
+                                    FiatValue="{Binding UnitPrice, Mode=TwoWay}"
+                                    Width="180"
+                                    HorizontalAlignment="Left">
+                                </userControls:FiatInput>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Comment -->
+                    <Grid Grid.Row="3" ColumnDefinitions="*">
+                        <StackPanel Grid.Column="0" Margin="5">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.AvgPriceLineEditor_Comment}" />
+                                <TextBox Text="{Binding Comment}"
+                                         HorizontalAlignment="Stretch" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+            <!-- Buttons -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10"
+                        Margin="0, 10, 0, 10">
+                <Button Width="100" Content="{x:Static lang:language.OkButton}"
+                        HorizontalContentAlignment="Center"
+                        Command="{Binding OkCommand}">
+                </Button>
+                <Button Width="100" Content="{x:Static lang:language.CancelButton}"
+                        HorizontalContentAlignment="Center"
+                        Command="{Binding CancelCommand}">
+                </Button>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

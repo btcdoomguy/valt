@@ -17,5 +17,6 @@ public enum ApplicationModalNames
     FixedExpenseEditor = 12,
     ChangePassword = 13,
     About = 14,
-    AvgPriceProfileManager = 15
+    AvgPriceProfileManager = 15,
+    AvgPriceLineEditor = 16
 }

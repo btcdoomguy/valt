@@ -11,6 +11,7 @@ using Valt.Infra.Modules.AvgPrice.Queries;
 using Valt.Infra.Modules.AvgPrice.Queries.DTOs;
 using Valt.UI.Base;
 using Valt.UI.Services;
+using Valt.UI.Views.Main.Modals.AvgPriceLineEditor;
 using Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles;
 
 namespace Valt.UI.Views.Main.Tabs.AvgPrice;
@@ -23,7 +24,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
     [ObservableProperty] private AvaloniaList<AvgPriceProfileDTO> _profiles = new();
     [ObservableProperty] private AvgPriceProfileDTO? _selectedProfile;
 
-    [ObservableProperty] private AvaloniaList<AvgPriceLineDTO> _lines;
+    [ObservableProperty] private AvaloniaList<AvgPriceLineDTO> _lines = new();
     public override MainViewTabNames TabName => MainViewTabNames.AvgPricePageContent;
 
     public AvgPriceViewModel()
@@ -67,8 +68,9 @@ public partial class AvgPriceViewModel : ValtTabViewModel
         Profiles.AddRange(profile);
     }
 
-    partial void OnSelectedProfileChanged(AvgPriceProfileDTO? value)
+    partial void OnSelectedProfileChanged(AvgPriceProfileDTO? oldValue, AvgPriceProfileDTO? newValue)
     {
+        AddOperationCommand.NotifyCanExecuteChanged();
         _ = FetchAvgPriceLines();
     }
 
@@ -82,6 +84,10 @@ public partial class AvgPriceViewModel : ValtTabViewModel
         Lines.Clear();
         Lines.AddRange(lines);
     }
+
+    [ObservableProperty] private AvgPriceLineDTO? _selectedLine;
+
+    public bool CanAddOperation => SelectedProfile is not null;
 
     [RelayCommand]
     private async Task ManageProfiles()
@@ -99,5 +105,66 @@ public partial class AvgPriceViewModel : ValtTabViewModel
             return;
 
         await FetchAvgPriceProfiles();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanAddOperation))]
+    private async Task AddOperation()
+    {
+        if (SelectedProfile is null)
+            return;
+
+        var ownerWindow = GetUserControlOwnerWindow()!;
+
+        var currency = FiatCurrency.GetFromCode(SelectedProfile.CurrencyCode);
+
+        var modal =
+            (AvgPriceLineEditorView)await _modalFactory.CreateAsync(ApplicationModalNames.AvgPriceLineEditor,
+                ownerWindow,
+                new AvgPriceLineEditorViewModel.Request
+                {
+                    ProfileId = SelectedProfile.Id,
+                    AssetName = SelectedProfile.AssetName,
+                    AssetPrecision = SelectedProfile.Precision,
+                    CurrencySymbol = currency.Symbol,
+                    CurrencySymbolOnRight = currency.SymbolOnRight
+                })!;
+
+        var result = await modal.ShowDialog<AvgPriceLineEditorViewModel.Response?>(ownerWindow);
+
+        if (result is null || !result.Ok)
+            return;
+
+        await FetchAvgPriceLines();
+    }
+
+    [RelayCommand]
+    private async Task EditOperation()
+    {
+        if (SelectedProfile is null || SelectedLine is null)
+            return;
+
+        var ownerWindow = GetUserControlOwnerWindow()!;
+
+        var currency = FiatCurrency.GetFromCode(SelectedProfile.CurrencyCode);
+
+        var modal =
+            (AvgPriceLineEditorView)await _modalFactory.CreateAsync(ApplicationModalNames.AvgPriceLineEditor,
+                ownerWindow,
+                new AvgPriceLineEditorViewModel.Request
+                {
+                    ProfileId = SelectedProfile.Id,
+                    AssetName = SelectedProfile.AssetName,
+                    AssetPrecision = SelectedProfile.Precision,
+                    CurrencySymbol = currency.Symbol,
+                    CurrencySymbolOnRight = currency.SymbolOnRight,
+                    ExistingLine = SelectedLine
+                })!;
+
+        var result = await modal.ShowDialog<AvgPriceLineEditorViewModel.Response?>(ownerWindow);
+
+        if (result is null || !result.Ok)
+            return;
+
+        await FetchAvgPriceLines();
     }
 }

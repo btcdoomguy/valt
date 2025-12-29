@@ -708,4 +708,76 @@
     <data name="Reports.MonthlyTotals.AllExpensesInFiat" xml:space="preserve">
         <value>Saídas (Total)</value>
     </data>
+    <data name="AvgPriceLineEditor.AddTitle" xml:space="preserve">
+        <value>Adicionar Linha</value>
+    </data>
+    <data name="AvgPriceLineEditor.EditTitle" xml:space="preserve">
+        <value>Editar Linha</value>
+    </data>
+    <data name="AvgPriceLineEditor.Date" xml:space="preserve">
+        <value>Data</value>
+    </data>
+    <data name="AvgPriceLineEditor.Type" xml:space="preserve">
+        <value>Tipo</value>
+    </data>
+    <data name="AvgPriceLineEditor.Buy" xml:space="preserve">
+        <value>Compra</value>
+    </data>
+    <data name="AvgPriceLineEditor.Sell" xml:space="preserve">
+        <value>Venda</value>
+    </data>
+    <data name="AvgPriceLineEditor.Setup" xml:space="preserve">
+        <value>Setup</value>
+    </data>
+    <data name="AvgPriceLineEditor.Quantity" xml:space="preserve">
+        <value>Quantidade</value>
+    </data>
+    <data name="AvgPriceLineEditor.UnitPrice" xml:space="preserve">
+        <value>Preço Unitário</value>
+    </data>
+    <data name="AvgPriceLineEditor.AvgCost" xml:space="preserve">
+        <value>Custo Médio</value>
+    </data>
+    <data name="AvgPriceLineEditor.Comment" xml:space="preserve">
+        <value>Comentário</value>
+    </data>
+    <data name="AvgPrice.ManageProfiles" xml:space="preserve">
+        <value>Gerenciar</value>
+    </data>
+    <data name="AvgPrice.AddOperation" xml:space="preserve">
+        <value>+ Adicionar Operação</value>
+    </data>
+    <data name="AvgPrice.Column.Date" xml:space="preserve">
+        <value>Data</value>
+    </data>
+    <data name="AvgPrice.Column.Type" xml:space="preserve">
+        <value>Tipo</value>
+    </data>
+    <data name="AvgPrice.Column.Quantity" xml:space="preserve">
+        <value>Quantidade</value>
+    </data>
+    <data name="AvgPrice.Column.UnitPrice" xml:space="preserve">
+        <value>Preço Unitário</value>
+    </data>
+    <data name="AvgPrice.Column.TotalQuantity" xml:space="preserve">
+        <value>Qtd Total</value>
+    </data>
+    <data name="AvgPrice.Column.TotalCost" xml:space="preserve">
+        <value>Custo Total</value>
+    </data>
+    <data name="AvgPrice.Column.AvgCost" xml:space="preserve">
+        <value>Custo Médio</value>
+    </data>
+    <data name="AvgPrice.Column.Comment" xml:space="preserve">
+        <value>Comentário</value>
+    </data>
+    <data name="AvgPrice.LineType.Buy" xml:space="preserve">
+        <value>Compra</value>
+    </data>
+    <data name="AvgPrice.LineType.Sell" xml:space="preserve">
+        <value>Venda</value>
+    </data>
+    <data name="AvgPrice.LineType.Setup" xml:space="preserve">
+        <value>Setup</value>
+    </data>
 </root>
