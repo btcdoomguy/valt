@@ -118,9 +118,18 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     {
         if (Design.IsDesignMode)
             return;
-        
-        PrepareAccountsAndCategoriesList();
-        
+
+        // Temporarily disable event handlers to prevent cascading updates during initialization
+        _ready = false;
+        try
+        {
+            PrepareAccountsAndCategoriesList();
+        }
+        finally
+        {
+            _ready = true;
+        }
+
         _ = FetchMonthlyTotalsAsync();
         _ = FetchExpensesByCategoryAsync();
         _ = FetchAllTimeHighDataAsync();
