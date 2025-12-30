@@ -34,7 +34,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
     [ObservableProperty] private AvaloniaList<AvgPriceProfileDTO> _profiles = new();
     [ObservableProperty] private AvgPriceProfileDTO? _selectedProfile;
 
-    [ObservableProperty] private AvaloniaList<AvgPriceLineDTO> _lines = new();
+    [ObservableProperty] private AvaloniaList<AvgPriceLineViewModel> _lines = new();
 
     // Totals filter properties
     [ObservableProperty] private DateTime _totalsFilterDate;
@@ -43,6 +43,10 @@ public partial class AvgPriceViewModel : ValtTabViewModel
     // Totals data
     [ObservableProperty] private AvaloniaList<AvgPriceTotalsRowViewModel> _totalsRows = new();
     [ObservableProperty] private bool _isTotalsLoading;
+
+    // Current position summary (from last line)
+    [ObservableProperty] private string _currentPosition = "-";
+    [ObservableProperty] private string _currentAvgPrice = "-";
 
     public override MainViewTabNames TabName => MainViewTabNames.AvgPricePageContent;
 
@@ -60,10 +64,11 @@ public partial class AvgPriceViewModel : ValtTabViewModel
 
         SelectedProfile = Profiles.FirstOrDefault();
 
-        Lines = new AvaloniaList<AvgPriceLineDTO>()
+        var testDto = new AvgPriceLineDTO(new AvgPriceLineId().Value, new DateOnly(2025, 12, 1), 0, (int)AvgPriceLineTypes.Buy,
+            0.5m, 600000m, "Test", 600000m, 3000m, 0.5m);
+        Lines = new AvaloniaList<AvgPriceLineViewModel>
         {
-            new AvgPriceLineDTO(new AvgPriceLineId().Value, new DateOnly(2025, 12, 1), 0, (int)AvgPriceLineTypes.Buy,
-                0.5m, 600000m, "Test", 600000m, 3000m, 0.5m)
+            new AvgPriceLineViewModel(testDto, 8, "pt-BR")
         };
 
         TotalsFilterDate = DateTime.Now;
@@ -118,18 +123,39 @@ public partial class AvgPriceViewModel : ValtTabViewModel
         if (SelectedProfile is null)
         {
             Lines.Clear();
+            CurrentPosition = "-";
+            CurrentAvgPrice = "-";
             return;
         }
 
-        var lines = await _avgPriceQueries.GetLinesOfProfileAsync(SelectedProfile.Id);
+        var dtos = await _avgPriceQueries.GetLinesOfProfileAsync(SelectedProfile.Id);
+        var currency = FiatCurrency.GetFromCode(SelectedProfile.CurrencyCode);
+        var viewModels = dtos.Select(dto => new AvgPriceLineViewModel(dto, SelectedProfile.Precision, currency.CultureName)).ToList();
 
         Lines.Clear();
-        Lines.AddRange(lines);
+        Lines.AddRange(viewModels);
+
+        // Update current position summary from the last line
+        UpdateCurrentPositionSummary();
     }
 
-    [ObservableProperty] private AvgPriceLineDTO? _selectedLine;
+    private void UpdateCurrentPositionSummary()
+    {
+        if (Lines.Count == 0 || SelectedProfile is null)
+        {
+            CurrentPosition = "-";
+            CurrentAvgPrice = "-";
+            return;
+        }
 
-    partial void OnSelectedLineChanged(AvgPriceLineDTO? value)
+        var lastLine = Lines.Last();
+        CurrentPosition = lastLine.TotalQuantity;
+        CurrentAvgPrice = lastLine.AvgCostOfAcquisition;
+    }
+
+    [ObservableProperty] private AvgPriceLineViewModel? _selectedLine;
+
+    partial void OnSelectedLineChanged(AvgPriceLineViewModel? value)
     {
         EditOperationCommand.NotifyCanExecuteChanged();
         DeleteOperationCommand.NotifyCanExecuteChanged();
@@ -179,10 +205,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
                 ownerWindow,
                 SelectedProfile?.Id)!;
 
-        var result = await modal.ShowDialog<ManageAvgPriceProfilesViewModel.Response?>(ownerWindow);
-
-        if (result is null)
-            return;
+        _ = await modal.ShowDialog<ManageAvgPriceProfilesViewModel.Response?>(ownerWindow);
 
         await FetchAvgPriceProfiles();
         await FetchAvgPriceLines();
@@ -238,7 +261,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
                     AssetPrecision = SelectedProfile.Precision,
                     CurrencySymbol = currency.Symbol,
                     CurrencySymbolOnRight = currency.SymbolOnRight,
-                    ExistingLine = SelectedLine
+                    ExistingLine = SelectedLine.ToDto()
                 })!;
 
         var result = await modal.ShowDialog<AvgPriceLineEditorViewModel.Response?>(ownerWindow);

@@ -819,4 +819,52 @@
     <data name="AvgPrice.Totals.YearlyTotal" xml:space="preserve">
         <value>TOTAL</value>
     </data>
+    <data name="AvgPrice.CurrentPosition" xml:space="preserve">
+        <value>Posição Atual</value>
+    </data>
+    <data name="AvgPrice.AveragePrice" xml:space="preserve">
+        <value>Preço Médio</value>
+    </data>
+    <data name="AvgPrice.Profiles.Title" xml:space="preserve">
+        <value>Perfis de Preço Médio</value>
+    </data>
+    <data name="AvgPrice.Profiles.ProfileName" xml:space="preserve">
+        <value>Nome do Perfil</value>
+    </data>
+    <data name="AvgPrice.Profiles.AssetType" xml:space="preserve">
+        <value>Tipo de Ativo</value>
+    </data>
+    <data name="AvgPrice.Profiles.Bitcoin" xml:space="preserve">
+        <value>Bitcoin</value>
+    </data>
+    <data name="AvgPrice.Profiles.CustomAsset" xml:space="preserve">
+        <value>Ativo Personalizado</value>
+    </data>
+    <data name="AvgPrice.Profiles.CustomAssetDetails" xml:space="preserve">
+        <value>Detalhes do Ativo</value>
+    </data>
+    <data name="AvgPrice.Profiles.AssetName" xml:space="preserve">
+        <value>Nome do Ativo</value>
+    </data>
+    <data name="AvgPrice.Profiles.Decimals" xml:space="preserve">
+        <value>Decimais</value>
+    </data>
+    <data name="AvgPrice.Profiles.FiatCurrency" xml:space="preserve">
+        <value>Moeda Fiduciária</value>
+    </data>
+    <data name="AvgPrice.Profiles.CalculationMethod" xml:space="preserve">
+        <value>Método de Cálculo</value>
+    </data>
+    <data name="AvgPrice.Profiles.Icon" xml:space="preserve">
+        <value>Ícone</value>
+    </data>
+    <data name="AvgPrice.Profiles.Visible" xml:space="preserve">
+        <value>Visível</value>
+    </data>
+    <data name="AvgPrice.Profiles.DeleteConfirm.Title" xml:space="preserve">
+        <value>Excluir Perfil</value>
+    </data>
+    <data name="AvgPrice.Profiles.DeleteConfirm.Message" xml:space="preserve">
+        <value>Este perfil possui {0} registro(s). Tem certeza que deseja excluí-lo? Todos os registros relacionados serão permanentemente excluídos.</value>
+    </data>
 </root>

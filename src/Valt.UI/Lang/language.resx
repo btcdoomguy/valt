@@ -824,4 +824,52 @@
     <data name="AvgPrice.Totals.YearlyTotal" xml:space="preserve">
         <value>TOTAL</value>
     </data>
+    <data name="AvgPrice.CurrentPosition" xml:space="preserve">
+        <value>Current Position</value>
+    </data>
+    <data name="AvgPrice.AveragePrice" xml:space="preserve">
+        <value>Average Price</value>
+    </data>
+    <data name="AvgPrice.Profiles.Title" xml:space="preserve">
+        <value>Average Price Profiles</value>
+    </data>
+    <data name="AvgPrice.Profiles.ProfileName" xml:space="preserve">
+        <value>Profile Name</value>
+    </data>
+    <data name="AvgPrice.Profiles.AssetType" xml:space="preserve">
+        <value>Asset Type</value>
+    </data>
+    <data name="AvgPrice.Profiles.Bitcoin" xml:space="preserve">
+        <value>Bitcoin</value>
+    </data>
+    <data name="AvgPrice.Profiles.CustomAsset" xml:space="preserve">
+        <value>Custom Asset</value>
+    </data>
+    <data name="AvgPrice.Profiles.CustomAssetDetails" xml:space="preserve">
+        <value>Custom Asset Details</value>
+    </data>
+    <data name="AvgPrice.Profiles.AssetName" xml:space="preserve">
+        <value>Asset Name</value>
+    </data>
+    <data name="AvgPrice.Profiles.Decimals" xml:space="preserve">
+        <value>Decimals</value>
+    </data>
+    <data name="AvgPrice.Profiles.FiatCurrency" xml:space="preserve">
+        <value>Fiat Currency</value>
+    </data>
+    <data name="AvgPrice.Profiles.CalculationMethod" xml:space="preserve">
+        <value>Calculation Method</value>
+    </data>
+    <data name="AvgPrice.Profiles.Icon" xml:space="preserve">
+        <value>Icon</value>
+    </data>
+    <data name="AvgPrice.Profiles.Visible" xml:space="preserve">
+        <value>Visible</value>
+    </data>
+    <data name="AvgPrice.Profiles.DeleteConfirm.Title" xml:space="preserve">
+        <value>Delete Profile</value>
+    </data>
+    <data name="AvgPrice.Profiles.DeleteConfirm.Message" xml:space="preserve">
+        <value>This profile has {0} record(s) registered. Are you sure you want to delete it? All related records will be permanently deleted.</value>
+    </data>
 </root>

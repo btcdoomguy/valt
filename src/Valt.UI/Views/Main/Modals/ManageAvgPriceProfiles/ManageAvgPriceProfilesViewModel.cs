@@ -94,9 +94,9 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
 
         AveragePriceProfiles =
         [
-            new AveragePriceProfileItem(new AvgPriceProfileId(), "Test 1"),
-            new AveragePriceProfileItem(new AvgPriceProfileId(), "Test 2"),
-            new AveragePriceProfileItem(new AvgPriceProfileId(), "Test 3"),
+            new AveragePriceProfileItem(new AvgPriceProfileId(), "Test 1", "BTC", '\uE84F', System.Drawing.Color.Orange),
+            new AveragePriceProfileItem(new AvgPriceProfileId(), "Test 2", "ETH", '\uE84F', System.Drawing.Color.Blue),
+            new AveragePriceProfileItem(new AvgPriceProfileId(), "Test 3", "SOL", '\uE84F', System.Drawing.Color.Purple),
         ];
 
         AvailableStrategies = new AvaloniaList<EnumItem>(EnumExtensions.ToList<AvgPriceCalculationMethod>());
@@ -120,10 +120,15 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
 
     private async Task FetchAvgPriceProfiles()
     {
-        var profile = await _avgPriceQueries.GetProfilesAsync(false);
+        var profiles = await _avgPriceQueries.GetProfilesAsync(false);
 
         AveragePriceProfiles.Clear();
-        AveragePriceProfiles.AddRange(profile.Select(x => new AveragePriceProfileItem(x.Id, x.Name)));
+        AveragePriceProfiles.AddRange(profiles.Select(x => new AveragePriceProfileItem(
+            x.Id,
+            x.Name,
+            x.AssetName,
+            x.Unicode,
+            x.Color)));
     }
     
     [RelayCommand]
@@ -237,8 +242,8 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
         if (lineCount > 0)
         {
             var confirmed = await MessageBoxHelper.ShowQuestionAsync(
-                "Delete Profile",
-                $"This profile has {lineCount} record(s) registered. Are you sure you want to delete it? All related records will be permanently deleted.",
+                Lang.language.AvgPrice_Profiles_DeleteConfirm_Title,
+                string.Format(Lang.language.AvgPrice_Profiles_DeleteConfirm_Message, lineCount),
                 GetWindow!());
 
             if (!confirmed)
