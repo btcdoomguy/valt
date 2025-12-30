@@ -80,4 +80,25 @@
         <Setter Property="VerticalAlignment" Value="Center" />
     </ControlTheme>
 
+    <!-- Custom button theme for CalendarDatePicker - simple calendar icon -->
+    <ControlTheme x:Key="ValtCalendarDatePickerButton" TargetType="Button">
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Text200Brush}" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{TemplateBinding Background}"
+                        CornerRadius="4">
+                    <TextBlock Text="&#xE935;"
+                               FontFamily="{StaticResource MaterialDesign}"
+                               FontSize="20"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Foreground="{TemplateBinding Foreground}" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
 </ResourceDictionary>

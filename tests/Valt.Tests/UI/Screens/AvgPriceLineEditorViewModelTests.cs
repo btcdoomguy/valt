@@ -185,7 +185,7 @@ public class AvgPriceLineEditorViewModelTests
         Assert.That(viewModel.LineId, Is.EqualTo(lineId.Value));
         Assert.That(viewModel.IsEditMode, Is.True);
         Assert.That(viewModel.IsInsertMode, Is.False);
-        Assert.That(viewModel.Date.Date, Is.EqualTo(new DateTime(2024, 6, 15)));
+        Assert.That(viewModel.Date!.Value.Date, Is.EqualTo(new DateTime(2024, 6, 15)));
         Assert.That(viewModel.LineType, Is.EqualTo(AvgPriceLineTypes.Buy));
         Assert.That(viewModel.Quantity, Is.EqualTo(1.5m));
         Assert.That(viewModel.Amount!.Value, Is.EqualTo(75000m));
@@ -327,7 +327,7 @@ public class AvgPriceLineEditorViewModelTests
         await viewModel.OnBindParameterAsync();
 
         // Set form values
-        viewModel.Date = new DateTimeOffset(new DateTime(2024, 6, 15));
+        viewModel.Date = new DateTime(2024, 6, 15);
         viewModel.LineType = AvgPriceLineTypes.Buy;
         viewModel.Quantity = 1m;
         viewModel.Amount = FiatValue.New(50000m);
@@ -389,7 +389,7 @@ public class AvgPriceLineEditorViewModelTests
         await viewModel.OnBindParameterAsync();
 
         // Update form values
-        viewModel.Date = new DateTimeOffset(new DateTime(2024, 6, 15));
+        viewModel.Date = new DateTime(2024, 6, 15);
         viewModel.Quantity = 2m;
         viewModel.Amount = FiatValue.New(90000m);
         viewModel.Comment = "Updated buy";

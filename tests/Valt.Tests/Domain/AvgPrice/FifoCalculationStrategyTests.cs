@@ -915,7 +915,7 @@ public class FifoCalculationStrategyTests
         var setup = AvgPriceLineBuilder.ASetupLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity(200m)
-            .WithAmount(FiatValue.New(35100m))
+            .WithAmount(FiatValue.New(175.50m)) // Avg price per unit
             .Build();
 
         // Buy 50 shares at $180.25

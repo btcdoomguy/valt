@@ -77,11 +77,11 @@ internal sealed class ValidPeriodStartForExistingExpenseAttribute : ValidationAt
 {
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
-        if (validationContext.ObjectInstance is FixedExpenseEditorViewModel vm && vm.FixedExpenseId != null)
+        if (validationContext.ObjectInstance is FixedExpenseEditorViewModel vm && vm.FixedExpenseId != null && vm.PeriodStart.HasValue)
         {
             try
             {
-                var date = DateOnly.FromDateTime(vm.PeriodStart.Date);
+                var date = DateOnly.FromDateTime(vm.PeriodStart.Value);
                 FixedExpenseRange newRange;
                 
                 if (vm.IsFixedSelectorVisible)

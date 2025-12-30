@@ -36,7 +36,7 @@ public partial class AvgPriceLineEditorViewModel : ValtModalValidatorViewModel
 
     [Required(ErrorMessage = "Date is required")]
     [ObservableProperty]
-    private DateTimeOffset _date = DateTimeOffset.Now;
+    private DateTime? _date = DateTime.Today;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsBuy))]
@@ -138,7 +138,7 @@ public partial class AvgPriceLineEditorViewModel : ValtModalValidatorViewModel
                 return;
             }
 
-            var date = DateOnly.FromDateTime(Date.Date);
+            var date = DateOnly.FromDateTime(Date!.Value);
 
             if (IsEditMode)
             {

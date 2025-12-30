@@ -84,7 +84,7 @@
                             Command="{Binding SetAvgPriceTabCommand}"
                             Margin="5,0">
                         <StackPanel Orientation="Horizontal">
-                            <Label Classes="icon" Content="&#xE26B;"></Label>
+                            <Label Classes="icon" Content="&#xE227;"></Label>
                             <Label Content="{x:Static local:language.Main_AvgPrice}" />
                         </StackPanel>
                     </Button>

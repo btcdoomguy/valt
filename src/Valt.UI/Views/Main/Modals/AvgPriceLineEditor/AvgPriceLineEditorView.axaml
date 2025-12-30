@@ -34,13 +34,11 @@
                         <StackPanel Grid.Column="0" Margin="5">
                             <StackPanel Classes="form-field">
                                 <TextBlock Text="{x:Static lang:language.AvgPriceLineEditor_Date}" />
-                                <DatePicker HorizontalAlignment="Left"
-                                            DayFormat="ddd dd"
-                                            MonthFormat="MMMM"
-                                            YearFormat="yyyy"
-                                            Height="34"
-                                            SelectedDate="{Binding Date}">
-                                </DatePicker>
+                                <CalendarDatePicker HorizontalAlignment="Left"
+                                                    SelectedDateFormat="Short"
+                                                    IsTodayHighlighted="True"
+                                                    Height="34"
+                                                    SelectedDate="{Binding Date}" />
                             </StackPanel>
                         </StackPanel>
                     </Grid>

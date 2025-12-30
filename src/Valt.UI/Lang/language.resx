@@ -705,7 +705,7 @@
         <value>Total</value>
     </data>
     <data name="Main.AvgPrice" xml:space="preserve">
-        <value>Average Price</value>
+        <value>Average Prices</value>
     </data>
     <data name="Reports.MonthlyTotals.AllIncomeInFiat" xml:space="preserve">
         <value>Total Income</value>
