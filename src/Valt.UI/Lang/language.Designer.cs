@@ -1610,5 +1610,41 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("AvgPrice.LineType.Setup", resourceCulture);
             }
         }
+
+        public static string AvgPrice_Totals_Period {
+            get {
+                return ResourceManager.GetString("AvgPrice.Totals.Period", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_Totals_Bought {
+            get {
+                return ResourceManager.GetString("AvgPrice.Totals.Bought", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_Totals_Sold {
+            get {
+                return ResourceManager.GetString("AvgPrice.Totals.Sold", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_Totals_ProfitLoss {
+            get {
+                return ResourceManager.GetString("AvgPrice.Totals.ProfitLoss", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_Totals_Volume {
+            get {
+                return ResourceManager.GetString("AvgPrice.Totals.Volume", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_Totals_YearlyTotal {
+            get {
+                return ResourceManager.GetString("AvgPrice.Totals.YearlyTotal", resourceCulture);
+            }
+        }
     }
 }

@@ -3,9 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Valt.Core.Common;
+using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Modules.AvgPrice;
 using Valt.Core.Modules.AvgPrice.Calculations;
 using Valt.Infra.Modules.AvgPrice.Queries;
@@ -14,8 +16,10 @@ using Valt.UI.Base;
 using Valt.UI.Services;
 using Valt.UI.Lang;
 using Valt.UI.Services.MessageBoxes;
+using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Modals.AvgPriceLineEditor;
 using Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles;
+using Valt.UI.Views.Main.Tabs.AvgPrice.Models;
 
 namespace Valt.UI.Views.Main.Tabs.AvgPrice;
 
@@ -23,12 +27,23 @@ public partial class AvgPriceViewModel : ValtTabViewModel
 {
     private readonly IAvgPriceQueries _avgPriceQueries;
     private readonly IAvgPriceRepository _avgPriceRepository;
+    private readonly IAvgPriceTotalizer _avgPriceTotalizer;
     private readonly IModalFactory _modalFactory;
+    private readonly IClock _clock;
 
     [ObservableProperty] private AvaloniaList<AvgPriceProfileDTO> _profiles = new();
     [ObservableProperty] private AvgPriceProfileDTO? _selectedProfile;
 
     [ObservableProperty] private AvaloniaList<AvgPriceLineDTO> _lines = new();
+
+    // Totals filter properties
+    [ObservableProperty] private DateTime _totalsFilterDate;
+    [ObservableProperty] private DateRange _totalsFilterRange = new(DateTime.MinValue, DateTime.MinValue);
+
+    // Totals data
+    [ObservableProperty] private AvaloniaList<AvgPriceTotalsRowViewModel> _totalsRows = new();
+    [ObservableProperty] private bool _isTotalsLoading;
+
     public override MainViewTabNames TabName => MainViewTabNames.AvgPricePageContent;
 
     public AvgPriceViewModel()
@@ -50,20 +65,33 @@ public partial class AvgPriceViewModel : ValtTabViewModel
             new AvgPriceLineDTO(new AvgPriceLineId().Value, new DateOnly(2025, 12, 1), 0, (int)AvgPriceLineTypes.Buy,
                 0.5m, 600000m, "Test", 600000m, 3000m, 0.5m)
         };
+
+        TotalsFilterDate = DateTime.Now;
     }
 
     public AvgPriceViewModel(IAvgPriceQueries avgPriceQueries,
         IAvgPriceRepository avgPriceRepository,
-        IModalFactory modalFactory)
+        IAvgPriceTotalizer avgPriceTotalizer,
+        IModalFactory modalFactory,
+        IClock clock)
     {
         _avgPriceQueries = avgPriceQueries;
         _avgPriceRepository = avgPriceRepository;
+        _avgPriceTotalizer = avgPriceTotalizer;
         _modalFactory = modalFactory;
+        _clock = clock;
+
+        TotalsFilterDate = _clock.GetCurrentDateTimeUtc();
     }
 
     public void Initialize()
     {
         _ = FetchAvgPriceProfiles();
+    }
+
+    partial void OnTotalsFilterRangeChanged(DateRange value)
+    {
+        _ = FetchTotalsAsync();
     }
 
     private async Task FetchAvgPriceProfiles()
@@ -82,6 +110,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
     {
         AddOperationCommand.NotifyCanExecuteChanged();
         _ = FetchAvgPriceLines();
+        _ = FetchTotalsAsync();
     }
 
     private async Task FetchAvgPriceLines()
@@ -336,6 +365,54 @@ public partial class AvgPriceViewModel : ValtTabViewModel
         {
             var ownerWindow = GetUserControlOwnerWindow()!;
             await MessageBoxHelper.ShowErrorAsync("Error", e.Message, ownerWindow);
+        }
+    }
+
+    private async Task FetchTotalsAsync()
+    {
+        if (SelectedProfile is null)
+        {
+            await Dispatcher.UIThread.InvokeAsync(() => TotalsRows.Clear());
+            return;
+        }
+
+        IsTotalsLoading = true;
+
+        try
+        {
+            var year = TotalsFilterDate.Year;
+            var profileId = new AvgPriceProfileId(SelectedProfile.Id);
+            var currency = FiatCurrency.GetFromCode(SelectedProfile.CurrencyCode);
+
+            var totals = await _avgPriceTotalizer.GetTotalsAsync(year, new[] { profileId });
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                TotalsRows.Clear();
+
+                // Add monthly rows
+                foreach (var monthlyTotal in totals.MonthlyTotals)
+                {
+                    TotalsRows.Add(new AvgPriceTotalsRowViewModel(monthlyTotal.Month, monthlyTotal.Values, currency));
+                }
+
+                // Add yearly total row
+                TotalsRows.Add(new AvgPriceTotalsRowViewModel(
+                    new DateTime(year, 1, 1),
+                    totals.YearlyTotals,
+                    currency,
+                    isYearlyTotal: true));
+
+                IsTotalsLoading = false;
+            });
+        }
+        catch (Exception)
+        {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                TotalsRows.Clear();
+                IsTotalsLoading = false;
+            });
         }
     }
 }

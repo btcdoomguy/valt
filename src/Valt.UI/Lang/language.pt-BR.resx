@@ -801,4 +801,22 @@
     <data name="AvgPrice.Column.Amount" xml:space="preserve">
         <value>Valor</value>
     </data>
+    <data name="AvgPrice.Totals.Period" xml:space="preserve">
+        <value>Período</value>
+    </data>
+    <data name="AvgPrice.Totals.Bought" xml:space="preserve">
+        <value>Comprado</value>
+    </data>
+    <data name="AvgPrice.Totals.Sold" xml:space="preserve">
+        <value>Vendido</value>
+    </data>
+    <data name="AvgPrice.Totals.ProfitLoss" xml:space="preserve">
+        <value>L/P</value>
+    </data>
+    <data name="AvgPrice.Totals.Volume" xml:space="preserve">
+        <value>Volume</value>
+    </data>
+    <data name="AvgPrice.Totals.YearlyTotal" xml:space="preserve">
+        <value>TOTAL</value>
+    </data>
 </root>

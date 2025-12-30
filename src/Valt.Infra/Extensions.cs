@@ -187,6 +187,7 @@ public static class Extensions
         services.AddSingleton<ITransactionTermService, TransactionTermService>();
         services.AddSingleton<IAccountTotalsCalculator, AccountTotalsCalculator>();
         services.AddSingleton<ITransactionAutoSatAmountCalculator, TransactionAutoSatAmountCalculator>();
+        services.AddSingleton<IAvgPriceTotalizer, AvgPriceTotalizer>();
 
         return services;
     }

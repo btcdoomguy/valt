@@ -3,6 +3,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:avgPrice="clr-namespace:Valt.UI.Views.Main.Tabs.AvgPrice"
+             xmlns:models="clr-namespace:Valt.UI.Views.Main.Tabs.AvgPrice.Models"
+             xmlns:userControls="clr-namespace:Valt.UI.UserControls"
              xmlns:lang="clr-namespace:Valt.UI.Lang"
              mc:Ignorable="d" d:DesignWidth="1300" d:DesignHeight="650"
              x:Class="Valt.UI.Views.Main.Tabs.AvgPrice.AvgPriceView"
@@ -12,8 +14,8 @@
     </Design.DataContext>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="400" />   <!-- Right Column -->
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="*" />   <!-- Right Column -->
         </Grid.ColumnDefinitions>
         <Border Grid.Column="0" Padding="15">
             <Grid RowDefinitions="50, *">
@@ -75,7 +77,7 @@
                     </DataGrid.ContextMenu>
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_Date}"
-                                            Binding="{Binding Date, StringFormat=\{0:yyyy-MM-dd\}}"
+                                            Binding="{Binding Date}"
                                             Width="100"
                                             CanUserSort="False" />
                         <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_Type}"
@@ -114,10 +116,62 @@
                 </DataGrid>
             </Grid>
         </Border>
-        <StackPanel Grid.Column="1">
-            <DataGrid>
+        <Border Grid.Column="1" Padding="15">
+            <StackPanel Orientation="Vertical" Spacing="10">
+                <!-- Year Filter -->
+                <userControls:DateCalendarSelector HorizontalContentAlignment="Center"
+                                                   Height="50"
+                                                   Date="{Binding TotalsFilterDate}"
+                                                   Range="{Binding TotalsFilterRange}">
+                    <userControls:DateCalendarSelector.AllowedSelectorModes>
+                        <userControls:DateCalendarSelectorMode>Year</userControls:DateCalendarSelectorMode>
+                    </userControls:DateCalendarSelector.AllowedSelectorModes>
+                </userControls:DateCalendarSelector>
 
-            </DataGrid>
-        </StackPanel>
+                <!-- Totals DataGrid -->
+                <Grid MinHeight="400">
+                    <DataGrid ItemsSource="{Binding TotalsRows}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              CanUserReorderColumns="False"
+                              CanUserResizeColumns="True"
+                              CanUserSortColumns="False"
+                              GridLinesVisibility="All"
+                              IsVisible="{Binding !IsTotalsLoading}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Totals_Period}"
+                                                Binding="{Binding Period}"
+                                                Width="100" />
+                            <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Totals_Bought}"
+                                                Binding="{Binding AmountBought}"
+                                                Width="*" />
+                            <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Totals_Sold}"
+                                                Binding="{Binding AmountSold}"
+                                                Width="*" />
+                            <DataGridTemplateColumn Header="{x:Static lang:language.AvgPrice_Totals_ProfitLoss}"
+                                                    Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate DataType="models:AvgPriceTotalsRowViewModel">
+                                        <TextBlock Text="{Binding ProfitLoss}"
+                                                   Foreground="{Binding ProfitLossColor}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="8,0" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Totals_Volume}"
+                                                Binding="{Binding Volume}"
+                                                Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <TextBlock Text="{x:Static lang:language.Loading}"
+                               FontSize="14"
+                               Foreground="{DynamicResource Text400Brush}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               IsVisible="{Binding IsTotalsLoading}" />
+                </Grid>
+            </StackPanel>
+        </Border>
     </Grid>
 </UserControl>
