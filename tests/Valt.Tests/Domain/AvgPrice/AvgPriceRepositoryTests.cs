@@ -122,7 +122,7 @@ public class AvgPriceRepositoryTests : DatabaseTest
             displayOrder: 1,
             AvgPriceLineTypes.Buy,
             100m, // 100 shares
-            FiatValue.New(500m), // $500 per share
+            FiatValue.New(500m),
             "First stock buy");
 
         var repository = new AvgPriceRepository(_localDatabase, _domainEventPublisher);
@@ -141,7 +141,8 @@ public class AvgPriceRepositoryTests : DatabaseTest
         Assert.That(restoredProfile.AvgPriceLines.Count, Is.EqualTo(1));
         var line = restoredProfile.AvgPriceLines.First();
         Assert.That(line.Quantity, Is.EqualTo(100m));
-        Assert.That(line.UnitPrice.Value, Is.EqualTo(500m));
+        Assert.That(line.Amount.Value, Is.EqualTo(500m));
+        Assert.That(line.UnitPrice.Value, Is.EqualTo(5m));
         Assert.That(line.Comment, Is.EqualTo("First stock buy"));
     }
 
@@ -170,7 +171,7 @@ public class AvgPriceRepositoryTests : DatabaseTest
             displayOrder: 1,
             AvgPriceLineTypes.Buy,
             0.5m, // 0.5 BTC
-            FiatValue.New(60000m),
+            FiatValue.New(30000m),
             "Buy more BTC");
 
         var repository = new AvgPriceRepository(_localDatabase, _domainEventPublisher);

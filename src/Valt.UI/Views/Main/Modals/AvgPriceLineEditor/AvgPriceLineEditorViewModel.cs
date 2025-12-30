@@ -42,25 +42,25 @@ public partial class AvgPriceLineEditorViewModel : ValtModalValidatorViewModel
     [NotifyPropertyChangedFor(nameof(IsBuy))]
     [NotifyPropertyChangedFor(nameof(IsSell))]
     [NotifyPropertyChangedFor(nameof(IsSetup))]
-    [NotifyPropertyChangedFor(nameof(UnitPriceLabel))]
+    [NotifyPropertyChangedFor(nameof(AmountLabel))]
     private AvgPriceLineTypes _lineType = AvgPriceLineTypes.Buy;
 
     public bool IsBuy => LineType == AvgPriceLineTypes.Buy;
     public bool IsSell => LineType == AvgPriceLineTypes.Sell;
     public bool IsSetup => LineType == AvgPriceLineTypes.Setup;
 
-    public string UnitPriceLabel => IsSetup
+    public string AmountLabel => IsSetup
         ? language.AvgPriceLineEditor_AvgCost
-        : language.AvgPriceLineEditor_UnitPrice;
+        : language.AvgPriceLineEditor_Amount;
 
     [Required(ErrorMessage = "Quantity is required")]
     [Range(0.00000001, double.MaxValue, ErrorMessage = "Quantity must be greater than zero")]
     [ObservableProperty]
     private decimal _quantity;
 
-    [Required(ErrorMessage = "Unit price is required")]
+    [Required(ErrorMessage = "Amount is required")]
     [ObservableProperty]
-    private FiatValue? _unitPrice = FiatValue.Empty;
+    private FiatValue? _amount = FiatValue.Empty;
 
     [ObservableProperty] private string _comment = string.Empty;
 
@@ -104,7 +104,7 @@ public partial class AvgPriceLineEditorViewModel : ValtModalValidatorViewModel
             Date = request.ExistingLine.Date.ToDateTime(TimeOnly.MinValue);
             LineType = (AvgPriceLineTypes)request.ExistingLine.AvgPriceLineTypeId;
             Quantity = request.ExistingLine.Quantity;
-            UnitPrice = FiatValue.New(request.ExistingLine.UnitPrice);
+            Amount = FiatValue.New(request.ExistingLine.Amount);
             Comment = request.ExistingLine.Comment;
             DisplayOrder = request.ExistingLine.DisplayOrder;
         }
@@ -151,7 +151,7 @@ public partial class AvgPriceLineEditorViewModel : ValtModalValidatorViewModel
             }
 
             // Add the new/updated line
-            profile.AddLine(date, DisplayOrder, LineType, Quantity, UnitPrice!, Comment);
+            profile.AddLine(date, DisplayOrder, LineType, Quantity, Amount!, Comment);
 
             await _avgPriceRepository.SaveAvgPriceProfileAsync(profile);
 

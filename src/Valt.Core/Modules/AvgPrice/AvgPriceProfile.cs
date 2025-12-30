@@ -83,12 +83,12 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
         Recalculate(orderedList);
     }
 
-    public void AddLine(DateOnly date, int displayOrder, AvgPriceLineTypes type, decimal quantity, FiatValue fiatValue,
+    public void AddLine(DateOnly date, int displayOrder, AvgPriceLineTypes type, decimal quantity, FiatValue amount,
         string comment)
     {
         var copiedList = _avgPriceLines.ToList();
 
-        var newLine = AvgPriceLine.New(date, displayOrder, type, quantity, fiatValue, comment);
+        var newLine = AvgPriceLine.New(date, displayOrder, type, quantity, amount, comment);
         copiedList.Add(newLine);
 
         var orderedList = copiedList.OrderBy(x => x.Date).ThenBy(x => x.DisplayOrder).ToList();

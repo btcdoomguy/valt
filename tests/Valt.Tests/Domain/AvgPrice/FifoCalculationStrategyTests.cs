@@ -38,7 +38,7 @@ public class FifoCalculationStrategyTests
         var line = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((0.1m))
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(5000m))
             .Build();
 
         var lines = new List<AvgPriceLine> { line };
@@ -62,7 +62,7 @@ public class FifoCalculationStrategyTests
         var line = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((0.001m))
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(50m))
             .Build();
 
         var lines = new List<AvgPriceLine> { line };
@@ -91,14 +91,14 @@ public class FifoCalculationStrategyTests
             .WithDate(new DateOnly(2024, 1, 1))
             .WithDisplayOrder(1)
             .WithQuantity((0.1m))
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(5000m))
             .Build();
 
         var line2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithDisplayOrder(1)
             .WithQuantity((0.2m))
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(12000m))
             .Build();
 
         var lines = new List<AvgPriceLine> { line1, line2 };
@@ -126,14 +126,14 @@ public class FifoCalculationStrategyTests
             .WithDate(new DateOnly(2024, 1, 1))
             .WithDisplayOrder(1)
             .WithQuantity((0.5m))
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(25000m))
             .Build();
 
         var buy2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithDisplayOrder(2)
             .WithQuantity((0.5m))
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(30000m))
             .Build();
 
         var lines = new List<AvgPriceLine> { buy1, buy2 };
@@ -166,19 +166,19 @@ public class FifoCalculationStrategyTests
         var buy1 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(40000m))
+            .WithAmount(FiatValue.New(40000m))
             .Build();
 
         var buy2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(60000m))
             .Build();
 
         var sell = AvgPriceLineBuilder.ASellLine()
             .WithDate(new DateOnly(2024, 1, 3))
             .WithQuantity((0.5m))
-            .WithUnitPrice(FiatValue.New(70000m)) // Sell price doesn't affect cost basis in FIFO
+            .WithAmount(FiatValue.New(70000m)) // Sell price doesn't affect cost basis in FIFO
             .Build();
 
         var lines = new List<AvgPriceLine> { buy1, buy2, sell };
@@ -208,19 +208,19 @@ public class FifoCalculationStrategyTests
         var buy1 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(40000m))
+            .WithAmount(FiatValue.New(40000m))
             .Build();
 
         var buy2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(60000m))
             .Build();
 
         var sell = AvgPriceLineBuilder.ASellLine()
             .WithDate(new DateOnly(2024, 1, 3))
             .WithQuantity((1.5m))
-            .WithUnitPrice(FiatValue.New(70000m))
+            .WithAmount(FiatValue.New(70000m))
             .Build();
 
         var lines = new List<AvgPriceLine> { buy1, buy2, sell };
@@ -249,13 +249,13 @@ public class FifoCalculationStrategyTests
         var buyLine = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(50000m))
             .Build();
 
         var sellLine = AvgPriceLineBuilder.ASellLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity((0.5m))
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(60000m))
             .Build();
 
         var lines = new List<AvgPriceLine> { buyLine, sellLine };
@@ -286,19 +286,19 @@ public class FifoCalculationStrategyTests
         var buy1 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(50000m))
             .Build();
 
         var sell = AvgPriceLineBuilder.ASellLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(60000m))
             .Build();
 
         var buy2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 3))
             .WithQuantity((0.5m))
-            .WithUnitPrice(FiatValue.New(70000m))
+            .WithAmount(FiatValue.New(35000m))
             .Build();
 
         var lines = new List<AvgPriceLine> { buy1, sell, buy2 };
@@ -332,19 +332,19 @@ public class FifoCalculationStrategyTests
         var buy1 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(40000m))
+            .WithAmount(FiatValue.New(40000m))
             .Build();
 
         var sell = AvgPriceLineBuilder.ASellLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity((0.5m))
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(25000m))
             .Build();
 
         var buy2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 3))
             .WithQuantity((0.3m))
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(18000m))
             .Build();
 
         var lines = new List<AvgPriceLine> { buy1, sell, buy2 };
@@ -384,25 +384,25 @@ public class FifoCalculationStrategyTests
         var buy1 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((0.5m))
-            .WithUnitPrice(FiatValue.New(30000m))
+            .WithAmount(FiatValue.New(15000m))
             .Build();
 
         var buy2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity((0.5m))
-            .WithUnitPrice(FiatValue.New(40000m))
+            .WithAmount(FiatValue.New(20000m))
             .Build();
 
         var buy3 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 3))
             .WithQuantity((0.5m))
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(25000m))
             .Build();
 
         var sell = AvgPriceLineBuilder.ASellLine()
             .WithDate(new DateOnly(2024, 1, 4))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(60000m))
             .Build();
 
         var lines = new List<AvgPriceLine> { buy1, buy2, buy3, sell };
@@ -431,13 +431,13 @@ public class FifoCalculationStrategyTests
         var buy = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(50000m))
             .Build();
 
         var setup = AvgPriceLineBuilder.ASetupLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity((2m)) // New BTC amount
-            .WithUnitPrice(FiatValue.New(45000m)) // New avg price
+            .WithAmount(FiatValue.New(45000m)) // New avg price per unit
             .Build();
 
         var lines = new List<AvgPriceLine> { buy, setup };
@@ -468,13 +468,13 @@ public class FifoCalculationStrategyTests
         var setup = AvgPriceLineBuilder.ASetupLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(40000m))
+            .WithAmount(FiatValue.New(40000m))
             .Build();
 
         var buy = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity((0.5m))
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(30000m))
             .Build();
 
         var lines = new List<AvgPriceLine> { setup, buy };
@@ -507,19 +507,19 @@ public class FifoCalculationStrategyTests
         var setup = AvgPriceLineBuilder.ASetupLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(40000m))
+            .WithAmount(FiatValue.New(40000m))
             .Build();
 
         var buy = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(60000m))
             .Build();
 
         var sell = AvgPriceLineBuilder.ASellLine()
             .WithDate(new DateOnly(2024, 1, 3))
             .WithQuantity((0.5m))
-            .WithUnitPrice(FiatValue.New(70000m))
+            .WithAmount(FiatValue.New(70000m))
             .Build();
 
         var lines = new List<AvgPriceLine> { setup, buy, sell };
@@ -561,19 +561,19 @@ public class FifoCalculationStrategyTests
         var buy1 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(40000m))
+            .WithAmount(FiatValue.New(40000m))
             .Build();
 
         var buy2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(60000m))
             .Build();
 
         var sell = AvgPriceLineBuilder.ASellLine()
             .WithDate(new DateOnly(2024, 1, 3))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(70000m))
+            .WithAmount(FiatValue.New(70000m))
             .Build();
 
         var lines = new List<AvgPriceLine> { buy1, buy2, sell };
@@ -600,34 +600,34 @@ public class FifoCalculationStrategyTests
         var buy1 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(30000m))
+            .WithAmount(FiatValue.New(30000m))
             .Build();
 
         var buy2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(50000m))
             .Build();
 
         var sell1 = AvgPriceLineBuilder.ASellLine()
             .WithDate(new DateOnly(2024, 1, 3))
             .WithDisplayOrder(1)
             .WithQuantity((0.5m))
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(60000m))
             .Build();
 
         var sell2 = AvgPriceLineBuilder.ASellLine()
             .WithDate(new DateOnly(2024, 1, 3))
             .WithDisplayOrder(2)
             .WithQuantity((0.5m))
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(60000m))
             .Build();
 
         var sell3 = AvgPriceLineBuilder.ASellLine()
             .WithDate(new DateOnly(2024, 1, 3))
             .WithDisplayOrder(3)
             .WithQuantity((0.5m))
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(60000m))
             .Build();
 
         var lines = new List<AvgPriceLine> { buy1, buy2, sell1, sell2, sell3 };
@@ -667,19 +667,19 @@ public class FifoCalculationStrategyTests
         var buy1 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(20000m))
+            .WithAmount(FiatValue.New(20000m))
             .Build();
 
         var buy2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(80000m))
+            .WithAmount(FiatValue.New(80000m))
             .Build();
 
         var sell = AvgPriceLineBuilder.ASellLine()
             .WithDate(new DateOnly(2024, 1, 3))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(60000m))
             .Build();
 
         var lines = new List<AvgPriceLine> { buy1, buy2, sell };
@@ -724,7 +724,7 @@ public class FifoCalculationStrategyTests
         var line = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity(10m)
-            .WithUnitPrice(FiatValue.New(500m))
+            .WithAmount(FiatValue.New(5000m))
             .Build();
 
         var lines = new List<AvgPriceLine> { line };
@@ -758,14 +758,14 @@ public class FifoCalculationStrategyTests
         var buy1 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity(3m)
-            .WithUnitPrice(FiatValue.New(175.33m))
+            .WithAmount(FiatValue.New(525.99m))
             .Build();
 
         // Buy 7 shares at $180.67
         var buy2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity(7m)
-            .WithUnitPrice(FiatValue.New(180.67m))
+            .WithAmount(FiatValue.New(1264.69m))
             .Build();
 
         var lines = new List<AvgPriceLine> { buy1, buy2 };
@@ -803,21 +803,21 @@ public class FifoCalculationStrategyTests
         var buy1 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity(100m)
-            .WithUnitPrice(FiatValue.New(300m))
+            .WithAmount(FiatValue.New(30000m))
             .Build();
 
         // Buy 50 shares at $350.00 (second lot)
         var buy2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity(50m)
-            .WithUnitPrice(FiatValue.New(350m))
+            .WithAmount(FiatValue.New(17500m))
             .Build();
 
         // Sell 80 shares (should come from first lot in FIFO)
         var sell = AvgPriceLineBuilder.ASellLine()
             .WithDate(new DateOnly(2024, 1, 3))
             .WithQuantity(80m)
-            .WithUnitPrice(FiatValue.New(400m)) // Sell price doesn't affect cost basis
+            .WithAmount(FiatValue.New(32000m)) // Sell price doesn't affect cost basis
             .Build();
 
         var lines = new List<AvgPriceLine> { buy1, buy2, sell };
@@ -854,21 +854,21 @@ public class FifoCalculationStrategyTests
         var buy1 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity(50m)
-            .WithUnitPrice(FiatValue.New(140.50m))
+            .WithAmount(FiatValue.New(7025m))
             .Build();
 
         // Sell 30 shares
         var sell = AvgPriceLineBuilder.ASellLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity(30m)
-            .WithUnitPrice(FiatValue.New(150m))
+            .WithAmount(FiatValue.New(4500m))
             .Build();
 
         // Buy 25 shares at $145.75
         var buy2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 3))
             .WithQuantity(25m)
-            .WithUnitPrice(FiatValue.New(145.75m))
+            .WithAmount(FiatValue.New(3643.75m))
             .Build();
 
         var lines = new List<AvgPriceLine> { buy1, sell, buy2 };
@@ -915,14 +915,14 @@ public class FifoCalculationStrategyTests
         var setup = AvgPriceLineBuilder.ASetupLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity(200m)
-            .WithUnitPrice(FiatValue.New(175.50m))
+            .WithAmount(FiatValue.New(35100m))
             .Build();
 
         // Buy 50 shares at $180.25
         var buy = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity(50m)
-            .WithUnitPrice(FiatValue.New(180.25m))
+            .WithAmount(FiatValue.New(9012.5m))
             .Build();
 
         var lines = new List<AvgPriceLine> { setup, buy };

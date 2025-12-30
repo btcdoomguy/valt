@@ -52,7 +52,7 @@ internal sealed class AvgPriceQueries : IAvgPriceQueries
             x.DisplayOrder,
             x.AvgPriceLineTypeId,
             x.Quantity,
-            x.UnitPrice,
+            x.Amount,
             x.Comment,
             x.AvgCostOfAcquisition,
             x.TotalCost,

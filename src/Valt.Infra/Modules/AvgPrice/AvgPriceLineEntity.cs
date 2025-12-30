@@ -11,6 +11,7 @@ public class AvgPriceLineEntity
     [BsonField("ord")] public int DisplayOrder { get; set; }
     [BsonField("type")] public int AvgPriceLineTypeId { get; set; }
     [BsonField("qt")] public decimal Quantity { get; set; }
+    [BsonField("amount")] public decimal Amount { get; set; }
     [BsonField("price")] public decimal UnitPrice { get; set; }
     [BsonField("notes")] public string Comment { get; set; } = null!;
     [BsonField("totalAvgCost")] public decimal AvgCostOfAcquisition { get; set; }

@@ -23,7 +23,7 @@ internal class BrazilianRuleCalculationStrategy : IAvgPriceCalculationStrategy
         {
             if (line.Type == AvgPriceLineTypes.Buy)
             {
-                totalCost += Math.Round(line.Quantity * line.UnitPrice.Value, _profile.Asset.Precision);
+                totalCost += Math.Round(line.Amount.Value, _profile.Asset.Precision);
                 quantity += line.Quantity;
                 avg = quantity > 0 ? Math.Round(totalCost / quantity, _profile.Asset.Precision) : 0m;
             }
@@ -39,7 +39,7 @@ internal class BrazilianRuleCalculationStrategy : IAvgPriceCalculationStrategy
             {
                 //Setup just overrides the current quantity and avg price
                 quantity = line.Quantity;
-                avg = line.UnitPrice.Value;
+                avg = line.Amount.Value;
                 totalCost = Math.Round(quantity * avg, _profile.Asset.Precision);
             }
 

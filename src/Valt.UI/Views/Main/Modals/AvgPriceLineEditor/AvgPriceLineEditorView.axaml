@@ -68,7 +68,7 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- Quantity and Unit Price -->
+                    <!-- Quantity and Amount -->
                     <Grid Grid.Row="2" ColumnDefinitions="*, *">
                         <StackPanel Grid.Column="0" Margin="5">
                             <StackPanel Classes="form-field">
@@ -83,9 +83,9 @@
                         </StackPanel>
                         <StackPanel Grid.Column="1" Margin="5">
                             <StackPanel Classes="form-field">
-                                <TextBlock Text="{Binding UnitPriceLabel}" />
+                                <TextBlock Text="{Binding AmountLabel}" />
                                 <userControls:FiatInput
-                                    FiatValue="{Binding UnitPrice, Mode=TwoWay}"
+                                    FiatValue="{Binding Amount, Mode=TwoWay}"
                                     Width="180"
                                     HorizontalAlignment="Left">
                                 </userControls:FiatInput>

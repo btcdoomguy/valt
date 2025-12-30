@@ -90,6 +90,10 @@
                                             Binding="{Binding UnitPrice, StringFormat=N2}"
                                             Width="120"
                                             CanUserSort="False"/>
+                        <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_Amount}"
+                                            Binding="{Binding Amount, StringFormat=N2}"
+                                            Width="120"
+                                            CanUserSort="False"/>
                         <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_TotalQuantity}"
                                             Binding="{Binding TotalQuantity, StringFormat=N8}"
                                             Width="120"

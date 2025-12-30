@@ -86,8 +86,8 @@ The solution follows clean architecture with three layers:
    // Good - Using builders with static factory methods
    var line = AvgPriceLineBuilder.ABuyLine()
        .WithDate(new DateOnly(2024, 1, 1))
-       .WithBtcAmount(BtcValue.ParseBitcoin(1m))
-       .WithBitcoinUnitPrice(FiatValue.New(50000m))
+       .WithQuantity(1m)
+       .WithAmount(FiatValue.New(50000m))
        .Build();
 
    var account = FiatAccountBuilder.AnAccount()

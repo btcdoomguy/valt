@@ -34,6 +34,7 @@ public static class Extensions
             DisplayOrder = line.DisplayOrder,
             TotalCost = line.Totals.TotalCost,
             AvgPriceLineType = line.Type,
+            Amount = line.Amount.Value,
             UnitPrice = line.UnitPrice.Value,
             ProfileId = new ObjectId(avgPriceProfileId),
             TotalQuantity = line.Totals.Quantity
@@ -55,7 +56,7 @@ public static class Extensions
                 line.DisplayOrder,
                 line.AvgPriceLineType,
                 line.Quantity,
-                line.UnitPrice,
+                line.Amount,
                 line.Comment,
                 new LineTotals(line.AvgCostOfAcquisition, line.TotalCost,
                     line.TotalQuantity))),

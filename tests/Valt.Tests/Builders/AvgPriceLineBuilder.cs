@@ -10,7 +10,7 @@ public class AvgPriceLineBuilder
     private int _displayOrder = 0;
     private AvgPriceLineTypes _type = AvgPriceLineTypes.Buy;
     private decimal _quantity = 0;
-    private FiatValue _bitcoinUnitPrice = FiatValue.Empty;
+    private FiatValue _amount = FiatValue.Empty;
     private string _comment = string.Empty;
     private LineTotals _totals = LineTotals.Empty;
 
@@ -44,9 +44,9 @@ public class AvgPriceLineBuilder
         return this;
     }
 
-    public AvgPriceLineBuilder WithUnitPrice(FiatValue bitcoinUnitPrice)
+    public AvgPriceLineBuilder WithAmount(FiatValue amount)
     {
-        _bitcoinUnitPrice = bitcoinUnitPrice;
+        _amount = amount;
         return this;
     }
 
@@ -64,7 +64,7 @@ public class AvgPriceLineBuilder
 
     public AvgPriceLine Build()
     {
-        return AvgPriceLine.Create(_id ?? new AvgPriceLineId(), _date, _displayOrder, _type, _quantity, _bitcoinUnitPrice, _comment, _totals);
+        return AvgPriceLine.Create(_id ?? new AvgPriceLineId(), _date, _displayOrder, _type, _quantity, _amount, _comment, _totals);
     }
 
     public static AvgPriceLineBuilder ABuyLine() => new AvgPriceLineBuilder().WithType(AvgPriceLineTypes.Buy);

@@ -127,11 +127,11 @@ public class AvgPriceLineEditorViewModelTests
         viewModel.SetSetupCommand.Execute(null);
 
         // Assert
-        Assert.That(viewModel.UnitPriceLabel, Does.Contain("Cost"));
+        Assert.That(viewModel.AmountLabel, Does.Contain("Cost"));
     }
 
     [Test]
-    public void Should_Show_UnitPrice_Label_When_Buy_Type_Selected()
+    public void Should_Show_Amount_Label_When_Buy_Type_Selected()
     {
         // Arrange
         var viewModel = CreateViewModel();
@@ -141,7 +141,7 @@ public class AvgPriceLineEditorViewModelTests
         viewModel.SetBuyCommand.Execute(null);
 
         // Assert
-        Assert.That(viewModel.UnitPriceLabel, Does.Contain("Price"));
+        Assert.That(viewModel.AmountLabel, Does.Contain("Amount"));
     }
 
     #endregion
@@ -160,7 +160,7 @@ public class AvgPriceLineEditorViewModelTests
             1,
             (int)AvgPriceLineTypes.Buy,
             1.5m,
-            50000m,
+            75000m,
             "Test comment",
             50000m,
             75000m,
@@ -188,7 +188,7 @@ public class AvgPriceLineEditorViewModelTests
         Assert.That(viewModel.Date.Date, Is.EqualTo(new DateTime(2024, 6, 15)));
         Assert.That(viewModel.LineType, Is.EqualTo(AvgPriceLineTypes.Buy));
         Assert.That(viewModel.Quantity, Is.EqualTo(1.5m));
-        Assert.That(viewModel.UnitPrice!.Value, Is.EqualTo(50000m));
+        Assert.That(viewModel.Amount!.Value, Is.EqualTo(75000m));
         Assert.That(viewModel.Comment, Is.EqualTo("Test comment"));
     }
 
@@ -330,7 +330,7 @@ public class AvgPriceLineEditorViewModelTests
         viewModel.Date = new DateTimeOffset(new DateTime(2024, 6, 15));
         viewModel.LineType = AvgPriceLineTypes.Buy;
         viewModel.Quantity = 1m;
-        viewModel.UnitPrice = FiatValue.New(50000m);
+        viewModel.Amount = FiatValue.New(50000m);
         viewModel.Comment = "New buy";
 
         // Act
@@ -391,7 +391,7 @@ public class AvgPriceLineEditorViewModelTests
         // Update form values
         viewModel.Date = new DateTimeOffset(new DateTime(2024, 6, 15));
         viewModel.Quantity = 2m;
-        viewModel.UnitPrice = FiatValue.New(50000m);
+        viewModel.Amount = FiatValue.New(90000m);
         viewModel.Comment = "Updated buy";
 
         // Act
@@ -434,7 +434,7 @@ public class AvgPriceLineEditorViewModelTests
 
         // Set invalid form values
         viewModel.Quantity = 0;
-        viewModel.UnitPrice = FiatValue.New(50000m);
+        viewModel.Amount = FiatValue.New(50000m);
 
         // Act
         await viewModel.OkCommand.ExecuteAsync(null);

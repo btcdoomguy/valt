@@ -52,8 +52,9 @@ internal class FifoCalculationStrategy : IAvgPriceCalculationStrategy
             else
             {
                 // Setup: clear the queue and add a single lot with the setup values
+                // For Setup, Amount represents the avg cost per unit (not total cost)
                 lots.Clear();
-                lots.Enqueue(new CostLot(line.Quantity, line.UnitPrice.Value));
+                lots.Enqueue(new CostLot(line.Quantity, line.Amount.Value));
             }
 
             // Calculate totals from remaining lots

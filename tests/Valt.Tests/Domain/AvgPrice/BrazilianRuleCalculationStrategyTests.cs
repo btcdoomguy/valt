@@ -38,7 +38,7 @@ public class BrazilianRuleCalculationStrategyTests
         var line = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((0.1m))
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(5000m))
             .Build();
 
         var lines = new List<AvgPriceLine> { line };
@@ -65,14 +65,14 @@ public class BrazilianRuleCalculationStrategyTests
             .WithDate(new DateOnly(2024, 1, 1))
             .WithDisplayOrder(1)
             .WithQuantity((0.1m))
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(5000m))
             .Build();
 
         var line2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithDisplayOrder(1)
             .WithQuantity((0.2m))
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(12000m))
             .Build();
 
         var lines = new List<AvgPriceLine> { line1, line2 };
@@ -101,13 +101,13 @@ public class BrazilianRuleCalculationStrategyTests
         var buyLine = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(50000m))
             .Build();
 
         var sellLine = AvgPriceLineBuilder.ASellLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity((0.5m))
-            .WithUnitPrice(FiatValue.New(60000m)) // Sell price doesn't affect avg in Brazilian rule
+            .WithAmount(FiatValue.New(60000m)) // Sell price doesn't affect avg in Brazilian rule
             .Build();
 
         var lines = new List<AvgPriceLine> { buyLine, sellLine };
@@ -141,19 +141,19 @@ public class BrazilianRuleCalculationStrategyTests
         var buy1 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(40000m))
+            .WithAmount(FiatValue.New(40000m))
             .Build();
 
         var sell = AvgPriceLineBuilder.ASellLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity((0.5m))
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(25000m))
             .Build();
 
         var buy2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 3))
             .WithQuantity((0.3m))
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(18000m))
             .Build();
 
         var lines = new List<AvgPriceLine> { buy1, sell, buy2 };
@@ -188,19 +188,19 @@ public class BrazilianRuleCalculationStrategyTests
         var buy1 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(50000m))
             .Build();
 
         var sell = AvgPriceLineBuilder.ASellLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(60000m))
             .Build();
 
         var buy2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 3))
             .WithQuantity((0.5m))
-            .WithUnitPrice(FiatValue.New(70000m))
+            .WithAmount(FiatValue.New(35000m))
             .Build();
 
         var lines = new List<AvgPriceLine> { buy1, sell, buy2 };
@@ -229,13 +229,13 @@ public class BrazilianRuleCalculationStrategyTests
         var buy = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(50000m))
             .Build();
 
         var setup = AvgPriceLineBuilder.ASetupLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity((2m)) // New BTC amount
-            .WithUnitPrice(FiatValue.New(45000m)) // New avg price
+            .WithAmount(FiatValue.New(45000m)) // New avg price
             .Build();
 
         var lines = new List<AvgPriceLine> { buy, setup };
@@ -266,13 +266,13 @@ public class BrazilianRuleCalculationStrategyTests
         var setup = AvgPriceLineBuilder.ASetupLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((1m))
-            .WithUnitPrice(FiatValue.New(40000m))
+            .WithAmount(FiatValue.New(40000m))
             .Build();
 
         var buy = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity((0.5m))
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(30000m))
             .Build();
 
         var lines = new List<AvgPriceLine> { setup, buy };
@@ -300,14 +300,14 @@ public class BrazilianRuleCalculationStrategyTests
             .WithDate(new DateOnly(2024, 1, 1))
             .WithDisplayOrder(1)
             .WithQuantity((0.5m))
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(25000m))
             .Build();
 
         var buy2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithDisplayOrder(2)
             .WithQuantity((0.5m))
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(30000m))
             .Build();
 
         var lines = new List<AvgPriceLine> { buy1, buy2 };
@@ -343,7 +343,7 @@ public class BrazilianRuleCalculationStrategyTests
         var line = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity((0.001m))
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(50m))
             .Build();
 
         var lines = new List<AvgPriceLine> { line };

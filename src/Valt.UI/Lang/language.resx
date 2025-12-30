@@ -737,8 +737,8 @@
     <data name="AvgPriceLineEditor.Quantity" xml:space="preserve">
         <value>Quantity</value>
     </data>
-    <data name="AvgPriceLineEditor.UnitPrice" xml:space="preserve">
-        <value>Unit Price</value>
+    <data name="AvgPriceLineEditor.Amount" xml:space="preserve">
+        <value>Amount</value>
     </data>
     <data name="AvgPriceLineEditor.AvgCost" xml:space="preserve">
         <value>Average Cost</value>
@@ -778,6 +778,9 @@
     </data>
     <data name="AvgPrice.Column.Quantity" xml:space="preserve">
         <value>Quantity</value>
+    </data>
+    <data name="AvgPrice.Column.Amount" xml:space="preserve">
+        <value>Amount</value>
     </data>
     <data name="AvgPrice.Column.UnitPrice" xml:space="preserve">
         <value>Unit Price</value>

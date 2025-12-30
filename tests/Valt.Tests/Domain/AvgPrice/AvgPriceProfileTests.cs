@@ -39,13 +39,13 @@ public class AvgPriceProfileTests
         var line1 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithQuantity(1)
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(50000m))
             .Build();
 
         var line2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithQuantity(0.5m)
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(60000m))
             .Build();
 
         // Act
@@ -96,7 +96,7 @@ public class AvgPriceProfileTests
             1,
             AvgPriceLineTypes.Buy,
             0.5m,
-            FiatValue.New(60000m),
+            FiatValue.New(30000m),
             "Second buy");
 
         profile.AddLine(
@@ -132,14 +132,14 @@ public class AvgPriceProfileTests
             .WithDate(new DateOnly(2024, 1, 1))
             .WithDisplayOrder(1)
             .WithQuantity(1m)
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(50000m))
             .Build();
 
         var line2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 2))
             .WithDisplayOrder(1)
             .WithQuantity(0.5m)
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(30000m))
             .Build();
 
         var profile = AvgPriceProfileBuilder.AProfile()
@@ -210,7 +210,7 @@ public class AvgPriceProfileTests
             2, // Second in order
             AvgPriceLineTypes.Buy,
             0.5m,
-            FiatValue.New(60000m),
+            FiatValue.New(30000m),
             "Second buy");
 
         profile.AddLine(
@@ -347,7 +347,7 @@ public class AvgPriceProfileTests
 
         // Add two buy lines
         profile.AddLine(new DateOnly(2024, 1, 1), 1, AvgPriceLineTypes.Buy, 1m, FiatValue.New(50000m), "First buy");
-        profile.AddLine(new DateOnly(2024, 1, 2), 1, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(60000m), "Second buy");
+        profile.AddLine(new DateOnly(2024, 1, 2), 1, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(30000m), "Second buy");
 
         // Get initial totals
         var orderedLines = profile.AvgPriceLines.OrderBy(x => x.Date).ToList();
@@ -422,10 +422,10 @@ public class AvgPriceProfileTests
         profile.AddLine(new DateOnly(2024, 1, 1), 1, AvgPriceLineTypes.Buy, 1m, FiatValue.New(50000m), "First buy");
 
         // Buy 0.5 BTC at $60,000
-        profile.AddLine(new DateOnly(2024, 1, 2), 1, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(60000m), "Second buy");
+        profile.AddLine(new DateOnly(2024, 1, 2), 1, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(30000m), "Second buy");
 
         // Sell 0.5 BTC (in Brazilian Rule, cost basis uses avg price)
-        profile.AddLine(new DateOnly(2024, 1, 3), 1, AvgPriceLineTypes.Sell, 0.5m, FiatValue.New(70000m), "Sell");
+        profile.AddLine(new DateOnly(2024, 1, 3), 1, AvgPriceLineTypes.Sell, 0.5m, FiatValue.New(35000m), "Sell");
 
         // Get Brazilian Rule result: After sell, remaining = 1 BTC with avg cost maintained
         var brazilianSellLine = profile.AvgPriceLines.First(x => x.Type == AvgPriceLineTypes.Sell);
@@ -703,7 +703,7 @@ public class AvgPriceProfileTests
         // After first: Total = $50,000, BTC = 1, Avg = $50,000
         // After second (current order): Total = $80,000, BTC = 1.5, Avg = $53,333.33
         profile.AddLine(new DateOnly(2024, 1, 1), 0, AvgPriceLineTypes.Buy, 1m, FiatValue.New(50000m), "Big Buy");
-        profile.AddLine(new DateOnly(2024, 1, 1), 1, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(60000m), "Small Buy");
+        profile.AddLine(new DateOnly(2024, 1, 1), 1, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(30000m), "Small Buy");
 
         var orderedLines = profile.AvgPriceLines.OrderBy(x => x.DisplayOrder).ToList();
         var smallBuy = orderedLines[1];
@@ -838,7 +838,7 @@ public class AvgPriceProfileTests
 
         // Big Buy first, Small Buy second
         profile.AddLine(new DateOnly(2024, 1, 1), 0, AvgPriceLineTypes.Buy, 1m, FiatValue.New(50000m), "Big Buy");
-        profile.AddLine(new DateOnly(2024, 1, 1), 1, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(60000m), "Small Buy");
+        profile.AddLine(new DateOnly(2024, 1, 1), 1, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(30000m), "Small Buy");
 
         var bigBuy = profile.AvgPriceLines.First(x => x.Comment == "Big Buy");
 
@@ -1029,14 +1029,14 @@ public class AvgPriceProfileTests
             .WithDate(new DateOnly(2024, 1, 1))
             .WithDisplayOrder(5) // Non-sequential
             .WithQuantity(1m)
-            .WithUnitPrice(FiatValue.New(50000m))
+            .WithAmount(FiatValue.New(50000m))
             .Build();
 
         var line2 = AvgPriceLineBuilder.ABuyLine()
             .WithDate(new DateOnly(2024, 1, 1))
             .WithDisplayOrder(10) // Non-sequential
             .WithQuantity(0.5m)
-            .WithUnitPrice(FiatValue.New(60000m))
+            .WithAmount(FiatValue.New(60000m))
             .Build();
 
         var profile = AvgPriceProfileBuilder.AProfile()
