@@ -124,9 +124,19 @@ public partial class TransactionListView : ValtBaseUserControl
 
     private void MainGrid_KeyDownHandler(object? sender, KeyEventArgs e)
     {
+        var vm = (DataContext as TransactionListViewModel)!;
+
+        if (e.Key == Key.C && e.KeyModifiers == KeyModifiers.Control)
+        {
+            if (vm.SelectedTransaction is null || !vm.IsSingleItemSelected) return;
+
+            _ = vm.CopyTransactionCommand.ExecuteAsync(vm.SelectedTransaction);
+            e.Handled = true;
+            return;
+        }
+
         if (e.Key != Key.Enter) return;
 
-        var vm = (DataContext as TransactionListViewModel)!;
         if (vm.SelectedTransaction is null) return;
 
         _ = vm.EditTransactionCommand.ExecuteAsync(vm.SelectedTransaction);

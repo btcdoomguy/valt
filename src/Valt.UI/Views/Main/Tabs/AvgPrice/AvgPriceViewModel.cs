@@ -96,7 +96,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
 
     partial void OnTotalsFilterRangeChanged(DateRange value)
     {
-        _ = FetchTotalsAsync();
+        _ = FetchTotals();
     }
 
     private async Task FetchAvgPriceProfiles()
@@ -115,7 +115,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
     {
         AddOperationCommand.NotifyCanExecuteChanged();
         _ = FetchAvgPriceLines();
-        _ = FetchTotalsAsync();
+        _ = FetchTotals();
     }
 
     private async Task FetchAvgPriceLines()
@@ -209,6 +209,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
 
         await FetchAvgPriceProfiles();
         await FetchAvgPriceLines();
+        await FetchTotals();
     }
 
     [RelayCommand(CanExecute = nameof(CanAddOperation))]
@@ -239,6 +240,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
             return;
 
         await FetchAvgPriceLines();
+        await FetchTotals();
     }
 
     [RelayCommand(CanExecute = nameof(CanEditOperation))]
@@ -270,6 +272,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
             return;
 
         await FetchAvgPriceLines();
+        await FetchTotals();
     }
 
     [RelayCommand(CanExecute = nameof(CanDeleteOperation))]
@@ -305,6 +308,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
             }
 
             await FetchAvgPriceLines();
+            await FetchTotals();
         }
         catch (Exception e)
         {
@@ -346,6 +350,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
             }
 
             await FetchAvgPriceLines();
+            await FetchTotals();
 
             // Re-select the moved line
             SelectedLine = Lines.FirstOrDefault(x => x.Id == SelectedLine?.Id);
@@ -380,6 +385,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
             }
 
             await FetchAvgPriceLines();
+            await FetchTotals();
 
             // Re-select the moved line
             SelectedLine = Lines.FirstOrDefault(x => x.Id == SelectedLine?.Id);
@@ -391,7 +397,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
         }
     }
 
-    private async Task FetchTotalsAsync()
+    private async Task FetchTotals()
     {
         if (SelectedProfile is null)
         {

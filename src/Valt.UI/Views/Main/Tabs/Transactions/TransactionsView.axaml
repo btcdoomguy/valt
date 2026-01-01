@@ -110,6 +110,7 @@
                                 Content="{x:Static local:language.Transactions_ViewAllAccounts}" />
                     </StackPanel>
                     <ListBox Grid.Row="1"
+                             x:Name="AccountsList"
                              Classes="accounts"
                              ItemsSource="{Binding Accounts}"
                              SelectedItem="{Binding SelectedAccount}"

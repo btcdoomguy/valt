@@ -65,7 +65,7 @@ public class ManageAvgPriceProfilesViewModelTests
         // Arrange
         var viewModel = CreateViewModel();
         var profileId = new AvgPriceProfileId();
-        var profile = new AveragePriceProfileItem(profileId.Value, "Test Profile");
+        var profile = CreateProfileItem(profileId.Value, "Test Profile");
 
         _avgPriceQueries.GetProfileAsync(Arg.Any<AvgPriceProfileId>())
             .Returns(Task.FromResult(CreateProfileDTO(profileId.Value, "Test Profile")));
@@ -87,7 +87,7 @@ public class ManageAvgPriceProfilesViewModelTests
         // Arrange
         var viewModel = CreateViewModel();
         var profileId = new AvgPriceProfileId();
-        var profile = new AveragePriceProfileItem(profileId.Value, "Test Profile");
+        var profile = CreateProfileItem(profileId.Value, "Test Profile");
 
         _avgPriceQueries.GetProfileAsync(Arg.Any<AvgPriceProfileId>())
             .Returns(Task.FromResult(CreateProfileDTO(profileId.Value, "Test Profile")));
@@ -111,7 +111,7 @@ public class ManageAvgPriceProfilesViewModelTests
         // Arrange
         var viewModel = CreateViewModel();
         var profileId = new AvgPriceProfileId();
-        var profile = new AveragePriceProfileItem(profileId.Value, "Test Profile");
+        var profile = CreateProfileItem(profileId.Value, "Test Profile");
 
         _avgPriceQueries.GetProfileAsync(Arg.Any<AvgPriceProfileId>())
             .Returns(Task.FromResult(CreateProfileDTO(profileId.Value, "Test Profile")));
@@ -137,7 +137,7 @@ public class ManageAvgPriceProfilesViewModelTests
         // Arrange
         var viewModel = CreateViewModel();
         var profileId = new AvgPriceProfileId();
-        var profile = new AveragePriceProfileItem(profileId.Value, "Test Profile");
+        var profile = CreateProfileItem(profileId.Value, "Test Profile");
 
         _avgPriceQueries.GetProfileAsync(Arg.Any<AvgPriceProfileId>())
             .Returns(Task.FromResult(CreateProfileDTO(profileId.Value, "Test Profile")));
@@ -300,11 +300,11 @@ public class ManageAvgPriceProfilesViewModelTests
         var expectedAssetName = "BTC";
         var expectedPrecision = 8;
 
-        var profileDTO = CreateProfileDTO(profileId.Value, expectedName, expectedAssetName, expectedPrecision);
+        var profileDto = CreateProfileDTO(profileId.Value, expectedName, expectedAssetName, expectedPrecision);
         _avgPriceQueries.GetProfileAsync(Arg.Any<AvgPriceProfileId>())
-            .Returns(Task.FromResult(profileDTO));
+            .Returns(Task.FromResult(profileDto));
 
-        var profile = new AveragePriceProfileItem(profileId.Value, expectedName);
+        var profile = CreateProfileItem(profileId.Value, expectedName, expectedAssetName);
 
         // Act
         viewModel.SelectedAveragePriceProfile = profile;
@@ -327,9 +327,9 @@ public class ManageAvgPriceProfilesViewModelTests
         var profileId = new AvgPriceProfileId();
         var originalName = "Original Name";
 
-        var profileDTO = CreateProfileDTO(profileId.Value, originalName);
+        var profileDto = CreateProfileDTO(profileId.Value, originalName);
         _avgPriceQueries.GetProfileAsync(Arg.Any<AvgPriceProfileId>())
-            .Returns(Task.FromResult(profileDTO));
+            .Returns(Task.FromResult(profileDto));
 
         var existingProfile = AvgPriceProfile.New(
             originalName,
@@ -342,7 +342,7 @@ public class ManageAvgPriceProfilesViewModelTests
         _avgPriceRepository.GetAvgPriceProfileByIdAsync(Arg.Any<AvgPriceProfileId>())
             .Returns(Task.FromResult<AvgPriceProfile?>(existingProfile));
 
-        var profile = new AveragePriceProfileItem(profileId.Value, originalName);
+        var profile = CreateProfileItem(profileId.Value, originalName);
         viewModel.SelectedAveragePriceProfile = profile;
 
         // Wait for async load
@@ -388,9 +388,9 @@ public class ManageAvgPriceProfilesViewModelTests
         var viewModel = CreateViewModel();
         var profileId = new AvgPriceProfileId();
 
-        var profileDTO = CreateProfileDTO(profileId.Value, "Test Profile");
+        var profileDto = CreateProfileDTO(profileId.Value, "Test Profile");
         _avgPriceQueries.GetProfileAsync(Arg.Any<AvgPriceProfileId>())
-            .Returns(Task.FromResult(profileDTO));
+            .Returns(Task.FromResult(profileDto));
 
         // No lines for this profile
         _avgPriceQueries.GetLinesOfProfileAsync(Arg.Any<AvgPriceProfileId>())
@@ -407,7 +407,7 @@ public class ManageAvgPriceProfilesViewModelTests
         _avgPriceRepository.GetAvgPriceProfileByIdAsync(Arg.Any<AvgPriceProfileId>())
             .Returns(Task.FromResult<AvgPriceProfile?>(existingProfile));
 
-        var profile = new AveragePriceProfileItem(profileId.Value, "Test Profile");
+        var profile = CreateProfileItem(profileId.Value, "Test Profile");
         viewModel.SelectedAveragePriceProfile = profile;
 
         // Wait for async load
@@ -427,9 +427,9 @@ public class ManageAvgPriceProfilesViewModelTests
         var viewModel = CreateViewModel();
         var profileId = new AvgPriceProfileId();
 
-        var profileDTO = CreateProfileDTO(profileId.Value, "Test Profile");
+        var profileDto = CreateProfileDTO(profileId.Value, "Test Profile");
         _avgPriceQueries.GetProfileAsync(Arg.Any<AvgPriceProfileId>())
-            .Returns(Task.FromResult(profileDTO));
+            .Returns(Task.FromResult(profileDto));
 
         _avgPriceQueries.GetLinesOfProfileAsync(Arg.Any<AvgPriceProfileId>())
             .Returns(Task.FromResult<IEnumerable<AvgPriceLineDTO>>(new List<AvgPriceLineDTO>()));
@@ -445,7 +445,7 @@ public class ManageAvgPriceProfilesViewModelTests
         _avgPriceRepository.GetAvgPriceProfileByIdAsync(Arg.Any<AvgPriceProfileId>())
             .Returns(Task.FromResult<AvgPriceProfile?>(existingProfile));
 
-        var profile = new AveragePriceProfileItem(profileId.Value, "Test Profile");
+        var profile = CreateProfileItem(profileId.Value, "Test Profile");
         viewModel.SelectedAveragePriceProfile = profile;
 
         // Wait for async load
@@ -465,6 +465,19 @@ public class ManageAvgPriceProfilesViewModelTests
     #endregion
 
     #region Helper Methods
+
+    private static AveragePriceProfileItem CreateProfileItem(
+        string id,
+        string name,
+        string assetName = "BTC")
+    {
+        return new AveragePriceProfileItem(
+            id,
+            name,
+            assetName,
+            Icon.Empty.Unicode,
+            Icon.Empty.Color);
+    }
 
     private static AvgPriceProfileDTO CreateProfileDTO(
         string id,
