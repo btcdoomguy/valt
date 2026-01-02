@@ -1,0 +1,60 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Services.MessageBoxes.ValtMessageBox"
+        Title=""
+        d:DesignWidth="400"
+        d:DesignHeight="200"
+        Width="400"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0"
+        CanResize="False">
+    <Border Classes="modal-container">
+        <StackPanel Orientation="Vertical" Margin="0">
+            <!-- Title Bar -->
+            <Border Background="{DynamicResource ModalTopBarBackground}"
+                    Height="30"
+                    PointerPressed="TitleBar_OnPointerPressed">
+                <Grid>
+                    <TextBlock x:Name="TitleText"
+                               Text=""
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource Text100Brush}" />
+                </Grid>
+            </Border>
+
+            <!-- Content Area -->
+            <Border Padding="20" MinHeight="80">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="15">
+                    <!-- Icon -->
+                    <TextBlock x:Name="IconText"
+                               FontFamily="{DynamicResource MaterialDesign}"
+                               FontSize="36"
+                               VerticalAlignment="Top"
+                               Padding="0, 5, 0, 0" />
+                    <!-- Message -->
+                    <TextBlock x:Name="MessageText"
+                               Text=""
+                               TextWrapping="Wrap"
+                               MaxWidth="300"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource Text100Brush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Buttons -->
+            <StackPanel x:Name="ButtonPanel"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        Spacing="10"
+                        Margin="0, 0, 0, 15">
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>
