@@ -1,0 +1,219 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avgPrice="clr-namespace:Valt.UI.Views.Main.Tabs.AvgPrice"
+             xmlns:models="clr-namespace:Valt.UI.Views.Main.Tabs.AvgPrice.Models"
+             xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+             xmlns:lang="clr-namespace:Valt.UI.Lang"
+             mc:Ignorable="d" d:DesignWidth="1300" d:DesignHeight="650"
+             x:Class="Valt.UI.Views.Main.Tabs.AvgPrice.AvgPriceView"
+             x:DataType="avgPrice:AvgPriceViewModel">
+    <Design.DataContext>
+        <avgPrice:AvgPriceViewModel />
+    </Design.DataContext>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="540" />   <!-- Right Column -->
+        </Grid.ColumnDefinitions>
+        <Border Grid.Column="0" Padding="15">
+            <Grid RowDefinitions="50, *">
+                <!-- Header Row with Profile Selector and Add Button -->
+                <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" VerticalAlignment="Center">
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                        <ComboBox ItemsSource="{Binding Profiles}"
+                                  SelectedItem="{Binding SelectedProfile}"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Center"
+                                  VerticalContentAlignment="Center"
+                                  IsTextSearchEnabled="True"
+                                  Height="34"
+                                  Width="220"
+                                  TabIndex="0">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2">
+                                        <TextBlock
+                                            FontFamily="{DynamicResource MaterialDesign}" FontSize="16"
+                                            Text="{Binding Unicode}"
+                                            VerticalAlignment="Center"
+                                            Margin="0,-1,0,0"
+                                            Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
+                                        <TextBlock Margin="8,0,0,0" Text="{Binding DisplayName}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <Button Command="{Binding ManageProfilesCommand}"
+                                Content="{x:Static lang:language.AvgPrice_ManageProfiles}"
+                                Height="34"
+                                VerticalAlignment="Center" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Button Command="{Binding AddOperationCommand}"
+                                Content="{x:Static lang:language.AvgPrice_AddOperation}" />
+                    </StackPanel>
+                </Grid>
+                <!-- Lines DataGrid -->
+                <DataGrid Grid.Row="1"
+                          x:Name="MainGrid"
+                          ItemsSource="{Binding Lines}"
+                          SelectedItem="{Binding SelectedLine}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserReorderColumns="True"
+                          CanUserResizeColumns="True"
+                          CanUserSortColumns="False"
+                          SelectionMode="Single"
+                          Margin="0,10,0,0">
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="{x:Static lang:language.AvgPrice_Menu_Edit}"
+                                      Command="{Binding EditOperationCommand}" />
+                            <MenuItem Header="{x:Static lang:language.AvgPrice_Menu_Delete}"
+                                      Command="{Binding DeleteOperationCommand}" />
+                            <Separator />
+                            <MenuItem Header="{x:Static lang:language.AvgPrice_Menu_MoveUp}"
+                                      Command="{Binding MoveUpCommand}" />
+                            <MenuItem Header="{x:Static lang:language.AvgPrice_Menu_MoveDown}"
+                                      Command="{Binding MoveDownCommand}" />
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_Date}"
+                                            Binding="{Binding Date}"
+                                            Width="100" />
+                        <DataGridTemplateColumn Header="{x:Static lang:language.AvgPrice_Column_Type}"
+                                                Width="80">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate DataType="models:AvgPriceLineViewModel">
+                                    <TextBlock Text="{Binding TypeName}"
+                                               Foreground="{Binding TypeColor}"
+                                               VerticalAlignment="Center"
+                                               Margin="8,0" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_Quantity}"
+                                            Binding="{Binding Quantity}"
+                                            Width="120" />
+                        <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_UnitPrice}"
+                                            Binding="{Binding UnitPrice}"
+                                            Width="120" />
+                        <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_Amount}"
+                                            Binding="{Binding Amount}"
+                                            Width="120" />
+                        <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_TotalQuantity}"
+                                            Binding="{Binding TotalQuantity}"
+                                            Width="120" />
+                        <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_TotalCost}"
+                                            Binding="{Binding TotalCost}"
+                                            Width="120" />
+                        <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_AvgCost}"
+                                            Binding="{Binding AvgCostOfAcquisition}"
+                                            Width="120" />
+                        <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_Comment}"
+                                            Binding="{Binding Comment}"
+                                            Width="*" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+        <Border Grid.Column="1" Padding="15">
+            <StackPanel Orientation="Vertical" Spacing="10">
+                <!-- Year Filter -->
+                <userControls:DateCalendarSelector HorizontalContentAlignment="Center"
+                                                   Height="50"
+                                                   Date="{Binding TotalsFilterDate}"
+                                                   Range="{Binding TotalsFilterRange}">
+                    <userControls:DateCalendarSelector.AllowedSelectorModes>
+                        <userControls:DateCalendarSelectorMode>Year</userControls:DateCalendarSelectorMode>
+                    </userControls:DateCalendarSelector.AllowedSelectorModes>
+                </userControls:DateCalendarSelector>
+
+                <!-- Totals DataGrid -->
+                <Grid MinHeight="400">
+                    <DataGrid ItemsSource="{Binding TotalsRows}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              CanUserReorderColumns="False"
+                              CanUserResizeColumns="True"
+                              CanUserSortColumns="False"
+                              GridLinesVisibility="All"
+                              IsVisible="{Binding !IsTotalsLoading}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Totals_Period}"
+                                                Binding="{Binding Period}"
+                                                Width="100" />
+                            <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Totals_Bought}"
+                                                Binding="{Binding AmountBought}"
+                                                Width="*" />
+                            <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Totals_Sold}"
+                                                Binding="{Binding AmountSold}"
+                                                Width="*" />
+                            <DataGridTemplateColumn Header="{x:Static lang:language.AvgPrice_Totals_ProfitLoss}"
+                                                    Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate DataType="models:AvgPriceTotalsRowViewModel">
+                                        <TextBlock Text="{Binding ProfitLoss}"
+                                                   Foreground="{Binding ProfitLossColor}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="8,0" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Totals_Volume}"
+                                                Binding="{Binding Volume}"
+                                                Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <TextBlock Text="{x:Static lang:language.Loading}"
+                               FontSize="14"
+                               Foreground="{DynamicResource Text400Brush}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               IsVisible="{Binding IsTotalsLoading}" />
+                </Grid>
+
+                <!-- Current Position Summary -->
+                <Border Background="{DynamicResource Surface200Brush}"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,10,0,0">
+                    <StackPanel Spacing="12">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <TextBlock Grid.Column="0"
+                                       Text="{x:Static lang:language.AvgPrice_CurrentPosition}"
+                                       FontSize="14"
+                                       Foreground="{DynamicResource Text400Brush}"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding CurrentPosition}"
+                                       FontSize="20"
+                                       FontWeight="SemiBold"
+                                       FontFamily="Consolas, Menlo, Monaco, monospace"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Center" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*, Auto">
+                            <TextBlock Grid.Column="0"
+                                       Text="{x:Static lang:language.AvgPrice_AveragePrice}"
+                                       FontSize="14"
+                                       Foreground="{DynamicResource Text400Brush}"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding CurrentAvgPrice}"
+                                       FontSize="20"
+                                       FontWeight="SemiBold"
+                                       FontFamily="Consolas, Menlo, Monaco, monospace"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Center" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

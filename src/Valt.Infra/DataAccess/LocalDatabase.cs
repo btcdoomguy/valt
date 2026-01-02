@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using LiteDB;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Infra.DataAccess.LiteDBMappers;
+using Valt.Infra.Modules.AvgPrice;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Categories;
 using Valt.Infra.Modules.Budget.FixedExpenses;
@@ -150,88 +151,85 @@ internal sealed class LocalDatabase : ILocalDatabase
         return mapper;
     }
 
+    private LiteDatabase GetOpenDatabase()
+    {
+        if (!HasDatabaseOpen || _database is null)
+            throw new InvalidOperationException("Open a database first.");
+        return _database;
+    }
+
+    #region AvgPrice module
+
+    public ILiteCollection<AvgPriceProfileEntity> GetAvgPriceProfiles()
+    {
+        return GetOpenDatabase().GetCollection<AvgPriceProfileEntity>("avgprice_profile");
+    }
+
+    public ILiteCollection<AvgPriceLineEntity> GetAvgPriceLines()
+    {
+        var collection = GetOpenDatabase().GetCollection<AvgPriceLineEntity>("avgprice_line");
+
+        collection.EnsureIndex(x => x.ProfileId);
+        collection.EnsureIndex(x => x.Date);
+        collection.EnsureIndex(x => x.DisplayOrder);
+
+        return collection;
+    }
+
+    #endregion
+
     #region Budget module
 
     public ILiteCollection<AccountEntity> GetAccounts()
     {
-        ArgumentNullException.ThrowIfNull(_database);
-
-        if (!HasDatabaseOpen)
-            throw new InvalidOperationException("Open a database first.");
-
-        return _database.GetCollection<AccountEntity>("budget_accounts");
+        return GetOpenDatabase().GetCollection<AccountEntity>("budget_accounts");
     }
 
     public ILiteCollection<AccountCacheEntity> GetAccountCaches()
     {
-        ArgumentNullException.ThrowIfNull(_database);
-
-        if (!HasDatabaseOpen)
-            throw new InvalidOperationException("Open a database first.");
-
-        return _database.GetCollection<AccountCacheEntity>("budget_accounts_cache");
+        return GetOpenDatabase().GetCollection<AccountCacheEntity>("budget_accounts_cache");
     }
 
     public ILiteCollection<TransactionTermEntity> GetTransactionTerms()
     {
-        ArgumentNullException.ThrowIfNull(_database);
-
-        if (!HasDatabaseOpen)
-            throw new InvalidOperationException("Open a database first.");
-
-        var collection = _database.GetCollection<TransactionTermEntity>("transaction_terms");
+        var collection = GetOpenDatabase().GetCollection<TransactionTermEntity>("transaction_terms");
 
         collection.EnsureIndex(x => x.Name);
         collection.EnsureIndex(x => x.Count);
+        collection.EnsureIndex(x => x.CategoryId);
 
         return collection;
     }
 
     public ILiteCollection<CategoryEntity> GetCategories()
     {
-        ArgumentNullException.ThrowIfNull(_database);
-
-        if (!HasDatabaseOpen)
-            throw new InvalidOperationException("Open a database first.");
-
-        return _database.GetCollection<CategoryEntity>("budget_categories");
+        return GetOpenDatabase().GetCollection<CategoryEntity>("budget_categories");
     }
 
     public ILiteCollection<FixedExpenseEntity> GetFixedExpenses()
     {
-        ArgumentNullException.ThrowIfNull(_database);
-
-        if (!HasDatabaseOpen)
-            throw new InvalidOperationException("Open a database first.");
-
-        return _database.GetCollection<FixedExpenseEntity>("budget_fixedexpenses");
+        return GetOpenDatabase().GetCollection<FixedExpenseEntity>("budget_fixedexpenses");
     }
-    
+
     public ILiteCollection<FixedExpenseRecordEntity> GetFixedExpenseRecords()
     {
-        ArgumentNullException.ThrowIfNull(_database);
+        var collection = GetOpenDatabase().GetCollection<FixedExpenseRecordEntity>("budget_fixedexpenserecords");
 
-        if (!HasDatabaseOpen)
-            throw new InvalidOperationException("Open a database first.");
-
-        var collection = _database.GetCollection<FixedExpenseRecordEntity>("budget_fixedexpenserecords");
-        
         collection.EnsureIndex(x => x.ReferenceDate);
-        
+
         return collection;
     }
 
     public ILiteCollection<TransactionEntity> GetTransactions()
     {
-        ArgumentNullException.ThrowIfNull(_database);
+        var collection = GetOpenDatabase().GetCollection<TransactionEntity>("budget_transactions");
 
-        if (!HasDatabaseOpen)
-            throw new InvalidOperationException("Open a database first.");
-
-        var collection = _database.GetCollection<TransactionEntity>("budget_transactions");
-        
         collection.EnsureIndex(x => x.Date);
-        
+        collection.EnsureIndex(x => x.FromAccountId);
+        collection.EnsureIndex(x => x.ToAccountId);
+        collection.EnsureIndex(x => x.CategoryId);
+        collection.EnsureIndex(x => x.SatAmountStateId);
+
         return collection;
     }
 
@@ -241,12 +239,7 @@ internal sealed class LocalDatabase : ILocalDatabase
 
     public ILiteCollection<ConfigurationEntity> GetConfiguration()
     {
-        ArgumentNullException.ThrowIfNull(_database);
-
-        if (!HasDatabaseOpen)
-            throw new InvalidOperationException("Open a database first.");
-
-        var collection = _database.GetCollection<ConfigurationEntity>("system_config");
+        var collection = GetOpenDatabase().GetCollection<ConfigurationEntity>("system_config");
 
         collection.EnsureIndex(x => x.Key);
 
@@ -255,12 +248,7 @@ internal sealed class LocalDatabase : ILocalDatabase
 
     public ILiteCollection<SettingEntity> GetSettings()
     {
-        ArgumentNullException.ThrowIfNull(_database);
-
-        if (!HasDatabaseOpen)
-            throw new InvalidOperationException("Open a database first.");
-
-        var collection = _database.GetCollection<SettingEntity>("system_settings");
+        var collection = GetOpenDatabase().GetCollection<SettingEntity>("system_settings");
 
         collection.EnsureIndex(x => x.Property);
 
@@ -282,14 +270,6 @@ internal sealed class LocalDatabase : ILocalDatabase
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
-    {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-        field = value;
-        OnPropertyChanged(propertyName);
-        return true;
     }
 
     #endregion

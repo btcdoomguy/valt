@@ -81,7 +81,7 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
     private FiatValue? _rangedAmountMax = FiatValue.Empty;
 
     [Required(ErrorMessage = "Start date is required")] [ObservableProperty] [ValidPeriodStartForExistingExpense]
-    private DateTimeOffset _periodStart = DateTimeOffset.Now;
+    private DateTime? _periodStart = DateTime.Today;
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayDaySelector))]
     private string _period = FixedExpensePeriods.Monthly.ToString();
@@ -290,7 +290,7 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
     private async Task<FixedExpense> CreateAsync()
     {
         var name = FixedExpenseName.New(Name);
-        var date = DateOnly.FromDateTime(PeriodStart.Date);
+        var date = DateOnly.FromDateTime(PeriodStart!.Value);
 
         FixedExpenseRange initialRange;
         if (IsFixedSelectorVisible)
@@ -313,7 +313,7 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
     private Task EditAsync(FixedExpense fixedExpense)
     {
         var name = FixedExpenseName.New(Name);
-        var date = DateOnly.FromDateTime(PeriodStart.Date);
+        var date = DateOnly.FromDateTime(PeriodStart!.Value);
 
         fixedExpense.Rename(name);
         fixedExpense.SetCategory(fixedExpense.CategoryId.Value);

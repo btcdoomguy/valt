@@ -23,15 +23,20 @@ using Valt.UI.Views.Main.Modals.TransactionEditor;
 using Valt.UI.Views.Main.Modals.MathExpression;
 using Valt.UI.Views.Main.Modals.Settings;
 using Valt.UI.Views.Main.Modals.StatusDisplay;
+using Valt.UI.Views.Main.Tabs.AvgPrice;
 using Valt.UI.Views.Main.Tabs.Reports;
+using Valt.UI.Services.LocalStorage;
+using Valt.UI.Views.Main.Modals.AvgPriceLineEditor;
+using Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles;
 using Valt.UI.Views.Main.Tabs.Transactions;
 
 namespace Valt.UI;
 
 public static class Extensions
 {
-    public static IServiceCollection AddValtUI(this IServiceCollection services)
+    public static IServiceCollection AddValtUI(this IServiceCollection services, ILocalStorageService localStorageService)
     {
+        services.AddSingleton(localStorageService);
         services.AddTransient<MainViewModel>();
         
         //controls
@@ -40,6 +45,7 @@ public static class Extensions
         //pages
         services.AddSingleton<TransactionsViewModel>();
         services.AddSingleton<ReportsViewModel>();
+        services.AddSingleton<AvgPriceViewModel>();
         //factory method for pages
         services.AddSingleton<Func<MainViewTabNames, ValtTabViewModel>>(services => pageNames =>
         {
@@ -47,6 +53,7 @@ public static class Extensions
             {
                 MainViewTabNames.TransactionsPageContent => services.GetRequiredService<TransactionsViewModel>(),
                 MainViewTabNames.ReportsPageContent => services.GetRequiredService<ReportsViewModel>(),
+                MainViewTabNames.AvgPricePageContent => services.GetRequiredService<AvgPriceViewModel>(),
                 _ => throw new ArgumentOutOfRangeException(nameof(pageNames), pageNames, null)
             };
         });
@@ -81,7 +88,9 @@ public static class Extensions
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<ManageFixedExpensesViewModel>();
         services.AddTransient<FixedExpenseEditorViewModel>();
-        
+        services.AddTransient<ManageAvgPriceProfilesViewModel>();
+        services.AddTransient<AvgPriceLineEditorViewModel>();
+
         //other
         services.AddSingleton<IInitialCategoryNameLanguageProvider, InitialCategoryNameLanguageProvider>();
 
@@ -150,6 +159,14 @@ public static class Extensions
                 ApplicationModalNames.FixedExpenseEditor => new FixedExpenseEditorView()
                 {
                     DataContext = services.GetRequiredService<FixedExpenseEditorViewModel>(),
+                },
+                ApplicationModalNames.AvgPriceProfileManager => new ManageAvgPriceProfilesView()
+                {
+                    DataContext = services.GetRequiredService<ManageAvgPriceProfilesViewModel>(),
+                },
+                ApplicationModalNames.AvgPriceLineEditor => new AvgPriceLineEditorView()
+                {
+                    DataContext = services.GetRequiredService<AvgPriceLineEditorViewModel>(),
                 },
                 _ => throw new ArgumentOutOfRangeException(nameof(modalNames), modalNames, null)
             };

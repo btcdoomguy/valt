@@ -163,13 +163,11 @@
                         <StackPanel Grid.Column="0" Margin="5">
                             <StackPanel Classes="form-field">
                                 <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_StartPeriod}" />
-                                <DatePicker HorizontalAlignment="Left"
-                                            DayFormat="ddd dd"
-                                            MonthFormat="MMMM"
-                                            YearFormat="yyy"
-                                            Height="34"
-                                            SelectedDate="{Binding PeriodStart}">
-                                </DatePicker>
+                                <CalendarDatePicker HorizontalAlignment="Left"
+                                                    SelectedDateFormat="Short"
+                                                    IsTodayHighlighted="True"
+                                                    Height="34"
+                                                    SelectedDate="{Binding PeriodStart}" />
                             </StackPanel>
                         </StackPanel>
                     </Grid>

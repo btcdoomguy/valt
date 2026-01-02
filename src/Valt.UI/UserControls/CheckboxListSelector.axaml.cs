@@ -216,6 +216,25 @@ public partial class CheckboxListSelector : UserControl
             _isUpdatingSelection = false;
         }
     }
+
+    [RelayCommand]
+    private void UnselectAll()
+    {
+        _isUpdatingSelection = true;
+        try
+        {
+            foreach (var item in InternalItems)
+            {
+                item.IsSelected = false;
+            }
+
+            UpdateSelectedItems();
+        }
+        finally
+        {
+            _isUpdatingSelection = false;
+        }
+    }
 }
 
 public partial class CheckboxListItem : ObservableObject

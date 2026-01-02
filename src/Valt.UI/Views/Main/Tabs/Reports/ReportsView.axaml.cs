@@ -14,7 +14,8 @@ public partial class ReportsView : ValtBaseUserControl
 {
     CartesianChart? _monthlyTotalsChart;
     PieChart? _categoryPieChart;
-    
+    private ReportsViewModel? _viewModel;
+
     public ReportsView()
     {
         InitializeComponent();
@@ -23,17 +24,32 @@ public partial class ReportsView : ValtBaseUserControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        
+
         _categoryPieChart = CategoryPieChart;
         _monthlyTotalsChart = MonthlyChart;
-        
+
         if (DataContext is ReportsViewModel vm)
         {
-            vm.PropertyChanged += ViewModelOnPropertyChanged;
-            vm.Initialize();
-            
+            _viewModel = vm;
+            _viewModel.PropertyChanged += ViewModelOnPropertyChanged;
+            _viewModel.Initialize();
+
             Dispatcher.UIThread.Post(() => ForceMonthlyTotalsRedraw(), DispatcherPriority.Background);
         }
+    }
+
+    protected override void OnUnloaded(RoutedEventArgs e)
+    {
+        base.OnUnloaded(e);
+
+        if (_viewModel is not null)
+        {
+            _viewModel.PropertyChanged -= ViewModelOnPropertyChanged;
+            _viewModel = null;
+        }
+
+        _monthlyTotalsChart = null;
+        _categoryPieChart = null;
     }
 
     private void ViewModelOnPropertyChanged(object? sender, PropertyChangedEventArgs e)

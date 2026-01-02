@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Valt.Core.Kernel.Abstractions.EventSystem;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Kernel.Factories;
+using Valt.Core.Modules.AvgPrice.Calculations;
 using Valt.Core.Modules.Budget.Accounts.Contracts;
 using Valt.Core.Modules.Budget.Categories.Contracts;
 using Valt.Core.Modules.Budget.FixedExpenses.Contracts;
@@ -23,6 +24,8 @@ using Valt.Infra.Kernel.EventSystem;
 using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Kernel.Scopes;
 using Valt.Infra.Kernel.Time;
+using Valt.Infra.Modules.AvgPrice;
+using Valt.Infra.Modules.AvgPrice.Queries;
 using Valt.Infra.Modules.Budget;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Accounts.Queries;
@@ -92,7 +95,7 @@ public static class Extensions
             provider.GetRequiredService<FrankfurterFiatHistoricalDataProvider>());
 
         //local historical provider
-        services.AddSingleton<ILocalHistoricalPriceProvider, LivePricesUpdaterJob>();
+        services.AddSingleton<ILocalHistoricalPriceProvider, LocalHistoricalPriceProvider>();
         
         //reports
         services.AddSingleton<IAllTimeHighReport, AllTimeHighReport>();
@@ -158,6 +161,7 @@ public static class Extensions
     private static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddSingleton<IAccountRepository, AccountRepository>();
+        services.AddSingleton<IAvgPriceRepository, AvgPriceRepository>();
         services.AddSingleton<ICategoryRepository, CategoryRepository>();
         services.AddSingleton<IFixedExpenseRepository, FixedExpenseRepository>();
         services.AddSingleton<ITransactionRepository, TransactionRepository>();
@@ -168,6 +172,7 @@ public static class Extensions
     private static IServiceCollection AddQueries(this IServiceCollection services)
     {
         services.AddSingleton<IAccountQueries, AccountQueries>();
+        services.AddSingleton<IAvgPriceQueries, AvgPriceQueries>();
         services.AddSingleton<ICategoryQueries, CategoryQueries>();
         services.AddSingleton<IFixedExpenseQueries, FixedExpenseQueries>();
         services.AddSingleton<ITransactionQueries, TransactionQueries>();
@@ -182,6 +187,7 @@ public static class Extensions
         services.AddSingleton<ITransactionTermService, TransactionTermService>();
         services.AddSingleton<IAccountTotalsCalculator, AccountTotalsCalculator>();
         services.AddSingleton<ITransactionAutoSatAmountCalculator, TransactionAutoSatAmountCalculator>();
+        services.AddSingleton<IAvgPriceTotalizer, AvgPriceTotalizer>();
 
         return services;
     }

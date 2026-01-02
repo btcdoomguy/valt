@@ -52,10 +52,9 @@ public sealed class BackgroundJobManager : IDisposable
     public async Task TriggerJobManuallyOnCurrentThreadAsync(BackgroundJobSystemNames systemName)
     {
         var job = _jobInfos.Keys.SingleOrDefault(x => x.SystemName == systemName);
-        if (job is not null)
+        if (job is not null && _jobInfos.TryGetValue(job, out var jobInfo))
         {
-            await job.StartAsync(CancellationToken.None);
-            await job.RunAsync(CancellationToken.None);
+            await jobInfo.RunOnCurrentThreadAsync(CancellationToken.None);
         }
     }
 
@@ -153,7 +152,34 @@ public sealed class JobInfo : INotifyPropertyChanged, IDisposable
         //reset timer to run now
         _timer?.Change(TimeSpan.Zero, _job.Interval);
     }
-    
+
+    public async Task RunOnCurrentThreadAsync(CancellationToken token)
+    {
+        await _semaphore.WaitAsync(token);
+        try
+        {
+            if (State == BackgroundJobState.Stopped)
+                await _job.StartAsync(token);
+
+            State = BackgroundJobState.Running;
+            ErrorMessage = null;
+
+            await _job.RunAsync(token);
+            State = BackgroundJobState.Ok;
+        }
+        catch (Exception ex)
+        {
+            State = ex is OperationCanceledException ? BackgroundJobState.Stopped : BackgroundJobState.Error;
+
+            if (State == BackgroundJobState.Error)
+                ErrorMessage = ex.Message;
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
     private async Task RunJobAsync(CancellationToken token = default)
     {
         if (!await _semaphore.WaitAsync(0, token)) 

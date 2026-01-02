@@ -36,7 +36,7 @@ using Valt.UI.Views.Main.Tabs.Transactions;
 
 namespace Valt.UI.Views.Main.Tabs.Reports;
 
-public partial class ReportsViewModel : ValtTabViewModel
+public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 {
     private readonly IAllTimeHighReport _allTimeHighReport;
     private readonly IMonthlyTotalsReport _monthlyTotalsReport;
@@ -90,7 +90,7 @@ public partial class ReportsViewModel : ValtTabViewModel
         FilterRange = new DateRange(new DateTime(FilterMainDate.Year, 1, 1), new DateTime(FilterMainDate.Year, 12, 31));
         var currentMonth = new DateTime(CategoryFilterMainDate.Year, CategoryFilterMainDate.Month, 1);
         CategoryFilterRange = new DateRange(currentMonth, currentMonth.AddMonths(1).AddDays(-1));
-
+        
         PrepareAccountsAndCategoriesList();
 
         SelectedAccounts.CollectionChanged += OnSelectedFiltersChanged;
@@ -116,6 +116,20 @@ public partial class ReportsViewModel : ValtTabViewModel
 
     public void Initialize()
     {
+        if (Design.IsDesignMode)
+            return;
+
+        // Temporarily disable event handlers to prevent cascading updates during initialization
+        _ready = false;
+        try
+        {
+            PrepareAccountsAndCategoriesList();
+        }
+        finally
+        {
+            _ready = true;
+        }
+
         _ = FetchMonthlyTotalsAsync();
         _ = FetchExpensesByCategoryAsync();
         _ = FetchAllTimeHighDataAsync();
@@ -123,6 +137,11 @@ public partial class ReportsViewModel : ValtTabViewModel
 
     private void PrepareAccountsAndCategoriesList()
     {
+        AvailableAccounts.Clear();
+        SelectedAccounts.Clear();
+        AvailableCategories.Clear();
+        SelectedCategories.Clear();
+        
         var accounts = _localDatabase.GetAccounts().FindAll().OrderByDescending(x => x.Visible).ThenBy(x => x.DisplayOrder)
             .Select(x => new SelectItem(x.Id.ToString(), x.Name));
         
@@ -194,15 +213,23 @@ public partial class ReportsViewModel : ValtTabViewModel
 
             var allTimeHighData = await _allTimeHighReport.GetAsync(fiatCurrency);
 
-            AllTimeHighData = new DashboardData(
-                language.Reports_AllTimeHigh_Title,
-                new ObservableCollection<RowItem>
-                {
-                    new(language.Reports_AllTimeHigh_AllTimeHigh,
-                        $"{CurrencyDisplay.FormatFiat(allTimeHighData.Value, fiatCurrency.Code)}"),
-                    new(language.Reports_AllTimeHigh_Date, allTimeHighData.Date.ToString()),
-                    new(language.Reports_AllTimeHigh_DeclineFromAth, $"{allTimeHighData.DeclineFromAth}%")
-                });
+            var rows = new ObservableCollection<RowItem>
+            {
+                new(language.Reports_AllTimeHigh_AllTimeHigh,
+                    $"{CurrencyDisplay.FormatFiat(allTimeHighData.Value, fiatCurrency.Code)}"),
+                new(language.Reports_AllTimeHigh_Date, allTimeHighData.Date.ToString()),
+                new(language.Reports_AllTimeHigh_DeclineFromAth, $"{allTimeHighData.DeclineFromAth}%")
+            };
+
+            if (allTimeHighData.MaxDrawdownDate.HasValue && allTimeHighData.MaxDrawdownPercent.HasValue)
+            {
+                rows.Add(new RowItem(language.Reports_AllTimeHigh_MaxDrawdownPercent,
+                    $"{allTimeHighData.MaxDrawdownPercent.Value}%"));
+                rows.Add(new RowItem(language.Reports_AllTimeHigh_MaxDrawdownDate,
+                    allTimeHighData.MaxDrawdownDate.Value.ToString()));
+            }
+
+            AllTimeHighData = new DashboardData(language.Reports_AllTimeHigh_Title, rows);
 
             IsAllTimeHighLoading = false;
         }
@@ -257,11 +284,14 @@ public partial class ReportsViewModel : ValtTabViewModel
             {
                 MonthlyTotalsChartData.RefreshChart(monthlyTotalsData);
 
+                var currency = FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency);
+
                 MonthlyReportItems.Clear();
                 MonthlyReportItems.AddRange(monthlyTotalsData.Items.Select(x =>
-                    new MonthlyReportItemViewModel(FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency),
-                        x)));
-
+                    new MonthlyReportItemViewModel(currency, x)));
+                
+                MonthlyReportItems.Add(new MonthlyReportItemViewModel(currency, monthlyTotalsData.Total));
+                
                 IsMonthlyTotalsLoading = false;
             });
         }
@@ -275,4 +305,18 @@ public partial class ReportsViewModel : ValtTabViewModel
     public override MainViewTabNames TabName => MainViewTabNames.ReportsPageContent;
 
     public record SelectItem(string Id, string Name);
+
+    public void Dispose()
+    {
+        _filterDebounceTokenSource?.Cancel();
+        _filterDebounceTokenSource?.Dispose();
+
+        SelectedAccounts.CollectionChanged -= OnSelectedFiltersChanged;
+        SelectedCategories.CollectionChanged -= OnSelectedFiltersChanged;
+
+        WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
+
+        MonthlyTotalsChartData.Dispose();
+        ExpensesByCategoryChartData.Dispose();
+    }
 }

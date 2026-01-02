@@ -1,6 +1,7 @@
 using System;
 using Valt.UI.Base;
 using Valt.UI.Views;
+using Valt.UI.Views.Main.Tabs.AvgPrice;
 using Valt.UI.Views.Main.Tabs.Reports;
 using TransactionsViewModel = Valt.UI.Views.Main.Tabs.Transactions.TransactionsViewModel;
 
@@ -14,6 +15,7 @@ public class DesignTimePageFactory : IPageFactory
         {
             MainViewTabNames.TransactionsPageContent => new TransactionsViewModel(),
             MainViewTabNames.ReportsPageContent => new ReportsViewModel(),
+            MainViewTabNames.AvgPricePageContent => new AvgPriceViewModel(),
             _ => throw new ArgumentOutOfRangeException(nameof(pageName), pageName, null)
         };
     }

@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using LiteDB;
+using Valt.Infra.Modules.AvgPrice;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Categories;
 using Valt.Infra.Modules.Budget.FixedExpenses;
@@ -20,6 +21,13 @@ public interface ILocalDatabase : INotifyPropertyChanged, IDisposable
     void ChangeDatabasePassword(string oldPassword, string newPassword);
 
     void ClearAccountCache();
+
+    #region AvgPrice module
+
+    ILiteCollection<AvgPriceProfileEntity> GetAvgPriceProfiles();
+    ILiteCollection<AvgPriceLineEntity> GetAvgPriceLines();
+
+    #endregion
 
     #region Budget module
 
@@ -45,8 +53,8 @@ public interface ILocalDatabase : INotifyPropertyChanged, IDisposable
     #endregion
 
     #region Settings module
-    
+
     ILiteCollection<SettingEntity> GetSettings();
-    
+
     #endregion
 }

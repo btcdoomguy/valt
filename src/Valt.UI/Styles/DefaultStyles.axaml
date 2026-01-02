@@ -495,6 +495,178 @@
     </Style>
 
     <!-- ═══════════════════════════════════════════════════════════════════════════════
+         CALENDAR DATE PICKER
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
+    <!-- Override CalendarDatePicker button template to use Material Design icon -->
+    <Style Selector="CalendarDatePicker /template/ Button#PART_Button">
+        <Setter Property="Width" Value="32" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="Transparent"
+                        CornerRadius="4"
+                        x:Name="ButtonBorder">
+                    <TextBlock Text="&#xE935;"
+                               FontFamily="{StaticResource MaterialDesign}"
+                               FontSize="20"
+                               Foreground="{DynamicResource Text200Brush}"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               x:Name="IconText" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="CalendarDatePicker /template/ Button#PART_Button:pointerover /template/ TextBlock#IconText">
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         CALENDAR (popup)
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
+    <!-- Calendar - set compact size -->
+    <Style Selector="Calendar">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+
+    <!-- CalendarItem - the main container -->
+    <Style Selector="CalendarItem">
+        <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background700Brush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="HeaderBackground" Value="{DynamicResource Background700Brush}" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="DayTitleTemplate">
+            <Template x:DataType="x:String">
+                <TextBlock Text="{Binding}"
+                           FontSize="11"
+                           Foreground="{DynamicResource Text300Brush}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Padding="0" />
+            </Template>
+        </Setter>
+    </Style>
+
+    <!-- Hide the background layer that causes visual issues -->
+    <Style Selector="CalendarItem /template/ Border#BackgroundLayer">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+
+    <!-- Center the month view grid -->
+    <Style Selector="CalendarItem /template/ Grid#PART_MonthView">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="Margin" Value="0" />
+    </Style>
+
+    <!-- Center the year view grid -->
+    <Style Selector="CalendarItem /template/ Grid#PART_YearView">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="Margin" Value="0" />
+    </Style>
+
+    <!-- Header button (shows month/year) - override template to remove grey background -->
+    <Style Selector="CalendarItem /template/ Button#PART_HeaderButton">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        <Setter Property="Padding" Value="4, 0" />
+    </Style>
+    <Style Selector="CalendarItem /template/ Button#PART_HeaderButton /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="CalendarItem /template/ Button#PART_HeaderButton:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Background600Brush}" />
+    </Style>
+
+    <!-- Navigation buttons - transparent background -->
+    <Style Selector="CalendarItem /template/ Button#PART_PreviousButton">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="CalendarItem /template/ Button#PART_PreviousButton /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="CalendarItem /template/ Button#PART_PreviousButton:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Background600Brush}" />
+    </Style>
+
+    <Style Selector="CalendarItem /template/ Button#PART_NextButton">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="CalendarItem /template/ Button#PART_NextButton /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="CalendarItem /template/ Button#PART_NextButton:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Background600Brush}" />
+    </Style>
+
+    <!-- Day buttons (the actual day numbers) -->
+    <Style Selector="CalendarDayButton">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="MinWidth" Value="26" />
+        <Setter Property="MinHeight" Value="26" />
+        <Setter Property="Margin" Value="1" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
+    <!-- Day buttons - inactive (other months) -->
+    <Style Selector="CalendarDayButton:inactive">
+        <Setter Property="Foreground" Value="{DynamicResource Text400Brush}" />
+    </Style>
+
+    <!-- Day buttons - today highlight -->
+    <Style Selector="CalendarDayButton:today">
+        <Setter Property="Background" Value="{DynamicResource Accent600Brush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+    </Style>
+
+    <!-- Day buttons - selected -->
+    <Style Selector="CalendarDayButton:selected">
+        <Setter Property="Background" Value="{DynamicResource Secondary600Brush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+    </Style>
+
+    <!-- Day buttons - hover -->
+    <Style Selector="CalendarDayButton:pointerover">
+        <Setter Property="Background" Value="{DynamicResource Background600Brush}" />
+    </Style>
+
+    <!-- Month/Year buttons in year/decade view -->
+    <Style Selector="CalendarButton">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="MinWidth" Value="44" />
+        <Setter Property="MinHeight" Value="26" />
+        <Setter Property="Margin" Value="2" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
+    <Style Selector="CalendarButton:pointerover">
+        <Setter Property="Background" Value="{DynamicResource Background600Brush}" />
+    </Style>
+
+    <Style Selector="CalendarButton:pressed">
+        <Setter Property="Background" Value="{DynamicResource Secondary600Brush}" />
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
          DATE PICKER
          ═══════════════════════════════════════════════════════════════════════════════ -->
 
@@ -601,5 +773,30 @@
 
     <Style Selector="Grid.footer">
         <Setter Property="Background" Value="{DynamicResource FooterBackgroundBrush}" />
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         EXPANDER - Reports Section Headers
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="Expander.section">
+        <Setter Property="Margin" Value="0, 0, 0, 12" />
+    </Style>
+
+    <Style Selector="TextBlock.section-header">
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource Text200Brush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <Style Selector="TextBlock.section-header-icon">
+        <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="Foreground" Value="{DynamicResource Accent300Brush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0, 0, 10, 0" />
+        <Setter Property="Padding" Value="0" />
     </Style>
 </Styles>

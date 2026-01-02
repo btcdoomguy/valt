@@ -65,6 +65,7 @@ public partial class MainViewModel : ValtViewModel
     [ObservableProperty] 
     [NotifyPropertyChangedFor(nameof(IsTransactionButtonSelected))]
     [NotifyPropertyChangedFor(nameof(IsReportButtonSelected))]
+    [NotifyPropertyChangedFor(nameof(IsAvgPriceButtonSelected))]
     private ValtTabViewModel? _selectedTabComponent;
 
     public bool IsTransactionButtonSelected =>
@@ -72,6 +73,9 @@ public partial class MainViewModel : ValtViewModel
 
     public bool IsReportButtonSelected =>
         SelectedTabComponent?.TabName == MainViewTabNames.ReportsPageContent;
+    
+    public bool IsAvgPriceButtonSelected =>
+        SelectedTabComponent?.TabName == MainViewTabNames.AvgPricePageContent;
 
     [ObservableProperty] private string _statusDisplay;
 
@@ -171,6 +175,12 @@ public partial class MainViewModel : ValtViewModel
     private void SetReportsTab()
     {
         SelectedTabComponent = _pageFactory.Create(MainViewTabNames.ReportsPageContent);
+    }
+    
+    [RelayCommand]
+    private void SetAvgPriceTab()
+    {
+        SelectedTabComponent = _pageFactory.Create(MainViewTabNames.AvgPricePageContent);
     }
 
     [RelayCommand]

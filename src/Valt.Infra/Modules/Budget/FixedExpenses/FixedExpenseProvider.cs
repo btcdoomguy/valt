@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Valt.Core.Modules.Budget.FixedExpenses;
 using Valt.Infra.DataAccess;
 
@@ -18,7 +19,7 @@ public class FixedExpenseProvider : IFixedExpenseProvider
         var maxDate = minDate.AddMonths(1).AddDays(-1);
 
         var allAccounts = _localDatabase.GetAccounts().FindAll().ToDictionary(x => x.Id, x => x);
-        
+
         var allFixedExpenses = _localDatabase.GetFixedExpenses().FindAll()
             .Where(x => x.Enabled)
             .ToList();
@@ -32,11 +33,13 @@ public class FixedExpenseProvider : IFixedExpenseProvider
             foreach (var rangedEntity in rangedEntities)
             {
                 var daysToProcess = new List<int>();
-                if (rangedEntity.Period is FixedExpensePeriods.Weekly or FixedExpensePeriods.Biweekly)
+                if (rangedEntity.Entity.Period is FixedExpensePeriods.Weekly or FixedExpensePeriods.Biweekly)
                 {
-                    var periodDates = GetDatesInPeriod(DateOnly.FromDateTime(rangedEntity.PeriodStart),
-                        rangedEntity.DayOfWeek.GetValueOrDefault(DayOfWeek.Sunday), minDate, maxDate,
-                        rangedEntity.Period is FixedExpensePeriods.Weekly ? Frequency.Weekly : Frequency.BiWeekly);
+                    var periodDates = GetDatesInPeriod(DateOnly.FromDateTime(rangedEntity.Entity.PeriodStart),
+                        rangedEntity.Entity.DayOfWeek.GetValueOrDefault(DayOfWeek.Sunday), minDate, maxDate,
+                        rangedEntity.Entity.Period is FixedExpensePeriods.Weekly
+                            ? Frequency.Weekly
+                            : Frequency.BiWeekly);
 
                     foreach (var periodDate in periodDates)
                     {
@@ -51,7 +54,7 @@ public class FixedExpenseProvider : IFixedExpenseProvider
                 else
                 {
                     //checks if the ranged entry is valid for the period
-                    var day = rangedEntity.Day;
+                    var day = rangedEntity.Entity.Day;
                     if (day > maxDate.Day)
                         day = maxDate.Day;
 
@@ -62,28 +65,33 @@ public class FixedExpenseProvider : IFixedExpenseProvider
                 {
                     var referenceDate = new DateOnly(date.Year, date.Month, day);
 
-                    if (referenceDate < DateOnly.FromDateTime(rangedEntity.PeriodStart))
+                    if (referenceDate < DateOnly.FromDateTime(rangedEntity.Entity.PeriodStart))
+                        continue;
+
+                    if (referenceDate > DateOnly.FromDateTime(rangedEntity.RangeEnd ?? DateTime.MaxValue))
                         continue;
 
                     if (rangedEntities.Any(x =>
-                            x.PeriodStart != rangedEntity.PeriodStart &&
-                            x.PeriodStart <= referenceDate.ToValtDateTime() &&
-                            x.PeriodStart > lastReferenceDate.ToValtDateTime()))
+                            x.Entity.PeriodStart != rangedEntity.Entity.PeriodStart &&
+                            x.Entity.PeriodStart <= referenceDate.ToValtDateTime() &&
+                            x.Entity.PeriodStart > lastReferenceDate.ToValtDateTime()))
                         continue;
 
-                    if (rangedEntity.Period == FixedExpensePeriods.Yearly)
+                    if (rangedEntity.Entity.Period == FixedExpensePeriods.Yearly)
                     {
-                        var fixedExpenseMonth = rangedEntity.PeriodStart.Month;
+                        var fixedExpenseMonth = rangedEntity.Entity.PeriodStart.Month;
 
                         if (date.Month != fixedExpenseMonth)
                             continue;
                     }
 
                     lastReferenceDate = referenceDate;
-                    
+
                     entries.Add(new FixedExpenseProviderEntry(fixedExpense.Id.ToString(), fixedExpense.Name,
                         fixedExpense.CategoryId.ToString(), referenceDate, fixedExpense.DefaultAccountId?.ToString(),
-                        rangedEntity.FixedAmount, rangedEntity.RangedAmountMin, rangedEntity.RangedAmountMax, fixedExpense.Currency ?? allAccounts[fixedExpense.DefaultAccountId!].Currency!));
+                        rangedEntity.Entity.FixedAmount, rangedEntity.Entity.RangedAmountMin,
+                        rangedEntity.Entity.RangedAmountMax,
+                        fixedExpense.Currency ?? allAccounts[fixedExpense.DefaultAccountId!].Currency!));
                 }
             }
         }
@@ -119,7 +127,7 @@ public class FixedExpenseProvider : IFixedExpenseProvider
         return Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(entries.OrderBy(x => x.Day));
     }
 
-    private List<FixedExpenseRangeEntity> GetFixedExpenseRangesFor(FixedExpenseEntity fixedExpense, DateOnly minDate,
+    private List<FixedExpenseRangeWithEnd> GetFixedExpenseRangesFor(FixedExpenseEntity fixedExpense, DateOnly minDate,
         DateOnly maxDate)
     {
         var fixedExpenseRanged = fixedExpense.Ranges.OrderBy(x => x.PeriodStart);
@@ -134,7 +142,19 @@ public class FixedExpenseProvider : IFixedExpenseProvider
         if (initialRangeEntity is not null)
             intervalRangeEntities.Add(initialRangeEntity);
 
-        return intervalRangeEntities.OrderBy(x => x.PeriodStart).ToList();
+        var orderedRanges = intervalRangeEntities.OrderBy(x => x.PeriodStart).ToArray();
+
+        var result = new List<FixedExpenseRangeWithEnd>();
+        if (orderedRanges.Length == 0)
+            return result;
+        
+        for (var index = 0; index < orderedRanges.Length - 1; index++)
+        {
+            result.Add(new FixedExpenseRangeWithEnd(orderedRanges[index], orderedRanges[index + 1].PeriodStart));
+        }
+        result.Add(new FixedExpenseRangeWithEnd(orderedRanges[^1], null));
+        
+        return result;
     }
 
     public enum Frequency
@@ -181,4 +201,6 @@ public class FixedExpenseProvider : IFixedExpenseProvider
 
         return result;
     }
+
+    internal record FixedExpenseRangeWithEnd(FixedExpenseRangeEntity Entity, DateTime? RangeEnd);
 }

@@ -33,7 +33,6 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
 
     public Task<MonthlyTotalsData> GetAsync(DateOnly baseDate, DateOnlyRange displayRange, FiatCurrency currency)
     {
-        var firstDayOfMonth = new DateOnly(baseDate.Year, baseDate.Month, 1);
         var accounts = _localDatabase.GetAccounts().FindAll().ToImmutableList();
         var transactions = _localDatabase.GetTransactions().FindAll().ToImmutableList();
 
@@ -43,11 +42,9 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
         }
 
         var minDate = transactions.Min(x => x.Date);
-        var lastDayOfMonth = new DateOnly(firstDayOfMonth.Year, firstDayOfMonth.Month, 1).AddMonths(1).AddDays(-1)
-            .ToValtDateTime();
-        var maxDate = _clock.GetCurrentLocalDate().ToValtDateTime() < lastDayOfMonth
-            ? _clock.GetCurrentLocalDate().ToValtDateTime()
-            : lastDayOfMonth;
+        var displayRangeEnd = displayRange.End.ToValtDateTime();
+        var currentDate = _clock.GetCurrentLocalDate().ToValtDateTime();
+        var maxDate = displayRangeEnd < currentDate ? displayRangeEnd : currentDate;
 
         var btcRates = _priceDatabase.GetBitcoinData().Find(x => x.Date >= minDate && x.Date <= maxDate)
             .ToImmutableList();
@@ -71,7 +68,7 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
     private class Calculator
     {
         private const decimal SatoshisPerBitcoin = 100_000_000m;
-        private const int MaxDaysToScanForRate = 5;
+        private const int MaxDaysToScanForRate = 10;
 
         private readonly FiatCurrency _currency;
         private readonly FrozenDictionary<ObjectId, AccountEntity> _accounts;
@@ -172,13 +169,16 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
             var resultItems = BuildResultItems(monthlyTotals);
             var filteredItems = resultItems
                 .Where(x => x.MonthYear >= _displayRange.Start && x.MonthYear <= _displayRange.End).ToList();
+            var totals = BuildTotals(filteredItems);
 
             return new MonthlyTotalsData
             {
                 MainCurrency = _currency,
-                Items = filteredItems
+                Items = filteredItems,
+                Total = totals
             };
         }
+
 
         private static void InitializeAccountTotalsIfNeeded(
             AccountEntity account,
@@ -281,6 +281,8 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
             var bitcoinExpenseTotal = 0m;
             var bitcoinPurchaseTotal = 0m;
             var bitcoinSaleTotal = 0m;
+            var allIncomeInFiat = 0m;
+            var allExpensesInFiat = 0m;
 
             foreach (var account in _accounts.Values)
             {
@@ -299,6 +301,8 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
                     bitcoinExpenseTotal += accountExpenses[accountId];
                     bitcoinPurchaseTotal += accountBitcoinPurchases[accountId];
                     bitcoinSaleTotal += accountBitcoinSales[accountId];
+                    allIncomeInFiat += GetFiatRateAt(currentDate, _currency) * (accountIncomes[accountId] * usdBitcoinPrice);
+                    allExpensesInFiat += GetFiatRateAt(currentDate, _currency) * (accountExpenses[accountId] * usdBitcoinPrice);
                 }
                 else
                 {
@@ -310,6 +314,8 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
                         fiatTotal += accountBalances[accountId];
                         incomeTotal += accountIncomes[accountId];
                         expenseTotal += accountExpenses[accountId];
+                        allIncomeInFiat += accountIncomes[accountId];
+                        allExpensesInFiat += accountExpenses[accountId];
                     }
                     else
                     {
@@ -320,6 +326,10 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
                                        (accountIncomes[accountId] / accountRateToUsd);
                         expenseTotal += GetFiatRateAt(currentDate, _currency) *
                                         (accountExpenses[accountId] / accountRateToUsd);
+                        allIncomeInFiat += GetFiatRateAt(currentDate, _currency) *
+                                           (accountIncomes[accountId] / accountRateToUsd);
+                        allExpensesInFiat += GetFiatRateAt(currentDate, _currency) *
+                                             (accountExpenses[accountId] / accountRateToUsd);
                     }
                 }
             }
@@ -332,7 +342,9 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
                 bitcoinIncomeTotal,
                 bitcoinExpenseTotal,
                 bitcoinPurchaseTotal,
-                bitcoinSaleTotal);
+                bitcoinSaleTotal,
+                allIncomeInFiat, 
+                allExpensesInFiat);
         }
 
         private static void ResetMonthlyChanges(
@@ -399,9 +411,27 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
                     BitcoinPurchased = monthly.Value.BitcoinPurchased,
                     BitcoinSold = monthly.Value.BitcoinSold,
                     Income = monthly.Value.Income,
-                    Expenses = monthly.Value.Expenses
+                    Expenses = monthly.Value.Expenses,
+                    AllExpensesInFiat = monthly.Value.AllExpensesInFiat,
+                    AllIncomeInFiat = monthly.Value.AllIncomeInFiat
                 };
             }).ToList();
+        }
+        
+        
+        private MonthlyTotalsData.Totals BuildTotals(List<MonthlyTotalsData.Item> resultItems)
+        {
+            return new MonthlyTotalsData.Totals()
+            {
+                BitcoinExpenses = resultItems.Sum(x => x.BitcoinExpenses),
+                BitcoinIncome = resultItems.Sum(x => x.BitcoinIncome),
+                BitcoinPurchased = resultItems.Sum(x => x.BitcoinPurchased),
+                BitcoinSold = resultItems.Sum(x => x.BitcoinSold),
+                Income = resultItems.Sum(x => x.Income),
+                Expenses = resultItems.Sum(x => x.Expenses),
+                AllExpensesInFiat = resultItems.Sum(x => x.AllExpensesInFiat),
+                AllIncomeInFiat = resultItems.Sum(x => x.AllIncomeInFiat)
+            };
         }
 
         private static bool IsEndOfMonth(DateTime date)
@@ -423,7 +453,7 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
             {
                 if (_fiatRates.TryGetValue(scanDate, out var rates))
                 {
-                    var entry = rates.SingleOrDefault(x => x.Currency == currencyCode);
+                    var entry = rates.FirstOrDefault(x => x.Currency == currencyCode);
                     if (entry is not null)
                     {
                         return entry.Price;
@@ -462,5 +492,7 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
         decimal BitcoinIncome,
         decimal BitcoinExpense,
         decimal BitcoinPurchased,
-        decimal BitcoinSold);
+        decimal BitcoinSold,
+        decimal AllIncomeInFiat,
+        decimal AllExpensesInFiat);
 }

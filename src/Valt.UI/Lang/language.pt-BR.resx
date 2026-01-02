@@ -657,6 +657,12 @@
     <data name="Reports.AllTimeHigh.DeclineFromAth" xml:space="preserve">
         <value>Diferença atual</value>
     </data>
+    <data name="Reports.AllTimeHigh.MaxDrawdownDate" xml:space="preserve">
+        <value>Data da maior queda</value>
+    </data>
+    <data name="Reports.AllTimeHigh.MaxDrawdownPercent" xml:space="preserve">
+        <value>Maior queda</value>
+    </data>
     <data name="Reports.MonthlyTotals.Obs" xml:space="preserve">
         <value>* o total atual é baseado nos valores do dia anterior</value>
     </data>
@@ -676,10 +682,10 @@
         <value>BTC Vendidos</value>
     </data>
     <data name="Reports.MonthlyTotals.Expenses" xml:space="preserve">
-        <value>Despesas</value>
+        <value>Saídas (Fiat)</value>
     </data>
     <data name="Reports.MonthlyTotals.Income" xml:space="preserve">
-        <value>Saídas</value>
+        <value>Entradas (Fiat)</value>
     </data>
     <data name="Reports.SpendingByCategories.Title" xml:space="preserve">
         <value>Gastos por categorias</value>
@@ -689,5 +695,176 @@
     </data>
     <data name="Reports.SpendingByCategories.Categories" xml:space="preserve">
         <value>Categorias</value>
+    </data>
+    <data name="Total" xml:space="preserve">
+        <value>Total</value>
+    </data>
+    <data name="Main.AvgPrice" xml:space="preserve">
+        <value>Preço-médio</value>
+    </data>
+    <data name="Reports.MonthlyTotals.AllIncomeInFiat" xml:space="preserve">
+        <value>Entradas (Total)</value>
+    </data>
+    <data name="Reports.MonthlyTotals.AllExpensesInFiat" xml:space="preserve">
+        <value>Saídas (Total)</value>
+    </data>
+    <data name="AvgPriceLineEditor.AddTitle" xml:space="preserve">
+        <value>Adicionar Linha</value>
+    </data>
+    <data name="AvgPriceLineEditor.EditTitle" xml:space="preserve">
+        <value>Editar Linha</value>
+    </data>
+    <data name="AvgPriceLineEditor.Date" xml:space="preserve">
+        <value>Data</value>
+    </data>
+    <data name="AvgPriceLineEditor.Type" xml:space="preserve">
+        <value>Tipo</value>
+    </data>
+    <data name="AvgPriceLineEditor.Buy" xml:space="preserve">
+        <value>Compra</value>
+    </data>
+    <data name="AvgPriceLineEditor.Sell" xml:space="preserve">
+        <value>Venda</value>
+    </data>
+    <data name="AvgPriceLineEditor.Setup" xml:space="preserve">
+        <value>Setup</value>
+    </data>
+    <data name="AvgPriceLineEditor.Quantity" xml:space="preserve">
+        <value>Quantidade</value>
+    </data>
+    <data name="AvgPriceLineEditor.AvgCost" xml:space="preserve">
+        <value>Custo Médio</value>
+    </data>
+    <data name="AvgPriceLineEditor.Comment" xml:space="preserve">
+        <value>Comentário</value>
+    </data>
+    <data name="AvgPrice.ManageProfiles" xml:space="preserve">
+        <value>Gerenciar</value>
+    </data>
+    <data name="AvgPrice.AddOperation" xml:space="preserve">
+        <value>+ Adicionar Operação</value>
+    </data>
+    <data name="AvgPrice.Menu.Edit" xml:space="preserve">
+        <value>Editar</value>
+    </data>
+    <data name="AvgPrice.Menu.Delete" xml:space="preserve">
+        <value>Excluir</value>
+    </data>
+    <data name="AvgPrice.Menu.MoveUp" xml:space="preserve">
+        <value>Mover para Cima</value>
+    </data>
+    <data name="AvgPrice.Menu.MoveDown" xml:space="preserve">
+        <value>Mover para Baixo</value>
+    </data>
+    <data name="AvgPrice.DeleteConfirm.Title" xml:space="preserve">
+        <value>Excluir Operação</value>
+    </data>
+    <data name="AvgPrice.DeleteConfirm.Message" xml:space="preserve">
+        <value>Tem certeza que deseja excluir esta operação? Esta ação não pode ser desfeita.</value>
+    </data>
+    <data name="AvgPrice.Column.Date" xml:space="preserve">
+        <value>Data</value>
+    </data>
+    <data name="AvgPrice.Column.Type" xml:space="preserve">
+        <value>Tipo</value>
+    </data>
+    <data name="AvgPrice.Column.Quantity" xml:space="preserve">
+        <value>Quantidade</value>
+    </data>
+    <data name="AvgPrice.Column.UnitPrice" xml:space="preserve">
+        <value>Preço Unitário</value>
+    </data>
+    <data name="AvgPrice.Column.TotalQuantity" xml:space="preserve">
+        <value>Qtd Total</value>
+    </data>
+    <data name="AvgPrice.Column.TotalCost" xml:space="preserve">
+        <value>Custo Total</value>
+    </data>
+    <data name="AvgPrice.Column.AvgCost" xml:space="preserve">
+        <value>Custo Médio</value>
+    </data>
+    <data name="AvgPrice.Column.Comment" xml:space="preserve">
+        <value>Comentário</value>
+    </data>
+    <data name="AvgPrice.LineType.Buy" xml:space="preserve">
+        <value>Compra</value>
+    </data>
+    <data name="AvgPrice.LineType.Sell" xml:space="preserve">
+        <value>Venda</value>
+    </data>
+    <data name="AvgPrice.LineType.Setup" xml:space="preserve">
+        <value>Setup</value>
+    </data>
+    <data name="AvgPriceLineEditor.Amount" xml:space="preserve">
+        <value>Valor</value>
+    </data>
+    <data name="AvgPrice.Column.Amount" xml:space="preserve">
+        <value>Valor</value>
+    </data>
+    <data name="AvgPrice.Totals.Period" xml:space="preserve">
+        <value>Período</value>
+    </data>
+    <data name="AvgPrice.Totals.Bought" xml:space="preserve">
+        <value>Comprado</value>
+    </data>
+    <data name="AvgPrice.Totals.Sold" xml:space="preserve">
+        <value>Vendido</value>
+    </data>
+    <data name="AvgPrice.Totals.ProfitLoss" xml:space="preserve">
+        <value>L/P</value>
+    </data>
+    <data name="AvgPrice.Totals.Volume" xml:space="preserve">
+        <value>Volume</value>
+    </data>
+    <data name="AvgPrice.Totals.YearlyTotal" xml:space="preserve">
+        <value>TOTAL</value>
+    </data>
+    <data name="AvgPrice.CurrentPosition" xml:space="preserve">
+        <value>Posição Atual</value>
+    </data>
+    <data name="AvgPrice.AveragePrice" xml:space="preserve">
+        <value>Preço Médio</value>
+    </data>
+    <data name="AvgPrice.Profiles.Title" xml:space="preserve">
+        <value>Perfis de Preço Médio</value>
+    </data>
+    <data name="AvgPrice.Profiles.ProfileName" xml:space="preserve">
+        <value>Nome do Perfil</value>
+    </data>
+    <data name="AvgPrice.Profiles.AssetType" xml:space="preserve">
+        <value>Tipo de Ativo</value>
+    </data>
+    <data name="AvgPrice.Profiles.Bitcoin" xml:space="preserve">
+        <value>Bitcoin</value>
+    </data>
+    <data name="AvgPrice.Profiles.CustomAsset" xml:space="preserve">
+        <value>Ativo Personalizado</value>
+    </data>
+    <data name="AvgPrice.Profiles.CustomAssetDetails" xml:space="preserve">
+        <value>Detalhes do Ativo</value>
+    </data>
+    <data name="AvgPrice.Profiles.AssetName" xml:space="preserve">
+        <value>Nome do Ativo</value>
+    </data>
+    <data name="AvgPrice.Profiles.Decimals" xml:space="preserve">
+        <value>Decimais</value>
+    </data>
+    <data name="AvgPrice.Profiles.FiatCurrency" xml:space="preserve">
+        <value>Moeda Fiduciária</value>
+    </data>
+    <data name="AvgPrice.Profiles.CalculationMethod" xml:space="preserve">
+        <value>Método de Cálculo</value>
+    </data>
+    <data name="AvgPrice.Profiles.Icon" xml:space="preserve">
+        <value>Ícone</value>
+    </data>
+    <data name="AvgPrice.Profiles.Visible" xml:space="preserve">
+        <value>Visível</value>
+    </data>
+    <data name="AvgPrice.Profiles.DeleteConfirm.Title" xml:space="preserve">
+        <value>Excluir Perfil</value>
+    </data>
+    <data name="AvgPrice.Profiles.DeleteConfirm.Message" xml:space="preserve">
+        <value>Este perfil possui {0} registro(s). Tem certeza que deseja excluí-lo? Todos os registros relacionados serão permanentemente excluídos.</value>
     </data>
 </root>

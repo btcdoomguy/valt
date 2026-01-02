@@ -29,8 +29,9 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(LocalStorageHelper.LoadCulture());
-        CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo(LocalStorageHelper.LoadCulture());
+        var localStorageService = new LocalStorageService();
+        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(localStorageService.LoadCulture());
+        CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo(localStorageService.LoadCulture());
 
         var collection = new ServiceCollection();
 
@@ -42,7 +43,7 @@ public partial class App : Application
         collection
             .AddValtCore()
             .AddValtInfrastructure()
-            .AddValtUI();
+            .AddValtUI(localStorageService);
 
         var serviceProvider = collection.BuildServiceProvider();
 

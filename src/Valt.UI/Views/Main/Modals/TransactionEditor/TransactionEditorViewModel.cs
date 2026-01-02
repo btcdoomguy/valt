@@ -52,7 +52,7 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
     private TransactionId? _transactionId;
 
     [Required(ErrorMessage = "Date is required")] [ObservableProperty]
-    private DateTimeOffset _date;
+    private DateTime? _date;
 
     [Required(ErrorMessage = "Name is required")] [ObservableProperty]
     private string _name = string.Empty;
@@ -609,13 +609,13 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
     [RelayCommand]
     private void NextDay()
     {
-        Date = Date.AddDays(1);
+        Date = Date?.AddDays(1);
     }
 
     [RelayCommand]
     private void PreviousDay()
     {
-        Date = Date.AddDays(-1);
+        Date = Date?.AddDays(-1);
     }
 
     [RelayCommand]
@@ -665,7 +665,7 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
     private Task<Transaction> CreateAsync()
     {
         var name = TransactionName.New(Name);
-        var date = DateOnly.FromDateTime(Date.Date);
+        var date = DateOnly.FromDateTime(Date!.Value);
 
         var transactionDetails = BuildTransactionDetailsFromForm();
 
@@ -676,7 +676,7 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
     private Task EditAsync(Transaction transaction)
     {
         var name = TransactionName.New(Name);
-        var date = DateOnly.FromDateTime(Date.Date);
+        var date = DateOnly.FromDateTime(Date!.Value);
         var transactionDetails = BuildTransactionDetailsFromForm();
 
         transaction.ChangeDate(date);

@@ -5,6 +5,7 @@ using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Transactions;
 using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
+using Valt.UI.Lang;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
 namespace Valt.UI.Views.Main.Tabs.Reports.Models;
@@ -27,48 +28,97 @@ public class MonthlyReportItemViewModel : ObservableObject
         BitcoinSold = item.BitcoinSold;
         BitcoinIncome = item.BitcoinIncome;
         BitcoinExpenses = item.BitcoinExpenses;
+        AllIncomeInFiat = item.AllIncomeInFiat;
+        AllExpensesInFiat = item.AllExpensesInFiat;
     }
     
+    public MonthlyReportItemViewModel(FiatCurrency currency, MonthlyTotalsData.Totals item)
+    {
+        Currency = currency;
+        Income = item.Income;
+        Expenses = item.Expenses;
+        BitcoinPurchased = item.BitcoinPurchased;
+        BitcoinSold = item.BitcoinSold;
+        BitcoinIncome = item.BitcoinIncome;
+        BitcoinExpenses = item.BitcoinExpenses;
+        AllIncomeInFiat = item.AllIncomeInFiat;
+        AllExpensesInFiat = item.AllExpensesInFiat;
+    }
+
     public FiatCurrency Currency { get; init; }
 
-    public DateOnly MonthYear { get; init; }
-    public string MonthYearFormatted => MonthYear.ToString("MMMM yyyy");
-    public decimal BtcTotal { get; init; }
+    public DateOnly? MonthYear { get; init; }
+    public string MonthYearFormatted => MonthYear?.ToString("MMMM yyyy") ?? language.Total;
+    public decimal? BtcTotal { get; init; }
 
-    public decimal BtcMonthlyChange { get; init; }
-    public string BtcMonthlyChangeFormatted => BtcMonthlyChange >= 0 ? $"+{BtcMonthlyChange}%" : $"{BtcMonthlyChange}%";
-    public SolidColorBrush BtcMonthlyChangeColor => Process(BtcMonthlyChange);
-    
-    public decimal BtcYearlyChange { get; init; }
-    public string BtcYearlyChangeFormatted => BtcYearlyChange >= 0 ? $"+{BtcYearlyChange}%" : $"{BtcYearlyChange}%";
-    public SolidColorBrush BtcYearlyChangeColor => Process(BtcYearlyChange);
+    public string BtcTotalFormatted =>
+        BtcTotal is not null ? CurrencyDisplay.FormatAsBitcoin(BtcTotal.Value) : string.Empty;
 
-    public decimal FiatTotal { get; init; }
-    public string FiatTotalFormatted => CurrencyDisplay.FormatFiat(FiatTotal, Currency.Code);
+    public decimal? BtcMonthlyChange { get; init; }
 
-    public decimal FiatMonthlyChange { get; init; }
-    public string FiatMonthlyChangeFormatted =>
-        FiatMonthlyChange >= 0 ? $"+{FiatMonthlyChange}%" : $"{FiatMonthlyChange}%";
-    public SolidColorBrush FiatMonthlyChangeColor => Process(FiatMonthlyChange);
+    public string BtcMonthlyChangeFormatted => BtcMonthlyChange is not null
+        ? BtcMonthlyChange >= 0 ? $"+{BtcMonthlyChange}%" : $"{BtcMonthlyChange}%"
+        : string.Empty;
 
-    public decimal FiatYearlyChange { get; init; }
-    public string FiatYearlyChangeFormatted => FiatYearlyChange >= 0 ? $"+{FiatYearlyChange}%" : $"{FiatYearlyChange}%";
-    public SolidColorBrush FiatYearlyChangeColor => Process(FiatYearlyChange);
-    
+    public SolidColorBrush BtcMonthlyChangeColor => BtcMonthlyChange is not null
+        ? Process(BtcMonthlyChange.Value)
+        : TransactionGridResources.Credit;
+
+    public decimal? BtcYearlyChange { get; init; }
+
+    public string BtcYearlyChangeFormatted => BtcMonthlyChange is not null
+        ? BtcYearlyChange >= 0 ? $"+{BtcYearlyChange}%" : $"{BtcYearlyChange}%"
+        : string.Empty;
+
+    public SolidColorBrush BtcYearlyChangeColor => BtcYearlyChange is not null
+        ? Process(BtcYearlyChange.Value)
+        : TransactionGridResources.Credit;
+
+    public decimal? FiatTotal { get; init; }
+
+    public string FiatTotalFormatted => FiatTotal is not null
+        ? CurrencyDisplay.FormatFiat(FiatTotal.Value, Currency.Code)
+        : string.Empty;
+
+    public decimal? FiatMonthlyChange { get; init; }
+
+    public string FiatMonthlyChangeFormatted => FiatMonthlyChange is not null
+        ? FiatMonthlyChange >= 0 ? $"+{FiatMonthlyChange}%" : $"{FiatMonthlyChange}%"
+        : string.Empty;
+
+    public SolidColorBrush FiatMonthlyChangeColor => FiatMonthlyChange is not null
+        ? Process(FiatMonthlyChange.Value)
+        : TransactionGridResources.Credit;
+
+    public decimal? FiatYearlyChange { get; init; }
+
+    public string FiatYearlyChangeFormatted => FiatYearlyChange is not null
+        ? FiatYearlyChange >= 0 ? $"+{FiatYearlyChange}%" : $"{FiatYearlyChange}%"
+        : string.Empty;
+
+    public SolidColorBrush FiatYearlyChangeColor => FiatYearlyChange is not null
+        ? Process(FiatYearlyChange.Value)
+        : TransactionGridResources.Credit;
+
     public decimal Income { get; init; }
     public string IncomeFormatted => CurrencyDisplay.FormatFiat(Income, Currency.Code);
     public decimal Expenses { get; init; }
     public string ExpensesFormatted => CurrencyDisplay.FormatFiat(Expenses, Currency.Code);
-        
+
     public decimal BitcoinPurchased { get; init; }
     public string BitcoinPurchasedFormatted => CurrencyDisplay.FormatAsBitcoin(BitcoinPurchased);
     public decimal BitcoinSold { get; init; }
     public string BitcoinSoldFormatted => CurrencyDisplay.FormatAsBitcoin(BitcoinSold);
-        
+
     public decimal BitcoinIncome { get; init; }
     public string BitcoinIncomeFormatted => CurrencyDisplay.FormatAsBitcoin(BitcoinIncome);
     public decimal BitcoinExpenses { get; init; }
     public string BitcoinExpensesFormatted => CurrencyDisplay.FormatAsBitcoin(BitcoinExpenses);
+    
+    public decimal AllIncomeInFiat { get; init; }
+    public string AllIncomeInFiatFormatted => CurrencyDisplay.FormatFiat(AllIncomeInFiat, Currency.Code);
+    public decimal AllExpensesInFiat { get; init; }
+    public string AllExpensesInFiatFormatted => CurrencyDisplay.FormatFiat(AllExpensesInFiat, Currency.Code);
 
     private SolidColorBrush Process(decimal percentage)
     {

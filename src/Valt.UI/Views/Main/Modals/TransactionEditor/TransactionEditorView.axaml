@@ -75,21 +75,20 @@
                                     FontSize="28"
                                     Padding="0"
                                     Command="{Binding PreviousDayCommand} " />
-                            <DatePicker HorizontalAlignment="Stretch" Grid.Column="1"
-                                        DayFormat="ddd dd"
-                                        MonthFormat="MMMM"
-                                        YearFormat="yyy"
-                                        TabIndex="10"
-                                        Height="36"
-                                        SelectedDate="{Binding Date}">
-                                <DatePicker.ContextMenu>
+                            <CalendarDatePicker HorizontalAlignment="Stretch" Grid.Column="1"
+                                                SelectedDateFormat="Long"
+                                                IsTodayHighlighted="True"
+                                                TabIndex="10"
+                                                Height="36"
+                                                SelectedDate="{Binding Date}">
+                                <CalendarDatePicker.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="{x:Static local:language.ManageTransactions_SelectToday}"
                                                   Command="{Binding SelectTodayCommand}">
                                         </MenuItem>
                                     </ContextMenu>
-                                </DatePicker.ContextMenu>
-                            </DatePicker>
+                                </CalendarDatePicker.ContextMenu>
+                            </CalendarDatePicker>
                             <Button
                                 Grid.Column="2"
                                 FontFamily="{DynamicResource MaterialDesign}"

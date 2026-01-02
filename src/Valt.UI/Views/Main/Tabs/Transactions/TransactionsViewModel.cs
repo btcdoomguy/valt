@@ -512,7 +512,11 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
     public void Dispose()
     {
-        _accountsTotalState!.Dispose();
+        if (_accountsTotalState is not null)
+            _accountsTotalState.PropertyChanged -= AccountsTotalStateOnPropertyChanged;
+
+        if (_filterState is not null)
+            _filterState.PropertyChanged -= FilterStateOnPropertyChanged;
 
         WeakReferenceMessenger.Default.Unregister<TransactionListChanged>(this);
         WeakReferenceMessenger.Default.Unregister<FilterDateRangeChanged>(this);

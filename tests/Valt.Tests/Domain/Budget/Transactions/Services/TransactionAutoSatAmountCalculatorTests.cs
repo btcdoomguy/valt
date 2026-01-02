@@ -121,7 +121,7 @@ public class TransactionAutoSatAmountCalculatorTests : DatabaseTest
 
         await _transactionRepository.SaveTransactionAsync(transaction);
 
-        var localHistoryProvider = new LivePricesUpdaterJob(_priceDatabase);
+        var localHistoryProvider = new LocalHistoricalPriceProvider(_priceDatabase);
 
         var service = new TransactionAutoSatAmountCalculator(_transactionRepository, _localDatabase, localHistoryProvider,
             NullLogger<TransactionAutoSatAmountCalculator>.Instance);
@@ -159,7 +159,7 @@ public class TransactionAutoSatAmountCalculatorTests : DatabaseTest
 
         await _transactionRepository.SaveTransactionAsync(transaction);
 
-        var localHistoryProvider = new LivePricesUpdaterJob(_priceDatabase);
+        var localHistoryProvider = new LocalHistoricalPriceProvider(_priceDatabase);
 
         var service = new TransactionAutoSatAmountCalculator(_transactionRepository, _localDatabase, localHistoryProvider,
             NullLogger<TransactionAutoSatAmountCalculator>.Instance);
@@ -206,7 +206,7 @@ public class TransactionAutoSatAmountCalculatorTests : DatabaseTest
 
         await _transactionRepository.SaveTransactionAsync(transaction);
 
-        var localHistoryProvider = new LivePricesUpdaterJob(_priceDatabase);
+        var localHistoryProvider = new LocalHistoricalPriceProvider(_priceDatabase);
 
         var service = new TransactionAutoSatAmountCalculator(_transactionRepository, _localDatabase, localHistoryProvider,
             NullLogger<TransactionAutoSatAmountCalculator>.Instance);

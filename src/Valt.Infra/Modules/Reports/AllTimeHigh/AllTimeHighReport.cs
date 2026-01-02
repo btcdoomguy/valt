@@ -94,9 +94,13 @@ internal class AllTimeHighReport : IAllTimeHighReport
             var allTimeHighCurrentDate = DateTime.MinValue;
             var allTimeHighCurrentFiatValue = decimal.Zero;
             var lastDayFiatValue = decimal.Zero;
-            
+
+            // Track max drawdown after ATH
+            var maxDrawdownDate = DateTime.MinValue;
+            var maxDrawdownValue = decimal.MaxValue;
+
             var accountCurrentScanDateTotals = new Dictionary<ObjectId, decimal>();
-            
+
             var currentScanDate = _startDate.AddDays(-1);
             while (currentScanDate < _endDate)
             {
@@ -142,13 +146,13 @@ internal class AllTimeHighReport : IAllTimeHighReport
                 {
                     if (!accountCurrentScanDateTotals.ContainsKey(account.Id))
                         continue;
-                    
+
                     if (account.AccountEntityType == AccountEntityType.Bitcoin)
-                    { 
+                    {
                         //convert it to dollar, then convert back to main fiat currency
                         var valueOnUsd =
                             accountCurrentScanDateTotals[account.Id] * GetUsdBitcoinPriceAt(currentScanDate);
-                        
+
                         dateTotal +=
                             GetFiatRateAt(currentScanDate, _currency) * valueOnUsd;
                     }
@@ -170,25 +174,46 @@ internal class AllTimeHighReport : IAllTimeHighReport
                         }
                     }
                 }
-                
+
                 if (currentScanDate == _endDate)
                     lastDayFiatValue = dateTotal;
 
-                if (dateTotal <= allTimeHighCurrentFiatValue) 
-                    continue;
-                
-                allTimeHighCurrentFiatValue = dateTotal;
-                allTimeHighCurrentDate = currentScanDate;
+                if (dateTotal > allTimeHighCurrentFiatValue)
+                {
+                    // New ATH found - reset max drawdown tracking
+                    allTimeHighCurrentFiatValue = dateTotal;
+                    allTimeHighCurrentDate = currentScanDate;
+                    maxDrawdownValue = decimal.MaxValue;
+                    maxDrawdownDate = DateTime.MinValue;
+                }
+                else if (dateTotal < maxDrawdownValue)
+                {
+                    // New low after ATH - update max drawdown
+                    maxDrawdownValue = dateTotal;
+                    maxDrawdownDate = currentScanDate;
+                }
             }
 
             var hasAccountsWithoutTransactions = Enumerable.Any(_accounts.Values, account => !accountCurrentScanDateTotals.ContainsKey(account.Id));
-            
+
             var declineFromAth = Math.Round((Math.Round(lastDayFiatValue / allTimeHighCurrentFiatValue - 1, 4) * 100), 2);
+
+            // Calculate max drawdown percentage (if there was a drawdown after ATH)
+            DateOnly? maxDrawdownDateResult = null;
+            decimal? maxDrawdownPercent = null;
+
+            if (maxDrawdownDate != DateTime.MinValue && maxDrawdownValue < allTimeHighCurrentFiatValue)
+            {
+                maxDrawdownDateResult = DateOnly.FromDateTime(maxDrawdownDate);
+                maxDrawdownPercent = Math.Round((Math.Round(maxDrawdownValue / allTimeHighCurrentFiatValue - 1, 4) * 100), 2);
+            }
 
             return new AllTimeHighData(DateOnly.FromDateTime(allTimeHighCurrentDate), _currency,
                 allTimeHighCurrentFiatValue, declineFromAth)
             {
-                HasAccountsWithoutTransactions = hasAccountsWithoutTransactions
+                HasAccountsWithoutTransactions = hasAccountsWithoutTransactions,
+                MaxDrawdownDate = maxDrawdownDateResult,
+                MaxDrawdownPercent = maxDrawdownPercent
             };
         }
 
@@ -204,7 +229,7 @@ internal class AllTimeHighReport : IAllTimeHighReport
             {
                 _ = _fiatRates.TryGetValue(scanDate, out var rates);
                 
-                var entry = rates?.SingleOrDefault(x => x.Currency == currencyCode);
+                var entry = rates?.FirstOrDefault(x => x.Currency == currencyCode);
 
                 if (entry is not null)
                     return entry.Price;

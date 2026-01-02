@@ -5,11 +5,16 @@ using Valt.Infra.Modules.Budget.Categories;
 
 namespace Valt.Tests.Builders;
 
+/// <summary>
+/// Builder for creating Category test data.
+/// </summary>
 public class CategoryBuilder
 {
-    private CategoryId _id = null!;
-    private CategoryName _name = null!;
+    private CategoryId _id = new();
+    private CategoryName _name = "Test Category";
     private Icon _icon = Icon.Empty;
+
+    public static CategoryBuilder ACategory() => new();
 
     public CategoryBuilder WithId(CategoryId id)
     {
