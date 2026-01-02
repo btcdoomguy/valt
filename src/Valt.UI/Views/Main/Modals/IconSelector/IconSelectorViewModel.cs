@@ -21,9 +21,6 @@ public partial class IconSelectorViewModel : ValtModalViewModel
     private static HashSet<IconMap> _icons = [];
     private bool? _isSearching;
 
-    [ObservableProperty] private IColorPalette _iconColorPalette = new MaterialHalfColorPalette();
-
-    
     #region Form Data
     
     [ObservableProperty] private IconMap? _selectedIcon;
