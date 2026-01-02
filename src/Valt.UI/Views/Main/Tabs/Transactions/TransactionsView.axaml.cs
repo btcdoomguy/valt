@@ -54,7 +54,7 @@ public partial class TransactionsView : ValtBaseUserControl
 
     private async void AccountsList_KeyDown(object? sender, KeyEventArgs e)
     {
-        if (e.KeyModifiers != KeyModifiers.Shift) return;
+        if (e.KeyModifiers != KeyModifiers.Control) return;
 
         var vm = (DataContext as TransactionsViewModel)!;
         if (vm.SelectedAccount is null) return;
@@ -63,13 +63,27 @@ public partial class TransactionsView : ValtBaseUserControl
         {
             await vm.MoveUpAccountCommand.ExecuteAsync(vm.SelectedAccount);
             e.Handled = true;
-            Dispatcher.UIThread.Post(() => AccountsList.Focus());
+            FocusSelectedAccountItem();
         }
         else if (e.Key == Key.Down)
         {
             await vm.MoveDownAccountCommand.ExecuteAsync(vm.SelectedAccount);
             e.Handled = true;
-            Dispatcher.UIThread.Post(() => AccountsList.Focus());
+            FocusSelectedAccountItem();
         }
+    }
+
+    private void FocusSelectedAccountItem()
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (AccountsList.SelectedItem is null) return;
+
+            var index = AccountsList.SelectedIndex;
+            if (index >= 0)
+            {
+                AccountsList.ContainerFromIndex(index)?.Focus();
+            }
+        }, DispatcherPriority.Background);
     }
 }

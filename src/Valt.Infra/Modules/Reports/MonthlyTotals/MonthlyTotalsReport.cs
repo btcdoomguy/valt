@@ -33,7 +33,6 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
 
     public Task<MonthlyTotalsData> GetAsync(DateOnly baseDate, DateOnlyRange displayRange, FiatCurrency currency)
     {
-        var firstDayOfMonth = new DateOnly(baseDate.Year, baseDate.Month, 1);
         var accounts = _localDatabase.GetAccounts().FindAll().ToImmutableList();
         var transactions = _localDatabase.GetTransactions().FindAll().ToImmutableList();
 
@@ -43,11 +42,9 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
         }
 
         var minDate = transactions.Min(x => x.Date);
-        var lastDayOfMonth = new DateOnly(firstDayOfMonth.Year, firstDayOfMonth.Month, 1).AddMonths(1).AddDays(-1)
-            .ToValtDateTime();
-        var maxDate = _clock.GetCurrentLocalDate().ToValtDateTime() < lastDayOfMonth
-            ? _clock.GetCurrentLocalDate().ToValtDateTime()
-            : lastDayOfMonth;
+        var displayRangeEnd = displayRange.End.ToValtDateTime();
+        var currentDate = _clock.GetCurrentLocalDate().ToValtDateTime();
+        var maxDate = displayRangeEnd < currentDate ? displayRangeEnd : currentDate;
 
         var btcRates = _priceDatabase.GetBitcoinData().Find(x => x.Date >= minDate && x.Date <= maxDate)
             .ToImmutableList();

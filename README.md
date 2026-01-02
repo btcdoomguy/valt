@@ -12,6 +12,8 @@ Valt is a *simple and easy-to-use* budget management app designed specifically f
 - 📝 **Transaction Tracking**: Register spending, income, and bitcoin transactions with ease.
 - 🔄 **Automatic Exchange Calculation**: When transferring between fiat and bitcoin accounts, the app auto-calculates the exchange rate and bitcoin equivalent.
 - 📊 **Price History**: Track a full history of bitcoin and fiat prices in USD terms.
+- 📉 **Reports Module**: Generate graphical reports of your transactions, check all your monthly and yearly evolution, track your cashflow.
+- 📈 **Average Price Calculation**: Calculate the average price of your bitcoin transactions/other assets and create profiles for different scenarios.
 - 🧮 **Bitcoin-Term Calculations**: Every transaction is calculated in bitcoin terms using the BTC closing price of that day.
 - 🔍 **Cost Analysis**: See how much your transaction cost in bitcoin on the date it occurred – and its value based on the current bitcoin price.
 - 📅 **Fixed Expenses**: Add and track all your recurring expenses to avoid missing payments!
@@ -23,20 +25,23 @@ With Valt, you can easily keep track of your finances and stay in control of you
 
 ## Useful Hotkeys ⌨️
 
-### Main Window
-- **F2**: Adds a new transaction.
-
 ### Transaction Window
+- **F2**: Adds a new transaction.
+- **Ctrl + Up/Down Arrow**: Move accounts order up or down
+
+### Transaction Editor Window
 - **Ctrl + 1**: Switch to Debt.
 - **Ctrl + 2**: Switch to Credit.
 - **Ctrl + 3**: Switch to Transfer.
 - **Ctrl + Left Arrow**: Move the date to the previous day.
 - **Ctrl + Right Arrow**: Move the date to the next day.
 
+### Average Price Window
+
+- **F2**: Adds a new operation
+
 ## Roadmap 🛤️
 
-- 📉 **Reports Module**: Generate graphical reports of your transactions, with filtering and saved presets for future use.
-- 📈 **Average Price Calculation**: Calculate the average price of your bitcoin transactions and create profiles for different scenarios.
 - 📊 **Cost of Living Evolution**: Visualize how your cost of living changes in fiat vs. bitcoin terms.
 - 💲 **More Fiat Currencies**: Expand support for additional fiat currencies.
 - 🎨 **Interface & UX Improvements**: Enhance the overall look, feel, and user experience.
