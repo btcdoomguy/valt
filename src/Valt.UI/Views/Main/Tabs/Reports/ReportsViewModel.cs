@@ -45,8 +45,12 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly ILocalDatabase _localDatabase;
     private readonly IClock _clock;
     private readonly ILogger<ReportsViewModel> _logger;
+    private readonly AccountsTotalState _accountsTotalState;
+
+    private const long TotalBtcSupplySats = 21_000_000_00_000_000L; // 21 million BTC in sats
 
     [ObservableProperty] private DashboardData _allTimeHighData;
+    [ObservableProperty] private DashboardData _btcStackData;
     [ObservableProperty] private AvaloniaList<MonthlyReportItemViewModel> _monthlyReportItems = new();
     [ObservableProperty] private MonthlyTotalsChartData _monthlyTotalsChartData = new();
     [ObservableProperty] private ExpensesByCategoryChartData _expensesByCategoryChartData = new();
@@ -56,6 +60,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private DateRange _categoryFilterRange;
 
     [ObservableProperty] private bool _isAllTimeHighLoading = true;
+    [ObservableProperty] private bool _isBtcStackLoading = true;
     [ObservableProperty] private bool _isMonthlyTotalsLoading = true;
     [ObservableProperty] private bool _isSpendingByCategoriesLoading = true;
 
@@ -76,7 +81,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         CurrencySettings currencySettings,
         ILocalDatabase localDatabase,
         IClock clock,
-        ILogger<ReportsViewModel> logger)
+        ILogger<ReportsViewModel> logger,
+        AccountsTotalState accountsTotalState)
     {
         _allTimeHighReport = allTimeHighReport;
         _monthlyTotalsReport = monthlyTotalsReport;
@@ -85,6 +91,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _localDatabase = localDatabase;
         _clock = clock;
         _logger = logger;
+        _accountsTotalState = accountsTotalState;
 
         FilterMainDate = CategoryFilterMainDate = _clock.GetCurrentDateTimeUtc();
         FilterRange = new DateRange(new DateTime(FilterMainDate.Year, 1, 1), new DateTime(FilterMainDate.Year, 12, 31));
@@ -111,6 +118,14 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             }
         });
 
+        _accountsTotalState.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(AccountsTotalState.CurrentWealth))
+            {
+                Dispatcher.UIThread.Post(UpdateBtcStackData);
+            }
+        };
+
         _ready = true;
     }
 
@@ -133,6 +148,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _ = FetchMonthlyTotalsAsync();
         _ = FetchExpensesByCategoryAsync();
         _ = FetchAllTimeHighDataAsync();
+        UpdateBtcStackData();
     }
 
     private void PrepareAccountsAndCategoriesList()
@@ -240,6 +256,46 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         finally
         {
             IsAllTimeHighLoading = false;
+        }
+    }
+
+    private void UpdateBtcStackData()
+    {
+        try
+        {
+            var wealth = _accountsTotalState.CurrentWealth;
+            if (wealth.WealthInSats == 0)
+            {
+                BtcStackData = new DashboardData(language.Reports_BtcStack_Title, new ObservableCollection<RowItem>
+                {
+                    new(language.Reports_BtcStack_CurrentStack, "0 BTC"),
+                    new(language.Reports_BtcStack_PercentOfSupply, "0%"),
+                    new(language.Reports_BtcStack_PeopleWithSameStack, "∞")
+                });
+                IsBtcStackLoading = false;
+                return;
+            }
+
+            var btcFormatted = CurrencyDisplay.FormatSatsAsBitcoin(wealth.WealthInSats);
+            var percentOfSupply = (decimal)wealth.WealthInSats / TotalBtcSupplySats * 100m;
+            var percentFormatted = percentOfSupply.ToString("0.############") + "%";
+            var peopleWithSameStack = Math.Round((decimal)TotalBtcSupplySats / wealth.WealthInSats);
+            var peopleFormatted = peopleWithSameStack.ToString("N0", CultureInfo.CurrentCulture);
+
+            var rows = new ObservableCollection<RowItem>
+            {
+                new(language.Reports_BtcStack_CurrentStack, btcFormatted + " BTC"),
+                new(language.Reports_BtcStack_PercentOfSupply, percentFormatted),
+                new(language.Reports_BtcStack_PeopleWithSameStack, peopleFormatted)
+            };
+
+            BtcStackData = new DashboardData(language.Reports_BtcStack_Title, rows);
+            IsBtcStackLoading = false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating BTC stack data");
+            IsBtcStackLoading = false;
         }
     }
 

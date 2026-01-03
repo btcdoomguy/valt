@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="200"
+             d:DesignHeight="32"
+             x:Class="Valt.UI.UserControls.ColorPalettePicker">
+    <Button x:Name="DropdownButton"
+            Height="32"
+            Padding="4"
+            HorizontalAlignment="Left"
+            HorizontalContentAlignment="Stretch">
+        <Button.Flyout>
+            <Flyout Placement="Bottom">
+                <Border Background="{DynamicResource Background800Brush}"
+                        BorderBrush="{DynamicResource Background600Brush}"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Padding="8">
+                    <WrapPanel x:Name="ColorPanel" Width="280" />
+                </Border>
+            </Flyout>
+        </Button.Flyout>
+        <Grid ColumnDefinitions="Auto, Auto, Auto">
+            <Border x:Name="ColorPreview"
+                    Grid.Column="0"
+                    Width="24"
+                    Height="24"
+                    CornerRadius="2"
+                    BorderThickness="1"
+                    BorderBrush="{DynamicResource Background600Brush}" />
+            <TextBlock Grid.Column="1"
+                       x:Name="ColorHexText"
+                       VerticalAlignment="Center"
+                       Margin="8, 0, 8, 0"
+                       Foreground="{DynamicResource Text200Brush}" />
+            <TextBlock Grid.Column="2"
+                       Text="&#xE5CF;"
+                       FontFamily="{DynamicResource MaterialDesign}"
+                       FontSize="18"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource Text300Brush}" />
+        </Grid>
+    </Button>
+</UserControl>

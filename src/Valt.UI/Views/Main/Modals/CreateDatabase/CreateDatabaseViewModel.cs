@@ -1,9 +1,12 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Valt.UI.Base;
+using Valt.UI.Helpers;
 
 namespace Valt.UI.Views.Main.Modals.CreateDatabase;
 
@@ -27,8 +30,23 @@ public partial class CreateDatabaseViewModel : ValtModalValidatorViewModel
     [Required(ErrorMessage = "Password is required.")]
     [CustomValidation(typeof(CreateDatabaseViewModel), "ValidatePassword")]
     private string _confirmPassword = string.Empty;
-    
+
+    [ObservableProperty]
+    private string _selectedLanguage = GetDefaultLanguage();
+
     #endregion
+
+    public static List<ComboBoxValue> AvailableLanguages =>
+    [
+        new("English (en-US)", "en-US"),
+        new("Português (pt-BR)", "pt-BR"),
+    ];
+
+    private static string GetDefaultLanguage()
+    {
+        var current = CultureInfo.CurrentCulture.Name;
+        return current == "pt-BR" ? "pt-BR" : "en-US";
+    }
 
     [RelayCommand]
     private Task Ok()
@@ -37,7 +55,7 @@ public partial class CreateDatabaseViewModel : ValtModalValidatorViewModel
 
         if (!HasErrors)
         {
-            CloseDialog?.Invoke(new Response(Path, Password));
+            CloseDialog?.Invoke(new Response(Path, Password, SelectedLanguage));
         }
 
         return Task.CompletedTask;
@@ -98,5 +116,5 @@ public partial class CreateDatabaseViewModel : ValtModalValidatorViewModel
         };
     }
     
-    public record Response(string Path, string Password);
+    public record Response(string Path, string Password, string Language);
 }

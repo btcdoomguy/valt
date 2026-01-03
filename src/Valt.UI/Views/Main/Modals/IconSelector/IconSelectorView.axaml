@@ -8,11 +8,11 @@
     xmlns:local="clr-namespace:Valt.UI.Lang"
     xmlns:iconSelector="clr-namespace:Valt.UI.Views.Main.Modals.IconSelector"
     mc:Ignorable="d"
-    d:DesignWidth="600" d:DesignHeight="470"
+    d:DesignWidth="600" d:DesignHeight="480"
     Width="600"
-    Height="470"
+    Height="480"
     MinWidth="600"
-    MinHeight="470"
+    MinHeight="480"
     x:Class="Valt.UI.Views.Main.Modals.IconSelector.IconSelectorView"
     x:DataType="iconSelector:IconSelectorViewModel"
     WindowStartupLocation="CenterScreen"
@@ -83,19 +83,8 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0, 10, 0, 0">
                 <TextBlock TextWrapping="Wrap" Text="{x:Static local:language.IconSelector_Color}"
                            TextAlignment="Right"
-                           Width="120" Margin="0, 0, 5, 0" VerticalAlignment="Center" />
-                <ColorPicker x:Name="IconColorPicker" 
-                             Palette="{Binding IconColorPalette}"
-                             Color="{Binding SelectedColor, Mode=TwoWay}"
-                             IsAccentColorsVisible="False"
-                             IsColorSpectrumVisible="False"
-                             IsColorSpectrumSliderVisible="false"
-                             IsColorComponentsVisible="False"
-                             IsColorModelVisible="False"
-                             IsHexInputVisible="False"
-                             SelectedIndex="1"
-                             Width="200">
-                </ColorPicker>
+                           Width="70" Margin="0, 0, 5, 0" VerticalAlignment="Center" />
+                <userControls:ColorPalettePicker SelectedColor="{Binding SelectedColor, Mode=TwoWay}" />
             </StackPanel>
             <!-- Buttons -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10"

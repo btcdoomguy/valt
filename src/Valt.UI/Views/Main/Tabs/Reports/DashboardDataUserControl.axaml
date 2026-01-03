@@ -3,9 +3,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Valt.UI.Views.Main.Tabs.Reports"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="250"
              x:Class="Valt.UI.Views.Main.Tabs.Reports.DashboardDataUserControl"
              x:DataType="vm:DashboardData">
+    <Design.DataContext>
+        <x:Static Member="vm:DashboardData.DesignTimeSample" />
+    </Design.DataContext>
     <Border BorderThickness="1"
             Background="{DynamicResource Background800Brush}"
             BorderBrush="{DynamicResource Background700Brush}"
@@ -36,6 +39,7 @@
                                            FontSize="13"
                                            Foreground="{DynamicResource Text300Brush}"
                                            DockPanel.Dock="Left"
+                                           Padding="0, 6, 10, 0"
                                            VerticalAlignment="Center"/>
 
                                 <TextBlock Text="{Binding RightText}"

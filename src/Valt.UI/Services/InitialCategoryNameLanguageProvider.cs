@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using Valt.Infra.Modules.Budget.Categories;
 using Valt.UI.Lang;
 
@@ -6,23 +7,29 @@ namespace Valt.UI.Services;
 
 public class InitialCategoryNameLanguageProvider : IInitialCategoryNameLanguageProvider
 {
-    public string Get(InitialCategoryNames categoryName)
+    public string Get(InitialCategoryNames categoryName, string? cultureCode = null)
     {
-        return categoryName switch
+        var resourceKey = categoryName switch
         {
-            InitialCategoryNames.BtcAccount => language.BootDatabase_BtcAccount,
-            InitialCategoryNames.FiatAccount => language.BootDatabase_FiatAccount,
-            InitialCategoryNames.Food => language.BootDatabase_Category_Food,
-            InitialCategoryNames.UtilityBills => language.BootDatabase_Category_UtilityBills,
-            InitialCategoryNames.Services => language.BootDatabase_Category_Services,
-            InitialCategoryNames.Gadgets => language.BootDatabase_Category_Gadgets,
-            InitialCategoryNames.Health => language.BootDatabase_Category_Health,
-            InitialCategoryNames.Transport => language.BootDatabase_Category_Transport,
-            InitialCategoryNames.Travel => language.BootDatabase_Category_Travel,
-            InitialCategoryNames.Entertainment => language.BootDatabase_Category_Entertainment,
-            InitialCategoryNames.Groceries => language.BootDatabase_Category_Groceries,
-            InitialCategoryNames.Paycheck => language.BootDatabase_Category_Paycheck,
+            InitialCategoryNames.BtcAccount => "BootDatabase.BtcAccount",
+            InitialCategoryNames.FiatAccount => "BootDatabase.FiatAccount",
+            InitialCategoryNames.Food => "BootDatabase.Category.Food",
+            InitialCategoryNames.UtilityBills => "BootDatabase.Category.UtilityBills",
+            InitialCategoryNames.Services => "BootDatabase.Category.Services",
+            InitialCategoryNames.Gadgets => "BootDatabase.Category.Gadgets",
+            InitialCategoryNames.Health => "BootDatabase.Category.Health",
+            InitialCategoryNames.Transport => "BootDatabase.Category.Transport",
+            InitialCategoryNames.Travel => "BootDatabase.Category.Travel",
+            InitialCategoryNames.Entertainment => "BootDatabase.Category.Entertainment",
+            InitialCategoryNames.Groceries => "BootDatabase.Category.Groceries",
+            InitialCategoryNames.Paycheck => "BootDatabase.Category.Paycheck",
             _ => throw new ArgumentOutOfRangeException(nameof(categoryName), categoryName, null)
         };
+
+        var culture = string.IsNullOrEmpty(cultureCode)
+            ? null
+            : CultureInfo.GetCultureInfo(cultureCode);
+
+        return language.ResourceManager.GetString(resourceKey, culture) ?? resourceKey;
     }
 }

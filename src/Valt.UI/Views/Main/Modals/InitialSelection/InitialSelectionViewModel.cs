@@ -61,7 +61,13 @@ public partial class InitialSelectionViewModel : ValtModalViewModel
 
         await UpdateRecentFilesAsync(result.Path);
 
-        CloseDialog?.Invoke(new Response() { File = result.Path, Password = result.Password, IsNew = true });
+        CloseDialog?.Invoke(new Response()
+        {
+            File = result.Path,
+            Password = result.Password,
+            IsNew = true,
+            InitialDataLanguage = result.Language
+        });
     }
 
     [RelayCommand]
@@ -169,5 +175,6 @@ public partial class InitialSelectionViewModel : ValtModalViewModel
         public string File { get; init; } = string.Empty;
         public string Password { get; init; } = string.Empty;
         public bool IsNew { get; init; }
+        public string? InitialDataLanguage { get; init; }
     }
 }

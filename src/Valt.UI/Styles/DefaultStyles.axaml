@@ -108,6 +108,14 @@
         <Setter Property="BorderBrush" Value="{DynamicResource Background900Brush}" />
     </Style>
 
+    <!-- Modal dialog container - visible border for chromeless windows -->
+    <Style Selector="Border.modal-container">
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background600Brush}" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
     <!-- About window uses Mono font -->
     <Style Selector="Window.about">
         <Setter Property="FontFamily" Value="Mono" />
