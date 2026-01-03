@@ -674,6 +674,18 @@
     <data name="Reports.AllTimeHigh.MaxDrawdownPercent" xml:space="preserve">
         <value>Max drawdown</value>
     </data>
+    <data name="Reports.BtcStack.Title" xml:space="preserve">
+        <value>Your BTC Stack</value>
+    </data>
+    <data name="Reports.BtcStack.CurrentStack" xml:space="preserve">
+        <value>Current stack</value>
+    </data>
+    <data name="Reports.BtcStack.PercentOfSupply" xml:space="preserve">
+        <value>% of total supply</value>
+    </data>
+    <data name="Reports.BtcStack.PeopleWithSameStack" xml:space="preserve">
+        <value>Max nº of people with same stack</value>
+    </data>
     <data name="Reports.MonthlyTotals.Obs" xml:space="preserve">
         <value>* latest totals are calculated based on yesterday amounts</value>
     </data>
@@ -876,6 +888,6 @@
         <value>This profile has {0} record(s) registered. Are you sure you want to delete it? All related records will be permanently deleted.</value>
     </data>
     <data name="InitialSelection.FirstMessage" xml:space="preserve">
-        <value>Valt stores your data in an encrypted database file.</value>
+        <value>You need to create or select your personal database file to store your financial data safely.</value>
     </data>
 </root>

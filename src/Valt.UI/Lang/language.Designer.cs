@@ -104,13 +104,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("CreateDatabase.ConfirmPassword", resourceCulture);
             }
         }
-
+        
         public static string CreateDatabase_InitialDataLanguage {
             get {
                 return ResourceManager.GetString("CreateDatabase.InitialDataLanguage", resourceCulture);
             }
         }
-
+        
         public static string IconSelector_ClearSelection {
             get {
                 return ResourceManager.GetString("IconSelector.ClearSelection", resourceCulture);
@@ -1344,6 +1344,30 @@ namespace Valt.UI.Lang {
         public static string Reports_AllTimeHigh_MaxDrawdownPercent {
             get {
                 return ResourceManager.GetString("Reports.AllTimeHigh.MaxDrawdownPercent", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcStack_Title {
+            get {
+                return ResourceManager.GetString("Reports.BtcStack.Title", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcStack_CurrentStack {
+            get {
+                return ResourceManager.GetString("Reports.BtcStack.CurrentStack", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcStack_PercentOfSupply {
+            get {
+                return ResourceManager.GetString("Reports.BtcStack.PercentOfSupply", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcStack_PeopleWithSameStack {
+            get {
+                return ResourceManager.GetString("Reports.BtcStack.PeopleWithSameStack", resourceCulture);
             }
         }
         

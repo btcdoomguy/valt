@@ -32,13 +32,14 @@
                             <TextBlock Text="{x:Static local:language.CreateDatabase_TextLine2}"></TextBlock>
                             <LineBreak />
                             <LineBreak />
-                            <TextBlock Text="{x:Static local:language.CreateDatabase_TextLine3}"></TextBlock>
+                            <TextBlock Foreground="{DynamicResource Accent300Brush}" Text="{x:Static local:language.CreateDatabase_TextLine3}"></TextBlock>
                         </TextBlock>
                     </StackPanel>
                     <StackPanel Orientation="Vertical" Spacing="20">
                         <!-- File path Field -->
                         <DockPanel>
-                            <TextBlock Width="150" TextAlignment="Right" Margin="0,0,5,0"
+                            <TextBlock Width="180" TextAlignment="Right" Margin="0,0,5,0"
+                                       HorizontalAlignment="Stretch"
                                        VerticalAlignment="Center"
                                        Text="{x:Static local:language.CreateDatabase_FilePath}"
                                        TextWrapping="Wrap" />
@@ -51,7 +52,8 @@
 
                         <!-- Password Field -->
                         <DockPanel>
-                            <TextBlock Width="150" TextAlignment="Right" Margin="0,0,5,0"
+                            <TextBlock Width="180" TextAlignment="Right" Margin="0,0,5,0"
+                                       HorizontalAlignment="Stretch"
                                        VerticalAlignment="Center"
                                        Text="{x:Static local:language.CreateDatabase_Password}"
                                        TextWrapping="Wrap" />
@@ -60,7 +62,8 @@
 
                         <!-- Confirm Password Field -->
                         <DockPanel>
-                            <TextBlock Width="150" TextAlignment="Right" Margin="0,0,5,0"
+                            <TextBlock Width="180" TextAlignment="Right" Margin="0,0,5,0"
+                                       HorizontalAlignment="Stretch"
                                        VerticalAlignment="Center"
                                        Text="{x:Static local:language.CreateDatabase_ConfirmPassword}"
                                        TextWrapping="Wrap" />
@@ -70,7 +73,8 @@
 
                         <!-- Initial Data Language Field -->
                         <DockPanel>
-                            <TextBlock Width="150" TextAlignment="Right" Margin="0,0,5,0"
+                            <TextBlock Width="180" TextAlignment="Right" Margin="0,0,5,0"
+                                       HorizontalAlignment="Stretch"
                                        VerticalAlignment="Center"
                                        Text="{x:Static local:language.CreateDatabase_InitialDataLanguage}"
                                        TextWrapping="Wrap" />

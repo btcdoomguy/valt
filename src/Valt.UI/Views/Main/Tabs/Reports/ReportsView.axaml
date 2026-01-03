@@ -30,14 +30,26 @@
                         <TextBlock Classes="section-header" Text="{x:Static lang:language.Reports_Summary}" />
                     </StackPanel>
                 </Expander.Header>
-                <Grid>
-                    <StackPanel Orientation="Vertical" Spacing="10" IsVisible="{Binding !IsAllTimeHighLoading}">
-                        <reports1:DashboardDataUserControl DataContext="{Binding AllTimeHighData}" MinWidth="300"></reports1:DashboardDataUserControl>
-                    </StackPanel>
-                    <TextBlock Text="{x:Static lang:language.Loading}" FontSize="14" Foreground="{DynamicResource Text400Brush}"
-                               HorizontalAlignment="Center" VerticalAlignment="Center"
-                               IsVisible="{Binding IsAllTimeHighLoading}" />
-                </Grid>
+                <StackPanel Orientation="Horizontal" Spacing="20">
+                    <!-- All Time High Dashboard -->
+                    <Grid MinWidth="300" MinHeight="150">
+                        <Panel IsVisible="{Binding !IsAllTimeHighLoading}">
+                            <reports1:DashboardDataUserControl DataContext="{Binding AllTimeHighData}" />
+                        </Panel>
+                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="14" Foreground="{DynamicResource Text400Brush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   IsVisible="{Binding IsAllTimeHighLoading}" />
+                    </Grid>
+                    <!-- BTC Stack Dashboard -->
+                    <Grid MinWidth="300" MinHeight="150">
+                        <Panel IsVisible="{Binding !IsBtcStackLoading}">
+                            <reports1:DashboardDataUserControl DataContext="{Binding BtcStackData}" />
+                        </Panel>
+                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="14" Foreground="{DynamicResource Text400Brush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   IsVisible="{Binding IsBtcStackLoading}" />
+                    </Grid>
+                </StackPanel>
             </Expander>
             <!--Monthly totals-->
             <Expander Classes="section" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsExpanded="True">
