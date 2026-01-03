@@ -5,9 +5,9 @@
         xmlns:userControls="clr-namespace:Valt.UI.UserControls"
         xmlns:local="clr-namespace:Valt.UI.Lang"
         xmlns:createDatabase1="clr-namespace:Valt.UI.Views.Main.Modals.CreateDatabase"
-        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="455"
         MaxWidth="600"
-        MaxHeight="400"
+        MaxHeight="455"
         x:Class="Valt.UI.Views.Main.Modals.CreateDatabase.CreateDatabaseView"
         Title="{x:Static local:language.CreateDatabaseTitle}"
         x:DataType="createDatabase1:CreateDatabaseViewModel"
@@ -66,6 +66,19 @@
                                        TextWrapping="Wrap" />
                             <TextBox PasswordChar="*" Text="{Binding ConfirmPassword}"
                                      VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <!-- Initial Data Language Field -->
+                        <DockPanel>
+                            <TextBlock Width="150" TextAlignment="Right" Margin="0,0,5,0"
+                                       VerticalAlignment="Center"
+                                       Text="{x:Static local:language.CreateDatabase_InitialDataLanguage}"
+                                       TextWrapping="Wrap" />
+                            <ComboBox ItemsSource="{Binding AvailableLanguages}"
+                                      DisplayMemberBinding="{Binding Text}"
+                                      SelectedValueBinding="{Binding Value}"
+                                      SelectedValue="{Binding SelectedLanguage}"
+                                      Width="200" />
                         </DockPanel>
                     </StackPanel>
                 </StackPanel>

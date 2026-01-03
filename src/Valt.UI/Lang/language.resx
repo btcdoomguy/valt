@@ -53,6 +53,9 @@
     <data name="CreateDatabase.ConfirmPassword" xml:space="preserve">
         <value>Confirm password</value>
     </data>
+    <data name="CreateDatabase.InitialDataLanguage" xml:space="preserve">
+        <value>Language for initial data</value>
+    </data>
     <data name="IconSelector.ClearSelection" xml:space="preserve">
         <value>Clear Selection</value>
     </data>
@@ -871,5 +874,8 @@
     </data>
     <data name="AvgPrice.Profiles.DeleteConfirm.Message" xml:space="preserve">
         <value>This profile has {0} record(s) registered. Are you sure you want to delete it? All related records will be permanently deleted.</value>
+    </data>
+    <data name="InitialSelection.FirstMessage" xml:space="preserve">
+        <value>Valt stores your data in an encrypted database file.</value>
     </data>
 </root>

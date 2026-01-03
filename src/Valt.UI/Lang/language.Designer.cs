@@ -104,7 +104,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("CreateDatabase.ConfirmPassword", resourceCulture);
             }
         }
-        
+
+        public static string CreateDatabase_InitialDataLanguage {
+            get {
+                return ResourceManager.GetString("CreateDatabase.InitialDataLanguage", resourceCulture);
+            }
+        }
+
         public static string IconSelector_ClearSelection {
             get {
                 return ResourceManager.GetString("IconSelector.ClearSelection", resourceCulture);
@@ -1610,136 +1616,142 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("AvgPrice.LineType.Setup", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Totals_Period {
             get {
                 return ResourceManager.GetString("AvgPrice.Totals.Period", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Totals_Bought {
             get {
                 return ResourceManager.GetString("AvgPrice.Totals.Bought", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Totals_Sold {
             get {
                 return ResourceManager.GetString("AvgPrice.Totals.Sold", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Totals_ProfitLoss {
             get {
                 return ResourceManager.GetString("AvgPrice.Totals.ProfitLoss", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Totals_Volume {
             get {
                 return ResourceManager.GetString("AvgPrice.Totals.Volume", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Totals_YearlyTotal {
             get {
                 return ResourceManager.GetString("AvgPrice.Totals.YearlyTotal", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_CurrentPosition {
             get {
                 return ResourceManager.GetString("AvgPrice.CurrentPosition", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_AveragePrice {
             get {
                 return ResourceManager.GetString("AvgPrice.AveragePrice", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Profiles_Title {
             get {
                 return ResourceManager.GetString("AvgPrice.Profiles.Title", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Profiles_ProfileName {
             get {
                 return ResourceManager.GetString("AvgPrice.Profiles.ProfileName", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Profiles_AssetType {
             get {
                 return ResourceManager.GetString("AvgPrice.Profiles.AssetType", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Profiles_Bitcoin {
             get {
                 return ResourceManager.GetString("AvgPrice.Profiles.Bitcoin", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Profiles_CustomAsset {
             get {
                 return ResourceManager.GetString("AvgPrice.Profiles.CustomAsset", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Profiles_CustomAssetDetails {
             get {
                 return ResourceManager.GetString("AvgPrice.Profiles.CustomAssetDetails", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Profiles_AssetName {
             get {
                 return ResourceManager.GetString("AvgPrice.Profiles.AssetName", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Profiles_Decimals {
             get {
                 return ResourceManager.GetString("AvgPrice.Profiles.Decimals", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Profiles_FiatCurrency {
             get {
                 return ResourceManager.GetString("AvgPrice.Profiles.FiatCurrency", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Profiles_CalculationMethod {
             get {
                 return ResourceManager.GetString("AvgPrice.Profiles.CalculationMethod", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Profiles_Icon {
             get {
                 return ResourceManager.GetString("AvgPrice.Profiles.Icon", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Profiles_Visible {
             get {
                 return ResourceManager.GetString("AvgPrice.Profiles.Visible", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Profiles_DeleteConfirm_Title {
             get {
                 return ResourceManager.GetString("AvgPrice.Profiles.DeleteConfirm.Title", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Profiles_DeleteConfirm_Message {
             get {
                 return ResourceManager.GetString("AvgPrice.Profiles.DeleteConfirm.Message", resourceCulture);
+            }
+        }
+        
+        public static string InitialSelection_FirstMessage {
+            get {
+                return ResourceManager.GetString("InitialSelection.FirstMessage", resourceCulture);
             }
         }
     }

@@ -48,6 +48,9 @@
     <data name="CreateDatabase.Password" xml:space="preserve">
         <value>Senha</value>
     </data>
+    <data name="CreateDatabase.InitialDataLanguage" xml:space="preserve">
+        <value>Idioma dos dados iniciais</value>
+    </data>
     <data name="IconSelector.Title" xml:space="preserve">
         <value>Selecione o ícone</value>
     </data>
@@ -866,5 +869,8 @@
     </data>
     <data name="AvgPrice.Profiles.DeleteConfirm.Message" xml:space="preserve">
         <value>Este perfil possui {0} registro(s). Tem certeza que deseja excluí-lo? Todos os registros relacionados serão permanentemente excluídos.</value>
+    </data>
+    <data name="InitialSelection.FirstMessage" xml:space="preserve">
+        <value>Valt armazena seus dados em um banco de dados criptografado.</value>
     </data>
 </root>
