@@ -97,7 +97,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         FilterRange = new DateRange(new DateTime(FilterMainDate.Year, 1, 1), new DateTime(FilterMainDate.Year, 12, 31));
         var currentMonth = new DateTime(CategoryFilterMainDate.Year, CategoryFilterMainDate.Month, 1);
         CategoryFilterRange = new DateRange(currentMonth, currentMonth.AddMonths(1).AddDays(-1));
-
+        
         PrepareAccountsAndCategoriesList();
 
         SelectedAccounts.CollectionChanged += OnSelectedFiltersChanged;
