@@ -13,24 +13,17 @@
     <UserControl.Styles>
         <!-- Monospace font for numeric values -->
         <Style Selector="TextBlock.mono">
-            <Setter Property="FontFamily" Value="JetBrains Mono, Cascadia Code, Consolas, monospace" />
             <Setter Property="FontWeight" Value="SemiBold" />
         </Style>
         <Style Selector="TextBlock.pair-label">
-            <Setter Property="FontFamily" Value="JetBrains Mono, Cascadia Code, Consolas, monospace" />
             <Setter Property="FontSize" Value="10" />
-            <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="LetterSpacing" Value="1" />
         </Style>
         <Style Selector="TextBlock.price">
-            <Setter Property="FontFamily" Value="JetBrains Mono, Cascadia Code, Consolas, monospace" />
-            <Setter Property="FontSize" Value="13" />
-            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="11" />
         </Style>
         <Style Selector="TextBlock.variation">
-            <Setter Property="FontFamily" Value="JetBrains Mono, Cascadia Code, Consolas, monospace" />
             <Setter Property="FontSize" Value="10" />
-            <Setter Property="FontWeight" Value="Medium" />
         </Style>
     </UserControl.Styles>
 

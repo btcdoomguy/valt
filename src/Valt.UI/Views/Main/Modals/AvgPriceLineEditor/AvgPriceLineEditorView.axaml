@@ -37,7 +37,7 @@
                                 <CalendarDatePicker HorizontalAlignment="Left"
                                                     SelectedDateFormat="Short"
                                                     IsTodayHighlighted="True"
-                                                    Height="34"
+                                                    Height="36"
                                                     SelectedDate="{Binding Date}" />
                             </StackPanel>
                         </StackPanel>

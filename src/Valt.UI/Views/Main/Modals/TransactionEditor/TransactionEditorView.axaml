@@ -30,43 +30,45 @@
                                          CloseClick="CustomTitleBarCloseClicked" />
             <Border Classes="form-fields-area" Height="330" Padding="0">
                 <Grid RowDefinitions="50, 50, 70, 80, 70">
-                    <DockPanel Grid.Row="0" Margin="0, 0, 0, 0" HorizontalAlignment="Stretch">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
-                            <Button Classes="transaction-option debt"
-                                    Width="100"
-                                    IsTabStop="False"
-                                    Classes.selected="{Binding DebtSelected}"
-                                    Command="{Binding SwitchToDebtCommand}">
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <Label Classes="icon" Content="&#xE15B;"></Label>
-                                    <Label Content="{x:Static local:language.ManageTransactions_Debt}" />
-                                </StackPanel>
-                            </Button>
-                            <Button Classes="transaction-option credit"
-                                    Width="100"
-                                    IsTabStop="False"
-                                    Classes.selected="{Binding CreditSelected}"
-                                    Command="{Binding SwitchToCreditCommand}">
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <Label Classes="icon" Content="&#xE145;"></Label>
-                                    <Label Content="{x:Static local:language.ManageTransactions_Credit}" />
-                                </StackPanel>
-                            </Button>
-                            <Button Classes="transaction-option transfer"
-                                    Width="100"
-                                    IsTabStop="False"
-                                    Classes.selected="{Binding TransferSelected}"
-                                    Command="{Binding SwitchToTransferCommand}">
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <Label Classes="icon" Content="&#xEB70;"></Label>
-                                    <Label Content="{x:Static local:language.ManageTransactions_Transfer}" />
-                                </StackPanel>
-                            </Button>
-                        </StackPanel>
+                    <DockPanel Grid.Row="0" Margin="0, 0, 0, 0" HorizontalAlignment="Center">
+                        <Border BorderBrush="LightGray" Background="{DynamicResource Text900Color}" BorderThickness="1" CornerRadius="4" Margin="0, 5, 0, 0" Padding="5, 0, 5, 0">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
+                                <Button Classes="transaction-option debt"
+                                        Width="100"
+                                        IsTabStop="False"
+                                        Classes.selected="{Binding DebtSelected}"
+                                        Command="{Binding SwitchToDebtCommand}">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <Label Classes="icon" Content="&#xE15B;"></Label>
+                                        <Label Content="{x:Static local:language.ManageTransactions_Debt}" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Classes="transaction-option credit"
+                                        Width="100"
+                                        IsTabStop="False"
+                                        Classes.selected="{Binding CreditSelected}"
+                                        Command="{Binding SwitchToCreditCommand}">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <Label Classes="icon" Content="&#xE145;"></Label>
+                                        <Label Content="{x:Static local:language.ManageTransactions_Credit}" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Classes="transaction-option transfer"
+                                        Width="100"
+                                        IsTabStop="False"
+                                        Classes.selected="{Binding TransferSelected}"
+                                        Command="{Binding SwitchToTransferCommand}">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <Label Classes="icon" Content="&#xEB70;"></Label>
+                                        <Label Content="{x:Static local:language.ManageTransactions_Transfer}" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Border>
                     </DockPanel>
 
                     <StackPanel Grid.Row="1" Margin="0, 10, 0, 0" Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Grid ColumnDefinitions="30, 300, 30">
+                        <Grid ColumnDefinitions="30, 140, 30">
                             <Button Grid.Column="0"
                                     FontFamily="{DynamicResource MaterialDesign}"
                                     Content="&#xE5DE;"
@@ -75,8 +77,8 @@
                                     FontSize="28"
                                     Padding="0"
                                     Command="{Binding PreviousDayCommand} " />
-                            <CalendarDatePicker HorizontalAlignment="Stretch" Grid.Column="1"
-                                                SelectedDateFormat="Long"
+                            <CalendarDatePicker HorizontalAlignment="Center" Grid.Column="1"
+                                                SelectedDateFormat="Short"
                                                 IsTodayHighlighted="True"
                                                 TabIndex="10"
                                                 Height="36"
@@ -129,7 +131,7 @@
                                           SelectedItem="{Binding Category}"
                                           HorizontalAlignment="Stretch"
                                           IsTextSearchEnabled="True"
-                                          Height="34"
+                                          Height="36"
                                           TabIndex="1">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>
@@ -157,7 +159,7 @@
                                           SelectedItem="{Binding FromAccount}"
                                           IsTextSearchEnabled="True"
                                           HorizontalAlignment="Stretch"
-                                          Height="34"
+                                          Height="36"
                                           TabIndex="2">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>
@@ -211,12 +213,12 @@
                     <Grid Grid.Row="4" Margin="0" Grid.ColumnDefinitions="*, 2*">
                         <StackPanel Grid.Column="0" Margin="5" Classes="form-field"
                                     IsVisible="{Binding TransferSelected}">
-                            <TextBlock Text="To" />
+                            <TextBlock Text="{x:Static local:language.ManageTransactions_To}" />
                             <ComboBox ItemsSource="{Binding AvailableAccounts}"
                                       SelectedItem="{Binding ToAccount}"
                                       HorizontalAlignment="Stretch"
                                       IsTextSearchEnabled="True"
-                                      Height="34"
+                                      Height="36"
                                       TabIndex="5">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
@@ -279,15 +281,22 @@
                 </Grid>
             </Border>
 
-            <Border Classes="form-fields-area" Height="20" Padding="0" Background="{DynamicResource Background900Brush}">
+            <Border Classes="form-fields-area" Height="20" Padding="0"
+                    Background="{DynamicResource Background900Brush}">
                 <StackPanel Orientation="Horizontal">
-                    <StackPanel Orientation="Horizontal" Margin="0, 0, 20, 0" IsVisible="{Binding IsBoundToFixedExpense}">
-                        <Label FontSize="11" Foreground="{DynamicResource Accent200Color}" HorizontalContentAlignment="Right" Content="{x:Static local:language.ManageTransactions_Properties_BoundToFixedExpense}" />
-                        <Label FontSize="11" Content="{Binding BoundToFixedExpenseCaption}"/>
+                    <StackPanel Orientation="Horizontal" Margin="0, 0, 20, 0"
+                                IsVisible="{Binding IsBoundToFixedExpense}">
+                        <Label FontSize="11" Foreground="{DynamicResource Accent200Color}"
+                               HorizontalContentAlignment="Right"
+                               Content="{x:Static local:language.ManageTransactions_Properties_BoundToFixedExpense}" />
+                        <Label FontSize="11" Content="{Binding BoundToFixedExpenseCaption}" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0, 0, 20, 0" IsVisible="{Binding IsAutoSatAmount}">
-                        <Label FontSize="11" Foreground="{DynamicResource Accent200Color}" HorizontalContentAlignment="Right">Price in sats:</Label>
-                        <Label FontSize="11" Content="{Binding SatAmountStateDescription}"/>
+                        <Label FontSize="11" Foreground="{DynamicResource Accent200Color}"
+                               HorizontalContentAlignment="Right">
+                            Price in sats:
+                        </Label>
+                        <Label FontSize="11" Content="{Binding SatAmountStateDescription}" />
                     </StackPanel>
                 </StackPanel>
             </Border>

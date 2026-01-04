@@ -96,9 +96,9 @@
          ═══════════════════════════════════════════════════════════════════════════════ -->
 
     <Style Selector="Window">
-        <Setter Property="BorderThickness" Value="5" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Background600Brush}" />
-        <Setter Property="FontFamily" Value="{DynamicResource Akko}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background400Brush}" />
+        <Setter Property="FontFamily" Value="{DynamicResource GeistMono}" />
         <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
         <Setter Property="Padding" Value="0" />
     </Style>
@@ -112,7 +112,7 @@
     <Style Selector="Border.modal-container">
         <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Background600Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background400Brush}" />
         <Setter Property="CornerRadius" Value="4" />
     </Style>
 
@@ -137,15 +137,15 @@
     <Style Selector="TextBlock.icon">
         <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
         <Setter Property="FontSize" Value="16" />
-        <Setter Property="Padding" Value="8, 4, 4, 0" />
+        <Setter Property="Padding" Value="8, 6, 4, 0" />
     </Style>
 
     <Style Selector="TextBlock.icon-text">
-        <Setter Property="Padding" Value="0, 10, 0, 0" />
+        <Setter Property="Padding" Value="0, 8, 0, 0" />
     </Style>
 
     <Style Selector="TextBlock.only-text">
-        <Setter Property="Padding" Value="8, 10, 8, 0" />
+        <Setter Property="Padding" Value="8, 8, 8, 0" />
     </Style>
 
     <!-- ═══════════════════════════════════════════════════════════════════════════════
@@ -198,20 +198,25 @@
          ═══════════════════════════════════════════════════════════════════════════════ -->
 
     <Style Selector="Button">
-        <Setter Property="Padding" Value="6, 8, 6, 0" />
-        <Setter Property="FontSize" Value="16" />
-        <Setter Property="Background" Value="{DynamicResource Accent600Brush}" />
+        <Setter Property="Padding" Value="6, 6, 6, 4" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Background" Value="{DynamicResource Accent700Brush}" />
         <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Accent400Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
         <Style Selector="^ /template/ ContentPresenter">
             <Setter Property="Transitions">
                 <Transitions>
                     <BrushTransition Property="Background" Duration="0:0:0.1" />
                     <BrushTransition Property="Foreground" Duration="0:0:0.1" />
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0.1" />
                 </Transitions>
             </Setter>
         </Style>
         <Style Selector="^:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource Accent700Brush}" />
+            <Setter Property="Background" Value="{DynamicResource Accent800Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Accent300Brush}" />
             <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
         </Style>
     </Style>
@@ -219,6 +224,7 @@
     <!-- Transparent button modifier -->
     <Style Selector="Button.transparent">
         <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
     </Style>
     <Style Selector="Button.transparent:pointerover /template/ ContentPresenter">
         <Setter Property="Background" Value="Transparent" />
@@ -234,9 +240,11 @@
 
     <!-- Delete button (destructive action) -->
     <Style Selector="Button.delete-button">
-        <Setter Property="Background" Value="{DynamicResource SemanticNegative500Brush}" />
+        <Setter Property="Background" Value="{DynamicResource SemanticNegative600Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SemanticNegative300Brush}" />
         <Style Selector="^:pointerover /template/ ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource SemanticNegative700Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SemanticNegative200Brush}" />
         </Style>
     </Style>
 
@@ -252,22 +260,28 @@
 
     <Style Selector="Button.calculator">
         <Setter Property="FontSize" Value="20" />
-        <Setter Property="Padding" Value="0" />
+        <Setter Property="Padding" Value="2, 0, 2, 0" />
         <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Content" Value="&#xEA5F;" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#69FFFFFF" />
+            <Setter Property="BorderBrush" Value="White" />
+        </Style>
     </Style>
 
     <Style Selector="Button.text-and-icon">
         <Setter Property="Padding" Value="2" />
-        <Setter Property="FontSize" Value="16" />
-        <Setter Property="Background" Value="{DynamicResource Accent600Brush}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Background" Value="{DynamicResource Accent700Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Accent400Brush}" />
         <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
         <Style Selector="^ Label">
-            <Setter Property="Margin" Value="0, 8, 0 ,0" />
+            <Setter Property="Margin" Value="0, 6, 0 ,4" />
         </Style>
         <Style Selector="^ Label.icon">
-            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontSize" Value="18" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
             <Setter Property="Margin" Value="0, 2, 0 ,0" />
@@ -275,12 +289,13 @@
     </Style>
 
     <Style Selector="Button.rounded">
-        <Setter Property="Padding" Value="4, 2, 0, 0" />
+        <Setter Property="Padding" Value="5, 2, 0, 0" />
         <Setter Property="Background" Value="#49FFFFFF" />
         <Setter Property="FontSize" Value="30" />
         <Setter Property="Width" Value="40" />
         <Setter Property="Height" Value="40" />
         <Setter Property="CornerRadius" Value="20" />
+        <Setter Property="BorderThickness" Value="0" />
         <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
         <Style Selector="^ /template/ ContentPresenter">
             <Setter Property="Transitions">
@@ -288,6 +303,10 @@
                     <BrushTransition Property="Background" Duration="0:0:0" />
                 </Transitions>
             </Setter>
+        </Style>
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#69FFFFFF" />
+            <Setter Property="BorderBrush" Value="White" />
         </Style>
     </Style>
 
@@ -322,15 +341,20 @@
     <Style Selector="Button.tab">
         <Setter Property="Padding" Value="2" />
         <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
         <Style Selector="^:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource Background600Brush}" />
+            <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
         </Style>
         <Style Selector="^.selected">
-            <Setter Property="Background" Value="{DynamicResource Background600Brush}" />
+            <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Background400Brush}" />
         </Style>
         <Style Selector="^ Label">
-            <Setter Property="FontSize" Value="18" />
-            <Setter Property="Margin" Value="0, 5 0, 0" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Margin" Value="0, 3 0, 2" />
         </Style>
         <Style Selector="^ Label.icon">
             <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
@@ -340,7 +364,8 @@
         <Style Selector="^ /template/ ContentPresenter">
             <Setter Property="Transitions">
                 <Transitions>
-                    <BrushTransition Property="Background" Duration="0:0:0.5" />
+                    <BrushTransition Property="Background" Duration="0:0:0" />
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0" />
                     <BrushTransition Property="Foreground" Duration="0:0:0" />
                 </Transitions>
             </Setter>
@@ -354,9 +379,12 @@
     <Style Selector="Button.transaction-option">
         <Setter Property="Padding" Value="2" />
         <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
         <Style Selector="^ Label">
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="Margin" Value="0, 5, 0, 0" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Margin" Value="0, 2, 0, 3" />
         </Style>
         <Style Selector="^ Label.icon">
             <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
@@ -367,42 +395,51 @@
             <Setter Property="Transitions">
                 <Transitions>
                     <BrushTransition Property="Background" Duration="0:0:0" />
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0" />
                 </Transitions>
             </Setter>
         </Style>
         <!-- Default (untyped) states -->
         <Style Selector="^:pointerover /template/ ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
         </Style>
         <Style Selector="^.selected">
-            <Setter Property="Background" Value="{DynamicResource Background900Brush}" />
+            <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
         </Style>
         <!-- Credit variant -->
         <Style Selector="^.credit:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource CreditBaseBrush}" />
-            <Setter Property="Foreground" Value="{DynamicResource Text900Brush}" />
+            <Setter Property="Background" Value="{DynamicResource SemanticPositive700Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CreditBaseBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
         </Style>
         <Style Selector="^.credit.selected">
-            <Setter Property="Background" Value="{DynamicResource CreditBaseBrush}" />
-            <Setter Property="Foreground" Value="{DynamicResource Text900Brush}" />
+            <Setter Property="Background" Value="{DynamicResource SemanticPositive700Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CreditBaseBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
         </Style>
         <!-- Debt variant -->
         <Style Selector="^.debt:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource DebtBaseBrush}" />
-            <Setter Property="Foreground" Value="{DynamicResource Text900Brush}" />
+            <Setter Property="Background" Value="{DynamicResource SemanticNegative700Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource DebtBaseBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
         </Style>
         <Style Selector="^.debt.selected">
-            <Setter Property="Background" Value="{DynamicResource DebtBaseBrush}" />
-            <Setter Property="Foreground" Value="{DynamicResource Text900Brush}" />
+            <Setter Property="Background" Value="{DynamicResource SemanticNegative700Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource DebtBaseBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
         </Style>
         <!-- Transfer variant -->
         <Style Selector="^.transfer:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource TransferBaseBrush}" />
-            <Setter Property="Foreground" Value="{DynamicResource Text900Brush}" />
+            <Setter Property="Background" Value="{DynamicResource SemanticWarning800Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource TransferBaseBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
         </Style>
         <Style Selector="^.transfer.selected">
-            <Setter Property="Background" Value="{DynamicResource TransferBaseBrush}" />
-            <Setter Property="Foreground" Value="{DynamicResource Text900Brush}" />
+            <Setter Property="Background" Value="{DynamicResource SemanticWarning800Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource TransferBaseBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
         </Style>
     </Style>
 
@@ -416,7 +453,7 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Height" Value="24" />
         <Setter Property="Width" Value="30" />
-        <Setter Property="Padding" Value="6, 0, 0, 0" />
+        <Setter Property="Padding" Value="6, 0, 0, 2" />
         <Style Selector="^ /template/ ContentPresenter">
             <Setter Property="Transitions">
                 <Transitions>
@@ -436,14 +473,17 @@
 
     <Style Selector="Button.titlebar.close">
         <Setter Property="Content" Value="&#xE5CD;" />
+        <Setter Property="BorderThickness" Value="0" />
     </Style>
 
     <Style Selector="Button.titlebar.maximize">
         <Setter Property="Content" Value="&#xEB54;" />
+        <Setter Property="BorderThickness" Value="0" />
     </Style>
 
     <Style Selector="Button.titlebar.minimize">
         <Setter Property="Content" Value="&#xE931;" />
+        <Setter Property="BorderThickness" Value="0" />
     </Style>
 
     <!-- ═══════════════════════════════════════════════════════════════════════════════
@@ -462,8 +502,9 @@
 
     <Style Selector="DataGrid">
         <Setter Property="Background" Value="{DynamicResource Background900Brush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Background900Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
         <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
     </Style>
 
     <!-- Alternating row colors -->
@@ -499,7 +540,62 @@
 
     <!-- DataGrid cell text styling (consolidated from views) -->
     <Style Selector="DataGridCell TextBlock">
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="12" />
+    </Style>
+
+    <!-- DataGrid column header styling - override template to remove sort icon reserved space -->
+    <Style Selector="DataGridColumnHeader">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Padding" Value="8, 6" />
+        <Setter Property="SeparatorBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid Name="PART_ColumnHeaderRoot"
+                      ColumnDefinitions="*,Auto"
+                      Background="{TemplateBinding Background}">
+                    <!-- Content area - no reserved sort icon space -->
+                    <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                          Margin="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}" />
+                    </Grid>
+                    <!-- Column separator -->
+                    <Rectangle Name="VerticalSeparator"
+                               Grid.Column="1"
+                               Width="1"
+                               VerticalAlignment="Stretch"
+                               Fill="{TemplateBinding SeparatorBrush}"
+                               IsVisible="{TemplateBinding AreSeparatorsVisible}" />
+                    <!-- Resize gripper -->
+                    <Thumb Name="PART_ResizeGripper"
+                           Grid.Column="1"
+                           Width="8"
+                           Margin="-4,0,0,0"
+                           Background="Transparent"
+                           Cursor="SizeWestEast"
+                           IsVisible="{Binding $parent[DataGrid].CanUserResizeColumns}" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Style Selector="DataGridCell TextBlock">
+        <Setter Property="Padding" Value="0, 0, 0, 0" />
+        <Setter Property="Margin" Value="8, 2, 0, 0" />
+    </Style>
+    
+    <Style Selector="DataGridColumnHeader Label">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="0" />
+    </Style>
+
+    <Style Selector="DataGridColumnHeader TextBlock">
+        <Setter Property="TextTrimming" Value="None" />
+        <Setter Property="TextWrapping" Value="NoWrap" />
     </Style>
 
     <!-- ═══════════════════════════════════════════════════════════════════════════════
@@ -713,6 +809,9 @@
 
     <Style Selector="ListBox.regularListBox">
         <Setter Property="Background" Value="{DynamicResource Background900Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
         <Style Selector="^ ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource Secondary700Color}" />
         </Style>
@@ -724,13 +823,16 @@
 
     <Style Selector="ListBox.accounts">
         <Setter Property="Background" Value="{DynamicResource Background900Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
         <Style Selector="^ ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Transitions">
                 <Transitions>
                     <BrushTransition Property="Background" Duration="0:0:0.3" />
                 </Transitions>
             </Setter>
-            <Setter Property="Background" Value="{DynamicResource LineSelected}" />
+            <Setter Property="Background" Value="{DynamicResource Secondary700Color}" />
         </Style>
         <Style Selector="^ ListBoxItem">
             <Setter Property="Padding" Value="5, 5, 5, 0" />
@@ -743,6 +845,9 @@
 
     <Style Selector="TreeView">
         <Setter Property="Background" Value="{DynamicResource Background900Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
     </Style>
 
     <Style Selector="TreeViewItem">
@@ -764,7 +869,8 @@
         <Setter Property="Margin" Value="5" />
         <Setter Property="Padding" Value="10" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Background600Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background400Brush}" />
+        <Setter Property="CornerRadius" Value="4" />
     </Style>
 
     <Style Selector="StackPanel.form-field">
@@ -773,6 +879,22 @@
 
     <Style Selector=".form-field > TextBlock">
         <Setter Property="Margin" Value="0, 0, 0, 5" />
+    </Style>
+
+    <!-- Hint box - informational message with left accent border -->
+    <Style Selector="Border.hint-box">
+        <Setter Property="Background" Value="{DynamicResource Secondary800Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Secondary400Brush}" />
+        <Setter Property="BorderThickness" Value="3, 1, 1, 1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="10" />
+        <Setter Property="Margin" Value="5" />
+    </Style>
+
+    <Style Selector="Border.hint-box > TextBlock">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{DynamicResource Text200Brush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
 
     <!-- ═══════════════════════════════════════════════════════════════════════════════

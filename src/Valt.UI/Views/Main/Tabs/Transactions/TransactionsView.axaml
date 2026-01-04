@@ -43,9 +43,7 @@
                             <Setter Property="VerticalAlignment" Value="Center" />
                         </Style>
                         <Style Selector="TextBlock.wealth-value">
-                            <Setter Property="FontFamily" Value="JetBrains Mono, Cascadia Code, Consolas, monospace" />
                             <Setter Property="FontSize" Value="13" />
-                            <Setter Property="FontWeight" Value="SemiBold" />
                             <Setter Property="HorizontalAlignment" Value="Right" />
                             <Setter Property="VerticalAlignment" Value="Center" />
                             <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
@@ -224,15 +222,15 @@
                         <Grid ColumnDefinitions="*, 50">
                             <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Stretch"
                                         Margin="0, 5, 0, 0">
-                                <TextBlock Text="{x:Static local:language.ManageFixedExpenses_Title}"></TextBlock>
-                                <TextBlock Text="{Binding FixedExpenseCurrentMonthDescription}"></TextBlock>
+                                <TextBlock FontSize="12" Text="{x:Static local:language.ManageFixedExpenses_Title}"></TextBlock>
+                                <TextBlock FontSize="12" Text="{Binding FixedExpenseCurrentMonthDescription}"></TextBlock>
 
                             </StackPanel>
-                            <Button Grid.Column="1" FontSize="18" Classes="transparent link"
+                            <Button Grid.Column="1" FontSize="18" Classes="icon-only"
                                     HorizontalAlignment="Right"
                                     HorizontalContentAlignment="Right"
                                     VerticalContentAlignment="Center"
-                                    Padding="0, 0, 15, 0"
+                                    Padding="4, 0, 4, 0"
                                     Content="&#xE745;"
                                     FontFamily="{DynamicResource MaterialDesign}"
                                     Height="30" Command="{Binding ManageFixedExpensesCommand}" />
@@ -247,6 +245,7 @@
                         SelectionMode="Single"
                         VerticalAlignment="Top"
                         BorderBrush="{DynamicResource Background500Brush}"
+                        CornerRadius="0"
                         BorderThickness="1, 0, 1,0"
                         Margin="0, 0, 10, 0"
                         Height="400">
@@ -263,18 +262,18 @@
                                                        HorizontalAlignment="Center"
                                                        VerticalAlignment="Center" />
                                             <TextBlock Text="{Binding DayFormatted}"
-                                                       FontSize="11"
+                                                       FontSize="10"
                                                        Width="16"
-                                                       FontWeight="Bold"
                                                        Foreground="{Binding TextColor}"
                                                        HorizontalAlignment="Center"
                                                        VerticalAlignment="Center"
-                                                       Margin="0, 16, 0, 0" />
+                                                       Margin="0, 13, 0, 0" />
                                         </Grid>
                                         <!-- Name and amount (two lines) -->
                                         <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" Margin="4, 0, 0, 0">
                                             <TextBlock FontSize="13"
                                                        Text="{Binding Name}"
+                                                       FontFamily="{DynamicResource Geist}"
                                                        Foreground="{Binding TextColor}"
                                                        TextTrimming="CharacterEllipsis" />
                                             <TextBlock FontSize="11"
@@ -335,9 +334,9 @@
                             Padding="5, 0, 0, 0"
                             BorderThickness="1, 0, 1, 1"
                             CornerRadius="0, 0, 5, 5">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0, 5, 0, 0">
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Margin="0, 5, 0, 0">
                             <TextBlock FontSize="12" Text="{x:Static local:language.RemainingFixedExpenses_Title}" />
-                            <TextBlock FontSize="12" Padding="0, 3, 5, 0" Foreground="{DynamicResource Accent200Color}"
+                            <TextBlock FontSize="12" Padding="3, 3, 5, 0" Foreground="{DynamicResource Accent200Color}"
                                        Text="{Binding RemainingFixedExpensesAmount}">
                             </TextBlock>
                         </StackPanel>

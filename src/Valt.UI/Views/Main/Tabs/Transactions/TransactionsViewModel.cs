@@ -375,7 +375,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     #region Fixed Expense operations
 
     public string FixedExpenseCurrentMonthDescription =>
-        $"({DateOnly.FromDateTime(_filterState!.MainDate).ToString("MM/yyyy")})";
+        $"({DateOnly.FromDateTime(_filterState!.MainDate).ToString("MM/yy")})";
 
     [RelayCommand]
     private async Task ManageFixedExpenses()
