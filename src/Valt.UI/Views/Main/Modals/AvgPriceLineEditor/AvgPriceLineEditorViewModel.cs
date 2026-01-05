@@ -134,7 +134,7 @@ public partial class AvgPriceLineEditorViewModel : ValtModalValidatorViewModel
 
             if (profile is null)
             {
-                await MessageBoxHelper.ShowErrorAsync("Error", "Profile not found", GetWindow!());
+                await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_ProfileNotFound, GetWindow!());
                 return;
             }
 
@@ -159,7 +159,7 @@ public partial class AvgPriceLineEditorViewModel : ValtModalValidatorViewModel
         }
         catch (Exception e)
         {
-            await MessageBoxHelper.ShowErrorAsync("Error", e.Message, GetWindow!());
+            await MessageBoxHelper.ShowErrorAsync(language.Error, e.Message, GetWindow!());
         }
     }
 

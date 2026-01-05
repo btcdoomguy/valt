@@ -28,6 +28,7 @@ using Valt.Infra.Modules.Budget.FixedExpenses;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
+using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
 using Valt.UI.State;
@@ -303,7 +304,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
         if (account is null)
         {
-            await MessageBoxHelper.ShowErrorAsync("Error", "Account not found", GetUserControlOwnerWindow()!);
+            await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_AccountNotFound, GetUserControlOwnerWindow()!);
             return;
         }
 
@@ -322,7 +323,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
         if (account is null)
         {
-            await MessageBoxHelper.ShowErrorAsync("Error", "Account not found", GetUserControlOwnerWindow()!);
+            await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_AccountNotFound, GetUserControlOwnerWindow()!);
             return;
         }
 
@@ -332,7 +333,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         }
         catch (Exception e)
         {
-            await MessageBoxHelper.ShowErrorAsync("Error", e.Message, GetUserControlOwnerWindow()!);
+            await MessageBoxHelper.ShowErrorAsync(language.Error, e.Message, GetUserControlOwnerWindow()!);
         }
 
         await _accountDisplayOrderManager!.NormalizeDisplayOrdersAsync(null);
@@ -347,7 +348,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
         if (account is null)
         {
-            await MessageBoxHelper.ShowErrorAsync("Error", "Account not found", GetUserControlOwnerWindow()!);
+            await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_AccountNotFound, GetUserControlOwnerWindow()!);
             return;
         }
 
@@ -364,7 +365,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
         if (account is null)
         {
-            await MessageBoxHelper.ShowErrorAsync("Error", "Account not found", GetUserControlOwnerWindow()!);
+            await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_AccountNotFound, GetUserControlOwnerWindow()!);
             return;
         }
 

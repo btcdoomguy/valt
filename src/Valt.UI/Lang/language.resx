@@ -992,4 +992,93 @@
     <data name="Transactions.Columns.Notes" xml:space="preserve">
         <value>Notes</value>
     </data>
+    <!-- Common Validation Messages -->
+    <data name="Validation.NameRequired" xml:space="preserve">
+        <value>Name is required</value>
+    </data>
+    <data name="Validation.CategoryRequired" xml:space="preserve">
+        <value>Category is required</value>
+    </data>
+    <data name="Validation.DateRequired" xml:space="preserve">
+        <value>Date is required</value>
+    </data>
+    <data name="Validation.ValueRequired" xml:space="preserve">
+        <value>Value is required</value>
+    </data>
+    <data name="Validation.IconRequired" xml:space="preserve">
+        <value>Icon is required</value>
+    </data>
+    <data name="Validation.StartDateRequired" xml:space="preserve">
+        <value>Start date is required</value>
+    </data>
+    <data name="Validation.NewNameRequired" xml:space="preserve">
+        <value>New name is required</value>
+    </data>
+    <!-- Account Validation Messages -->
+    <data name="Validation.AccountNameRequired" xml:space="preserve">
+        <value>Inform a valid account name</value>
+    </data>
+    <data name="Validation.OriginAccountRequired" xml:space="preserve">
+        <value>Origin account is required</value>
+    </data>
+    <data name="Validation.DestinationAccountRequired" xml:space="preserve">
+        <value>Destination account is required</value>
+    </data>
+    <!-- Password Validation Messages -->
+    <data name="Validation.PasswordRequired" xml:space="preserve">
+        <value>Password is required</value>
+    </data>
+    <data name="Validation.OldPasswordRequired" xml:space="preserve">
+        <value>Old password is required</value>
+    </data>
+    <data name="Validation.PasswordMinLength" xml:space="preserve">
+        <value>Password must be at least 6 characters long</value>
+    </data>
+    <data name="Validation.OldPasswordMinLength" xml:space="preserve">
+        <value>Old password must be at least 6 characters long</value>
+    </data>
+    <data name="Validation.PasswordsDoNotMatch" xml:space="preserve">
+        <value>Passwords do not match</value>
+    </data>
+    <!-- AvgPrice Validation Messages -->
+    <data name="Validation.QuantityRequired" xml:space="preserve">
+        <value>Quantity is required</value>
+    </data>
+    <data name="Validation.QuantityGreaterThanZero" xml:space="preserve">
+        <value>Quantity must be greater than zero</value>
+    </data>
+    <data name="Validation.AmountRequired" xml:space="preserve">
+        <value>Amount is required</value>
+    </data>
+    <data name="Validation.PrecisionRange" xml:space="preserve">
+        <value>Precision must be between 0 and 15</value>
+    </data>
+    <!-- Database Validation Messages -->
+    <data name="Validation.DatabasePathRequired" xml:space="preserve">
+        <value>Inform a valid path to store the database file</value>
+    </data>
+    <!-- Error Dialog Titles -->
+    <data name="Error.ValidationError" xml:space="preserve">
+        <value>Validation Error</value>
+    </data>
+    <!-- Error Messages -->
+    <data name="Error.TransactionNotFound" xml:space="preserve">
+        <value>Transaction not found</value>
+    </data>
+    <data name="Error.AccountNotFound" xml:space="preserve">
+        <value>Account not found</value>
+    </data>
+    <data name="Error.FixedExpenseNotFound" xml:space="preserve">
+        <value>Fixed expense not found</value>
+    </data>
+    <data name="Error.ProfileNotFound" xml:space="preserve">
+        <value>Profile not found</value>
+    </data>
+    <data name="Error.FileNotFound" xml:space="preserve">
+        <value>The selected file does not exist</value>
+    </data>
+    <!-- Dialog Buttons -->
+    <data name="Button.Refresh" xml:space="preserve">
+        <value>Refresh</value>
+    </data>
 </root>

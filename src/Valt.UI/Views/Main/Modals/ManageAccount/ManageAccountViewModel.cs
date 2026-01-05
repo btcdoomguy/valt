@@ -13,6 +13,7 @@ using Valt.Core.Modules.Budget.Transactions.Contracts;
 using Valt.Infra.Modules.Configuration;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
+using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
 using Valt.UI.Views.Main.Modals.IconSelector;
@@ -110,7 +111,7 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
 
             if (account is null)
             {
-                await MessageBoxHelper.ShowAlertAsync("Validation Error", "Account not found.", GetWindow!());
+                await MessageBoxHelper.ShowAlertAsync(language.Error_ValidationError, language.Error_AccountNotFound, GetWindow!());
                 return;
             }
 

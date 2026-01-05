@@ -138,7 +138,7 @@
                     </Grid>
 
                     <!-- Period Section -->
-                    <Grid ColumnDefinitions="*, *">
+                    <Grid ColumnDefinitions="*, *" ColumnSpacing="5">
                         <StackPanel Grid.Column="0" Classes="form-field">
                             <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_PeriodRange}" />
                             <ComboBox ItemsSource="{Binding AvailablePeriods}"

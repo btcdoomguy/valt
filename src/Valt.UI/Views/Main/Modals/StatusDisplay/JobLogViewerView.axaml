@@ -42,7 +42,7 @@
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10, 0, 10, 10" Spacing="10">
                 <Button Content="{x:Static local:language.JobLogViewer_ClearLog}"
                         Command="{Binding ClearLogCommand}" />
-                <Button Content="Refresh"
+                <Button Content="{x:Static local:language.Button_Refresh}"
                         Command="{Binding RefreshCommand}" />
                 <Button Classes="action-button" Content="{x:Static local:language.OkButton}"
                         Click="CloseButton_Click" />

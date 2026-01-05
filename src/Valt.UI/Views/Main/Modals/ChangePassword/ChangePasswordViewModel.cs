@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Valt.Infra.DataAccess;
 using Valt.UI.Base;
+using Valt.UI.Lang;
 using Valt.UI.Services.MessageBoxes;
 
 namespace Valt.UI.Views.Main.Modals.ChangePassword;
@@ -53,7 +54,7 @@ public partial class ChangePasswordViewModel : ValtModalValidatorViewModel
         }
         catch (Exception ex)
         {
-            await MessageBoxHelper.ShowErrorAsync("Error", ex.Message, OwnerWindow!);
+            await MessageBoxHelper.ShowErrorAsync(language.Error, ex.Message, OwnerWindow!);
         }
     }
     

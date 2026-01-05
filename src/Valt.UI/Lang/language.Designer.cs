@@ -1982,5 +1982,175 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Transactions.Columns.Notes", resourceCulture);
             }
         }
+
+        // Common Validation Messages
+        public static string Validation_NameRequired {
+            get {
+                return ResourceManager.GetString("Validation.NameRequired", resourceCulture);
+            }
+        }
+
+        public static string Validation_CategoryRequired {
+            get {
+                return ResourceManager.GetString("Validation.CategoryRequired", resourceCulture);
+            }
+        }
+
+        public static string Validation_DateRequired {
+            get {
+                return ResourceManager.GetString("Validation.DateRequired", resourceCulture);
+            }
+        }
+
+        public static string Validation_ValueRequired {
+            get {
+                return ResourceManager.GetString("Validation.ValueRequired", resourceCulture);
+            }
+        }
+
+        public static string Validation_IconRequired {
+            get {
+                return ResourceManager.GetString("Validation.IconRequired", resourceCulture);
+            }
+        }
+
+        public static string Validation_StartDateRequired {
+            get {
+                return ResourceManager.GetString("Validation.StartDateRequired", resourceCulture);
+            }
+        }
+
+        public static string Validation_NewNameRequired {
+            get {
+                return ResourceManager.GetString("Validation.NewNameRequired", resourceCulture);
+            }
+        }
+
+        // Account Validation Messages
+        public static string Validation_AccountNameRequired {
+            get {
+                return ResourceManager.GetString("Validation.AccountNameRequired", resourceCulture);
+            }
+        }
+
+        public static string Validation_OriginAccountRequired {
+            get {
+                return ResourceManager.GetString("Validation.OriginAccountRequired", resourceCulture);
+            }
+        }
+
+        public static string Validation_DestinationAccountRequired {
+            get {
+                return ResourceManager.GetString("Validation.DestinationAccountRequired", resourceCulture);
+            }
+        }
+
+        // Password Validation Messages
+        public static string Validation_PasswordRequired {
+            get {
+                return ResourceManager.GetString("Validation.PasswordRequired", resourceCulture);
+            }
+        }
+
+        public static string Validation_OldPasswordRequired {
+            get {
+                return ResourceManager.GetString("Validation.OldPasswordRequired", resourceCulture);
+            }
+        }
+
+        public static string Validation_PasswordMinLength {
+            get {
+                return ResourceManager.GetString("Validation.PasswordMinLength", resourceCulture);
+            }
+        }
+
+        public static string Validation_OldPasswordMinLength {
+            get {
+                return ResourceManager.GetString("Validation.OldPasswordMinLength", resourceCulture);
+            }
+        }
+
+        public static string Validation_PasswordsDoNotMatch {
+            get {
+                return ResourceManager.GetString("Validation.PasswordsDoNotMatch", resourceCulture);
+            }
+        }
+
+        // AvgPrice Validation Messages
+        public static string Validation_QuantityRequired {
+            get {
+                return ResourceManager.GetString("Validation.QuantityRequired", resourceCulture);
+            }
+        }
+
+        public static string Validation_QuantityGreaterThanZero {
+            get {
+                return ResourceManager.GetString("Validation.QuantityGreaterThanZero", resourceCulture);
+            }
+        }
+
+        public static string Validation_AmountRequired {
+            get {
+                return ResourceManager.GetString("Validation.AmountRequired", resourceCulture);
+            }
+        }
+
+        public static string Validation_PrecisionRange {
+            get {
+                return ResourceManager.GetString("Validation.PrecisionRange", resourceCulture);
+            }
+        }
+
+        // Database Validation Messages
+        public static string Validation_DatabasePathRequired {
+            get {
+                return ResourceManager.GetString("Validation.DatabasePathRequired", resourceCulture);
+            }
+        }
+
+        // Error Dialog Titles
+        public static string Error_ValidationError {
+            get {
+                return ResourceManager.GetString("Error.ValidationError", resourceCulture);
+            }
+        }
+
+        // Error Messages
+        public static string Error_TransactionNotFound {
+            get {
+                return ResourceManager.GetString("Error.TransactionNotFound", resourceCulture);
+            }
+        }
+
+        public static string Error_AccountNotFound {
+            get {
+                return ResourceManager.GetString("Error.AccountNotFound", resourceCulture);
+            }
+        }
+
+        public static string Error_FixedExpenseNotFound {
+            get {
+                return ResourceManager.GetString("Error.FixedExpenseNotFound", resourceCulture);
+            }
+        }
+
+        public static string Error_ProfileNotFound {
+            get {
+                return ResourceManager.GetString("Error.ProfileNotFound", resourceCulture);
+            }
+        }
+
+        public static string Error_FileNotFound {
+            get {
+                return ResourceManager.GetString("Error.FileNotFound", resourceCulture);
+            }
+        }
+
+        // Dialog Buttons
+        public static string Button_Refresh {
+            get {
+                return ResourceManager.GetString("Button.Refresh", resourceCulture);
+            }
+        }
     }
 }

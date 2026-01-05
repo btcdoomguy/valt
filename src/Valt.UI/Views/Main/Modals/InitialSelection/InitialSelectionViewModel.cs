@@ -8,6 +8,7 @@ using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Valt.UI.Base;
+using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.LocalStorage;
 using Valt.UI.Services.MessageBoxes;
@@ -82,7 +83,7 @@ public partial class InitialSelectionViewModel : ValtModalViewModel
 
         if (!File.Exists(SelectedFile))
         {
-            await MessageBoxHelper.ShowErrorAsync("Error", "The selected file does not exist.", thisWindow);
+            await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_FileNotFound, thisWindow);
             RecentFiles.Remove(SelectedFile);
             await _localStorageService!.ChangeRecentFilesAsync(RecentFiles);
             return;

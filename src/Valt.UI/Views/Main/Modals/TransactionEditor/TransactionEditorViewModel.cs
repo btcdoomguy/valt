@@ -443,7 +443,7 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
 
         if (transaction is null)
         {
-            await MessageBoxHelper.ShowErrorAsync("Error", "Transaction not found", GetWindow!());
+            await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_TransactionNotFound, GetWindow!());
             Close();
             return;
         }

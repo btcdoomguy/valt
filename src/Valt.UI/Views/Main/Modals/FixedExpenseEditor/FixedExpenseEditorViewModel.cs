@@ -228,7 +228,7 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
 
             if (fixedExpense is null)
             {
-                await MessageBoxHelper.ShowErrorAsync("Error", "Fixed expense not found", GetWindow!());
+                await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_FixedExpenseNotFound, GetWindow!());
                 Close();
                 return;
             }
@@ -294,7 +294,7 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
         }
         catch (Exception e)
         {
-            await MessageBoxHelper.ShowErrorAsync("Error", e.Message, GetWindow!());
+            await MessageBoxHelper.ShowErrorAsync(language.Error, e.Message, GetWindow!());
             return;
         }
 
