@@ -149,6 +149,18 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                <DataGridTemplateColumn Tag="Notes" Width="200"
+                                        Header="{x:Static local:language.Transactions_Columns_Notes}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="models1:TransactionViewModel">
+                            <TextBlock Classes="only-text" Text="{Binding Notes}"
+                                       TextTrimming="CharacterEllipsis"
+                                       ToolTip.Tip="{Binding Notes}"
+                                       Foreground="{Binding LineColor}">
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
             <DataGrid.ContextMenu>
                 <ContextMenu>

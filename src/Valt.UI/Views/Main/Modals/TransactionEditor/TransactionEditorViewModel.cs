@@ -94,10 +94,12 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
     [ObservableProperty] private bool _isToBtcInputFocused;
     [ObservableProperty] private bool _isToFiatInputFocused;
 
-    [NotifyPropertyChangedFor(nameof(IsBoundToFixedExpense), nameof(BoundToFixedExpenseCaption))] [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsBoundToFixedExpense), nameof(BoundToFixedExpenseCaption), nameof(HasMetadata))]
+    [ObservableProperty]
     private TransactionFixedExpenseReference? _transactionFixedExpenseReference;
 
-    [NotifyPropertyChangedFor(nameof(IsBoundToFixedExpense), nameof(BoundToFixedExpenseCaption))] [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsBoundToFixedExpense), nameof(BoundToFixedExpenseCaption), nameof(HasMetadata))]
+    [ObservableProperty]
     private FixedExpenseDto? _fixedExpense;
 
     #endregion
@@ -326,11 +328,15 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         ? $"{FixedExpense.Name} ({TransactionFixedExpenseReference.ReferenceDate.ToShortDateString()})"
         : language.Empty;
 
+    public bool HasMetadata => IsBoundToFixedExpense || IsAutoSatAmount;
+
     #endregion Properties
 
     #region Auto Sat Area
 
-    [ObservableProperty] private bool _isAutoSatAmount;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasMetadata))]
+    private bool _isAutoSatAmount;
 
     [ObservableProperty] private string? _satAmountStateDescription;
 
@@ -461,6 +467,7 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         }
 
         Name = transaction.Name;
+        Notes = transaction.Notes ?? string.Empty;
         Category = AvailableCategories.FirstOrDefault(c => c.Id == transaction.CategoryId.Value);
         FromAccount =
             AvailableAccounts.FirstOrDefault(a => a.Id == transaction.TransactionDetails.FromAccountId);
@@ -668,8 +675,9 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         var date = DateOnly.FromDateTime(Date!.Value);
 
         var transactionDetails = BuildTransactionDetailsFromForm();
+        var notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes;
 
-        return Task.FromResult(Transaction.New(date, name, Category!.Id, transactionDetails, string.Empty,
+        return Task.FromResult(Transaction.New(date, name, Category!.Id, transactionDetails, notes,
             TransactionFixedExpenseReference));
     }
 
@@ -678,11 +686,13 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         var name = TransactionName.New(Name);
         var date = DateOnly.FromDateTime(Date!.Value);
         var transactionDetails = BuildTransactionDetailsFromForm();
+        var notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes;
 
         transaction.ChangeDate(date);
         transaction.ChangeNameAndCategory(name, Category!.Id);
         transaction.SetFixedExpense(TransactionFixedExpenseReference);
         transaction.ChangeTransactionDetails(transactionDetails);
+        transaction.ChangeNotes(notes);
 
         return Task.CompletedTask;
     }

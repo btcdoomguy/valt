@@ -965,4 +965,22 @@
     <data name="TransactionEditor.Help.Tip2" xml:space="preserve">
         <value>You can also type on the Category and Account drop downs to fill the data quickly.</value>
     </data>
+    <data name="AvgPrice.Help.BrazilianRule" xml:space="preserve">
+        <value>Brazilian Rule: The average price is calculated in a simple way, where profits uses the average price as base. It follows the brazilian accounting rules.</value>
+    </data>
+    <data name="AvgPrice.Help.FIFO" xml:space="preserve">
+        <value>FIFO (first-in first-out): Follows american standards for calculating profits, where each purchase is considered a separate stack and profits are calculated separately according to the purchase order.</value>
+    </data>
+    <data name="ManageTransactions.Notes" xml:space="preserve">
+        <value>Notes</value>
+    </data>
+    <data name="ManageTransactions.Notes.Placeholder" xml:space="preserve">
+        <value>Add notes about this transaction...</value>
+    </data>
+    <data name="ManageTransactions.Properties" xml:space="preserve">
+        <value>Properties</value>
+    </data>
+    <data name="Transactions.Columns.Notes" xml:space="preserve">
+        <value>Notes</value>
+    </data>
 </root>

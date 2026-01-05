@@ -15,7 +15,7 @@ public class Transaction : AggregateRoot<TransactionId>
     public AutoSatAmountDetails? AutoSatAmountDetails { get; private set; }
     public bool HasAutoSatAmount => AutoSatAmountDetails is not null;
     public TransactionFixedExpenseReference? FixedExpenseReference { get; private set; }
-    public string? Notes { get; }
+    public string? Notes { get; private set; }
 
     private Transaction(TransactionId id, DateOnly date, TransactionName name, CategoryId categoryId,
         TransactionDetails transactionDetails, AutoSatAmountDetails? autoSatAmountDetails, string? notes,
@@ -135,7 +135,7 @@ public class Transaction : AggregateRoot<TransactionId>
 
         if (FixedExpenseReference == fieldExpense)
             return;
-        
+
         if (FixedExpenseReference is not null)
         {
             AddEvent(new TransactionUnboundFromFixedExpenseEvent(this.Id, FixedExpenseReference));
@@ -147,7 +147,16 @@ public class Transaction : AggregateRoot<TransactionId>
             AddEvent(new TransactionBoundToFixedExpenseEvent(this.Id, fieldExpense));
             FixedExpenseReference = fieldExpense;
         }
-        
+
+        AddEvent(new TransactionEditedEvent(this));
+    }
+
+    public void ChangeNotes(string? notes)
+    {
+        if (Notes == notes)
+            return;
+
+        Notes = notes;
         AddEvent(new TransactionEditedEvent(this));
     }
 }

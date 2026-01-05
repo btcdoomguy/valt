@@ -936,4 +936,22 @@
     <data name="TransactionEditor.Help.Tip2" xml:space="preserve">
         <value>Você também pode digitar nas caixas de Categoria e Conta para preencher os dados rapidamente.</value>
     </data>
+    <data name="AvgPrice.Help.BrazilianRule" xml:space="preserve">
+        <value>Regra Brasileira: O preço médio é calculado de forma simples, onde os lucros utilizam o preço médio como base. Segue as regras contábeis brasileiras.</value>
+    </data>
+    <data name="AvgPrice.Help.FIFO" xml:space="preserve">
+        <value>FIFO (primeiro a entrar, primeiro a sair): Segue os padrões americanos para cálculo de lucros, onde cada compra é considerada uma pilha separada e os lucros são calculados separadamente de acordo com a ordem de compra.</value>
+    </data>
+    <data name="ManageTransactions.Notes" xml:space="preserve">
+        <value>Notas</value>
+    </data>
+    <data name="ManageTransactions.Notes.Placeholder" xml:space="preserve">
+        <value>Adicione notas sobre esta transação...</value>
+    </data>
+    <data name="ManageTransactions.Properties" xml:space="preserve">
+        <value>Propriedades</value>
+    </data>
+    <data name="Transactions.Columns.Notes" xml:space="preserve">
+        <value>Notas</value>
+    </data>
 </root>

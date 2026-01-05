@@ -1928,5 +1928,41 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("TransactionEditor.Help.Tip2", resourceCulture);
             }
         }
+
+        public static string AvgPrice_Help_BrazilianRule {
+            get {
+                return ResourceManager.GetString("AvgPrice.Help.BrazilianRule", resourceCulture);
+            }
+        }
+
+        public static string AvgPrice_Help_FIFO {
+            get {
+                return ResourceManager.GetString("AvgPrice.Help.FIFO", resourceCulture);
+            }
+        }
+
+        public static string ManageTransactions_Notes {
+            get {
+                return ResourceManager.GetString("ManageTransactions.Notes", resourceCulture);
+            }
+        }
+
+        public static string ManageTransactions_Notes_Placeholder {
+            get {
+                return ResourceManager.GetString("ManageTransactions.Notes.Placeholder", resourceCulture);
+            }
+        }
+
+        public static string ManageTransactions_Properties {
+            get {
+                return ResourceManager.GetString("ManageTransactions.Properties", resourceCulture);
+            }
+        }
+
+        public static string Transactions_Columns_Notes {
+            get {
+                return ResourceManager.GetString("Transactions.Columns.Notes", resourceCulture);
+            }
+        }
     }
 }

@@ -7,10 +7,10 @@
         xmlns:local="clr-namespace:Valt.UI.Lang"
         xmlns:manageTransactions1="clr-namespace:Valt.UI.Views.Main.Modals.TransactionEditor"
         mc:Ignorable="d"
-        d:DesignWidth="600"
-        d:DesignHeight="440"
-        MaxWidth="600"
-        MaxHeight="440"
+        d:DesignWidth="820"
+        d:DesignHeight="455"
+        MaxWidth="820"
+        MaxHeight="455"
         x:Class="Valt.UI.Views.Main.Modals.TransactionEditor.TransactionEditorView"
         x:DataType="manageTransactions1:TransactionEditorViewModel"
         Title="{Binding WindowTitle}"
@@ -25,92 +25,84 @@
         <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" />
     </Window.KeyBindings>
     <Border>
-        <StackPanel Orientation="Vertical">
-            <userControls:CustomTitleBar Title="{Binding WindowTitle}" TitleBarPressed="CustomTitleBarButtonPressed"
+        <DockPanel>
+            <userControls:CustomTitleBar DockPanel.Dock="Top"
+                                         Title="{Binding WindowTitle}"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
-            <Border Classes="form-fields-area" Height="330" Padding="0">
-                <Panel>
-                    <Grid RowDefinitions="50, 50, 70, 80, 70">
-                        <DockPanel Grid.Row="0" Margin="0, 0, 0, 0" HorizontalAlignment="Center">
+
+            <!-- Buttons at bottom -->
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10" Margin="0, 0, 0, 5">
+                <Button Width="100" TabIndex="11" Content="{x:Static local:language.OkButton}"
+                        HorizontalContentAlignment="Center"
+                        Command="{Binding OkCommand}"
+                        IsDefault="True" />
+                <Button Width="100" TabIndex="12" Content="{x:Static local:language.CancelButton}"
+                        HorizontalContentAlignment="Center"
+                        Command="{Binding CancelCommand}"
+                        IsCancel="True" />
+            </StackPanel>
+
+            <!-- Main content area -->
+            <StackPanel Orientation="Horizontal">
+                <!-- Left pane - Form fields -->
+                <Border Classes="form-fields-area" Width="500" Padding="10">
+                    <Panel>
+                        <StackPanel Spacing="10">
+                            <!-- Transaction type selector -->
                             <Border BorderBrush="LightGray" Background="{DynamicResource Text900Color}"
-                                    BorderThickness="1"
-                                    CornerRadius="4" Margin="0, 5, 0, 0" Padding="5, 0, 5, 0">
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
-                                    <Button Classes="transaction-option debt"
-                                            Width="100"
-                                            IsTabStop="False"
+                                    BorderThickness="1" CornerRadius="4" Padding="5" HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Spacing="20">
+                                    <Button Classes="transaction-option debt" Width="100" IsTabStop="False"
                                             Classes.selected="{Binding DebtSelected}"
                                             Command="{Binding SwitchToDebtCommand}">
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <Label Classes="icon" Content="&#xE15B;"></Label>
+                                            <Label Classes="icon" Content="&#xE15B;" />
                                             <Label Content="{x:Static local:language.ManageTransactions_Debt}" />
                                         </StackPanel>
                                     </Button>
-                                    <Button Classes="transaction-option credit"
-                                            Width="100"
-                                            IsTabStop="False"
+                                    <Button Classes="transaction-option credit" Width="100" IsTabStop="False"
                                             Classes.selected="{Binding CreditSelected}"
                                             Command="{Binding SwitchToCreditCommand}">
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <Label Classes="icon" Content="&#xE145;"></Label>
+                                            <Label Classes="icon" Content="&#xE145;" />
                                             <Label Content="{x:Static local:language.ManageTransactions_Credit}" />
                                         </StackPanel>
                                     </Button>
-                                    <Button Classes="transaction-option transfer"
-                                            Width="100"
-                                            IsTabStop="False"
+                                    <Button Classes="transaction-option transfer" Width="100" IsTabStop="False"
                                             Classes.selected="{Binding TransferSelected}"
                                             Command="{Binding SwitchToTransferCommand}">
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <Label Classes="icon" Content="&#xEB70;"></Label>
+                                            <Label Classes="icon" Content="&#xEB70;" />
                                             <Label Content="{x:Static local:language.ManageTransactions_Transfer}" />
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>
                             </Border>
-                        </DockPanel>
 
-                        <StackPanel Grid.Row="1" Margin="0, 10, 0, 0" Orientation="Horizontal"
-                                    HorizontalAlignment="Center">
-                            <Grid ColumnDefinitions="30, 140, 30">
-                                <Button Grid.Column="0"
-                                        FontFamily="{DynamicResource MaterialDesign}"
-                                        Content="&#xE5DE;"
-                                        FontWeight="Bold"
-                                        IsTabStop="False"
-                                        FontSize="28"
-                                        Padding="0"
-                                        Command="{Binding PreviousDayCommand} " />
-                                <CalendarDatePicker HorizontalAlignment="Center" Grid.Column="1"
-                                                    SelectedDateFormat="Short"
-                                                    IsTodayHighlighted="True"
-                                                    TabIndex="10"
-                                                    Height="36"
+                            <!-- Date picker -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="0">
+                                <Button FontFamily="{DynamicResource MaterialDesign}" Content="&#xE5DE;"
+                                        FontWeight="Bold" IsTabStop="False" FontSize="28" Padding="0"
+                                        Command="{Binding PreviousDayCommand}" />
+                                <CalendarDatePicker Width="140" SelectedDateFormat="Short"
+                                                    IsTodayHighlighted="True" TabIndex="10" Height="36"
                                                     SelectedDate="{Binding Date}">
                                     <CalendarDatePicker.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Header="{x:Static local:language.ManageTransactions_SelectToday}"
-                                                      Command="{Binding SelectTodayCommand}">
-                                            </MenuItem>
+                                                      Command="{Binding SelectTodayCommand}" />
                                         </ContextMenu>
                                     </CalendarDatePicker.ContextMenu>
                                 </CalendarDatePicker>
-                                <Button
-                                    Grid.Column="2"
-                                    FontFamily="{DynamicResource MaterialDesign}"
-                                    Content="&#xE5DF;"
-                                    FontWeight="Bold"
-                                    IsTabStop="False"
-                                    FontSize="28"
-                                    Margin="1,0, 0, 0"
-                                    Padding="0"
-                                    Command="{Binding NextDayCommand}" />
-                            </Grid>
-                        </StackPanel>
+                                <Button FontFamily="{DynamicResource MaterialDesign}" Content="&#xE5DF;"
+                                        FontWeight="Bold" IsTabStop="False" FontSize="28" Padding="0"
+                                        Command="{Binding NextDayCommand}" />
+                            </StackPanel>
 
-                        <Grid Grid.Row="2" Margin="0" Grid.ColumnDefinitions="2*, *">
-                            <StackPanel Grid.Column="0" Margin="5">
-                                <StackPanel Classes="form-field">
+                            <!-- Name and Category row -->
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <StackPanel Classes="form-field" Width="250">
                                     <TextBlock Text="{x:Static local:language.ManageTransactions_Name}" />
                                     <AutoCompleteBox x:Name="AutoCompleteTransactionNameBox"
                                                      DropDownClosed="AutoCompleteTransactionNameBox_OnDropDownClosed"
@@ -127,233 +119,202 @@
                                         </AutoCompleteBox.ItemTemplate>
                                     </AutoCompleteBox>
                                 </StackPanel>
-                            </StackPanel>
-                            <StackPanel Grid.Column="1" Margin="5">
-                                <StackPanel Classes="form-field">
+                                <StackPanel Classes="form-field" Width="210">
                                     <TextBlock Text="{x:Static local:language.ManageTransactions_Category}" />
                                     <ComboBox ItemsSource="{Binding AvailableCategories}"
                                               SelectedItem="{Binding Category}"
                                               HorizontalAlignment="Stretch"
-                                              IsTextSearchEnabled="True"
-                                              Height="36"
-                                              TabIndex="1">
+                                              IsTextSearchEnabled="True" Height="36" TabIndex="1">
                                         <ComboBox.ItemTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal">
-                                                    <TextBlock
-                                                        FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
-                                                        Text="{Binding Unicode}"
-                                                        Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}">
-                                                    </TextBlock>
-                                                    <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}">
-                                                    </TextBlock>
+                                                    <TextBlock FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
+                                                               Text="{Binding Unicode}"
+                                                               Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
+                                                    <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}" />
                                                 </StackPanel>
                                             </DataTemplate>
                                         </ComboBox.ItemTemplate>
                                     </ComboBox>
                                 </StackPanel>
                             </StackPanel>
-                        </Grid>
 
-                        <Grid Grid.Row="3" Margin="0" Grid.ColumnDefinitions="2*, 3*">
-                            <StackPanel Grid.Column="0" Margin="5">
-                                <StackPanel Classes="form-field">
+                            <!-- From Account and Amount row -->
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <StackPanel Classes="form-field" Width="190">
                                     <TextBlock Text="{x:Static local:language.ManageTransactions_From}" />
                                     <ComboBox ItemsSource="{Binding AvailableAccounts}"
                                               SelectedItem="{Binding FromAccount}"
                                               IsTextSearchEnabled="True"
-                                              HorizontalAlignment="Stretch"
-                                              Height="36"
-                                              TabIndex="2">
+                                              HorizontalAlignment="Stretch" Height="36" TabIndex="2">
                                         <ComboBox.ItemTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal">
-                                                    <TextBlock
-                                                        FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
-                                                        Text="{Binding Unicode}"
-                                                        Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}">
-                                                    </TextBlock>
-                                                    <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}">
-                                                    </TextBlock>
+                                                    <TextBlock FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
+                                                               Text="{Binding Unicode}"
+                                                               Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
+                                                    <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}" />
                                                 </StackPanel>
                                             </DataTemplate>
                                         </ComboBox.ItemTemplate>
                                     </ComboBox>
                                 </StackPanel>
-                            </StackPanel>
-                            <StackPanel Grid.Column="1" Margin="5">
                                 <StackPanel Classes="form-field">
                                     <TextBlock Text="{x:Static local:language.ManageTransactions_Amount}" />
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                                        <userControls:BtcInput
-                                            x:Name="FromBtc"
-                                            Focusable="True"
+                                    <Panel>
+                                        <userControls:BtcInput x:Name="FromBtc" Focusable="True"
                                             IsVisible="{Binding FromAccountIsBtc}"
                                             IsInputFocused="{Binding IsFromBtcInputFocused, Mode=TwoWay}"
                                             BtcValue="{Binding FromAccountBtcValue, Mode=TwoWay}"
                                             TabIndex="3"
                                             CalculatorCommand="{Binding OpenCalculatorCommand}"
                                             CalculatorCommandParameter="FromBtc"
-                                            Width="346"
-                                            HorizontalAlignment="Stretch">
-                                        </userControls:BtcInput>
-                                        <userControls:FiatInput
-                                            x:Name="FromFiat"
-                                            Focusable="True"
+                                            Width="270"
+                                            Height="38" />
+                                        <userControls:FiatInput x:Name="FromFiat" Focusable="True"
                                             IsInputFocused="{Binding IsFromFiatInputFocused, Mode=TwoWay}"
                                             IsVisible="{Binding !FromAccountIsBtc}"
                                             FiatValue="{Binding FromAccountFiatValue, Mode=TwoWay}"
                                             TabIndex="4"
                                             CalculatorCommand="{Binding OpenCalculatorCommand}"
                                             CalculatorCommandParameter="FromFiat"
-                                            Width="346"
-                                            HorizontalAlignment="Stretch">
-                                        </userControls:FiatInput>
-                                    </StackPanel>
-                                </StackPanel>
-                            </StackPanel>
-                        </Grid>
-
-                        <Grid Grid.Row="4" Margin="0" ColumnDefinitions="2*, 3*">
-                            <StackPanel Grid.Column="0" Margin="5" Classes="form-field"
-                                        IsVisible="{Binding TransferSelected}">
-                                <TextBlock Text="{x:Static local:language.ManageTransactions_To}" />
-                                <ComboBox ItemsSource="{Binding AvailableAccounts}"
-                                          SelectedItem="{Binding ToAccount}"
-                                          HorizontalAlignment="Stretch"
-                                          IsTextSearchEnabled="True"
-                                          Height="36"
-                                          TabIndex="5">
-                                    <ComboBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock
-                                                    FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
-                                                    Text="{Binding Unicode}"
-                                                    Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}">
-                                                </TextBlock>
-                                                <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}">
-                                                </TextBlock>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ComboBox.ItemTemplate>
-                                </ComboBox>
-                            </StackPanel>
-
-                            <StackPanel Grid.Column="1" Margin="5" Classes="form-field"
-                                        IsVisible="{Binding ShowTransferValueField}">
-                                <TextBlock Text="{x:Static local:language.ManageTransactions_Amount}" />
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                                    <userControls:BtcInput
-                                        x:Name="ToBtc"
-                                        IsVisible="{Binding ToAccountIsBtc}"
-                                        IsInputFocused="{Binding IsToBtcInputFocused, Mode=TwoWay}"
-                                        BtcValue="{Binding ToAccountBtcValue, Mode=TwoWay}"
-                                        TabIndex="6"
-                                        CalculatorCommand="{Binding OpenCalculatorCommand}"
-                                        CalculatorCommandParameter="ToBtc"
-                                        Width="346"
-                                        HorizontalAlignment="Stretch">
-                                    </userControls:BtcInput>
-                                    <userControls:FiatInput
-                                        x:Name="ToFiat"
-                                        HorizontalAlignment="Stretch"
-                                        TabIndex="7"
-                                        IsVisible="{Binding !ToAccountIsBtc}"
-                                        IsInputFocused="{Binding IsToFiatInputFocused, Mode=TwoWay}"
-                                        FiatValue="{Binding ToAccountFiatValue, Mode=TwoWay}"
-                                        CalculatorCommand="{Binding OpenCalculatorCommand}"
-                                        Width="346"
-                                        CalculatorCommandParameter="ToFiat">
-                                    </userControls:FiatInput>
+                                            Width="270"
+                                            Height="38" />
+                                    </Panel>
                                 </StackPanel>
                             </StackPanel>
 
-                            <Border Grid.Column="1"
-                                    IsVisible="{Binding ShowTransferValueField}"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Top"
-                                    Margin="0, -8, 0, 0">
-                                <StackPanel Orientation="Horizontal">
-                                    <Label FontFamily="{DynamicResource MaterialDesign}" FontSize="18" Classes="icon"
-                                           Content="&#xEB70;">
-                                    </Label>
-                                    <Label Margin="0, 4, 0, 0" Content="{Binding TransferRate}" />
+                            <!-- To Account and Amount row (Transfer only) -->
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <StackPanel Classes="form-field" Width="190" IsVisible="{Binding TransferSelected}">
+                                    <TextBlock Text="{x:Static local:language.ManageTransactions_To}" />
+                                    <ComboBox ItemsSource="{Binding AvailableAccounts}"
+                                              SelectedItem="{Binding ToAccount}"
+                                              HorizontalAlignment="Stretch"
+                                              IsTextSearchEnabled="True" Height="36" TabIndex="5">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
+                                                               Text="{Binding Unicode}"
+                                                               Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
+                                                    <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
                                 </StackPanel>
-                            </Border>
-                        </Grid>
-                    </Grid>
-                    <userControls:ModuleHelperText HorizontalAlignment="Right" VerticalAlignment="Top">
-                        <userControls:ModuleHelperText.HelpContent>
-                            <StackPanel Spacing="8">
-                                <TextBlock FontWeight="Bold" FontSize="14" Text="{x:Static local:language.Help_KeyboardShortcuts}" />
-                                <StackPanel Spacing="4">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <TextBlock FontWeight="Bold" Width="110" Text="Ctrl+1" />
-                                        <TextBlock Text="{x:Static local:language.TransactionEditor_Help_SwitchToDebt}" />
+                                <StackPanel Classes="form-field" IsVisible="{Binding ShowTransferValueField}">
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <TextBlock Text="{x:Static local:language.ManageTransactions_Amount}" />
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label FontFamily="{DynamicResource MaterialDesign}" FontSize="14"
+                                                   Classes="icon" Content="&#xEB70;" Padding="0" />
+                                            <Label FontSize="11" Content="{Binding TransferRate}" Padding="2,0,0,0" />
+                                        </StackPanel>
                                     </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <TextBlock FontWeight="Bold" Width="110" Text="Ctrl+2" />
-                                        <TextBlock Text="{x:Static local:language.TransactionEditor_Help_SwitchToCredit}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <TextBlock FontWeight="Bold" Width="110" Text="Ctrl+3" />
-                                        <TextBlock Text="{x:Static local:language.TransactionEditor_Help_SwitchToTransfer}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <TextBlock FontWeight="Bold" Width="110" Text="Ctrl + ←" />
-                                        <TextBlock Text="{x:Static local:language.TransactionEditor_Help_PreviousDay}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <TextBlock FontWeight="Bold" Width="110" Text="Ctrl + →" />
-                                        <TextBlock Text="{x:Static local:language.TransactionEditor_Help_NextDay}" />
-                                    </StackPanel>
+                                    <Panel>
+                                        <userControls:BtcInput x:Name="ToBtc"
+                                            IsVisible="{Binding ToAccountIsBtc}"
+                                            IsInputFocused="{Binding IsToBtcInputFocused, Mode=TwoWay}"
+                                            BtcValue="{Binding ToAccountBtcValue, Mode=TwoWay}"
+                                            TabIndex="6"
+                                            CalculatorCommand="{Binding OpenCalculatorCommand}"
+                                            CalculatorCommandParameter="ToBtc"
+                                            Width="270"
+                                            Height="38" />
+                                        <userControls:FiatInput x:Name="ToFiat"
+                                            TabIndex="7"
+                                            IsVisible="{Binding !ToAccountIsBtc}"
+                                            IsInputFocused="{Binding IsToFiatInputFocused, Mode=TwoWay}"
+                                            FiatValue="{Binding ToAccountFiatValue, Mode=TwoWay}"
+                                            CalculatorCommand="{Binding OpenCalculatorCommand}"
+                                            CalculatorCommandParameter="ToFiat"
+                                            Width="270"
+                                            Height="38" />
+                                    </Panel>
                                 </StackPanel>
-                                <TextBlock FontWeight="Bold" FontSize="14" Text="{x:Static local:language.Help_Tips}" Margin="0, 8, 0, 0" />
-                                <TextBlock TextWrapping="Wrap"
-                                           Text="{x:Static local:language.TransactionEditor_Help_Tip1}" />
-                                <TextBlock TextWrapping="Wrap"
-                                           Text="{x:Static local:language.TransactionEditor_Help_Tip2}" />
                             </StackPanel>
-                        </userControls:ModuleHelperText.HelpContent>
-                    </userControls:ModuleHelperText>
-                </Panel>
-            </Border>
+                        </StackPanel>
 
-            <Border Classes="form-fields-area" Height="20" Padding="0"
-                    Background="{DynamicResource Background900Brush}">
-                <StackPanel Orientation="Horizontal">
-                    <StackPanel Orientation="Horizontal" Margin="0, 0, 20, 0"
-                                IsVisible="{Binding IsBoundToFixedExpense}">
-                        <Label FontSize="11" Foreground="{DynamicResource Accent200Color}"
-                               HorizontalContentAlignment="Right"
-                               Content="{x:Static local:language.ManageTransactions_Properties_BoundToFixedExpense}" />
-                        <Label FontSize="11" Content="{Binding BoundToFixedExpenseCaption}" />
+                        <!-- Help icon -->
+                        <userControls:ModuleHelperText HorizontalAlignment="Right" VerticalAlignment="Top">
+                            <userControls:ModuleHelperText.HelpContent>
+                                <StackPanel Spacing="8">
+                                    <TextBlock FontWeight="Bold" FontSize="14"
+                                               Text="{x:Static local:language.Help_KeyboardShortcuts}" />
+                                    <StackPanel Spacing="4">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock FontWeight="Bold" Width="110" Text="Ctrl+1" />
+                                            <TextBlock Text="{x:Static local:language.TransactionEditor_Help_SwitchToDebt}" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock FontWeight="Bold" Width="110" Text="Ctrl+2" />
+                                            <TextBlock Text="{x:Static local:language.TransactionEditor_Help_SwitchToCredit}" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock FontWeight="Bold" Width="110" Text="Ctrl+3" />
+                                            <TextBlock Text="{x:Static local:language.TransactionEditor_Help_SwitchToTransfer}" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock FontWeight="Bold" Width="110" Text="Ctrl + ←" />
+                                            <TextBlock Text="{x:Static local:language.TransactionEditor_Help_PreviousDay}" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock FontWeight="Bold" Width="110" Text="Ctrl + →" />
+                                            <TextBlock Text="{x:Static local:language.TransactionEditor_Help_NextDay}" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <TextBlock FontWeight="Bold" FontSize="14"
+                                               Text="{x:Static local:language.Help_Tips}" Margin="0, 8, 0, 0" />
+                                    <TextBlock TextWrapping="Wrap"
+                                               Text="{x:Static local:language.TransactionEditor_Help_Tip1}" />
+                                    <TextBlock TextWrapping="Wrap"
+                                               Text="{x:Static local:language.TransactionEditor_Help_Tip2}" />
+                                </StackPanel>
+                            </userControls:ModuleHelperText.HelpContent>
+                        </userControls:ModuleHelperText>
+                    </Panel>
+                </Border>
+
+                <!-- Right pane - Notes and metadata -->
+                <Border Classes="form-fields-area" Padding="10" Background="{DynamicResource Background800Brush}">
+                    <StackPanel Spacing="10" Width="276">
+                        <!-- Notes field -->
+                        <StackPanel Classes="form-field">
+                            <TextBlock Text="{x:Static local:language.ManageTransactions_Notes}" />
+                            <TextBox Text="{Binding Notes}"
+                                     AcceptsReturn="True"
+                                     TextWrapping="Wrap"
+                                     MaxLength="1000"
+                                     Height="160"
+                                     TabIndex="8"
+                                     Watermark="{x:Static local:language.ManageTransactions_Notes_Placeholder}" />
+                        </StackPanel>
+
+                        <!-- Metadata section -->
+                        <Border Background="{DynamicResource Background900Brush}"
+                                CornerRadius="4" Padding="10"
+                                IsVisible="{Binding HasMetadata}">
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="{x:Static local:language.ManageTransactions_Properties}"
+                                           FontWeight="SemiBold" FontSize="12"
+                                           Foreground="{DynamicResource Text300Brush}" />
+                                <StackPanel Spacing="2" IsVisible="{Binding IsBoundToFixedExpense}">
+                                    <TextBlock FontSize="11" Foreground="{DynamicResource Accent200Color}"
+                                               Text="{x:Static local:language.ManageTransactions_Properties_BoundToFixedExpense}" />
+                                    <TextBlock FontSize="11" Text="{Binding BoundToFixedExpenseCaption}" />
+                                </StackPanel>
+                                <StackPanel Spacing="2" IsVisible="{Binding IsAutoSatAmount}">
+                                    <TextBlock FontSize="11" Foreground="{DynamicResource Accent200Color}"
+                                               Text="{x:Static local:language.ManageTransactions_Properties_PriceInSats}" />
+                                    <TextBlock FontSize="11" Text="{Binding SatAmountStateDescription}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0, 0, 20, 0" IsVisible="{Binding IsAutoSatAmount}">
-                        <Label FontSize="11" Foreground="{DynamicResource Accent200Color}"
-                               HorizontalContentAlignment="Right">
-                            Price in sats:
-                        </Label>
-                        <Label FontSize="11" Content="{Binding SatAmountStateDescription}" />
-                    </StackPanel>
-                </StackPanel>
-            </Border>
-
-            <!-- Buttons -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10"
-                        Margin="0, 0, 0, 0">
-                <Button Width="100" TabIndex="11" Content="{x:Static local:language.OkButton}"
-                        HorizontalContentAlignment="Center"
-                        Command="{Binding OkCommand}"
-                        IsDefault="True">
-                </Button>
-                <Button Width="100" TabIndex="12" Content="{x:Static local:language.CancelButton}"
-                        HorizontalContentAlignment="Center"
-                        Command="{Binding CancelCommand}"
-                        IsCancel="True">
-                </Button>
+                </Border>
             </StackPanel>
-        </StackPanel>
+        </DockPanel>
     </Border>
 </Window>
