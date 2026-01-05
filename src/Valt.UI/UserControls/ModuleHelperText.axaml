@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="24"
+             d:DesignHeight="24"
+             x:Class="Valt.UI.UserControls.ModuleHelperText"
+             x:Name="Root">
+    <UserControl.Styles>
+        <Style Selector="Border.helper-icon">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Cursor" Value="Help" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="2" />
+        </Style>
+        <Style Selector="Border.helper-icon:pointerover">
+            <Setter Property="Background" Value="{DynamicResource Background600Brush}" />
+        </Style>
+        <Style Selector="TextBlock.helper-icon">
+            <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="Foreground" Value="{DynamicResource Text300Brush}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Border.helper-icon:pointerover TextBlock.helper-icon">
+            <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        </Style>
+        <Style Selector="ToolTip.helper-tooltip">
+            <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="12" />
+            <Setter Property="MaxWidth" Value="350" />
+        </Style>
+    </UserControl.Styles>
+
+    <Border Classes="helper-icon">
+        <ToolTip.Tip>
+            <ToolTip Classes="helper-tooltip">
+                <ContentPresenter Content="{Binding #Root.HelpContent}" />
+            </ToolTip>
+        </ToolTip.Tip>
+        <!-- Help outline icon: &#xE887; -->
+        <TextBlock Classes="helper-icon" Text="&#xE887;" />
+    </Border>
+</UserControl>

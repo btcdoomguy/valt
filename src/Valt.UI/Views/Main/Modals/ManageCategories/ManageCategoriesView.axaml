@@ -119,8 +119,8 @@
                             </StackPanel>
                         </StackPanel>
                     </Border>
-                    <Border Classes="form-fields-area" Height="80">
-                        <TextBlock FontStyle="Italic" Text="{x:Static lang:language.ManageCategories_Tip}" TextWrapping="Wrap" />
+                    <Border Classes="hint-box" Height="80">
+                        <TextBlock Text="{x:Static lang:language.ManageCategories_Tip}" TextWrapping="Wrap" />
                     </Border>
                 </StackPanel>
             </Grid>

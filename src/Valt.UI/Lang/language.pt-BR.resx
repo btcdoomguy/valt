@@ -909,4 +909,31 @@
     <data name="JobLogViewer.NoLogs" xml:space="preserve">
         <value>Nenhuma entrada de log ainda.</value>
     </data>
+    <data name="Help.KeyboardShortcuts" xml:space="preserve">
+        <value>Atalhos de Teclado</value>
+    </data>
+    <data name="Help.Tips" xml:space="preserve">
+        <value>Dicas</value>
+    </data>
+    <data name="TransactionEditor.Help.SwitchToDebt" xml:space="preserve">
+        <value>Mudar para Débito</value>
+    </data>
+    <data name="TransactionEditor.Help.SwitchToCredit" xml:space="preserve">
+        <value>Mudar para Crédito</value>
+    </data>
+    <data name="TransactionEditor.Help.SwitchToTransfer" xml:space="preserve">
+        <value>Mudar para Transferência</value>
+    </data>
+    <data name="TransactionEditor.Help.PreviousDay" xml:space="preserve">
+        <value>Ir para o dia anterior</value>
+    </data>
+    <data name="TransactionEditor.Help.NextDay" xml:space="preserve">
+        <value>Ir para o próximo dia</value>
+    </data>
+    <data name="TransactionEditor.Help.Tip1" xml:space="preserve">
+        <value>Comece a digitar no campo Nome para ver sugestões baseadas no seu histórico de transações.</value>
+    </data>
+    <data name="TransactionEditor.Help.Tip2" xml:space="preserve">
+        <value>Você também pode digitar nas caixas de Categoria e Conta para preencher os dados rapidamente.</value>
+    </data>
 </root>

@@ -1874,5 +1874,59 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("InitialSelection.FirstMessage", resourceCulture);
             }
         }
+
+        public static string Help_KeyboardShortcuts {
+            get {
+                return ResourceManager.GetString("Help.KeyboardShortcuts", resourceCulture);
+            }
+        }
+
+        public static string Help_Tips {
+            get {
+                return ResourceManager.GetString("Help.Tips", resourceCulture);
+            }
+        }
+
+        public static string TransactionEditor_Help_SwitchToDebt {
+            get {
+                return ResourceManager.GetString("TransactionEditor.Help.SwitchToDebt", resourceCulture);
+            }
+        }
+
+        public static string TransactionEditor_Help_SwitchToCredit {
+            get {
+                return ResourceManager.GetString("TransactionEditor.Help.SwitchToCredit", resourceCulture);
+            }
+        }
+
+        public static string TransactionEditor_Help_SwitchToTransfer {
+            get {
+                return ResourceManager.GetString("TransactionEditor.Help.SwitchToTransfer", resourceCulture);
+            }
+        }
+
+        public static string TransactionEditor_Help_PreviousDay {
+            get {
+                return ResourceManager.GetString("TransactionEditor.Help.PreviousDay", resourceCulture);
+            }
+        }
+
+        public static string TransactionEditor_Help_NextDay {
+            get {
+                return ResourceManager.GetString("TransactionEditor.Help.NextDay", resourceCulture);
+            }
+        }
+
+        public static string TransactionEditor_Help_Tip1 {
+            get {
+                return ResourceManager.GetString("TransactionEditor.Help.Tip1", resourceCulture);
+            }
+        }
+
+        public static string TransactionEditor_Help_Tip2 {
+            get {
+                return ResourceManager.GetString("TransactionEditor.Help.Tip2", resourceCulture);
+            }
+        }
     }
 }
