@@ -59,7 +59,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
     [ObservableProperty] private AvaloniaList<AccountViewModel> _accounts = new();
     [ObservableProperty] private AvaloniaList<FixedExpensesEntryViewModel> _fixedExpenseEntries = new();
-    [ObservableProperty] private string _remainingFixedExpensesAmount = "R$ 12345,67 - R$ 23456,78";
+    [ObservableProperty] private string _remainingFixedExpensesAmount = "R$ 12345,67 (+/- 5000,00)";
 
     [ObservableProperty] private AccountViewModel? _selectedAccount;
     [ObservableProperty] private FixedExpensesEntryViewModel? _selectedFixedExpense;
@@ -240,8 +240,14 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
                 RemainingFixedExpensesAmount =
                     $"{CurrencyDisplay.FormatFiat(minTotal, _currencySettings.MainFiatCurrency)}";
             else
+            {
+                var middle = (maxTotal + minTotal) / 2;
+                var variation = maxTotal - middle;
+                
                 RemainingFixedExpensesAmount =
-                    $"{CurrencyDisplay.FormatFiat(minTotal, _currencySettings.MainFiatCurrency)} - {CurrencyDisplay.FormatFiat(maxTotal, _currencySettings.MainFiatCurrency)}";
+                    $"{CurrencyDisplay.FormatFiat(middle, _currencySettings.MainFiatCurrency)} (+/- {CurrencyDisplay.FormatFiat(variation, _currencySettings.MainFiatCurrency)})";
+            }
+                
         }
         catch (Exception ex)
         {

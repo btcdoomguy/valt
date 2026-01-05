@@ -34,13 +34,13 @@
                         <ComboBox ItemsSource="{Binding AvailableFiatCurrencies}"
                                   DisplayMemberBinding="{Binding Text}"
                                   SelectedValueBinding="{Binding Value}"
-                                  SelectedValue="{Binding MainFiatCurrency}" Width="100" />
+                                  SelectedValue="{Binding MainFiatCurrency}" Width="200" />
                     </DockPanel>
                     <DockPanel>
-                        <TextBlock Width="220" TextAlignment="Right" Margin="0,0,5,0"
-                                   VerticalAlignment="Center"
+                        <TextBlock Width="220" TextAlignment="Right" Margin="0,5,5,0"
+                                   VerticalAlignment="Top"
                                    Text="{x:Static local:language.Settings_Culture}" TextWrapping="Wrap" />
-                        <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Vertical" Margin="0, 0, 0, 0">
                             <ComboBox ItemsSource="{Binding Cultures}"
                                       DisplayMemberBinding="{Binding Text}"
                                       SelectedValueBinding="{Binding Value}"

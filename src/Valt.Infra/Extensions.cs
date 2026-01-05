@@ -101,6 +101,7 @@ public static class Extensions
         services.AddSingleton<IAllTimeHighReport, AllTimeHighReport>();
         services.AddSingleton<IExpensesByCategoryReport, ExpensesByCategoryReport>();
         services.AddSingleton<IMonthlyTotalsReport, MonthlyTotalsReport>();
+        services.AddSingleton<IReportDataProviderFactory, ReportDataProviderFactory>();
 
         //background jobs
         services.AddSingleton<BackgroundJobManager>();

@@ -1,59 +1,38 @@
-using System.Collections.Frozen;
-using System.Collections.Immutable;
 using LiteDB;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
-using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Categories;
-using Valt.Infra.DataAccess;
 using Valt.Infra.Modules.Budget.Accounts;
-using Valt.Infra.Modules.Budget.Categories;
 using Valt.Infra.Modules.Budget.Transactions;
-using Valt.Infra.Modules.DataSources.Bitcoin;
-using Valt.Infra.Modules.DataSources.Fiat;
-using Valt.Infra.Modules.Reports.MonthlyTotals;
 
 namespace Valt.Infra.Modules.Reports.ExpensesByCategory;
 
 internal class ExpensesByCategoryReport : IExpensesByCategoryReport
 {
-    private readonly IPriceDatabase _priceDatabase;
-    private readonly ILocalDatabase _localDatabase;
-    private readonly IClock _clock;
     private readonly ILogger<ExpensesByCategoryReport> _logger;
 
-    public ExpensesByCategoryReport(IPriceDatabase priceDatabase, ILocalDatabase localDatabase,
-        IClock clock,
-        ILogger<ExpensesByCategoryReport> logger)
+    public ExpensesByCategoryReport(ILogger<ExpensesByCategoryReport> logger)
     {
-        _priceDatabase = priceDatabase;
-        _localDatabase = localDatabase;
-        _clock = clock;
         _logger = logger;
     }
-    
-    public Task<ExpensesByCategoryData> GetAsync(DateOnly baseDate, DateOnlyRange displayRange, FiatCurrency currency, IExpensesByCategoryReport.Filter filter)
+
+    public Task<ExpensesByCategoryData> GetAsync(DateOnly baseDate, DateOnlyRange displayRange, FiatCurrency currency, IExpensesByCategoryReport.Filter filter, IReportDataProvider provider)
     {
-        var accounts = _localDatabase.GetAccounts().FindAll().ToImmutableList();
-        var categories = _localDatabase.GetCategories().FindAll().ToImmutableList();
-        
+        if (provider.AllTransactions.Count == 0)
+        {
+            // Return empty result instead of throwing
+            return Task.FromResult(new ExpensesByCategoryData
+            {
+                MainCurrency = currency,
+                Items = new List<ExpensesByCategoryData.Item>()
+            });
+        }
+
         var minDate = displayRange.Start.ToValtDateTime();
         var maxDate = displayRange.End.ToValtDateTime();
-        
-        var transactions = _localDatabase.GetTransactions().Find(x => x.Date >= minDate && x.Date <= maxDate).ToImmutableList();
-        
-        if (transactions.Count == 0)
-        {
-            throw new ApplicationException("No transactions found");
-        }
-        
-        var btcRates = _priceDatabase.GetBitcoinData().Find(x => x.Date >= minDate.AddDays(-5) && x.Date <= maxDate)
-            .ToImmutableList();
-        var fiatRates = _priceDatabase.GetFiatData().Find(x => x.Date >= minDate.AddDays(-5) && x.Date <= maxDate)
-            .ToImmutableList();
-        
-        var calculator = new Calculator(currency, accounts, categories, transactions, btcRates, fiatRates, minDate, maxDate, filter);
+
+        var calculator = new Calculator(currency, provider, minDate, maxDate, filter);
 
         try
         {
@@ -65,51 +44,29 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
             throw;
         }
     }
-    
+
     private class Calculator
     {
         private const decimal SatoshisPerBitcoin = 100_000_000m;
-        private const int MaxDaysToScanForRate = 5;
 
         private readonly FiatCurrency _currency;
-        private readonly FrozenDictionary<ObjectId, AccountEntity> _accounts;
-        private readonly FrozenDictionary<ObjectId, CategoryEntity> _categories;
+        private readonly IReportDataProvider _provider;
         private readonly DateTime _startDate;
         private readonly DateTime _endDate;
         private readonly IExpensesByCategoryReport.Filter _filter;
-        private readonly FrozenDictionary<DateTime, BitcoinDataEntity> _btcRates;
-        private readonly FrozenDictionary<DateTime, ImmutableList<FiatDataEntity>> _fiatRates;
-        private readonly FrozenDictionary<DateTime, ImmutableList<TransactionEntity>> _transactionsByDate;
-        private readonly FrozenDictionary<DateTime, ImmutableList<ObjectId>> _accountsByDate;
 
         public Calculator(
             FiatCurrency currency,
-            ImmutableList<AccountEntity> accounts,
-            ImmutableList<CategoryEntity> categories,
-            ImmutableList<TransactionEntity> transactions,
-            ImmutableList<BitcoinDataEntity> btcRates,
-            ImmutableList<FiatDataEntity> fiatRates,
+            IReportDataProvider provider,
             DateTime startDate,
             DateTime endDate,
             IExpensesByCategoryReport.Filter filter)
         {
             _currency = currency;
-            _categories = categories.ToFrozenDictionary(x => x.Id);
-            _accounts = accounts.ToFrozenDictionary(x => x.Id);
+            _provider = provider;
             _startDate = startDate;
             _endDate = endDate;
             _filter = filter;
-            _btcRates = btcRates.ToFrozenDictionary(x => x.Date);
-            _fiatRates = fiatRates.GroupBy(x => x.Date).ToFrozenDictionary(x => x.Key, x => x.ToImmutableList());
-
-            _transactionsByDate = transactions.GroupBy(x => x.Date)
-                .ToFrozenDictionary(x => x.Key, x => x.ToImmutableList());
-            _accountsByDate = _transactionsByDate.ToFrozenDictionary(
-                x => x.Key,
-                x => x.Value.SelectMany(y => new[] { y.FromAccountId, y.ToAccountId ?? ObjectId.Empty })
-                    .Where(y => y != ObjectId.Empty)
-                    .Distinct()
-                    .ToImmutableList());
         }
 
         public ExpensesByCategoryData Calculate()
@@ -121,12 +78,12 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
             {
                 currentDate = currentDate.AddDays(1);
 
-                if (!_accountsByDate.TryGetValue(currentDate, out var accountsForDate))
+                if (!_provider.AccountsByDate.TryGetValue(currentDate, out var accountsForDate))
                 {
                     continue;
                 }
 
-                if (!_transactionsByDate.TryGetValue(currentDate, out var transactionsForDate))
+                if (!_provider.TransactionsByDate.TryGetValue(currentDate, out var transactionsForDate))
                 {
                     continue;
                 }
@@ -135,29 +92,29 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
                 {
                     if (!_filter.AccountIds.Contains(new AccountId(accountId.ToString())))
                         continue;
-                    
-                    var account = _accounts[accountId];
+
+                    var account = _provider.Accounts[accountId];
 
                     var transactions = transactionsForDate.Where(x => x.FromAccountId == accountId && (x.Type == TransactionEntityType.Fiat || x.Type == TransactionEntityType.Bitcoin));
-                    
+
                     foreach (var transaction in transactions)
                     {
                         if (!_filter.CategoryIds.Contains(new CategoryId(transaction.CategoryId.ToString())))
                             continue;
-                        
+
                         if (account.AccountEntityType == AccountEntityType.Bitcoin)
                         {
                             //only spending
                             if (transaction.FromSatAmount > 0)
                                 continue;
-                            
+
                             if (!categoryFiatTotals.ContainsKey(transaction.CategoryId))
                                 categoryFiatTotals[transaction.CategoryId] = 0;
-                            
-                            var usdBitcoinPrice = GetUsdBitcoinPriceAt(currentDate);
+
+                            var usdBitcoinPrice = _provider.GetUsdBitcoinPriceAt(currentDate);
                             var bitcoin = transaction.FromSatAmount.GetValueOrDefault() / SatoshisPerBitcoin;
-                            
-                            categoryFiatTotals[transaction.CategoryId] += GetFiatRateAt(currentDate, _currency) *
+
+                            categoryFiatTotals[transaction.CategoryId] += _provider.GetFiatRateAt(currentDate, _currency) *
                                                                            (bitcoin * usdBitcoinPrice);
                         }
                         else
@@ -165,13 +122,13 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
                             //only spending
                             if (transaction.FromFiatAmount > 0)
                                 continue;
-                            
+
                             if (!categoryFiatTotals.ContainsKey(transaction.CategoryId))
                                 categoryFiatTotals[transaction.CategoryId] = 0;
-                            
+
                             var accountCurrency = FiatCurrency.GetFromCode(account.Currency!);
-                            var accountRateToUsd = GetFiatRateAt(currentDate, accountCurrency);
-                            
+                            var accountRateToUsd = _provider.GetFiatRateAt(currentDate, accountCurrency);
+
                             if (account.Currency == _currency.Code)
                             {
                                 categoryFiatTotals[transaction.CategoryId] += transaction.FromFiatAmount.GetValueOrDefault();
@@ -192,7 +149,7 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
                 Items = categoryFiatTotals.Select(x => new ExpensesByCategoryData.Item()
                 {
                     CategoryId = new CategoryId(x.Key.ToString()),
-                    Icon = Icon.RestoreFromId(_categories[x.Key].Icon!),
+                    Icon = Icon.RestoreFromId(_provider.Categories[x.Key].Icon!),
                     CategoryName = BuildCategoryName(x.Key),
                     FiatTotal = x.Value * -1
                 }).OrderBy(x => x.CategoryName).ToList()
@@ -201,53 +158,9 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
 
         private string BuildCategoryName(ObjectId id)
         {
-            var category = _categories[id];
+            var category = _provider.Categories[id];
 
-            return category.ParentId is not null ? $"{_categories[category.ParentId].Name} >> {category.Name}" : $"{category.Name}";
-        }
-
-        private decimal GetFiatRateAt(DateTime date, FiatCurrency currency)
-        {
-            if (currency == FiatCurrency.Usd)
-            {
-                return 1;
-            }
-
-            var scanDate = date.Date;
-            var currencyCode = currency.Code;
-
-            for (var i = 0; i < MaxDaysToScanForRate; i++)
-            {
-                if (_fiatRates.TryGetValue(scanDate, out var rates))
-                {
-                    var entry = rates.FirstOrDefault(x => x.Currency == currencyCode);
-                    if (entry is not null)
-                    {
-                        return entry.Price;
-                    }
-                }
-
-                scanDate = scanDate.AddDays(-1);
-            }
-
-            throw new ApplicationException($"Could not find fiat rate for {currencyCode} on {date}");
-        }
-
-        private decimal GetUsdBitcoinPriceAt(DateTime date)
-        {
-            var scanDate = date;
-
-            for (var i = 0; i < MaxDaysToScanForRate; i++)
-            {
-                if (_btcRates.TryGetValue(scanDate, out var btcRate))
-                {
-                    return btcRate.Price;
-                }
-
-                scanDate = scanDate.AddDays(-1);
-            }
-
-            throw new ApplicationException($"Could not find BTC rate on {date}");
+            return category.ParentId is not null ? $"{_provider.Categories[category.ParentId].Name} >> {category.Name}" : $"{category.Name}";
         }
     }
 }

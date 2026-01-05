@@ -38,8 +38,8 @@
             <!-- Buttons -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10"
                         Margin="0, 0, 0, 0">
-                <Button Width="100" Content="{x:Static local:language.OkButton}" Command="{Binding OkCommand}" IsDefault="True"></Button>
-                <Button Width="100" Content="{x:Static local:language.CancelButton}" Command="{Binding CancelCommand}" IsCancel="True"></Button>
+                <Button Width="100" HorizontalContentAlignment="Center" Content="{x:Static local:language.OkButton}" Command="{Binding OkCommand}" IsDefault="True"></Button>
+                <Button Width="100" HorizontalContentAlignment="Center" Content="{x:Static local:language.CancelButton}" Command="{Binding CancelCommand}" IsCancel="True"></Button>
             </StackPanel>
         </StackPanel>
     </Border>

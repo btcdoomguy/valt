@@ -7,7 +7,7 @@ namespace Valt.Infra.Modules.Reports.ExpensesByCategory;
 
 public interface IExpensesByCategoryReport
 {
-    Task<ExpensesByCategoryData> GetAsync(DateOnly baseDate, DateOnlyRange displayRange, FiatCurrency currency, Filter filter);
+    Task<ExpensesByCategoryData> GetAsync(DateOnly baseDate, DateOnlyRange displayRange, FiatCurrency currency, Filter filter, IReportDataProvider provider);
 
     public record Filter(IEnumerable<AccountId> AccountIds, IEnumerable<CategoryId> CategoryIds);
 }

@@ -151,7 +151,7 @@
                         </StackPanel>
                     </Grid>
 
-                    <Grid Grid.Row="3" Margin="0" Grid.ColumnDefinitions="*, 2*">
+                    <Grid Grid.Row="3" Margin="0" Grid.ColumnDefinitions="2*, 3*">
                         <StackPanel Grid.Column="0" Margin="5">
                             <StackPanel Classes="form-field">
                                 <TextBlock Text="{x:Static local:language.ManageTransactions_From}" />
@@ -190,7 +190,7 @@
                                         TabIndex="3"
                                         CalculatorCommand="{Binding OpenCalculatorCommand}"
                                         CalculatorCommandParameter="FromBtc"
-                                        Width="370"
+                                        Width="346"
                                         HorizontalAlignment="Stretch">
                                     </userControls:BtcInput>
                                     <userControls:FiatInput
@@ -202,7 +202,7 @@
                                         TabIndex="4"
                                         CalculatorCommand="{Binding OpenCalculatorCommand}"
                                         CalculatorCommandParameter="FromFiat"
-                                        Width="370"
+                                        Width="346"
                                         HorizontalAlignment="Stretch">
                                     </userControls:FiatInput>
                                 </StackPanel>
@@ -210,7 +210,7 @@
                         </StackPanel>
                     </Grid>
 
-                    <Grid Grid.Row="4" Margin="0" Grid.ColumnDefinitions="*, 2*">
+                    <Grid Grid.Row="4" Margin="0" ColumnDefinitions="2*, 3*">
                         <StackPanel Grid.Column="0" Margin="5" Classes="form-field"
                                     IsVisible="{Binding TransferSelected}">
                             <TextBlock Text="{x:Static local:language.ManageTransactions_To}" />
@@ -248,7 +248,7 @@
                                     TabIndex="6"
                                     CalculatorCommand="{Binding OpenCalculatorCommand}"
                                     CalculatorCommandParameter="ToBtc"
-                                    Width="370"
+                                    Width="346"
                                     HorizontalAlignment="Stretch">
                                 </userControls:BtcInput>
                                 <userControls:FiatInput
@@ -259,7 +259,7 @@
                                     IsInputFocused="{Binding IsToFiatInputFocused, Mode=TwoWay}"
                                     FiatValue="{Binding ToAccountFiatValue, Mode=TwoWay}"
                                     CalculatorCommand="{Binding OpenCalculatorCommand}"
-                                    Width="370"
+                                    Width="346"
                                     CalculatorCommandParameter="ToFiat">
                                 </userControls:FiatInput>
                             </StackPanel>
@@ -306,11 +306,13 @@
                         Margin="0, 0, 0, 0">
                 <Button Width="100" TabIndex="11" Content="{x:Static local:language.OkButton}"
                         HorizontalContentAlignment="Center"
-                        Command="{Binding OkCommand}">
+                        Command="{Binding OkCommand}"
+                        IsDefault="True">
                 </Button>
                 <Button Width="100" TabIndex="12" Content="{x:Static local:language.CancelButton}"
                         HorizontalContentAlignment="Center"
-                        Command="{Binding CancelCommand}">
+                        Command="{Binding CancelCommand}"
+                        IsCancel="True">
                 </Button>
             </StackPanel>
         </StackPanel>

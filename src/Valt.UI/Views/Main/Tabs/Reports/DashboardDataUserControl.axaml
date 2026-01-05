@@ -23,7 +23,7 @@
                 <Label HorizontalContentAlignment="Left"
                        Content="{Binding Title}"
                        Foreground="{DynamicResource Accent200Brush}"
-                       FontSize="14"
+                       FontSize="13"
                        FontWeight="SemiBold"
                        Padding="0" />
             </Border>
@@ -36,18 +36,18 @@
                                 BorderThickness="0,0,0,1">
                             <DockPanel LastChildFill="True">
                                 <TextBlock Text="{Binding LeftText}"
-                                           FontSize="13"
+                                           FontSize="11"
                                            Foreground="{DynamicResource Text300Brush}"
                                            DockPanel.Dock="Left"
-                                           Padding="0, 6, 10, 0"
+                                           Padding="0, 6, 15, 0"
                                            VerticalAlignment="Center"/>
 
                                 <TextBlock Text="{Binding RightText}"
                                            FontSize="13"
                                            FontWeight="Medium"
-                                           FontFamily="JetBrains Mono, Cascadia Code, Consolas, monospace"
                                            Foreground="{DynamicResource Text100Brush}"
                                            DockPanel.Dock="Right"
+                                           Padding="0, 4, 10, 0"
                                            HorizontalAlignment="Right"
                                            VerticalAlignment="Center"/>
                             </DockPanel>

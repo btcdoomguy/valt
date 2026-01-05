@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -19,8 +18,6 @@ using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Categories;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
-using Valt.Infra.Modules.Budget.Accounts;
-using Valt.Infra.Modules.Budget.Categories;
 using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
 using Valt.Infra.Modules.Reports.ExpensesByCategory;
@@ -28,11 +25,9 @@ using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
 using Valt.UI.Lang;
-using Valt.UI.Services.LocalStorage;
 using Valt.UI.State;
 using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Tabs.Reports.Models;
-using Valt.UI.Views.Main.Tabs.Transactions;
 
 namespace Valt.UI.Views.Main.Tabs.Reports;
 
@@ -41,6 +36,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly IAllTimeHighReport _allTimeHighReport;
     private readonly IMonthlyTotalsReport _monthlyTotalsReport;
     private readonly IExpensesByCategoryReport _expensesByCategoryReport;
+    private readonly IReportDataProviderFactory _reportDataProviderFactory;
     private readonly CurrencySettings _currencySettings;
     private readonly ILocalDatabase _localDatabase;
     private readonly IClock _clock;
@@ -48,6 +44,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly AccountsTotalState _accountsTotalState;
 
     private const long TotalBtcSupplySats = 21_000_000_00_000_000L; // 21 million BTC in sats
+
+    // Cached provider for the lifetime of the tab being active
+    private IReportDataProvider? _cachedProvider;
 
     [ObservableProperty] private DashboardData _allTimeHighData;
     [ObservableProperty] private DashboardData _btcStackData;
@@ -78,6 +77,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     public ReportsViewModel(IAllTimeHighReport allTimeHighReport,
         IMonthlyTotalsReport monthlyTotalsReport,
         IExpensesByCategoryReport expensesByCategoryReport,
+        IReportDataProviderFactory reportDataProviderFactory,
         CurrencySettings currencySettings,
         ILocalDatabase localDatabase,
         IClock clock,
@@ -87,6 +87,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _allTimeHighReport = allTimeHighReport;
         _monthlyTotalsReport = monthlyTotalsReport;
         _expensesByCategoryReport = expensesByCategoryReport;
+        _reportDataProviderFactory = reportDataProviderFactory;
         _currencySettings = currencySettings;
         _localDatabase = localDatabase;
         _clock = clock;
@@ -97,7 +98,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         FilterRange = new DateRange(new DateTime(FilterMainDate.Year, 1, 1), new DateTime(FilterMainDate.Year, 12, 31));
         var currentMonth = new DateTime(CategoryFilterMainDate.Year, CategoryFilterMainDate.Month, 1);
         CategoryFilterRange = new DateRange(currentMonth, currentMonth.AddMonths(1).AddDays(-1));
-        
+
         PrepareAccountsAndCategoriesList();
 
         SelectedAccounts.CollectionChanged += OnSelectedFiltersChanged;
@@ -109,11 +110,10 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             {
                 case nameof(CurrencySettings.MainFiatCurrency):
                     IsAllTimeHighLoading = true;
-                    _ = FetchAllTimeHighDataAsync();
                     IsMonthlyTotalsLoading = true;
-                    _ = FetchMonthlyTotalsAsync();
                     IsSpendingByCategoriesLoading = true;
-                    _ = FetchExpensesByCategoryAsync();
+                    // Reload data when currency changes
+                    _ = ReloadDataAndFetchAllReportsAsync();
                     break;
             }
         });
@@ -145,10 +145,47 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             _ready = true;
         }
 
-        _ = FetchMonthlyTotalsAsync();
-        _ = FetchExpensesByCategoryAsync();
-        _ = FetchAllTimeHighDataAsync();
+        _ = LoadDataAndFetchAllReportsAsync();
         UpdateBtcStackData();
+    }
+
+    /// <summary>
+    /// Unloads the cached provider to free memory when the tab is no longer active
+    /// </summary>
+    public void UnloadData()
+    {
+        _cachedProvider = null;
+        _logger.LogDebug("Report data provider unloaded");
+    }
+
+    private IReportDataProvider GetOrCreateProvider()
+    {
+        _cachedProvider ??= _reportDataProviderFactory.Create();
+        return _cachedProvider;
+    }
+
+    private async Task LoadDataAndFetchAllReportsAsync()
+    {
+        // Create and cache the provider
+        _cachedProvider = _reportDataProviderFactory.Create();
+
+        await FetchAllReportsAsync(_cachedProvider);
+    }
+
+    private async Task ReloadDataAndFetchAllReportsAsync()
+    {
+        // Recreate the provider (data might have changed)
+        _cachedProvider = _reportDataProviderFactory.Create();
+
+        await FetchAllReportsAsync(_cachedProvider);
+    }
+
+    private async Task FetchAllReportsAsync(IReportDataProvider provider)
+    {
+        await Task.WhenAll(
+            FetchMonthlyTotalsAsync(provider),
+            FetchExpensesByCategoryAsync(provider),
+            FetchAllTimeHighDataAsync(provider));
     }
 
     private void PrepareAccountsAndCategoriesList()
@@ -157,10 +194,10 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         SelectedAccounts.Clear();
         AvailableCategories.Clear();
         SelectedCategories.Clear();
-        
+
         var accounts = _localDatabase.GetAccounts().FindAll().OrderByDescending(x => x.Visible).ThenBy(x => x.DisplayOrder)
             .Select(x => new SelectItem(x.Id.ToString(), x.Name));
-        
+
         AvailableAccounts.AddRange(accounts);
         SelectedAccounts.AddRange(AvailableAccounts);
 
@@ -172,7 +209,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             var name = category.Value.Name;
             if (category.Value.ParentId is not null)
                 name = categories[category.Value.ParentId.ToString()].Name + " >> " +  name;
-            
+
             parsedCategories.Add(new SelectItem(category.Key, name));
         }
 
@@ -185,7 +222,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         if (!_ready) return;
 
         IsMonthlyTotalsLoading = true;
-        _ = FetchMonthlyTotalsAsync();
+        var provider = GetOrCreateProvider();
+        _ = FetchMonthlyTotalsAsync(provider);
     }
 
     partial void OnCategoryFilterRangeChanged(DateRange value)
@@ -193,7 +231,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         if (!_ready) return;
 
         IsSpendingByCategoriesLoading = true;
-        _ = FetchExpensesByCategoryAsync();
+        var provider = GetOrCreateProvider();
+        _ = FetchExpensesByCategoryAsync(provider);
     }
 
     private void OnSelectedFiltersChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -213,7 +252,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         try
         {
             await Task.Delay(FilterDebounceDelayMs, cancellationToken);
-            await FetchExpensesByCategoryAsync();
+            var provider = GetOrCreateProvider();
+            await FetchExpensesByCategoryAsync(provider);
         }
         catch (TaskCanceledException)
         {
@@ -221,13 +261,13 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
     }
 
-    private async Task FetchAllTimeHighDataAsync()
+    private async Task FetchAllTimeHighDataAsync(IReportDataProvider provider)
     {
         try
         {
             var fiatCurrency = FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency);
 
-            var allTimeHighData = await _allTimeHighReport.GetAsync(fiatCurrency);
+            var allTimeHighData = await _allTimeHighReport.GetAsync(fiatCurrency, provider);
 
             var rows = new ObservableCollection<RowItem>
             {
@@ -299,7 +339,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
     }
 
-    private async Task FetchExpensesByCategoryAsync()
+    private async Task FetchExpensesByCategoryAsync(IReportDataProvider provider)
     {
         try
         {
@@ -312,7 +352,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 new DateOnlyRange(DateOnly.FromDateTime(CategoryFilterRange.Start),
                     DateOnly.FromDateTime(CategoryFilterRange.End)),
                 FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency),
-                filter);
+                filter,
+                provider);
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
@@ -327,14 +368,15 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
     }
 
-    private async Task FetchMonthlyTotalsAsync()
+    private async Task FetchMonthlyTotalsAsync(IReportDataProvider provider)
     {
         try
         {
             var monthlyTotalsData = await _monthlyTotalsReport.GetAsync(
                 DateOnly.FromDateTime(FilterMainDate),
                 new DateOnlyRange(DateOnly.FromDateTime(FilterRange.Start), DateOnly.FromDateTime(FilterRange.End)),
-                FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency));
+                FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency),
+                provider);
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
@@ -345,9 +387,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 MonthlyReportItems.Clear();
                 MonthlyReportItems.AddRange(monthlyTotalsData.Items.Select(x =>
                     new MonthlyReportItemViewModel(currency, x)));
-                
+
                 MonthlyReportItems.Add(new MonthlyReportItemViewModel(currency, monthlyTotalsData.Total));
-                
+
                 IsMonthlyTotalsLoading = false;
             });
         }
@@ -374,5 +416,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         MonthlyTotalsChartData.Dispose();
         ExpensesByCategoryChartData.Dispose();
+
+        // Clear the provider on dispose
+        _cachedProvider = null;
     }
 }

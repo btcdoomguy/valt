@@ -57,6 +57,18 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string SaveButton {
+            get {
+                return ResourceManager.GetString("SaveButton", resourceCulture);
+            }
+        }
+        
+        public static string SaveAndAddButton {
+            get {
+                return ResourceManager.GetString("SaveAndAddButton", resourceCulture);
+            }
+        }
+        
         public static string ChangeCategoryTransactionTitle {
             get {
                 return ResourceManager.GetString("ChangeCategoryTransactionTitle", resourceCulture);

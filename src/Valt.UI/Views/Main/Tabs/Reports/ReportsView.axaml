@@ -264,13 +264,18 @@
                                     CornerRadius="4"
                                     Padding="10"
                                     IsVisible="{Binding !IsSpendingByCategoriesLoading}">
-                                <avalonia:PieChart x:Name="CategoryPieChart"
-                                                   Width="700"
-                                                   Height="750"
-                                                   LegendPosition="Right"
-                                                   LegendTextSize="12"
-                                                   Series="{Binding ExpensesByCategoryChartData.Series}">
-                                </avalonia:PieChart>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                              HorizontalScrollBarVisibility="Disabled"
+                                              MaxHeight="600">
+                                    <avalonia:CartesianChart x:Name="CategoryBarChart"
+                                                             Height="{Binding ExpensesByCategoryChartData.ChartHeight}"
+                                                             Series="{Binding ExpensesByCategoryChartData.Series}"
+                                                             XAxes="{Binding ExpensesByCategoryChartData.XAxes}"
+                                                             YAxes="{Binding ExpensesByCategoryChartData.YAxes}"
+                                                             TooltipTextSize="12"
+                                                             Margin="20, 10, 20, 10">
+                                    </avalonia:CartesianChart>
+                                </ScrollViewer>
                             </Border>
                             <TextBlock Text="{x:Static lang:language.Loading}" FontSize="14" Foreground="{DynamicResource Text400Brush}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"

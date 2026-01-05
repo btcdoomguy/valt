@@ -29,6 +29,12 @@
     <data name="CancelButton" xml:space="preserve">
         <value>Cancel</value>
     </data>
+    <data name="SaveButton" xml:space="preserve">
+        <value>Save</value>
+    </data>
+    <data name="SaveAndAddButton" xml:space="preserve">
+        <value>Save and Add New</value>
+    </data>
     <data name="ChangeCategoryTransactionTitle" xml:space="preserve">
         <value>New Name</value>
     </data>
