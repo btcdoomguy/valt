@@ -47,7 +47,7 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
 
     public async Task RunAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("[FiatHistoryUpdater] Updating fiat history");
+        _logger.LogInformation("[FiatHistoryUpdater] Starting fiat history update cycle");
         try
         {
             // Skip if no local database is open (we need it for currency configuration)
@@ -58,7 +58,13 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
             }
 
             if (!_priceDatabase.HasDatabaseOpen)
+            {
+                _logger.LogInformation("[FiatHistoryUpdater] Price database not open, skipping update");
                 return;
+            }
+
+            var currentRecordCount = _priceDatabase.GetFiatData().Query().Count();
+            _logger.LogInformation("[FiatHistoryUpdater] Current fiat price records: {Count}", currentRecordCount);
 
             // Get currencies from configuration
             var currencies = _configurationManager.GetAvailableFiatCurrencies();
@@ -67,6 +73,9 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
                 _logger.LogInformation("[FiatHistoryUpdater] No currencies configured, skipping update");
                 return;
             }
+
+            _logger.LogInformation("[FiatHistoryUpdater] Configured currencies: {Currencies}",
+                string.Join(", ", currencies));
 
             var utcNow = DateTime.UtcNow;
             var localDate = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, 0, 0, 0, DateTimeKind.Local);
@@ -79,8 +88,19 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
             // Get fiat data date range from prices.db
             var (minFiatDate, maxFiatDate) = GetFiatDateRange();
 
+            if (minFiatDate.HasValue && maxFiatDate.HasValue)
+            {
+                _logger.LogInformation("[FiatHistoryUpdater] Current fiat date range: {MinDate} to {MaxDate}",
+                    minFiatDate.Value.ToString("yyyy-MM-dd"), maxFiatDate.Value.ToString("yyyy-MM-dd"));
+            }
+            else
+            {
+                _logger.LogInformation("[FiatHistoryUpdater] No existing fiat data found");
+            }
+
             // Calculate the required start date based on the lowest transaction date
             var requiredStartDate = GetRequiredStartDate();
+            _logger.LogInformation("[FiatHistoryUpdater] Required start date: {StartDate}", requiredStartDate.ToString("yyyy-MM-dd"));
 
             var updated = false;
 
@@ -135,8 +155,17 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
 
             if (updated)
             {
+                var newRecordCount = _priceDatabase.GetFiatData().Query().Count();
+                _logger.LogInformation("[FiatHistoryUpdater] Database updated. Total records: {Count} (added {Added})",
+                    newRecordCount, newRecordCount - currentRecordCount);
                 WeakReferenceMessenger.Default.Send<FiatHistoryPriceUpdatedMessage>();
             }
+            else
+            {
+                _logger.LogInformation("[FiatHistoryUpdater] Already up to date, no new data needed");
+            }
+
+            _logger.LogInformation("[FiatHistoryUpdater] Update cycle completed successfully");
         }
         catch (Exception ex)
         {

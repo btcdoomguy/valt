@@ -50,6 +50,11 @@ public partial class App : Application
         //register the current service provider as the universal provider
         serviceProvider.SetAsContextScope();
 
+        // Add job logger provider to capture logs into job log pools
+        var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+        var jobManager = serviceProvider.GetRequiredService<BackgroundJobManager>();
+        loggerFactory.AddProvider(new JobLoggerProvider(jobManager));
+
         //initialize all setting classes
         _ = serviceProvider.GetService<CurrencySettings>();
         _ = serviceProvider.GetService<DisplaySettings>();

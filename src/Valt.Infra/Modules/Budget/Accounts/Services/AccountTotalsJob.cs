@@ -36,9 +36,19 @@ internal class AccountTotalsJob : IBackgroundJob
 
             if (today != _currentDay)
             {
+                _logger.LogInformation("[AccountTotalsCalculator] Day changed from {OldDate} to {NewDate}, refreshing totals",
+                    _currentDay?.ToString("yyyy-MM-dd") ?? "null", today.ToString("yyyy-MM-dd"));
+
                 await _accountCacheService.RefreshCurrentTotalsAsync(today);
 
                 _currentDay = today;
+                _logger.LogInformation("[AccountTotalsCalculator] Account totals refreshed successfully for {Date}",
+                    today.ToString("yyyy-MM-dd"));
+            }
+            else
+            {
+                _logger.LogDebug("[AccountTotalsCalculator] No date change, skipping refresh (current: {Date})",
+                    today.ToString("yyyy-MM-dd"));
             }
         }
         catch (Exception ex)

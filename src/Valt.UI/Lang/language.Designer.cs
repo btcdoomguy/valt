@@ -422,7 +422,25 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("StatusDisplay.Title", resourceCulture);
             }
         }
-        
+
+        public static string JobLogViewer_Title {
+            get {
+                return ResourceManager.GetString("JobLogViewer.Title", resourceCulture);
+            }
+        }
+
+        public static string JobLogViewer_ClearLog {
+            get {
+                return ResourceManager.GetString("JobLogViewer.ClearLog", resourceCulture);
+            }
+        }
+
+        public static string JobLogViewer_NoLogs {
+            get {
+                return ResourceManager.GetString("JobLogViewer.NoLogs", resourceCulture);
+            }
+        }
+
         public static string Transactions_Ratio {
             get {
                 return ResourceManager.GetString("Transactions.Ratio", resourceCulture);

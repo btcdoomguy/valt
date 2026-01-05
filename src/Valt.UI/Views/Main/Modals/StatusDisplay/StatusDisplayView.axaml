@@ -26,10 +26,10 @@
             <userControls:CustomTitleBar Title="{x:Static local:language.StatusDisplay_Title}" TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
             <Border Classes="form-fields-area" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="214">
-                <ListBox ItemsSource="{Binding Jobs}">
+                <ListBox ItemsSource="{Binding Jobs}" SelectedItem="{Binding SelectedJob}" DoubleTapped="ListBox_DoubleTapped">
                     <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="backgroundJobs1:JobInfo">
-                            <Grid ColumnDefinitions="5*, 3*">
+                            <Grid ColumnDefinitions="5*, 3*" ToolTip.Tip="Double-click to view logs">
                                 <TextBlock Grid.Column="0" Text="{Binding Job.Name}" HorizontalAlignment="Right" Margin="0, 0, 10, 0" />
                                 <TextBlock Grid.Column="1" Text="{Binding State}" Margin="10, 0, 0, 0" />
                             </Grid>

@@ -900,4 +900,13 @@
     <data name="Settings.FiatCurrencies.Info" xml:space="preserve">
         <value>USD está inclusa por padrão. Moedas em uso não podem ser removidas.</value>
     </data>
+    <data name="JobLogViewer.Title" xml:space="preserve">
+        <value>Log do Job: {0}</value>
+    </data>
+    <data name="JobLogViewer.ClearLog" xml:space="preserve">
+        <value>Limpar Log</value>
+    </data>
+    <data name="JobLogViewer.NoLogs" xml:space="preserve">
+        <value>Nenhuma entrada de log ainda.</value>
+    </data>
 </root>

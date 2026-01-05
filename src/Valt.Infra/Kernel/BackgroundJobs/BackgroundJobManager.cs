@@ -107,6 +107,7 @@ public sealed class JobInfo : INotifyPropertyChanged, IDisposable
 {
     private readonly IBackgroundJob _job;
     private readonly SemaphoreSlim _semaphore = new(1, 1);
+    private readonly JobLogPool _logPool = new();
     private Timer? _timer;
     private CancellationToken _token;
     private BackgroundJobState _state = BackgroundJobState.Stopped;
@@ -117,6 +118,7 @@ public sealed class JobInfo : INotifyPropertyChanged, IDisposable
     }
 
     public IBackgroundJob Job => _job;
+    public JobLogPool LogPool => _logPool;
         
     public BackgroundJobState State
     {
