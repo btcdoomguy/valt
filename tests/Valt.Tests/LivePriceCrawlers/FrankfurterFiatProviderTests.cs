@@ -12,8 +12,9 @@ public class FrankfurterFiatProviderTests
     public async Task Should_Get_Prices()
     {
         var frankfurterUsdRateProvider = new FrankfurterFiatRateProvider(new Clock(), new NullLogger<FrankfurterFiatRateProvider>());
+        var currencies = new[] { FiatCurrency.Brl.Code, FiatCurrency.Eur.Code };
 
-        var prices = await frankfurterUsdRateProvider.GetAsync();
+        var prices = await frankfurterUsdRateProvider.GetAsync(currencies);
 
         Assert.That(prices.Items.SingleOrDefault(x => x.CurrencyCode == FiatCurrency.Brl.Code)!.Price, Is.GreaterThan(0));
         Assert.That(prices.Items.SingleOrDefault(x => x.CurrencyCode == FiatCurrency.Eur.Code)!.Price, Is.GreaterThan(0));

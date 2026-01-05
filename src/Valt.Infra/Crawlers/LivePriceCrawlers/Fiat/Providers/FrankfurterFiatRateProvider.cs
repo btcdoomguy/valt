@@ -16,16 +16,24 @@ public class FrankfurterFiatRateProvider : IFiatPriceProvider
         _clock = clock;
         _logger = logger;
     }
-    
+
     public string Name => "Frankfurter Fiat Rate";
 
-    public async Task<FiatUsdPrice> GetAsync()
+    public async Task<FiatUsdPrice> GetAsync(IEnumerable<string> currencies)
     {
         using var client = new HttpClient();
         client.Timeout = TimeSpan.FromSeconds(5);
         try
         {
-            var response = await client.GetAsync($"https://api.frankfurter.dev/v1/latest?base=USD&symbols={string.Join(',', FiatCurrency.GetAll().Select(x => x.Code))}");
+            var currencyList = currencies.Where(c => c != FiatCurrency.Usd.Code).ToList();
+            if (currencyList.Count == 0)
+            {
+                // No currencies to fetch, return just USD
+                return new FiatUsdPrice(_clock.GetCurrentDateTimeUtc(), true,
+                    new[] { new FiatUsdPrice.Item(FiatCurrency.Usd.Code, 1) });
+            }
+
+            var response = await client.GetAsync($"https://api.frankfurter.dev/v1/latest?base=USD&symbols={string.Join(',', currencyList)}");
             if (!response.IsSuccessStatusCode)
             {
                 throw new ApplicationException("Invalid API Response");
@@ -37,11 +45,11 @@ public class FrankfurterFiatRateProvider : IFiatPriceProvider
 
             var ratesResponse = new List<FiatUsdPrice.Item>();
             ratesResponse.Add(new FiatUsdPrice.Item(FiatCurrency.Usd.Code, 1));
-            foreach (var symbol in FiatCurrency.GetAll())
+            foreach (var currencyCode in currencyList)
             {
-                if (rates.TryGetProperty(symbol.Code, out var rate))
+                if (rates.TryGetProperty(currencyCode, out var rate))
                 {
-                    ratesResponse.Add(new FiatUsdPrice.Item(symbol.Code, rate.GetDecimal()));
+                    ratesResponse.Add(new FiatUsdPrice.Item(currencyCode, rate.GetDecimal()));
                 }
             }
 

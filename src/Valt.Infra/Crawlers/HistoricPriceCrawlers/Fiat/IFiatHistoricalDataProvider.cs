@@ -4,7 +4,7 @@ public interface IFiatHistoricalDataProvider
 {
     bool RequiresApiKey { get; }
 
-    Task<IEnumerable<FiatPriceData>> GetPricesAsync(DateOnly startDate, DateOnly endDate);
+    Task<IEnumerable<FiatPriceData>> GetPricesAsync(DateOnly startDate, DateOnly endDate, IEnumerable<string> currencies);
 
     public record FiatPriceData(DateOnly Date, IReadOnlySet<CurrencyAndPrice> Data);
     public record CurrencyAndPrice(string Currency, decimal Price);

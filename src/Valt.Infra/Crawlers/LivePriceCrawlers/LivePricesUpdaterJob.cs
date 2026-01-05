@@ -7,6 +7,7 @@ using Valt.Infra.Crawlers.LivePriceCrawlers.Fiat.Providers;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Messages;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel.BackgroundJobs;
+using Valt.Infra.Modules.Configuration;
 
 namespace Valt.Infra.Crawlers.LivePriceCrawlers;
 
@@ -16,6 +17,7 @@ internal class LivePricesUpdaterJob : IBackgroundJob
     private readonly IBitcoinPriceProvider _bitcoinPriceProvider;
     private readonly IPriceDatabase _priceDatabase;
     private readonly ILocalHistoricalPriceProvider _localHistoricalPriceProvider;
+    private readonly ConfigurationManager _configurationManager;
     private readonly ILogger<LivePricesUpdaterJob> _logger;
 
     private decimal? _lastClosingPrice;
@@ -33,12 +35,14 @@ internal class LivePricesUpdaterJob : IBackgroundJob
         IBitcoinPriceProvider bitcoinPriceProvider,
         IPriceDatabase priceDatabase,
         ILocalHistoricalPriceProvider localHistoricalPriceProvider,
+        ConfigurationManager configurationManager,
         ILogger<LivePricesUpdaterJob> logger)
     {
         _fiatPriceProvider = fiatPriceProvider;
         _bitcoinPriceProvider = bitcoinPriceProvider;
         _priceDatabase = priceDatabase;
         _localHistoricalPriceProvider = localHistoricalPriceProvider;
+        _configurationManager = configurationManager;
         _logger = logger;
     }
 
@@ -53,7 +57,8 @@ internal class LivePricesUpdaterJob : IBackgroundJob
         var isUpToDate = false;
         try
         {
-            var fiatTask = _fiatPriceProvider.GetAsync();
+            var currencies = _configurationManager.GetAvailableFiatCurrencies();
+            var fiatTask = _fiatPriceProvider.GetAsync(currencies);
             var btcTask = _bitcoinPriceProvider.GetAsync();
 
             await Task.WhenAll(fiatTask, btcTask).ConfigureAwait(false);

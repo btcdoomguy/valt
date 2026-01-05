@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Messages;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel.BackgroundJobs;
+using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Modules.DataSources.Fiat;
 
 namespace Valt.Infra.Crawlers.HistoricPriceCrawlers.Fiat;
@@ -11,6 +12,7 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
 {
     private readonly IPriceDatabase _priceDatabase;
     private readonly IFiatHistoricalDataProvider _provider;
+    private readonly ConfigurationManager _configurationManager;
     private readonly ILogger<FiatHistoryUpdaterJob> _logger;
 
     public string Name => "Fiat history updater job";
@@ -23,10 +25,12 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
 
     public FiatHistoryUpdaterJob(IPriceDatabase priceDatabase,
         IFiatHistoricalDataProvider provider,
+        ConfigurationManager configurationManager,
         ILogger<FiatHistoryUpdaterJob> logger)
     {
         _priceDatabase = priceDatabase;
         _provider = provider;
+        _configurationManager = configurationManager;
         _logger = logger;
     }
 
@@ -77,8 +81,9 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
             _logger.LogInformation("[FiatHistoryUpdater] From {0} to {1}", startDate!.ToShortDateString(),
                 endDate.ToShortDateString());
 
+            var currencies = _configurationManager.GetAvailableFiatCurrencies();
             var prices = (await _provider.GetPricesAsync(DateOnly.FromDateTime(startDate),
-                DateOnly.FromDateTime(endDate)).ConfigureAwait(false)).ToList();
+                DateOnly.FromDateTime(endDate), currencies).ConfigureAwait(false)).ToList();
 
             if (prices.Count != 0)
             {
