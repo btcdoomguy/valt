@@ -723,7 +723,7 @@
         <value>Max drawdown</value>
     </data>
     <data name="Reports.BtcStack.Title" xml:space="preserve">
-        <value>Your BTC Stack</value>
+        <value>Your Stack</value>
     </data>
     <data name="Reports.BtcStack.CurrentStack" xml:space="preserve">
         <value>Current stack</value>
@@ -732,7 +732,16 @@
         <value>% of total supply</value>
     </data>
     <data name="Reports.BtcStack.PeopleWithSameStack" xml:space="preserve">
-        <value>Max nº of people with same stack</value>
+        <value>Global ranking</value>
+    </data>
+    <data name="Reports.Statistics.Title" xml:space="preserve">
+        <value>Statistics</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpenses" xml:space="preserve">
+        <value>Median expenses (12mo)</value>
+    </data>
+    <data name="Reports.Statistics.WealthCoverage" xml:space="preserve">
+        <value>Wealth coverage</value>
     </data>
     <data name="Reports.MonthlyTotals.Obs" xml:space="preserve">
         <value>* latest totals are calculated based on yesterday amounts</value>

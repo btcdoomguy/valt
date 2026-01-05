@@ -122,55 +122,55 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("CreateDatabase.InitialDataLanguage", resourceCulture);
             }
         }
-
+        
         public static string CreateDatabase_FiatCurrencies {
             get {
                 return ResourceManager.GetString("CreateDatabase.FiatCurrencies", resourceCulture);
             }
         }
-
+        
         public static string CreateDatabase_FiatCurrencies_Info {
             get {
                 return ResourceManager.GetString("CreateDatabase.FiatCurrencies.Info", resourceCulture);
             }
         }
-
+        
         public static string CreateDatabase_FiatCurrencies_SelectTitle {
             get {
                 return ResourceManager.GetString("CreateDatabase.FiatCurrencies.SelectTitle", resourceCulture);
             }
         }
-
+        
         public static string Settings_FiatCurrencies {
             get {
                 return ResourceManager.GetString("Settings.FiatCurrencies", resourceCulture);
             }
         }
-
+        
         public static string Settings_FiatCurrencies_Info {
             get {
                 return ResourceManager.GetString("Settings.FiatCurrencies.Info", resourceCulture);
             }
         }
-
+        
         public static string Settings_FiatCurrencies_CannotRemove {
             get {
                 return ResourceManager.GetString("Settings.FiatCurrencies.CannotRemove", resourceCulture);
             }
         }
-
+        
         public static string Settings_FiatCurrencies_ConfirmAdd_Title {
             get {
                 return ResourceManager.GetString("Settings.FiatCurrencies.ConfirmAdd.Title", resourceCulture);
             }
         }
-
+        
         public static string Settings_FiatCurrencies_ConfirmAdd_Message {
             get {
                 return ResourceManager.GetString("Settings.FiatCurrencies.ConfirmAdd.Message", resourceCulture);
             }
         }
-
+        
         public static string IconSelector_ClearSelection {
             get {
                 return ResourceManager.GetString("IconSelector.ClearSelection", resourceCulture);
@@ -422,25 +422,7 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("StatusDisplay.Title", resourceCulture);
             }
         }
-
-        public static string JobLogViewer_Title {
-            get {
-                return ResourceManager.GetString("JobLogViewer.Title", resourceCulture);
-            }
-        }
-
-        public static string JobLogViewer_ClearLog {
-            get {
-                return ResourceManager.GetString("JobLogViewer.ClearLog", resourceCulture);
-            }
-        }
-
-        public static string JobLogViewer_NoLogs {
-            get {
-                return ResourceManager.GetString("JobLogViewer.NoLogs", resourceCulture);
-            }
-        }
-
+        
         public static string Transactions_Ratio {
             get {
                 return ResourceManager.GetString("Transactions.Ratio", resourceCulture);
@@ -1034,25 +1016,25 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("FixedExpenseEditor.Validation.InvalidRangePeriodStart", resourceCulture);
             }
         }
-
+        
         public static string FixedExpenseEditor_ChangeRecurrence {
             get {
                 return ResourceManager.GetString("FixedExpenseEditor.ChangeRecurrence", resourceCulture);
             }
         }
-
+        
         public static string FixedExpenseEditor_CancelChangeRecurrence {
             get {
                 return ResourceManager.GetString("FixedExpenseEditor.CancelChangeRecurrence", resourceCulture);
             }
         }
-
+        
         public static string ManageFixedExpenses_RecurrenceSection {
             get {
                 return ResourceManager.GetString("ManageFixedExpenses.RecurrenceSection", resourceCulture);
             }
         }
-
+        
         public static string FixedExpenses_Period_Weekly {
             get {
                 return ResourceManager.GetString("FixedExpenses.Period.Weekly", resourceCulture);
@@ -1358,25 +1340,25 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Settings.RequiresRestart", resourceCulture);
             }
         }
-
+        
         public static string Settings_Tab_General {
             get {
                 return ResourceManager.GetString("Settings.Tab.General", resourceCulture);
             }
         }
-
+        
         public static string Settings_Tab_Currencies {
             get {
                 return ResourceManager.GetString("Settings.Tab.Currencies", resourceCulture);
             }
         }
-
+        
         public static string Settings_Tab_Advanced {
             get {
                 return ResourceManager.GetString("Settings.Tab.Advanced", resourceCulture);
             }
         }
-
+        
         public static string Offline_Line1 {
             get {
                 return ResourceManager.GetString("Offline.Line1", resourceCulture);
@@ -1484,7 +1466,25 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.BtcStack.PeopleWithSameStack", resourceCulture);
             }
         }
-        
+
+        public static string Reports_Statistics_Title {
+            get {
+                return ResourceManager.GetString("Reports.Statistics.Title", resourceCulture);
+            }
+        }
+
+        public static string Reports_Statistics_MedianExpenses {
+            get {
+                return ResourceManager.GetString("Reports.Statistics.MedianExpenses", resourceCulture);
+            }
+        }
+
+        public static string Reports_Statistics_WealthCoverage {
+            get {
+                return ResourceManager.GetString("Reports.Statistics.WealthCoverage", resourceCulture);
+            }
+        }
+
         public static string Reports_MonthlyTotals_Obs {
             get {
                 return ResourceManager.GetString("Reports.MonthlyTotals.Obs", resourceCulture);
@@ -1892,261 +1892,271 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("InitialSelection.FirstMessage", resourceCulture);
             }
         }
-
+        
+        public static string JobLogViewer_Title {
+            get {
+                return ResourceManager.GetString("JobLogViewer.Title", resourceCulture);
+            }
+        }
+        
+        public static string JobLogViewer_ClearLog {
+            get {
+                return ResourceManager.GetString("JobLogViewer.ClearLog", resourceCulture);
+            }
+        }
+        
+        public static string JobLogViewer_NoLogs {
+            get {
+                return ResourceManager.GetString("JobLogViewer.NoLogs", resourceCulture);
+            }
+        }
+        
         public static string Help_KeyboardShortcuts {
             get {
                 return ResourceManager.GetString("Help.KeyboardShortcuts", resourceCulture);
             }
         }
-
+        
         public static string Help_Tips {
             get {
                 return ResourceManager.GetString("Help.Tips", resourceCulture);
             }
         }
-
+        
         public static string TransactionEditor_Help_SwitchToDebt {
             get {
                 return ResourceManager.GetString("TransactionEditor.Help.SwitchToDebt", resourceCulture);
             }
         }
-
+        
         public static string TransactionEditor_Help_SwitchToCredit {
             get {
                 return ResourceManager.GetString("TransactionEditor.Help.SwitchToCredit", resourceCulture);
             }
         }
-
+        
         public static string TransactionEditor_Help_SwitchToTransfer {
             get {
                 return ResourceManager.GetString("TransactionEditor.Help.SwitchToTransfer", resourceCulture);
             }
         }
-
+        
         public static string TransactionEditor_Help_PreviousDay {
             get {
                 return ResourceManager.GetString("TransactionEditor.Help.PreviousDay", resourceCulture);
             }
         }
-
+        
         public static string TransactionEditor_Help_NextDay {
             get {
                 return ResourceManager.GetString("TransactionEditor.Help.NextDay", resourceCulture);
             }
         }
-
+        
         public static string TransactionEditor_Help_Tip1 {
             get {
                 return ResourceManager.GetString("TransactionEditor.Help.Tip1", resourceCulture);
             }
         }
-
+        
         public static string TransactionEditor_Help_Tip2 {
             get {
                 return ResourceManager.GetString("TransactionEditor.Help.Tip2", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Help_BrazilianRule {
             get {
                 return ResourceManager.GetString("AvgPrice.Help.BrazilianRule", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_Help_FIFO {
             get {
                 return ResourceManager.GetString("AvgPrice.Help.FIFO", resourceCulture);
             }
         }
-
+        
         public static string ManageTransactions_Notes {
             get {
                 return ResourceManager.GetString("ManageTransactions.Notes", resourceCulture);
             }
         }
-
+        
         public static string ManageTransactions_Notes_Placeholder {
             get {
                 return ResourceManager.GetString("ManageTransactions.Notes.Placeholder", resourceCulture);
             }
         }
-
+        
         public static string ManageTransactions_Properties {
             get {
                 return ResourceManager.GetString("ManageTransactions.Properties", resourceCulture);
             }
         }
-
+        
         public static string Transactions_Columns_Notes {
             get {
                 return ResourceManager.GetString("Transactions.Columns.Notes", resourceCulture);
             }
         }
-
-        // Common Validation Messages
+        
         public static string Validation_NameRequired {
             get {
                 return ResourceManager.GetString("Validation.NameRequired", resourceCulture);
             }
         }
-
+        
         public static string Validation_CategoryRequired {
             get {
                 return ResourceManager.GetString("Validation.CategoryRequired", resourceCulture);
             }
         }
-
+        
         public static string Validation_DateRequired {
             get {
                 return ResourceManager.GetString("Validation.DateRequired", resourceCulture);
             }
         }
-
+        
         public static string Validation_ValueRequired {
             get {
                 return ResourceManager.GetString("Validation.ValueRequired", resourceCulture);
             }
         }
-
+        
         public static string Validation_IconRequired {
             get {
                 return ResourceManager.GetString("Validation.IconRequired", resourceCulture);
             }
         }
-
+        
         public static string Validation_StartDateRequired {
             get {
                 return ResourceManager.GetString("Validation.StartDateRequired", resourceCulture);
             }
         }
-
+        
         public static string Validation_NewNameRequired {
             get {
                 return ResourceManager.GetString("Validation.NewNameRequired", resourceCulture);
             }
         }
-
-        // Account Validation Messages
+        
         public static string Validation_AccountNameRequired {
             get {
                 return ResourceManager.GetString("Validation.AccountNameRequired", resourceCulture);
             }
         }
-
+        
         public static string Validation_OriginAccountRequired {
             get {
                 return ResourceManager.GetString("Validation.OriginAccountRequired", resourceCulture);
             }
         }
-
+        
         public static string Validation_DestinationAccountRequired {
             get {
                 return ResourceManager.GetString("Validation.DestinationAccountRequired", resourceCulture);
             }
         }
-
-        // Password Validation Messages
+        
         public static string Validation_PasswordRequired {
             get {
                 return ResourceManager.GetString("Validation.PasswordRequired", resourceCulture);
             }
         }
-
+        
         public static string Validation_OldPasswordRequired {
             get {
                 return ResourceManager.GetString("Validation.OldPasswordRequired", resourceCulture);
             }
         }
-
+        
         public static string Validation_PasswordMinLength {
             get {
                 return ResourceManager.GetString("Validation.PasswordMinLength", resourceCulture);
             }
         }
-
+        
         public static string Validation_OldPasswordMinLength {
             get {
                 return ResourceManager.GetString("Validation.OldPasswordMinLength", resourceCulture);
             }
         }
-
+        
         public static string Validation_PasswordsDoNotMatch {
             get {
                 return ResourceManager.GetString("Validation.PasswordsDoNotMatch", resourceCulture);
             }
         }
-
-        // AvgPrice Validation Messages
+        
         public static string Validation_QuantityRequired {
             get {
                 return ResourceManager.GetString("Validation.QuantityRequired", resourceCulture);
             }
         }
-
+        
         public static string Validation_QuantityGreaterThanZero {
             get {
                 return ResourceManager.GetString("Validation.QuantityGreaterThanZero", resourceCulture);
             }
         }
-
+        
         public static string Validation_AmountRequired {
             get {
                 return ResourceManager.GetString("Validation.AmountRequired", resourceCulture);
             }
         }
-
+        
         public static string Validation_PrecisionRange {
             get {
                 return ResourceManager.GetString("Validation.PrecisionRange", resourceCulture);
             }
         }
-
-        // Database Validation Messages
+        
         public static string Validation_DatabasePathRequired {
             get {
                 return ResourceManager.GetString("Validation.DatabasePathRequired", resourceCulture);
             }
         }
-
-        // Error Dialog Titles
+        
         public static string Error_ValidationError {
             get {
                 return ResourceManager.GetString("Error.ValidationError", resourceCulture);
             }
         }
-
-        // Error Messages
+        
         public static string Error_TransactionNotFound {
             get {
                 return ResourceManager.GetString("Error.TransactionNotFound", resourceCulture);
             }
         }
-
+        
         public static string Error_AccountNotFound {
             get {
                 return ResourceManager.GetString("Error.AccountNotFound", resourceCulture);
             }
         }
-
+        
         public static string Error_FixedExpenseNotFound {
             get {
                 return ResourceManager.GetString("Error.FixedExpenseNotFound", resourceCulture);
             }
         }
-
+        
         public static string Error_ProfileNotFound {
             get {
                 return ResourceManager.GetString("Error.ProfileNotFound", resourceCulture);
             }
         }
-
+        
         public static string Error_FileNotFound {
             get {
                 return ResourceManager.GetString("Error.FileNotFound", resourceCulture);
             }
         }
-
-        // Dialog Buttons
+        
         public static string Button_Refresh {
             get {
                 return ResourceManager.GetString("Button.Refresh", resourceCulture);

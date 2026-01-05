@@ -676,7 +676,7 @@
         <value>Maior queda</value>
     </data>
     <data name="Reports.BtcStack.Title" xml:space="preserve">
-        <value>Seu Stack de BTC</value>
+        <value>Seu stack</value>
     </data>
     <data name="Reports.BtcStack.CurrentStack" xml:space="preserve">
         <value>Stack atual</value>
@@ -685,7 +685,16 @@
         <value>% do supply total</value>
     </data>
     <data name="Reports.BtcStack.PeopleWithSameStack" xml:space="preserve">
-        <value>Máx. de pessoas com o msm stack</value>
+        <value>Ranking global</value>
+    </data>
+    <data name="Reports.Statistics.Title" xml:space="preserve">
+        <value>Estatísticas</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpenses" xml:space="preserve">
+        <value>Despesas medianas (12m)</value>
+    </data>
+    <data name="Reports.Statistics.WealthCoverage" xml:space="preserve">
+        <value>Cobertura do patrimônio</value>
     </data>
     <data name="Reports.MonthlyTotals.Obs" xml:space="preserve">
         <value>* o total atual é baseado nos valores do dia anterior</value>

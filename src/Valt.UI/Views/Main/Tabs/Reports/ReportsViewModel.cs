@@ -22,6 +22,7 @@ using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
 using Valt.Infra.Modules.Reports.ExpensesByCategory;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
+using Valt.Infra.Modules.Reports.Statistics;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
 using Valt.UI.Lang;
@@ -36,6 +37,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly IAllTimeHighReport _allTimeHighReport;
     private readonly IMonthlyTotalsReport _monthlyTotalsReport;
     private readonly IExpensesByCategoryReport _expensesByCategoryReport;
+    private readonly IStatisticsReport _statisticsReport;
     private readonly IReportDataProviderFactory _reportDataProviderFactory;
     private readonly CurrencySettings _currencySettings;
     private readonly ILocalDatabase _localDatabase;
@@ -50,6 +52,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
     [ObservableProperty] private DashboardData _allTimeHighData;
     [ObservableProperty] private DashboardData _btcStackData;
+    [ObservableProperty] private DashboardData _statisticsData;
     [ObservableProperty] private AvaloniaList<MonthlyReportItemViewModel> _monthlyReportItems = new();
     [ObservableProperty] private MonthlyTotalsChartData _monthlyTotalsChartData = new();
     [ObservableProperty] private ExpensesByCategoryChartData _expensesByCategoryChartData = new();
@@ -60,6 +63,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
     [ObservableProperty] private bool _isAllTimeHighLoading = true;
     [ObservableProperty] private bool _isBtcStackLoading = true;
+    [ObservableProperty] private bool _isStatisticsLoading = true;
     [ObservableProperty] private bool _isMonthlyTotalsLoading = true;
     [ObservableProperty] private bool _isSpendingByCategoriesLoading = true;
 
@@ -77,6 +81,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     public ReportsViewModel(IAllTimeHighReport allTimeHighReport,
         IMonthlyTotalsReport monthlyTotalsReport,
         IExpensesByCategoryReport expensesByCategoryReport,
+        IStatisticsReport statisticsReport,
         IReportDataProviderFactory reportDataProviderFactory,
         CurrencySettings currencySettings,
         ILocalDatabase localDatabase,
@@ -87,6 +92,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _allTimeHighReport = allTimeHighReport;
         _monthlyTotalsReport = monthlyTotalsReport;
         _expensesByCategoryReport = expensesByCategoryReport;
+        _statisticsReport = statisticsReport;
         _reportDataProviderFactory = reportDataProviderFactory;
         _currencySettings = currencySettings;
         _localDatabase = localDatabase;
@@ -110,6 +116,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             {
                 case nameof(CurrencySettings.MainFiatCurrency):
                     IsAllTimeHighLoading = true;
+                    IsStatisticsLoading = true;
                     IsMonthlyTotalsLoading = true;
                     IsSpendingByCategoriesLoading = true;
                     // Reload data when currency changes
@@ -185,7 +192,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         await Task.WhenAll(
             FetchMonthlyTotalsAsync(provider),
             FetchExpensesByCategoryAsync(provider),
-            FetchAllTimeHighDataAsync(provider));
+            FetchAllTimeHighDataAsync(provider),
+            FetchStatisticsDataAsync(provider));
     }
 
     private void PrepareAccountsAndCategoriesList()
@@ -296,6 +304,39 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         finally
         {
             IsAllTimeHighLoading = false;
+        }
+    }
+
+    private async Task FetchStatisticsDataAsync(IReportDataProvider provider)
+    {
+        try
+        {
+            var fiatCurrency = FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency);
+            var currentWealth = _accountsTotalState.CurrentWealth;
+
+            // Get current wealth in main fiat currency
+            var currentWealthInFiat = currentWealth.AllWealthInMainFiatCurrency;
+
+            var statisticsData = await _statisticsReport.GetAsync(fiatCurrency, currentWealthInFiat, provider);
+
+            var rows = new ObservableCollection<RowItem>
+            {
+                new(language.Reports_Statistics_MedianExpenses,
+                    $"{CurrencyDisplay.FormatFiat(statisticsData.MedianMonthlyExpenses, fiatCurrency.Code)}"),
+                new(language.Reports_Statistics_WealthCoverage, statisticsData.WealthCoverageFormatted)
+            };
+
+            StatisticsData = new DashboardData(language.Reports_Statistics_Title, rows);
+
+            IsStatisticsLoading = false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching statistics data");
+        }
+        finally
+        {
+            IsStatisticsLoading = false;
         }
     }
 

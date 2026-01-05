@@ -49,6 +49,15 @@
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    IsVisible="{Binding IsBtcStackLoading}" />
                     </Grid>
+                    <!-- Statistics Dashboard -->
+                    <Grid MinWidth="300" MinHeight="150">
+                        <Panel IsVisible="{Binding !IsStatisticsLoading}">
+                            <reports1:DashboardDataUserControl DataContext="{Binding StatisticsData}" />
+                        </Panel>
+                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="14" Foreground="{DynamicResource Text400Brush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   IsVisible="{Binding IsStatisticsLoading}" />
+                    </Grid>
                 </StackPanel>
             </Expander>
             <!--Monthly totals-->
