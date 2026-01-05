@@ -18,6 +18,7 @@ using Valt.Infra.Modules.Budget.Accounts.Queries;
 using Valt.Infra.Modules.Budget.Accounts.Queries.DTOs;
 using Valt.Infra.Modules.Budget.Categories.Queries;
 using Valt.Infra.Modules.Budget.Categories.Queries.DTOs;
+using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
 using Valt.UI.Base;
@@ -34,6 +35,7 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
     private readonly ICategoryQueries _categoryQueries;
     private readonly DisplaySettings _displaySettings;
     private readonly ITransactionTermService _transactionTermService;
+    private readonly ConfigurationManager? _configurationManager;
 
     public AvaloniaList<CategoryDTO> AvailableCategories { get; set; } = new();
     public AvaloniaList<AccountDTO> AvailableAccounts { get; set; } = new();
@@ -118,7 +120,8 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
         new(language.DaysOfWeek_Saturday, ((int)DayOfWeek.Saturday).ToString())
     ];
 
-    public static List<string> AvailableCurrencies => FiatCurrency.GetAll().Select(x => x.Code).ToList();
+    public List<string> AvailableCurrencies => _configurationManager?.GetAvailableFiatCurrencies()
+        ?? FiatCurrency.GetAll().Select(x => x.Code).ToList();
 
     public bool IsDefaultAccountSelectorVisible => IsAttachedToDefaultAccount;
 
@@ -138,13 +141,15 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
         IAccountQueries accountQueries,
         ICategoryQueries categoryQueries,
         DisplaySettings displaySettings,
-        ITransactionTermService transactionTermService)
+        ITransactionTermService transactionTermService,
+        ConfigurationManager configurationManager)
     {
         _fixedExpenseRepository = fixedExpenseRepository;
         _accountQueries = accountQueries;
         _categoryQueries = categoryQueries;
         _displaySettings = displaySettings;
         _transactionTermService = transactionTermService;
+        _configurationManager = configurationManager;
 
         _ = InitializeAsync();
     }

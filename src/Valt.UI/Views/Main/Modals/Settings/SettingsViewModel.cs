@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Valt.Core.Common;
 using Valt.Infra.DataAccess;
+using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
 using Valt.UI.Base;
@@ -24,16 +25,23 @@ public partial class SettingsViewModel : ValtModalViewModel
     private readonly ITransactionTermService _transactionTermService;
     private readonly IModalFactory _modalFactory;
     private readonly ILocalStorageService _localStorageService;
+    private readonly ConfigurationManager? _configurationManager;
 
     [ObservableProperty] private string _mainFiatCurrency;
     [ObservableProperty] private bool _showHiddenAccounts;
     [ObservableProperty] private string _currentCulture;
 
-    public static List<ComboBoxValue> AvailableFiatCurrencies
+    public List<ComboBoxValue> AvailableFiatCurrencies
     {
         get
         {
-            return FiatCurrency.GetAll().Select(x => new ComboBoxValue($"{x.Code} ({x.Symbol})", x.Code)).ToList();
+            var currencies = _configurationManager?.GetAvailableFiatCurrencies()
+                ?? FiatCurrency.GetAll().Select(x => x.Code).ToList();
+            return currencies.Select(code =>
+            {
+                var currency = FiatCurrency.GetFromCode(code);
+                return new ComboBoxValue($"{currency.Code} ({currency.Symbol})", currency.Code);
+            }).ToList();
         }
     }
 
@@ -72,7 +80,8 @@ public partial class SettingsViewModel : ValtModalViewModel
         ILocalDatabase localDatabase,
         ITransactionTermService transactionTermService,
         IModalFactory modalFactory,
-        ILocalStorageService localStorageService)
+        ILocalStorageService localStorageService,
+        ConfigurationManager configurationManager)
     {
         _currencySettings = currencySettings;
         _displaySettings = displaySettings;
@@ -80,6 +89,7 @@ public partial class SettingsViewModel : ValtModalViewModel
         _transactionTermService = transactionTermService;
         _modalFactory = modalFactory;
         _localStorageService = localStorageService;
+        _configurationManager = configurationManager;
 
         MainFiatCurrency = _currencySettings.MainFiatCurrency;
         ShowHiddenAccounts = _displaySettings.ShowHiddenAccounts;

@@ -13,6 +13,7 @@ using Valt.Core.Modules.AvgPrice;
 using Valt.Core.Modules.AvgPrice.Calculations;
 using Valt.Infra.Kernel.Extensions;
 using Valt.Infra.Modules.AvgPrice.Queries;
+using Valt.Infra.Modules.Configuration;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
 using Valt.UI.Services;
@@ -28,6 +29,7 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
     private readonly IModalFactory _modalFactory;
     private readonly IAvgPriceQueries _avgPriceQueries;
     private readonly IAvgPriceRepository _avgPriceRepository;
+    private readonly ConfigurationManager? _configurationManager;
 
     [ObservableProperty] private string? _id;
     [ObservableProperty] private string _name;
@@ -51,7 +53,8 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(SymbolOnRight))] [NotifyPropertyChangedFor(nameof(Symbol))]
     private string _currency;
 
-    public static List<string> AvailableCurrencies => FiatCurrency.GetAll().Select(x => x.Code).ToList();
+    public List<string> AvailableCurrencies => _configurationManager?.GetAvailableFiatCurrencies()
+        ?? FiatCurrency.GetAll().Select(x => x.Code).ToList();
     public bool SymbolOnRight => FiatCurrency.GetFromCode(Currency).SymbolOnRight;
     public string Symbol => FiatCurrency.GetFromCode(Currency).Symbol;
 
@@ -104,11 +107,13 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
 
     public ManageAvgPriceProfilesViewModel(IModalFactory modalFactory,
         IAvgPriceQueries avgPriceQueries,
-        IAvgPriceRepository avgPriceRepository)
+        IAvgPriceRepository avgPriceRepository,
+        ConfigurationManager configurationManager)
     {
         _modalFactory = modalFactory;
         _avgPriceQueries = avgPriceQueries;
         _avgPriceRepository = avgPriceRepository;
+        _configurationManager = configurationManager;
 
         AvailableStrategies = new AvaloniaList<EnumItem>(EnumExtensions.ToList<AvgPriceCalculationMethod>());
     }
@@ -299,7 +304,7 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
         Id = null;
         AssetName = "BTC";
         Precision = 8;
-        Currency = AvailableCurrencies.First();
+        Currency = AvailableCurrencies.FirstOrDefault() ?? FiatCurrency.Usd.Code;
         Icon = Icon.Empty;
         SelectedStrategy = AvailableStrategies.First();
         Name = "";

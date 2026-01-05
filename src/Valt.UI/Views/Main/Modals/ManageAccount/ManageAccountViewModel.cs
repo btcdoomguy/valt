@@ -10,6 +10,7 @@ using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Accounts.Contracts;
 using Valt.Core.Modules.Budget.Accounts.Exceptions;
 using Valt.Core.Modules.Budget.Transactions.Contracts;
+using Valt.Infra.Modules.Configuration;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
 using Valt.UI.Services;
@@ -23,6 +24,7 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
     private readonly IAccountRepository? _accountRepository;
     private readonly ITransactionRepository? _transactionRepository;
     private readonly IModalFactory? _modalFactory;
+    private readonly ConfigurationManager? _configurationManager;
 
     #region Form Data
 
@@ -65,7 +67,8 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
         nameof(AccountTypes.Bitcoin),
     ];
 
-    public static List<string> AvailableCurrencies => FiatCurrency.GetAll().Select(x => x.Code).ToList();
+    public List<string> AvailableCurrencies => _configurationManager?.GetAvailableFiatCurrencies()
+        ?? FiatCurrency.GetAll().Select(x => x.Code).ToList();
 
     [ObservableProperty] private bool _canEditAccountStructure = true;
 
@@ -77,7 +80,7 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
     public ManageAccountViewModel()
     {
         AccountType = AvailableAccountTypes[0];
-        Currency = AvailableCurrencies[0];
+        Currency = FiatCurrency.Usd.Code;
         Visible = true;
 
         InitialBtcAmount = BtcValue.New(100000);
@@ -86,15 +89,17 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
 
     public ManageAccountViewModel(IAccountRepository accountRepository,
         ITransactionRepository transactionRepository,
-        IModalFactory modalFactory)
+        IModalFactory modalFactory,
+        ConfigurationManager configurationManager)
     {
-        AccountType = AvailableAccountTypes[0];
-        Currency = AvailableCurrencies[0];
-        Visible = true;
-
         _accountRepository = accountRepository;
         _transactionRepository = transactionRepository;
         _modalFactory = modalFactory;
+        _configurationManager = configurationManager;
+
+        AccountType = AvailableAccountTypes[0];
+        Currency = AvailableCurrencies.FirstOrDefault() ?? FiatCurrency.Usd.Code;
+        Visible = true;
     }
 
     public override async Task OnBindParameterAsync()
@@ -211,6 +216,12 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
             }
 
             await _accountRepository!.SaveAccountAsync(account);
+
+            // When creating/updating a fiat account, ensure the currency is in the available currencies list
+            if (AccountType == nameof(AccountTypes.Fiat))
+            {
+                _configurationManager?.AddFiatCurrency(Currency);
+            }
 
             CloseDialog?.Invoke(new Response(true));
         }
