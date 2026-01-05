@@ -509,6 +509,15 @@
     <data name="FixedExpenseEditor.Validation.InvalidRangePeriodStart" xml:space="preserve">
         <value>Cannot set the new range period start below the last record</value>
     </data>
+    <data name="FixedExpenseEditor.ChangeRecurrence" xml:space="preserve">
+        <value>Change...</value>
+    </data>
+    <data name="FixedExpenseEditor.CancelChangeRecurrence" xml:space="preserve">
+        <value>Cancel</value>
+    </data>
+    <data name="ManageFixedExpenses.RecurrenceSection" xml:space="preserve">
+        <value>Recurrence</value>
+    </data>
     <data name="FixedExpenses.Period.Weekly" xml:space="preserve">
         <value>Weekly</value>
     </data>

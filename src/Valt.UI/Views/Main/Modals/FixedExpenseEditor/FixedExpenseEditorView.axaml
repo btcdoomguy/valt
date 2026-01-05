@@ -119,6 +119,24 @@
 
                     <Separator Height="1" Margin="0, 5" />
 
+                    <!-- Period Section Header with Change/Cancel button -->
+                    <Grid ColumnDefinitions="*, Auto" Margin="0, 0, 0, 5">
+                        <TextBlock Grid.Column="0"
+                                   Text="{x:Static lang:language.ManageFixedExpenses_RecurrenceSection}"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center" />
+                        <Button Grid.Column="1"
+                                Content="{x:Static lang:language.FixedExpenseEditor_ChangeRecurrence}"
+                                Classes="link"
+                                IsVisible="{Binding ShowChangeRecurrenceButton}"
+                                Command="{Binding EnterChangeRecurrenceModeCommand}" />
+                        <Button Grid.Column="1"
+                                Content="{x:Static lang:language.FixedExpenseEditor_CancelChangeRecurrence}"
+                                Classes="link"
+                                IsVisible="{Binding ShowCancelChangeRecurrenceButton}"
+                                Command="{Binding CancelChangeRecurrenceModeCommand}" />
+                    </Grid>
+
                     <!-- Period Section -->
                     <Grid ColumnDefinitions="*, *">
                         <StackPanel Grid.Column="0" Classes="form-field">
@@ -129,6 +147,7 @@
                                       SelectedValueBinding="{Binding Value}"
                                       HorizontalAlignment="Stretch"
                                       IsTextSearchEnabled="True"
+                                      IsEnabled="{Binding !IsRecurrenceInfoLocked}"
                                       Height="36" />
                         </StackPanel>
 
@@ -137,6 +156,7 @@
                             <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Day}" />
                             <NumericUpDown Increment="1" Minimum="1" Maximum="31" Value="{Binding Day}"
                                            HorizontalContentAlignment="Stretch"
+                                           IsEnabled="{Binding !IsRecurrenceInfoLocked}"
                                            Height="36" />
                         </StackPanel>
 
@@ -149,6 +169,7 @@
                                       SelectedValueBinding="{Binding Value}"
                                       HorizontalAlignment="Stretch"
                                       IsTextSearchEnabled="True"
+                                      IsEnabled="{Binding !IsRecurrenceInfoLocked}"
                                       Height="36" />
                         </StackPanel>
                     </Grid>
@@ -159,6 +180,7 @@
                         <CalendarDatePicker HorizontalAlignment="Left"
                                             SelectedDateFormat="Short"
                                             IsTodayHighlighted="True"
+                                            IsEnabled="{Binding !IsRecurrenceInfoLocked}"
                                             Height="36"
                                             SelectedDate="{Binding PeriodStart}" />
                     </StackPanel>

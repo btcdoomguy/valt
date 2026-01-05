@@ -498,6 +498,15 @@
     <data name="FixedExpenseEditor.Validation.InvalidRangePeriodStart" xml:space="preserve">
         <value>A data de início de um novo período não pode ser menor do que o último lançamento registrado</value>
     </data>
+    <data name="FixedExpenseEditor.ChangeRecurrence" xml:space="preserve">
+        <value>Alterar...</value>
+    </data>
+    <data name="FixedExpenseEditor.CancelChangeRecurrence" xml:space="preserve">
+        <value>Cancelar</value>
+    </data>
+    <data name="ManageFixedExpenses.RecurrenceSection" xml:space="preserve">
+        <value>Recorrência</value>
+    </data>
     <data name="ManageFixedExpenses.DayOfWeek" xml:space="preserve">
         <value>Dia da semana</value>
     </data>

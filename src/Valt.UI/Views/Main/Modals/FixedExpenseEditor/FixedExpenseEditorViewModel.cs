@@ -45,9 +45,31 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
     [ObservableProperty] private DateOnly? _lastFixedExpenseRecordReferenceDate;
     [ObservableProperty] private FixedExpenseRange? _currentFixedExpenseRange;
 
+    // Edit mode state
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsRecurrenceInfoLocked))]
+    [NotifyPropertyChangedFor(nameof(ShowChangeRecurrenceButton))]
+    [NotifyPropertyChangedFor(nameof(ShowCancelChangeRecurrenceButton))]
+    private bool _isInChangeRecurrenceMode;
+
+    // Store original recurrence values for cancel operation
+    private string? _originalPeriod;
+    private int _originalDay;
+    private DateTime? _originalPeriodStart;
+
+    public bool IsEditing => FixedExpenseId != null;
+    public bool IsRecurrenceInfoLocked => IsEditing && !IsInChangeRecurrenceMode;
+    public bool ShowChangeRecurrenceButton => IsEditing && !IsInChangeRecurrenceMode;
+    public bool ShowCancelChangeRecurrenceButton => IsEditing && IsInChangeRecurrenceMode;
+
     #region Form Data
 
-    [ObservableProperty] private FixedExpenseId? _fixedExpenseId;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsEditing))]
+    [NotifyPropertyChangedFor(nameof(IsRecurrenceInfoLocked))]
+    [NotifyPropertyChangedFor(nameof(ShowChangeRecurrenceButton))]
+    [NotifyPropertyChangedFor(nameof(ShowCancelChangeRecurrenceButton))]
+    private FixedExpenseId? _fixedExpenseId;
 
     [Required(ErrorMessage = "Name is required")] [ObservableProperty]
     private string _name = string.Empty;
@@ -290,6 +312,35 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
     private void Close()
     {
         CloseWindow?.Invoke();
+    }
+
+    [RelayCommand]
+    private void EnterChangeRecurrenceMode()
+    {
+        // Store original values for cancel operation
+        _originalPeriod = Period;
+        _originalDay = Day;
+        _originalPeriodStart = PeriodStart;
+
+        // Set the minimum valid date for the new period start
+        // Must be after the last recorded transaction
+        if (LastFixedExpenseRecordReferenceDate.HasValue)
+        {
+            PeriodStart = LastFixedExpenseRecordReferenceDate.Value.AddDays(1).ToValtDateTime();
+        }
+
+        IsInChangeRecurrenceMode = true;
+    }
+
+    [RelayCommand]
+    private void CancelChangeRecurrenceMode()
+    {
+        // Restore original values
+        Period = _originalPeriod ?? Period;
+        Day = _originalDay;
+        PeriodStart = _originalPeriodStart;
+
+        IsInChangeRecurrenceMode = false;
     }
 
     private async Task<FixedExpense> CreateAsync()
