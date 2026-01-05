@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Valt.Core.Common;
@@ -11,8 +14,10 @@ using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
+using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.LocalStorage;
+using Valt.UI.Services.MessageBoxes;
 using Valt.UI.Views.Main.Modals.ChangePassword;
 
 namespace Valt.UI.Views.Main.Modals.Settings;
@@ -30,6 +35,19 @@ public partial class SettingsViewModel : ValtModalViewModel
     [ObservableProperty] private string _mainFiatCurrency;
     [ObservableProperty] private bool _showHiddenAccounts;
     [ObservableProperty] private string _currentCulture;
+
+    private List<string> _initialSelectedCurrencies = new();
+    private HashSet<string> _currenciesInUse = new();
+
+    /// <summary>
+    /// All available fiat currencies (excluding USD which is mandatory)
+    /// </summary>
+    public AvaloniaList<FiatCurrencyItem> AllFiatCurrencies { get; } = new(FiatCurrencyItem.GetAllExceptUsd());
+
+    /// <summary>
+    /// Selected fiat currencies (excluding USD which is mandatory)
+    /// </summary>
+    public AvaloniaList<FiatCurrencyItem> SelectedFiatCurrencies { get; } = new();
 
     public List<ComboBoxValue> AvailableFiatCurrencies
     {
@@ -73,6 +91,8 @@ public partial class SettingsViewModel : ValtModalViewModel
         //Design-time constructor
         MainFiatCurrency = "BRL";
         ShowHiddenAccounts = false;
+
+        SelectedFiatCurrencies.CollectionChanged += OnSelectedFiatCurrenciesChanged;
     }
     
     public SettingsViewModel(CurrencySettings currencySettings,
@@ -94,6 +114,52 @@ public partial class SettingsViewModel : ValtModalViewModel
         MainFiatCurrency = _currencySettings.MainFiatCurrency;
         ShowHiddenAccounts = _displaySettings.ShowHiddenAccounts;
         CurrentCulture = _localStorageService.LoadCulture();
+
+        // Initialize currencies
+        InitializeFiatCurrencies();
+        SelectedFiatCurrencies.CollectionChanged += OnSelectedFiatCurrenciesChanged;
+    }
+
+    private void InitializeFiatCurrencies()
+    {
+        // Get currently configured currencies (excluding USD)
+        var configuredCurrencies = _configurationManager?.GetAvailableFiatCurrencies()
+            .Where(c => c != "USD")
+            .ToList() ?? new List<string>();
+
+        _initialSelectedCurrencies = new List<string>(configuredCurrencies);
+
+        // Get currencies in use (cannot be removed)
+        _currenciesInUse = _configurationManager?.GetCurrenciesInUse()
+            .Where(c => c != "USD")
+            .ToHashSet(StringComparer.OrdinalIgnoreCase) ?? new HashSet<string>();
+
+        // Select the configured currencies in the list
+        foreach (var item in AllFiatCurrencies.Where(c => configuredCurrencies.Contains(c.Code, StringComparer.OrdinalIgnoreCase)))
+        {
+            SelectedFiatCurrencies.Add(item);
+        }
+    }
+
+    private async void OnSelectedFiatCurrenciesChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems is not null)
+        {
+            foreach (FiatCurrencyItem item in e.OldItems)
+            {
+                // Check if currency is in use
+                if (_currenciesInUse.Contains(item.Code))
+                {
+                    // Re-add the item to prevent removal
+                    SelectedFiatCurrencies.Add(item);
+
+                    await MessageBoxHelper.ShowAlertAsync(
+                        language.Error,
+                        string.Format(language.Settings_FiatCurrencies_CannotRemove, item.Code),
+                        OwnerWindow!);
+                }
+            }
+        }
     }
     
     [RelayCommand]
@@ -131,6 +197,26 @@ public partial class SettingsViewModel : ValtModalViewModel
     [RelayCommand]
     private async Task Ok()
     {
+        // Check if new currencies were added
+        var currentCurrencies = SelectedFiatCurrencies.Select(c => c.Code).ToList();
+        var newCurrencies = currentCurrencies.Except(_initialSelectedCurrencies, StringComparer.OrdinalIgnoreCase).ToList();
+
+        if (newCurrencies.Any())
+        {
+            var confirmed = await MessageBoxHelper.ShowQuestionAsync(
+                language.Settings_FiatCurrencies_ConfirmAdd_Title,
+                language.Settings_FiatCurrencies_ConfirmAdd_Message,
+                OwnerWindow!);
+
+            if (!confirmed)
+                return;
+        }
+
+        // Save currency settings (always include USD)
+        var currenciesToSave = new List<string> { "USD" };
+        currenciesToSave.AddRange(currentCurrencies);
+        _configurationManager?.SetAvailableFiatCurrencies(currenciesToSave);
+
         _currencySettings.MainFiatCurrency = MainFiatCurrency;
         _currencySettings.Save();
 

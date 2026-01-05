@@ -122,7 +122,55 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("CreateDatabase.InitialDataLanguage", resourceCulture);
             }
         }
-        
+
+        public static string CreateDatabase_FiatCurrencies {
+            get {
+                return ResourceManager.GetString("CreateDatabase.FiatCurrencies", resourceCulture);
+            }
+        }
+
+        public static string CreateDatabase_FiatCurrencies_Info {
+            get {
+                return ResourceManager.GetString("CreateDatabase.FiatCurrencies.Info", resourceCulture);
+            }
+        }
+
+        public static string CreateDatabase_FiatCurrencies_SelectTitle {
+            get {
+                return ResourceManager.GetString("CreateDatabase.FiatCurrencies.SelectTitle", resourceCulture);
+            }
+        }
+
+        public static string Settings_FiatCurrencies {
+            get {
+                return ResourceManager.GetString("Settings.FiatCurrencies", resourceCulture);
+            }
+        }
+
+        public static string Settings_FiatCurrencies_Info {
+            get {
+                return ResourceManager.GetString("Settings.FiatCurrencies.Info", resourceCulture);
+            }
+        }
+
+        public static string Settings_FiatCurrencies_CannotRemove {
+            get {
+                return ResourceManager.GetString("Settings.FiatCurrencies.CannotRemove", resourceCulture);
+            }
+        }
+
+        public static string Settings_FiatCurrencies_ConfirmAdd_Title {
+            get {
+                return ResourceManager.GetString("Settings.FiatCurrencies.ConfirmAdd.Title", resourceCulture);
+            }
+        }
+
+        public static string Settings_FiatCurrencies_ConfirmAdd_Message {
+            get {
+                return ResourceManager.GetString("Settings.FiatCurrencies.ConfirmAdd.Message", resourceCulture);
+            }
+        }
+
         public static string IconSelector_ClearSelection {
             get {
                 return ResourceManager.GetString("IconSelector.ClearSelection", resourceCulture);

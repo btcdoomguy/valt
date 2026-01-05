@@ -885,4 +885,19 @@
     <data name="InitialSelection.FirstMessage" xml:space="preserve">
         <value>Crie ou selecione seu banco de dados pessoal para armazenar suas informações financeiras.</value>
     </data>
+    <data name="Settings.FiatCurrencies" xml:space="preserve">
+        <value>Moedas fiduciárias</value>
+    </data>
+    <data name="Settings.FiatCurrencies.CannotRemove" xml:space="preserve">
+        <value>A moeda "{0}" não pode ser removida pois está sendo utilizada.</value>
+    </data>
+    <data name="Settings.FiatCurrencies.ConfirmAdd.Message" xml:space="preserve">
+        <value>Adicionar novas moedas irá iniciar o download de seus históricos de preços. Continuar?</value>
+    </data>
+    <data name="Settings.FiatCurrencies.ConfirmAdd.Title" xml:space="preserve">
+        <value>Adicionar moedas</value>
+    </data>
+    <data name="Settings.FiatCurrencies.Info" xml:space="preserve">
+        <value>USD está inclusa por padrão. Moedas em uso não podem ser removidas.</value>
+    </data>
 </root>

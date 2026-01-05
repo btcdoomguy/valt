@@ -57,7 +57,23 @@ internal class LivePricesUpdaterJob : IBackgroundJob
         var isUpToDate = false;
         try
         {
-            var currencies = _configurationManager.GetAvailableFiatCurrencies();
+            // If price database is empty, skip loading
+            if (!_priceDatabase.HasDatabaseOpen || _priceDatabase.GetFiatData().Query().Count() == 0)
+            {
+                _logger.LogInformation("[LivePricesUpdaterJob] Price database is empty, skipping update");
+                return;
+            }
+
+            // Get currencies to fetch:
+            // - If local database is open, use configuration
+            // - If not, use currencies already in price database
+            var currencies = GetCurrenciesToFetch();
+            if (currencies.Count == 0)
+            {
+                _logger.LogInformation("[LivePricesUpdaterJob] No currencies to fetch, skipping update");
+                return;
+            }
+
             var fiatTask = _fiatPriceProvider.GetAsync(currencies);
             var btcTask = _bitcoinPriceProvider.GetAsync();
 
@@ -121,6 +137,42 @@ internal class LivePricesUpdaterJob : IBackgroundJob
         }
     }
     
+    /// <summary>
+    /// Gets the list of currencies to fetch for live prices.
+    /// If local database is open, uses configuration.
+    /// If configuration is empty, falls back to price database currencies.
+    /// </summary>
+    private List<string> GetCurrenciesToFetch()
+    {
+        if (_configurationManager.HasLocalDatabaseOpen)
+        {
+            var configCurrencies = _configurationManager.GetAvailableFiatCurrencies();
+            if (configCurrencies.Count > 0)
+            {
+                return configCurrencies;
+            }
+            // Fall through to use price database currencies if config is empty
+        }
+
+        // Extract currencies from existing price database data
+        try
+        {
+            var currencies = _priceDatabase.GetFiatData()
+                .FindAll()
+                .Select(x => x.Currency)
+                .Distinct()
+                .ToList();
+
+            _logger.LogInformation("[LivePricesUpdaterJob] Using {Count} currencies from price database", currencies.Count);
+            return currencies;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[LivePricesUpdaterJob] Error getting currencies from price database");
+            return new List<string>();
+        }
+    }
+
     private async Task LastKnownPricesAsync()
     {
         if (!_priceDatabase.HasDatabaseOpen)

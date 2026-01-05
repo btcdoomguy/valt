@@ -12,6 +12,11 @@ public class ConfigurationManager
         _localDatabase = localDatabase;
     }
 
+    /// <summary>
+    /// Gets whether the local database is currently open.
+    /// </summary>
+    public bool HasLocalDatabaseOpen => _localDatabase.HasDatabaseOpen;
+
     public Task<int> GetMigrationVersionAsync()
     {
         var latestVersion = _localDatabase.GetConfiguration().
@@ -133,5 +138,46 @@ public class ConfigurationManager
         SetAvailableFiatCurrencies(currencies);
 
         return currencies;
+    }
+
+    /// <summary>
+    /// Gets the list of fiat currencies currently in use by accounts, fixed expenses, and avg price profiles.
+    /// These currencies cannot be removed from the available currencies list.
+    /// </summary>
+    public List<string> GetCurrenciesInUse()
+    {
+        var currenciesInUse = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        // Get currencies from fiat accounts
+        var accounts = _localDatabase.GetAccounts().FindAll();
+        foreach (var account in accounts)
+        {
+            if (account.AccountEntityType == AccountEntityType.Fiat && !string.IsNullOrWhiteSpace(account.Currency))
+            {
+                currenciesInUse.Add(account.Currency.Trim().ToUpperInvariant());
+            }
+        }
+
+        // Get currencies from fixed expenses
+        var fixedExpenses = _localDatabase.GetFixedExpenses().FindAll();
+        foreach (var expense in fixedExpenses)
+        {
+            if (!string.IsNullOrWhiteSpace(expense.Currency))
+            {
+                currenciesInUse.Add(expense.Currency.Trim().ToUpperInvariant());
+            }
+        }
+
+        // Get currencies from avg price profiles
+        var avgPriceProfiles = _localDatabase.GetAvgPriceProfiles().FindAll();
+        foreach (var profile in avgPriceProfiles)
+        {
+            if (!string.IsNullOrWhiteSpace(profile.Currency))
+            {
+                currenciesInUse.Add(profile.Currency.Trim().ToUpperInvariant());
+            }
+        }
+
+        return currenciesInUse.ToList();
     }
 }

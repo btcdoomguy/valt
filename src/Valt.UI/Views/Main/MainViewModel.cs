@@ -261,7 +261,7 @@ public partial class MainViewModel : ValtViewModel
 
             if (result.IsNew)
             {
-                await _databaseInitializer!.InitializeAsync(result.InitialDataLanguage);
+                await _databaseInitializer!.InitializeAsync(result.InitialDataLanguage, result.SelectedCurrencies);
             }
 
             await _databaseInitializer!.MigrateAsync();

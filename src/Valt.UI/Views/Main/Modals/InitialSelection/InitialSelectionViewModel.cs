@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -66,7 +67,8 @@ public partial class InitialSelectionViewModel : ValtModalViewModel
             File = result.Path,
             Password = result.Password,
             IsNew = true,
-            InitialDataLanguage = result.Language
+            InitialDataLanguage = result.Language,
+            SelectedCurrencies = result.SelectedCurrencies
         });
     }
 
@@ -176,5 +178,6 @@ public partial class InitialSelectionViewModel : ValtModalViewModel
         public string Password { get; init; } = string.Empty;
         public bool IsNew { get; init; }
         public string? InitialDataLanguage { get; init; }
+        public List<string>? SelectedCurrencies { get; init; }
     }
 }

@@ -62,6 +62,30 @@
     <data name="CreateDatabase.InitialDataLanguage" xml:space="preserve">
         <value>Language for initial data</value>
     </data>
+    <data name="CreateDatabase.FiatCurrencies" xml:space="preserve">
+        <value>Fiat currencies</value>
+    </data>
+    <data name="CreateDatabase.FiatCurrencies.Info" xml:space="preserve">
+        <value>USD is always included. Select additional currencies:</value>
+    </data>
+    <data name="CreateDatabase.FiatCurrencies.SelectTitle" xml:space="preserve">
+        <value>Additional currencies</value>
+    </data>
+    <data name="Settings.FiatCurrencies" xml:space="preserve">
+        <value>Available currencies</value>
+    </data>
+    <data name="Settings.FiatCurrencies.Info" xml:space="preserve">
+        <value>USD is always included. Currencies in use cannot be removed.</value>
+    </data>
+    <data name="Settings.FiatCurrencies.CannotRemove" xml:space="preserve">
+        <value>Cannot remove currency "{0}" because it is currently in use.</value>
+    </data>
+    <data name="Settings.FiatCurrencies.ConfirmAdd.Title" xml:space="preserve">
+        <value>Add currencies</value>
+    </data>
+    <data name="Settings.FiatCurrencies.ConfirmAdd.Message" xml:space="preserve">
+        <value>Adding new currencies will download historical price data. Continue?</value>
+    </data>
     <data name="IconSelector.ClearSelection" xml:space="preserve">
         <value>Clear Selection</value>
     </data>
