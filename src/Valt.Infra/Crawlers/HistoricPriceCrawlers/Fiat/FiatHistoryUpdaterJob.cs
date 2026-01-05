@@ -10,7 +10,10 @@ namespace Valt.Infra.Crawlers.HistoricPriceCrawlers.Fiat;
 
 internal class FiatHistoryUpdaterJob : IBackgroundJob
 {
+    private static readonly DateTime DefaultStartDate = new(2020, 1, 1);
+
     private readonly IPriceDatabase _priceDatabase;
+    private readonly ILocalDatabase _localDatabase;
     private readonly IFiatHistoricalDataProvider _provider;
     private readonly ConfigurationManager _configurationManager;
     private readonly ILogger<FiatHistoryUpdaterJob> _logger;
@@ -24,11 +27,13 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
 
 
     public FiatHistoryUpdaterJob(IPriceDatabase priceDatabase,
+        ILocalDatabase localDatabase,
         IFiatHistoricalDataProvider provider,
         ConfigurationManager configurationManager,
         ILogger<FiatHistoryUpdaterJob> logger)
     {
         _priceDatabase = priceDatabase;
+        _localDatabase = localDatabase;
         _provider = provider;
         _configurationManager = configurationManager;
         _logger = logger;
@@ -65,44 +70,71 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
 
             var utcNow = DateTime.UtcNow;
             var localDate = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, 0, 0, 0, DateTimeKind.Local);
-
-            // Check if price database has any fiat data for start date calculation
-            var historicalLastDate = new DateTime(2008, 1, 1);
-            try
-            {
-                historicalLastDate = _priceDatabase.GetFiatData().FindAll().Max(x => x.Date);
-            }
-            catch (InvalidOperationException)
-            {
-                //ignore - no data available, will start from 2008
-            }
-            catch (NotSupportedException)
-            {
-                //ignore - no data available, will start from 2008
-            }
-
-            var startDate = historicalLastDate.AddDays(1);
             var endDate = localDate.AddDays(-1);
 
-            //skip useless calls
-            while (startDate.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
-                startDate = startDate.AddDays(1);
-
+            // Skip weekends for end date
             while (endDate.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
                 endDate = endDate.AddDays(-1);
 
-            if (startDate > endDate)
-                return;
+            // Get fiat data date range from prices.db
+            var (minFiatDate, maxFiatDate) = GetFiatDateRange();
 
-            _logger.LogInformation("[FiatHistoryUpdater] From {0} to {1}", startDate!.ToShortDateString(),
-                endDate.ToShortDateString());
+            // Calculate the required start date based on the lowest transaction date
+            var requiredStartDate = GetRequiredStartDate();
 
-            var prices = (await _provider.GetPricesAsync(DateOnly.FromDateTime(startDate),
-                DateOnly.FromDateTime(endDate), currencies).ConfigureAwait(false)).ToList();
+            var updated = false;
 
-            if (prices.Count != 0)
+            // First: Fill backward gaps if needed (transaction date earlier than min fiat date)
+            if (minFiatDate is not null && requiredStartDate < minFiatDate.Value)
             {
-                FillLocalDatabase(prices);
+                var gapEndDate = minFiatDate.Value.AddDays(-1);
+                while (gapEndDate.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
+                    gapEndDate = gapEndDate.AddDays(-1);
+
+                if (requiredStartDate <= gapEndDate)
+                {
+                    _logger.LogInformation("[FiatHistoryUpdater] Filling gap from {0} to {1}",
+                        requiredStartDate.ToShortDateString(), gapEndDate.ToShortDateString());
+
+                    var gapPrices = (await _provider.GetPricesAsync(
+                        DateOnly.FromDateTime(requiredStartDate),
+                        DateOnly.FromDateTime(gapEndDate),
+                        currencies).ConfigureAwait(false)).ToList();
+
+                    if (gapPrices.Count != 0)
+                    {
+                        FillLocalDatabase(gapPrices);
+                        updated = true;
+                    }
+                }
+            }
+
+            // Second: Fill forward (new data after max fiat date)
+            var startDate = maxFiatDate?.AddDays(1) ?? requiredStartDate;
+
+            // Skip weekends for start date
+            while (startDate.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
+                startDate = startDate.AddDays(1);
+
+            if (startDate <= endDate)
+            {
+                _logger.LogInformation("[FiatHistoryUpdater] From {0} to {1}",
+                    startDate.ToShortDateString(), endDate.ToShortDateString());
+
+                var prices = (await _provider.GetPricesAsync(
+                    DateOnly.FromDateTime(startDate),
+                    DateOnly.FromDateTime(endDate),
+                    currencies).ConfigureAwait(false)).ToList();
+
+                if (prices.Count != 0)
+                {
+                    FillLocalDatabase(prices);
+                    updated = true;
+                }
+            }
+
+            if (updated)
+            {
                 WeakReferenceMessenger.Default.Send<FiatHistoryPriceUpdatedMessage>();
             }
         }
@@ -111,6 +143,63 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
             _logger.LogError(ex, "[FiatHistoryUpdater] Error during execution");
             throw;
         }
+    }
+
+    /// <summary>
+    /// Gets the min and max dates of fiat data in the price database.
+    /// </summary>
+    private (DateTime? minDate, DateTime? maxDate) GetFiatDateRange()
+    {
+        try
+        {
+            var fiatData = _priceDatabase.GetFiatData().FindAll().ToList();
+            if (fiatData.Count == 0)
+                return (null, null);
+
+            return (fiatData.Min(x => x.Date), fiatData.Max(x => x.Date));
+        }
+        catch (InvalidOperationException)
+        {
+            return (null, null);
+        }
+        catch (NotSupportedException)
+        {
+            return (null, null);
+        }
+    }
+
+    /// <summary>
+    /// Gets the required start date for fiat history based on the lowest transaction date.
+    /// Uses 2020-01-01 as the default, but goes earlier if there are transactions before that.
+    /// </summary>
+    private DateTime GetRequiredStartDate()
+    {
+        var startDate = DefaultStartDate;
+
+        try
+        {
+            var transactions = _localDatabase.GetTransactions().FindAll().ToList();
+            if (transactions.Count > 0)
+            {
+                var lowestTransactionDate = transactions.Min(x => x.Date);
+                if (lowestTransactionDate < startDate)
+                {
+                    startDate = lowestTransactionDate;
+                    _logger.LogInformation("[FiatHistoryUpdater] Using earliest transaction date: {0}",
+                        startDate.ToShortDateString());
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "[FiatHistoryUpdater] Error getting lowest transaction date, using default");
+        }
+
+        // Skip to first weekday
+        while (startDate.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
+            startDate = startDate.AddDays(1);
+
+        return startDate;
     }
 
     private void FillLocalDatabase(IEnumerable<IFiatHistoricalDataProvider.FiatPriceData> prices)

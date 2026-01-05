@@ -109,7 +109,7 @@ public class FixedExpenseProviderTests : IntegrationTest
 
         var transaction = Transaction.New(new DateOnly(2025, 1, 25), "Electricity", new CategoryId(),
             new FiatDetails(brlAccount.Id, FiatValue.New(170m), false), null, new TransactionFixedExpenseReference(_electricityFixedExpenseId.Value, new DateOnly(2025, 1, 30)));
-        var transactionRepo = new TransactionRepository(_localDatabase, _serviceProvider.GetRequiredService<IDomainEventPublisher>());
+        var transactionRepo = new TransactionRepository(_localDatabase, _priceDatabase, _serviceProvider.GetRequiredService<IDomainEventPublisher>());
         
         await transactionRepo.SaveTransactionAsync(transaction);
         
