@@ -59,7 +59,8 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
     [ObservableProperty] private AvaloniaList<AccountViewModel> _accounts = new();
     [ObservableProperty] private AvaloniaList<FixedExpensesEntryViewModel> _fixedExpenseEntries = new();
-    [ObservableProperty] private string _remainingFixedExpensesAmount = "R$ 12345,67 (+/- 5000,00)";
+    [ObservableProperty] private string _remainingFixedExpensesAmount = "~ R$ 12.345,67";
+    [ObservableProperty] private string? _remainingFixedExpensesTooltip;
 
     [ObservableProperty] private AccountViewModel? _selectedAccount;
     [ObservableProperty] private FixedExpensesEntryViewModel? _selectedFixedExpense;
@@ -237,15 +238,19 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
             }
 
             if (minTotal == maxTotal)
+            {
                 RemainingFixedExpensesAmount =
                     $"{CurrencyDisplay.FormatFiat(minTotal, _currencySettings.MainFiatCurrency)}";
+                RemainingFixedExpensesTooltip = null;
+            }
             else
             {
                 var middle = (maxTotal + minTotal) / 2;
-                var variation = maxTotal - middle;
-                
+
                 RemainingFixedExpensesAmount =
-                    $"{CurrencyDisplay.FormatFiat(middle, _currencySettings.MainFiatCurrency)} (+/- {CurrencyDisplay.FormatFiat(variation, _currencySettings.MainFiatCurrency)})";
+                    $"~ {CurrencyDisplay.FormatFiat(middle, _currencySettings.MainFiatCurrency)}";
+                RemainingFixedExpensesTooltip =
+                    $"{CurrencyDisplay.FormatFiat(minTotal, _currencySettings.MainFiatCurrency)} - {CurrencyDisplay.FormatFiat(maxTotal, _currencySettings.MainFiatCurrency)}";
             }
                 
         }
