@@ -62,11 +62,24 @@ internal sealed class PriceDatabase : IPriceDatabase
 
     public void CloseDatabase()
     {
+        if (_database != null && !_inMemoryDb)
+        {
+            // Checkpoint to merge -log.db into main .db file before closing
+            _database.Checkpoint();
+        }
         _database?.Dispose();
         _database = null;
         _filePath = null;
         _inMemoryDb = true;
         OnPropertyChanged(nameof(HasDatabaseOpen));
+    }
+
+    public void Checkpoint()
+    {
+        if (_database != null && !_inMemoryDb)
+        {
+            _database.Checkpoint();
+        }
     }
 
     private BsonMapper CreateMapper()

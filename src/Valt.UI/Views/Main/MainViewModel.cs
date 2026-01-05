@@ -224,11 +224,6 @@ public partial class MainViewModel : ValtViewModel
         var appLifetime =
             Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
 
-        if (!await InitializePriceDatabaseAsync())
-        {
-            appLifetime!.Shutdown();
-        }
-
         var openedFile = false;
         while (!openedFile)
         {
@@ -265,10 +260,17 @@ public partial class MainViewModel : ValtViewModel
             }
 
             await _databaseInitializer!.MigrateAsync();
+            
+            // Initialize price database AFTER local database is opened
+            // This ensures we have access to AvailableFiatCurrencies configuration
+            if (!await InitializePriceDatabaseAsync())
+            {
+                appLifetime!.Shutdown();
+            }
 
             openedFile = true;
             SetTransactionsTab();
-
+            
             //this avoids some race conditions with the jobs and current UI state
             Dispatcher.UIThread.Invoke(() =>
             {
@@ -292,18 +294,10 @@ public partial class MainViewModel : ValtViewModel
             if (!_priceDatabase.HasDatabaseOpen)
                 _priceDatabase!.OpenDatabase();
 
-            await Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                IsLoading = true;
-                LoadingMessage = language.LoadingMessage;
-            });
-
             _backgroundJobManager!.StartAllJobs(jobType: BackgroundJobTypes.PriceDatabase);
 
             while (_backgroundJobManager.IsRunningTasksOf(BackgroundJobTypes.PriceDatabase))
                 await Task.Delay(100);
-
-            IsLoading = false;
 
             return true;
         }
@@ -316,6 +310,10 @@ public partial class MainViewModel : ValtViewModel
         catch (Exception ex)
         {
             await MessageBoxHelper.ShowErrorAsync(language.Error, $"{ex.Message}", Window!);
+        }
+        finally
+        {
+            IsLoading = false;
         }
         
         return false;
@@ -407,6 +405,10 @@ public partial class MainViewModel : ValtViewModel
             return;
 
         await _backgroundJobManager.StopAll();
+
+        // Close databases to trigger checkpoint (merges -log.db into main .db file)
+        _localDatabase?.CloseDatabase();
+        _priceDatabase?.CloseDatabase();
     }
     
     private void UpdatePepeImage()

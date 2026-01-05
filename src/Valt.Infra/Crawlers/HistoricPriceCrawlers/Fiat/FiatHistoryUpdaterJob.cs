@@ -45,34 +45,40 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
         _logger.LogInformation("[FiatHistoryUpdater] Updating fiat history");
         try
         {
-            var utcNow = DateTime.UtcNow;
-            var localDate = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, 0, 0, 0, DateTimeKind.Local);
+            // Skip if no local database is open (we need it for currency configuration)
+            if (!_configurationManager.HasLocalDatabaseOpen)
+            {
+                _logger.LogInformation("[FiatHistoryUpdater] No local database open, skipping update");
+                return;
+            }
 
             if (!_priceDatabase.HasDatabaseOpen)
                 return;
 
-            // Check if price database has any fiat data
-            var hasFiatData = false;
+            // Get currencies from configuration
+            var currencies = _configurationManager.GetAvailableFiatCurrencies();
+            if (currencies.Count == 0)
+            {
+                _logger.LogInformation("[FiatHistoryUpdater] No currencies configured, skipping update");
+                return;
+            }
+
+            var utcNow = DateTime.UtcNow;
+            var localDate = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, 0, 0, 0, DateTimeKind.Local);
+
+            // Check if price database has any fiat data for start date calculation
             var historicalLastDate = new DateTime(2008, 1, 1);
             try
             {
                 historicalLastDate = _priceDatabase.GetFiatData().FindAll().Max(x => x.Date);
-                hasFiatData = true;
             }
             catch (InvalidOperationException)
             {
-                //ignore - no data available
+                //ignore - no data available, will start from 2008
             }
             catch (NotSupportedException)
             {
-                //ignore - no data available
-            }
-
-            // If price database is empty and no local database is open, skip
-            if (!hasFiatData && !_configurationManager.HasLocalDatabaseOpen)
-            {
-                _logger.LogInformation("[FiatHistoryUpdater] Price database is empty and no local database open, skipping update");
-                return;
+                //ignore - no data available, will start from 2008
             }
 
             var startDate = historicalLastDate.AddDays(1);
@@ -91,16 +97,6 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
             _logger.LogInformation("[FiatHistoryUpdater] From {0} to {1}", startDate!.ToShortDateString(),
                 endDate.ToShortDateString());
 
-            // Get currencies to fetch:
-            // - If local database is open, use configuration
-            // - If not, use currencies already in price database
-            var currencies = GetCurrenciesToFetch();
-            if (currencies.Count == 0)
-            {
-                _logger.LogInformation("[FiatHistoryUpdater] No currencies to fetch, skipping update");
-                return;
-            }
-
             var prices = (await _provider.GetPricesAsync(DateOnly.FromDateTime(startDate),
                 DateOnly.FromDateTime(endDate), currencies).ConfigureAwait(false)).ToList();
 
@@ -114,42 +110,6 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
         {
             _logger.LogError(ex, "[FiatHistoryUpdater] Error during execution");
             throw;
-        }
-    }
-
-    /// <summary>
-    /// Gets the list of currencies to fetch for historical data.
-    /// If local database is open, uses configuration.
-    /// If configuration is empty, falls back to price database currencies.
-    /// </summary>
-    private List<string> GetCurrenciesToFetch()
-    {
-        if (_configurationManager.HasLocalDatabaseOpen)
-        {
-            var configCurrencies = _configurationManager.GetAvailableFiatCurrencies();
-            if (configCurrencies.Count > 0)
-            {
-                return configCurrencies;
-            }
-            // Fall through to use price database currencies if config is empty
-        }
-
-        // Extract currencies from existing price database data
-        try
-        {
-            var currencies = _priceDatabase.GetFiatData()
-                .FindAll()
-                .Select(x => x.Currency)
-                .Distinct()
-                .ToList();
-
-            _logger.LogInformation("[FiatHistoryUpdater] Using {Count} currencies from price database", currencies.Count);
-            return currencies;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "[FiatHistoryUpdater] Error getting currencies from price database");
-            return new List<string>();
         }
     }
 

@@ -57,20 +57,25 @@ internal class LivePricesUpdaterJob : IBackgroundJob
         var isUpToDate = false;
         try
         {
-            // If price database is empty, skip loading
+            // Skip if no local database is open (we need it for currency configuration)
+            if (!_configurationManager.HasLocalDatabaseOpen)
+            {
+                _logger.LogInformation("[LivePricesUpdaterJob] No local database open, skipping update");
+                return;
+            }
+
+            // Skip if price database is not open or empty
             if (!_priceDatabase.HasDatabaseOpen || _priceDatabase.GetFiatData().Query().Count() == 0)
             {
                 _logger.LogInformation("[LivePricesUpdaterJob] Price database is empty, skipping update");
                 return;
             }
 
-            // Get currencies to fetch:
-            // - If local database is open, use configuration
-            // - If not, use currencies already in price database
-            var currencies = GetCurrenciesToFetch();
+            // Get currencies from configuration
+            var currencies = _configurationManager.GetAvailableFiatCurrencies();
             if (currencies.Count == 0)
             {
-                _logger.LogInformation("[LivePricesUpdaterJob] No currencies to fetch, skipping update");
+                _logger.LogInformation("[LivePricesUpdaterJob] No currencies configured, skipping update");
                 return;
             }
 
@@ -134,42 +139,6 @@ internal class LivePricesUpdaterJob : IBackgroundJob
         {
             _logger.LogError(ex, "[LivePricesUpdaterJob] Error during execution");
             throw;
-        }
-    }
-    
-    /// <summary>
-    /// Gets the list of currencies to fetch for live prices.
-    /// If local database is open, uses configuration.
-    /// If configuration is empty, falls back to price database currencies.
-    /// </summary>
-    private List<string> GetCurrenciesToFetch()
-    {
-        if (_configurationManager.HasLocalDatabaseOpen)
-        {
-            var configCurrencies = _configurationManager.GetAvailableFiatCurrencies();
-            if (configCurrencies.Count > 0)
-            {
-                return configCurrencies;
-            }
-            // Fall through to use price database currencies if config is empty
-        }
-
-        // Extract currencies from existing price database data
-        try
-        {
-            var currencies = _priceDatabase.GetFiatData()
-                .FindAll()
-                .Select(x => x.Currency)
-                .Distinct()
-                .ToList();
-
-            _logger.LogInformation("[LivePricesUpdaterJob] Using {Count} currencies from price database", currencies.Count);
-            return currencies;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "[LivePricesUpdaterJob] Error getting currencies from price database");
-            return new List<string>();
         }
     }
 
