@@ -110,6 +110,7 @@ public class TransactionQueries : ITransactionQueries
                 FixedExpenseReferenceDate = fixedExpenseRecord is not null
                     ? DateOnly.FromDateTime(fixedExpenseRecord.ReferenceDate)
                     : null,
+                Notes = transactionEntity.Notes
             };
         });
 

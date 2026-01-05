@@ -49,6 +49,7 @@ public partial class TransactionViewModel : ObservableObject
     public string? FixedExpenseId { get; set; }
     public string? FixedExpenseName { get; set; }
     public DateOnly? FixedExpenseReferenceDate { get; set; }
+    public string? Notes { get; set; }
 
     public SolidColorBrush AutoSatLineColor { get; private set; }
 
@@ -61,7 +62,7 @@ public partial class TransactionViewModel : ObservableObject
         TransactionTransferTypes transferType,
         TransactionTypes transactionType,
         long? autoSatAmount, string? fixedExpenseRecordId, string? fixedExpenseId, string? fixedExpenseName,
-        DateOnly? fixedExpenseReferenceDate, bool futureTransaction)
+        DateOnly? fixedExpenseReferenceDate, string? notes, bool futureTransaction)
     {
         Id = id;
         Date = date;
@@ -89,6 +90,7 @@ public partial class TransactionViewModel : ObservableObject
         FixedExpenseId = fixedExpenseId;
         FixedExpenseName = fixedExpenseName;
         FixedExpenseReferenceDate = fixedExpenseReferenceDate;
+        Notes = notes;
         _autoSatAmount = autoSatAmount;
         _futureTransaction = futureTransaction;
     }
@@ -202,6 +204,7 @@ public partial class TransactionViewModel : ObservableObject
             dto.FixedExpenseId,
             dto.FixedExpenseName,
             dto.FixedExpenseReferenceDate,
+            dto.Notes,
             dto.Date > today));
     }
 }

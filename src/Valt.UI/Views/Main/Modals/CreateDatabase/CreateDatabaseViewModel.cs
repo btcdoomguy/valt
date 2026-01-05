@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Collections;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -34,6 +36,16 @@ public partial class CreateDatabaseViewModel : ValtModalValidatorViewModel
     [ObservableProperty]
     private string _selectedLanguage = GetDefaultLanguage();
 
+    /// <summary>
+    /// All available fiat currencies (excluding USD which is mandatory)
+    /// </summary>
+    public AvaloniaList<FiatCurrencyItem> AvailableFiatCurrencies { get; } = new(FiatCurrencyItem.GetAllExceptUsd());
+
+    /// <summary>
+    /// Selected fiat currencies (excluding USD which is mandatory)
+    /// </summary>
+    public AvaloniaList<FiatCurrencyItem> SelectedFiatCurrencies { get; } = new();
+
     #endregion
 
     public static List<ComboBoxValue> AvailableLanguages =>
@@ -55,7 +67,11 @@ public partial class CreateDatabaseViewModel : ValtModalValidatorViewModel
 
         if (!HasErrors)
         {
-            CloseDialog?.Invoke(new Response(Path, Password, SelectedLanguage));
+            // Build the list of selected currencies (always include USD)
+            var selectedCurrencies = new List<string> { "USD" };
+            selectedCurrencies.AddRange(SelectedFiatCurrencies.Select(c => c.Code));
+
+            CloseDialog?.Invoke(new Response(Path, Password, SelectedLanguage, selectedCurrencies));
         }
 
         return Task.CompletedTask;
@@ -116,5 +132,5 @@ public partial class CreateDatabaseViewModel : ValtModalValidatorViewModel
         };
     }
     
-    public record Response(string Path, string Password, string Language);
+    public record Response(string Path, string Password, string Language, List<string> SelectedCurrencies);
 }

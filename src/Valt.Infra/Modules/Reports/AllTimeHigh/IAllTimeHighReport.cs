@@ -4,5 +4,5 @@ namespace Valt.Infra.Modules.Reports.AllTimeHigh;
 
 public interface IAllTimeHighReport
 {
-    Task<AllTimeHighData> GetAsync(FiatCurrency currency);
+    Task<AllTimeHighData> GetAsync(FiatCurrency currency, IReportDataProvider provider);
 }

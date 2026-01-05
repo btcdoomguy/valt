@@ -16,7 +16,12 @@ public interface IPriceDatabase : INotifyPropertyChanged, IDisposable
     void OpenDatabase();
     void OpenInMemoryDatabase(Stream stream);
     void CloseDatabase();
-    
+
+    /// <summary>
+    /// Merges the WAL log file into the main database file.
+    /// </summary>
+    void Checkpoint();
+
     ILiteCollection<BitcoinDataEntity> GetBitcoinData();
     ILiteCollection<FiatDataEntity> GetFiatData();
     

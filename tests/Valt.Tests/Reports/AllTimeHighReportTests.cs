@@ -7,6 +7,7 @@ using Valt.Core.Modules.Budget.Transactions.Details;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.DataSources.Bitcoin;
 using Valt.Infra.Modules.DataSources.Fiat;
+using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
 using Valt.Tests.Builders;
 
@@ -88,15 +89,18 @@ public class AllTimeHighReportTests : DatabaseTest
     [Test]
     public void Should_Throw_Error_If_No_Transactions_Found()
     {
-        var allTimeHighReport = new AllTimeHighReport(_priceDatabase, _localDatabase, new FakeClock(new DateTime(2025, 12, 31)));
+        var clock = new FakeClock(new DateTime(2025, 12, 31));
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var allTimeHighReport = new AllTimeHighReport(clock);
 
-        Assert.ThrowsAsync<ApplicationException>(() => allTimeHighReport.GetAsync(FiatCurrency.Brl));
+        Assert.ThrowsAsync<ApplicationException>(() => allTimeHighReport.GetAsync(FiatCurrency.Brl, provider));
     }
 
     [Test]
     public async Task Should_Get_Incomplete_AllTimeHigh_For_FiatCurrency()
     {
-        var allTimeHighReport = new AllTimeHighReport(_priceDatabase, _localDatabase, new FakeClock(new DateTime(2025, 12, 31)));
+        var clock = new FakeClock(new DateTime(2025, 12, 31));
+        var allTimeHighReport = new AllTimeHighReport(clock);
 
         try
         {
@@ -108,7 +112,8 @@ public class AllTimeHighReportTests : DatabaseTest
                 TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
             }.Build());
 
-            var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl);
+            var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+            var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.Currency, Is.EqualTo(FiatCurrency.Brl));
@@ -126,7 +131,8 @@ public class AllTimeHighReportTests : DatabaseTest
     [Test]
     public async Task Should_Get_Complete_AllTimeHigh_For_FiatCurrency()
     {
-        var allTimeHighReport = new AllTimeHighReport(_priceDatabase, _localDatabase, new FakeClock(new DateTime(2025, 12, 31)));
+        var clock = new FakeClock(new DateTime(2025, 12, 31));
+        var allTimeHighReport = new AllTimeHighReport(clock);
 
         try
         {
@@ -162,7 +168,8 @@ public class AllTimeHighReportTests : DatabaseTest
                 TransactionDetails = new BitcoinDetails(_btcAccount.Id.ToString(), BtcValue.ParseBitcoin(1), true)
             }.Build());
 
-            var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl);
+            var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+            var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.Currency, Is.EqualTo(FiatCurrency.Brl));
@@ -176,11 +183,12 @@ public class AllTimeHighReportTests : DatabaseTest
             _localDatabase.GetTransactions().DeleteAll();
         }
     }
-    
+
     [Test]
     public async Task Should_Properly_Calculate_AllTimeHigh_For_FiatCurrency_After_Rate_Change()
     {
-        var allTimeHighReport = new AllTimeHighReport(_priceDatabase, _localDatabase, new FakeClock(new DateTime(2025, 12, 31)));
+        var clock = new FakeClock(new DateTime(2025, 12, 31));
+        var allTimeHighReport = new AllTimeHighReport(clock);
 
         try
         {
@@ -215,7 +223,7 @@ public class AllTimeHighReportTests : DatabaseTest
                 Date = new DateOnly(2025, 5, 1),
                 TransactionDetails = new BitcoinDetails(_btcAccount.Id.ToString(), BtcValue.ParseBitcoin(1), true)
             }.Build());
-            
+
             //replace one of the btc rates to a higher one
             var dateToReplace = _priceDatabase.GetBitcoinData().FindOne(x => x.Date == new DateTime(2025, 6, 1));
             _priceDatabase.GetBitcoinData().Delete(dateToReplace.Id);
@@ -225,7 +233,8 @@ public class AllTimeHighReportTests : DatabaseTest
                 Price = 200000m
             });
 
-            var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl);
+            var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+            var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.Currency, Is.EqualTo(FiatCurrency.Brl));

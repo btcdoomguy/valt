@@ -7,6 +7,7 @@ using Valt.Core.Modules.AvgPrice.Calculations;
 using Valt.Infra.Kernel;
 using Valt.Infra.Modules.AvgPrice.Queries;
 using Valt.Infra.Modules.AvgPrice.Queries.DTOs;
+using Valt.Infra.Modules.Configuration;
 using Valt.UI.Services;
 using Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles;
 using Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles.Models;
@@ -14,11 +15,12 @@ using Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles.Models;
 namespace Valt.Tests.UI.Screens;
 
 [TestFixture]
-public class ManageAvgPriceProfilesViewModelTests
+public class ManageAvgPriceProfilesViewModelTests : DatabaseTest
 {
     private IModalFactory _modalFactory;
     private IAvgPriceQueries _avgPriceQueries;
     private IAvgPriceRepository _avgPriceRepository;
+    private ConfigurationManager _configurationManager;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -27,11 +29,13 @@ public class ManageAvgPriceProfilesViewModelTests
     }
 
     [SetUp]
-    public void SetUp()
+    public new void SetUp()
     {
+        base.SetUp();
         _modalFactory = Substitute.For<IModalFactory>();
         _avgPriceQueries = Substitute.For<IAvgPriceQueries>();
         _avgPriceRepository = Substitute.For<IAvgPriceRepository>();
+        _configurationManager = new ConfigurationManager(_localDatabase);
 
         // Default setup: return empty list of profiles
         _avgPriceQueries.GetProfilesAsync(Arg.Any<bool>())
@@ -40,7 +44,7 @@ public class ManageAvgPriceProfilesViewModelTests
 
     private ManageAvgPriceProfilesViewModel CreateViewModel()
     {
-        return new ManageAvgPriceProfilesViewModel(_modalFactory, _avgPriceQueries, _avgPriceRepository);
+        return new ManageAvgPriceProfilesViewModel(_modalFactory, _avgPriceQueries, _avgPriceRepository, _configurationManager);
     }
 
     #region State Tests - EditMode and View States

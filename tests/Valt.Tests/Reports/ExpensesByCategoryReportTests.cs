@@ -8,6 +8,7 @@ using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Categories;
 using Valt.Infra.Modules.DataSources.Bitcoin;
 using Valt.Infra.Modules.DataSources.Fiat;
+using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.ExpensesByCategory;
 using Valt.Tests.Builders;
 
@@ -177,11 +178,9 @@ public class ExpensesByCategoryReportTests : DatabaseTest
     public async Task Should_Calculate_Expenses_By_Category_In_USD()
     {
         var baseDate = new DateOnly(2025, 01, 31);
-        var report = new ExpensesByCategoryReport(
-            _priceDatabase,
-            _localDatabase,
-            new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue)),
-            new NullLogger<ExpensesByCategoryReport>());
+        var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var report = new ExpensesByCategoryReport(new NullLogger<ExpensesByCategoryReport>());
 
         var filter = new IExpensesByCategoryReport.Filter(
             new[] { new AccountId(_usdAccount.Id.ToString()), new AccountId(_brlAccount.Id.ToString()), new AccountId(_btcAccount.Id.ToString()) },
@@ -192,7 +191,8 @@ public class ExpensesByCategoryReportTests : DatabaseTest
             baseDate,
             new DateOnlyRange(new DateOnly(2025, 01, 01), new DateOnly(2025, 01, 31)),
             FiatCurrency.Usd,
-            filter);
+            filter,
+            provider);
 
         Assert.That(result.MainCurrency, Is.EqualTo(FiatCurrency.Usd));
         Assert.That(result.Items.Count, Is.EqualTo(3));
@@ -217,11 +217,9 @@ public class ExpensesByCategoryReportTests : DatabaseTest
     public async Task Should_Calculate_Expenses_By_Category_In_BRL()
     {
         var baseDate = new DateOnly(2025, 01, 31);
-        var report = new ExpensesByCategoryReport(
-            _priceDatabase,
-            _localDatabase,
-            new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue)),
-            new NullLogger<ExpensesByCategoryReport>());
+        var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var report = new ExpensesByCategoryReport(new NullLogger<ExpensesByCategoryReport>());
 
         var filter = new IExpensesByCategoryReport.Filter(
             new[] { new AccountId(_usdAccount.Id.ToString()), new AccountId(_brlAccount.Id.ToString()), new AccountId(_btcAccount.Id.ToString()) },
@@ -232,7 +230,8 @@ public class ExpensesByCategoryReportTests : DatabaseTest
             baseDate,
             new DateOnlyRange(new DateOnly(2025, 01, 01), new DateOnly(2025, 01, 31)),
             FiatCurrency.Brl,
-            filter);
+            filter,
+            provider);
 
         Assert.That(result.MainCurrency, Is.EqualTo(FiatCurrency.Brl));
 
@@ -253,11 +252,9 @@ public class ExpensesByCategoryReportTests : DatabaseTest
     public async Task Should_Filter_By_Account()
     {
         var baseDate = new DateOnly(2025, 01, 31);
-        var report = new ExpensesByCategoryReport(
-            _priceDatabase,
-            _localDatabase,
-            new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue)),
-            new NullLogger<ExpensesByCategoryReport>());
+        var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var report = new ExpensesByCategoryReport(new NullLogger<ExpensesByCategoryReport>());
 
         // Only include USD account
         var filter = new IExpensesByCategoryReport.Filter(
@@ -269,7 +266,8 @@ public class ExpensesByCategoryReportTests : DatabaseTest
             baseDate,
             new DateOnlyRange(new DateOnly(2025, 01, 01), new DateOnly(2025, 01, 31)),
             FiatCurrency.Usd,
-            filter);
+            filter,
+            provider);
 
         // Should only have Food category (USD account transactions)
         Assert.That(result.Items.Count, Is.EqualTo(1));
@@ -281,11 +279,9 @@ public class ExpensesByCategoryReportTests : DatabaseTest
     public async Task Should_Filter_By_Category()
     {
         var baseDate = new DateOnly(2025, 01, 31);
-        var report = new ExpensesByCategoryReport(
-            _priceDatabase,
-            _localDatabase,
-            new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue)),
-            new NullLogger<ExpensesByCategoryReport>());
+        var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var report = new ExpensesByCategoryReport(new NullLogger<ExpensesByCategoryReport>());
 
         // Only include Food category
         var filter = new IExpensesByCategoryReport.Filter(
@@ -297,7 +293,8 @@ public class ExpensesByCategoryReportTests : DatabaseTest
             baseDate,
             new DateOnlyRange(new DateOnly(2025, 01, 01), new DateOnly(2025, 01, 31)),
             FiatCurrency.Usd,
-            filter);
+            filter,
+            provider);
 
         // Should only have Food category
         Assert.That(result.Items.Count, Is.EqualTo(1));
@@ -309,11 +306,9 @@ public class ExpensesByCategoryReportTests : DatabaseTest
     public async Task Should_Calculate_Expenses_Across_Multiple_Months()
     {
         var baseDate = new DateOnly(2025, 02, 28);
-        var report = new ExpensesByCategoryReport(
-            _priceDatabase,
-            _localDatabase,
-            new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue)),
-            new NullLogger<ExpensesByCategoryReport>());
+        var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var report = new ExpensesByCategoryReport(new NullLogger<ExpensesByCategoryReport>());
 
         var filter = new IExpensesByCategoryReport.Filter(
             new[] { new AccountId(_usdAccount.Id.ToString()), new AccountId(_brlAccount.Id.ToString()), new AccountId(_btcAccount.Id.ToString()) },
@@ -324,7 +319,8 @@ public class ExpensesByCategoryReportTests : DatabaseTest
             baseDate,
             new DateOnlyRange(new DateOnly(2025, 01, 01), new DateOnly(2025, 02, 28)),
             FiatCurrency.Usd,
-            filter);
+            filter,
+            provider);
 
         // Food: $150 (Jan) + $200 (Feb) = $350
         var foodItem = result.Items.Single(x => x.CategoryId == _foodCategoryId);
@@ -340,37 +336,37 @@ public class ExpensesByCategoryReportTests : DatabaseTest
     }
 
     [Test]
-    public void Should_Throw_When_No_Transactions_Found()
+    public async Task Should_Return_Empty_When_No_Transactions_In_Range()
     {
         var baseDate = new DateOnly(2023, 01, 31); // Before any transactions
-        var report = new ExpensesByCategoryReport(
-            _priceDatabase,
-            _localDatabase,
-            new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue)),
-            new NullLogger<ExpensesByCategoryReport>());
+        var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var report = new ExpensesByCategoryReport(new NullLogger<ExpensesByCategoryReport>());
 
         var filter = new IExpensesByCategoryReport.Filter(
             new[] { new AccountId(_usdAccount.Id.ToString()) },
             new[] { _foodCategoryId }
         );
 
-        Assert.ThrowsAsync<ApplicationException>(async () =>
-            await report.GetAsync(
-                baseDate,
-                new DateOnlyRange(new DateOnly(2023, 01, 01), new DateOnly(2023, 01, 31)),
-                FiatCurrency.Usd,
-                filter));
+        var result = await report.GetAsync(
+            baseDate,
+            new DateOnlyRange(new DateOnly(2023, 01, 01), new DateOnly(2023, 01, 31)),
+            FiatCurrency.Usd,
+            filter,
+            provider);
+
+        // Should return empty result when no transactions match the date range
+        Assert.That(result.Items, Is.Empty);
+        Assert.That(result.MainCurrency, Is.EqualTo(FiatCurrency.Usd));
     }
 
     [Test]
     public async Task Should_Only_Include_Expenses_Not_Income()
     {
         var baseDate = new DateOnly(2025, 01, 31);
-        var report = new ExpensesByCategoryReport(
-            _priceDatabase,
-            _localDatabase,
-            new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue)),
-            new NullLogger<ExpensesByCategoryReport>());
+        var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var report = new ExpensesByCategoryReport(new NullLogger<ExpensesByCategoryReport>());
 
         var filter = new IExpensesByCategoryReport.Filter(
             new[] { new AccountId(_usdAccount.Id.ToString()) },
@@ -381,7 +377,8 @@ public class ExpensesByCategoryReportTests : DatabaseTest
             baseDate,
             new DateOnlyRange(new DateOnly(2025, 01, 01), new DateOnly(2025, 01, 31)),
             FiatCurrency.Usd,
-            filter);
+            filter,
+            provider);
 
         // Food: $100 + $50 = $150 (the $20 refund/income is NOT included)
         var foodItem = result.Items.Single(x => x.CategoryId == _foodCategoryId);
@@ -392,11 +389,9 @@ public class ExpensesByCategoryReportTests : DatabaseTest
     public async Task Should_Order_Results_By_Category_Name()
     {
         var baseDate = new DateOnly(2025, 01, 31);
-        var report = new ExpensesByCategoryReport(
-            _priceDatabase,
-            _localDatabase,
-            new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue)),
-            new NullLogger<ExpensesByCategoryReport>());
+        var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var report = new ExpensesByCategoryReport(new NullLogger<ExpensesByCategoryReport>());
 
         var filter = new IExpensesByCategoryReport.Filter(
             new[] { new AccountId(_usdAccount.Id.ToString()), new AccountId(_brlAccount.Id.ToString()), new AccountId(_btcAccount.Id.ToString()) },
@@ -407,7 +402,8 @@ public class ExpensesByCategoryReportTests : DatabaseTest
             baseDate,
             new DateOnlyRange(new DateOnly(2025, 01, 01), new DateOnly(2025, 01, 31)),
             FiatCurrency.Usd,
-            filter);
+            filter,
+            provider);
 
         // Categories should be ordered alphabetically: Food, Transport, Utilities
         Assert.That(result.Items[0].CategoryName, Is.EqualTo("Food"));

@@ -31,4 +31,5 @@ public record TransactionDTO
     public string? FixedExpenseId { get; set; }
     public string? FixedExpenseName { get; set; }
     public DateOnly? FixedExpenseReferenceDate { get; set; }
+    public string? Notes { get; set; }
 }

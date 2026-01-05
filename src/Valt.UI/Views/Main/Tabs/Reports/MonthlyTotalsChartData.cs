@@ -61,7 +61,8 @@ public class MonthlyTotalsChartData : IDisposable
                 TextSize = 12,
                 Position = AxisPosition.End,
                 Labels = MonthLabels,
-                LabelsRotation = -45
+                LabelsRotation = -45,
+                MinZoomDelta = 1
             };
 
         YAxes[0] = new Axis
@@ -74,7 +75,8 @@ public class MonthlyTotalsChartData : IDisposable
             LabelsPaint = new SolidColorPaint(FiatLight) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) },
             TextSize = 12,
             SeparatorsPaint = new SolidColorPaint(GridColor.WithAlpha(40)) { StrokeThickness = 1 },
-            MinLimit = 0
+            MinLimit = 0,
+            MinZoomDelta = 12
         };
 
         YAxes[1] = new Axis
@@ -88,7 +90,8 @@ public class MonthlyTotalsChartData : IDisposable
             TextSize = 12,
             SeparatorsPaint = null, // Don't duplicate grid lines
             Position = AxisPosition.End,
-            MinLimit = 0
+            MinLimit = 0,
+            MinZoomDelta = 1
         };
     }
 

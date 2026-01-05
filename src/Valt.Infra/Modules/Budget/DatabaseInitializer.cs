@@ -6,6 +6,7 @@ using Valt.Core.Modules.Budget.Categories;
 using Valt.Core.Modules.Budget.Categories.Contracts;
 using Valt.Infra.DataAccess.Migrations;
 using Valt.Infra.Modules.Budget.Categories;
+using Valt.Infra.Modules.Configuration;
 
 namespace Valt.Infra.Modules.Budget;
 
@@ -15,19 +16,22 @@ internal class DatabaseInitializer : IDatabaseInitializer
     private readonly ICategoryRepository _categoryRepository;
     private readonly MigrationManager _migrationManager;
     private readonly IInitialCategoryNameLanguageProvider _initialCategoryNameLanguageProvider;
+    private readonly ConfigurationManager _configurationManager;
 
     public DatabaseInitializer(IAccountRepository accountRepository,
         ICategoryRepository categoryRepository,
         MigrationManager migrationManager,
-        IInitialCategoryNameLanguageProvider initialCategoryNameLanguageProvider)
+        IInitialCategoryNameLanguageProvider initialCategoryNameLanguageProvider,
+        ConfigurationManager configurationManager)
     {
         _accountRepository = accountRepository;
         _categoryRepository = categoryRepository;
         _migrationManager = migrationManager;
         _initialCategoryNameLanguageProvider = initialCategoryNameLanguageProvider;
+        _configurationManager = configurationManager;
     }
 
-    public async Task InitializeAsync(string? initialDataLanguage = null)
+    public async Task InitializeAsync(string? initialDataLanguage = null, IEnumerable<string>? selectedCurrencies = null)
     {
         var fiatAccount = FiatAccount.New(_initialCategoryNameLanguageProvider.Get(InitialCategoryNames.FiatAccount, initialDataLanguage),
             true, new Icon("MaterialSymbolsOutlined", "account_balanced", '\ue84f', Color.FromArgb(-16731500)),
@@ -65,6 +69,12 @@ internal class DatabaseInitializer : IDatabaseInitializer
 
         foreach (var category in categories)
             await _categoryRepository.SaveCategoryAsync(category);
+
+        // Initialize available fiat currencies if provided
+        if (selectedCurrencies is not null)
+        {
+            _configurationManager.SetAvailableFiatCurrencies(selectedCurrencies);
+        }
     }
 
     public async Task MigrateAsync()

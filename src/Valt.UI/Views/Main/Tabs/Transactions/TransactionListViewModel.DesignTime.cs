@@ -47,6 +47,7 @@ public partial class TransactionListViewModel
                 fixedExpenseId: null,
                 fixedExpenseName: null,
                 fixedExpenseReferenceDate: null,
+                notes: "Sample note for credit transaction",
                 futureTransaction: true),
             new(id: IdGenerator.Generate(),
                 date: new DateOnly(2025, 2, 13),
@@ -76,6 +77,7 @@ public partial class TransactionListViewModel
                 fixedExpenseId: null,
                 fixedExpenseName: null,
                 fixedExpenseReferenceDate: null,
+                notes: null,
                 futureTransaction: false),
             new(id: IdGenerator.Generate(),
                 date: new DateOnly(2025, 2, 12),
@@ -105,6 +107,7 @@ public partial class TransactionListViewModel
                 fixedExpenseId: null,
                 fixedExpenseName: null,
                 fixedExpenseReferenceDate: null,
+                notes: "Bought BTC on Nubank",
                 futureTransaction: false),
         };
 

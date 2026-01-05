@@ -3,16 +3,21 @@ using Valt.Infra.Crawlers.HistoricPriceCrawlers.Messages;
 
 namespace Valt.Infra.Kernel.BackgroundJobs;
 
-public class BackgroundJobCoordinator : IRecipient<BitcoinHistoryPriceUpdatedMessage>, IRecipient<FiatHistoryPriceUpdatedMessage>, IDisposable
+public class BackgroundJobCoordinator :
+    IRecipient<BitcoinHistoryPriceUpdatedMessage>,
+    IRecipient<FiatHistoryPriceUpdatedMessage>,
+    IRecipient<FiatHistoryRefreshRequestedMessage>,
+    IDisposable
 {
     private readonly BackgroundJobManager _manager;
 
     public BackgroundJobCoordinator(BackgroundJobManager manager)
     {
         _manager = manager;
-        
+
         WeakReferenceMessenger.Default.Register<BitcoinHistoryPriceUpdatedMessage>(this);
         WeakReferenceMessenger.Default.Register<FiatHistoryPriceUpdatedMessage>(this);
+        WeakReferenceMessenger.Default.Register<FiatHistoryRefreshRequestedMessage>(this);
     }
 
     public void Receive(BitcoinHistoryPriceUpdatedMessage message)
@@ -27,9 +32,15 @@ public class BackgroundJobCoordinator : IRecipient<BitcoinHistoryPriceUpdatedMes
         _manager.TriggerJobManually(BackgroundJobSystemNames.LivePricesUpdater);
     }
 
+    public void Receive(FiatHistoryRefreshRequestedMessage message)
+    {
+        _manager.TriggerJobManually(BackgroundJobSystemNames.FiatHistoryUpdater);
+    }
+
     public void Dispose()
     {
         WeakReferenceMessenger.Default.Unregister<BitcoinHistoryPriceUpdatedMessage>(this);
         WeakReferenceMessenger.Default.Unregister<FiatHistoryPriceUpdatedMessage>(this);
+        WeakReferenceMessenger.Default.Unregister<FiatHistoryRefreshRequestedMessage>(this);
     }
 }

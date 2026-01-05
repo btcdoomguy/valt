@@ -312,7 +312,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
         }
         catch (Exception e)
         {
-            await MessageBoxHelper.ShowErrorAsync("Error", e.Message, ownerWindow);
+            await MessageBoxHelper.ShowErrorAsync(language.Error, e.Message, ownerWindow);
         }
     }
 
@@ -358,7 +358,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
         catch (Exception e)
         {
             var ownerWindow = GetUserControlOwnerWindow()!;
-            await MessageBoxHelper.ShowErrorAsync("Error", e.Message, ownerWindow);
+            await MessageBoxHelper.ShowErrorAsync(language.Error, e.Message, ownerWindow);
         }
     }
 
@@ -393,7 +393,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
         catch (Exception e)
         {
             var ownerWindow = GetUserControlOwnerWindow()!;
-            await MessageBoxHelper.ShowErrorAsync("Error", e.Message, ownerWindow);
+            await MessageBoxHelper.ShowErrorAsync(language.Error, e.Message, ownerWindow);
         }
     }
 

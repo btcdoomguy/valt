@@ -13,7 +13,7 @@ namespace Valt.UI.Views.Main.Tabs.Reports;
 public partial class ReportsView : ValtBaseUserControl
 {
     CartesianChart? _monthlyTotalsChart;
-    PieChart? _categoryPieChart;
+    CartesianChart? _categoryBarChart;
     private ReportsViewModel? _viewModel;
 
     public ReportsView()
@@ -25,7 +25,7 @@ public partial class ReportsView : ValtBaseUserControl
     {
         base.OnApplyTemplate(e);
 
-        _categoryPieChart = CategoryPieChart;
+        _categoryBarChart = CategoryBarChart;
         _monthlyTotalsChart = MonthlyChart;
 
         if (DataContext is ReportsViewModel vm)
@@ -49,7 +49,7 @@ public partial class ReportsView : ValtBaseUserControl
         }
 
         _monthlyTotalsChart = null;
-        _categoryPieChart = null;
+        _categoryBarChart = null;
     }
 
     private void ViewModelOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -59,7 +59,7 @@ public partial class ReportsView : ValtBaseUserControl
             ForceMonthlyTotalsRedraw();
         }
     }
-    
+
     private void ForceMonthlyTotalsRedraw()
     {
         Dispatcher.UIThread.InvokeAsync(() =>
@@ -74,11 +74,11 @@ public partial class ReportsView : ValtBaseUserControl
         });
     }
 
-    private void ForceCategoryPieRedraw()
+    private void ForceCategoryBarRedraw()
     {
-        _categoryPieChart?.InvalidateMeasure();
-        _categoryPieChart?.InvalidateVisual();
-        _categoryPieChart?.CoreChart.Update(new ChartUpdateParams()
+        _categoryBarChart?.InvalidateMeasure();
+        _categoryBarChart?.InvalidateVisual();
+        _categoryBarChart?.CoreChart.Update(new ChartUpdateParams()
         {
             IsAutomaticUpdate = true,
             Throttling = false

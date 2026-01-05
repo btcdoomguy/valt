@@ -29,6 +29,12 @@
     <data name="CancelButton" xml:space="preserve">
         <value>Cancel</value>
     </data>
+    <data name="SaveButton" xml:space="preserve">
+        <value>Save</value>
+    </data>
+    <data name="SaveAndAddButton" xml:space="preserve">
+        <value>Save and Add New</value>
+    </data>
     <data name="ChangeCategoryTransactionTitle" xml:space="preserve">
         <value>New Name</value>
     </data>
@@ -55,6 +61,30 @@
     </data>
     <data name="CreateDatabase.InitialDataLanguage" xml:space="preserve">
         <value>Language for initial data</value>
+    </data>
+    <data name="CreateDatabase.FiatCurrencies" xml:space="preserve">
+        <value>Fiat currencies</value>
+    </data>
+    <data name="CreateDatabase.FiatCurrencies.Info" xml:space="preserve">
+        <value>USD is always included. Select additional currencies:</value>
+    </data>
+    <data name="CreateDatabase.FiatCurrencies.SelectTitle" xml:space="preserve">
+        <value>Additional currencies</value>
+    </data>
+    <data name="Settings.FiatCurrencies" xml:space="preserve">
+        <value>Available currencies</value>
+    </data>
+    <data name="Settings.FiatCurrencies.Info" xml:space="preserve">
+        <value>USD is always included. Currencies in use cannot be removed.</value>
+    </data>
+    <data name="Settings.FiatCurrencies.CannotRemove" xml:space="preserve">
+        <value>Cannot remove currency "{0}" because it is currently in use.</value>
+    </data>
+    <data name="Settings.FiatCurrencies.ConfirmAdd.Title" xml:space="preserve">
+        <value>Add currencies</value>
+    </data>
+    <data name="Settings.FiatCurrencies.ConfirmAdd.Message" xml:space="preserve">
+        <value>Adding new currencies will download historical price data. Continue?</value>
     </data>
     <data name="IconSelector.ClearSelection" xml:space="preserve">
         <value>Clear Selection</value>
@@ -479,6 +509,15 @@
     <data name="FixedExpenseEditor.Validation.InvalidRangePeriodStart" xml:space="preserve">
         <value>Cannot set the new range period start below the last record</value>
     </data>
+    <data name="FixedExpenseEditor.ChangeRecurrence" xml:space="preserve">
+        <value>Change...</value>
+    </data>
+    <data name="FixedExpenseEditor.CancelChangeRecurrence" xml:space="preserve">
+        <value>Cancel</value>
+    </data>
+    <data name="ManageFixedExpenses.RecurrenceSection" xml:space="preserve">
+        <value>Recurrence</value>
+    </data>
     <data name="FixedExpenses.Period.Weekly" xml:space="preserve">
         <value>Weekly</value>
     </data>
@@ -632,6 +671,15 @@
     <data name="Settings.RequiresRestart" xml:space="preserve">
         <value>(requires restart)</value>
     </data>
+    <data name="Settings.Tab.General" xml:space="preserve">
+        <value>General</value>
+    </data>
+    <data name="Settings.Tab.Currencies" xml:space="preserve">
+        <value>Currencies</value>
+    </data>
+    <data name="Settings.Tab.Advanced" xml:space="preserve">
+        <value>Advanced</value>
+    </data>
     <data name="Offline.Line1" xml:space="preserve">
         <value>Rates are offline.</value>
     </data>
@@ -675,7 +723,7 @@
         <value>Max drawdown</value>
     </data>
     <data name="Reports.BtcStack.Title" xml:space="preserve">
-        <value>Your BTC Stack</value>
+        <value>Your Stack</value>
     </data>
     <data name="Reports.BtcStack.CurrentStack" xml:space="preserve">
         <value>Current stack</value>
@@ -684,7 +732,16 @@
         <value>% of total supply</value>
     </data>
     <data name="Reports.BtcStack.PeopleWithSameStack" xml:space="preserve">
-        <value>Max nº of people with same stack</value>
+        <value>Global ranking</value>
+    </data>
+    <data name="Reports.Statistics.Title" xml:space="preserve">
+        <value>Statistics</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpenses" xml:space="preserve">
+        <value>Median expenses (12mo)</value>
+    </data>
+    <data name="Reports.Statistics.WealthCoverage" xml:space="preserve">
+        <value>Wealth coverage</value>
     </data>
     <data name="Reports.MonthlyTotals.Obs" xml:space="preserve">
         <value>* latest totals are calculated based on yesterday amounts</value>
@@ -889,5 +946,148 @@
     </data>
     <data name="InitialSelection.FirstMessage" xml:space="preserve">
         <value>You need to create or select your personal database file to store your financial data safely.</value>
+    </data>
+    <data name="JobLogViewer.Title" xml:space="preserve">
+        <value>Job Log: {0}</value>
+    </data>
+    <data name="JobLogViewer.ClearLog" xml:space="preserve">
+        <value>Clear Log</value>
+    </data>
+    <data name="JobLogViewer.NoLogs" xml:space="preserve">
+        <value>No log entries yet.</value>
+    </data>
+    <data name="Help.KeyboardShortcuts" xml:space="preserve">
+        <value>Keyboard Shortcuts</value>
+    </data>
+    <data name="Help.Tips" xml:space="preserve">
+        <value>Tips</value>
+    </data>
+    <data name="TransactionEditor.Help.SwitchToDebt" xml:space="preserve">
+        <value>Switch to Debt</value>
+    </data>
+    <data name="TransactionEditor.Help.SwitchToCredit" xml:space="preserve">
+        <value>Switch to Credit</value>
+    </data>
+    <data name="TransactionEditor.Help.SwitchToTransfer" xml:space="preserve">
+        <value>Switch to Transfer</value>
+    </data>
+    <data name="TransactionEditor.Help.PreviousDay" xml:space="preserve">
+        <value>Move to the previous day</value>
+    </data>
+    <data name="TransactionEditor.Help.NextDay" xml:space="preserve">
+        <value>Move to the next day</value>
+    </data>
+    <data name="TransactionEditor.Help.Tip1" xml:space="preserve">
+        <value>Start typing in the Name field to see suggestions based on your transaction history.</value>
+    </data>
+    <data name="TransactionEditor.Help.Tip2" xml:space="preserve">
+        <value>You can also type on the Category and Account drop downs to fill the data quickly.</value>
+    </data>
+    <data name="AvgPrice.Help.BrazilianRule" xml:space="preserve">
+        <value>Brazilian Rule: The average price is calculated in a simple way, where profits uses the average price as base. It follows the brazilian accounting rules.</value>
+    </data>
+    <data name="AvgPrice.Help.FIFO" xml:space="preserve">
+        <value>FIFO (first-in first-out): Follows american standards for calculating profits, where each purchase is considered a separate stack and profits are calculated separately according to the purchase order.</value>
+    </data>
+    <data name="ManageTransactions.Notes" xml:space="preserve">
+        <value>Notes</value>
+    </data>
+    <data name="ManageTransactions.Notes.Placeholder" xml:space="preserve">
+        <value>Add notes about this transaction...</value>
+    </data>
+    <data name="ManageTransactions.Properties" xml:space="preserve">
+        <value>Properties</value>
+    </data>
+    <data name="Transactions.Columns.Notes" xml:space="preserve">
+        <value>Notes</value>
+    </data>
+    <!-- Common Validation Messages -->
+    <data name="Validation.NameRequired" xml:space="preserve">
+        <value>Name is required</value>
+    </data>
+    <data name="Validation.CategoryRequired" xml:space="preserve">
+        <value>Category is required</value>
+    </data>
+    <data name="Validation.DateRequired" xml:space="preserve">
+        <value>Date is required</value>
+    </data>
+    <data name="Validation.ValueRequired" xml:space="preserve">
+        <value>Value is required</value>
+    </data>
+    <data name="Validation.IconRequired" xml:space="preserve">
+        <value>Icon is required</value>
+    </data>
+    <data name="Validation.StartDateRequired" xml:space="preserve">
+        <value>Start date is required</value>
+    </data>
+    <data name="Validation.NewNameRequired" xml:space="preserve">
+        <value>New name is required</value>
+    </data>
+    <!-- Account Validation Messages -->
+    <data name="Validation.AccountNameRequired" xml:space="preserve">
+        <value>Inform a valid account name</value>
+    </data>
+    <data name="Validation.OriginAccountRequired" xml:space="preserve">
+        <value>Origin account is required</value>
+    </data>
+    <data name="Validation.DestinationAccountRequired" xml:space="preserve">
+        <value>Destination account is required</value>
+    </data>
+    <!-- Password Validation Messages -->
+    <data name="Validation.PasswordRequired" xml:space="preserve">
+        <value>Password is required</value>
+    </data>
+    <data name="Validation.OldPasswordRequired" xml:space="preserve">
+        <value>Old password is required</value>
+    </data>
+    <data name="Validation.PasswordMinLength" xml:space="preserve">
+        <value>Password must be at least 6 characters long</value>
+    </data>
+    <data name="Validation.OldPasswordMinLength" xml:space="preserve">
+        <value>Old password must be at least 6 characters long</value>
+    </data>
+    <data name="Validation.PasswordsDoNotMatch" xml:space="preserve">
+        <value>Passwords do not match</value>
+    </data>
+    <!-- AvgPrice Validation Messages -->
+    <data name="Validation.QuantityRequired" xml:space="preserve">
+        <value>Quantity is required</value>
+    </data>
+    <data name="Validation.QuantityGreaterThanZero" xml:space="preserve">
+        <value>Quantity must be greater than zero</value>
+    </data>
+    <data name="Validation.AmountRequired" xml:space="preserve">
+        <value>Amount is required</value>
+    </data>
+    <data name="Validation.PrecisionRange" xml:space="preserve">
+        <value>Precision must be between 0 and 15</value>
+    </data>
+    <!-- Database Validation Messages -->
+    <data name="Validation.DatabasePathRequired" xml:space="preserve">
+        <value>Inform a valid path to store the database file</value>
+    </data>
+    <!-- Error Dialog Titles -->
+    <data name="Error.ValidationError" xml:space="preserve">
+        <value>Validation Error</value>
+    </data>
+    <!-- Error Messages -->
+    <data name="Error.TransactionNotFound" xml:space="preserve">
+        <value>Transaction not found</value>
+    </data>
+    <data name="Error.AccountNotFound" xml:space="preserve">
+        <value>Account not found</value>
+    </data>
+    <data name="Error.FixedExpenseNotFound" xml:space="preserve">
+        <value>Fixed expense not found</value>
+    </data>
+    <data name="Error.ProfileNotFound" xml:space="preserve">
+        <value>Profile not found</value>
+    </data>
+    <data name="Error.FileNotFound" xml:space="preserve">
+        <value>The selected file does not exist</value>
+    </data>
+    <!-- Dialog Buttons -->
+    <data name="Button.Refresh" xml:space="preserve">
+        <value>Refresh</value>
     </data>
 </root>

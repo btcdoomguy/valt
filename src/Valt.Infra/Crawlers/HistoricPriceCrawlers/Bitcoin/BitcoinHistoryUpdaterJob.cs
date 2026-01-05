@@ -39,17 +39,31 @@ internal class BitcoinHistoryUpdaterJob : IBackgroundJob
 
     public async Task RunAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("[BitcoinHistoryUpdater] Updating BTC history");
-        
-        if (_priceDatabase.GetBitcoinData().Query().Count() == 0)
+        _logger.LogInformation("[BitcoinHistoryUpdater] Starting BTC history update cycle");
+
+        if (!_priceDatabase.HasDatabaseOpen)
+        {
+            _logger.LogInformation("[BitcoinHistoryUpdater] Price database not open, skipping");
+            return;
+        }
+
+        var recordCount = _priceDatabase.GetBitcoinData().Query().Count();
+        _logger.LogInformation("[BitcoinHistoryUpdater] Current BTC price records: {Count}", recordCount);
+
+        if (recordCount == 0)
         {
             _logger.LogInformation("[BitcoinHistoryUpdater] Starting the prices db with the initial seed");
-            var prices = await _seedProvider.GetPricesAsync();
-            _priceDatabase.GetBitcoinData().InsertBulk(prices.Select(x => new BitcoinDataEntity()
+            var seedPrices = await _seedProvider.GetPricesAsync();
+            var seedList = seedPrices.ToList();
+            _logger.LogInformation("[BitcoinHistoryUpdater] Loading {Count} seed prices", seedList.Count);
+
+            _priceDatabase.GetBitcoinData().InsertBulk(seedList.Select(x => new BitcoinDataEntity()
             {
                 Date = x.Date.ToValtDateTime(),
                 Price = x.Price
             }));
+
+            _logger.LogInformation("[BitcoinHistoryUpdater] Seed data loaded successfully");
         }
 
         try
@@ -57,17 +71,21 @@ internal class BitcoinHistoryUpdaterJob : IBackgroundJob
             var utcNow = DateTime.UtcNow;
             var localDate = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, 0, 0, 0, DateTimeKind.Local);
 
-            if (!_priceDatabase.HasDatabaseOpen)
-                return;
-            
             var lastStoredDate = _priceDatabase.GetBitcoinData().Max(x => x.Date).Date;
             var endDate = localDate.Date.AddDays(-1);
 
-            if (lastStoredDate >= endDate)
-                return;
+            _logger.LogInformation("[BitcoinHistoryUpdater] Last stored date: {LastDate}, Target end date: {EndDate}",
+                lastStoredDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
 
-            _logger.LogInformation("[BitcoinHistoryUpdater] From {0} to {1}", lastStoredDate.ToShortDateString(),
-                endDate.ToShortDateString());
+            if (lastStoredDate >= endDate)
+            {
+                _logger.LogInformation("[BitcoinHistoryUpdater] Already up to date, no new data needed");
+                return;
+            }
+
+            var daysToFetch = (endDate - lastStoredDate).Days;
+            _logger.LogInformation("[BitcoinHistoryUpdater] Fetching {Days} days of data from {Start} to {End}",
+                daysToFetch, lastStoredDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
 
             var prices = await _provider.GetPricesAsync(DateOnly.FromDateTime(lastStoredDate),
                 DateOnly.FromDateTime(endDate)).ConfigureAwait(false);
@@ -78,9 +96,9 @@ internal class BitcoinHistoryUpdaterJob : IBackgroundJob
                 var dateToConsider = price.Date.ToValtDateTime();
                 if (dateToConsider <= endDate)
                 {
-                    _logger.LogInformation("[BitcoinHistoryUpdater] Adding price {PricePrice} for {DateToConsider}",
+                    _logger.LogInformation("[BitcoinHistoryUpdater] Adding BTC price ${Price:N2} for {Date}",
                         price.Price, dateToConsider.ToString("yyyy-MM-dd"));
-                    
+
                     entries.Add(new BitcoinDataEntity()
                     {
                         Date = dateToConsider,
@@ -88,12 +106,19 @@ internal class BitcoinHistoryUpdaterJob : IBackgroundJob
                     });
                 }
             }
-            
+
             if (entries.Count != 0)
             {
                 _priceDatabase.GetBitcoinData().Insert(entries);
+                _logger.LogInformation("[BitcoinHistoryUpdater] Inserted {Count} new BTC price records", entries.Count);
                 WeakReferenceMessenger.Default.Send<BitcoinHistoryPriceUpdatedMessage>();
             }
+            else
+            {
+                _logger.LogInformation("[BitcoinHistoryUpdater] No new entries to insert");
+            }
+
+            _logger.LogInformation("[BitcoinHistoryUpdater] Update cycle completed successfully");
         }
         catch (Exception ex)
         {

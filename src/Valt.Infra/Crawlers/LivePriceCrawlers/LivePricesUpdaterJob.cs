@@ -7,6 +7,7 @@ using Valt.Infra.Crawlers.LivePriceCrawlers.Fiat.Providers;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Messages;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel.BackgroundJobs;
+using Valt.Infra.Modules.Configuration;
 
 namespace Valt.Infra.Crawlers.LivePriceCrawlers;
 
@@ -16,6 +17,7 @@ internal class LivePricesUpdaterJob : IBackgroundJob
     private readonly IBitcoinPriceProvider _bitcoinPriceProvider;
     private readonly IPriceDatabase _priceDatabase;
     private readonly ILocalHistoricalPriceProvider _localHistoricalPriceProvider;
+    private readonly ConfigurationManager _configurationManager;
     private readonly ILogger<LivePricesUpdaterJob> _logger;
 
     private decimal? _lastClosingPrice;
@@ -33,12 +35,14 @@ internal class LivePricesUpdaterJob : IBackgroundJob
         IBitcoinPriceProvider bitcoinPriceProvider,
         IPriceDatabase priceDatabase,
         ILocalHistoricalPriceProvider localHistoricalPriceProvider,
+        ConfigurationManager configurationManager,
         ILogger<LivePricesUpdaterJob> logger)
     {
         _fiatPriceProvider = fiatPriceProvider;
         _bitcoinPriceProvider = bitcoinPriceProvider;
         _priceDatabase = priceDatabase;
         _localHistoricalPriceProvider = localHistoricalPriceProvider;
+        _configurationManager = configurationManager;
         _logger = logger;
     }
 
@@ -50,18 +54,57 @@ internal class LivePricesUpdaterJob : IBackgroundJob
 
     public async Task RunAsync(CancellationToken stoppingToken)
     {
+        _logger.LogInformation("[LivePricesUpdaterJob] Starting price update cycle");
         var isUpToDate = false;
         try
         {
-            var fiatTask = _fiatPriceProvider.GetAsync();
+            // Skip if no local database is open (we need it for currency configuration)
+            if (!_configurationManager.HasLocalDatabaseOpen)
+            {
+                _logger.LogInformation("[LivePricesUpdaterJob] No local database open, skipping update");
+                return;
+            }
+
+            // Skip if price database is not open or empty
+            if (!_priceDatabase.HasDatabaseOpen || _priceDatabase.GetFiatData().Query().Count() == 0)
+            {
+                _logger.LogInformation("[LivePricesUpdaterJob] Price database is empty, skipping update");
+                return;
+            }
+
+            // Get currencies from configuration
+            var currencies = _configurationManager.GetAvailableFiatCurrencies();
+            if (currencies.Count == 0)
+            {
+                _logger.LogInformation("[LivePricesUpdaterJob] No currencies configured, skipping update");
+                return;
+            }
+
+            _logger.LogInformation("[LivePricesUpdaterJob] Fetching prices for {Count} currencies: {Currencies}",
+                currencies.Count, string.Join(", ", currencies));
+
+            var fiatTask = _fiatPriceProvider.GetAsync(currencies);
             var btcTask = _bitcoinPriceProvider.GetAsync();
 
             await Task.WhenAll(fiatTask, btcTask).ConfigureAwait(false);
 
             _fiatUsdPrice = fiatTask.Result;
             _btcPrice = btcTask.Result;
-            
+
             isUpToDate = _fiatUsdPrice.UpToDate && _btcPrice.UpToDate;
+
+            // Log BTC price
+            var btcUsdPrice = _btcPrice.Items.FirstOrDefault(x => x.CurrencyCode == "USD");
+            if (btcUsdPrice != null)
+            {
+                _logger.LogInformation("[LivePricesUpdaterJob] BTC/USD: ${Price:N2}", btcUsdPrice.Price);
+            }
+
+            // Log fiat rates
+            foreach (var fiatRate in _fiatUsdPrice.Items)
+            {
+                _logger.LogInformation("[LivePricesUpdaterJob] USD/{Currency}: {Price:N4}", fiatRate.CurrencyCode, fiatRate.Price);
+            }
         }
         catch (Exception ex)
         {
@@ -108,6 +151,7 @@ internal class LivePricesUpdaterJob : IBackgroundJob
             }
 
             WeakReferenceMessenger.Default.Send(new LivePriceUpdateMessage(_btcPrice, _fiatUsdPrice, isUpToDate));
+            _logger.LogInformation("[LivePricesUpdaterJob] Price update completed successfully (up-to-date: {IsUpToDate})", isUpToDate);
         }
         catch (Exception ex)
         {
@@ -115,9 +159,11 @@ internal class LivePricesUpdaterJob : IBackgroundJob
             throw;
         }
     }
-    
+
     private async Task LastKnownPricesAsync()
     {
+        _logger.LogInformation("[LivePricesUpdaterJob] Loading last known prices from database");
+
         if (!_priceDatabase.HasDatabaseOpen)
         {
             _logger.LogError("[LivePricesUpdaterJob] Price database not open to load last known prices");
@@ -134,14 +180,22 @@ internal class LivePricesUpdaterJob : IBackgroundJob
         var btcLastPriceStored =
             await _localHistoricalPriceProvider.GetUsdBitcoinRateAtAsync(btcLastDateStored).ConfigureAwait(false)!;
 
+        _logger.LogInformation("[LivePricesUpdaterJob] Using stored BTC price from {Date}: ${Price:N2}",
+            btcLastDateStored, btcLastPriceStored.Value);
+
         var fiatLastDateStored = DateOnly.FromDateTime(_priceDatabase.GetFiatData().Max(x => x.Date).Date);
         var fiatLastPricesStored = await _localHistoricalPriceProvider.GetAllFiatRatesAtAsync(fiatLastDateStored)
             .ConfigureAwait(false);
+
+        _logger.LogInformation("[LivePricesUpdaterJob] Using stored fiat rates from {Date} ({Count} currencies)",
+            fiatLastDateStored, fiatLastPricesStored.Count());
 
         WeakReferenceMessenger.Default.Send(new LivePriceUpdateMessage(
             new BtcPrice(btcLastDateStored.ToDateTime(TimeOnly.MinValue, DateTimeKind.Local), false,
                 new[] { new BtcPrice.Item(FiatCurrency.Usd.Code, btcLastPriceStored.Value, btcLastPriceStored.Value) }),
             new FiatUsdPrice(fiatLastDateStored.ToDateTime(TimeOnly.MinValue, DateTimeKind.Local), false,
                 fiatLastPricesStored.Select(x => new FiatUsdPrice.Item(x.Currency.Code, x.Rate))), false));
+
+        _logger.LogInformation("[LivePricesUpdaterJob] Fallback to stored prices completed");
     }
 }

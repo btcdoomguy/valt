@@ -77,7 +77,7 @@
                                                  IsChecked="{Binding IsBitcoin, Mode=OneWay}"
                                                  IsEnabled="{Binding EditFields}"
                                                  GroupName="AssetType"
-                                                 Command="{Binding SetBitcoinCommand} "/>
+                                                 Command="{Binding SetBitcoinCommand} " />
                                     <RadioButton Content="{x:Static lang:language.AvgPrice_Profiles_CustomAsset}"
                                                  IsChecked="{Binding IsCustomAsset, Mode=OneWay}"
                                                  IsEnabled="{Binding EditFields}"
@@ -91,14 +91,16 @@
                                 <TextBlock Text="{x:Static lang:language.AvgPrice_Profiles_CustomAssetDetails}" />
                                 <StackPanel Orientation="Horizontal" Spacing="10">
                                     <StackPanel>
-                                        <TextBlock Text="{x:Static lang:language.AvgPrice_Profiles_AssetName}" FontSize="12" Foreground="{DynamicResource Text400Brush}" />
+                                        <TextBlock Text="{x:Static lang:language.AvgPrice_Profiles_AssetName}"
+                                                   FontSize="12" Foreground="{DynamicResource Text400Brush}" />
                                         <TextBox Text="{Binding AssetName}"
                                                  IsEnabled="{Binding EditFields}"
                                                  Width="180"
                                                  VerticalAlignment="Center" />
                                     </StackPanel>
                                     <StackPanel>
-                                        <TextBlock Text="{x:Static lang:language.AvgPrice_Profiles_Decimals}" FontSize="12" Foreground="{DynamicResource Text400Brush}" />
+                                        <TextBlock Text="{x:Static lang:language.AvgPrice_Profiles_Decimals}"
+                                                   FontSize="12" Foreground="{DynamicResource Text400Brush}" />
                                         <TextBox Text="{Binding Precision}"
                                                  IsEnabled="{Binding EditFields}"
                                                  Width="100"
@@ -112,15 +114,29 @@
                                 <TextBlock Text="{x:Static lang:language.AvgPrice_Profiles_FiatCurrency}" />
                                 <ComboBox ItemsSource="{Binding AvailableCurrencies}"
                                           SelectedItem="{Binding Currency}"
-                                          IsEnabled="{Binding EditFields}"/>
+                                          IsEnabled="{Binding EditFields}" />
                             </StackPanel>
 
                             <!--Strategy-->
                             <StackPanel Classes="form-field">
-                                <TextBlock Text="{x:Static lang:language.AvgPrice_Profiles_CalculationMethod}" />
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <TextBlock Text="{x:Static lang:language.AvgPrice_Profiles_CalculationMethod}" />
+                                    <userControls:ModuleHelperText Margin="0, -3, 0, 0">
+                                        <userControls:ModuleHelperText.HelpContent>
+                                            <StackPanel Spacing="4">
+                                                <TextBlock FontSize="12"
+                                                           Text="{x:Static lang:language.AvgPrice_Help_BrazilianRule}"
+                                                           TextWrapping="Wrap" />
+                                                <TextBlock FontSize="12"
+                                                           Text="{x:Static lang:language.AvgPrice_Help_FIFO}"
+                                                           TextWrapping="Wrap" />
+                                            </StackPanel>
+                                        </userControls:ModuleHelperText.HelpContent>
+                                    </userControls:ModuleHelperText>
+                                </StackPanel>
                                 <ComboBox ItemsSource="{Binding AvailableStrategies}"
                                           SelectedItem="{Binding SelectedStrategy}"
-                                          IsEnabled="{Binding EditFields}"/>
+                                          IsEnabled="{Binding EditFields}" />
                             </StackPanel>
 
                             <StackPanel Classes="form-field">

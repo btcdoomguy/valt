@@ -5,9 +5,9 @@
         xmlns:userControls="clr-namespace:Valt.UI.UserControls"
         xmlns:local="clr-namespace:Valt.UI.Lang"
         xmlns:createDatabase1="clr-namespace:Valt.UI.Views.Main.Modals.CreateDatabase"
-        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="455"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="760"
         MaxWidth="600"
-        MaxHeight="455"
+        MaxHeight="760"
         x:Class="Valt.UI.Views.Main.Modals.CreateDatabase.CreateDatabaseView"
         Title="{x:Static local:language.CreateDatabaseTitle}"
         x:DataType="createDatabase1:CreateDatabaseViewModel"
@@ -83,6 +83,26 @@
                                       SelectedValueBinding="{Binding Value}"
                                       SelectedValue="{Binding SelectedLanguage}"
                                       Width="200" />
+                        </DockPanel>
+
+                        <!-- Fiat Currencies Field -->
+                        <DockPanel>
+                            <TextBlock Width="180" TextAlignment="Right" Margin="0,5,5,0"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Top"
+                                       Text="{x:Static local:language.CreateDatabase_FiatCurrencies}"
+                                       TextWrapping="Wrap" />
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock FontStyle="Italic" FontSize="11" Margin="0,0,0,5"
+                                           Text="{x:Static local:language.CreateDatabase_FiatCurrencies_Info}" />
+                                <userControls:CheckboxListSelector
+                                    Title="{x:Static local:language.CreateDatabase_FiatCurrencies_SelectTitle}"
+                                    DisplayMemberPath="DisplayName"
+                                    Height="200"
+                                    MaxListHeight="200"
+                                    ItemsSource="{Binding AvailableFiatCurrencies}"
+                                    SelectedItems="{Binding SelectedFiatCurrencies}" />
+                            </StackPanel>
                         </DockPanel>
                     </StackPanel>
                 </StackPanel>

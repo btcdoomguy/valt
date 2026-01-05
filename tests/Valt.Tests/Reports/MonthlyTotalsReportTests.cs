@@ -7,6 +7,7 @@ using Valt.Core.Modules.Budget.Transactions.Details;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.DataSources.Bitcoin;
 using Valt.Infra.Modules.DataSources.Fiat;
+using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.Tests.Builders;
 
@@ -25,7 +26,7 @@ public class MonthlyTotalsReportTests : DatabaseTest
     protected override Task SeedDatabase()
     {
         _categoryId = IdGenerator.Generate();
-        
+
         //initialize demo accounts
         _btcAccount = new BtcAccountBuilder()
         {
@@ -130,7 +131,7 @@ public class MonthlyTotalsReportTests : DatabaseTest
 
             currentDate = currentDate.AddDays(1);
         }
-        
+
         //some transfers
         _localDatabase.GetTransactions().Insert(new TransactionBuilder()
         {
@@ -156,14 +157,15 @@ public class MonthlyTotalsReportTests : DatabaseTest
     public async Task Should_Calculate_MonthlyTotals()
     {
         var baseDate = new DateOnly(2025, 12, 31);
-        var report = new MonthlyTotalsReport(_priceDatabase, _localDatabase, new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue)),
-            new NullLogger<MonthlyTotalsReport>());
+        var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var report = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
 
         var result2024 = await report.GetAsync(baseDate, new DateOnlyRange(new DateOnly(2024, 01, 01), new DateOnly(2024, 12, 31)),
-            FiatCurrency.Brl);
+            FiatCurrency.Brl, provider);
         var result2025 = await report.GetAsync(baseDate, new DateOnlyRange(new DateOnly(2025, 01, 01), new DateOnly(2025, 12, 31)),
-            FiatCurrency.Brl);
-        
+            FiatCurrency.Brl, provider);
+
         Assert.That(result2024.MainCurrency, Is.EqualTo(FiatCurrency.Brl));
         Assert.That(result2024.Items[0].BtcTotal, Is.EqualTo(1.00007m));
         Assert.That(result2024.Items[0].FiatTotal, Is.EqualTo(564840.17m));
@@ -171,21 +173,21 @@ public class MonthlyTotalsReportTests : DatabaseTest
         Assert.That(result2024.Items[0].BtcYearlyChange, Is.Zero);
         Assert.That(result2024.Items[0].Income, Is.EqualTo(1383.33m));
         Assert.That(result2024.Items[0].Expenses, Is.EqualTo(-415m));
-        
+
         Assert.That(result2024.Items[11].BtcTotal, Is.EqualTo(1.000746m));
         Assert.That(result2024.Items[11].FiatTotal, Is.EqualTo(581446.63m));
         Assert.That(result2024.Items[11].BtcMonthlyChange, Is.EqualTo(0.00m));
         Assert.That(result2024.Items[11].BtcYearlyChange, Is.Zero);
         Assert.That(result2024.Items[11].Income, Is.EqualTo(1383.33m));
         Assert.That(result2024.Items[11].Expenses, Is.EqualTo(-415m));
-        
+
         Assert.That(result2025.Items[0].BtcTotal, Is.EqualTo(1.000916m));
         Assert.That(result2025.Items[0].FiatTotal, Is.EqualTo(577008.47m));
         Assert.That(result2025.Items[0].BtcMonthlyChange, Is.EqualTo(0.02m));
         Assert.That(result2025.Items[0].BtcYearlyChange, Is.EqualTo(0.02m));
         Assert.That(result2025.Items[0].Income, Is.EqualTo(1383.33m));
         Assert.That(result2025.Items[0].Expenses, Is.EqualTo(-415m));
-        
+
         Assert.That(result2025.Items[11].BtcTotal, Is.EqualTo(1.001693m));
         Assert.That(result2025.Items[11].FiatTotal, Is.EqualTo(588184.32m));
         Assert.That(result2025.Items[11].BtcMonthlyChange, Is.EqualTo(0.01m));

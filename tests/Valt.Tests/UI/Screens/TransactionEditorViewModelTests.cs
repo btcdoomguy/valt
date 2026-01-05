@@ -22,7 +22,7 @@ public class TransactionEditorViewModelTests : DatabaseTest
 
     private TransactionEditorViewModel CreateInstance()
     {
-        var transactionRepository = new TransactionRepository(_localDatabase, _domainEventPublisher);
+        var transactionRepository = new TransactionRepository(_localDatabase, _priceDatabase, _domainEventPublisher);
         _accountQueries = new AccountQueries(_localDatabase, new AccountTotalsCalculator(_localDatabase, new AccountCacheService(_localDatabase, new Clock())));
         _categoryQueries = new CategoryQueries(_localDatabase);
         _fixedExpenseQueries = new FixedExpenseQueries(_localDatabase);

@@ -498,6 +498,15 @@
     <data name="FixedExpenseEditor.Validation.InvalidRangePeriodStart" xml:space="preserve">
         <value>A data de início de um novo período não pode ser menor do que o último lançamento registrado</value>
     </data>
+    <data name="FixedExpenseEditor.ChangeRecurrence" xml:space="preserve">
+        <value>Alterar...</value>
+    </data>
+    <data name="FixedExpenseEditor.CancelChangeRecurrence" xml:space="preserve">
+        <value>Cancelar</value>
+    </data>
+    <data name="ManageFixedExpenses.RecurrenceSection" xml:space="preserve">
+        <value>Recorrência</value>
+    </data>
     <data name="ManageFixedExpenses.DayOfWeek" xml:space="preserve">
         <value>Dia da semana</value>
     </data>
@@ -667,7 +676,7 @@
         <value>Maior queda</value>
     </data>
     <data name="Reports.BtcStack.Title" xml:space="preserve">
-        <value>Seu Stack de BTC</value>
+        <value>Seu stack</value>
     </data>
     <data name="Reports.BtcStack.CurrentStack" xml:space="preserve">
         <value>Stack atual</value>
@@ -676,7 +685,16 @@
         <value>% do supply total</value>
     </data>
     <data name="Reports.BtcStack.PeopleWithSameStack" xml:space="preserve">
-        <value>Máx. de pessoas com o msm stack</value>
+        <value>Ranking global</value>
+    </data>
+    <data name="Reports.Statistics.Title" xml:space="preserve">
+        <value>Estatísticas</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpenses" xml:space="preserve">
+        <value>Despesas medianas (12m)</value>
+    </data>
+    <data name="Reports.Statistics.WealthCoverage" xml:space="preserve">
+        <value>Cobertura do patrimônio</value>
     </data>
     <data name="Reports.MonthlyTotals.Obs" xml:space="preserve">
         <value>* o total atual é baseado nos valores do dia anterior</value>
@@ -884,5 +902,163 @@
     </data>
     <data name="InitialSelection.FirstMessage" xml:space="preserve">
         <value>Crie ou selecione seu banco de dados pessoal para armazenar suas informações financeiras.</value>
+    </data>
+    <data name="Settings.FiatCurrencies" xml:space="preserve">
+        <value>Moedas fiduciárias</value>
+    </data>
+    <data name="Settings.FiatCurrencies.CannotRemove" xml:space="preserve">
+        <value>A moeda "{0}" não pode ser removida pois está sendo utilizada.</value>
+    </data>
+    <data name="Settings.FiatCurrencies.ConfirmAdd.Message" xml:space="preserve">
+        <value>Adicionar novas moedas irá iniciar o download de seus históricos de preços. Continuar?</value>
+    </data>
+    <data name="Settings.FiatCurrencies.ConfirmAdd.Title" xml:space="preserve">
+        <value>Adicionar moedas</value>
+    </data>
+    <data name="Settings.FiatCurrencies.Info" xml:space="preserve">
+        <value>USD está inclusa por padrão. Moedas em uso não podem ser removidas.</value>
+    </data>
+    <data name="JobLogViewer.Title" xml:space="preserve">
+        <value>Log do Job: {0}</value>
+    </data>
+    <data name="JobLogViewer.ClearLog" xml:space="preserve">
+        <value>Limpar Log</value>
+    </data>
+    <data name="JobLogViewer.NoLogs" xml:space="preserve">
+        <value>Nenhuma entrada de log ainda.</value>
+    </data>
+    <data name="Help.KeyboardShortcuts" xml:space="preserve">
+        <value>Atalhos de Teclado</value>
+    </data>
+    <data name="Help.Tips" xml:space="preserve">
+        <value>Dicas</value>
+    </data>
+    <data name="TransactionEditor.Help.SwitchToDebt" xml:space="preserve">
+        <value>Mudar para Débito</value>
+    </data>
+    <data name="TransactionEditor.Help.SwitchToCredit" xml:space="preserve">
+        <value>Mudar para Crédito</value>
+    </data>
+    <data name="TransactionEditor.Help.SwitchToTransfer" xml:space="preserve">
+        <value>Mudar para Transferência</value>
+    </data>
+    <data name="TransactionEditor.Help.PreviousDay" xml:space="preserve">
+        <value>Ir para o dia anterior</value>
+    </data>
+    <data name="TransactionEditor.Help.NextDay" xml:space="preserve">
+        <value>Ir para o próximo dia</value>
+    </data>
+    <data name="TransactionEditor.Help.Tip1" xml:space="preserve">
+        <value>Comece a digitar no campo Nome para ver sugestões baseadas no seu histórico de transações.</value>
+    </data>
+    <data name="TransactionEditor.Help.Tip2" xml:space="preserve">
+        <value>Você também pode digitar nas caixas de Categoria e Conta para preencher os dados rapidamente.</value>
+    </data>
+    <data name="AvgPrice.Help.BrazilianRule" xml:space="preserve">
+        <value>Regra Brasileira: O preço médio é calculado de forma simples, onde os lucros utilizam o preço médio como base. Segue as regras contábeis brasileiras.</value>
+    </data>
+    <data name="AvgPrice.Help.FIFO" xml:space="preserve">
+        <value>FIFO (primeiro a entrar, primeiro a sair): Segue os padrões americanos para cálculo de lucros, onde cada compra é considerada uma pilha separada e os lucros são calculados separadamente de acordo com a ordem de compra.</value>
+    </data>
+    <data name="ManageTransactions.Notes" xml:space="preserve">
+        <value>Notas</value>
+    </data>
+    <data name="ManageTransactions.Notes.Placeholder" xml:space="preserve">
+        <value>Adicione notas sobre esta transação...</value>
+    </data>
+    <data name="ManageTransactions.Properties" xml:space="preserve">
+        <value>Propriedades</value>
+    </data>
+    <data name="Transactions.Columns.Notes" xml:space="preserve">
+        <value>Notas</value>
+    </data>
+    <!-- Common Validation Messages -->
+    <data name="Validation.NameRequired" xml:space="preserve">
+        <value>Nome é obrigatório</value>
+    </data>
+    <data name="Validation.CategoryRequired" xml:space="preserve">
+        <value>Categoria é obrigatória</value>
+    </data>
+    <data name="Validation.DateRequired" xml:space="preserve">
+        <value>Data é obrigatória</value>
+    </data>
+    <data name="Validation.ValueRequired" xml:space="preserve">
+        <value>Valor é obrigatório</value>
+    </data>
+    <data name="Validation.IconRequired" xml:space="preserve">
+        <value>Ícone é obrigatório</value>
+    </data>
+    <data name="Validation.StartDateRequired" xml:space="preserve">
+        <value>Data de início é obrigatória</value>
+    </data>
+    <data name="Validation.NewNameRequired" xml:space="preserve">
+        <value>Novo nome é obrigatório</value>
+    </data>
+    <!-- Account Validation Messages -->
+    <data name="Validation.AccountNameRequired" xml:space="preserve">
+        <value>Informe um nome de conta válido</value>
+    </data>
+    <data name="Validation.OriginAccountRequired" xml:space="preserve">
+        <value>Conta de origem é obrigatória</value>
+    </data>
+    <data name="Validation.DestinationAccountRequired" xml:space="preserve">
+        <value>Conta de destino é obrigatória</value>
+    </data>
+    <!-- Password Validation Messages -->
+    <data name="Validation.PasswordRequired" xml:space="preserve">
+        <value>Senha é obrigatória</value>
+    </data>
+    <data name="Validation.OldPasswordRequired" xml:space="preserve">
+        <value>Senha antiga é obrigatória</value>
+    </data>
+    <data name="Validation.PasswordMinLength" xml:space="preserve">
+        <value>A senha deve ter pelo menos 6 caracteres</value>
+    </data>
+    <data name="Validation.OldPasswordMinLength" xml:space="preserve">
+        <value>A senha antiga deve ter pelo menos 6 caracteres</value>
+    </data>
+    <data name="Validation.PasswordsDoNotMatch" xml:space="preserve">
+        <value>As senhas não coincidem</value>
+    </data>
+    <!-- AvgPrice Validation Messages -->
+    <data name="Validation.QuantityRequired" xml:space="preserve">
+        <value>Quantidade é obrigatória</value>
+    </data>
+    <data name="Validation.QuantityGreaterThanZero" xml:space="preserve">
+        <value>Quantidade deve ser maior que zero</value>
+    </data>
+    <data name="Validation.AmountRequired" xml:space="preserve">
+        <value>Valor é obrigatório</value>
+    </data>
+    <data name="Validation.PrecisionRange" xml:space="preserve">
+        <value>Precisão deve estar entre 0 e 15</value>
+    </data>
+    <!-- Database Validation Messages -->
+    <data name="Validation.DatabasePathRequired" xml:space="preserve">
+        <value>Informe um caminho válido para armazenar o arquivo do banco de dados</value>
+    </data>
+    <!-- Error Dialog Titles -->
+    <data name="Error.ValidationError" xml:space="preserve">
+        <value>Erro de Validação</value>
+    </data>
+    <!-- Error Messages -->
+    <data name="Error.TransactionNotFound" xml:space="preserve">
+        <value>Transação não encontrada</value>
+    </data>
+    <data name="Error.AccountNotFound" xml:space="preserve">
+        <value>Conta não encontrada</value>
+    </data>
+    <data name="Error.FixedExpenseNotFound" xml:space="preserve">
+        <value>Despesa fixa não encontrada</value>
+    </data>
+    <data name="Error.ProfileNotFound" xml:space="preserve">
+        <value>Perfil não encontrado</value>
+    </data>
+    <data name="Error.FileNotFound" xml:space="preserve">
+        <value>O arquivo selecionado não existe</value>
+    </data>
+    <!-- Dialog Buttons -->
+    <data name="Button.Refresh" xml:space="preserve">
+        <value>Atualizar</value>
     </data>
 </root>

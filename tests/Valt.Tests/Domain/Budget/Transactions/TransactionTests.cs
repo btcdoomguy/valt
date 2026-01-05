@@ -82,4 +82,99 @@ public class TransactionTests : DatabaseTest
     }
 
     #endregion
+
+    #region Notes Tests
+
+    [Test]
+    public void Should_Create_Transaction_With_Notes()
+    {
+        // Arrange & Act
+        var transaction = new TransactionBuilder()
+            .WithCategoryId(_categoryId)
+            .WithDate(new DateOnly(2023, 1, 1))
+            .WithName("My Transaction")
+            .WithTransactionDetails(new FiatDetails(_fiatAccountId, 100m, true))
+            .WithNotes("This is a test note")
+            .BuildDomainObject();
+
+        // Assert
+        Assert.That(transaction.Notes, Is.EqualTo("This is a test note"));
+    }
+
+    [Test]
+    public void Should_Create_Transaction_Without_Notes()
+    {
+        // Arrange & Act
+        var transaction = new TransactionBuilder()
+            .WithCategoryId(_categoryId)
+            .WithDate(new DateOnly(2023, 1, 1))
+            .WithName("My Transaction")
+            .WithTransactionDetails(new FiatDetails(_fiatAccountId, 100m, true))
+            .BuildDomainObject();
+
+        // Assert
+        Assert.That(transaction.Notes, Is.Null);
+    }
+
+    [Test]
+    public void Should_Change_Notes_On_Transaction()
+    {
+        // Arrange
+        var transaction = new TransactionBuilder()
+            .WithCategoryId(_categoryId)
+            .WithDate(new DateOnly(2023, 1, 1))
+            .WithName("My Transaction")
+            .WithTransactionDetails(new FiatDetails(_fiatAccountId, 100m, true))
+            .WithNotes("Original note")
+            .BuildDomainObject();
+
+        // Act
+        transaction.ChangeNotes("Updated note");
+
+        // Assert
+        Assert.That(transaction.Notes, Is.EqualTo("Updated note"));
+    }
+
+    [Test]
+    public void Should_Clear_Notes_When_Setting_To_Null()
+    {
+        // Arrange
+        var transaction = new TransactionBuilder()
+            .WithCategoryId(_categoryId)
+            .WithDate(new DateOnly(2023, 1, 1))
+            .WithName("My Transaction")
+            .WithTransactionDetails(new FiatDetails(_fiatAccountId, 100m, true))
+            .WithNotes("Original note")
+            .BuildDomainObject();
+
+        // Act
+        transaction.ChangeNotes(null);
+
+        // Assert
+        Assert.That(transaction.Notes, Is.Null);
+    }
+
+    [Test]
+    public void Should_Not_Emit_Event_When_Notes_Not_Changed()
+    {
+        // Arrange
+        var transaction = new TransactionBuilder()
+            .WithCategoryId(_categoryId)
+            .WithDate(new DateOnly(2023, 1, 1))
+            .WithName("My Transaction")
+            .WithTransactionDetails(new FiatDetails(_fiatAccountId, 100m, true))
+            .WithNotes("Same note")
+            .WithVersion(1) // Set version > 0 to avoid creation event
+            .BuildDomainObject();
+
+        transaction.ClearEvents(); // Clear any existing events
+
+        // Act
+        transaction.ChangeNotes("Same note");
+
+        // Assert
+        Assert.That(transaction.Events, Is.Empty);
+    }
+
+    #endregion
 }

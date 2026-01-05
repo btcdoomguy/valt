@@ -18,6 +18,7 @@ using Valt.Infra.Modules.Budget.Accounts.Queries;
 using Valt.Infra.Modules.Budget.Accounts.Queries.DTOs;
 using Valt.Infra.Modules.Budget.Categories.Queries;
 using Valt.Infra.Modules.Budget.Categories.Queries.DTOs;
+using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
 using Valt.UI.Base;
@@ -34,6 +35,7 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
     private readonly ICategoryQueries _categoryQueries;
     private readonly DisplaySettings _displaySettings;
     private readonly ITransactionTermService _transactionTermService;
+    private readonly ConfigurationManager? _configurationManager;
 
     public AvaloniaList<CategoryDTO> AvailableCategories { get; set; } = new();
     public AvaloniaList<AccountDTO> AvailableAccounts { get; set; } = new();
@@ -43,9 +45,31 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
     [ObservableProperty] private DateOnly? _lastFixedExpenseRecordReferenceDate;
     [ObservableProperty] private FixedExpenseRange? _currentFixedExpenseRange;
 
+    // Edit mode state
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsRecurrenceInfoLocked))]
+    [NotifyPropertyChangedFor(nameof(ShowChangeRecurrenceButton))]
+    [NotifyPropertyChangedFor(nameof(ShowCancelChangeRecurrenceButton))]
+    private bool _isInChangeRecurrenceMode;
+
+    // Store original recurrence values for cancel operation
+    private string? _originalPeriod;
+    private int _originalDay;
+    private DateTime? _originalPeriodStart;
+
+    public bool IsEditing => FixedExpenseId != null;
+    public bool IsRecurrenceInfoLocked => IsEditing && !IsInChangeRecurrenceMode;
+    public bool ShowChangeRecurrenceButton => IsEditing && !IsInChangeRecurrenceMode;
+    public bool ShowCancelChangeRecurrenceButton => IsEditing && IsInChangeRecurrenceMode;
+
     #region Form Data
 
-    [ObservableProperty] private FixedExpenseId? _fixedExpenseId;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsEditing))]
+    [NotifyPropertyChangedFor(nameof(IsRecurrenceInfoLocked))]
+    [NotifyPropertyChangedFor(nameof(ShowChangeRecurrenceButton))]
+    [NotifyPropertyChangedFor(nameof(ShowCancelChangeRecurrenceButton))]
+    private FixedExpenseId? _fixedExpenseId;
 
     [Required(ErrorMessage = "Name is required")] [ObservableProperty]
     private string _name = string.Empty;
@@ -118,7 +142,8 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
         new(language.DaysOfWeek_Saturday, ((int)DayOfWeek.Saturday).ToString())
     ];
 
-    public static List<string> AvailableCurrencies => FiatCurrency.GetAll().Select(x => x.Code).ToList();
+    public List<string> AvailableCurrencies => _configurationManager?.GetAvailableFiatCurrencies()
+        ?? FiatCurrency.GetAll().Select(x => x.Code).ToList();
 
     public bool IsDefaultAccountSelectorVisible => IsAttachedToDefaultAccount;
 
@@ -138,13 +163,15 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
         IAccountQueries accountQueries,
         ICategoryQueries categoryQueries,
         DisplaySettings displaySettings,
-        ITransactionTermService transactionTermService)
+        ITransactionTermService transactionTermService,
+        ConfigurationManager configurationManager)
     {
         _fixedExpenseRepository = fixedExpenseRepository;
         _accountQueries = accountQueries;
         _categoryQueries = categoryQueries;
         _displaySettings = displaySettings;
         _transactionTermService = transactionTermService;
+        _configurationManager = configurationManager;
 
         _ = InitializeAsync();
     }
@@ -201,7 +228,7 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
 
             if (fixedExpense is null)
             {
-                await MessageBoxHelper.ShowErrorAsync("Error", "Fixed expense not found", GetWindow!());
+                await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_FixedExpenseNotFound, GetWindow!());
                 Close();
                 return;
             }
@@ -267,7 +294,7 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
         }
         catch (Exception e)
         {
-            await MessageBoxHelper.ShowErrorAsync("Error", e.Message, GetWindow!());
+            await MessageBoxHelper.ShowErrorAsync(language.Error, e.Message, GetWindow!());
             return;
         }
 
@@ -285,6 +312,35 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
     private void Close()
     {
         CloseWindow?.Invoke();
+    }
+
+    [RelayCommand]
+    private void EnterChangeRecurrenceMode()
+    {
+        // Store original values for cancel operation
+        _originalPeriod = Period;
+        _originalDay = Day;
+        _originalPeriodStart = PeriodStart;
+
+        // Set the minimum valid date for the new period start
+        // Must be after the last recorded transaction
+        if (LastFixedExpenseRecordReferenceDate.HasValue)
+        {
+            PeriodStart = LastFixedExpenseRecordReferenceDate.Value.AddDays(1).ToValtDateTime();
+        }
+
+        IsInChangeRecurrenceMode = true;
+    }
+
+    [RelayCommand]
+    private void CancelChangeRecurrenceMode()
+    {
+        // Restore original values
+        Period = _originalPeriod ?? Period;
+        Day = _originalDay;
+        PeriodStart = _originalPeriodStart;
+
+        IsInChangeRecurrenceMode = false;
     }
 
     private async Task<FixedExpense> CreateAsync()

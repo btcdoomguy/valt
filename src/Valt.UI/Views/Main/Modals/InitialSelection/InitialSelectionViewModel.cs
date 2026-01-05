@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Valt.UI.Base;
+using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.LocalStorage;
 using Valt.UI.Services.MessageBoxes;
@@ -66,7 +68,8 @@ public partial class InitialSelectionViewModel : ValtModalViewModel
             File = result.Path,
             Password = result.Password,
             IsNew = true,
-            InitialDataLanguage = result.Language
+            InitialDataLanguage = result.Language,
+            SelectedCurrencies = result.SelectedCurrencies
         });
     }
 
@@ -80,7 +83,7 @@ public partial class InitialSelectionViewModel : ValtModalViewModel
 
         if (!File.Exists(SelectedFile))
         {
-            await MessageBoxHelper.ShowErrorAsync("Error", "The selected file does not exist.", thisWindow);
+            await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_FileNotFound, thisWindow);
             RecentFiles.Remove(SelectedFile);
             await _localStorageService!.ChangeRecentFilesAsync(RecentFiles);
             return;
@@ -176,5 +179,6 @@ public partial class InitialSelectionViewModel : ValtModalViewModel
         public string Password { get; init; } = string.Empty;
         public bool IsNew { get; init; }
         public string? InitialDataLanguage { get; init; }
+        public List<string>? SelectedCurrencies { get; init; }
     }
 }

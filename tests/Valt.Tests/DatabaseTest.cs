@@ -40,7 +40,7 @@ public abstract class DatabaseTest
     {
         _domainEventPublisher = Substitute.For<IDomainEventPublisher>();
 
-        _transactionRepository = new TransactionRepository(_localDatabase, _domainEventPublisher);
+        _transactionRepository = new TransactionRepository(_localDatabase, _priceDatabase, _domainEventPublisher);
         _categoryRepository = new CategoryRepository(_localDatabase);
         _accountRepository = new AccountRepository(_localDatabase, _domainEventPublisher);
     }

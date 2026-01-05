@@ -7,7 +7,8 @@
     <converters:EnumEqualityConverter x:Key="EnumEqualityConverter" />
     <converters:AvgPriceLineTypeConverter x:Key="AvgPriceLineTypeConverter" />
 
-    <FontFamily x:Key="Akko">/Assets/Fonts/AkkoPro-Regular.ttf#Akko Pro</FontFamily>
+    <FontFamily x:Key="GeistMono">/Assets/Fonts/GeistMono-Regular.ttf#Geist Mono</FontFamily>
+    <FontFamily x:Key="Geist">/Assets/Fonts/Geist-Regular.ttf#Geist</FontFamily>
     <FontFamily x:Key="Phosphor">/Assets/Fonts/Phosphor.ttf#Phosphor</FontFamily>
     <FontFamily x:Key="Phosphor-Fill">/Assets/Fonts/Phosphor-Fill.ttf#Phosphor-Fill</FontFamily>
     <FontFamily x:Key="MaterialDesign">/Assets/Fonts/MaterialSymbolsOutlined.ttf#Material Symbols Outlined Thin</FontFamily>

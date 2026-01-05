@@ -2,6 +2,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Collections;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Valt.Infra.Kernel.BackgroundJobs;
 using Valt.UI.Base;
 
@@ -11,7 +13,10 @@ public partial class StatusDisplayViewModel : ValtModalViewModel
 {
     private readonly BackgroundJobManager _jobManager;
     public AvaloniaList<JobInfo> Jobs { get; set; }
-    
+
+    [ObservableProperty]
+    private JobInfo? _selectedJob;
+
     public StatusDisplayViewModel()
     {
         Jobs = [
@@ -21,11 +26,25 @@ public partial class StatusDisplayViewModel : ValtModalViewModel
             new JobInfo(new FooBackgroundJob("Job 4", "Job4")),
         ];
     }
-    
+
     public StatusDisplayViewModel(BackgroundJobManager jobManager)
     {
         _jobManager = jobManager;
         Jobs = new AvaloniaList<JobInfo>(_jobManager.GetJobInfos());
+    }
+
+    [RelayCommand]
+    private void OpenJobLog(JobInfo? jobInfo)
+    {
+        if (jobInfo == null)
+            return;
+
+        var logViewer = new JobLogViewerView
+        {
+            DataContext = new JobLogViewerViewModel(jobInfo)
+        };
+
+        logViewer.ShowDialog(GetWindow());
     }
 
     public class FooBackgroundJob : IBackgroundJob

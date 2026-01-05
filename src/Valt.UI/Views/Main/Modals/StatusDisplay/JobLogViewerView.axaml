@@ -1,0 +1,52 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        xmlns:statusDisplay="clr-namespace:Valt.UI.Views.Main.Modals.StatusDisplay"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Views.Main.Modals.StatusDisplay.JobLogViewerView"
+        Title="{Binding Title}"
+        d:DesignWidth="800"
+        d:DesignHeight="500"
+        Width="800"
+        Height="500"
+        MinWidth="600"
+        MinHeight="400"
+        x:DataType="statusDisplay:JobLogViewerViewModel"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <statusDisplay:JobLogViewerViewModel />
+    </Design.DataContext>
+    <Border>
+        <Grid RowDefinitions="Auto, *, Auto">
+            <userControls:CustomTitleBar Grid.Row="0" Title="{Binding Title}" TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+
+            <Border Grid.Row="1" Classes="form-fields-area" Margin="10">
+                <TextBox Text="{Binding LogContent}"
+                         IsReadOnly="True"
+                         AcceptsReturn="True"
+                         TextWrapping="NoWrap"
+                         FontFamily="Consolas, Courier New, monospace"
+                         FontSize="12"
+                         VerticalContentAlignment="Top"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         ScrollViewer.HorizontalScrollBarVisibility="Auto" />
+            </Border>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10, 0, 10, 10" Spacing="10">
+                <Button Content="{x:Static local:language.JobLogViewer_ClearLog}"
+                        Command="{Binding ClearLogCommand}" />
+                <Button Content="{x:Static local:language.Button_Refresh}"
+                        Command="{Binding RefreshCommand}" />
+                <Button Classes="action-button" Content="{x:Static local:language.OkButton}"
+                        Click="CloseButton_Click" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

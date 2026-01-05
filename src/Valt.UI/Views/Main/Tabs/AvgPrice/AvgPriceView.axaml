@@ -28,7 +28,7 @@
                                   VerticalAlignment="Center"
                                   VerticalContentAlignment="Center"
                                   IsTextSearchEnabled="True"
-                                  Height="34"
+                                  Height="36"
                                   Width="220"
                                   TabIndex="0">
                             <ComboBox.ItemTemplate>
@@ -48,7 +48,7 @@
                         </ComboBox>
                         <Button Command="{Binding ManageProfilesCommand}"
                                 Content="{x:Static lang:language.AvgPrice_ManageProfiles}"
-                                Height="34"
+                                Height="36"
                                 VerticalAlignment="Center" />
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">

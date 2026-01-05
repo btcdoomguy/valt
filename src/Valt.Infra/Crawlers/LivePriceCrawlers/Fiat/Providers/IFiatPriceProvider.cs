@@ -5,5 +5,5 @@ namespace Valt.Infra.Crawlers.LivePriceCrawlers.Fiat.Providers;
 public interface IFiatPriceProvider
 {
     string Name { get; }
-    Task<FiatUsdPrice> GetAsync();
+    Task<FiatUsdPrice> GetAsync(IEnumerable<string> currencies);
 }
