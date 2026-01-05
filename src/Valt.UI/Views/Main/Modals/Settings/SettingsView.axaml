@@ -11,9 +11,9 @@
         Title="{x:Static local:language.Settings_Title}"
         WindowStartupLocation="CenterOwner"
         d:DesignWidth="550"
-        d:DesignHeight="640"
+        d:DesignHeight="470"
         MaxWidth="550"
-        MaxHeight="640"
+        MaxHeight="470"
         ExtendClientAreaToDecorationsHint="True"
         SystemDecorations="None"
         ExtendClientAreaTitleBarHeightHint="0">
@@ -25,73 +25,85 @@
             <userControls:CustomTitleBar Title="{x:Static local:language.Settings_Title}"
                                          TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
-            <Border Classes="form-fields-area" Height="560">
-                <StackPanel Orientation="Vertical" Spacing="15">
-                    <DockPanel>
-                        <TextBlock Width="220" TextAlignment="Right" Margin="0,0,5,0"
-                                   VerticalAlignment="Center"
-                                   Text="{x:Static local:language.Settings_MainFiatCurrency}" TextWrapping="Wrap" />
-                        <ComboBox ItemsSource="{Binding AvailableFiatCurrencies}"
-                                  DisplayMemberBinding="{Binding Text}"
-                                  SelectedValueBinding="{Binding Value}"
-                                  SelectedValue="{Binding MainFiatCurrency}" Width="200" />
-                    </DockPanel>
-                    <DockPanel>
-                        <TextBlock Width="220" TextAlignment="Right" Margin="0,5,5,0"
-                                   VerticalAlignment="Top"
-                                   Text="{x:Static local:language.Settings_Culture}" TextWrapping="Wrap" />
-                        <StackPanel Orientation="Vertical" Margin="0, 0, 0, 0">
-                            <ComboBox ItemsSource="{Binding Cultures}"
-                                      DisplayMemberBinding="{Binding Text}"
-                                      SelectedValueBinding="{Binding Value}"
-                                      SelectedValue="{Binding CurrentCulture}" Width="200" />
-
-                            <TextBlock FontStyle="Italic" Text="{x:Static local:language.Settings_RequiresRestart}" />
+            <Border Classes="form-fields-area" Height="390">
+                <TabControl>
+                    <!-- General Tab -->
+                    <TabItem Header="{x:Static local:language.Settings_Tab_General}" FontSize="16">
+                        <StackPanel Orientation="Vertical" Spacing="15" Margin="10">
+                            <DockPanel>
+                                <TextBlock Width="220" TextAlignment="Right" Margin="0,0,5,0"
+                                           VerticalAlignment="Center"
+                                           Text="{x:Static local:language.Settings_MainFiatCurrency}"
+                                           TextWrapping="Wrap" />
+                                <ComboBox ItemsSource="{Binding AvailableFiatCurrencies}"
+                                          DisplayMemberBinding="{Binding Text}"
+                                          SelectedValueBinding="{Binding Value}"
+                                          SelectedValue="{Binding MainFiatCurrency}" Width="200" />
+                            </DockPanel>
+                            <DockPanel>
+                                <TextBlock Width="220" TextAlignment="Right" Margin="0,5,5,0"
+                                           VerticalAlignment="Top"
+                                           Text="{x:Static local:language.Settings_Culture}" TextWrapping="Wrap" />
+                                <StackPanel Orientation="Vertical">
+                                    <ComboBox ItemsSource="{Binding Cultures}"
+                                              DisplayMemberBinding="{Binding Text}"
+                                              SelectedValueBinding="{Binding Value}"
+                                              SelectedValue="{Binding CurrentCulture}" Width="200" />
+                                    <TextBlock FontStyle="Italic"
+                                               Text="{x:Static local:language.Settings_RequiresRestart}" />
+                                </StackPanel>
+                            </DockPanel>
+                            <DockPanel>
+                                <TextBlock Width="220" TextAlignment="Right" Margin="0,0,5,0"
+                                           VerticalAlignment="Center"
+                                           Text="{x:Static local:language.Settings_ShowHiddenAccounts}"
+                                           TextWrapping="Wrap" />
+                                <CheckBox IsChecked="{Binding ShowHiddenAccounts}" />
+                            </DockPanel>
                         </StackPanel>
-                    </DockPanel>
-                    <DockPanel>
-                        <TextBlock Width="220" TextAlignment="Right" Margin="0,0,5,0"
-                                   VerticalAlignment="Center"
-                                   Text="{x:Static local:language.Settings_ShowHiddenAccounts}" TextWrapping="Wrap" />
-                        <CheckBox IsChecked="{Binding ShowHiddenAccounts}"></CheckBox>
-                    </DockPanel>
-                    <!-- Fiat Currencies Section -->
-                    <DockPanel>
-                        <TextBlock Width="220" TextAlignment="Right" Margin="0,5,5,0"
-                                   VerticalAlignment="Top"
-                                   Text="{x:Static local:language.Settings_FiatCurrencies}" TextWrapping="Wrap" />
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock FontStyle="Italic" FontSize="11" Margin="0,0,0,5"
+                    </TabItem>
+
+                    <!-- Currencies Tab -->
+                    <TabItem Header="{x:Static local:language.Settings_Tab_Currencies}" FontSize="16">
+                        <StackPanel Orientation="Vertical" Spacing="10" Margin="10">
+                            <TextBlock FontStyle="Italic" FontSize="11"
                                        Text="{x:Static local:language.Settings_FiatCurrencies_Info}" />
                             <userControls:CheckboxListSelector
                                 Title="{x:Static local:language.Settings_FiatCurrencies}"
                                 DisplayMemberPath="DisplayName"
-                                Height="200"
-                                MaxListHeight="200"
+                                Height="280"
+                                MaxListHeight="280"
                                 ItemsSource="{Binding AllFiatCurrencies}"
                                 SelectedItems="{Binding SelectedFiatCurrencies}" />
                         </StackPanel>
-                    </DockPanel>
-                    <Button HorizontalAlignment="Center" Classes="transparent link"
-                            Command="{Binding ClearAccountCacheCommand}"
-                            Content="{x:Static local:language.Settings_ClearAccountTotalsCache}" />
-                    <Button HorizontalAlignment="Center" Classes="transparent link"
-                            Command="{Binding ProcessTransactionTermCacheCommand}"
-                            Content="{x:Static local:language.Settings_ClearTransactionTermCache}" />
-                    <Button HorizontalAlignment="Center" Classes="transparent link"
-                            Command="{Binding ChangeDatabasePasswordCommand}"
-                            Content="{x:Static local:language.Settings_ChangeDatabasePassword}" />
-                </StackPanel>
+                    </TabItem>
+
+                    <!-- Advanced Tab -->
+                    <TabItem Header="{x:Static local:language.Settings_Tab_Advanced}" FontSize="16">
+                        <StackPanel Orientation="Vertical" Spacing="15" Margin="10"
+                                    VerticalAlignment="Center">
+                            <Button HorizontalAlignment="Center" Classes="transparent link"
+                                    Command="{Binding ClearAccountCacheCommand}"
+                                    Content="{x:Static local:language.Settings_ClearAccountTotalsCache}" />
+                            <Button HorizontalAlignment="Center" Classes="transparent link"
+                                    Command="{Binding ProcessTransactionTermCacheCommand}"
+                                    Content="{x:Static local:language.Settings_ClearTransactionTermCache}" />
+                            <Button HorizontalAlignment="Center" Classes="transparent link"
+                                    Command="{Binding ChangeDatabasePasswordCommand}"
+                                    Content="{x:Static local:language.Settings_ChangeDatabasePassword}" />
+                        </StackPanel>
+                    </TabItem>
+                </TabControl>
             </Border>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10"
-                        Margin="0, 0, 0, 0">
+                        Margin="0,0,0,0">
                 <Button Width="100" Content="{x:Static local:language.OkButton}" HorizontalContentAlignment="Center"
-                        Command="{Binding OkCommand}">
-                </Button>
+                        Command="{Binding OkCommand}"
+                        IsDefault="True" />
                 <Button Width="100" Content="{x:Static local:language.CancelButton}"
                         HorizontalContentAlignment="Center"
-                        Command="{Binding CancelCommand}">
-                </Button>
+                        Command="{Binding CancelCommand}"
+                        IsCancel="True" />
             </StackPanel>
         </StackPanel>
     </Border>

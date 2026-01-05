@@ -662,6 +662,15 @@
     <data name="Settings.RequiresRestart" xml:space="preserve">
         <value>(requires restart)</value>
     </data>
+    <data name="Settings.Tab.General" xml:space="preserve">
+        <value>General</value>
+    </data>
+    <data name="Settings.Tab.Currencies" xml:space="preserve">
+        <value>Currencies</value>
+    </data>
+    <data name="Settings.Tab.Advanced" xml:space="preserve">
+        <value>Advanced</value>
+    </data>
     <data name="Offline.Line1" xml:space="preserve">
         <value>Rates are offline.</value>
     </data>

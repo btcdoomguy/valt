@@ -1322,7 +1322,25 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Settings.RequiresRestart", resourceCulture);
             }
         }
-        
+
+        public static string Settings_Tab_General {
+            get {
+                return ResourceManager.GetString("Settings.Tab.General", resourceCulture);
+            }
+        }
+
+        public static string Settings_Tab_Currencies {
+            get {
+                return ResourceManager.GetString("Settings.Tab.Currencies", resourceCulture);
+            }
+        }
+
+        public static string Settings_Tab_Advanced {
+            get {
+                return ResourceManager.GetString("Settings.Tab.Advanced", resourceCulture);
+            }
+        }
+
         public static string Offline_Line1 {
             get {
                 return ResourceManager.GetString("Offline.Line1", resourceCulture);
