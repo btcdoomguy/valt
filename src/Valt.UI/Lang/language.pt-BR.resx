@@ -628,7 +628,7 @@
         <value>Sobre</value>
     </data>
     <data name="About.Tip" xml:space="preserve">
-        <value>Se você gosta do app, me manda uns sats:</value>
+        <value>Se você gosta do app, me mande uns sats pra pagar as contas:</value>
     </data>
     <data name="Settings.RequiresRestart" xml:space="preserve">
         <value>(requer reinicialização)</value>
