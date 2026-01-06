@@ -1,0 +1,135 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:lang="clr-namespace:Valt.UI.Lang"
+        xmlns:fixedExpenseHistory="clr-namespace:Valt.UI.Views.Main.Modals.FixedExpenseHistory"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Views.Main.Modals.FixedExpenseHistory.FixedExpenseHistoryView"
+        Title="{Binding FixedExpenseName}"
+        x:DataType="fixedExpenseHistory:FixedExpenseHistoryViewModel"
+        d:DesignWidth="1000"
+        d:DesignHeight="700"
+        Width="1000"
+        Height="700"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <fixedExpenseHistory:FixedExpenseHistoryViewModel />
+    </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" />
+    </Window.KeyBindings>
+    <Border>
+        <Grid RowDefinitions="Auto, *, Auto">
+            <userControls:CustomTitleBar Grid.Row="0" Title="{Binding FixedExpenseName}"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+
+            <Grid Grid.Row="1" RowDefinitions="Auto, *, Auto, *" Margin="10">
+                <!-- Transactions Section -->
+                <TextBlock Grid.Row="0"
+                           Text="{x:Static lang:language.FixedExpenseHistory_Transactions}"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           Margin="0,0,0,5" />
+
+                <DataGrid Grid.Row="1"
+                          x:Name="TransactionsGrid"
+                          Margin="0,0,0,10"
+                          GridLinesVisibility="All"
+                          ItemsSource="{Binding Transactions}"
+                          SelectionMode="Single"
+                          CanUserResizeColumns="True"
+                          IsReadOnly="True"
+                          SelectedItem="{Binding SelectedTransaction}"
+                          DoubleTapped="TransactionsGrid_OnDoubleTapped">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{x:Static lang:language.Transactions_Columns_Date}" Width="90"
+                                            Binding="{Binding Date}" />
+                        <DataGridTextColumn Header="{x:Static lang:language.Transactions_Columns_Description}" Width="*"
+                                            Binding="{Binding Name}" />
+                        <DataGridTextColumn Header="{x:Static lang:language.Transactions_Columns_Amount}" Width="120"
+                                            Binding="{Binding Amount}" />
+                        <DataGridTemplateColumn Header="{x:Static lang:language.Transactions_Columns_Category}" Width="150">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate DataType="fixedExpenseHistory:FixedExpenseHistoryViewModel+TransactionHistoryItemViewModel">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Classes="icon"
+                                            Text="{Binding CategoryIcon.Unicode}"
+                                            Foreground="{Binding CategoryIcon.Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}">
+                                        </TextBlock>
+                                        <TextBlock Classes="icon-text" Text="{Binding CategoryName}">
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="{x:Static lang:language.FixedExpenseHistory_Account}" Width="150">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate DataType="fixedExpenseHistory:FixedExpenseHistoryViewModel+TransactionHistoryItemViewModel">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Classes="icon"
+                                            Text="{Binding AccountIcon.Unicode}"
+                                            Foreground="{Binding AccountIcon.Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}">
+                                        </TextBlock>
+                                        <TextBlock Classes="icon-text" Text="{Binding AccountName}">
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="{x:Static lang:language.FixedExpenseHistory_ReferenceDate}" Width="100"
+                                            Binding="{Binding ReferenceDate}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!-- Price History Section -->
+                <TextBlock Grid.Row="2"
+                           Text="{x:Static lang:language.FixedExpenseHistory_PriceHistory}"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           Margin="0,10,0,5" />
+
+                <DataGrid Grid.Row="3"
+                          x:Name="PriceHistoryGrid"
+                          GridLinesVisibility="All"
+                          ItemsSource="{Binding PriceHistory}"
+                          SelectionMode="Single"
+                          CanUserResizeColumns="True"
+                          IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{x:Static lang:language.FixedExpenseHistory_PeriodStart}" Width="150"
+                                            Binding="{Binding PeriodStart}" />
+                        <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Amount}" Width="200"
+                                            Binding="{Binding Amount}" />
+                        <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Period}" Width="100"
+                                            Binding="{Binding Period}" />
+                        <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Day}" Width="80"
+                                            Binding="{Binding Day}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+
+            <!-- Bottom Buttons -->
+            <Border Grid.Row="2"
+                    Classes="form-fields-area"
+                    VerticalAlignment="Stretch"
+                    Margin="10"
+                    Padding="10">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="{x:Static lang:language.OkButton}"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding CloseCommand}"
+                            Classes="primary"
+                            Width="100" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

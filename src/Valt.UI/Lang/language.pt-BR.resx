@@ -1061,4 +1061,22 @@
     <data name="Button.Refresh" xml:space="preserve">
         <value>Atualizar</value>
     </data>
+    <data name="FixedExpenseHistory.Transactions" xml:space="preserve">
+        <value>Transações</value>
+    </data>
+    <data name="FixedExpenseHistory.PriceHistory" xml:space="preserve">
+        <value>Histórico de Preços</value>
+    </data>
+    <data name="FixedExpenseHistory.ReferenceDate" xml:space="preserve">
+        <value>Data Ref.</value>
+    </data>
+    <data name="FixedExpenseHistory.PeriodStart" xml:space="preserve">
+        <value>Início do Período</value>
+    </data>
+    <data name="FixedExpenseHistory.Account" xml:space="preserve">
+        <value>Conta</value>
+    </data>
+    <data name="FixedExpenseHistory.ViewHistory" xml:space="preserve">
+        <value>Ver Histórico</value>
+    </data>
 </root>

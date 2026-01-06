@@ -1090,4 +1090,22 @@
     <data name="Button.Refresh" xml:space="preserve">
         <value>Refresh</value>
     </data>
+    <data name="FixedExpenseHistory.Transactions" xml:space="preserve">
+        <value>Transactions</value>
+    </data>
+    <data name="FixedExpenseHistory.PriceHistory" xml:space="preserve">
+        <value>Price History</value>
+    </data>
+    <data name="FixedExpenseHistory.ReferenceDate" xml:space="preserve">
+        <value>Ref. Date</value>
+    </data>
+    <data name="FixedExpenseHistory.PeriodStart" xml:space="preserve">
+        <value>Period Start</value>
+    </data>
+    <data name="FixedExpenseHistory.Account" xml:space="preserve">
+        <value>Account</value>
+    </data>
+    <data name="FixedExpenseHistory.ViewHistory" xml:space="preserve">
+        <value>View History</value>
+    </data>
 </root>

@@ -2162,5 +2162,41 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Button.Refresh", resourceCulture);
             }
         }
+
+        public static string FixedExpenseHistory_Transactions {
+            get {
+                return ResourceManager.GetString("FixedExpenseHistory.Transactions", resourceCulture);
+            }
+        }
+
+        public static string FixedExpenseHistory_PriceHistory {
+            get {
+                return ResourceManager.GetString("FixedExpenseHistory.PriceHistory", resourceCulture);
+            }
+        }
+
+        public static string FixedExpenseHistory_ReferenceDate {
+            get {
+                return ResourceManager.GetString("FixedExpenseHistory.ReferenceDate", resourceCulture);
+            }
+        }
+
+        public static string FixedExpenseHistory_PeriodStart {
+            get {
+                return ResourceManager.GetString("FixedExpenseHistory.PeriodStart", resourceCulture);
+            }
+        }
+
+        public static string FixedExpenseHistory_Account {
+            get {
+                return ResourceManager.GetString("FixedExpenseHistory.Account", resourceCulture);
+            }
+        }
+
+        public static string FixedExpenseHistory_ViewHistory {
+            get {
+                return ResourceManager.GetString("FixedExpenseHistory.ViewHistory", resourceCulture);
+            }
+        }
     }
 }

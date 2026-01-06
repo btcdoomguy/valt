@@ -42,13 +42,36 @@
                     <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Name}" Width="200"
                                         Binding="{Binding Name}">
                     </DataGridTextColumn>
-                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Category}" Width="180"
-                                        Binding="{Binding Category}">
-                    </DataGridTextColumn>
-                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_DefaultAccount}"
-                                        Width="150"
-                                        Binding="{Binding DefaultAccount}">
-                    </DataGridTextColumn>
+                    <DataGridTemplateColumn Header="{x:Static lang:language.FixedExpenses_Columns_Category}" Width="180">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate DataType="manageFixedExpenses:ManageFixedExpensesViewModel+FixedExpenseListItemViewModel">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock
+                                        Classes="icon"
+                                        Text="{Binding CategoryIcon.Unicode}"
+                                        Foreground="{Binding CategoryIcon.Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}">
+                                    </TextBlock>
+                                    <TextBlock Classes="icon-text" Text="{Binding Category}">
+                                    </TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="{x:Static lang:language.FixedExpenses_Columns_DefaultAccount}" Width="150">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate DataType="manageFixedExpenses:ManageFixedExpensesViewModel+FixedExpenseListItemViewModel">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock
+                                        Classes="icon"
+                                        Text="{Binding DefaultAccountIcon.Unicode}"
+                                        Foreground="{Binding DefaultAccountIcon.Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}">
+                                    </TextBlock>
+                                    <TextBlock Classes="icon-text" Text="{Binding DefaultAccount}">
+                                    </TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Currency}" Width="100"
                                         Binding="{Binding Currency}">
                     </DataGridTextColumn>
@@ -70,6 +93,10 @@
                         <MenuItem Header="{x:Static lang:language.Transactions_Menu_Edit}"
                                   Command="{Binding EditFixedExpenseCommand}">
                         </MenuItem>
+                        <MenuItem Header="{x:Static lang:language.FixedExpenseHistory_ViewHistory}"
+                                  Command="{Binding ViewHistoryCommand}">
+                        </MenuItem>
+                        <Separator />
                         <MenuItem Header="{x:Static lang:language.Transactions_Menu_Delete}"
                                   Command="{Binding DeleteFixedExpenseCommand}">
                         </MenuItem>

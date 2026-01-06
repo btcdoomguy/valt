@@ -8,4 +8,5 @@ public interface IFixedExpenseQueries
     Task<FixedExpenseDto?> GetFixedExpenseAsync(FixedExpenseId id);
     Task<IEnumerable<FixedExpenseDto>> GetFixedExpensesAsync();
     Task<FixedExpenseNamesDTO> GetFixedExpenseNamesAsync(FixedExpenseId? current = null);
+    Task<FixedExpenseHistoryDto?> GetFixedExpenseHistoryAsync(FixedExpenseId id);
 }

@@ -51,8 +51,89 @@ public class FixedExpenseQueries(ILocalDatabase localDatabase) : IFixedExpenseQu
         return Task.FromResult(dto);
     }
 
+    public Task<FixedExpenseHistoryDto?> GetFixedExpenseHistoryAsync(FixedExpenseId id)
+    {
+        var fixedExpenseObjectId = new ObjectId(id);
+        var fixedExpense = localDatabase.GetFixedExpenses().FindById(fixedExpenseObjectId);
+
+        if (fixedExpense is null)
+            return Task.FromResult<FixedExpenseHistoryDto?>(null);
+
+        var account = fixedExpense.DefaultAccountId is not null
+            ? localDatabase.GetAccounts().FindById(fixedExpense.DefaultAccountId)
+            : null;
+
+        var displayCurrency = fixedExpense.Currency ?? account?.Currency ?? "USD";
+
+        // Get all records with transactions for this fixed expense
+        var records = localDatabase.GetFixedExpenseRecords()
+            .Include(x => x.Transaction)
+            .Find(x => x.FixedExpense.Id == fixedExpenseObjectId && x.Transaction != null)
+            .ToList();
+
+        var allAccounts = localDatabase.GetAccounts().FindAll().ToList();
+        var allCategories = localDatabase.GetCategories().FindAll().ToList();
+
+        var transactionItems = records
+            .OrderByDescending(x => x.Transaction!.Date)
+            .Select(record =>
+            {
+                var transaction = record.Transaction!;
+                var transactionAccount = allAccounts.SingleOrDefault(a => a.Id == transaction.FromAccountId);
+                var category = allCategories.SingleOrDefault(c => c.Id == transaction.CategoryId);
+
+                var amount = transaction.FromFiatAmount is not null
+                    ? CurrencyDisplay.FormatFiat(transaction.FromFiatAmount.Value, transactionAccount?.Currency ?? displayCurrency)
+                    : transaction.FromSatAmount is not null
+                        ? CurrencyDisplay.FormatSatsAsBitcoin(transaction.FromSatAmount.Value)
+                        : string.Empty;
+
+                return new TransactionHistoryItemDto
+                {
+                    TransactionId = transaction.Id.ToString(),
+                    Date = DateOnly.FromDateTime(transaction.Date),
+                    Name = transaction.Name,
+                    Amount = amount,
+                    CategoryName = category?.Name ?? string.Empty,
+                    CategoryIcon = category?.Icon,
+                    AccountName = transactionAccount?.Name ?? string.Empty,
+                    AccountIcon = transactionAccount?.Icon,
+                    ReferenceDate = DateOnly.FromDateTime(record.ReferenceDate)
+                };
+            })
+            .ToList();
+
+        var priceHistoryItems = fixedExpense.Ranges
+            .OrderByDescending(x => x.PeriodStart)
+            .Select(range =>
+            {
+                var amount = range.FixedAmount is not null
+                    ? CurrencyDisplay.FormatFiat(range.FixedAmount.Value, displayCurrency)
+                    : $"{CurrencyDisplay.FormatFiat(range.RangedAmountMin!.Value, displayCurrency)} - {CurrencyDisplay.FormatFiat(range.RangedAmountMax!.Value, displayCurrency)}";
+
+                return new PriceHistoryItemDto
+                {
+                    PeriodStart = DateOnly.FromDateTime(range.PeriodStart),
+                    Amount = amount,
+                    Period = range.Period.ToString(),
+                    Day = range.Day
+                };
+            })
+            .ToList();
+
+        var dto = new FixedExpenseHistoryDto
+        {
+            FixedExpenseId = fixedExpense.Id.ToString(),
+            FixedExpenseName = fixedExpense.Name,
+            Transactions = transactionItems,
+            PriceHistory = priceHistoryItems
+        };
+
+        return Task.FromResult<FixedExpenseHistoryDto?>(dto);
+    }
+
     private static FixedExpenseDto ConvertToDto(FixedExpenseEntity fixedExpense, AccountEntity? account,
-        CategoryEntity category)
+        CategoryEntity? category)
     {
         var displayCurrency = fixedExpense.Currency ??
                               account?.Currency;
@@ -86,7 +167,9 @@ public class FixedExpenseQueries(ILocalDatabase localDatabase) : IFixedExpenseQu
                 PeriodStart = DateOnly.FromDateTime(range.PeriodStart)
             }).OrderBy(x => x.PeriodStart).ToHashSet(),
             CategoryName = category?.Name,
+            CategoryIcon = category?.Icon,
             DefaultAccountName = account?.Name,
+            DefaultAccountIcon = account?.Icon,
         };
     }
 }
