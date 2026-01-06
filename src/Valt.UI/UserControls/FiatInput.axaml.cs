@@ -224,6 +224,14 @@ public partial class FiatInput : UserControl
     private void OnKeyDown(object? sender, KeyEventArgs e)
     {
         var sourceText = e.Source as TextBox;
+
+        // Allow Ctrl+C (copy) and Ctrl+V (paste)
+        if (e.KeyModifiers.HasFlag(KeyModifiers.Control) && (e.Key == Key.C || e.Key == Key.V))
+        {
+            e.Handled = false;
+            return;
+        }
+
         switch (e.Key)
         {
             case Key.Back:
@@ -244,7 +252,7 @@ public partial class FiatInput : UserControl
                 break;
             }
             case Key.Tab or Key.Escape or Key.Left or Key.Right:
-                e.Handled = false; // Allow tab navigation
+                e.Handled = false; // Allow tab and shift+tab navigation
                 break;
             case >= Key.D0 and <= Key.D9:
             // Allow numeric keys

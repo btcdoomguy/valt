@@ -448,10 +448,11 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
             return;
         }
 
+        Date = transaction.Date.ToValtDateTime();
         if (!request.CopyTransaction)
         {
             _transactionId = transaction.Id;
-            Date = transaction.Date.ToValtDateTime();
+
             WindowTitle = language.ManageTransactions_EditTitle;
             if (transaction.FixedExpenseReference is not null)
             {
