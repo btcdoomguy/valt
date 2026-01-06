@@ -44,6 +44,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly IClock _clock;
     private readonly ILogger<ReportsViewModel> _logger;
     private readonly AccountsTotalState _accountsTotalState;
+    private readonly RatesState _ratesState;
 
     private const long TotalBtcSupplySats = 21_000_000_00_000_000L; // 21 million BTC in sats
 
@@ -87,7 +88,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         ILocalDatabase localDatabase,
         IClock clock,
         ILogger<ReportsViewModel> logger,
-        AccountsTotalState accountsTotalState)
+        AccountsTotalState accountsTotalState,
+        RatesState ratesState)
     {
         _allTimeHighReport = allTimeHighReport;
         _monthlyTotalsReport = monthlyTotalsReport;
@@ -99,6 +101,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _clock = clock;
         _logger = logger;
         _accountsTotalState = accountsTotalState;
+        _ratesState = ratesState;
 
         FilterMainDate = CategoryFilterMainDate = _clock.GetCurrentDateTimeUtc();
         FilterRange = new DateRange(new DateTime(FilterMainDate.Year, 1, 1), new DateTime(FilterMainDate.Year, 12, 31));
@@ -322,9 +325,18 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             var rows = new ObservableCollection<RowItem>
             {
                 new(language.Reports_Statistics_MedianExpenses,
-                    $"{CurrencyDisplay.FormatFiat(statisticsData.MedianMonthlyExpenses, fiatCurrency.Code)}"),
-                new(language.Reports_Statistics_WealthCoverage, statisticsData.WealthCoverageFormatted)
+                    $"{CurrencyDisplay.FormatFiat(statisticsData.MedianMonthlyExpenses, fiatCurrency.Code)}")
             };
+
+            // Add expenses in sats if we have valid rate data
+            var expensesInSats = ConvertFiatToSats(statisticsData.MedianMonthlyExpenses, fiatCurrency);
+            if (expensesInSats.HasValue)
+            {
+                var satsFormatted = expensesInSats.Value.ToString("N0", CultureInfo.CurrentCulture) + " sats";
+                rows.Add(new RowItem(language.Reports_Statistics_MedianExpensesSats, satsFormatted));
+            }
+
+            rows.Add(new RowItem(language.Reports_Statistics_WealthCoverage, statisticsData.WealthCoverageFormatted));
 
             StatisticsData = new DashboardData(language.Reports_Statistics_Title, rows);
 
@@ -338,6 +350,37 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         {
             IsStatisticsLoading = false;
         }
+    }
+
+    private long? ConvertFiatToSats(decimal fiatValue, FiatCurrency fiatCurrency)
+    {
+        var bitcoinPriceUsd = _ratesState.BitcoinPrice;
+        var fiatRates = _ratesState.FiatRates;
+
+        if (bitcoinPriceUsd is null or 0 || fiatRates is null)
+            return null;
+
+        // Convert fiat value to USD
+        decimal valueInUsd;
+        if (fiatCurrency.Code == FiatCurrency.Usd.Code)
+        {
+            valueInUsd = fiatValue;
+        }
+        else if (fiatRates.TryGetValue(fiatCurrency.Code, out var rate) && rate != 0)
+        {
+            // fiatRates contains the rate of each currency relative to USD (e.g., BRL rate = 5.0 means 1 USD = 5 BRL)
+            valueInUsd = fiatValue / rate;
+        }
+        else
+        {
+            return null;
+        }
+
+        // Convert USD to BTC then to sats
+        var btcValue = valueInUsd / bitcoinPriceUsd.Value;
+        var sats = (long)(btcValue * 100_000_000m);
+
+        return sats;
     }
 
     private void UpdateBtcStackData()

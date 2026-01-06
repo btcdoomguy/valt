@@ -740,6 +740,9 @@
     <data name="Reports.Statistics.MedianExpenses" xml:space="preserve">
         <value>Median expenses (12mo)</value>
     </data>
+    <data name="Reports.Statistics.MedianExpensesSats" xml:space="preserve">
+        <value>Expenses as sats</value>
+    </data>
     <data name="Reports.Statistics.WealthCoverage" xml:space="preserve">
         <value>Wealth coverage</value>
     </data>

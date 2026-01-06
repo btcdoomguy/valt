@@ -1479,6 +1479,12 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string Reports_Statistics_MedianExpensesSats {
+            get {
+                return ResourceManager.GetString("Reports.Statistics.MedianExpensesSats", resourceCulture);
+            }
+        }
+
         public static string Reports_Statistics_WealthCoverage {
             get {
                 return ResourceManager.GetString("Reports.Statistics.WealthCoverage", resourceCulture);
