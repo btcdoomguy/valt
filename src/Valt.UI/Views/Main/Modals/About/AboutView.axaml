@@ -25,8 +25,8 @@
                                          TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
             <Grid Margin="20" RowDefinitions="200, *">
-                <Grid Grid.Row="0" ColumnDefinitions="128, *">
-                    <Image Grid.Column="0" Source="/Assets/valt-logo.png" Width="128" Height="138" />
+                <Grid Grid.Row="0" ColumnDefinitions="180, *">
+                    <Image Grid.Column="0" Source="/Assets/valt-logo.png" Width="165" Height="176" />
                     <TextBlock Margin="20, 0, 0, 0" Grid.Column="1" FontSize="12" TextWrapping="Wrap">
                         <TextBlock Text="VALT" FontSize="48"></TextBlock>
                         <TextBlock Text="{Binding AppVersion}" FontSize="12" Margin="0, -24, 0, 0" />

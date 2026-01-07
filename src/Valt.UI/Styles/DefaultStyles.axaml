@@ -552,7 +552,6 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid Name="PART_ColumnHeaderRoot"
-                      ColumnDefinitions="*,Auto"
                       Background="{TemplateBinding Background}">
                     <!-- Content area - no reserved sort icon space -->
                     <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -561,18 +560,18 @@
                         <ContentPresenter Content="{TemplateBinding Content}"
                                           ContentTemplate="{TemplateBinding ContentTemplate}" />
                     </Grid>
-                    <!-- Column separator -->
+                    <!-- Column separator - overlaid at right edge -->
                     <Rectangle Name="VerticalSeparator"
-                               Grid.Column="1"
                                Width="1"
+                               HorizontalAlignment="Right"
                                VerticalAlignment="Stretch"
                                Fill="{TemplateBinding SeparatorBrush}"
                                IsVisible="{TemplateBinding AreSeparatorsVisible}" />
-                    <!-- Resize gripper -->
+                    <!-- Resize gripper - overlaid at right edge -->
                     <Thumb Name="PART_ResizeGripper"
-                           Grid.Column="1"
                            Width="8"
-                           Margin="-4,0,0,0"
+                           HorizontalAlignment="Right"
+                           Margin="0,0,-4,0"
                            Background="Transparent"
                            Cursor="SizeWestEast"
                            IsVisible="{Binding $parent[DataGrid].CanUserResizeColumns}" />
