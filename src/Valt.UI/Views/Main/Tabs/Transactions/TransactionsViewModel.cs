@@ -33,6 +33,7 @@ using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
 using Valt.UI.State;
 using Valt.UI.Views.Main.Modals.ManageAccount;
+using Valt.UI.Views.Main.Modals.FixedExpenseEditor;
 using Valt.UI.Views.Main.Modals.ManageFixedExpenses;
 using Valt.UI.Views.Main.Modals.TransactionEditor;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
@@ -402,6 +403,26 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
         await _accountDisplayOrderManager!.NormalizeDisplayOrdersAsync(null);
         await FetchAccounts();
+        await FetchFixedExpenses();
+    }
+
+    [RelayCommand]
+    private async Task EditFixedExpense(FixedExpensesEntryViewModel? entry)
+    {
+        if (entry is null)
+            return;
+
+        var ownerWindow = GetUserControlOwnerWindow!();
+
+        var window = (FixedExpenseEditorView)await _modalFactory!.CreateAsync(
+            ApplicationModalNames.FixedExpenseEditor,
+            ownerWindow, new FixedExpenseEditorViewModel.Request()
+            {
+                FixedExpenseId = entry.Id
+            })!;
+
+        _ = await window.ShowDialog<FixedExpenseEditorViewModel.Response?>(ownerWindow!);
+
         await FetchFixedExpenses();
     }
 

@@ -6,6 +6,7 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Valt.Core.Common;
 using Valt.Core.Modules.Budget.FixedExpenses;
 using Valt.Core.Modules.Budget.FixedExpenses.Contracts;
 using Valt.Core.Modules.Budget.Transactions.Contracts;
@@ -21,6 +22,7 @@ using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
 using Valt.UI.State;
 using Valt.UI.Views.Main.Modals.FixedExpenseEditor;
+using Valt.UI.Views.Main.Modals.FixedExpenseHistory;
 
 namespace Valt.UI.Views.Main.Modals.ManageFixedExpenses;
 
@@ -51,7 +53,9 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
             Id = "1",
             Name = "Rent",
             Category = "House",
+            CategoryIcon = Icon.Empty,
             DefaultAccount = "Main Account 1",
+            DefaultAccountIcon = Icon.Empty,
             Amount = "$ 1000.00",
             Period = "Monthly",
             Day = "5",
@@ -95,7 +99,13 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
                 Id = fixedExpenseDTO.Id,
                 Name = fixedExpenseDTO.Name,
                 Category = fixedExpenseDTO.CategoryName ?? string.Empty,
+                CategoryIcon = fixedExpenseDTO.CategoryIcon is not null
+                    ? Icon.RestoreFromId(fixedExpenseDTO.CategoryIcon)
+                    : Icon.Empty,
                 DefaultAccount = fixedExpenseDTO.DefaultAccountName ?? string.Empty,
+                DefaultAccountIcon = fixedExpenseDTO.DefaultAccountIcon is not null
+                    ? Icon.RestoreFromId(fixedExpenseDTO.DefaultAccountIcon)
+                    : Icon.Empty,
                 Currency = fixedExpenseDTO.Currency ?? string.Empty,
                 Amount = fixedExpenseDTO.LatestRange.FixedAmount is not null
                     ? fixedExpenseDTO.LatestRange.FixedAmountFormatted!
@@ -183,6 +193,21 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
     }
 
     [RelayCommand]
+    private async Task ViewHistory()
+    {
+        if (SelectedFixedExpense is null)
+            return;
+
+        var window = (FixedExpenseHistoryView)await _modalFactory.CreateAsync(ApplicationModalNames.FixedExpenseHistory,
+            OwnerWindow, new FixedExpenseHistoryViewModel.Request
+            {
+                FixedExpenseId = SelectedFixedExpense.Id
+            })!;
+
+        _ = await window.ShowDialog<object?>(OwnerWindow!);
+    }
+
+    [RelayCommand]
     private async Task DeleteFixedExpense()
     {
         if (SelectedFixedExpense is null)
@@ -216,7 +241,9 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
         public string Id { get; set; }
         public string Name { get; set; }
         public string Category { get; set; }
+        public Icon CategoryIcon { get; set; }
         public string DefaultAccount { get; set; }
+        public Icon DefaultAccountIcon { get; set; }
         public string Currency { get; set; }
         public string Amount { get; set; }
         public string Period { get; set; }

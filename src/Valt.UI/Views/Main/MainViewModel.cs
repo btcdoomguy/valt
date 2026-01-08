@@ -28,6 +28,7 @@ using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
 using Valt.UI.State;
 using Valt.UI.State.Events;
+using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Controls;
 using Valt.UI.Views.Main.Modals.About;
 using Valt.UI.Views.Main.Modals.InitialSelection;
@@ -48,6 +49,7 @@ public partial class MainViewModel : ValtViewModel
     private readonly BackgroundJobManager? _backgroundJobManager;
     private readonly IDatabaseInitializer? _databaseInitializer;
     private readonly LiveRatesViewModel _liveRatesViewModel;
+    private readonly UpdateIndicatorViewModel _updateIndicatorViewModel;
     private readonly IAllTimeHighReport _allTimeHighReport;
     private readonly IClock _clock;
     private readonly ILogger<MainViewModel> _logger;
@@ -93,6 +95,7 @@ public partial class MainViewModel : ValtViewModel
     [ObservableProperty] private bool _isOffline;
 
     public LiveRatesViewModel LiveRatesViewModel => _liveRatesViewModel;
+    public UpdateIndicatorViewModel UpdateIndicator => _updateIndicatorViewModel;
     public AvaloniaList<JobInfo> Jobs { get; set; }
 
     #region Event subscribers
@@ -112,6 +115,7 @@ public partial class MainViewModel : ValtViewModel
         _pageFactory = new DesignTimePageFactory();
         _modalFactory = new DesignTimeModalFactory();
         _currencySettings = new CurrencySettings(_localDatabase);
+        _updateIndicatorViewModel = new UpdateIndicatorViewModel();
 
         HasDatabaseOpen = true;
         _currencySettings.MainFiatCurrency = FiatCurrency.Brl.Code;
@@ -127,6 +131,7 @@ public partial class MainViewModel : ValtViewModel
         BackgroundJobManager backgroundJobManager,
         IDatabaseInitializer databaseInitializer,
         LiveRatesViewModel liveRatesViewModel,
+        UpdateIndicatorViewModel updateIndicatorViewModel,
         LiveRateState liveRateState,
         IAllTimeHighReport allTimeHighReport,
         IClock clock,
@@ -140,6 +145,7 @@ public partial class MainViewModel : ValtViewModel
         _backgroundJobManager = backgroundJobManager;
         _databaseInitializer = databaseInitializer;
         _liveRatesViewModel = liveRatesViewModel;
+        _updateIndicatorViewModel = updateIndicatorViewModel;
         _allTimeHighReport = allTimeHighReport;
         _clock = clock;
         _logger = logger;
@@ -270,12 +276,28 @@ public partial class MainViewModel : ValtViewModel
 
             openedFile = true;
             SetTransactionsTab();
-            
+
             //this avoids some race conditions with the jobs and current UI state
             Dispatcher.UIThread.Invoke(() =>
             {
                 _backgroundJobManager!.StartAllJobs(jobType: BackgroundJobTypes.ValtDatabase);
             });
+
+            // Check for updates (fire and forget - don't block startup)
+            _ = CheckForUpdatesAsync();
+        }
+    }
+
+    private async Task CheckForUpdatesAsync()
+    {
+        try
+        {
+            _updateIndicatorViewModel.SetOwnerWindow(Window!);
+            await _updateIndicatorViewModel.CheckForUpdateAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to check for updates");
         }
     }
 

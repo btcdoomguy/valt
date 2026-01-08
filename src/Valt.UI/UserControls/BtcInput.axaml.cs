@@ -172,7 +172,15 @@ public partial class BtcInput : UserControl
         if (textBox is null)
             return;
 
+        // Allow Tab and Shift+Tab for navigation
         if (e.Key == Key.Tab)
+        {
+            e.Handled = false;
+            return;
+        }
+
+        // Allow Ctrl+C (copy) and Ctrl+V (paste)
+        if (e.KeyModifiers.HasFlag(KeyModifiers.Control) && (e.Key == Key.C || e.Key == Key.V))
         {
             e.Handled = false;
             return;

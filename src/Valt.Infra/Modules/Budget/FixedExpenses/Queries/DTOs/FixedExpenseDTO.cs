@@ -6,8 +6,10 @@ public record FixedExpenseDto
     public required string Name { get; set; }
     public string? CategoryId { get; set; }
     public string? CategoryName { get; set; }
+    public string? CategoryIcon { get; set; }
     public string? DefaultAccountId { get; set; }
     public string? DefaultAccountName { get; set; }
+    public string? DefaultAccountIcon { get; set; }
     public string? Currency { get; set; }
     public required string DisplayCurrency { get; set; }
     

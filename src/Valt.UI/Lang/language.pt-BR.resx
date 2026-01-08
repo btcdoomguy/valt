@@ -628,7 +628,7 @@
         <value>Sobre</value>
     </data>
     <data name="About.Tip" xml:space="preserve">
-        <value>Se você gosta do app, me manda uns sats:</value>
+        <value>Se você gosta do app, me mande uns sats pra pagar as contas:</value>
     </data>
     <data name="Settings.RequiresRestart" xml:space="preserve">
         <value>(requer reinicialização)</value>
@@ -692,6 +692,9 @@
     </data>
     <data name="Reports.Statistics.MedianExpenses" xml:space="preserve">
         <value>Despesas medianas (12m)</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesSats" xml:space="preserve">
+        <value>Despesas em sats</value>
     </data>
     <data name="Reports.Statistics.WealthCoverage" xml:space="preserve">
         <value>Cobertura do patrimônio</value>
@@ -1060,5 +1063,48 @@
     <!-- Dialog Buttons -->
     <data name="Button.Refresh" xml:space="preserve">
         <value>Atualizar</value>
+    </data>
+    <data name="FixedExpenseHistory.Transactions" xml:space="preserve">
+        <value>Transações</value>
+    </data>
+    <data name="FixedExpenseHistory.PriceHistory" xml:space="preserve">
+        <value>Histórico de Preços</value>
+    </data>
+    <data name="FixedExpenseHistory.ReferenceDate" xml:space="preserve">
+        <value>Data Ref.</value>
+    </data>
+    <data name="FixedExpenseHistory.PeriodStart" xml:space="preserve">
+        <value>Início do Período</value>
+    </data>
+    <data name="FixedExpenseHistory.Account" xml:space="preserve">
+        <value>Conta</value>
+    </data>
+    <data name="FixedExpenseHistory.ViewHistory" xml:space="preserve">
+        <value>Ver Histórico</value>
+    </data>
+    <!-- Update Notification -->
+    <data name="Update_Available" xml:space="preserve">
+        <value>Atualização disponível: {0}</value>
+    </data>
+    <data name="Update_NewVersionAvailable" xml:space="preserve">
+        <value>Nova versão disponível!</value>
+    </data>
+    <data name="Update_DownloadButton" xml:space="preserve">
+        <value>Baixar</value>
+    </data>
+    <data name="Update_ViewOnGitHub" xml:space="preserve">
+        <value>Ver no GitHub</value>
+    </data>
+    <data name="Update_Downloading" xml:space="preserve">
+        <value>Baixando...</value>
+    </data>
+    <data name="Update_DownloadError" xml:space="preserve">
+        <value>Falha no download. Tente novamente ou baixe do GitHub.</value>
+    </data>
+    <data name="Update_NoPlatformAsset" xml:space="preserve">
+        <value>Download não disponível para sua plataforma. Por favor, baixe do GitHub.</value>
+    </data>
+    <data name="Update_SaveDialogTitle" xml:space="preserve">
+        <value>Salvar arquivo de atualização</value>
     </data>
 </root>

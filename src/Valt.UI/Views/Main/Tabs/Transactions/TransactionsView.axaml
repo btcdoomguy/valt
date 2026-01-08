@@ -300,6 +300,12 @@
                                                 CommandParameter="{Binding .}">
                                             </MenuItem>
                                             <MenuItem
+                                                Header="{x:Static local:language.Transactions_Menu_Edit}"
+                                                Command="{Binding ((vm1:TransactionsViewModel)DataContext).EditFixedExpenseCommand, ElementName=Root}"
+                                                CommandParameter="{Binding .}">
+                                            </MenuItem>
+                                            <Separator />
+                                            <MenuItem
                                                 Header="{x:Static local:language.TransactionFixedExpenses_IgnoreForThisMonth}"
                                                 Command="{Binding ((vm1:TransactionsViewModel)DataContext).IgnoreFixedExpenseCommand, ElementName=Root}"
                                                 CommandParameter="{Binding .}"

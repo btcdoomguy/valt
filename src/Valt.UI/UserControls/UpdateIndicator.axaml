@@ -1,0 +1,120 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+             xmlns:local="clr-namespace:Valt.UI.Lang"
+             mc:Ignorable="d"
+             d:DesignWidth="250"
+             d:DesignHeight="30"
+             x:Class="Valt.UI.UserControls.UpdateIndicator"
+             x:DataType="userControls:UpdateIndicatorViewModel"
+             IsVisible="{Binding IsUpdateAvailable}">
+    <Design.DataContext>
+        <userControls:UpdateIndicatorViewModel />
+    </Design.DataContext>
+    <Button x:Name="UpdateButton"
+            Background="Transparent"
+            BorderThickness="0"
+            Padding="8,4"
+            Cursor="Hand"
+            VerticalAlignment="Center">
+        <Button.Styles>
+            <Style Selector="Button#UpdateButton:pointerover /template/ ContentPresenter">
+                <Setter Property="Background" Value="Transparent" />
+            </Style>
+            <Style Selector="Button#UpdateButton:pressed /template/ ContentPresenter">
+                <Setter Property="Background" Value="Transparent" />
+            </Style>
+        </Button.Styles>
+        <Button.Flyout>
+            <Flyout Placement="Top">
+                <Border Background="{DynamicResource Background800Brush}"
+                        BorderBrush="{DynamicResource Background600Brush}"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Padding="12"
+                        MinWidth="300"
+                        MaxWidth="400">
+                    <StackPanel Spacing="12">
+                        <!-- Header -->
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock FontFamily="{DynamicResource MaterialDesign}"
+                                       FontSize="24"
+                                       Foreground="{DynamicResource Accent300Brush}"
+                                       VerticalAlignment="Center"
+                                       Text="&#xE923;" />
+                            <StackPanel>
+                                <TextBlock Text="{x:Static local:language.Update_NewVersionAvailable}"
+                                           FontWeight="SemiBold"
+                                           FontSize="14"
+                                           Foreground="{DynamicResource Text100Brush}" />
+                                <TextBlock Text="{Binding NewVersion}"
+                                           FontSize="12"
+                                           Foreground="{DynamicResource Text300Brush}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Release Notes -->
+                        <Border Background="{DynamicResource Background900Brush}"
+                                CornerRadius="4"
+                                Padding="8"
+                                MaxHeight="200">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <TextBlock Text="{Binding ReleaseNotes}"
+                                           TextWrapping="Wrap"
+                                           FontSize="12"
+                                           Foreground="{DynamicResource Text200Brush}" />
+                            </ScrollViewer>
+                        </Border>
+
+                        <!-- Error message -->
+                        <TextBlock Text="{Binding DownloadError}"
+                                   IsVisible="{Binding DownloadError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                   Foreground="IndianRed"
+                                   FontSize="12"
+                                   TextWrapping="Wrap" />
+
+                        <!-- Progress bar -->
+                        <StackPanel IsVisible="{Binding IsDownloading}" Spacing="4">
+                            <TextBlock Text="{x:Static local:language.Update_Downloading}"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource Text300Brush}" />
+                            <ProgressBar Value="{Binding DownloadProgress}"
+                                         Minimum="0"
+                                         Maximum="100"
+                                         Height="8" />
+                        </StackPanel>
+
+                        <!-- Buttons -->
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="8"
+                                    HorizontalAlignment="Right"
+                                    IsVisible="{Binding !IsDownloading}">
+                            <Button Content="{x:Static local:language.Update_ViewOnGitHub}"
+                                    Classes="secondary"
+                                    Command="{Binding OpenGitHubCommand}"
+                                    Padding="12,6" />
+                            <Button Content="{x:Static local:language.Update_DownloadButton}"
+                                    Classes="primary"
+                                    Command="{Binding DownloadUpdateCommand}"
+                                    IsEnabled="{Binding CanDownload}"
+                                    Padding="12,6" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Flyout>
+        </Button.Flyout>
+        <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBlock FontFamily="{DynamicResource MaterialDesign}"
+                       FontSize="16"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource Accent300Brush}"
+                       Text="&#xE923;" />
+            <TextBlock Text="{Binding UpdateText}"
+                       VerticalAlignment="Center"
+                       FontSize="12"
+                       Foreground="{DynamicResource Accent200Brush}" />
+        </StackPanel>
+    </Button>
+</UserControl>

@@ -115,6 +115,7 @@ public class ExpensesByCategoryChartData : IDisposable, INotifyPropertyChanged
 
         // Create a single RowSeries with all values
         var values = sortedItems.Select(x => Convert.ToDouble(x.FiatTotal)).ToList();
+        var total = values.Sum();
         var colors = sortedItems.Select(x =>
         {
             var iconColor = x.Icon.Color;
@@ -132,6 +133,15 @@ public class ExpensesByCategoryChartData : IDisposable, INotifyPropertyChanged
                 var value = (decimal)point.Model;
                 return CurrencyDisplay.FormatFiat(value, FiatCurrency.Code);
             },
+            XToolTipLabelFormatter = point =>
+            {
+                var value = point.Model;
+                var percentage = total > 0 ? (value / total) * 100 : 0;
+                var categoryName = point.Index < sortedItems.Count ? sortedItems[point.Index].CategoryName : "";
+                var formattedValue = CurrencyDisplay.FormatFiat((decimal)value, FiatCurrency.Code);
+                return $"{percentage:F1}%";
+            },
+            YToolTipLabelFormatter = _ => null!,
             Padding = 2
         };
 

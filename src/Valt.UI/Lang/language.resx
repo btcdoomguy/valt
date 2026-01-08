@@ -666,7 +666,7 @@
         <value>About</value>
     </data>
     <data name="About.Tip" xml:space="preserve">
-        <value>If you like the app, send me some sats:</value>
+        <value>If you like the app, send me some sats to pay the bills:</value>
     </data>
     <data name="Settings.RequiresRestart" xml:space="preserve">
         <value>(requires restart)</value>
@@ -739,6 +739,9 @@
     </data>
     <data name="Reports.Statistics.MedianExpenses" xml:space="preserve">
         <value>Median expenses (12mo)</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesSats" xml:space="preserve">
+        <value>Expenses as sats</value>
     </data>
     <data name="Reports.Statistics.WealthCoverage" xml:space="preserve">
         <value>Wealth coverage</value>
@@ -1089,5 +1092,48 @@
     <!-- Dialog Buttons -->
     <data name="Button.Refresh" xml:space="preserve">
         <value>Refresh</value>
+    </data>
+    <data name="FixedExpenseHistory.Transactions" xml:space="preserve">
+        <value>Transactions</value>
+    </data>
+    <data name="FixedExpenseHistory.PriceHistory" xml:space="preserve">
+        <value>Price History</value>
+    </data>
+    <data name="FixedExpenseHistory.ReferenceDate" xml:space="preserve">
+        <value>Ref. Date</value>
+    </data>
+    <data name="FixedExpenseHistory.PeriodStart" xml:space="preserve">
+        <value>Period Start</value>
+    </data>
+    <data name="FixedExpenseHistory.Account" xml:space="preserve">
+        <value>Account</value>
+    </data>
+    <data name="FixedExpenseHistory.ViewHistory" xml:space="preserve">
+        <value>View History</value>
+    </data>
+    <!-- Update Notification -->
+    <data name="Update_Available" xml:space="preserve">
+        <value>Update available: {0}</value>
+    </data>
+    <data name="Update_NewVersionAvailable" xml:space="preserve">
+        <value>New version available!</value>
+    </data>
+    <data name="Update_DownloadButton" xml:space="preserve">
+        <value>Download</value>
+    </data>
+    <data name="Update_ViewOnGitHub" xml:space="preserve">
+        <value>View on GitHub</value>
+    </data>
+    <data name="Update_Downloading" xml:space="preserve">
+        <value>Downloading...</value>
+    </data>
+    <data name="Update_DownloadError" xml:space="preserve">
+        <value>Download failed. Please try again or download from GitHub.</value>
+    </data>
+    <data name="Update_NoPlatformAsset" xml:space="preserve">
+        <value>No download available for your platform. Please download from GitHub.</value>
+    </data>
+    <data name="Update_SaveDialogTitle" xml:space="preserve">
+        <value>Save update file</value>
     </data>
 </root>

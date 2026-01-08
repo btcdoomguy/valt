@@ -147,7 +147,11 @@
             <Grid
                 Classes="footer"
                 ColumnDefinitions="*, 200">
-                <StackPanel Grid.Column="0"></StackPanel>
+                <userControls1:UpdateIndicator Grid.Column="0"
+                                               DataContext="{Binding UpdateIndicator}"
+                                               HorizontalAlignment="Left"
+                                               VerticalAlignment="Center"
+                                               Margin="10, 0, 0, 0" />
                 <TextBlock Grid.Column="1"
                            FontSize="12"
                            HorizontalAlignment="Right"
