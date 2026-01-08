@@ -105,6 +105,9 @@ public sealed class BackgroundJobManager : IDisposable
 
 public sealed class JobInfo : INotifyPropertyChanged, IDisposable
 {
+    private const int MaxRetryAttempts = 3;
+    private static readonly TimeSpan RetryDelay = TimeSpan.FromMilliseconds(100);
+
     private readonly IBackgroundJob _job;
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly JobLogPool _logPool = new();
@@ -166,7 +169,7 @@ public sealed class JobInfo : INotifyPropertyChanged, IDisposable
             State = BackgroundJobState.Running;
             ErrorMessage = null;
 
-            await _job.RunAsync(token);
+            await RunWithRetryAsync(token);
             State = BackgroundJobState.Ok;
         }
         catch (Exception ex)
@@ -184,25 +187,25 @@ public sealed class JobInfo : INotifyPropertyChanged, IDisposable
 
     private async Task RunJobAsync(CancellationToken token = default)
     {
-        if (!await _semaphore.WaitAsync(0, token)) 
+        if (!await _semaphore.WaitAsync(0, token))
             return;
-        
+
         if (State == BackgroundJobState.Stopped)
             await _job.StartAsync(_token);
-        
+
         State = BackgroundJobState.Running;
         ErrorMessage = null;
 
         try
         {
-            await _job.RunAsync(_token);
+            await RunWithRetryAsync(_token);
             State = BackgroundJobState.Ok;
         }
         catch (Exception ex)
         {
             State = ex is OperationCanceledException ? BackgroundJobState.Stopped : // Cancelled via token
                 BackgroundJobState.Error; // Other errors
-            
+
             if (State == BackgroundJobState.Error)
                 ErrorMessage = ex.Message;
         }
@@ -210,6 +213,36 @@ public sealed class JobInfo : INotifyPropertyChanged, IDisposable
         {
             _semaphore.Release();
         }
+    }
+
+    private async Task RunWithRetryAsync(CancellationToken token)
+    {
+        Exception? lastException = null;
+
+        for (var attempt = 1; attempt <= MaxRetryAttempts; attempt++)
+        {
+            try
+            {
+                await _job.RunAsync(token);
+                return; // Success, exit retry loop
+            }
+            catch (OperationCanceledException)
+            {
+                throw; // Don't retry on cancellation
+            }
+            catch (Exception ex)
+            {
+                lastException = ex;
+
+                if (attempt < MaxRetryAttempts)
+                {
+                    await Task.Delay(RetryDelay, token);
+                }
+            }
+        }
+
+        // All retries exhausted, throw the last exception
+        throw lastException!;
     }
 
     public async Task StopAsync()

@@ -23,6 +23,7 @@ public class InitialCategoryNameLanguageProvider : IInitialCategoryNameLanguageP
             InitialCategoryNames.Entertainment => "BootDatabase.Category.Entertainment",
             InitialCategoryNames.Groceries => "BootDatabase.Category.Groceries",
             InitialCategoryNames.Paycheck => "BootDatabase.Category.Paycheck",
+            InitialCategoryNames.Housing => "BootDatabase.Category.Housing",
             _ => throw new ArgumentOutOfRangeException(nameof(categoryName), categoryName, null)
         };
 

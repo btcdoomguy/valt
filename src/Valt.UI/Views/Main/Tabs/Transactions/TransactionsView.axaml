@@ -117,7 +117,7 @@
                             <DataTemplate>
                                 <!-- Had to create a clickable area using the background transparent to proper render the contextmenu on right click otherwise clickable area doesn't work! -->
                                 <Border Padding="5" Background="Transparent">
-                                    <Grid ColumnDefinitions="60, auto">
+                                    <Grid ColumnDefinitions="60, auto" Opacity="{Binding Visible, Converter={StaticResource BoolToOpacityConverter}}">
                                         <Label
                                             Grid.Column="0"
                                             Width="48"
@@ -160,7 +160,13 @@
 
                                             <MenuItem Header="{x:Static local:language.Transactions_Hide}"
                                                       Command="{Binding ((vm1:TransactionsViewModel)DataContext).HideAccountCommand, ElementName=Root}"
-                                                      CommandParameter="{Binding .}">
+                                                      CommandParameter="{Binding .}"
+                                                      IsVisible="{Binding Visible}">
+                                            </MenuItem>
+                                            <MenuItem Header="{x:Static local:language.Transactions_Show}"
+                                                      Command="{Binding ((vm1:TransactionsViewModel)DataContext).ShowAccountCommand, ElementName=Root}"
+                                                      CommandParameter="{Binding .}"
+                                                      IsVisible="{Binding IsHidden}">
                                             </MenuItem>
                                             <MenuItem Header="{x:Static local:language.Transactions_Delete}"
                                                       Command="{Binding ((vm1:TransactionsViewModel)DataContext).DeleteAccountCommand, ElementName=Root}"

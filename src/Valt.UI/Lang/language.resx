@@ -230,6 +230,9 @@
     <data name="Transactions.Hide" xml:space="preserve">
         <value>Hide</value>
     </data>
+    <data name="Transactions.Show" xml:space="preserve">
+        <value>Show</value>
+    </data>
     <data name="Transactions.Delete" xml:space="preserve">
         <value>Delete</value>
     </data>
@@ -1135,5 +1138,8 @@
     </data>
     <data name="Update_SaveDialogTitle" xml:space="preserve">
         <value>Save update file</value>
+    </data>
+    <data name="BootDatabase.Category.Housing" xml:space="preserve">
+        <value>Housing</value>
     </data>
 </root>

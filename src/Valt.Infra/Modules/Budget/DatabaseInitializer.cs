@@ -54,7 +54,8 @@ internal class DatabaseInitializer : IDatabaseInitializer
                 new Icon("MaterialSymbolsOutlined", "directions_car", '\ue531', Color.FromArgb(-9155159))),
             Category.New(_initialCategoryNameLanguageProvider.Get(InitialCategoryNames.Travel, initialDataLanguage),
                 new Icon("MaterialSymbolsOutlined", "airlines", '\uE7CA', Color.FromArgb(-18176))),
-
+            Category.New(_initialCategoryNameLanguageProvider.Get(InitialCategoryNames.Housing, initialDataLanguage),
+                new Icon("MaterialSymbolsOutlined", "house", '\uEA44', Color.FromArgb(-3997614))),
             Category.New(_initialCategoryNameLanguageProvider.Get(InitialCategoryNames.Services, initialDataLanguage),
                 new Icon("MaterialSymbolsOutlined", "home_repair_service", '\uf100', Color.FromArgb(-8336444))),
             Category.New(_initialCategoryNameLanguageProvider.Get(InitialCategoryNames.Gadgets, initialDataLanguage),

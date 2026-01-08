@@ -13,5 +13,6 @@ public enum InitialCategoryNames
     Travel,
     Entertainment,
     Groceries,
-    Paycheck
+    Paycheck,
+    Housing
 }

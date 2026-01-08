@@ -459,6 +459,12 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string Transactions_Show {
+            get {
+                return ResourceManager.GetString("Transactions.Show", resourceCulture);
+            }
+        }
+        
         public static string Transactions_Delete {
             get {
                 return ResourceManager.GetString("Transactions.Delete", resourceCulture);
@@ -2204,52 +2210,58 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("FixedExpenseHistory.ViewHistory", resourceCulture);
             }
         }
-
+        
         public static string Update_Available {
             get {
                 return ResourceManager.GetString("Update_Available", resourceCulture);
             }
         }
-
+        
         public static string Update_NewVersionAvailable {
             get {
                 return ResourceManager.GetString("Update_NewVersionAvailable", resourceCulture);
             }
         }
-
+        
         public static string Update_DownloadButton {
             get {
                 return ResourceManager.GetString("Update_DownloadButton", resourceCulture);
             }
         }
-
+        
         public static string Update_ViewOnGitHub {
             get {
                 return ResourceManager.GetString("Update_ViewOnGitHub", resourceCulture);
             }
         }
-
+        
         public static string Update_Downloading {
             get {
                 return ResourceManager.GetString("Update_Downloading", resourceCulture);
             }
         }
-
+        
         public static string Update_DownloadError {
             get {
                 return ResourceManager.GetString("Update_DownloadError", resourceCulture);
             }
         }
-
+        
         public static string Update_NoPlatformAsset {
             get {
                 return ResourceManager.GetString("Update_NoPlatformAsset", resourceCulture);
             }
         }
-
+        
         public static string Update_SaveDialogTitle {
             get {
                 return ResourceManager.GetString("Update_SaveDialogTitle", resourceCulture);
+            }
+        }
+        
+        public static string BootDatabase_Category_Housing {
+            get {
+                return ResourceManager.GetString("BootDatabase.Category.Housing", resourceCulture);
             }
         }
     }

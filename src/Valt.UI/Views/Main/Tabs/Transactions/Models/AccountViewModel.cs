@@ -23,6 +23,8 @@ public partial class AccountViewModel : ObservableObject
 
     public Icon? RenderIcon => Icon is not null ? Core.Common.Icon.RestoreFromId(Icon) : null;
 
+    public bool IsHidden => !Visible;
+
     public AccountViewModel(string id, string type, string name, bool visible, string? icon, string? currency,
         bool isBtcAccount, decimal? fiatTotal, long? satsTotal, bool hasFutureTotal, decimal? futureFiatTotal, long? futureSatsTotal)
     {
