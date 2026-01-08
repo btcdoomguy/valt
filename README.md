@@ -23,29 +23,11 @@ Valt is a *simple and easy-to-use* budget management app designed specifically f
 
 With Valt, you can easily keep track of your finances and stay in control of your spending. You can also use it to track historical data about each bitcoin purchase or spending, getting the price of bitcoin on each historical date and checking the evolution of your wealth.
 
-## Useful Hotkeys ⌨️
-
-### Transaction Window
-- **F2**: Adds a new transaction.
-- **Ctrl + Up/Down Arrow**: Move accounts order up or down
-
-### Transaction Editor Window
-- **Ctrl + 1**: Switch to Debt.
-- **Ctrl + 2**: Switch to Credit.
-- **Ctrl + 3**: Switch to Transfer.
-- **Ctrl + Left Arrow**: Move the date to the previous day.
-- **Ctrl + Right Arrow**: Move the date to the next day.
-
-### Average Price Window
-
-- **F2**: Adds a new operation
-
 ## Roadmap 🛤️
 
 - 📊 **Cost of Living Evolution**: Visualize how your cost of living changes in fiat vs. bitcoin terms.
 - 💲 **More Fiat Currencies**: Expand support for additional fiat currencies.
 - 🎨 **Interface & UX Improvements**: Enhance the overall look, feel, and user experience.
-- 🔗 **View Related Transactions**: See all transactions linked to a fixed expense.
 - 🆕 **Latest Changes Window**: A dedicated view for recent updates and changes.
 - 🔒 **Safe Mode**: Hide sensitive values during app usage for privacy.
 - 📤 **Export/Import Data**: Easily export and import your data.
