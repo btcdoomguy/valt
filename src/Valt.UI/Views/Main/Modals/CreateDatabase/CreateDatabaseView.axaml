@@ -5,9 +5,9 @@
         xmlns:userControls="clr-namespace:Valt.UI.UserControls"
         xmlns:local="clr-namespace:Valt.UI.Lang"
         xmlns:createDatabase1="clr-namespace:Valt.UI.Views.Main.Modals.CreateDatabase"
-        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="760"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="740"
         MaxWidth="600"
-        MaxHeight="760"
+        MaxHeight="740"
         x:Class="Valt.UI.Views.Main.Modals.CreateDatabase.CreateDatabaseView"
         Title="{x:Static local:language.CreateDatabaseTitle}"
         x:DataType="createDatabase1:CreateDatabaseViewModel"
@@ -23,7 +23,7 @@
             <userControls:CustomTitleBar Title="{x:Static local:language.CreateDatabaseTitle}"
                                          TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
-            <Border Classes="form-fields-area">
+            <Border Classes="form-fields-area" MaxHeight="660">
                 <StackPanel Spacing="15" Margin="15">
                     <StackPanel Spacing="15">
                         <TextBlock TextWrapping="Wrap">
@@ -110,8 +110,8 @@
             <!-- Buttons -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10"
                         Margin="0, 0, 0, 10">
-                <Button Width="100" HorizontalContentAlignment="Center"
-                        Content="{x:Static local:language.OkButton}" Command="{Binding OkCommand}"
+                <Button Width="100" HorizontalContentAlignment="Center" Command="{Binding OkCommand}"
+                        Content="{x:Static local:language.OkButton}" 
                         IsDefault="False">
                 </Button>
                 <Button Width="100" HorizontalContentAlignment="Center"
