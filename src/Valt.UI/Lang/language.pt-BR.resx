@@ -1082,4 +1082,29 @@
     <data name="FixedExpenseHistory.ViewHistory" xml:space="preserve">
         <value>Ver Histórico</value>
     </data>
+    <!-- Update Notification -->
+    <data name="Update_Available" xml:space="preserve">
+        <value>Atualização disponível: {0}</value>
+    </data>
+    <data name="Update_NewVersionAvailable" xml:space="preserve">
+        <value>Nova versão disponível!</value>
+    </data>
+    <data name="Update_DownloadButton" xml:space="preserve">
+        <value>Baixar</value>
+    </data>
+    <data name="Update_ViewOnGitHub" xml:space="preserve">
+        <value>Ver no GitHub</value>
+    </data>
+    <data name="Update_Downloading" xml:space="preserve">
+        <value>Baixando...</value>
+    </data>
+    <data name="Update_DownloadError" xml:space="preserve">
+        <value>Falha no download. Tente novamente ou baixe do GitHub.</value>
+    </data>
+    <data name="Update_NoPlatformAsset" xml:space="preserve">
+        <value>Download não disponível para sua plataforma. Por favor, baixe do GitHub.</value>
+    </data>
+    <data name="Update_SaveDialogTitle" xml:space="preserve">
+        <value>Salvar arquivo de atualização</value>
+    </data>
 </root>

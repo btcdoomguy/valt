@@ -29,6 +29,7 @@ using Valt.UI.Views.Main.Tabs.Reports;
 using Valt.UI.Services.LocalStorage;
 using Valt.UI.Views.Main.Modals.AvgPriceLineEditor;
 using Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles;
+using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Tabs.Transactions;
 
 namespace Valt.UI;
@@ -42,6 +43,7 @@ public static class Extensions
         
         //controls
         services.AddTransient<LiveRatesViewModel>();
+        services.AddSingleton<UpdateIndicatorViewModel>();
 
         //pages
         services.AddSingleton<TransactionsViewModel>();

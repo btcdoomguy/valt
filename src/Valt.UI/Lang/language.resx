@@ -1111,4 +1111,29 @@
     <data name="FixedExpenseHistory.ViewHistory" xml:space="preserve">
         <value>View History</value>
     </data>
+    <!-- Update Notification -->
+    <data name="Update_Available" xml:space="preserve">
+        <value>Update available: {0}</value>
+    </data>
+    <data name="Update_NewVersionAvailable" xml:space="preserve">
+        <value>New version available!</value>
+    </data>
+    <data name="Update_DownloadButton" xml:space="preserve">
+        <value>Download</value>
+    </data>
+    <data name="Update_ViewOnGitHub" xml:space="preserve">
+        <value>View on GitHub</value>
+    </data>
+    <data name="Update_Downloading" xml:space="preserve">
+        <value>Downloading...</value>
+    </data>
+    <data name="Update_DownloadError" xml:space="preserve">
+        <value>Download failed. Please try again or download from GitHub.</value>
+    </data>
+    <data name="Update_NoPlatformAsset" xml:space="preserve">
+        <value>No download available for your platform. Please download from GitHub.</value>
+    </data>
+    <data name="Update_SaveDialogTitle" xml:space="preserve">
+        <value>Save update file</value>
+    </data>
 </root>
