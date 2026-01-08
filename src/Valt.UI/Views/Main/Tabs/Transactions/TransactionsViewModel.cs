@@ -318,6 +318,25 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     }
 
     [RelayCommand]
+    private async Task ShowAccount(AccountViewModel selectedAccount)
+    {
+        var account = await _accountRepository!.GetAccountByIdAsync(selectedAccount.Id);
+
+        if (account is null)
+        {
+            await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_AccountNotFound, GetUserControlOwnerWindow()!);
+            return;
+        }
+
+        account.ChangeVisibility(true);
+
+        await _accountRepository.SaveAccountAsync(account);
+
+        await _accountDisplayOrderManager!.NormalizeDisplayOrdersAsync(null);
+        await FetchAccounts();
+    }
+
+    [RelayCommand]
     private async Task DeleteAccount(AccountViewModel selectedAccount)
     {
         var account = await _accountRepository!.GetAccountByIdAsync(selectedAccount.Id);

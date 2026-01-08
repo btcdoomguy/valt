@@ -207,6 +207,9 @@
     <data name="Transactions.Hide" xml:space="preserve">
         <value>Esconder</value>
     </data>
+    <data name="Transactions.Show" xml:space="preserve">
+        <value>Exibir</value>
+    </data>
     <data name="Transactions.Menu.Copy" xml:space="preserve">
         <value>Copiar</value>
     </data>
@@ -1106,5 +1109,8 @@
     </data>
     <data name="Update_SaveDialogTitle" xml:space="preserve">
         <value>Salvar arquivo de atualização</value>
+    </data>
+    <data name="BootDatabase.Category.Housing" xml:space="preserve">
+        <value>Moradia</value>
     </data>
 </root>
