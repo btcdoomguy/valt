@@ -91,8 +91,22 @@ public class LocalStorageService : ILocalStorageService
 
     private class ValtSettings
     {
-        public string Culture { get; set; } = CultureInfo.CurrentCulture.Name;
+        public string Culture { get; set; } = GetDefaultCulture();
         public DataGridSettings DataGridSettings { get; set; } = new();
         public List<string> RecentFiles { get; set; } = new();
+
+        private static string GetDefaultCulture()
+        {
+            var osCulture = CultureInfo.CurrentCulture;
+
+            // Check if OS culture is Portuguese (any variant) and map to pt-BR
+            if (osCulture.TwoLetterISOLanguageName.Equals("pt", System.StringComparison.OrdinalIgnoreCase))
+            {
+                return "pt-BR";
+            }
+
+            // Default to en-US for all other languages
+            return "en-US";
+        }
     }
 }

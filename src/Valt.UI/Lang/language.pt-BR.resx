@@ -51,6 +51,15 @@
     <data name="CreateDatabase.InitialDataLanguage" xml:space="preserve">
         <value>Idioma dos dados iniciais</value>
     </data>
+    <data name="CreateDatabase.FiatCurrencies" xml:space="preserve">
+        <value>Moedas fiduciárias</value>
+    </data>
+    <data name="CreateDatabase.FiatCurrencies.Info" xml:space="preserve">
+        <value>USD está sempre inclusa. Selecione moedas adicionais:</value>
+    </data>
+    <data name="CreateDatabase.FiatCurrencies.SelectTitle" xml:space="preserve">
+        <value>Moedas adicionais</value>
+    </data>
     <data name="IconSelector.Title" xml:space="preserve">
         <value>Selecione o ícone</value>
     </data>
