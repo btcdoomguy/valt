@@ -23,12 +23,36 @@ internal class MigrationManager
 
         if (nextMigrations.Count == 0)
             return;
-        
+
         foreach (var migration in nextMigrations)
         {
             await migration.ExecuteAsync();
         }
-        
+
         await _configurationManager.SetMigrationVersionAsync(nextMigrations.Max(x => x.Version));
+
+        // Update the minimum assembly version requirement based on all migrations
+        // (both previously executed and newly executed)
+        UpdateMinimumAssemblyVersion();
+    }
+
+    private void UpdateMinimumAssemblyVersion()
+    {
+        // Get the maximum MinimumAssemblyVersion from all migrations
+        var maxVersion = _migrationScripts
+            .Select(m => m.MinimumAssemblyVersion)
+            .OrderByDescending(v => v)
+            .FirstOrDefault();
+
+        if (maxVersion is not null)
+        {
+            var currentMinVersion = _configurationManager.GetMinimumAssemblyVersion();
+
+            // Only update if the new version is higher
+            if (currentMinVersion is null || maxVersion > currentMinVersion)
+            {
+                _configurationManager.SetMinimumAssemblyVersion(maxVersion);
+            }
+        }
     }
 }

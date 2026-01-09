@@ -127,12 +127,12 @@ public class FixedExpenseProviderTests : IntegrationTest
     public async Task Should_Detect_FixedExpense_Was_MarkedAsPaid()
     {
         await PrepareDataType1();
-        
+
         var fixedExpenseRecordEntity = new FixedExpenseRecordEntity()
         {
             Id = ObjectId.NewObjectId(),
             FixedExpense = _localDatabase.GetFixedExpenses().FindById(new ObjectId(_electricityFixedExpenseId.Value)),
-            ReferenceDate = new DateTime(2025, 1, 30),
+            ReferenceDate = new DateOnly(2025, 1, 30).ToValtDateTime(),
             FixedExpenseRecordStateId = (int) FixedExpenseRecordState.ManuallyPaid
         };
         _localDatabase.GetFixedExpenseRecords().Insert(fixedExpenseRecordEntity);
@@ -149,12 +149,12 @@ public class FixedExpenseProviderTests : IntegrationTest
     public async Task Should_Detect_FixedExpense_Was_Ignored()
     {
         await PrepareDataType1();
-        
+
         var fixedExpenseRecordEntity = new FixedExpenseRecordEntity()
         {
             Id = ObjectId.NewObjectId(),
             FixedExpense = _localDatabase.GetFixedExpenses().FindById(_electricityFixedExpenseId.ToObjectId()),
-            ReferenceDate = new DateTime(2025, 1, 30),
+            ReferenceDate = new DateOnly(2025, 1, 30).ToValtDateTime(),
             FixedExpenseRecordStateId = (int) FixedExpenseRecordState.Ignored
         };
         _localDatabase.GetFixedExpenseRecords().Insert(fixedExpenseRecordEntity);

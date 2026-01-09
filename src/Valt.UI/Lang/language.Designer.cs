@@ -2168,7 +2168,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Error.FileNotFound", resourceCulture);
             }
         }
-        
+
+        public static string Error_IncompatibleVersion {
+            get {
+                return ResourceManager.GetString("Error.IncompatibleVersion", resourceCulture);
+            }
+        }
+
         public static string Button_Refresh {
             get {
                 return ResourceManager.GetString("Button.Refresh", resourceCulture);

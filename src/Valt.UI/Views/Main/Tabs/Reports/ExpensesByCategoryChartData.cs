@@ -80,7 +80,9 @@ public class ExpensesByCategoryChartData : IDisposable, INotifyPropertyChanged
                 Labels = CategoryLabels,
                 LabelsPaint = new SolidColorPaint(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) },
                 TextSize = 12,
-                SeparatorsPaint = new SolidColorPaint(GridColor.WithAlpha(40)) { StrokeThickness = 1 }
+                SeparatorsPaint = new SolidColorPaint(GridColor.WithAlpha(40)) { StrokeThickness = 1 },
+                MinStep = 1,  // Force showing every label, prevents skipping labels when there are few items
+                ForceStepToMin = true
             }
         };
     }

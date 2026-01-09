@@ -20,8 +20,7 @@ internal class AllTimeHighReport : IAllTimeHighReport
             throw new ApplicationException("No transactions found");
 
         // Discard the current day because rates are not closed yet
-        var dateUntil = _clock.GetCurrentLocalDate().AddDays(-1);
-        var maxDate = dateUntil.ToValtDateTime();
+        var maxDate = _clock.GetCurrentLocalDate().AddDays(-1);
 
         var calculator = new Calculator(currency, provider, provider.MinTransactionDate, maxDate);
 
@@ -34,14 +33,14 @@ internal class AllTimeHighReport : IAllTimeHighReport
 
         private readonly FiatCurrency _currency;
         private readonly IReportDataProvider _provider;
-        private readonly DateTime _startDate;
-        private readonly DateTime _endDate;
+        private readonly DateOnly _startDate;
+        private readonly DateOnly _endDate;
 
         public Calculator(
             FiatCurrency currency,
             IReportDataProvider provider,
-            DateTime startDate,
-            DateTime endDate)
+            DateOnly startDate,
+            DateOnly endDate)
         {
             _currency = currency;
             _provider = provider;
@@ -51,12 +50,12 @@ internal class AllTimeHighReport : IAllTimeHighReport
 
         public Task<AllTimeHighData> CalculateAsync()
         {
-            var allTimeHighCurrentDate = DateTime.MinValue;
+            var allTimeHighCurrentDate = DateOnly.MinValue;
             var allTimeHighCurrentFiatValue = decimal.Zero;
             var lastDayFiatValue = decimal.Zero;
 
             // Track max drawdown after ATH
-            var maxDrawdownDate = DateTime.MinValue;
+            var maxDrawdownDate = DateOnly.MinValue;
             var maxDrawdownValue = decimal.MaxValue;
 
             var accountCurrentScanDateTotals = new Dictionary<ObjectId, decimal>();
@@ -144,7 +143,7 @@ internal class AllTimeHighReport : IAllTimeHighReport
                     allTimeHighCurrentFiatValue = dateTotal;
                     allTimeHighCurrentDate = currentScanDate;
                     maxDrawdownValue = decimal.MaxValue;
-                    maxDrawdownDate = DateTime.MinValue;
+                    maxDrawdownDate = DateOnly.MinValue;
                 }
                 else if (dateTotal < maxDrawdownValue)
                 {
@@ -162,13 +161,13 @@ internal class AllTimeHighReport : IAllTimeHighReport
             DateOnly? maxDrawdownDateResult = null;
             decimal? maxDrawdownPercent = null;
 
-            if (maxDrawdownDate != DateTime.MinValue && maxDrawdownValue < allTimeHighCurrentFiatValue)
+            if (maxDrawdownDate != DateOnly.MinValue && maxDrawdownValue < allTimeHighCurrentFiatValue)
             {
-                maxDrawdownDateResult = DateOnly.FromDateTime(maxDrawdownDate);
+                maxDrawdownDateResult = maxDrawdownDate;
                 maxDrawdownPercent = Math.Round((Math.Round(maxDrawdownValue / allTimeHighCurrentFiatValue - 1, 4) * 100), 2);
             }
 
-            return Task.FromResult(new AllTimeHighData(DateOnly.FromDateTime(allTimeHighCurrentDate), _currency,
+            return Task.FromResult(new AllTimeHighData(allTimeHighCurrentDate, _currency,
                 allTimeHighCurrentFiatValue, declineFromAth)
             {
                 HasAccountsWithoutTransactions = hasAccountsWithoutTransactions,

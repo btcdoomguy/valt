@@ -156,12 +156,12 @@ public class AccountCacheTests : IntegrationTest
         var accountRepository = _serviceProvider.GetRequiredService<IAccountRepository>();
         var transactionRepository = _serviceProvider.GetRequiredService<ITransactionRepository>();
         var localDatabase = _serviceProvider.GetRequiredService<ILocalDatabase>();
-        var today = DateTime.Today;
+        var today = DateOnly.FromDateTime(DateTime.Today);
 
         var account1 = FiatAccount.New("Test 1", true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
         await accountRepository.SaveAccountAsync(account1);
 
-        var transaction = Transaction.New(DateOnly.FromDateTime(today.AddDays(5)), "My Transaction", new CategoryId(),
+        var transaction = Transaction.New(today.AddDays(5), "My Transaction", new CategoryId(),
             new FiatDetails(account1.Id, 200m, true), null, null);
         await transactionRepository.SaveTransactionAsync(transaction);
 
@@ -171,7 +171,7 @@ public class AccountCacheTests : IntegrationTest
         var account1Cache = accountCaches.SingleOrDefault(x => x.Id == account1.Id.AsObjectId());
 
         Assert.That(account1Cache.Total, Is.EqualTo(1200));
-        Assert.That(account1Cache.CurrentDate, Is.EqualTo(today));
+        Assert.That(DateOnly.FromDateTime(account1Cache.CurrentDate.ToUniversalTime()), Is.EqualTo(today));
         Assert.That(account1Cache.CurrentTotal, Is.EqualTo(1000));
     }
 
@@ -181,12 +181,12 @@ public class AccountCacheTests : IntegrationTest
         var accountRepository = _serviceProvider.GetRequiredService<IAccountRepository>();
         var transactionRepository = _serviceProvider.GetRequiredService<ITransactionRepository>();
         var localDatabase = _serviceProvider.GetRequiredService<ILocalDatabase>();
-        var today = DateTime.Today;
+        var today = DateOnly.FromDateTime(DateTime.Today);
 
         var account1 = FiatAccount.New("Test 1", true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
         await accountRepository.SaveAccountAsync(account1);
 
-        var transaction = Transaction.New(DateOnly.FromDateTime(today.AddDays(5)), "My Transaction", new CategoryId(),
+        var transaction = Transaction.New(today.AddDays(5), "My Transaction", new CategoryId(),
             new FiatDetails(account1.Id, 200m, true), null, null);
         await transactionRepository.SaveTransactionAsync(transaction);
 
@@ -196,10 +196,10 @@ public class AccountCacheTests : IntegrationTest
         var account1Cache = accountCaches.SingleOrDefault(x => x.Id == account1.Id.AsObjectId());
 
         Assert.That(account1Cache.Total, Is.EqualTo(1200));
-        Assert.That(account1Cache.CurrentDate, Is.EqualTo(today));
+        Assert.That(DateOnly.FromDateTime(account1Cache.CurrentDate.ToUniversalTime()), Is.EqualTo(today));
         Assert.That(account1Cache.CurrentTotal, Is.EqualTo(1000));
 
-        transaction.ChangeDate(DateOnly.FromDateTime(today));
+        transaction.ChangeDate(today);
 
         await transactionRepository.SaveTransactionAsync(transaction);
 
@@ -208,7 +208,7 @@ public class AccountCacheTests : IntegrationTest
         account1Cache = accountCaches.SingleOrDefault(x => x.Id == account1.Id.AsObjectId());
 
         Assert.That(account1Cache.Total, Is.EqualTo(1200));
-        Assert.That(account1Cache.CurrentDate, Is.EqualTo(today));
+        Assert.That(DateOnly.FromDateTime(account1Cache.CurrentDate.ToUniversalTime()), Is.EqualTo(today));
         Assert.That(account1Cache.CurrentTotal, Is.EqualTo(1200));
     }
 
@@ -218,12 +218,12 @@ public class AccountCacheTests : IntegrationTest
         var accountRepository = _serviceProvider.GetRequiredService<IAccountRepository>();
         var transactionRepository = _serviceProvider.GetRequiredService<ITransactionRepository>();
         var localDatabase = _serviceProvider.GetRequiredService<ILocalDatabase>();
-        var today = DateTime.Today;
+        var today = DateOnly.FromDateTime(DateTime.Today);
 
         var account1 = FiatAccount.New("Test 1", true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
         await accountRepository.SaveAccountAsync(account1);
 
-        var transaction = Transaction.New(DateOnly.FromDateTime(today.AddDays(5)), "My Transaction", new CategoryId(),
+        var transaction = Transaction.New(today.AddDays(5), "My Transaction", new CategoryId(),
             new FiatDetails(account1.Id, 200m, true), null, null);
         await transactionRepository.SaveTransactionAsync(transaction);
 
@@ -233,10 +233,10 @@ public class AccountCacheTests : IntegrationTest
         var account1Cache = accountCaches.SingleOrDefault(x => x.Id == account1.Id.AsObjectId());
 
         Assert.That(account1Cache.Total, Is.EqualTo(1200));
-        Assert.That(account1Cache.CurrentDate, Is.EqualTo(today));
+        Assert.That(DateOnly.FromDateTime(account1Cache.CurrentDate.ToUniversalTime()), Is.EqualTo(today));
         Assert.That(account1Cache.CurrentTotal, Is.EqualTo(1000));
 
-        transaction.ChangeDate(DateOnly.FromDateTime(today));
+        transaction.ChangeDate(today);
         transaction.ChangeTransactionDetails(new FiatDetails(account1.Id, 100m, false));
 
         await transactionRepository.SaveTransactionAsync(transaction);
@@ -246,7 +246,7 @@ public class AccountCacheTests : IntegrationTest
         account1Cache = accountCaches.SingleOrDefault(x => x.Id == account1.Id.AsObjectId());
 
         Assert.That(account1Cache.Total, Is.EqualTo(900));
-        Assert.That(account1Cache.CurrentDate, Is.EqualTo(today));
+        Assert.That(DateOnly.FromDateTime(account1Cache.CurrentDate.ToUniversalTime()), Is.EqualTo(today));
         Assert.That(account1Cache.CurrentTotal, Is.EqualTo(900));
     }
     
@@ -256,12 +256,12 @@ public class AccountCacheTests : IntegrationTest
         var accountRepository = _serviceProvider.GetRequiredService<IAccountRepository>();
         var transactionRepository = _serviceProvider.GetRequiredService<ITransactionRepository>();
         var localDatabase = _serviceProvider.GetRequiredService<ILocalDatabase>();
-        var today = DateTime.Today;
+        var today = DateOnly.FromDateTime(DateTime.Today);
 
         var account1 = FiatAccount.New("Test 1", true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
         await accountRepository.SaveAccountAsync(account1);
 
-        var transaction = Transaction.New(DateOnly.FromDateTime(today.AddDays(5)), "My Transaction", new CategoryId(),
+        var transaction = Transaction.New(today.AddDays(5), "My Transaction", new CategoryId(),
             new FiatDetails(account1.Id, 200m, false), null, null);
         await transactionRepository.SaveTransactionAsync(transaction);
 
@@ -271,19 +271,19 @@ public class AccountCacheTests : IntegrationTest
         var account1Cache = accountCaches.SingleOrDefault(x => x.Id == account1.Id.AsObjectId());
 
         Assert.That(account1Cache.Total, Is.EqualTo(800));
-        Assert.That(account1Cache.CurrentDate, Is.EqualTo(today));
+        Assert.That(DateOnly.FromDateTime(account1Cache.CurrentDate.ToUniversalTime()), Is.EqualTo(today));
         Assert.That(account1Cache.CurrentTotal, Is.EqualTo(1000));
 
         var service = _serviceProvider.GetRequiredService<IAccountCacheService>();
-        
-        await service.RefreshCurrentTotalsAsync(DateOnly.FromDateTime(today.AddDays(5)));
-        
+
+        await service.RefreshCurrentTotalsAsync(today.AddDays(5));
+
         accountCaches = localDatabase.GetAccountCaches().FindAll().ToList();
 
         account1Cache = accountCaches.SingleOrDefault(x => x.Id == account1.Id.AsObjectId());
 
         Assert.That(account1Cache.Total, Is.EqualTo(800));
-        Assert.That(account1Cache.CurrentDate, Is.EqualTo(today.AddDays(5)));
+        Assert.That(DateOnly.FromDateTime(account1Cache.CurrentDate.ToUniversalTime()), Is.EqualTo(today.AddDays(5)));
         Assert.That(account1Cache.CurrentTotal, Is.EqualTo(800));
     }
 }

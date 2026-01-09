@@ -143,6 +143,10 @@ public class MonthlyTotalsChartData : IDisposable
         BtcValues.Clear();
         MonthLabels.Clear();
 
+        // Reset X-axis zoom to show all data points when year changes
+        XAxes[0].MinLimit = null;
+        XAxes[0].MaxLimit = null;
+
         // Dispose old series before clearing
         DisposeSeries();
         Series.Clear();

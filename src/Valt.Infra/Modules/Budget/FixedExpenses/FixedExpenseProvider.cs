@@ -103,8 +103,10 @@ public class FixedExpenseProvider : IFixedExpenseProvider
             .Where(x => x.ReferenceDate >= rangeMin && x.ReferenceDate < rangeMax).ToList();
         foreach (var entry in entries)
         {
+            // Compare using DateOnly to avoid timezone issues with DateTime
+            var entryDate = entry.ReferenceDate;
             var match = fixedExpenseRecords.SingleOrDefault(x =>
-                x.ReferenceDate == entry.ReferenceDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Local) &&
+                DateOnly.FromDateTime(x.ReferenceDate.ToUniversalTime()) == entryDate &&
                 x.FixedExpense.Id.ToString() == entry.Id);
 
             if (match is null)

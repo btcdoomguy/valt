@@ -25,8 +25,8 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
             throw new ApplicationException("No transactions found");
         }
 
-        var displayRangeEnd = displayRange.End.ToValtDateTime();
-        var currentDate = _clock.GetCurrentLocalDate().ToValtDateTime();
+        var displayRangeEnd = displayRange.End;
+        var currentDate = _clock.GetCurrentLocalDate();
         var maxDate = displayRangeEnd < currentDate ? displayRangeEnd : currentDate;
 
         var calculator = new Calculator(currency, provider, provider.MinTransactionDate, maxDate, displayRange);
@@ -48,15 +48,15 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
 
         private readonly FiatCurrency _currency;
         private readonly IReportDataProvider _provider;
-        private readonly DateTime _startDate;
-        private readonly DateTime _endDate;
+        private readonly DateOnly _startDate;
+        private readonly DateOnly _endDate;
         private readonly DateOnlyRange _displayRange;
 
         public Calculator(
             FiatCurrency currency,
             IReportDataProvider provider,
-            DateTime startDate,
-            DateTime endDate,
+            DateOnly startDate,
+            DateOnly endDate,
             DateOnlyRange displayRange)
         {
             _currency = currency;
@@ -221,7 +221,7 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
         }
 
         private MonthlyTotal CalculateMonthlyData(
-            DateTime currentDate,
+            DateOnly currentDate,
             Dictionary<ObjectId, decimal> accountBalances,
             Dictionary<ObjectId, decimal> accountIncomes,
             Dictionary<ObjectId, decimal> accountExpenses,
@@ -389,7 +389,7 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
             };
         }
 
-        private static bool IsEndOfMonth(DateTime date)
+        private static bool IsEndOfMonth(DateOnly date)
         {
             return date.Day == DateTime.DaysInMonth(date.Year, date.Month);
         }

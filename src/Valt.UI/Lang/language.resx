@@ -1142,4 +1142,7 @@
     <data name="BootDatabase.Category.Housing" xml:space="preserve">
         <value>Housing</value>
     </data>
+    <data name="Error.IncompatibleVersion" xml:space="preserve">
+        <value>This database requires app version {0} or higher. You are running version {1}. Please update the application.</value>
+    </data>
 </root>

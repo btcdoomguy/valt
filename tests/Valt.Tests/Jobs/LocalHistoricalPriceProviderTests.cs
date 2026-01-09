@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Valt.Core.Common;
+using Valt.Infra;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers;
 using Valt.Infra.Crawlers.LivePriceCrawlers;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Bitcoin.Providers;
@@ -27,12 +28,12 @@ public class LocalHistoricalPriceProviderTests : IntegrationTest
         _priceDatabase.GetFiatData().Insert(new FiatDataEntity
         {
             Currency = FiatCurrency.Usd.Code,
-            Date = new DateTime(2023, 1, 1),
+            Date = new DateOnly(2023, 1, 1).ToValtDateTime(),
             Price = 1000m
         });
         _priceDatabase.GetBitcoinData().Insert(new BitcoinDataEntity()
         {
-            Date = new DateTime(2023, 1, 1),
+            Date = new DateOnly(2023, 1, 1).ToValtDateTime(),
             Price = 10000m
         });
 

@@ -141,6 +141,36 @@ public class ConfigurationManager
     }
 
     /// <summary>
+    /// Gets the minimum assembly version required to open this database.
+    /// Returns null if no minimum version has been set (legacy database or new database).
+    /// </summary>
+    public Version? GetMinimumAssemblyVersion()
+    {
+        var config = _localDatabase.GetConfiguration()
+            .FindOne(x => x.Key == ConfigurationKeys.MinimumAssemblyVersion);
+
+        if (config is null || string.IsNullOrWhiteSpace(config.Value))
+            return null;
+
+        return Version.TryParse(config.Value, out var version) ? version : null;
+    }
+
+    /// <summary>
+    /// Sets the minimum assembly version required to open this database.
+    /// </summary>
+    public void SetMinimumAssemblyVersion(Version version)
+    {
+        var config = _localDatabase.GetConfiguration()
+            .FindOne(x => x.Key == ConfigurationKeys.MinimumAssemblyVersion);
+
+        if (config is null)
+            config = new ConfigurationEntity { Key = ConfigurationKeys.MinimumAssemblyVersion };
+
+        config.Value = version.ToString();
+        _localDatabase.GetConfiguration().Upsert(config);
+    }
+
+    /// <summary>
     /// Gets the list of fiat currencies currently in use by accounts, fixed expenses, and avg price profiles.
     /// These currencies cannot be removed from the available currencies list.
     /// </summary>

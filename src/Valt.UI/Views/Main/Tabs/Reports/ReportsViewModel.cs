@@ -51,9 +51,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     // Cached provider for the lifetime of the tab being active
     private IReportDataProvider? _cachedProvider;
 
-    [ObservableProperty] private DashboardData _allTimeHighData;
-    [ObservableProperty] private DashboardData _btcStackData;
-    [ObservableProperty] private DashboardData _statisticsData;
+    [ObservableProperty] private DashboardData _allTimeHighData = DashboardData.Empty;
+    [ObservableProperty] private DashboardData _btcStackData = DashboardData.Empty;
+    [ObservableProperty] private DashboardData _statisticsData = DashboardData.Empty;
     [ObservableProperty] private AvaloniaList<MonthlyReportItemViewModel> _monthlyReportItems = new();
     [ObservableProperty] private MonthlyTotalsChartData _monthlyTotalsChartData = new();
     [ObservableProperty] private ExpensesByCategoryChartData _expensesByCategoryChartData = new();
@@ -303,6 +303,11 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching all time high data");
+            AllTimeHighData = new DashboardData(language.Reports_AllTimeHigh_Title,
+                new ObservableCollection<RowItem>
+                {
+                    new(language.Error, ex.Message)
+                });
         }
         finally
         {
@@ -345,6 +350,11 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching statistics data");
+            StatisticsData = new DashboardData(language.Reports_Statistics_Title,
+                new ObservableCollection<RowItem>
+                {
+                    new(language.Error, ex.Message)
+                });
         }
         finally
         {
