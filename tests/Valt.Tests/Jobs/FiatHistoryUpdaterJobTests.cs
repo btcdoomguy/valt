@@ -141,7 +141,8 @@ public class FiatHistoryUpdaterJobTests
     [Test]
     public async Task Should_Use_RegularProvider_When_Data_Already_Exists_For_Currency()
     {
-        // Arrange: Configure currencies with existing data
+        // Arrange: Configure currencies with existing data starting from 2020-01-01 (default start date)
+        // This ensures there's no backward gap since the required start date defaults to 2020-01-01
         var configManager = CreateConfigurationManager(new List<string> { FiatCurrency.Brl.Code });
 
         var existingData = new List<FiatDataEntity>
@@ -149,7 +150,7 @@ public class FiatHistoryUpdaterJobTests
             new()
             {
                 Currency = FiatCurrency.Brl.Code,
-                Date = new DateOnly(2024, 1, 1).ToValtDateTime(),
+                Date = new DateOnly(2020, 1, 1).ToValtDateTime(),
                 Price = 5.0m
             }
         };
@@ -164,8 +165,12 @@ public class FiatHistoryUpdaterJobTests
 
         _priceDatabase.GetFiatData().Returns(fiatDataCollection);
 
+        // Transaction after the min date - no backward gap needed
         var transactionsCollection = Substitute.For<ILiteCollection<Infra.Modules.Budget.Transactions.TransactionEntity>>();
-        transactionsCollection.FindAll().Returns(new List<Infra.Modules.Budget.Transactions.TransactionEntity>());
+        transactionsCollection.FindAll().Returns(new List<Infra.Modules.Budget.Transactions.TransactionEntity>
+        {
+            new() { Date = new DateTime(2024, 1, 1) }
+        });
         _localDatabase.GetTransactions().Returns(transactionsCollection);
 
         _regularProvider.GetPricesAsync(
@@ -192,13 +197,13 @@ public class FiatHistoryUpdaterJobTests
         // Act
         await job.RunAsync(CancellationToken.None);
 
-        // Assert: Regular provider should be called
+        // Assert: Regular provider should be called for forward updates
         await _regularProvider.Received().GetPricesAsync(
             Arg.Any<DateOnly>(),
             Arg.Any<DateOnly>(),
             Arg.Is<IEnumerable<FiatCurrency>>(c => c.Contains(FiatCurrency.Brl)));
 
-        // Initial seed provider should not be called
+        // Initial seed provider should not be called (no backward gap)
         await _initialSeedProvider.DidNotReceive().GetPricesAsync(
             Arg.Any<DateOnly>(),
             Arg.Any<DateOnly>(),
@@ -291,6 +296,78 @@ public class FiatHistoryUpdaterJobTests
             Arg.Any<DateOnly>(),
             Arg.Any<DateOnly>(),
             Arg.Is<IEnumerable<FiatCurrency>>(c => c.Contains(FiatCurrency.Brl) && !c.Contains(FiatCurrency.Eur)));
+    }
+
+    [Test]
+    public async Task Should_Use_InitialSeedProvider_For_Backward_Gap_When_Transaction_Added_Before_MinDate()
+    {
+        // Arrange: Currency has existing data starting from 2024-01-10, but a transaction requires data from 2023-12-01
+        var configManager = CreateConfigurationManager(new List<string> { FiatCurrency.Brl.Code });
+
+        // Existing data starts from 2024-01-10
+        var existingData = new List<FiatDataEntity>
+        {
+            new()
+            {
+                Currency = FiatCurrency.Brl.Code,
+                Date = new DateOnly(2024, 1, 10).ToValtDateTime(),
+                Price = 5.0m
+            }
+        };
+
+        var fiatDataCollection = Substitute.For<ILiteCollection<FiatDataEntity>>();
+        fiatDataCollection.Exists(Arg.Any<System.Linq.Expressions.Expression<Func<FiatDataEntity, bool>>>()).Returns(true);
+        var queryable = Substitute.For<ILiteQueryable<FiatDataEntity>>();
+        queryable.Count().Returns(existingData.Count);
+        fiatDataCollection.Query().Returns(queryable);
+        fiatDataCollection.FindAll().Returns(existingData);
+        fiatDataCollection.Find(Arg.Any<System.Linq.Expressions.Expression<Func<FiatDataEntity, bool>>>()).Returns(existingData);
+
+        _priceDatabase.GetFiatData().Returns(fiatDataCollection);
+
+        // Transaction from 2023-12-01 requires data before the min date
+        var transactionsCollection = Substitute.For<ILiteCollection<Infra.Modules.Budget.Transactions.TransactionEntity>>();
+        transactionsCollection.FindAll().Returns(new List<Infra.Modules.Budget.Transactions.TransactionEntity>
+        {
+            new() { Date = new DateTime(2023, 12, 1) }
+        });
+        _localDatabase.GetTransactions().Returns(transactionsCollection);
+
+        _initialSeedProvider.GetPricesAsync(
+                Arg.Any<DateOnly>(),
+                Arg.Any<DateOnly>(),
+                Arg.Any<IEnumerable<FiatCurrency>>())
+            .Returns(new List<IFiatHistoricalDataProvider.FiatPriceData>
+            {
+                new(new DateOnly(2023, 12, 1), new HashSet<IFiatHistoricalDataProvider.CurrencyAndPrice>
+                {
+                    new(FiatCurrency.Brl, 4.9m)
+                })
+            });
+
+        _regularProvider.GetPricesAsync(
+                Arg.Any<DateOnly>(),
+                Arg.Any<DateOnly>(),
+                Arg.Any<IEnumerable<FiatCurrency>>())
+            .Returns(new List<IFiatHistoricalDataProvider.FiatPriceData>());
+
+        var providers = new List<IFiatHistoricalDataProvider> { _initialSeedProvider, _regularProvider };
+
+        var job = new FiatHistoryUpdaterJob(
+            _priceDatabase,
+            _localDatabase,
+            providers,
+            configManager,
+            new NullLogger<FiatHistoryUpdaterJob>());
+
+        // Act
+        await job.RunAsync(CancellationToken.None);
+
+        // Assert: Initial seed provider should be called for backward gap (dates before 2024-01-10)
+        await _initialSeedProvider.Received().GetPricesAsync(
+            Arg.Is<DateOnly>(d => d < new DateOnly(2024, 1, 10)),
+            Arg.Any<DateOnly>(),
+            Arg.Is<IEnumerable<FiatCurrency>>(c => c.Contains(FiatCurrency.Brl)));
     }
 
     #endregion

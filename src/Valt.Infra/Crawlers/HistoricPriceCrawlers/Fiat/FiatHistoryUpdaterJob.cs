@@ -15,19 +15,19 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
 
     private readonly IPriceDatabase _priceDatabase;
     private readonly ILocalDatabase _localDatabase;
-    private readonly IEnumerable<IFiatHistoricalDataProvider> _providers;
     private readonly ConfigurationManager _configurationManager;
     private readonly ILogger<FiatHistoryUpdaterJob> _logger;
 
-    public string Name => "Fiat history updater job";
+    private readonly IFiatHistoricalDataProvider? _initialSeedProvider;
+    private readonly IFiatHistoricalDataProvider? _regularProvider;
 
+    public string Name => "Fiat history updater job";
     public BackgroundJobSystemNames SystemName => BackgroundJobSystemNames.FiatHistoryUpdater;
     public BackgroundJobTypes JobType => BackgroundJobTypes.PriceDatabase;
-
     public TimeSpan Interval => TimeSpan.FromSeconds(120);
 
-
-    public FiatHistoryUpdaterJob(IPriceDatabase priceDatabase,
+    public FiatHistoryUpdaterJob(
+        IPriceDatabase priceDatabase,
         ILocalDatabase localDatabase,
         IEnumerable<IFiatHistoricalDataProvider> providers,
         ConfigurationManager configurationManager,
@@ -35,9 +35,12 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
     {
         _priceDatabase = priceDatabase;
         _localDatabase = localDatabase;
-        _providers = providers;
         _configurationManager = configurationManager;
         _logger = logger;
+
+        var providersList = providers.ToList();
+        _initialSeedProvider = providersList.FirstOrDefault(p => p.InitialDownloadSource);
+        _regularProvider = providersList.FirstOrDefault(p => !p.InitialDownloadSource);
     }
 
     public Task StartAsync(CancellationToken stoppingToken)
@@ -49,180 +52,37 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
     public async Task RunAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("[FiatHistoryUpdater] Starting fiat history update cycle");
+
         try
         {
-            // Skip if no local database is open (we need it for currency configuration)
-            if (!_configurationManager.HasLocalDatabaseOpen)
-            {
-                _logger.LogInformation("[FiatHistoryUpdater] No local database open, skipping update");
+            if (!CanRun())
                 return;
-            }
 
-            if (!_priceDatabase.HasDatabaseOpen)
+            var currencies = GetConfiguredCurrencies();
+            if (currencies.Count == 0)
             {
-                _logger.LogInformation("[FiatHistoryUpdater] Price database not open, skipping update");
+                _logger.LogInformation("[FiatHistoryUpdater] No currencies configured, skipping update");
                 return;
             }
 
             var currentRecordCount = _priceDatabase.GetFiatData().Query().Count();
             _logger.LogInformation("[FiatHistoryUpdater] Current fiat price records: {Count}", currentRecordCount);
 
-            // Get currencies from configuration
-            var currencyCodes = _configurationManager.GetAvailableFiatCurrencies();
-            if (currencyCodes.Count == 0)
-            {
-                _logger.LogInformation("[FiatHistoryUpdater] No currencies configured, skipping update");
-                return;
-            }
-
-            var currencies = currencyCodes.Select(FiatCurrency.GetFromCode).ToList();
-
-            _logger.LogInformation("[FiatHistoryUpdater] Configured currencies: {Currencies}",
-                string.Join(", ", currencies.Select(c => c.Code)));
-
-            var utcNow = DateTime.UtcNow;
-            var localDate = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, 0, 0, 0, DateTimeKind.Local);
-            var endDate = localDate.AddDays(-1);
-
-            // Skip weekends for end date
-            while (endDate.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
-                endDate = endDate.AddDays(-1);
-
-            // Calculate the required start date based on the lowest transaction date
             var requiredStartDate = GetRequiredStartDate();
-            _logger.LogInformation("[FiatHistoryUpdater] Required start date: {StartDate}", requiredStartDate.ToString("yyyy-MM-dd"));
+            var endDate = CalculateEndDate();
 
-            // Separate currencies into those that need initial seed vs those that need updates
-            var currenciesWithData = new List<FiatCurrency>();
-            var currenciesWithoutData = new List<FiatCurrency>();
+            _logger.LogInformation("[FiatHistoryUpdater] Date range: {StartDate} to {EndDate}",
+                requiredStartDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
 
-            foreach (var currency in currencies)
-            {
-                if (HasDataForCurrency(currency))
-                {
-                    currenciesWithData.Add(currency);
-                }
-                else
-                {
-                    currenciesWithoutData.Add(currency);
-                }
-            }
-
-            _logger.LogInformation("[FiatHistoryUpdater] Currencies with existing data: {Currencies}",
-                currenciesWithData.Count > 0 ? string.Join(", ", currenciesWithData.Select(c => c.Code)) : "none");
-            _logger.LogInformation("[FiatHistoryUpdater] Currencies needing initial seed: {Currencies}",
-                currenciesWithoutData.Count > 0 ? string.Join(", ", currenciesWithoutData.Select(c => c.Code)) : "none");
+            var (currenciesWithData, currenciesWithoutData) = CategorizeCurrencies(currencies);
+            LogCurrencyCategories(currenciesWithData, currenciesWithoutData);
 
             var updated = false;
 
-            // Process currencies without data using initial seed provider
-            if (currenciesWithoutData.Count > 0)
-            {
-                var initialSeedProvider = GetProvider(initialDownloadSource: true);
-                if (initialSeedProvider is not null)
-                {
-                    _logger.LogInformation("[FiatHistoryUpdater] Using {Provider} for initial seed of {Count} currencies",
-                        initialSeedProvider.Name, currenciesWithoutData.Count);
+            updated |= await ProcessCurrenciesWithoutDataAsync(currenciesWithoutData, requiredStartDate, endDate);
+            updated |= await ProcessCurrenciesWithDataAsync(currenciesWithData, requiredStartDate, endDate);
 
-                    var prices = (await initialSeedProvider.GetPricesAsync(
-                        DateOnly.FromDateTime(requiredStartDate),
-                        DateOnly.FromDateTime(endDate),
-                        currenciesWithoutData).ConfigureAwait(false)).ToList();
-
-                    if (prices.Count != 0)
-                    {
-                        FillLocalDatabase(prices, initialSeedProvider.Name);
-                        updated = true;
-                    }
-                }
-                else
-                {
-                    _logger.LogWarning("[FiatHistoryUpdater] No initial seed provider available");
-                }
-            }
-
-            // Process currencies with existing data using regular provider
-            if (currenciesWithData.Count > 0)
-            {
-                var regularProvider = GetProvider(initialDownloadSource: false);
-                if (regularProvider is not null)
-                {
-                    // Get fiat data date range from prices.db for currencies with data
-                    var (minFiatDate, maxFiatDate) = GetFiatDateRange();
-
-                    if (minFiatDate.HasValue && maxFiatDate.HasValue)
-                    {
-                        _logger.LogInformation("[FiatHistoryUpdater] Current fiat date range: {MinDate} to {MaxDate}",
-                            minFiatDate.Value.ToString("yyyy-MM-dd"), maxFiatDate.Value.ToString("yyyy-MM-dd"));
-                    }
-
-                    // First: Fill backward gaps if needed (transaction date earlier than min fiat date)
-                    if (minFiatDate is not null && requiredStartDate < minFiatDate.Value)
-                    {
-                        var gapEndDate = minFiatDate.Value.AddDays(-1);
-                        while (gapEndDate.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
-                            gapEndDate = gapEndDate.AddDays(-1);
-
-                        if (requiredStartDate <= gapEndDate)
-                        {
-                            _logger.LogInformation("[FiatHistoryUpdater] Filling gap from {0} to {1}",
-                                requiredStartDate.ToShortDateString(), gapEndDate.ToShortDateString());
-
-                            var gapPrices = (await regularProvider.GetPricesAsync(
-                                DateOnly.FromDateTime(requiredStartDate),
-                                DateOnly.FromDateTime(gapEndDate),
-                                currenciesWithData).ConfigureAwait(false)).ToList();
-
-                            if (gapPrices.Count != 0)
-                            {
-                                FillLocalDatabase(gapPrices, regularProvider.Name);
-                                updated = true;
-                            }
-                        }
-                    }
-
-                    // Second: Fill forward (new data after max fiat date)
-                    var startDate = maxFiatDate?.AddDays(1) ?? requiredStartDate;
-
-                    // Skip weekends for start date
-                    while (startDate.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
-                        startDate = startDate.AddDays(1);
-
-                    if (startDate <= endDate)
-                    {
-                        _logger.LogInformation("[FiatHistoryUpdater] Using {Provider} from {0} to {1}",
-                            regularProvider.Name, startDate.ToShortDateString(), endDate.ToShortDateString());
-
-                        var prices = (await regularProvider.GetPricesAsync(
-                            DateOnly.FromDateTime(startDate),
-                            DateOnly.FromDateTime(endDate),
-                            currenciesWithData).ConfigureAwait(false)).ToList();
-
-                        if (prices.Count != 0)
-                        {
-                            FillLocalDatabase(prices, regularProvider.Name);
-                            updated = true;
-                        }
-                    }
-                }
-                else
-                {
-                    _logger.LogWarning("[FiatHistoryUpdater] No regular provider available");
-                }
-            }
-
-            if (updated)
-            {
-                var newRecordCount = _priceDatabase.GetFiatData().Query().Count();
-                _logger.LogInformation("[FiatHistoryUpdater] Database updated. Total records: {Count} (added {Added})",
-                    newRecordCount, newRecordCount - currentRecordCount);
-                WeakReferenceMessenger.Default.Send<FiatHistoryPriceUpdatedMessage>();
-            }
-            else
-            {
-                _logger.LogInformation("[FiatHistoryUpdater] Already up to date, no new data needed");
-            }
-
+            LogUpdateResult(updated, currentRecordCount);
             _logger.LogInformation("[FiatHistoryUpdater] Update cycle completed successfully");
         }
         catch (Exception ex)
@@ -232,9 +92,58 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
         }
     }
 
-    private IFiatHistoricalDataProvider? GetProvider(bool initialDownloadSource)
+    #region Initialization Checks
+
+    private bool CanRun()
     {
-        return _providers.FirstOrDefault(p => p.InitialDownloadSource == initialDownloadSource);
+        if (!_configurationManager.HasLocalDatabaseOpen)
+        {
+            _logger.LogInformation("[FiatHistoryUpdater] No local database open, skipping update");
+            return false;
+        }
+
+        if (!_priceDatabase.HasDatabaseOpen)
+        {
+            _logger.LogInformation("[FiatHistoryUpdater] Price database not open, skipping update");
+            return false;
+        }
+
+        return true;
+    }
+
+    private List<FiatCurrency> GetConfiguredCurrencies()
+    {
+        var currencyCodes = _configurationManager.GetAvailableFiatCurrencies();
+        var currencies = currencyCodes.Select(FiatCurrency.GetFromCode).ToList();
+
+        if (currencies.Count > 0)
+        {
+            _logger.LogInformation("[FiatHistoryUpdater] Configured currencies: {Currencies}",
+                string.Join(", ", currencies.Select(c => c.Code)));
+        }
+
+        return currencies;
+    }
+
+    #endregion
+
+    #region Currency Categorization
+
+    private (List<FiatCurrency> withData, List<FiatCurrency> withoutData) CategorizeCurrencies(
+        IEnumerable<FiatCurrency> currencies)
+    {
+        var withData = new List<FiatCurrency>();
+        var withoutData = new List<FiatCurrency>();
+
+        foreach (var currency in currencies)
+        {
+            if (HasDataForCurrency(currency))
+                withData.Add(currency);
+            else
+                withoutData.Add(currency);
+        }
+
+        return (withData, withoutData);
     }
 
     private bool HasDataForCurrency(FiatCurrency currency)
@@ -249,33 +158,25 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
         }
     }
 
-    /// <summary>
-    /// Gets the min and max dates of fiat data in the price database.
-    /// </summary>
-    private (DateTime? minDate, DateTime? maxDate) GetFiatDateRange()
+    private void LogCurrencyCategories(List<FiatCurrency> withData, List<FiatCurrency> withoutData)
     {
-        try
-        {
-            var fiatData = _priceDatabase.GetFiatData().FindAll().ToList();
-            if (fiatData.Count == 0)
-                return (null, null);
-
-            return (fiatData.Min(x => x.Date), fiatData.Max(x => x.Date));
-        }
-        catch (InvalidOperationException)
-        {
-            return (null, null);
-        }
-        catch (NotSupportedException)
-        {
-            return (null, null);
-        }
+        _logger.LogInformation("[FiatHistoryUpdater] Currencies with existing data: {Currencies}",
+            withData.Count > 0 ? string.Join(", ", withData.Select(c => c.Code)) : "none");
+        _logger.LogInformation("[FiatHistoryUpdater] Currencies needing initial seed: {Currencies}",
+            withoutData.Count > 0 ? string.Join(", ", withoutData.Select(c => c.Code)) : "none");
     }
 
-    /// <summary>
-    /// Gets the required start date for fiat history based on the lowest transaction date.
-    /// Uses 2020-01-01 as the default, but goes earlier if there are transactions before that.
-    /// </summary>
+    #endregion
+
+    #region Date Calculations
+
+    private DateTime CalculateEndDate()
+    {
+        var utcNow = DateTime.UtcNow;
+        var localDate = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, 0, 0, 0, DateTimeKind.Local);
+        return SkipWeekendsBackward(localDate.AddDays(-1));
+    }
+
     private DateTime GetRequiredStartDate()
     {
         var startDate = DefaultStartDate;
@@ -289,8 +190,8 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
                 if (lowestTransactionDate < startDate)
                 {
                     startDate = lowestTransactionDate;
-                    _logger.LogInformation("[FiatHistoryUpdater] Using earliest transaction date: {0}",
-                        startDate.ToShortDateString());
+                    _logger.LogInformation("[FiatHistoryUpdater] Using earliest transaction date: {Date}",
+                        startDate.ToString("yyyy-MM-dd"));
                 }
             }
         }
@@ -299,21 +200,167 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
             _logger.LogWarning(ex, "[FiatHistoryUpdater] Error getting lowest transaction date, using default");
         }
 
-        // Skip to first weekday
-        while (startDate.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
-            startDate = startDate.AddDays(1);
-
-        return startDate;
+        return SkipWeekendsForward(startDate);
     }
 
-    private void FillLocalDatabase(IEnumerable<IFiatHistoricalDataProvider.FiatPriceData> prices, string providerName)
+    private (DateTime? minDate, DateTime? maxDate) GetFiatDateRange()
     {
-        var pricesList = prices.ToList();
-        if (pricesList.Count == 0)
+        try
+        {
+            var fiatData = _priceDatabase.GetFiatData().FindAll().ToList();
+            if (fiatData.Count == 0)
+                return (null, null);
+
+            return (fiatData.Min(x => x.Date), fiatData.Max(x => x.Date));
+        }
+        catch (Exception)
+        {
+            return (null, null);
+        }
+    }
+
+    private static DateTime SkipWeekendsForward(DateTime date)
+    {
+        while (date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
+            date = date.AddDays(1);
+        return date;
+    }
+
+    private static DateTime SkipWeekendsBackward(DateTime date)
+    {
+        while (date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
+            date = date.AddDays(-1);
+        return date;
+    }
+
+    #endregion
+
+    #region Data Processing
+
+    private async Task<bool> ProcessCurrenciesWithoutDataAsync(
+        List<FiatCurrency> currencies,
+        DateTime startDate,
+        DateTime endDate)
+    {
+        if (currencies.Count == 0)
+            return false;
+
+        if (_initialSeedProvider is null)
+        {
+            _logger.LogWarning("[FiatHistoryUpdater] No initial seed provider available");
+            return false;
+        }
+
+        _logger.LogInformation("[FiatHistoryUpdater] Using {Provider} for initial seed of {Count} currencies",
+            _initialSeedProvider.Name, currencies.Count);
+
+        return await FetchAndStorePricesAsync(_initialSeedProvider, currencies, startDate, endDate);
+    }
+
+    private async Task<bool> ProcessCurrenciesWithDataAsync(
+        List<FiatCurrency> currencies,
+        DateTime requiredStartDate,
+        DateTime endDate)
+    {
+        if (currencies.Count == 0)
+            return false;
+
+        var (minFiatDate, maxFiatDate) = GetFiatDateRange();
+
+        if (minFiatDate.HasValue && maxFiatDate.HasValue)
+        {
+            _logger.LogInformation("[FiatHistoryUpdater] Current fiat date range: {MinDate} to {MaxDate}",
+                minFiatDate.Value.ToString("yyyy-MM-dd"), maxFiatDate.Value.ToString("yyyy-MM-dd"));
+        }
+
+        var updated = false;
+
+        // Fill backward gap using initial seed provider
+        updated |= await FillBackwardGapAsync(currencies, requiredStartDate, minFiatDate);
+
+        // Fill forward using regular provider
+        updated |= await FillForwardDataAsync(currencies, maxFiatDate, requiredStartDate, endDate);
+
+        return updated;
+    }
+
+    private async Task<bool> FillBackwardGapAsync(
+        List<FiatCurrency> currencies,
+        DateTime requiredStartDate,
+        DateTime? minFiatDate)
+    {
+        if (minFiatDate is null || requiredStartDate >= minFiatDate.Value)
+            return false;
+
+        if (_initialSeedProvider is null)
+        {
+            _logger.LogWarning("[FiatHistoryUpdater] No initial seed provider available for backward gap filling");
+            return false;
+        }
+
+        var gapEndDate = SkipWeekendsBackward(minFiatDate.Value.AddDays(-1));
+
+        if (requiredStartDate > gapEndDate)
+            return false;
+
+        _logger.LogInformation("[FiatHistoryUpdater] Filling backward gap using {Provider} from {StartDate} to {EndDate}",
+            _initialSeedProvider.Name, requiredStartDate.ToString("yyyy-MM-dd"), gapEndDate.ToString("yyyy-MM-dd"));
+
+        return await FetchAndStorePricesAsync(_initialSeedProvider, currencies, requiredStartDate, gapEndDate);
+    }
+
+    private async Task<bool> FillForwardDataAsync(
+        List<FiatCurrency> currencies,
+        DateTime? maxFiatDate,
+        DateTime requiredStartDate,
+        DateTime endDate)
+    {
+        if (_regularProvider is null)
+        {
+            _logger.LogWarning("[FiatHistoryUpdater] No regular provider available");
+            return false;
+        }
+
+        var startDate = SkipWeekendsForward(maxFiatDate?.AddDays(1) ?? requiredStartDate);
+
+        if (startDate > endDate)
+            return false;
+
+        _logger.LogInformation("[FiatHistoryUpdater] Using {Provider} from {StartDate} to {EndDate}",
+            _regularProvider.Name, startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
+
+        return await FetchAndStorePricesAsync(_regularProvider, currencies, startDate, endDate);
+    }
+
+    private async Task<bool> FetchAndStorePricesAsync(
+        IFiatHistoricalDataProvider provider,
+        List<FiatCurrency> currencies,
+        DateTime startDate,
+        DateTime endDate)
+    {
+        var prices = (await provider.GetPricesAsync(
+            DateOnly.FromDateTime(startDate),
+            DateOnly.FromDateTime(endDate),
+            currencies).ConfigureAwait(false)).ToList();
+
+        if (prices.Count == 0)
+            return false;
+
+        StorePrices(prices, provider.Name);
+        return true;
+    }
+
+    #endregion
+
+    #region Database Operations
+
+    private void StorePrices(List<IFiatHistoricalDataProvider.FiatPriceData> prices, string providerName)
+    {
+        if (prices.Count == 0)
             return;
 
-        var minDate = pricesList.Min(p => p.Date).ToValtDateTime();
-        var maxDate = pricesList.Max(p => p.Date).ToValtDateTime();
+        var minDate = prices.Min(p => p.Date).ToValtDateTime();
+        var maxDate = prices.Max(p => p.Date).ToValtDateTime();
 
         var existingEntries = _priceDatabase.GetFiatData()
             .Find(x => x.Date >= minDate && x.Date <= maxDate)
@@ -321,26 +368,28 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
             .ToHashSet();
 
         var entries = new List<FiatDataEntity>();
-        foreach (var price in pricesList)
+
+        foreach (var price in prices)
         {
-            var dateToConsider = price.Date.ToValtDateTime();
+            var date = price.Date.ToValtDateTime();
+
             foreach (var currencyData in price.Data)
             {
                 var currencyCode = currencyData.Currency.Code;
-                if (existingEntries.Contains((dateToConsider, currencyCode)))
+
+                if (existingEntries.Contains((date, currencyCode)))
                 {
-                    _logger.LogDebug(
-                        "[FiatHistoryUpdater] Skipping duplicate entry for {Date} {Currency}",
-                        dateToConsider.ToString("yyyy-MM-dd"), currencyCode);
+                    _logger.LogDebug("[FiatHistoryUpdater] Skipping duplicate entry for {Date} {Currency}",
+                        date.ToString("yyyy-MM-dd"), currencyCode);
                     continue;
                 }
 
-                _logger.LogInformation(
-                    "[FiatHistoryUpdater] [{Source}] Adding price {CurrencyPrice} for {Date} for {Currency}",
-                    providerName, currencyData.Price, dateToConsider.ToString("yyyy-MM-dd"), currencyCode);
-                entries.Add(new FiatDataEntity()
+                _logger.LogInformation("[FiatHistoryUpdater] [{Source}] Adding price {Price} for {Date} for {Currency}",
+                    providerName, currencyData.Price, date.ToString("yyyy-MM-dd"), currencyCode);
+
+                entries.Add(new FiatDataEntity
                 {
-                    Date = dateToConsider,
+                    Date = date,
                     Currency = currencyCode,
                     Price = currencyData.Price
                 });
@@ -353,4 +402,21 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
             _priceDatabase.Checkpoint();
         }
     }
+
+    private void LogUpdateResult(bool updated, int previousRecordCount)
+    {
+        if (updated)
+        {
+            var newRecordCount = _priceDatabase.GetFiatData().Query().Count();
+            _logger.LogInformation("[FiatHistoryUpdater] Database updated. Total records: {Count} (added {Added})",
+                newRecordCount, newRecordCount - previousRecordCount);
+            WeakReferenceMessenger.Default.Send<FiatHistoryPriceUpdatedMessage>();
+        }
+        else
+        {
+            _logger.LogInformation("[FiatHistoryUpdater] Already up to date, no new data needed");
+        }
+    }
+
+    #endregion
 }
