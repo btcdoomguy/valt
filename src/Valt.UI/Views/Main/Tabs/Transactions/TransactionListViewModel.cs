@@ -367,26 +367,30 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     }
 
     [RelayCommand]
-    private async Task BindToFixedExpense(TransactionViewModel selectedTransaction)
+    private async Task BindToFixedExpense()
     {
+        if (SelectedTransaction is null || SelectedFixedExpense is null) return;
+
         //TODO: move to a specific app layer
-        var transaction = await _transactionRepository.GetTransactionByIdAsync(new TransactionId(selectedTransaction.Id));
-        
-        transaction.SetFixedExpense(new TransactionFixedExpenseReference(SelectedFixedExpense.Id, SelectedFixedExpense.ReferenceDate));
-        
+        var transaction = await _transactionRepository.GetTransactionByIdAsync(new TransactionId(SelectedTransaction.Id));
+
+        transaction!.SetFixedExpense(new TransactionFixedExpenseReference(SelectedFixedExpense.Id, SelectedFixedExpense.ReferenceDate));
+
         await _transactionRepository.SaveTransactionAsync(transaction);
         WeakReferenceMessenger.Default.Send(new TransactionListChanged());
         await FetchTransactions();
     }
-    
+
     [RelayCommand]
-    private async Task UnbindFromFixedExpense(TransactionViewModel selectedTransaction)
+    private async Task UnbindFromFixedExpense()
     {
+        if (SelectedTransaction is null) return;
+
         //TODO: move to a specific app layer
-        var transaction = await _transactionRepository.GetTransactionByIdAsync(new TransactionId(selectedTransaction.Id));
-        
-        transaction.SetFixedExpense(null);
-        
+        var transaction = await _transactionRepository.GetTransactionByIdAsync(new TransactionId(SelectedTransaction.Id));
+
+        transaction!.SetFixedExpense(null);
+
         await _transactionRepository.SaveTransactionAsync(transaction);
         WeakReferenceMessenger.Default.Send(new TransactionListChanged());
         await FetchTransactions();

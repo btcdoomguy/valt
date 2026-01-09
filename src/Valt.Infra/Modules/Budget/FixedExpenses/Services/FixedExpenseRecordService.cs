@@ -98,9 +98,15 @@ public class FixedExpenseRecordService : IFixedExpenseRecordService
 
     private Task ClearAnyFixedExpenseRecordAsync(TransactionFixedExpenseReference fixedExpenseReference)
     {
+        // Use date range comparison - exact DateTime equality doesn't work reliably
+        // in LiteDB queries due to timezone/Kind handling differences
+        var referenceDate = fixedExpenseReference.ReferenceDate;
+        var startOfDay = new DateTime(referenceDate.Year, referenceDate.Month, referenceDate.Day, 0, 0, 0, DateTimeKind.Utc);
+        var endOfDay = startOfDay.AddDays(1);
+
         _localDatabase.GetFixedExpenseRecords().DeleteMany(x =>
             x.FixedExpense.Id == fixedExpenseReference.FixedExpenseId.ToObjectId() &&
-            x.ReferenceDate == fixedExpenseReference.ReferenceDate.ToValtDateTime());
+            x.ReferenceDate >= startOfDay && x.ReferenceDate < endOfDay);
         return Task.CompletedTask;
     }
 }

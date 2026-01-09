@@ -96,17 +96,20 @@ public class FixedExpenseProvider : IFixedExpenseProvider
             }
         }
 
-        var rangeMin = minDate.ToValtDateTime();
-        var rangeMax = minDate.AddMonths(1).ToValtDateTime();
+        // Use midnight-to-midnight range to ensure all records for the month are captured
+        // regardless of the time component stored in the database
+        var rangeMin = new DateTime(minDate.Year, minDate.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+        var rangeMax = rangeMin.AddMonths(1);
         //scan all fixed expense records from this month
         var fixedExpenseRecords = _localDatabase.GetFixedExpenseRecords().Query()
             .Where(x => x.ReferenceDate >= rangeMin && x.ReferenceDate < rangeMax).ToList();
         foreach (var entry in entries)
         {
-            // Compare using DateOnly to avoid timezone issues with DateTime
+            // Compare using DateOnly - dates are stored at noon UTC via ToValtDateTime()
+            // so extracting the date part directly gives the correct day
             var entryDate = entry.ReferenceDate;
             var match = fixedExpenseRecords.SingleOrDefault(x =>
-                DateOnly.FromDateTime(x.ReferenceDate.ToUniversalTime()) == entryDate &&
+                DateOnly.FromDateTime(x.ReferenceDate) == entryDate &&
                 x.FixedExpense.Id.ToString() == entry.Id);
 
             if (match is null)

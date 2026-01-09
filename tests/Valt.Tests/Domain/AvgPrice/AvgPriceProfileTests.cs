@@ -197,17 +197,25 @@ public class AvgPriceProfileTests
     }
 
     [Test]
-    public void Should_Handle_Display_Order_For_Same_Date()
+    public void Should_Auto_Increment_Display_Order_For_Same_Date()
     {
         // Arrange
         var profile = AvgPriceProfileBuilder.AProfile()
             .WithCurrency(FiatCurrency.Usd)
             .Build();
 
-        // Add two lines on the same day with different display orders
+        // Add multiple lines on the same day - display order should auto-increment
         profile.AddLine(
             new DateOnly(2024, 1, 1),
-            2, // Second in order
+            999, // This value should be ignored - auto-calculated to 0
+            AvgPriceLineTypes.Buy,
+            1m,
+            FiatValue.New(50000m),
+            "First buy");
+
+        profile.AddLine(
+            new DateOnly(2024, 1, 1),
+            999, // This value should be ignored - auto-calculated to 1
             AvgPriceLineTypes.Buy,
             0.5m,
             FiatValue.New(30000m),
@@ -215,25 +223,54 @@ public class AvgPriceProfileTests
 
         profile.AddLine(
             new DateOnly(2024, 1, 1),
-            1, // First in order
+            999, // This value should be ignored - auto-calculated to 2
             AvgPriceLineTypes.Buy,
-            1m,
-            FiatValue.New(50000m),
-            "First buy");
+            0.25m,
+            FiatValue.New(20000m),
+            "Third buy");
 
-        // Assert
+        // Assert - Display orders should be auto-incremented 0, 1, 2
         var orderedLines = profile.AvgPriceLines
             .OrderBy(x => x.Date)
             .ThenBy(x => x.DisplayOrder)
             .ToList();
 
-        // First line (order 1): Total = 50000, BTC = 1
-        Assert.That(orderedLines[0].DisplayOrder, Is.EqualTo(1));
+        Assert.That(orderedLines[0].DisplayOrder, Is.EqualTo(0));
+        Assert.That(orderedLines[0].Comment, Is.EqualTo("First buy"));
         Assert.That(orderedLines[0].Totals.TotalCost, Is.EqualTo(50000m));
 
-        // Second line (order 2): Total = 80000, BTC = 1.5
-        Assert.That(orderedLines[1].DisplayOrder, Is.EqualTo(2));
+        Assert.That(orderedLines[1].DisplayOrder, Is.EqualTo(1));
+        Assert.That(orderedLines[1].Comment, Is.EqualTo("Second buy"));
         Assert.That(orderedLines[1].Totals.TotalCost, Is.EqualTo(80000m));
+
+        Assert.That(orderedLines[2].DisplayOrder, Is.EqualTo(2));
+        Assert.That(orderedLines[2].Comment, Is.EqualTo("Third buy"));
+        Assert.That(orderedLines[2].Totals.TotalCost, Is.EqualTo(100000m));
+    }
+
+    [Test]
+    public void Should_Reset_Display_Order_For_Different_Dates()
+    {
+        // Arrange
+        var profile = AvgPriceProfileBuilder.AProfile()
+            .WithCurrency(FiatCurrency.Usd)
+            .Build();
+
+        // Add lines on different dates
+        profile.AddLine(new DateOnly(2024, 1, 1), 0, AvgPriceLineTypes.Buy, 1m, FiatValue.New(50000m), "Day1 First");
+        profile.AddLine(new DateOnly(2024, 1, 1), 0, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(30000m), "Day1 Second");
+        profile.AddLine(new DateOnly(2024, 1, 2), 0, AvgPriceLineTypes.Buy, 0.25m, FiatValue.New(20000m), "Day2 First");
+        profile.AddLine(new DateOnly(2024, 1, 2), 0, AvgPriceLineTypes.Buy, 0.1m, FiatValue.New(10000m), "Day2 Second");
+
+        // Assert - Display orders should reset per date
+        var day1Lines = profile.AvgPriceLines.Where(x => x.Date == new DateOnly(2024, 1, 1)).OrderBy(x => x.DisplayOrder).ToList();
+        var day2Lines = profile.AvgPriceLines.Where(x => x.Date == new DateOnly(2024, 1, 2)).OrderBy(x => x.DisplayOrder).ToList();
+
+        Assert.That(day1Lines[0].DisplayOrder, Is.EqualTo(0));
+        Assert.That(day1Lines[1].DisplayOrder, Is.EqualTo(1));
+
+        Assert.That(day2Lines[0].DisplayOrder, Is.EqualTo(0));
+        Assert.That(day2Lines[1].DisplayOrder, Is.EqualTo(1));
     }
 
     [Test]
