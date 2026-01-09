@@ -119,6 +119,26 @@ internal sealed class PriceDatabase : IPriceDatabase
         return collection;
     }
 
+    public int GetVersion()
+    {
+        var db = GetOpenDatabase();
+        var collection = db.GetCollection("_config");
+        var doc = collection.FindById("version");
+        return doc?["value"].AsInt32 ?? 0;
+    }
+
+    public void SetVersion(int version)
+    {
+        var db = GetOpenDatabase();
+        var collection = db.GetCollection("_config");
+        var doc = new LiteDB.BsonDocument
+        {
+            ["_id"] = "version",
+            ["value"] = version
+        };
+        collection.Upsert(doc);
+    }
+
     public void BeginTransaction()
     {
         GetOpenDatabase().BeginTrans();
@@ -132,6 +152,15 @@ internal sealed class PriceDatabase : IPriceDatabase
     public void RollbackTransaction()
     {
         GetOpenDatabase().Rollback();
+    }
+
+    public bool HasPriceData()
+    {
+        var db = GetOpenDatabase();
+        var btcCollection = db.GetCollection<BitcoinDataEntity>("datasource_bitcoin");
+        var fiatCollection = db.GetCollection<FiatDataEntity>("datasource_fiat");
+
+        return btcCollection.Count() > 0 || fiatCollection.Count() > 0;
     }
 
     #endregion

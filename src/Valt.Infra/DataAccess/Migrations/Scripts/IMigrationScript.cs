@@ -11,5 +11,12 @@ internal interface IMigrationScript
     /// </summary>
     Version MinimumAssemblyVersion { get; }
 
+    /// <summary>
+    /// If set, indicates that the prices.db should be reset to this version.
+    /// The reset only occurs if the current prices.db version is lower than this value.
+    /// After reset, the prices.db version will be set to this value.
+    /// </summary>
+    int? ResetPricesToVersion => null;
+
     Task ExecuteAsync();
 }

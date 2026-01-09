@@ -40,8 +40,6 @@ internal class Migration_001_ConvertDatesToUtcNoon : IMigrationScript
         MigrateAvgPriceLines();
         MigrateAccountCache();
 
-        // Migrate price database (shared, but needs to match new format)
-        MigratePriceDatabase();
 
         return Task.CompletedTask;
     }
@@ -110,35 +108,6 @@ internal class Migration_001_ConvertDatesToUtcNoon : IMigrationScript
         {
             item.CurrentDate = ConvertToUtcNoon(item.CurrentDate);
             collection.Update(item);
-        }
-    }
-
-    private void MigratePriceDatabase()
-    {
-        // Check if price database is already migrated by looking at first entry
-        var btcSample = _priceDatabase.GetBitcoinData().FindAll().FirstOrDefault();
-        if (btcSample != null && IsAlreadyUtcNoon(btcSample.Date))
-        {
-            // Already migrated (probably by another database instance)
-            return;
-        }
-
-        // Migrate Bitcoin prices
-        var btcCollection = _priceDatabase.GetBitcoinData();
-        var btcItems = btcCollection.FindAll().ToList();
-        foreach (var item in btcItems)
-        {
-            item.Date = ConvertToUtcNoon(item.Date);
-            btcCollection.Update(item);
-        }
-
-        // Migrate Fiat prices
-        var fiatCollection = _priceDatabase.GetFiatData();
-        var fiatItems = fiatCollection.FindAll().ToList();
-        foreach (var item in fiatItems)
-        {
-            item.Date = ConvertToUtcNoon(item.Date);
-            fiatCollection.Update(item);
         }
     }
 
