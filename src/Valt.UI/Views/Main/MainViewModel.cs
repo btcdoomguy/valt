@@ -20,6 +20,7 @@ using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel.BackgroundJobs;
 using Valt.Infra.Modules.Budget;
+using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
@@ -48,6 +49,7 @@ public partial class MainViewModel : ValtViewModel
     private readonly CurrencySettings _currencySettings;
     private readonly BackgroundJobManager? _backgroundJobManager;
     private readonly IDatabaseInitializer? _databaseInitializer;
+    private readonly IDatabaseVersionChecker? _databaseVersionChecker;
     private readonly LiveRatesViewModel _liveRatesViewModel;
     private readonly UpdateIndicatorViewModel _updateIndicatorViewModel;
     private readonly IAllTimeHighReport _allTimeHighReport;
@@ -130,6 +132,7 @@ public partial class MainViewModel : ValtViewModel
         CurrencySettings currencySettings,
         BackgroundJobManager backgroundJobManager,
         IDatabaseInitializer databaseInitializer,
+        IDatabaseVersionChecker databaseVersionChecker,
         LiveRatesViewModel liveRatesViewModel,
         UpdateIndicatorViewModel updateIndicatorViewModel,
         LiveRateState liveRateState,
@@ -144,6 +147,7 @@ public partial class MainViewModel : ValtViewModel
         _currencySettings = currencySettings;
         _backgroundJobManager = backgroundJobManager;
         _databaseInitializer = databaseInitializer;
+        _databaseVersionChecker = databaseVersionChecker;
         _liveRatesViewModel = liveRatesViewModel;
         _updateIndicatorViewModel = updateIndicatorViewModel;
         _allTimeHighReport = allTimeHighReport;
@@ -258,6 +262,22 @@ public partial class MainViewModel : ValtViewModel
             {
                 await MessageBoxHelper.ShowErrorAsync(language.Error, $"{ex.Message}", Window!);
                 continue;
+            }
+
+            // Check database version compatibility before proceeding
+            if (!result.IsNew)
+            {
+                var compatibilityResult = _databaseVersionChecker!.CheckCompatibility();
+                if (!compatibilityResult.IsCompatible)
+                {
+                    await MessageBoxHelper.ShowErrorAsync(language.Error,
+                        string.Format(language.Error_IncompatibleVersion,
+                            compatibilityResult.RequiredVersion,
+                            compatibilityResult.CurrentVersion),
+                        Window!);
+                    _localDatabase.CloseDatabase();
+                    continue;
+                }
             }
 
             if (result.IsNew)

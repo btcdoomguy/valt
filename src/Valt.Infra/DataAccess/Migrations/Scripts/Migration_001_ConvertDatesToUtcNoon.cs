@@ -29,6 +29,8 @@ internal class Migration_001_ConvertDatesToUtcNoon : IMigrationScript
 
     public int Version => 1;
 
+    public Version MinimumAssemblyVersion => new(0, 2, 0, 2);
+
     public Task ExecuteAsync()
     {
         // Migrate local database collections

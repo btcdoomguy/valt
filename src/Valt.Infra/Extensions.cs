@@ -113,6 +113,7 @@ public static class Extensions
         services.AddSingleton<IDatabaseInitializer, DatabaseInitializer>();
         services.AddSingleton<ConfigurationManager>();
         services.AddSingleton<MigrationManager>();
+        services.AddSingleton<IDatabaseVersionChecker, DatabaseVersionChecker>();
 
         services.Scan(scan => scan
             .FromAssemblyOf<Extensions.Foo>()
