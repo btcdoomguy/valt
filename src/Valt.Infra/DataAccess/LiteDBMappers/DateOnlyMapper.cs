@@ -8,7 +8,8 @@ public class DateOnlyMapper
     {
         mapper.RegisterType<DateOnly>(
             serialize: date => new BsonValue(date.ToValtDateTime()),
-            deserialize: bson => DateOnly.FromDateTime(bson.AsDateTime)
+            // Convert to UTC before extracting date to ensure timezone doesn't shift the date
+            deserialize: bson => DateOnly.FromDateTime(bson.AsDateTime.ToUniversalTime())
         );
     }
 }

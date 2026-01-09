@@ -42,13 +42,13 @@ internal class ReportDataProvider : IReportDataProvider
 
     public FrozenDictionary<ObjectId, AccountEntity> Accounts { get; }
     public FrozenDictionary<ObjectId, CategoryEntity> Categories { get; }
-    public FrozenDictionary<DateTime, ImmutableList<TransactionEntity>> TransactionsByDate { get; }
-    public FrozenDictionary<DateTime, ImmutableList<ObjectId>> AccountsByDate { get; }
-    public FrozenDictionary<DateTime, BitcoinDataEntity> BtcRates { get; }
-    public FrozenDictionary<DateTime, ImmutableList<FiatDataEntity>> FiatRates { get; }
+    public FrozenDictionary<DateOnly, ImmutableList<TransactionEntity>> TransactionsByDate { get; }
+    public FrozenDictionary<DateOnly, ImmutableList<ObjectId>> AccountsByDate { get; }
+    public FrozenDictionary<DateOnly, BitcoinDataEntity> BtcRates { get; }
+    public FrozenDictionary<DateOnly, ImmutableList<FiatDataEntity>> FiatRates { get; }
     public ImmutableList<TransactionEntity> AllTransactions { get; }
-    public DateTime MinTransactionDate { get; }
-    public DateTime MaxTransactionDate { get; }
+    public DateOnly MinTransactionDate { get; }
+    public DateOnly MaxTransactionDate { get; }
 
     public ReportDataProvider(IPriceDatabase priceDatabase, ILocalDatabase localDatabase, IClock clock)
     {
@@ -66,23 +66,22 @@ internal class ReportDataProvider : IReportDataProvider
         if (AllTransactions.Count == 0)
         {
             // No transactions - set empty collections
-            MinTransactionDate = clock.GetCurrentLocalDate().ToValtDateTime();
-            MaxTransactionDate = clock.GetCurrentLocalDate().ToValtDateTime();
-            TransactionsByDate = FrozenDictionary<DateTime, ImmutableList<TransactionEntity>>.Empty;
-            AccountsByDate = FrozenDictionary<DateTime, ImmutableList<ObjectId>>.Empty;
-            BtcRates = FrozenDictionary<DateTime, BitcoinDataEntity>.Empty;
-            FiatRates = FrozenDictionary<DateTime, ImmutableList<FiatDataEntity>>.Empty;
+            MinTransactionDate = clock.GetCurrentLocalDate();
+            MaxTransactionDate = clock.GetCurrentLocalDate();
+            TransactionsByDate = FrozenDictionary<DateOnly, ImmutableList<TransactionEntity>>.Empty;
+            AccountsByDate = FrozenDictionary<DateOnly, ImmutableList<ObjectId>>.Empty;
+            BtcRates = FrozenDictionary<DateOnly, BitcoinDataEntity>.Empty;
+            FiatRates = FrozenDictionary<DateOnly, ImmutableList<FiatDataEntity>>.Empty;
             return;
         }
 
-        // Determine date range
-        MinTransactionDate = AllTransactions.Min(x => x.Date);
-        var currentDate = clock.GetCurrentLocalDate().ToValtDateTime();
-        MaxTransactionDate = currentDate;
+        // Determine date range - extract DateOnly from UTC to ensure consistency
+        MinTransactionDate = AllTransactions.Min(x => DateOnly.FromDateTime(x.Date.ToUniversalTime()));
+        MaxTransactionDate = clock.GetCurrentLocalDate();
 
-        // Build transaction indexes
+        // Build transaction indexes - group by DateOnly extracted from UTC
         TransactionsByDate = AllTransactions
-            .GroupBy(x => x.Date)
+            .GroupBy(x => DateOnly.FromDateTime(x.Date.ToUniversalTime()))
             .ToFrozenDictionary(x => x.Key, x => x.ToImmutableList());
 
         AccountsByDate = TransactionsByDate.ToFrozenDictionary(
@@ -94,28 +93,29 @@ internal class ReportDataProvider : IReportDataProvider
                 .ToImmutableList());
 
         // Load rates with buffer for lookups
-        var rateMinDate = MinTransactionDate.AddDays(-MaxDaysToScanForRate);
+        var rateMinDate = MinTransactionDate.AddDays(-MaxDaysToScanForRate).ToValtDateTime();
+        var rateMaxDate = MaxTransactionDate.ToValtDateTime();
         var btcRates = priceDatabase.GetBitcoinData()
-            .Find(x => x.Date >= rateMinDate && x.Date <= MaxTransactionDate)
+            .Find(x => x.Date >= rateMinDate && x.Date <= rateMaxDate)
             .ToImmutableList();
-        BtcRates = btcRates.ToFrozenDictionary(x => x.Date);
+        BtcRates = btcRates.ToFrozenDictionary(x => DateOnly.FromDateTime(x.Date.ToUniversalTime()));
 
         var fiatRates = priceDatabase.GetFiatData()
-            .Find(x => x.Date >= rateMinDate && x.Date <= MaxTransactionDate)
+            .Find(x => x.Date >= rateMinDate && x.Date <= rateMaxDate)
             .ToImmutableList();
         FiatRates = fiatRates
-            .GroupBy(x => x.Date)
+            .GroupBy(x => DateOnly.FromDateTime(x.Date.ToUniversalTime()))
             .ToFrozenDictionary(x => x.Key, x => x.ToImmutableList());
     }
 
-    public decimal GetFiatRateAt(DateTime date, FiatCurrency currency)
+    public decimal GetFiatRateAt(DateOnly date, FiatCurrency currency)
     {
         if (currency == FiatCurrency.Usd)
         {
             return 1;
         }
 
-        var scanDate = date.Date;
+        var scanDate = date;
         var currencyCode = currency.Code;
 
         for (var i = 0; i < MaxDaysToScanForRate; i++)
@@ -135,7 +135,7 @@ internal class ReportDataProvider : IReportDataProvider
         throw new ApplicationException($"Could not find fiat rate for {currencyCode} on {date}");
     }
 
-    public decimal GetUsdBitcoinPriceAt(DateTime date)
+    public decimal GetUsdBitcoinPriceAt(DateOnly date)
     {
         var scanDate = date;
 

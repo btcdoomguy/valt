@@ -14,15 +14,15 @@ public interface IReportDataProvider
 {
     FrozenDictionary<ObjectId, AccountEntity> Accounts { get; }
     FrozenDictionary<ObjectId, CategoryEntity> Categories { get; }
-    FrozenDictionary<DateTime, ImmutableList<TransactionEntity>> TransactionsByDate { get; }
-    FrozenDictionary<DateTime, ImmutableList<ObjectId>> AccountsByDate { get; }
-    FrozenDictionary<DateTime, BitcoinDataEntity> BtcRates { get; }
-    FrozenDictionary<DateTime, ImmutableList<FiatDataEntity>> FiatRates { get; }
+    FrozenDictionary<DateOnly, ImmutableList<TransactionEntity>> TransactionsByDate { get; }
+    FrozenDictionary<DateOnly, ImmutableList<ObjectId>> AccountsByDate { get; }
+    FrozenDictionary<DateOnly, BitcoinDataEntity> BtcRates { get; }
+    FrozenDictionary<DateOnly, ImmutableList<FiatDataEntity>> FiatRates { get; }
 
     ImmutableList<TransactionEntity> AllTransactions { get; }
-    DateTime MinTransactionDate { get; }
-    DateTime MaxTransactionDate { get; }
+    DateOnly MinTransactionDate { get; }
+    DateOnly MaxTransactionDate { get; }
 
-    decimal GetFiatRateAt(DateTime date, FiatCurrency currency);
-    decimal GetUsdBitcoinPriceAt(DateTime date);
+    decimal GetFiatRateAt(DateOnly date, FiatCurrency currency);
+    decimal GetUsdBitcoinPriceAt(DateOnly date);
 }

@@ -51,9 +51,10 @@ public class FixedExpenseIntegrationTests : IntegrationTest
     [Test]
     public async Task Should_Generate_FixedExpenseRecord()
     {
+        var expectedDate = new DateOnly(2025, 1, 30).ToValtDateTime();
         var record = _localDatabase.GetFixedExpenseRecords().FindOne(x =>
             x.FixedExpense.Id == _fixedExpenseId.ToObjectId() &&
-            x.Transaction.Id == _transactionId.ToObjectId() && x.ReferenceDate == new DateTime(2025, 1, 30));
+            x.Transaction.Id == _transactionId.ToObjectId() && x.ReferenceDate == expectedDate);
 
         Assert.That(record, Is.Not.Null);
     }
@@ -64,9 +65,10 @@ public class FixedExpenseIntegrationTests : IntegrationTest
         var transactionRepo = _serviceProvider.GetRequiredService<ITransactionRepository>();
         await transactionRepo.DeleteTransactionAsync(_transactionId);
 
+        var expectedDate = new DateOnly(2025, 1, 30).ToValtDateTime();
         var record = _localDatabase.GetFixedExpenseRecords().FindOne(x =>
             x.FixedExpense.Id == _fixedExpenseId.ToObjectId() &&
-            x.Transaction.Id == _transactionId.ToObjectId() && x.ReferenceDate == new DateTime(2025, 1, 30));
+            x.Transaction.Id == _transactionId.ToObjectId() && x.ReferenceDate == expectedDate);
 
         Assert.That(record, Is.Null);
     }
@@ -77,9 +79,10 @@ public class FixedExpenseIntegrationTests : IntegrationTest
         var fixedExpenseRepo = _serviceProvider.GetRequiredService<IFixedExpenseRepository>();
         await fixedExpenseRepo.DeleteFixedExpenseAsync(_fixedExpenseId);
 
+        var expectedDate = new DateOnly(2025, 1, 30).ToValtDateTime();
         var record = _localDatabase.GetFixedExpenseRecords().FindOne(x =>
             x.FixedExpense.Id == _fixedExpenseId.ToObjectId() &&
-            x.Transaction.Id == _transactionId.ToObjectId() && x.ReferenceDate == new DateTime(2025, 1, 30));
+            x.Transaction.Id == _transactionId.ToObjectId() && x.ReferenceDate == expectedDate);
 
         Assert.That(record, Is.Null);
     }

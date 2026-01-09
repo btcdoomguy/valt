@@ -29,10 +29,7 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
             });
         }
 
-        var minDate = displayRange.Start.ToValtDateTime();
-        var maxDate = displayRange.End.ToValtDateTime();
-
-        var calculator = new Calculator(currency, provider, minDate, maxDate, filter);
+        var calculator = new Calculator(currency, provider, displayRange.Start, displayRange.End, filter);
 
         try
         {
@@ -51,15 +48,15 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
 
         private readonly FiatCurrency _currency;
         private readonly IReportDataProvider _provider;
-        private readonly DateTime _startDate;
-        private readonly DateTime _endDate;
+        private readonly DateOnly _startDate;
+        private readonly DateOnly _endDate;
         private readonly IExpensesByCategoryReport.Filter _filter;
 
         public Calculator(
             FiatCurrency currency,
             IReportDataProvider provider,
-            DateTime startDate,
-            DateTime endDate,
+            DateOnly startDate,
+            DateOnly endDate,
             IExpensesByCategoryReport.Filter filter)
         {
             _currency = currency;

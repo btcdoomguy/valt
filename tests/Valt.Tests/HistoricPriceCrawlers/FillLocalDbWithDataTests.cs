@@ -26,7 +26,7 @@ public class FillLocalDbWithDataTests : DatabaseTest
     [Test]
     public void Should_GetSpecificPrice_Fast()
     {
-        var priceDate = new DateTime(2018, 3, 8);
+        var priceDate = new DateOnly(2018, 3, 8).ToValtDateTime();
         var stopWatch = new Stopwatch();
         stopWatch.Start();
         var entry = _priceDatabase.GetBitcoinData().Query().Where(x => x.Date == priceDate).FirstOrDefault();

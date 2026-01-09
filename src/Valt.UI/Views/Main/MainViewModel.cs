@@ -158,7 +158,7 @@ public partial class MainViewModel : ValtViewModel
         
         WeakReferenceMessenger.Default.Register<LivePriceUpdated>(this, (recipient, message) =>
         {
-            var percentage = liveRateState.BitcoinPrice / liveRateState.PreviousBitcoinPrice.GetValueOrDefault();
+            var percentage = liveRateState.BitcoinPrice / liveRateState.PreviousBitcoinPrice.GetValueOrDefault(1);
             
             Crashing = percentage <= 0.95m;
             Down = percentage <= 0.97m && !Crashing;

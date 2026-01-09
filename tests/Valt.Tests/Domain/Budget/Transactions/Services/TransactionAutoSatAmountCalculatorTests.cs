@@ -5,6 +5,7 @@ using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Categories;
 using Valt.Core.Modules.Budget.Transactions;
 using Valt.Core.Modules.Budget.Transactions.Details;
+using Valt.Infra;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers;
 using Valt.Infra.Modules.Budget.Transactions.Services;
 using Valt.Infra.Modules.DataSources.Bitcoin;
@@ -59,17 +60,17 @@ public class TransactionAutoSatAmountCalculatorTests : DatabaseTest
         //init sample bitcoin data history
         var bitcoinDataEntity1 = new BitcoinDataEntity()
         {
-            Date = new DateTime(2023, 1, 1),
+            Date = new DateOnly(2023, 1, 1).ToValtDateTime(),
             Price = 50000m
         };
         var bitcoinDataEntity2 = new BitcoinDataEntity()
         {
-            Date = new DateTime(2023, 1, 2),
+            Date = new DateOnly(2023, 1, 2).ToValtDateTime(),
             Price = 51000m
         };
         var bitcoinDataEntity3 = new BitcoinDataEntity()
         {
-            Date = new DateTime(2023, 1, 3),
+            Date = new DateOnly(2023, 1, 3).ToValtDateTime(),
             Price = 52000m
         };
 
@@ -80,19 +81,19 @@ public class TransactionAutoSatAmountCalculatorTests : DatabaseTest
         //init sample fiat data history
         var fiatDataEntity1 = new FiatDataEntity()
         {
-            Date = new DateTime(2023, 1, 1),
+            Date = new DateOnly(2023, 1, 1).ToValtDateTime(),
             Currency = FiatCurrency.Brl.Code,
             Price = 5m
         };
         var fiatDataEntity2 = new FiatDataEntity()
         {
-            Date = new DateTime(2023, 1, 2),
+            Date = new DateOnly(2023, 1, 2).ToValtDateTime(),
             Currency = FiatCurrency.Brl.Code,
             Price = 5.1m
         };
         var fiatDataEntity3 = new FiatDataEntity()
         {
-            Date = new DateTime(2023, 1, 3),
+            Date = new DateOnly(2023, 1, 3).ToValtDateTime(),
             Currency = FiatCurrency.Brl.Code,
             Price = 5.2m
         };
@@ -178,14 +179,14 @@ public class TransactionAutoSatAmountCalculatorTests : DatabaseTest
         //adds rates without value
         var bitcoinDataEntity1 = new BitcoinDataEntity()
         {
-            Date = new DateTime(2022, 12, 31),
+            Date = new DateOnly(2022, 12, 31).ToValtDateTime(),
             Price = 0m
         };
         _priceDatabase.GetBitcoinData().Insert(bitcoinDataEntity1);
 
         var fiatDataEntity1 = new FiatDataEntity()
         {
-            Date = new DateTime(2022, 12, 31),
+            Date = new DateOnly(2022, 12, 31).ToValtDateTime(),
             Currency = FiatCurrency.Brl.Code,
             Price = 0m
         };
