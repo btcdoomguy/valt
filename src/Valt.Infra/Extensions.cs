@@ -83,6 +83,7 @@ public static class Extensions
 
         //price crawlers fiat
         services.AddSingleton<IFiatPriceProvider, FrankfurterFiatRateProvider>();
+        services.AddSingleton<IFiatPriceProvider, CurrencyApiFiatRateProvider>();
         
         //initial seed provider
         services.AddSingleton<IBitcoinInitialSeedPriceProvider, BitcoinInitialSeedPriceProvider>();

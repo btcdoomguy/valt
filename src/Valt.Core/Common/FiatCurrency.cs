@@ -34,6 +34,8 @@ public record FiatCurrency(string Code, int Decimals, string Symbol, bool Symbol
     public static FiatCurrency Sgd => new FiatCurrency("SGD", 2, "$", false, "en-SG");
     public static FiatCurrency Thb => new FiatCurrency("THB", 2, "฿", false, "th-TH");
     public static FiatCurrency Try => new FiatCurrency("TRY", 2, "₺", false, "tr-TR");
+    public static FiatCurrency Uyu => new FiatCurrency("UYU", 2, "$U", false, "es-UY");
+    public static FiatCurrency Pyg => new FiatCurrency("PYG", 0, "₲", false, "es-PY");
     public static FiatCurrency Zar => new FiatCurrency("ZAR", 2, "R", false, "en-ZA");
 
     public static FiatCurrency GetFromCode(string code)
@@ -70,6 +72,8 @@ public record FiatCurrency(string Code, int Decimals, string Symbol, bool Symbol
             "sgd" => Sgd,
             "thb" => Thb,
             "try" => Try,
+            "uyu" => Uyu,
+            "pyg" => Pyg,
             "zar" => Zar,
             _ => throw new InvalidCurrencyCodeException(code)
         };
@@ -107,6 +111,8 @@ public record FiatCurrency(string Code, int Decimals, string Symbol, bool Symbol
         yield return Sgd;
         yield return Thb;
         yield return Try;
+        yield return Uyu;
+        yield return Pyg;
         yield return Zar;
     }
 
