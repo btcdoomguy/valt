@@ -13,7 +13,7 @@ namespace Valt.Infra.Crawlers.LivePriceCrawlers;
 
 internal class LivePricesUpdaterJob : IBackgroundJob
 {
-    private readonly IFiatPriceProvider _fiatPriceProvider;
+    private readonly IFiatPriceProviderSelector _fiatPriceProviderSelector;
     private readonly IBitcoinPriceProvider _bitcoinPriceProvider;
     private readonly IPriceDatabase _priceDatabase;
     private readonly ILocalHistoricalPriceProvider _localHistoricalPriceProvider;
@@ -31,14 +31,14 @@ internal class LivePricesUpdaterJob : IBackgroundJob
     public BackgroundJobTypes JobType => BackgroundJobTypes.PriceDatabase;
     public TimeSpan Interval => TimeSpan.FromSeconds(30);
 
-    public LivePricesUpdaterJob(IFiatPriceProvider fiatPriceProvider,
+    public LivePricesUpdaterJob(IFiatPriceProviderSelector fiatPriceProviderSelector,
         IBitcoinPriceProvider bitcoinPriceProvider,
         IPriceDatabase priceDatabase,
         ILocalHistoricalPriceProvider localHistoricalPriceProvider,
         ConfigurationManager configurationManager,
         ILogger<LivePricesUpdaterJob> logger)
     {
-        _fiatPriceProvider = fiatPriceProvider;
+        _fiatPriceProviderSelector = fiatPriceProviderSelector;
         _bitcoinPriceProvider = bitcoinPriceProvider;
         _priceDatabase = priceDatabase;
         _localHistoricalPriceProvider = localHistoricalPriceProvider;
@@ -72,20 +72,22 @@ internal class LivePricesUpdaterJob : IBackgroundJob
                 return;
             }
 
-            // Get currencies from configuration
-            var currencyCodes = _configurationManager.GetAvailableFiatCurrencies();
+            // Get currencies actually in use (from accounts, fixed expenses, and avg price profiles)
+            var currencyCodes = _configurationManager.GetCurrenciesInUse();
             if (currencyCodes.Count == 0)
             {
-                _logger.LogInformation("[LivePricesUpdaterJob] No currencies configured, skipping update");
+                _logger.LogInformation("[LivePricesUpdaterJob] No currencies in use, skipping update");
                 return;
             }
 
             var currencies = currencyCodes.Select(FiatCurrency.GetFromCode).ToList();
 
-            _logger.LogInformation("[LivePricesUpdaterJob] Fetching prices for {Count} currencies: {Currencies}",
+            _logger.LogInformation("[LivePricesUpdaterJob] Fetching prices for {Count} currencies in use: {Currencies}",
                 currencies.Count, string.Join(", ", currencies.Select(c => c.Code)));
 
-            var fiatTask = _fiatPriceProvider.GetAsync(currencies);
+            // Fetch fiat and BTC prices in parallel
+            // The fiat price selector handles splitting currencies between providers
+            var fiatTask = _fiatPriceProviderSelector.GetAsync(currencies);
             var btcTask = _bitcoinPriceProvider.GetAsync();
 
             await Task.WhenAll(fiatTask, btcTask).ConfigureAwait(false);

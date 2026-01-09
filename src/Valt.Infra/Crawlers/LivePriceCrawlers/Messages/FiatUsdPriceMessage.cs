@@ -2,7 +2,7 @@ using Valt.Core.Common;
 
 namespace Valt.Infra.Crawlers.LivePriceCrawlers.Messages;
 
-public record FiatUsdPrice
+public record  FiatUsdPrice
 {
     public DateTime Utc { get; }
     public bool UpToDate { get; }
