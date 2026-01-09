@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
+using Valt.Core.Common;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Messages;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel.BackgroundJobs;
@@ -67,15 +68,17 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
             _logger.LogInformation("[FiatHistoryUpdater] Current fiat price records: {Count}", currentRecordCount);
 
             // Get currencies from configuration
-            var currencies = _configurationManager.GetAvailableFiatCurrencies();
-            if (currencies.Count == 0)
+            var currencyCodes = _configurationManager.GetAvailableFiatCurrencies();
+            if (currencyCodes.Count == 0)
             {
                 _logger.LogInformation("[FiatHistoryUpdater] No currencies configured, skipping update");
                 return;
             }
 
+            var currencies = currencyCodes.Select(FiatCurrency.GetFromCode).ToList();
+
             _logger.LogInformation("[FiatHistoryUpdater] Configured currencies: {Currencies}",
-                string.Join(", ", currencies));
+                string.Join(", ", currencies.Select(c => c.Code)));
 
             var utcNow = DateTime.UtcNow;
             var localDate = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, 0, 0, 0, DateTimeKind.Local);
@@ -249,24 +252,25 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
         foreach (var price in pricesList)
         {
             var dateToConsider = price.Date.ToValtDateTime();
-            foreach (var currency in price.Data)
+            foreach (var currencyData in price.Data)
             {
-                if (existingEntries.Contains((dateToConsider, currency.Currency)))
+                var currencyCode = currencyData.Currency.Code;
+                if (existingEntries.Contains((dateToConsider, currencyCode)))
                 {
                     _logger.LogDebug(
                         "[FiatHistoryUpdater] Skipping duplicate entry for {Date} {Currency}",
-                        dateToConsider.ToString("yyyy-MM-dd"), currency.Currency);
+                        dateToConsider.ToString("yyyy-MM-dd"), currencyCode);
                     continue;
                 }
 
                 _logger.LogInformation(
                     "[FiatHistoryUpdater] Adding price {CurrencyPrice} for {S} for {CurrencyCurrency}",
-                    currency.Price, dateToConsider.ToString("yyyy-MM-dd"), currency.Currency);
+                    currencyData.Price, dateToConsider.ToString("yyyy-MM-dd"), currencyCode);
                 entries.Add(new FiatDataEntity()
                 {
                     Date = dateToConsider,
-                    Currency = currency.Currency,
-                    Price = currency.Price
+                    Currency = currencyCode,
+                    Price = currencyData.Price
                 });
             }
         }

@@ -7,26 +7,42 @@ namespace Valt.Infra.Crawlers.HistoricPriceCrawlers.Fiat.Providers;
 public class FrankfurterFiatHistoricalDataProvider : IFiatHistoricalDataProvider
 {
     private readonly ILogger<FrankfurterFiatHistoricalDataProvider> _logger;
-    public bool RequiresApiKey => false;
+
+    private static readonly HashSet<FiatCurrency> FrankfurterSupportedCurrencies = new(
+    [
+        FiatCurrency.Aud, FiatCurrency.Bgn, FiatCurrency.Brl, FiatCurrency.Cad,
+        FiatCurrency.Chf, FiatCurrency.Cny, FiatCurrency.Czk, FiatCurrency.Dkk,
+        FiatCurrency.Eur, FiatCurrency.Gbp, FiatCurrency.Hkd, FiatCurrency.Huf,
+        FiatCurrency.Idr, FiatCurrency.Ils, FiatCurrency.Inr, FiatCurrency.Isk,
+        FiatCurrency.Jpy, FiatCurrency.Krw, FiatCurrency.Mxn, FiatCurrency.Myr,
+        FiatCurrency.Nok, FiatCurrency.Nzd, FiatCurrency.Php, FiatCurrency.Pln,
+        FiatCurrency.Ron, FiatCurrency.Sek, FiatCurrency.Sgd, FiatCurrency.Thb,
+        FiatCurrency.Try, FiatCurrency.Usd, FiatCurrency.Zar
+    ]);
 
     public FrankfurterFiatHistoricalDataProvider(ILogger<FrankfurterFiatHistoricalDataProvider> logger)
     {
         _logger = logger;
     }
 
-    public async Task<IEnumerable<IFiatHistoricalDataProvider.FiatPriceData>> GetPricesAsync(DateOnly startDate, DateOnly endDate, IEnumerable<string> currencies)
+    public string Name => "Frankfurter";
+    public bool RequiresApiKey => false;
+    public IReadOnlySet<FiatCurrency> SupportedCurrencies => FrankfurterSupportedCurrencies;
+
+    public async Task<IEnumerable<IFiatHistoricalDataProvider.FiatPriceData>> GetPricesAsync(DateOnly startDate, DateOnly endDate, IEnumerable<FiatCurrency> currencies)
     {
         using var client = new HttpClient() { Timeout = TimeSpan.FromSeconds(10) };
         try
         {
-            var currencyList = currencies.Where(c => c != FiatCurrency.Usd.Code).ToList();
+            var currencyList = currencies.Where(c => c != FiatCurrency.Usd).ToList();
             if (currencyList.Count == 0)
             {
                 // No currencies to fetch
                 return [];
             }
 
-            var response = await client.GetAsync($"https://api.frankfurter.dev/v1/{startDate.ToString("yyyy-MM-dd")}..{endDate.ToString("yyyy-MM-dd")}?base=USD&symbols={string.Join(",", currencyList)}");
+            var symbolsParam = string.Join(",", currencyList.Select(c => c.Code));
+            var response = await client.GetAsync($"https://api.frankfurter.dev/v1/{startDate.ToString("yyyy-MM-dd")}..{endDate.ToString("yyyy-MM-dd")}?base=USD&symbols={symbolsParam}");
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -42,9 +58,9 @@ public class FrankfurterFiatHistoricalDataProvider : IFiatHistoricalDataProvider
 
                     foreach (var currencyProperty in currenciesFromResponse.EnumerateObject())
                     {
-                        var currency = currencyProperty.Name;
+                        var currencyCode = currencyProperty.Name;
                         var rate = currencyProperty.Value.GetDouble();
-                        currencyDict.Add(currency, rate);
+                        currencyDict.Add(currencyCode, rate);
                     }
 
                     ratesDict.Add(date, currencyDict);
@@ -55,8 +71,9 @@ public class FrankfurterFiatHistoricalDataProvider : IFiatHistoricalDataProvider
                 {
                     var currencyPrices = new HashSet<IFiatHistoricalDataProvider.CurrencyAndPrice>();
 
-                    foreach (var (currency, d) in value)
+                    foreach (var (currencyCode, d) in value)
                     {
+                        var currency = FiatCurrency.GetFromCode(currencyCode);
                         var price = Convert.ToDecimal(d);
                         currencyPrices.Add(new IFiatHistoricalDataProvider.CurrencyAndPrice(currency, price));
                     }

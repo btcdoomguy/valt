@@ -29,7 +29,7 @@ public partial class RatesState : ObservableObject, IRecipient<LivePriceUpdateMe
     {
         BitcoinPrice = message.Btc.Items.SingleOrDefault(x => x.CurrencyCode == FiatCurrency.Usd.Code)!.Price;
         PreviousBitcoinPrice = message.Btc.Items.SingleOrDefault(x => x.CurrencyCode == FiatCurrency.Usd.Code)!.PreviousPrice;
-        FiatRates = message.Fiat.Items.ToDictionary(x => x.CurrencyCode, x => x.Price);
+        FiatRates = message.Fiat.Items.ToDictionary(x => x.Currency.Code, x => x.Price);
         IsUpToDate = message.IsUpToDate;
 
         WeakReferenceMessenger.Default.Send(new RatesUpdated());

@@ -73,15 +73,17 @@ internal class LivePricesUpdaterJob : IBackgroundJob
             }
 
             // Get currencies from configuration
-            var currencies = _configurationManager.GetAvailableFiatCurrencies();
-            if (currencies.Count == 0)
+            var currencyCodes = _configurationManager.GetAvailableFiatCurrencies();
+            if (currencyCodes.Count == 0)
             {
                 _logger.LogInformation("[LivePricesUpdaterJob] No currencies configured, skipping update");
                 return;
             }
 
+            var currencies = currencyCodes.Select(FiatCurrency.GetFromCode).ToList();
+
             _logger.LogInformation("[LivePricesUpdaterJob] Fetching prices for {Count} currencies: {Currencies}",
-                currencies.Count, string.Join(", ", currencies));
+                currencies.Count, string.Join(", ", currencies.Select(c => c.Code)));
 
             var fiatTask = _fiatPriceProvider.GetAsync(currencies);
             var btcTask = _bitcoinPriceProvider.GetAsync();
@@ -103,7 +105,7 @@ internal class LivePricesUpdaterJob : IBackgroundJob
             // Log fiat rates
             foreach (var fiatRate in _fiatUsdPrice.Items)
             {
-                _logger.LogInformation("[LivePricesUpdaterJob] USD/{Currency}: {Price:N4}", fiatRate.CurrencyCode, fiatRate.Price);
+                _logger.LogInformation("[LivePricesUpdaterJob] USD/{Currency}: {Price:N4}", fiatRate.Currency.Code, fiatRate.Price);
             }
         }
         catch (Exception ex)
@@ -194,7 +196,7 @@ internal class LivePricesUpdaterJob : IBackgroundJob
             new BtcPrice(btcLastDateStored.ToDateTime(TimeOnly.MinValue, DateTimeKind.Local), false,
                 new[] { new BtcPrice.Item(FiatCurrency.Usd.Code, btcLastPriceStored.Value, btcLastPriceStored.Value) }),
             new FiatUsdPrice(fiatLastDateStored.ToDateTime(TimeOnly.MinValue, DateTimeKind.Local), false,
-                fiatLastPricesStored.Select(x => new FiatUsdPrice.Item(x.Currency.Code, x.Rate))), false));
+                fiatLastPricesStored.Select(x => new FiatUsdPrice.Item(x.Currency, x.Rate))), false));
 
         _logger.LogInformation("[LivePricesUpdaterJob] Fallback to stored prices completed");
     }

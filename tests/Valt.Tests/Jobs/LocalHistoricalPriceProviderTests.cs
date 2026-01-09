@@ -68,7 +68,7 @@ public class LocalHistoricalPriceProviderTests : IntegrationTest
             (recipient, message) => { receivedValue = message; });
 
         var failingFiatProvider = Substitute.For<IFiatPriceProvider>();
-        failingFiatProvider.GetAsync(Arg.Any<IEnumerable<string>>()).Returns<Task<FiatUsdPrice>>(_ => throw new HttpRequestException("No internet"));
+        failingFiatProvider.GetAsync(Arg.Any<IEnumerable<FiatCurrency>>()).Returns<Task<FiatUsdPrice>>(_ => throw new HttpRequestException("No internet"));
 
         var failingBtcProvider = Substitute.For<IBitcoinPriceProvider>();
         failingBtcProvider.GetAsync().Returns<Task<BtcPrice>>(_ => throw new TimeoutException("No internet"));
