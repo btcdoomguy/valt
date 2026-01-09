@@ -376,12 +376,9 @@ public partial class MainViewModel : ValtViewModel
 
     private async Task<bool> InstallProcessAsync()
     {
-        if (!await MessageBoxHelper.ShowOkCancelAsync(language.InstallPriceDatabase_Title,
-                language.InstallPriceDatabase_Info,
-                Window!))
-        {
-            return false;
-        }
+        await MessageBoxHelper.ShowAlertAsync(language.InstallPriceDatabase_Title,
+            language.InstallPriceDatabase_Info,
+            Window!);
         
         _priceDatabase!.OpenDatabase();
 
