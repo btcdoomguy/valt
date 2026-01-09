@@ -5,6 +5,8 @@ namespace Valt.UI.Views.Main.Tabs.Reports;
 
 public record DashboardData(string Title, ObservableCollection<RowItem> Rows)
 {
+    public static DashboardData Empty => new(string.Empty, new ObservableCollection<RowItem>());
+
     public static DashboardData DesignTimeSample => new(
         "Your all-time high",
         new ObservableCollection<RowItem>
