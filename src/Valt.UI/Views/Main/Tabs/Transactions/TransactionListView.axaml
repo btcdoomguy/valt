@@ -184,13 +184,11 @@
                     </MenuItem>
                     <MenuItem Header="{Binding BindToFixedExpenseCaption}"
                               IsVisible="{Binding CanBindToFixedExpense}"
-                              Command="{Binding BindToFixedExpenseCommand}"
-                              CommandParameter="{Binding SelectedTransaction}">
+                              Command="{Binding BindToFixedExpenseCommand}">
                     </MenuItem>
                     <MenuItem Header="{Binding UnbindToFixedExpenseCaption}"
                               IsVisible="{Binding CanUnbindFromFixedExpense}"
-                              Command="{Binding UnbindFromFixedExpenseCommand}"
-                              CommandParameter="{Binding SelectedTransaction}">
+                              Command="{Binding UnbindFromFixedExpenseCommand}">
                     </MenuItem>
 
                 </ContextMenu>

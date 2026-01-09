@@ -86,6 +86,7 @@ internal sealed class PriceDatabase : IPriceDatabase
     {
         var mapper = new BsonMapper();
         DateOnlyMapper.Register(mapper);
+        DateTimeMapper.Register(mapper);
         return mapper;
     }
 

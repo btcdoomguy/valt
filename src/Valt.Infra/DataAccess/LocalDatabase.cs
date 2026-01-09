@@ -148,6 +148,7 @@ internal sealed class LocalDatabase : ILocalDatabase
     {
         var mapper = new BsonMapper();
         DateOnlyMapper.Register(mapper);
+        DateTimeMapper.Register(mapper);
         return mapper;
     }
 
