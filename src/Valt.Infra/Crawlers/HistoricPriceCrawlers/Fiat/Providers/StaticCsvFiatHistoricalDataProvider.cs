@@ -31,6 +31,7 @@ public class StaticCsvFiatHistoricalDataProvider : IFiatHistoricalDataProvider
     public string Name => "StaticCsv";
     public bool RequiresApiKey => false;
     public bool InitialDownloadSource => true;
+    public bool IsFallbackProvider => false;
     public IReadOnlySet<FiatCurrency> SupportedCurrencies => SupportedCurrenciesSet;
 
     public async Task<IEnumerable<IFiatHistoricalDataProvider.FiatPriceData>> GetPricesAsync(

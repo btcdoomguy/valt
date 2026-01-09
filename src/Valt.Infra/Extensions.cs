@@ -102,6 +102,10 @@ public static class Extensions
         services.AddSingleton<IFiatHistoricalDataProvider, StaticCsvFiatHistoricalDataProvider>(provider =>
             provider.GetRequiredService<StaticCsvFiatHistoricalDataProvider>());
 
+        services.AddSingleton<CurrencyApiFiatHistoricalDataProvider>();
+        services.AddSingleton<IFiatHistoricalDataProvider, CurrencyApiFiatHistoricalDataProvider>(provider =>
+            provider.GetRequiredService<CurrencyApiFiatHistoricalDataProvider>());
+
         //local historical provider
         services.AddSingleton<ILocalHistoricalPriceProvider, LocalHistoricalPriceProvider>();
         

@@ -28,6 +28,7 @@ public class FrankfurterFiatHistoricalDataProvider : IFiatHistoricalDataProvider
     public string Name => "Frankfurter";
     public bool RequiresApiKey => false;
     public bool InitialDownloadSource => false;
+    public bool IsFallbackProvider => false;
     public IReadOnlySet<FiatCurrency> SupportedCurrencies => FrankfurterSupportedCurrencies;
 
     public async Task<IEnumerable<IFiatHistoricalDataProvider.FiatPriceData>> GetPricesAsync(DateOnly startDate, DateOnly endDate, IEnumerable<FiatCurrency> currencies)

@@ -20,6 +20,7 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
 
     private readonly IFiatHistoricalDataProvider? _initialSeedProvider;
     private readonly IFiatHistoricalDataProvider? _regularProvider;
+    private readonly IFiatHistoricalDataProvider? _fallbackProvider;
 
     public string Name => "Fiat history updater job";
     public BackgroundJobSystemNames SystemName => BackgroundJobSystemNames.FiatHistoryUpdater;
@@ -39,8 +40,9 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
         _logger = logger;
 
         var providersList = providers.ToList();
-        _initialSeedProvider = providersList.FirstOrDefault(p => p.InitialDownloadSource);
-        _regularProvider = providersList.FirstOrDefault(p => !p.InitialDownloadSource);
+        _initialSeedProvider = providersList.FirstOrDefault(p => p.InitialDownloadSource && !p.IsFallbackProvider);
+        _regularProvider = providersList.FirstOrDefault(p => !p.InitialDownloadSource && !p.IsFallbackProvider);
+        _fallbackProvider = providersList.FirstOrDefault(p => p.IsFallbackProvider);
     }
 
     public Task StartAsync(CancellationToken stoppingToken)
@@ -245,16 +247,48 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
         if (currencies.Count == 0)
             return false;
 
-        if (_initialSeedProvider is null)
+        var updated = false;
+
+        // Process with initial seed provider
+        if (_initialSeedProvider is not null)
         {
-            _logger.LogWarning("[FiatHistoryUpdater] No initial seed provider available");
-            return false;
+            var supportedCurrencies = currencies
+                .Where(c => _initialSeedProvider.SupportedCurrencies.Contains(c))
+                .ToList();
+
+            if (supportedCurrencies.Count > 0)
+            {
+                _logger.LogInformation("[FiatHistoryUpdater] Using {Provider} for initial seed of {Count} currencies",
+                    _initialSeedProvider.Name, supportedCurrencies.Count);
+                updated |= await FetchAndStorePricesAsync(_initialSeedProvider, supportedCurrencies, startDate, endDate);
+            }
+
+            // Use fallback for unsupported currencies
+            var unsupportedCurrencies = currencies
+                .Where(c => !_initialSeedProvider.SupportedCurrencies.Contains(c))
+                .ToList();
+
+            if (unsupportedCurrencies.Count > 0 && _fallbackProvider is not null)
+            {
+                _logger.LogInformation("[FiatHistoryUpdater] Using fallback {Provider} for initial seed of {Count} unsupported currencies: {Currencies}",
+                    _fallbackProvider.Name, unsupportedCurrencies.Count,
+                    string.Join(", ", unsupportedCurrencies.Select(c => c.Code)));
+                updated |= await FetchAndStorePricesAsync(_fallbackProvider, unsupportedCurrencies, startDate, endDate);
+            }
+        }
+        else if (_fallbackProvider is not null)
+        {
+            // No initial seed provider, use fallback for all
+            _logger.LogInformation("[FiatHistoryUpdater] Using fallback {Provider} for initial seed of {Count} currencies",
+                _fallbackProvider.Name, currencies.Count);
+            updated |= await FetchAndStorePricesAsync(_fallbackProvider, currencies, startDate, endDate);
+        }
+        else
+        {
+            _logger.LogWarning("[FiatHistoryUpdater] No initial seed or fallback provider available");
         }
 
-        _logger.LogInformation("[FiatHistoryUpdater] Using {Provider} for initial seed of {Count} currencies",
-            _initialSeedProvider.Name, currencies.Count);
-
-        return await FetchAndStorePricesAsync(_initialSeedProvider, currencies, startDate, endDate);
+        return updated;
     }
 
     private async Task<bool> ProcessCurrenciesWithDataAsync(
@@ -292,21 +326,51 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
         if (minFiatDate is null || requiredStartDate >= minFiatDate.Value)
             return false;
 
-        if (_initialSeedProvider is null)
-        {
-            _logger.LogWarning("[FiatHistoryUpdater] No initial seed provider available for backward gap filling");
-            return false;
-        }
-
         var gapEndDate = SkipWeekendsBackward(minFiatDate.Value.AddDays(-1));
 
         if (requiredStartDate > gapEndDate)
             return false;
 
-        _logger.LogInformation("[FiatHistoryUpdater] Filling backward gap using {Provider} from {StartDate} to {EndDate}",
-            _initialSeedProvider.Name, requiredStartDate.ToString("yyyy-MM-dd"), gapEndDate.ToString("yyyy-MM-dd"));
+        var updated = false;
 
-        return await FetchAndStorePricesAsync(_initialSeedProvider, currencies, requiredStartDate, gapEndDate);
+        if (_initialSeedProvider is not null)
+        {
+            var supportedCurrencies = currencies
+                .Where(c => _initialSeedProvider.SupportedCurrencies.Contains(c))
+                .ToList();
+
+            if (supportedCurrencies.Count > 0)
+            {
+                _logger.LogInformation("[FiatHistoryUpdater] Filling backward gap using {Provider} from {StartDate} to {EndDate}",
+                    _initialSeedProvider.Name, requiredStartDate.ToString("yyyy-MM-dd"), gapEndDate.ToString("yyyy-MM-dd"));
+                updated |= await FetchAndStorePricesAsync(_initialSeedProvider, supportedCurrencies, requiredStartDate, gapEndDate);
+            }
+
+            // Use fallback for unsupported currencies
+            var unsupportedCurrencies = currencies
+                .Where(c => !_initialSeedProvider.SupportedCurrencies.Contains(c))
+                .ToList();
+
+            if (unsupportedCurrencies.Count > 0 && _fallbackProvider is not null)
+            {
+                _logger.LogInformation("[FiatHistoryUpdater] Filling backward gap using fallback {Provider} for {Count} unsupported currencies: {Currencies}",
+                    _fallbackProvider.Name, unsupportedCurrencies.Count,
+                    string.Join(", ", unsupportedCurrencies.Select(c => c.Code)));
+                updated |= await FetchAndStorePricesAsync(_fallbackProvider, unsupportedCurrencies, requiredStartDate, gapEndDate);
+            }
+        }
+        else if (_fallbackProvider is not null)
+        {
+            _logger.LogInformation("[FiatHistoryUpdater] Filling backward gap using fallback {Provider} from {StartDate} to {EndDate}",
+                _fallbackProvider.Name, requiredStartDate.ToString("yyyy-MM-dd"), gapEndDate.ToString("yyyy-MM-dd"));
+            updated |= await FetchAndStorePricesAsync(_fallbackProvider, currencies, requiredStartDate, gapEndDate);
+        }
+        else
+        {
+            _logger.LogWarning("[FiatHistoryUpdater] No initial seed or fallback provider available for backward gap filling");
+        }
+
+        return updated;
     }
 
     private async Task<bool> FillForwardDataAsync(
@@ -315,21 +379,51 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
         DateTime requiredStartDate,
         DateTime endDate)
     {
-        if (_regularProvider is null)
-        {
-            _logger.LogWarning("[FiatHistoryUpdater] No regular provider available");
-            return false;
-        }
-
         var startDate = SkipWeekendsForward(maxFiatDate?.AddDays(1) ?? requiredStartDate);
 
         if (startDate > endDate)
             return false;
 
-        _logger.LogInformation("[FiatHistoryUpdater] Using {Provider} from {StartDate} to {EndDate}",
-            _regularProvider.Name, startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
+        var updated = false;
 
-        return await FetchAndStorePricesAsync(_regularProvider, currencies, startDate, endDate);
+        if (_regularProvider is not null)
+        {
+            var supportedCurrencies = currencies
+                .Where(c => _regularProvider.SupportedCurrencies.Contains(c))
+                .ToList();
+
+            if (supportedCurrencies.Count > 0)
+            {
+                _logger.LogInformation("[FiatHistoryUpdater] Using {Provider} from {StartDate} to {EndDate}",
+                    _regularProvider.Name, startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
+                updated |= await FetchAndStorePricesAsync(_regularProvider, supportedCurrencies, startDate, endDate);
+            }
+
+            // Use fallback for unsupported currencies
+            var unsupportedCurrencies = currencies
+                .Where(c => !_regularProvider.SupportedCurrencies.Contains(c))
+                .ToList();
+
+            if (unsupportedCurrencies.Count > 0 && _fallbackProvider is not null)
+            {
+                _logger.LogInformation("[FiatHistoryUpdater] Using fallback {Provider} for {Count} unsupported currencies: {Currencies}",
+                    _fallbackProvider.Name, unsupportedCurrencies.Count,
+                    string.Join(", ", unsupportedCurrencies.Select(c => c.Code)));
+                updated |= await FetchAndStorePricesAsync(_fallbackProvider, unsupportedCurrencies, startDate, endDate);
+            }
+        }
+        else if (_fallbackProvider is not null)
+        {
+            _logger.LogInformation("[FiatHistoryUpdater] Using fallback {Provider} from {StartDate} to {EndDate}",
+                _fallbackProvider.Name, startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
+            updated |= await FetchAndStorePricesAsync(_fallbackProvider, currencies, startDate, endDate);
+        }
+        else
+        {
+            _logger.LogWarning("[FiatHistoryUpdater] No regular or fallback provider available");
+        }
+
+        return updated;
     }
 
     private async Task<bool> FetchAndStorePricesAsync(
