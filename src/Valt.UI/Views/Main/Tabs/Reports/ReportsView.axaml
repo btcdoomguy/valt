@@ -30,9 +30,9 @@
                         <TextBlock Classes="section-header" Text="{x:Static lang:language.Reports_Summary}" />
                     </StackPanel>
                 </Expander.Header>
-                <StackPanel Orientation="Horizontal" Spacing="20">
+                <StackPanel Orientation="Horizontal" Spacing="10">
                     <!-- All Time High Dashboard -->
-                    <Grid MinWidth="300" MinHeight="150">
+                    <Grid MinHeight="150">
                         <Panel IsVisible="{Binding !IsAllTimeHighLoading}">
                             <reports1:DashboardDataUserControl DataContext="{Binding AllTimeHighData}" />
                         </Panel>
@@ -41,7 +41,7 @@
                                    IsVisible="{Binding IsAllTimeHighLoading}" />
                     </Grid>
                     <!-- BTC Stack Dashboard -->
-                    <Grid MinWidth="300" MinHeight="150">
+                    <Grid MinHeight="150">
                         <Panel IsVisible="{Binding !IsBtcStackLoading}">
                             <reports1:DashboardDataUserControl DataContext="{Binding BtcStackData}" />
                         </Panel>
@@ -50,7 +50,7 @@
                                    IsVisible="{Binding IsBtcStackLoading}" />
                     </Grid>
                     <!-- Statistics Dashboard -->
-                    <Grid MinWidth="300" MinHeight="150">
+                    <Grid MinHeight="150">
                         <Panel IsVisible="{Binding !IsStatisticsLoading}">
                             <reports1:DashboardDataUserControl DataContext="{Binding StatisticsData}" />
                         </Panel>

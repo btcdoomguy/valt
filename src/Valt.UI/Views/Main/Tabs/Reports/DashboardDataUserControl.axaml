@@ -13,8 +13,7 @@
             Background="{DynamicResource Background800Brush}"
             BorderBrush="{DynamicResource Background700Brush}"
             CornerRadius="4"
-            MaxWidth="450"
-            HorizontalAlignment="Left">
+            Width="320">
 
         <StackPanel Orientation="Vertical">
             <Border Background="{DynamicResource Background700Brush}"
@@ -34,23 +33,27 @@
                         <Border Padding="12, 6"
                                 BorderBrush="{DynamicResource Background700Brush}"
                                 BorderThickness="0,0,0,1">
-                            <DockPanel LastChildFill="True">
-                                <TextBlock Text="{Binding LeftText}"
-                                           FontSize="11"
-                                           Foreground="{DynamicResource Text300Brush}"
-                                           DockPanel.Dock="Left"
-                                           Padding="0, 6, 15, 0"
-                                           VerticalAlignment="Center"/>
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                          VerticalScrollBarVisibility="Disabled">
+                                <DockPanel LastChildFill="True" MinWidth="280">
+                                    <TextBlock Text="{Binding LeftText}"
+                                               FontSize="11"
+                                               Foreground="{DynamicResource Text300Brush}"
+                                               DockPanel.Dock="Left"
+                                               Padding="0, 6, 15, 0"
+                                               VerticalAlignment="Center"/>
 
-                                <TextBlock Text="{Binding RightText}"
-                                           FontSize="13"
-                                           FontWeight="Medium"
-                                           Foreground="{DynamicResource Text100Brush}"
-                                           DockPanel.Dock="Right"
-                                           Padding="0, 4, 10, 0"
-                                           HorizontalAlignment="Right"
-                                           VerticalAlignment="Center"/>
-                            </DockPanel>
+                                    <TextBlock Text="{Binding RightText}"
+                                               FontSize="13"
+                                               FontWeight="Medium"
+                                               Foreground="{DynamicResource Text100Brush}"
+                                               DockPanel.Dock="Right"
+                                               Padding="0, 4, 10, 0"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"
+                                               TextWrapping="NoWrap"/>
+                                </DockPanel>
+                            </ScrollViewer>
                         </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
