@@ -96,6 +96,10 @@ public static class Extensions
         services.AddSingleton<IFiatHistoricalDataProvider, FrankfurterFiatHistoricalDataProvider>(provider =>
             provider.GetRequiredService<FrankfurterFiatHistoricalDataProvider>());
 
+        services.AddSingleton<StaticCsvFiatHistoricalDataProvider>();
+        services.AddSingleton<IFiatHistoricalDataProvider, StaticCsvFiatHistoricalDataProvider>(provider =>
+            provider.GetRequiredService<StaticCsvFiatHistoricalDataProvider>());
+
         //local historical provider
         services.AddSingleton<ILocalHistoricalPriceProvider, LocalHistoricalPriceProvider>();
         
