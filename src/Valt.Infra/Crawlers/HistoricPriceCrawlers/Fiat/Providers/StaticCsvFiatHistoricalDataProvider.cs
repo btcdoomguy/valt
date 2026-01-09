@@ -19,7 +19,8 @@ public class StaticCsvFiatHistoricalDataProvider : IFiatHistoricalDataProvider
         FiatCurrency.Jpy, FiatCurrency.Krw, FiatCurrency.Mxn, FiatCurrency.Myr,
         FiatCurrency.Nok, FiatCurrency.Nzd, FiatCurrency.Php, FiatCurrency.Pln,
         FiatCurrency.Ron, FiatCurrency.Sek, FiatCurrency.Sgd, FiatCurrency.Thb,
-        FiatCurrency.Try, FiatCurrency.Usd, FiatCurrency.Zar
+        FiatCurrency.Try, FiatCurrency.Usd, FiatCurrency.Zar, FiatCurrency.Uyu,
+        FiatCurrency.Pyg
     ]);
 
     public StaticCsvFiatHistoricalDataProvider(ILogger<StaticCsvFiatHistoricalDataProvider> logger)
