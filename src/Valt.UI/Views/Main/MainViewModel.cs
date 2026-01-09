@@ -325,7 +325,7 @@ public partial class MainViewModel : ValtViewModel
     {
         try
         {
-            if (!_priceDatabase.DatabaseFileExists())
+            if (!_priceDatabase.DatabaseFileExists() || IsPriceDatabaseEmpty())
             {
                 var installResult = await InstallProcessAsync();
 
@@ -359,6 +359,19 @@ public partial class MainViewModel : ValtViewModel
         }
         
         return false;
+    }
+
+    private bool IsPriceDatabaseEmpty()
+    {
+        try
+        {
+            _priceDatabase!.OpenDatabase();
+            return !_priceDatabase.HasPriceData();
+        }
+        finally
+        {
+            _priceDatabase!.CloseDatabase();
+        }
     }
 
     private async Task<bool> InstallProcessAsync()
