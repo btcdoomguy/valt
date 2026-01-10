@@ -1040,7 +1040,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("ManageFixedExpenses.RecurrenceSection", resourceCulture);
             }
         }
-        
+
+        public static string ManageFixedExpenses_InformationSection {
+            get {
+                return ResourceManager.GetString("ManageFixedExpenses.InformationSection", resourceCulture);
+            }
+        }
+
         public static string FixedExpenses_Period_Weekly {
             get {
                 return ResourceManager.GetString("FixedExpenses.Period.Weekly", resourceCulture);

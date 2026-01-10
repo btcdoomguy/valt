@@ -104,13 +104,21 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
     [ObservableProperty] [RequiredIfVariableAmount] [RangedAmountMinLessThanMax]
     private FiatValue? _rangedAmountMax = FiatValue.Empty;
 
-    [Required(ErrorMessage = "Start date is required")] [ObservableProperty] [ValidPeriodStartForExistingExpense]
+    [Required(ErrorMessage = "Start date is required")]
+    [ObservableProperty]
+    [ValidPeriodStartForExistingExpense]
+    [NotifyPropertyChangedFor(nameof(PeriodStartDisplayText))]
     private DateTime? _periodStart = DateTime.Today;
 
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayDaySelector))]
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DisplayDaySelector))]
+    [NotifyPropertyChangedFor(nameof(PeriodDisplayText))]
+    [NotifyPropertyChangedFor(nameof(DayDisplayText))]
     private string _period = FixedExpensePeriods.Monthly.ToString();
 
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(AdaptedDay))]
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(AdaptedDay))]
+    [NotifyPropertyChangedFor(nameof(DayDisplayText))]
     private int _day = 5;
 
     public string AdaptedDay
@@ -151,6 +159,32 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
 
     public bool DisplayDaySelector => Period == FixedExpensePeriods.Monthly.ToString() ||
                                       Period == FixedExpensePeriods.Yearly.ToString();
+
+    // Display properties for read-only mode
+    public string PeriodDisplayText => Period switch
+    {
+        nameof(FixedExpensePeriods.Weekly) => language.FixedExpenses_Period_Weekly,
+        nameof(FixedExpensePeriods.Biweekly) => language.FixedExpenses_Period_Biweekly,
+        nameof(FixedExpensePeriods.Monthly) => language.FixedExpenses_Period_Monthly,
+        nameof(FixedExpensePeriods.Yearly) => language.FixedExpenses_Period_Yearly,
+        _ => Period
+    };
+
+    public string DayDisplayText => DisplayDaySelector
+        ? Day.ToString()
+        : ((DayOfWeek)Day) switch
+        {
+            DayOfWeek.Sunday => language.DaysOfWeek_Sunday,
+            DayOfWeek.Monday => language.DaysOfWeek_Monday,
+            DayOfWeek.Tuesday => language.DaysOfWeek_Tuesday,
+            DayOfWeek.Wednesday => language.DaysOfWeek_Wednesday,
+            DayOfWeek.Thursday => language.DaysOfWeek_Thursday,
+            DayOfWeek.Friday => language.DaysOfWeek_Friday,
+            DayOfWeek.Saturday => language.DaysOfWeek_Saturday,
+            _ => Day.ToString()
+        };
+
+    public string PeriodStartDisplayText => PeriodStart?.ToString("d") ?? string.Empty;
 
     #endregion
 

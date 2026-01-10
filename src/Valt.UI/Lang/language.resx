@@ -521,6 +521,9 @@
     <data name="ManageFixedExpenses.RecurrenceSection" xml:space="preserve">
         <value>Recurrence</value>
     </data>
+    <data name="ManageFixedExpenses.InformationSection" xml:space="preserve">
+        <value>Information</value>
+    </data>
     <data name="FixedExpenses.Period.Weekly" xml:space="preserve">
         <value>Weekly</value>
     </data>

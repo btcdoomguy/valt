@@ -519,6 +519,9 @@
     <data name="ManageFixedExpenses.RecurrenceSection" xml:space="preserve">
         <value>Recorrência</value>
     </data>
+    <data name="ManageFixedExpenses.InformationSection" xml:space="preserve">
+        <value>Informações</value>
+    </data>
     <data name="ManageFixedExpenses.DayOfWeek" xml:space="preserve">
         <value>Dia da semana</value>
     </data>
