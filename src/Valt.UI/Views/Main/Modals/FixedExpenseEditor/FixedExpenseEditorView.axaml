@@ -10,9 +10,9 @@
         x:Class="Valt.UI.Views.Main.Modals.FixedExpenseEditor.FixedExpenseEditorView"
         Title="{Binding WindowTitle}"
         x:DataType="fixedExpenseEditor:FixedExpenseEditorViewModel"
-        d:DesignWidth="550"
-        d:DesignHeight="700"
-        MaxWidth="550"
+        d:DesignWidth="800"
+        d:DesignHeight="500"
+        Width="800"
         SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
@@ -29,52 +29,58 @@
             <userControls:CustomTitleBar Title="{Binding WindowTitle}" TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
             <Border Classes="form-fields-area" Padding="10">
-                <StackPanel Orientation="Vertical" Spacing="5">
+                <Grid ColumnDefinitions="2*, Auto, 3*" ColumnSpacing="15">
+                    <!-- Left Column -->
+                    <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="5">
 
-                    <!-- Name Field -->
-                    <StackPanel Classes="form-field">
-                        <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Name}" />
-                        <AutoCompleteBox x:Name="AutoCompleteTransactionNameBox"
-                                         Text="{Binding Name, Mode=TwoWay}"
-                                         SelectedItem="{Binding TransactionTermResult, Mode=TwoWay}">
-                            <AutoCompleteBox.ItemTemplate>
-                                <DataTemplate DataType="transactionTerms:TransactionTermResult">
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" />
-                                        <TextBlock Text="{Binding CategoryName}" FontStyle="Italic" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </AutoCompleteBox.ItemTemplate>
-                        </AutoCompleteBox>
-                    </StackPanel>
+                        <!-- Section Header -->
+                        <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_InformationSection}"
+                                   FontWeight="SemiBold"
+                                   Margin="0, 0, 0, 5" />
 
-                    <!-- Category Field -->
-                    <StackPanel Classes="form-field">
-                        <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Category}" />
-                        <ComboBox ItemsSource="{Binding AvailableCategories}"
-                                  SelectedItem="{Binding Category}"
-                                  HorizontalAlignment="Stretch"
-                                  IsTextSearchEnabled="True"
-                                  Height="36">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock
-                                            FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
-                                            Text="{Binding Unicode}"
-                                            Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
-                                        <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </StackPanel>
+                        <!-- Name Field -->
+                        <StackPanel Classes="form-field">
+                            <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Name}" />
+                            <AutoCompleteBox x:Name="AutoCompleteTransactionNameBox"
+                                             Text="{Binding Name, Mode=TwoWay}"
+                                             SelectedItem="{Binding TransactionTermResult, Mode=TwoWay}">
+                                <AutoCompleteBox.ItemTemplate>
+                                    <DataTemplate DataType="transactionTerms:TransactionTermResult">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                                            <TextBlock Text="{Binding CategoryName}" FontStyle="Italic" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </AutoCompleteBox.ItemTemplate>
+                            </AutoCompleteBox>
+                        </StackPanel>
 
-                    <Separator Height="1" Margin="0, 5" />
+                        <!-- Category Field -->
+                        <StackPanel Classes="form-field">
+                            <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Category}" />
+                            <ComboBox ItemsSource="{Binding AvailableCategories}"
+                                      SelectedItem="{Binding Category}"
+                                      HorizontalAlignment="Stretch"
+                                      IsTextSearchEnabled="True"
+                                      Height="36">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock
+                                                FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
+                                                Text="{Binding Unicode}"
+                                                Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
+                                            <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
 
-                    <!-- Currency Definition Section -->
-                    <Grid ColumnDefinitions="*, *">
-                        <StackPanel Grid.Column="0" Classes="form-field">
+                        <Separator Height="1" Margin="0, 5" />
+
+                        <!-- Currency Definition Section -->
+                        <StackPanel Classes="form-field">
                             <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_CurrencyDefinition}" />
                             <RadioButton GroupName="CurrencyDefinition"
                                          Content="{x:Static lang:language.ManageFixedExpenses_CurrencyDefinition_AttachedToDefaultAccount}"
@@ -85,7 +91,7 @@
                         </StackPanel>
 
                         <!-- Currency selector (when attached to currency) -->
-                        <StackPanel Grid.Column="1" Classes="form-field" IsVisible="{Binding !IsDefaultAccountSelectorVisible}">
+                        <StackPanel Classes="form-field" IsVisible="{Binding !IsDefaultAccountSelectorVisible}">
                             <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Currency}" />
                             <ComboBox ItemsSource="{Binding AvailableCurrencies}"
                                       SelectedItem="{Binding Currency}"
@@ -95,7 +101,7 @@
                         </StackPanel>
 
                         <!-- Default account selector (when attached to account) -->
-                        <StackPanel Grid.Column="1" Classes="form-field" IsVisible="{Binding IsDefaultAccountSelectorVisible}">
+                        <StackPanel Classes="form-field" IsVisible="{Binding IsDefaultAccountSelectorVisible}">
                             <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_DefaultAccount}" />
                             <ComboBox ItemsSource="{Binding AvailableAccounts}"
                                       SelectedItem="{Binding DefaultAccount}"
@@ -115,81 +121,112 @@
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
                         </StackPanel>
-                    </Grid>
 
-                    <Separator Height="1" Margin="0, 5" />
+                        <Separator Height="1" Margin="0, 5" />
 
-                    <!-- Period Section Header with Change/Cancel button -->
-                    <Grid ColumnDefinitions="*, Auto" Margin="0, 0, 0, 5">
-                        <TextBlock Grid.Column="0"
-                                   Text="{x:Static lang:language.ManageFixedExpenses_RecurrenceSection}"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center" />
-                        <Button Grid.Column="1"
-                                Content="{x:Static lang:language.FixedExpenseEditor_ChangeRecurrence}"
-                                Classes="link"
-                                IsVisible="{Binding ShowChangeRecurrenceButton}"
-                                Command="{Binding EnterChangeRecurrenceModeCommand}" />
-                        <Button Grid.Column="1"
-                                Content="{x:Static lang:language.FixedExpenseEditor_CancelChangeRecurrence}"
-                                Classes="link"
-                                IsVisible="{Binding ShowCancelChangeRecurrenceButton}"
-                                Command="{Binding CancelChangeRecurrenceModeCommand}" />
-                    </Grid>
-
-                    <!-- Period Section -->
-                    <Grid ColumnDefinitions="*, *" ColumnSpacing="5">
-                        <StackPanel Grid.Column="0" Classes="form-field">
-                            <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_PeriodRange}" />
-                            <ComboBox ItemsSource="{Binding AvailablePeriods}"
-                                      SelectedValue="{Binding Period}"
-                                      DisplayMemberBinding="{Binding Text}"
-                                      SelectedValueBinding="{Binding Value}"
-                                      HorizontalAlignment="Stretch"
-                                      IsTextSearchEnabled="True"
-                                      IsEnabled="{Binding !IsRecurrenceInfoLocked}"
-                                      Height="36" />
-                        </StackPanel>
-
-                        <!-- Day selector (for monthly/yearly) -->
-                        <StackPanel Grid.Column="1" Classes="form-field" IsVisible="{Binding DisplayDaySelector}">
-                            <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Day}" />
-                            <NumericUpDown Increment="1" Minimum="1" Maximum="31" Value="{Binding Day}"
-                                           HorizontalContentAlignment="Stretch"
-                                           IsEnabled="{Binding !IsRecurrenceInfoLocked}"
-                                           Height="36" />
-                        </StackPanel>
-
-                        <!-- Day of week selector (for weekly) -->
-                        <StackPanel Grid.Column="1" Classes="form-field" IsVisible="{Binding !DisplayDaySelector}">
-                            <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_DayOfWeek}" />
-                            <ComboBox ItemsSource="{Binding AvailableDaysOfWeek}"
-                                      SelectedValue="{Binding AdaptedDay}"
-                                      DisplayMemberBinding="{Binding Text}"
-                                      SelectedValueBinding="{Binding Value}"
-                                      HorizontalAlignment="Stretch"
-                                      IsTextSearchEnabled="True"
-                                      IsEnabled="{Binding !IsRecurrenceInfoLocked}"
-                                      Height="36" />
-                        </StackPanel>
-                    </Grid>
-
-                    <!-- Start Period -->
-                    <StackPanel Classes="form-field">
-                        <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_StartPeriod}" />
-                        <CalendarDatePicker HorizontalAlignment="Left"
-                                            SelectedDateFormat="Short"
-                                            IsTodayHighlighted="True"
-                                            IsEnabled="{Binding !IsRecurrenceInfoLocked}"
-                                            Height="36"
-                                            SelectedDate="{Binding PeriodStart}" />
+                        <!-- Enabled Checkbox -->
+                        <CheckBox Margin="0, 5" Content="{x:Static lang:language.ManageFixedExpenses_Enabled}"
+                                  IsChecked="{Binding Enabled}" />
                     </StackPanel>
 
-                    <Separator Height="1" Margin="0, 5" />
+                    <!-- Vertical Separator -->
+                    <Separator Grid.Column="1" Width="1" />
 
-                    <!-- Amount Definition Section -->
-                    <Grid ColumnDefinitions="*, 2*">
-                        <StackPanel Grid.Column="0" Classes="form-field">
+                    <!-- Right Column -->
+                    <StackPanel Grid.Column="2" Orientation="Vertical" Spacing="5">
+                        <!-- Period Section Header with Change/Cancel button -->
+                        <Grid ColumnDefinitions="*, Auto" Margin="0, 0, 0, 5">
+                            <TextBlock Grid.Column="0"
+                                       Text="{x:Static lang:language.ManageFixedExpenses_RecurrenceSection}"
+                                       FontWeight="SemiBold"
+                                       VerticalAlignment="Center" />
+                            <Button Grid.Column="1"
+                                    Content="{x:Static lang:language.FixedExpenseEditor_ChangeRecurrence}"
+                                    Classes="link"
+                                    IsVisible="{Binding ShowChangeRecurrenceButton}"
+                                    Command="{Binding EnterChangeRecurrenceModeCommand}" />
+                            <Button Grid.Column="1"
+                                    Content="{x:Static lang:language.FixedExpenseEditor_CancelChangeRecurrence}"
+                                    Classes="link"
+                                    IsVisible="{Binding ShowCancelChangeRecurrenceButton}"
+                                    Command="{Binding CancelChangeRecurrenceModeCommand}" />
+                        </Grid>
+
+                        <!-- Read-only Period Section (when locked) -->
+                        <Grid ColumnDefinitions="*, *" ColumnSpacing="5" IsVisible="{Binding IsRecurrenceInfoLocked}">
+                            <StackPanel Grid.Column="0" Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_PeriodRange}" />
+                                <TextBlock Text="{Binding PeriodDisplayText}"
+                                           Margin="0, 8, 0, 0"
+                                           FontWeight="SemiBold" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Day}"
+                                           IsVisible="{Binding DisplayDaySelector}" />
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_DayOfWeek}"
+                                           IsVisible="{Binding !DisplayDaySelector}" />
+                                <TextBlock Text="{Binding DayDisplayText}"
+                                           Margin="0, 8, 0, 0"
+                                           FontWeight="SemiBold" />
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Read-only Start Period (when locked) -->
+                        <StackPanel Classes="form-field" IsVisible="{Binding IsRecurrenceInfoLocked}">
+                            <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_StartPeriod}" />
+                            <TextBlock Text="{Binding PeriodStartDisplayText}"
+                                       Margin="0, 8, 0, 0"
+                                       FontWeight="SemiBold" />
+                        </StackPanel>
+
+                        <!-- Editable Period Section (when unlocked) -->
+                        <Grid ColumnDefinitions="*, *" ColumnSpacing="5" IsVisible="{Binding !IsRecurrenceInfoLocked}">
+                            <StackPanel Grid.Column="0" Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_PeriodRange}" />
+                                <ComboBox ItemsSource="{Binding AvailablePeriods}"
+                                          SelectedValue="{Binding Period}"
+                                          DisplayMemberBinding="{Binding Text}"
+                                          SelectedValueBinding="{Binding Value}"
+                                          HorizontalAlignment="Stretch"
+                                          IsTextSearchEnabled="True"
+                                          Height="36" />
+                            </StackPanel>
+
+                            <!-- Day selector (for monthly/yearly) -->
+                            <StackPanel Grid.Column="1" Classes="form-field" IsVisible="{Binding DisplayDaySelector}">
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Day}" />
+                                <NumericUpDown Increment="1" Minimum="1" Maximum="31" Value="{Binding Day}"
+                                               HorizontalContentAlignment="Stretch"
+                                               Height="36" />
+                            </StackPanel>
+
+                            <!-- Day of week selector (for weekly) -->
+                            <StackPanel Grid.Column="1" Classes="form-field" IsVisible="{Binding !DisplayDaySelector}">
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_DayOfWeek}" />
+                                <ComboBox ItemsSource="{Binding AvailableDaysOfWeek}"
+                                          SelectedValue="{Binding AdaptedDay}"
+                                          DisplayMemberBinding="{Binding Text}"
+                                          SelectedValueBinding="{Binding Value}"
+                                          HorizontalAlignment="Stretch"
+                                          IsTextSearchEnabled="True"
+                                          Height="36" />
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Editable Start Period (when unlocked) -->
+                        <StackPanel Classes="form-field" IsVisible="{Binding !IsRecurrenceInfoLocked}">
+                            <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_StartPeriod}" />
+                            <CalendarDatePicker HorizontalAlignment="Left"
+                                                SelectedDateFormat="Short"
+                                                IsTodayHighlighted="True"
+                                                Height="36"
+                                                SelectedDate="{Binding PeriodStart}" />
+                        </StackPanel>
+
+                        <Separator Height="1" Margin="0, 5" />
+
+                        <!-- Amount Definition Section -->
+                        <StackPanel Classes="form-field">
                             <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_AmountDefinition}" />
                             <RadioButton GroupName="AmountDefinition"
                                          Content="{x:Static lang:language.ManageFixedExpenses_AmountDefinition_Fixed}"
@@ -200,7 +237,7 @@
                         </StackPanel>
 
                         <!-- Fixed amount input -->
-                        <StackPanel Grid.Column="1" Classes="form-field" IsVisible="{Binding IsFixedSelectorVisible}">
+                        <StackPanel Classes="form-field" IsVisible="{Binding IsFixedSelectorVisible}">
                             <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Amount_Fixed}" />
                             <userControls:FiatInput
                                 FiatValue="{Binding FixedAmount, Mode=TwoWay}"
@@ -209,29 +246,27 @@
                         </StackPanel>
 
                         <!-- Variable amount range inputs -->
-                        <StackPanel Grid.Column="1" Classes="form-field" IsVisible="{Binding !IsFixedSelectorVisible}">
-                            <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Amount_From}" />
-                            <userControls:FiatInput
-                                FiatValue="{Binding RangedAmountMin, Mode=TwoWay}"
-                                Width="200"
-                                HorizontalAlignment="Left" />
-                            <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Amount_To}" Margin="0, 5, 0, 0" />
-                            <userControls:FiatInput
-                                FiatValue="{Binding RangedAmountMax, Mode=TwoWay}"
-                                Width="200"
-                                HorizontalAlignment="Left" />
-                        </StackPanel>
-                    </Grid>
+                        <Grid ColumnDefinitions="*, *" ColumnSpacing="10" IsVisible="{Binding !IsFixedSelectorVisible}">
+                            <StackPanel Grid.Column="0" Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Amount_From}" />
+                                <userControls:FiatInput
+                                    FiatValue="{Binding RangedAmountMin, Mode=TwoWay}"
+                                    HorizontalAlignment="Stretch" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Classes="form-field">
+                                <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_Amount_To}" />
+                                <userControls:FiatInput
+                                    FiatValue="{Binding RangedAmountMax, Mode=TwoWay}"
+                                    HorizontalAlignment="Stretch" />
+                            </StackPanel>
+                        </Grid>
 
-                    <!-- Hint Box -->
-                    <Border Classes="hint-box">
-                        <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_AmountDefinition_Hint}" />
-                    </Border>
-
-                    <!-- Enabled Checkbox -->
-                    <CheckBox Margin="0, 5" Content="{x:Static lang:language.ManageFixedExpenses_Enabled}"
-                              IsChecked="{Binding Enabled}" />
-                </StackPanel>
+                        <!-- Hint Box -->
+                        <Border Classes="hint-box">
+                            <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_AmountDefinition_Hint}" />
+                        </Border>
+                    </StackPanel>
+                </Grid>
             </Border>
 
             <!-- Buttons -->
