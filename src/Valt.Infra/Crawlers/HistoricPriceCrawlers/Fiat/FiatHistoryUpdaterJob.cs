@@ -139,6 +139,10 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
 
         foreach (var currency in currencies)
         {
+            // Skip USD as it's the base currency (all rates are USD-based)
+            if (currency == FiatCurrency.Usd)
+                continue;
+
             if (HasDataForCurrency(currency))
                 withData.Add(currency);
             else
@@ -379,7 +383,8 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
         DateTime requiredStartDate,
         DateTime endDate)
     {
-        var startDate = SkipWeekendsForward(maxFiatDate?.AddDays(1) ?? requiredStartDate);
+        // Use .Date to normalize to midnight, ensuring proper date-only comparison
+        var startDate = SkipWeekendsForward(maxFiatDate?.AddDays(1).Date ?? requiredStartDate);
 
         if (startDate > endDate)
             return false;

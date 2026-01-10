@@ -46,7 +46,7 @@
                     <GradientStop Offset="1" Color="{DynamicResource Background800Color}"></GradientStop>
                 </LinearGradientBrush>
             </Border.Background>
-            <Grid ColumnDefinitions="*, *, 250">
+            <Grid ColumnDefinitions="*, *, 260">
                 <!--Top bar buttons-->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Height="50" Spacing="15">
                     <DropDownButton Classes="icon" Content="&#xe8b8;">
@@ -90,23 +90,33 @@
                     </Button>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Panel IsVisible="{Binding IsOffline}" Margin="0, 30, 10, 0"
-                           HorizontalAlignment="Right">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock FontFamily="{DynamicResource MaterialDesign}"
-                                       FontSize="32"
-                                       Foreground="{DynamicResource Accent300Brush}"
-                                       Text="&#xE002;">
-                            </TextBlock>
-                            <StackPanel Orientation="Vertical" Margin="0, 4, 0 ,0">
-                                <TextBlock Foreground="{DynamicResource Accent100Brush}"
-                                           FontSize="12"
-                                           Text="{x:Static local:language.Offline_Line1}" />
-                                <TextBlock FontSize="8" Foreground="{DynamicResource Accent100Brush}"
-                                           Text="{x:Static local:language.Offline_Line2}" />
+                    <Border IsVisible="{Binding IsOffline}"
+                            Margin="0, 10, 10, 0"
+                            Padding="8, 4"
+                            Background="{DynamicResource Background800Brush}"
+                            BorderBrush="{DynamicResource Background600Brush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            HorizontalAlignment="Right">
+                        <ToolTip.Tip>
+                            <StackPanel>
+                                <TextBlock Text="{x:Static local:language.Offline_Line1}" />
+                                <TextBlock Text="{x:Static local:language.Offline_Line2}" FontSize="11" Opacity="0.8" />
                             </StackPanel>
+                        </ToolTip.Tip>
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                            <TextBlock FontFamily="{DynamicResource MaterialDesign}"
+                                       FontSize="20"
+                                       Foreground="{DynamicResource Accent300Brush}"
+                                       Text="&#xE002;"
+                                       HorizontalAlignment="Center" />
+                            <TextBlock Foreground="{DynamicResource Accent300Brush}"
+                                       FontSize="9"
+                                       FontWeight="SemiBold"
+                                       Text="OFFLINE"
+                                       HorizontalAlignment="Center" />
                         </StackPanel>
-                    </Panel>
+                    </Border>
                     <Border IsVisible="{Binding ShowPepe}" HorizontalAlignment="Right" Margin="0, 10, 4, 0"
                             Width="100" Height="80"
                             ClipToBounds="True"

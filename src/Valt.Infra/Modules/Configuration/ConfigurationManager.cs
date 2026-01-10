@@ -173,6 +173,9 @@ public class ConfigurationManager
     /// <summary>
     /// Gets the list of fiat currencies currently in use by accounts, fixed expenses, and avg price profiles.
     /// These currencies cannot be removed from the available currencies list.
+    /// NOTE: This method should only be used for UI validation (preventing removal of in-use currencies)
+    /// and for initial configuration seeding. Do NOT use this for determining which currencies to fetch
+    /// prices for - use GetAvailableFiatCurrencies() instead.
     /// </summary>
     public List<string> GetCurrenciesInUse()
     {

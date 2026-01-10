@@ -72,17 +72,17 @@ internal class LivePricesUpdaterJob : IBackgroundJob
                 return;
             }
 
-            // Get currencies actually in use (from accounts, fixed expenses, and avg price profiles)
-            var currencyCodes = _configurationManager.GetCurrenciesInUse();
+            // Get all available configured currencies
+            var currencyCodes = _configurationManager.GetAvailableFiatCurrencies();
             if (currencyCodes.Count == 0)
             {
-                _logger.LogInformation("[LivePricesUpdaterJob] No currencies in use, skipping update");
+                _logger.LogInformation("[LivePricesUpdaterJob] No currencies configured, skipping update");
                 return;
             }
 
             var currencies = currencyCodes.Select(FiatCurrency.GetFromCode).ToList();
 
-            _logger.LogInformation("[LivePricesUpdaterJob] Fetching prices for {Count} currencies in use: {Currencies}",
+            _logger.LogInformation("[LivePricesUpdaterJob] Fetching prices for {Count} configured currencies: {Currencies}",
                 currencies.Count, string.Join(", ", currencies.Select(c => c.Code)));
 
             // Fetch fiat and BTC prices in parallel
