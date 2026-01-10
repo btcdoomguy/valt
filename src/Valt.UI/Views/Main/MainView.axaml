@@ -92,7 +92,7 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Border IsVisible="{Binding IsOffline}"
                             Margin="0, 10, 10, 0"
-                            Padding="8, 4"
+                            Padding="8, 14"
                             Background="{DynamicResource Background800Brush}"
                             BorderBrush="{DynamicResource Background600Brush}"
                             BorderThickness="1"
