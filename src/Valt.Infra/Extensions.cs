@@ -83,7 +83,9 @@ public static class Extensions
 
         //price crawlers fiat
         services.AddSingleton<IFiatPriceProvider, FrankfurterFiatRateProvider>();
-        
+        services.AddSingleton<IFiatPriceProvider, CurrencyApiFiatRateProvider>();
+        services.AddSingleton<IFiatPriceProviderSelector, FiatPriceProviderSelector>();
+
         //initial seed provider
         services.AddSingleton<IBitcoinInitialSeedPriceProvider, BitcoinInitialSeedPriceProvider>();
 
@@ -95,6 +97,14 @@ public static class Extensions
         services.AddSingleton<FrankfurterFiatHistoricalDataProvider>();
         services.AddSingleton<IFiatHistoricalDataProvider, FrankfurterFiatHistoricalDataProvider>(provider =>
             provider.GetRequiredService<FrankfurterFiatHistoricalDataProvider>());
+
+        services.AddSingleton<StaticCsvFiatHistoricalDataProvider>();
+        services.AddSingleton<IFiatHistoricalDataProvider, StaticCsvFiatHistoricalDataProvider>(provider =>
+            provider.GetRequiredService<StaticCsvFiatHistoricalDataProvider>());
+
+        services.AddSingleton<CurrencyApiFiatHistoricalDataProvider>();
+        services.AddSingleton<IFiatHistoricalDataProvider, CurrencyApiFiatHistoricalDataProvider>(provider =>
+            provider.GetRequiredService<CurrencyApiFiatHistoricalDataProvider>());
 
         //local historical provider
         services.AddSingleton<ILocalHistoricalPriceProvider, LocalHistoricalPriceProvider>();

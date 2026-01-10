@@ -6,12 +6,13 @@ using Valt.Infra.Crawlers.LivePriceCrawlers.Messages;
 
 namespace Valt.Infra.Crawlers.LivePriceCrawlers.Fiat.Providers;
 
-public class FrankfurterFiatRateProvider : IFiatPriceProvider
+public class CurrencyApiFiatRateProvider : IFiatPriceProvider
 {
     private readonly IClock _clock;
-    private readonly ILogger<FrankfurterFiatRateProvider> _logger;
+    private readonly ILogger<CurrencyApiFiatRateProvider> _logger;
 
-    private static readonly HashSet<FiatCurrency> FrankfurterSupportedCurrencies = new(
+    // Currency API supports all 34 FiatCurrency codes
+    private static readonly HashSet<FiatCurrency> CurrencyApiSupportedCurrencies = new(
     [
         FiatCurrency.Aud, FiatCurrency.Bgn, FiatCurrency.Brl, FiatCurrency.Cad,
         FiatCurrency.Chf, FiatCurrency.Cny, FiatCurrency.Czk, FiatCurrency.Dkk,
@@ -19,18 +20,19 @@ public class FrankfurterFiatRateProvider : IFiatPriceProvider
         FiatCurrency.Idr, FiatCurrency.Ils, FiatCurrency.Inr, FiatCurrency.Isk,
         FiatCurrency.Jpy, FiatCurrency.Krw, FiatCurrency.Mxn, FiatCurrency.Myr,
         FiatCurrency.Nok, FiatCurrency.Nzd, FiatCurrency.Php, FiatCurrency.Pln,
-        FiatCurrency.Ron, FiatCurrency.Sek, FiatCurrency.Sgd, FiatCurrency.Thb,
-        FiatCurrency.Try, FiatCurrency.Usd, FiatCurrency.Zar
+        FiatCurrency.Pyg, FiatCurrency.Ron, FiatCurrency.Sek, FiatCurrency.Sgd,
+        FiatCurrency.Thb, FiatCurrency.Try, FiatCurrency.Usd, FiatCurrency.Uyu,
+        FiatCurrency.Zar
     ]);
 
-    public FrankfurterFiatRateProvider(IClock clock, ILogger<FrankfurterFiatRateProvider> logger)
+    public CurrencyApiFiatRateProvider(IClock clock, ILogger<CurrencyApiFiatRateProvider> logger)
     {
         _clock = clock;
         _logger = logger;
     }
 
-    public string Name => "Frankfurter";
-    public IReadOnlySet<FiatCurrency> SupportedCurrencies => FrankfurterSupportedCurrencies;
+    public string Name => "CurrencyApi";
+    public IReadOnlySet<FiatCurrency> SupportedCurrencies => CurrencyApiSupportedCurrencies;
 
     public async Task<FiatUsdPrice> GetAsync(IEnumerable<FiatCurrency> currencies)
     {
@@ -46,8 +48,7 @@ public class FrankfurterFiatRateProvider : IFiatPriceProvider
                     new[] { new FiatUsdPrice.Item(FiatCurrency.Usd, 1) });
             }
 
-            var symbolsParam = string.Join(',', currencyList.Select(c => c.Code));
-            var response = await client.GetAsync($"https://api.frankfurter.dev/v1/latest?base=USD&symbols={symbolsParam}");
+            var response = await client.GetAsync("https://latest.currency-api.pages.dev/v1/currencies/usd.json");
             if (!response.IsSuccessStatusCode)
             {
                 throw new ApplicationException("Invalid API Response");
@@ -55,13 +56,14 @@ public class FrankfurterFiatRateProvider : IFiatPriceProvider
 
             var content = await response.Content.ReadAsStringAsync();
             var json = JsonDocument.Parse(content);
-            var rates = json.RootElement.GetProperty("rates");
+            var rates = json.RootElement.GetProperty("usd");
 
             var ratesResponse = new List<FiatUsdPrice.Item>();
             ratesResponse.Add(new FiatUsdPrice.Item(FiatCurrency.Usd, 1));
             foreach (var currency in currencyList)
             {
-                if (rates.TryGetProperty(currency.Code, out var rate))
+                var currencyCode = currency.Code.ToLowerInvariant();
+                if (rates.TryGetProperty(currencyCode, out var rate))
                 {
                     ratesResponse.Add(new FiatUsdPrice.Item(currency, rate.GetDecimal()));
                 }
@@ -71,7 +73,7 @@ public class FrankfurterFiatRateProvider : IFiatPriceProvider
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during execution of Frankfurter Fiat Rate provider");
+            _logger.LogError(ex, "Error during execution of CurrencyApi Fiat Rate provider");
             throw;
         }
     }

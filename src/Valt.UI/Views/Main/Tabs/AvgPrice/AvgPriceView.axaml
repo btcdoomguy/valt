@@ -67,6 +67,7 @@
                           CanUserResizeColumns="True"
                           CanUserSortColumns="False"
                           SelectionMode="Single"
+                          HorizontalScrollBarVisibility="Visible"
                           Margin="0,10,0,0">
                     <DataGrid.ContextMenu>
                         <ContextMenu>
@@ -116,7 +117,7 @@
                                             Width="120" />
                         <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Column_Comment}"
                                             Binding="{Binding Comment}"
-                                            Width="*" />
+                                            Width="200" />
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>

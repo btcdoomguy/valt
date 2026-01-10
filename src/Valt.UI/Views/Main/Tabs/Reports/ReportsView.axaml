@@ -31,6 +31,15 @@
                     </StackPanel>
                 </Expander.Header>
                 <StackPanel Orientation="Horizontal" Spacing="10">
+                    <!-- Wealth Dashboard -->
+                    <Grid MinHeight="150">
+                        <Panel IsVisible="{Binding !IsWealthLoading}">
+                            <reports1:DashboardDataUserControl DataContext="{Binding WealthData}" />
+                        </Panel>
+                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="14" Foreground="{DynamicResource Text400Brush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   IsVisible="{Binding IsWealthLoading}" />
+                    </Grid>
                     <!-- All Time High Dashboard -->
                     <Grid MinHeight="150">
                         <Panel IsVisible="{Binding !IsAllTimeHighLoading}">

@@ -9,7 +9,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write     # Required for softprops/action-gh-release
+      contents: write       # Required for softprops/action-gh-release
+      id-token: write       # Required for artifact attestations (OIDC)
+      attestations: write   # Required for artifact attestations
 
     steps:
       - name: Checkout code
@@ -49,6 +51,21 @@ jobs:
             --verbosity detailed -o ${{ github.workspace }}/publish/osx-x64
           cd ${{ github.workspace }}/publish/osx-x64
           zip -r ${{ github.workspace }}/Valt-MacOS-experimental-${{ github.ref_name }}.zip .
+
+      - name: Attest Windows artifact
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: Valt-Windows-${{ github.ref_name }}.zip
+
+      - name: Attest Linux artifact
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: Valt-Linux-${{ github.ref_name }}.zip
+
+      - name: Attest macOS artifact
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: Valt-MacOS-experimental-${{ github.ref_name }}.zip
 
       - name: Release
         uses: softprops/action-gh-release@v2

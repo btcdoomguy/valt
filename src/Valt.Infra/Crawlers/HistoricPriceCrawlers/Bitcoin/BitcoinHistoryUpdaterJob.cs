@@ -63,6 +63,7 @@ internal class BitcoinHistoryUpdaterJob : IBackgroundJob
                 Price = x.Price
             }));
 
+            _priceDatabase.Checkpoint();
             _logger.LogInformation("[BitcoinHistoryUpdater] Seed data loaded successfully");
         }
 
@@ -110,6 +111,7 @@ internal class BitcoinHistoryUpdaterJob : IBackgroundJob
             if (entries.Count != 0)
             {
                 _priceDatabase.GetBitcoinData().Insert(entries);
+                _priceDatabase.Checkpoint();
                 _logger.LogInformation("[BitcoinHistoryUpdater] Inserted {Count} new BTC price records", entries.Count);
                 WeakReferenceMessenger.Default.Send<BitcoinHistoryPriceUpdatedMessage>();
             }

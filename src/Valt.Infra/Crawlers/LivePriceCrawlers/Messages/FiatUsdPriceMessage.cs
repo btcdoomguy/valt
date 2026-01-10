@@ -1,6 +1,8 @@
+using Valt.Core.Common;
+
 namespace Valt.Infra.Crawlers.LivePriceCrawlers.Messages;
 
-public record FiatUsdPrice
+public record  FiatUsdPrice
 {
     public DateTime Utc { get; }
     public bool UpToDate { get; }
@@ -13,5 +15,5 @@ public record FiatUsdPrice
         Items = new HashSet<Item>(items);
     }
 
-    public record Item(string CurrencyCode, decimal Price);
+    public record Item(FiatCurrency Currency, decimal Price);
 }

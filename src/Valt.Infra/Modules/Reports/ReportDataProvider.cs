@@ -38,7 +38,7 @@ internal class ReportDataProviderFactory : IReportDataProviderFactory
 
 internal class ReportDataProvider : IReportDataProvider
 {
-    private const int MaxDaysToScanForRate = 10;
+    private static readonly DateOnly CutoffDate = new(2010, 1, 1);
 
     public FrozenDictionary<ObjectId, AccountEntity> Accounts { get; }
     public FrozenDictionary<ObjectId, CategoryEntity> Categories { get; }
@@ -49,6 +49,9 @@ internal class ReportDataProvider : IReportDataProvider
     public ImmutableList<TransactionEntity> AllTransactions { get; }
     public DateOnly MinTransactionDate { get; }
     public DateOnly MaxTransactionDate { get; }
+
+    private readonly ImmutableArray<DateOnly> _sortedBtcDates;
+    private readonly FrozenDictionary<string, ImmutableArray<DateOnly>> _sortedFiatDatesByCurrency;
 
     public ReportDataProvider(IPriceDatabase priceDatabase, ILocalDatabase localDatabase, IClock clock)
     {
@@ -72,6 +75,8 @@ internal class ReportDataProvider : IReportDataProvider
             AccountsByDate = FrozenDictionary<DateOnly, ImmutableList<ObjectId>>.Empty;
             BtcRates = FrozenDictionary<DateOnly, BitcoinDataEntity>.Empty;
             FiatRates = FrozenDictionary<DateOnly, ImmutableList<FiatDataEntity>>.Empty;
+            _sortedBtcDates = [];
+            _sortedFiatDatesByCurrency = FrozenDictionary<string, ImmutableArray<DateOnly>>.Empty;
             return;
         }
 
@@ -92,20 +97,29 @@ internal class ReportDataProvider : IReportDataProvider
                 .Distinct()
                 .ToImmutableList());
 
-        // Load rates with buffer for lookups
-        var rateMinDate = MinTransactionDate.AddDays(-MaxDaysToScanForRate).ToValtDateTime();
-        var rateMaxDate = MaxTransactionDate.ToValtDateTime();
+        // Load all rates for flexible lookups
         var btcRates = priceDatabase.GetBitcoinData()
-            .Find(x => x.Date >= rateMinDate && x.Date <= rateMaxDate)
+            .FindAll()
             .ToImmutableList();
         BtcRates = btcRates.ToFrozenDictionary(x => DateOnly.FromDateTime(x.Date.ToUniversalTime()));
+        _sortedBtcDates = BtcRates.Keys.Order().ToImmutableArray();
 
         var fiatRates = priceDatabase.GetFiatData()
-            .Find(x => x.Date >= rateMinDate && x.Date <= rateMaxDate)
+            .FindAll()
             .ToImmutableList();
         FiatRates = fiatRates
             .GroupBy(x => DateOnly.FromDateTime(x.Date.ToUniversalTime()))
             .ToFrozenDictionary(x => x.Key, x => x.ToImmutableList());
+
+        // Build sorted date indexes per currency for efficient lookups
+        _sortedFiatDatesByCurrency = fiatRates
+            .GroupBy(x => x.Currency)
+            .ToFrozenDictionary(
+                g => g.Key,
+                g => g.Select(x => DateOnly.FromDateTime(x.Date.ToUniversalTime()))
+                    .Distinct()
+                    .Order()
+                    .ToImmutableArray());
     }
 
     public decimal GetFiatRateAt(DateOnly date, FiatCurrency currency)
@@ -115,21 +129,22 @@ internal class ReportDataProvider : IReportDataProvider
             return 1;
         }
 
-        var scanDate = date;
         var currencyCode = currency.Code;
 
-        for (var i = 0; i < MaxDaysToScanForRate; i++)
+        if (!_sortedFiatDatesByCurrency.TryGetValue(currencyCode, out var sortedDates) || sortedDates.Length == 0)
         {
-            if (FiatRates.TryGetValue(scanDate, out var rates))
-            {
-                var entry = rates.FirstOrDefault(x => x.Currency == currencyCode);
-                if (entry is not null)
-                {
-                    return entry.Price;
-                }
-            }
+            throw new ApplicationException($"No fiat rate data available for {currencyCode}");
+        }
 
-            scanDate = scanDate.AddDays(-1);
+        var targetDate = date < CutoffDate ? sortedDates[0] : FindClosestDate(sortedDates, date);
+
+        if (FiatRates.TryGetValue(targetDate, out var rates))
+        {
+            var entry = rates.FirstOrDefault(x => x.Currency == currencyCode);
+            if (entry is not null)
+            {
+                return entry.Price;
+            }
         }
 
         throw new ApplicationException($"Could not find fiat rate for {currencyCode} on {date}");
@@ -137,18 +152,45 @@ internal class ReportDataProvider : IReportDataProvider
 
     public decimal GetUsdBitcoinPriceAt(DateOnly date)
     {
-        var scanDate = date;
-
-        for (var i = 0; i < MaxDaysToScanForRate; i++)
+        if (_sortedBtcDates.Length == 0)
         {
-            if (BtcRates.TryGetValue(scanDate, out var btcRate))
-            {
-                return btcRate.Price;
-            }
+            throw new ApplicationException("No BTC rate data available");
+        }
 
-            scanDate = scanDate.AddDays(-1);
+        var targetDate = date < CutoffDate ? _sortedBtcDates[0] : FindClosestDate(_sortedBtcDates, date);
+
+        if (BtcRates.TryGetValue(targetDate, out var btcRate))
+        {
+            return btcRate.Price;
         }
 
         throw new ApplicationException($"Could not find BTC rate on {date}");
+    }
+
+    /// <summary>
+    /// Finds the closest date on or before the target date using binary search.
+    /// If the target date is before all available dates, returns the first available date.
+    /// </summary>
+    private static DateOnly FindClosestDate(ImmutableArray<DateOnly> sortedDates, DateOnly targetDate)
+    {
+        var index = sortedDates.BinarySearch(targetDate);
+
+        if (index >= 0)
+        {
+            // Exact match found
+            return sortedDates[index];
+        }
+
+        // BinarySearch returns ~index where index is the first element larger than target
+        var insertionPoint = ~index;
+
+        if (insertionPoint == 0)
+        {
+            // Target is before all dates, return the first available
+            return sortedDates[0];
+        }
+
+        // Return the date just before the insertion point (last date <= target)
+        return sortedDates[insertionPoint - 1];
     }
 }

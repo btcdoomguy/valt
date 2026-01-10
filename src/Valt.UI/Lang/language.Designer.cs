@@ -1448,7 +1448,19 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.AllTimeHigh.MaxDrawdownPercent", resourceCulture);
             }
         }
-        
+
+        public static string Reports_Wealth_Title {
+            get {
+                return ResourceManager.GetString("Reports.Wealth.Title", resourceCulture);
+            }
+        }
+
+        public static string Reports_Wealth_TotalInBtc_Tooltip {
+            get {
+                return ResourceManager.GetString("Reports.Wealth.TotalInBtc.Tooltip", resourceCulture);
+            }
+        }
+
         public static string Reports_BtcStack_Title {
             get {
                 return ResourceManager.GetString("Reports.BtcStack.Title", resourceCulture);
@@ -1470,6 +1482,12 @@ namespace Valt.UI.Lang {
         public static string Reports_BtcStack_PeopleWithSameStack {
             get {
                 return ResourceManager.GetString("Reports.BtcStack.PeopleWithSameStack", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcStack_PeopleWithSameStack_Tooltip {
+            get {
+                return ResourceManager.GetString("Reports.BtcStack.PeopleWithSameStack.Tooltip", resourceCulture);
             }
         }
         

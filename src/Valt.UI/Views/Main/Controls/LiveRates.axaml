@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:Valt.UI.Views.Main.Controls"
-             mc:Ignorable="d" d:DesignWidth="280" d:DesignHeight="80"
+             mc:Ignorable="d" d:DesignWidth="260" d:DesignHeight="80"
              x:Class="Valt.UI.Views.Main.Controls.LiveRates"
              x:DataType="controls:LiveRatesViewModel">
     <Design.DataContext>
