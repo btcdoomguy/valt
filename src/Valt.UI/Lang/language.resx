@@ -725,6 +725,12 @@
     <data name="Reports.AllTimeHigh.MaxDrawdownPercent" xml:space="preserve">
         <value>Max drawdown</value>
     </data>
+    <data name="Reports.Wealth.Title" xml:space="preserve">
+        <value>Wealth</value>
+    </data>
+    <data name="Reports.Wealth.TotalInBtc.Tooltip" xml:space="preserve">
+        <value>This is your total wealth represented in bitcoin as a unit of account</value>
+    </data>
     <data name="Reports.BtcStack.Title" xml:space="preserve">
         <value>Your Stack</value>
     </data>
@@ -736,6 +742,9 @@
     </data>
     <data name="Reports.BtcStack.PeopleWithSameStack" xml:space="preserve">
         <value>Global ranking</value>
+    </data>
+    <data name="Reports.BtcStack.PeopleWithSameStack.Tooltip" xml:space="preserve">
+        <value>Maximum number of people who can have the same stack as you</value>
     </data>
     <data name="Reports.Statistics.Title" xml:space="preserve">
         <value>Statistics</value>

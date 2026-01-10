@@ -29,10 +29,12 @@
 
             <ItemsControl ItemsSource="{Binding Rows}">
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate DataType="vm:RowItem">
                         <Border Padding="12, 6"
                                 BorderBrush="{DynamicResource Background700Brush}"
-                                BorderThickness="0,0,0,1">
+                                BorderThickness="0,0,0,1"
+                                ToolTip.Tip="{Binding Tooltip}"
+                                ToolTip.ShowDelay="300">
                             <ScrollViewer HorizontalScrollBarVisibility="Auto"
                                           VerticalScrollBarVisibility="Disabled">
                                 <DockPanel LastChildFill="True" MinWidth="280">

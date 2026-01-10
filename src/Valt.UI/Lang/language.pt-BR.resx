@@ -687,6 +687,12 @@
     <data name="Reports.AllTimeHigh.MaxDrawdownPercent" xml:space="preserve">
         <value>Maior queda</value>
     </data>
+    <data name="Reports.Wealth.Title" xml:space="preserve">
+        <value>Patrimônio</value>
+    </data>
+    <data name="Reports.Wealth.TotalInBtc.Tooltip" xml:space="preserve">
+        <value>Esse é o seu patrimônio total representado em bitcoin como unidade de conta</value>
+    </data>
     <data name="Reports.BtcStack.Title" xml:space="preserve">
         <value>Seu stack</value>
     </data>
@@ -698,6 +704,9 @@
     </data>
     <data name="Reports.BtcStack.PeopleWithSameStack" xml:space="preserve">
         <value>Ranking global</value>
+    </data>
+    <data name="Reports.BtcStack.PeopleWithSameStack.Tooltip" xml:space="preserve">
+        <value>Quantidade máxima de pessoas que podem ter o mesmo stack que você</value>
     </data>
     <data name="Reports.Statistics.Title" xml:space="preserve">
         <value>Estatísticas</value>

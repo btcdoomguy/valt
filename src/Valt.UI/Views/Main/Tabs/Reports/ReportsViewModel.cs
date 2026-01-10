@@ -51,6 +51,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     // Cached provider for the lifetime of the tab being active
     private IReportDataProvider? _cachedProvider;
 
+    [ObservableProperty] private DashboardData _wealthData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _allTimeHighData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _btcStackData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _statisticsData = DashboardData.Empty;
@@ -62,6 +63,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private DateTime _categoryFilterMainDate;
     [ObservableProperty] private DateRange _categoryFilterRange;
 
+    [ObservableProperty] private bool _isWealthLoading = true;
     [ObservableProperty] private bool _isAllTimeHighLoading = true;
     [ObservableProperty] private bool _isBtcStackLoading = true;
     [ObservableProperty] private bool _isStatisticsLoading = true;
@@ -132,6 +134,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         {
             if (args.PropertyName == nameof(AccountsTotalState.CurrentWealth))
             {
+                Dispatcher.UIThread.Post(UpdateWealthData);
                 Dispatcher.UIThread.Post(UpdateBtcStackData);
             }
         };
@@ -156,6 +159,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
 
         _ = LoadDataAndFetchAllReportsAsync();
+        UpdateWealthData();
         UpdateBtcStackData();
     }
 
@@ -393,6 +397,38 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         return sats;
     }
 
+    private void UpdateWealthData()
+    {
+        try
+        {
+            var wealth = _accountsTotalState.CurrentWealth;
+            var fiatCurrency = FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency);
+
+            var totalInBtc = CurrencyDisplay.FormatSatsAsBitcoin(wealth.AllWealthInSats);
+            var btcWealth = CurrencyDisplay.FormatSatsAsBitcoin(wealth.WealthInSats);
+            var fiatWealth = CurrencyDisplay.FormatFiat(wealth.WealthInMainFiatCurrency, fiatCurrency.Code);
+            var totalInFiat = CurrencyDisplay.FormatFiat(wealth.AllWealthInMainFiatCurrency, fiatCurrency.Code);
+            var btcRatio = wealth.WealthInBtcRatio.ToString(CultureInfo.InvariantCulture) + "%";
+
+            var rows = new ObservableCollection<RowItem>
+            {
+                new(language.Transactions_Total, totalInBtc + " BTC", language.Reports_Wealth_TotalInBtc_Tooltip),
+                new(language.Transactions_TotalInFiat, totalInFiat),
+                new(language.Transactions_MyStack, btcWealth + " BTC"),
+                new(language.Transactions_MyOther, fiatWealth),
+                new(language.Transactions_Ratio, btcRatio)
+            };
+
+            WealthData = new DashboardData(language.Reports_Wealth_Title, rows);
+            IsWealthLoading = false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating wealth data");
+            IsWealthLoading = false;
+        }
+    }
+
     private void UpdateBtcStackData()
     {
         try
@@ -404,7 +440,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 {
                     new(language.Reports_BtcStack_CurrentStack, "0 BTC"),
                     new(language.Reports_BtcStack_PercentOfSupply, "0%"),
-                    new(language.Reports_BtcStack_PeopleWithSameStack, "∞")
+                    new(language.Reports_BtcStack_PeopleWithSameStack, "∞", language.Reports_BtcStack_PeopleWithSameStack_Tooltip)
                 });
                 IsBtcStackLoading = false;
                 return;
@@ -420,7 +456,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             {
                 new(language.Reports_BtcStack_CurrentStack, btcFormatted + " BTC"),
                 new(language.Reports_BtcStack_PercentOfSupply, percentFormatted),
-                new(language.Reports_BtcStack_PeopleWithSameStack, peopleFormatted)
+                new(language.Reports_BtcStack_PeopleWithSameStack, peopleFormatted, language.Reports_BtcStack_PeopleWithSameStack_Tooltip)
             };
 
             BtcStackData = new DashboardData(language.Reports_BtcStack_Title, rows);
