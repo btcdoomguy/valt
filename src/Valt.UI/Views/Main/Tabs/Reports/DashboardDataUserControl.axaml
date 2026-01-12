@@ -35,8 +35,7 @@
                                 BorderThickness="0,0,0,1"
                                 ToolTip.Tip="{Binding Tooltip}"
                                 ToolTip.ShowDelay="300">
-                            <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                                          VerticalScrollBarVisibility="Disabled">
+
                                 <DockPanel LastChildFill="True" MinWidth="280">
                                     <TextBlock Text="{Binding LeftText}"
                                                FontSize="11"
@@ -55,7 +54,6 @@
                                                VerticalAlignment="Center"
                                                TextWrapping="NoWrap"/>
                                 </DockPanel>
-                            </ScrollViewer>
                         </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

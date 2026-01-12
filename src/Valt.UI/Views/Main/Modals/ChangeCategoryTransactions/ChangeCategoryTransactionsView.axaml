@@ -6,12 +6,12 @@
         xmlns:transactionTerms="clr-namespace:Valt.Infra.TransactionTerms;assembly=Valt.Infra"
         xmlns:local="clr-namespace:Valt.UI.Lang"
         xmlns:changeCategoryTransactions="clr-namespace:Valt.UI.Views.Main.Modals.ChangeCategoryTransactions"
-        mc:Ignorable="d" d:DesignWidth="350" d:DesignHeight="180"
+        mc:Ignorable="d" d:DesignWidth="350" d:DesignHeight="300"
         MaxWidth="350"
-        MaxHeight="180"
+        MaxHeight="300"
         x:Class="Valt.UI.Views.Main.Modals.ChangeCategoryTransactions.ChangeCategoryTransactionsView"
         x:DataType="changeCategoryTransactions:ChangeCategoryTransactionsViewModel"
-        Title="{x:Static local:language.ChangeCategoryTransactionTitle}"
+        Title="{x:Static local:language.ChangeCategoryTransactions_Title}"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
         SystemDecorations="None"
@@ -21,23 +21,50 @@
     </Window.KeyBindings>
     <Border>
         <StackPanel Orientation="Vertical">
-            <userControls:CustomTitleBar Title="{x:Static local:language.ChangeCategoryTransactionTitle}" TitleBarPressed="CustomTitleBarButtonPressed"
+            <userControls:CustomTitleBar Title="{x:Static local:language.ChangeCategoryTransactions_Title}" TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
-            <Border Classes="form-fields-area" Height="95">
-                <StackPanel Classes="form-field">
-                    <TextBlock Text="{x:Static local:language.ChangeCategoryTransactionTitle}">
-                    </TextBlock>
-                    <AutoCompleteBox x:Name="NameBox"
-                             Margin="0, 10, 0, 0"
-                             Text="{Binding Name, Mode=TwoWay}">
-                        <AutoCompleteBox.ItemTemplate>
-                            <DataTemplate DataType="transactionTerms:TransactionTermResult">
-                                <StackPanel>
-                                    <TextBlock Text="{Binding Name}" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </AutoCompleteBox.ItemTemplate>
-                    </AutoCompleteBox>
+            <Border Classes="form-fields-area" Height="215">
+                <StackPanel Spacing="10">
+                    <!-- Rename checkbox and name field -->
+                    <StackPanel Classes="form-field">
+                        <CheckBox Content="{x:Static local:language.ChangeCategoryTransactions_Rename}"
+                                  IsChecked="{Binding RenameEnabled}" />
+                        <AutoCompleteBox x:Name="NameBox"
+                                 Margin="0, 5, 0, 0"
+                                 IsEnabled="{Binding RenameEnabled}"
+                                 Text="{Binding Name, Mode=TwoWay}">
+                            <AutoCompleteBox.ItemTemplate>
+                                <DataTemplate DataType="transactionTerms:TransactionTermResult">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </AutoCompleteBox.ItemTemplate>
+                        </AutoCompleteBox>
+                    </StackPanel>
+                    <!-- Change category checkbox and dropdown -->
+                    <StackPanel Classes="form-field">
+                        <CheckBox Content="{x:Static local:language.ChangeCategoryTransactions_ChangeCategory}"
+                                  IsChecked="{Binding ChangeCategoryEnabled}" />
+                        <ComboBox ItemsSource="{Binding AvailableCategories}"
+                                  SelectedItem="{Binding SelectedCategory}"
+                                  HorizontalAlignment="Stretch"
+                                  IsEnabled="{Binding ChangeCategoryEnabled}"
+                                  IsTextSearchEnabled="True"
+                                  Height="36"
+                                  Margin="0, 5, 0, 0">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
+                                                   Text="{Binding Unicode}"
+                                                   Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
+                                        <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
                 </StackPanel>
             </Border>
             <!-- Buttons -->

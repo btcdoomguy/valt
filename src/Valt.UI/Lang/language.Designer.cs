@@ -74,7 +74,25 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("ChangeCategoryTransactionTitle", resourceCulture);
             }
         }
-        
+
+        public static string ChangeCategoryTransactions_Title {
+            get {
+                return ResourceManager.GetString("ChangeCategoryTransactions_Title", resourceCulture);
+            }
+        }
+
+        public static string ChangeCategoryTransactions_Rename {
+            get {
+                return ResourceManager.GetString("ChangeCategoryTransactions_Rename", resourceCulture);
+            }
+        }
+
+        public static string ChangeCategoryTransactions_ChangeCategory {
+            get {
+                return ResourceManager.GetString("ChangeCategoryTransactions_ChangeCategory", resourceCulture);
+            }
+        }
+
         public static string CreateDatabaseTitle {
             get {
                 return ResourceManager.GetString("CreateDatabaseTitle", resourceCulture);
@@ -1514,19 +1532,61 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.Statistics.MedianExpenses", resourceCulture);
             }
         }
-        
-        public static string Reports_Statistics_MedianExpensesSats {
-            get {
-                return ResourceManager.GetString("Reports.Statistics.MedianExpensesSats", resourceCulture);
-            }
-        }
-        
+
         public static string Reports_Statistics_WealthCoverage {
             get {
                 return ResourceManager.GetString("Reports.Statistics.WealthCoverage", resourceCulture);
             }
         }
-        
+
+        public static string Reports_Statistics_WealthCoverage_Tooltip {
+            get {
+                return ResourceManager.GetString("Reports.Statistics.WealthCoverage.Tooltip", resourceCulture);
+            }
+        }
+
+        public static string Reports_Statistics_MedianExpensesPrevious {
+            get {
+                return ResourceManager.GetString("Reports.Statistics.MedianExpensesPrevious", resourceCulture);
+            }
+        }
+
+        public static string Reports_Statistics_MedianExpensesEvolution {
+            get {
+                return ResourceManager.GetString("Reports.Statistics.MedianExpensesEvolution", resourceCulture);
+            }
+        }
+
+        public static string Reports_Statistics_MedianExpensesEvolution_Tooltip {
+            get {
+                return ResourceManager.GetString("Reports.Statistics.MedianExpensesEvolution.Tooltip", resourceCulture);
+            }
+        }
+
+        public static string Reports_Statistics_MedianExpensesSatsLabel {
+            get {
+                return ResourceManager.GetString("Reports.Statistics.MedianExpensesSatsLabel", resourceCulture);
+            }
+        }
+
+        public static string Reports_Statistics_MedianExpensesSatsPrevious {
+            get {
+                return ResourceManager.GetString("Reports.Statistics.MedianExpensesSatsPrevious", resourceCulture);
+            }
+        }
+
+        public static string Reports_Statistics_MedianExpensesSatsEvolution {
+            get {
+                return ResourceManager.GetString("Reports.Statistics.MedianExpensesSatsEvolution", resourceCulture);
+            }
+        }
+
+        public static string Reports_Statistics_MedianExpensesSatsEvolution_Tooltip {
+            get {
+                return ResourceManager.GetString("Reports.Statistics.MedianExpensesSatsEvolution.Tooltip", resourceCulture);
+            }
+        }
+
         public static string Reports_MonthlyTotals_Obs {
             get {
                 return ResourceManager.GetString("Reports.MonthlyTotals.Obs", resourceCulture);

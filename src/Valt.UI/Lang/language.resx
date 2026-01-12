@@ -38,6 +38,15 @@
     <data name="ChangeCategoryTransactionTitle" xml:space="preserve">
         <value>New Name</value>
     </data>
+    <data name="ChangeCategoryTransactions_Title" xml:space="preserve">
+        <value>Bulk Edit Transactions</value>
+    </data>
+    <data name="ChangeCategoryTransactions_Rename" xml:space="preserve">
+        <value>Rename all transactions</value>
+    </data>
+    <data name="ChangeCategoryTransactions_ChangeCategory" xml:space="preserve">
+        <value>Change category for all transactions</value>
+    </data>
     <data name="CreateDatabaseTitle" xml:space="preserve">
         <value>Create new database</value>
     </data>
@@ -758,11 +767,32 @@
     <data name="Reports.Statistics.MedianExpenses" xml:space="preserve">
         <value>Median expenses (12mo)</value>
     </data>
-    <data name="Reports.Statistics.MedianExpensesSats" xml:space="preserve">
-        <value>Expenses as sats</value>
-    </data>
     <data name="Reports.Statistics.WealthCoverage" xml:space="preserve">
         <value>Wealth coverage</value>
+    </data>
+    <data name="Reports.Statistics.WealthCoverage.Tooltip" xml:space="preserve">
+        <value>How long you can sustain yourself with your current wealth without new income</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesPrevious" xml:space="preserve">
+        <value>Median expenses (prev 12mo)</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesEvolution" xml:space="preserve">
+        <value>YoY evolution</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesEvolution.Tooltip" xml:space="preserve">
+        <value>Your inflation measured in fiat. This is the increase in your expenses relative to the same period last year. Negative numbers mean a decrease in cost of living measured in fiat currency</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesSatsLabel" xml:space="preserve">
+        <value>Median sats (12mo)</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesSatsPrevious" xml:space="preserve">
+        <value>Median sats (prev 12mo)</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesSatsEvolution" xml:space="preserve">
+        <value>Sats YoY evolution</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesSatsEvolution.Tooltip" xml:space="preserve">
+        <value>Your inflation measured in bitcoin. This is the increase in your expenses relative to the same period last year. Negative numbers mean a decrease in cost of living measured in bitcoin</value>
     </data>
     <data name="Reports.MonthlyTotals.Obs" xml:space="preserve">
         <value>* latest totals are calculated based on yesterday amounts</value>
