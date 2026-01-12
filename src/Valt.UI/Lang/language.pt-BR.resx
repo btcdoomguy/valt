@@ -241,7 +241,7 @@
         <value>Editar</value>
     </data>
     <data name="Transactions.Menu.RenameAll" xml:space="preserve">
-        <value>Renomear todos</value>
+        <value>Editar todos</value>
     </data>
     <data name="Transactions.MoveDown" xml:space="preserve">
         <value>Mover para baixo</value>

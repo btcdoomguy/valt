@@ -74,25 +74,25 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("ChangeCategoryTransactionTitle", resourceCulture);
             }
         }
-
+        
         public static string ChangeCategoryTransactions_Title {
             get {
                 return ResourceManager.GetString("ChangeCategoryTransactions_Title", resourceCulture);
             }
         }
-
+        
         public static string ChangeCategoryTransactions_Rename {
             get {
                 return ResourceManager.GetString("ChangeCategoryTransactions_Rename", resourceCulture);
             }
         }
-
+        
         public static string ChangeCategoryTransactions_ChangeCategory {
             get {
                 return ResourceManager.GetString("ChangeCategoryTransactions_ChangeCategory", resourceCulture);
             }
         }
-
+        
         public static string CreateDatabaseTitle {
             get {
                 return ResourceManager.GetString("CreateDatabaseTitle", resourceCulture);
@@ -302,13 +302,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("ManageAccount.CurrencyNickname", resourceCulture);
             }
         }
-
+        
         public static string ManageAccount_InitialAmount {
             get {
                 return ResourceManager.GetString("ManageAccount.InitialAmount", resourceCulture);
             }
         }
-
+        
         public static string ManageCategories_Title {
             get {
                 return ResourceManager.GetString("ManageCategories.Title", resourceCulture);
@@ -1064,13 +1064,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("ManageFixedExpenses.RecurrenceSection", resourceCulture);
             }
         }
-
+        
         public static string ManageFixedExpenses_InformationSection {
             get {
                 return ResourceManager.GetString("ManageFixedExpenses.InformationSection", resourceCulture);
             }
         }
-
+        
         public static string FixedExpenses_Period_Weekly {
             get {
                 return ResourceManager.GetString("FixedExpenses.Period.Weekly", resourceCulture);
@@ -1478,19 +1478,19 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.AllTimeHigh.MaxDrawdownPercent", resourceCulture);
             }
         }
-
+        
         public static string Reports_Wealth_Title {
             get {
                 return ResourceManager.GetString("Reports.Wealth.Title", resourceCulture);
             }
         }
-
+        
         public static string Reports_Wealth_TotalInBtc_Tooltip {
             get {
                 return ResourceManager.GetString("Reports.Wealth.TotalInBtc.Tooltip", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcStack_Title {
             get {
                 return ResourceManager.GetString("Reports.BtcStack.Title", resourceCulture);
@@ -1514,7 +1514,7 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.BtcStack.PeopleWithSameStack", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcStack_PeopleWithSameStack_Tooltip {
             get {
                 return ResourceManager.GetString("Reports.BtcStack.PeopleWithSameStack.Tooltip", resourceCulture);
@@ -1532,61 +1532,61 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.Statistics.MedianExpenses", resourceCulture);
             }
         }
-
+        
         public static string Reports_Statistics_WealthCoverage {
             get {
                 return ResourceManager.GetString("Reports.Statistics.WealthCoverage", resourceCulture);
             }
         }
-
+        
         public static string Reports_Statistics_WealthCoverage_Tooltip {
             get {
                 return ResourceManager.GetString("Reports.Statistics.WealthCoverage.Tooltip", resourceCulture);
             }
         }
-
+        
         public static string Reports_Statistics_MedianExpensesPrevious {
             get {
                 return ResourceManager.GetString("Reports.Statistics.MedianExpensesPrevious", resourceCulture);
             }
         }
-
+        
         public static string Reports_Statistics_MedianExpensesEvolution {
             get {
                 return ResourceManager.GetString("Reports.Statistics.MedianExpensesEvolution", resourceCulture);
             }
         }
-
+        
         public static string Reports_Statistics_MedianExpensesEvolution_Tooltip {
             get {
                 return ResourceManager.GetString("Reports.Statistics.MedianExpensesEvolution.Tooltip", resourceCulture);
             }
         }
-
+        
         public static string Reports_Statistics_MedianExpensesSatsLabel {
             get {
                 return ResourceManager.GetString("Reports.Statistics.MedianExpensesSatsLabel", resourceCulture);
             }
         }
-
+        
         public static string Reports_Statistics_MedianExpensesSatsPrevious {
             get {
                 return ResourceManager.GetString("Reports.Statistics.MedianExpensesSatsPrevious", resourceCulture);
             }
         }
-
+        
         public static string Reports_Statistics_MedianExpensesSatsEvolution {
             get {
                 return ResourceManager.GetString("Reports.Statistics.MedianExpensesSatsEvolution", resourceCulture);
             }
         }
-
+        
         public static string Reports_Statistics_MedianExpensesSatsEvolution_Tooltip {
             get {
                 return ResourceManager.GetString("Reports.Statistics.MedianExpensesSatsEvolution.Tooltip", resourceCulture);
             }
         }
-
+        
         public static string Reports_MonthlyTotals_Obs {
             get {
                 return ResourceManager.GetString("Reports.MonthlyTotals.Obs", resourceCulture);
@@ -2258,13 +2258,7 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Error.FileNotFound", resourceCulture);
             }
         }
-
-        public static string Error_IncompatibleVersion {
-            get {
-                return ResourceManager.GetString("Error.IncompatibleVersion", resourceCulture);
-            }
-        }
-
+        
         public static string Button_Refresh {
             get {
                 return ResourceManager.GetString("Button.Refresh", resourceCulture);
@@ -2358,6 +2352,12 @@ namespace Valt.UI.Lang {
         public static string BootDatabase_Category_Housing {
             get {
                 return ResourceManager.GetString("BootDatabase.Category.Housing", resourceCulture);
+            }
+        }
+        
+        public static string Error_IncompatibleVersion {
+            get {
+                return ResourceManager.GetString("Error.IncompatibleVersion", resourceCulture);
             }
         }
     }

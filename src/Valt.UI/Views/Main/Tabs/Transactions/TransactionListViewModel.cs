@@ -307,7 +307,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     }
 
     [RelayCommand]
-    private async Task RenameAll()
+    private async Task ChangeNamesAndCategories()
     {
         var ownerWindow = GetUserControlOwnerWindow()!;
 

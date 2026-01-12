@@ -288,7 +288,7 @@
         <value>Copy</value>
     </data>
     <data name="Transactions.Menu.RenameAll" xml:space="preserve">
-        <value>Rename all</value>
+        <value>Edit all</value>
     </data>
     <data name="Transactions.Menu.Delete" xml:space="preserve">
         <value>Delete</value>
