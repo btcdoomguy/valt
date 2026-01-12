@@ -279,12 +279,18 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string ManageAccount_CurrencyNickname {
+            get {
+                return ResourceManager.GetString("ManageAccount.CurrencyNickname", resourceCulture);
+            }
+        }
+
         public static string ManageAccount_InitialAmount {
             get {
                 return ResourceManager.GetString("ManageAccount.InitialAmount", resourceCulture);
             }
         }
-        
+
         public static string ManageCategories_Title {
             get {
                 return ResourceManager.GetString("ManageCategories.Title", resourceCulture);

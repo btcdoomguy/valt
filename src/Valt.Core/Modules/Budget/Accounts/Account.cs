@@ -7,18 +7,20 @@ namespace Valt.Core.Modules.Budget.Accounts;
 public abstract class Account : AggregateRoot<AccountId>
 {
     public AccountName Name { get; protected set; }
+    public AccountCurrencyNickname CurrencyNickname { get; protected set; }
     public bool Visible { get; protected set; }
     public Icon Icon { get; protected set; }
     public int DisplayOrder { get; protected set; }
 
     public abstract AccountTypes AccountType { get; }
 
-    protected Account(AccountId id, AccountName name, bool visible, Icon icon, int displayOrder, int version)
+    protected Account(AccountId id, AccountName name, bool visible, Icon icon, AccountCurrencyNickname currencyNickname, int displayOrder, int version)
     {
         Id = id;
         Name = name;
         Visible = visible;
         Icon = icon;
+        CurrencyNickname = currencyNickname;
         DisplayOrder = displayOrder;
         Version = version;
 
@@ -32,6 +34,16 @@ public abstract class Account : AggregateRoot<AccountId>
             return;
         
         Name = name;
+
+        AddEvent(new AccountUpdatedEvent(this));
+    }
+    
+    public void ChangeCurrencyNickname(AccountCurrencyNickname nickname)
+    {
+        if (CurrencyNickname == nickname)
+            return;
+        
+        CurrencyNickname = nickname;
 
         AddEvent(new AccountUpdatedEvent(this));
     }

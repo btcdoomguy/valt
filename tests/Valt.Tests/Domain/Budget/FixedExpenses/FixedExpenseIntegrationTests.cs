@@ -33,7 +33,7 @@ public class FixedExpenseIntegrationTests : IntegrationTest
         _fixedExpenseId = fixedExpense.Id;
 
         //adds a transaction bound to the fixed expense entry
-        var brlAccount = FiatAccount.New("My account", true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
+        var brlAccount = FiatAccount.New("My account", AccountCurrencyNickname.Empty, true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
         var accountRepo = _serviceProvider.GetRequiredService<IAccountRepository>();
 
         await accountRepo.SaveAccountAsync(brlAccount);

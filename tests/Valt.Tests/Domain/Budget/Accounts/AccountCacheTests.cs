@@ -22,7 +22,7 @@ public class AccountCacheTests : IntegrationTest
         var transactionRepository = _serviceProvider.GetRequiredService<ITransactionRepository>();
         var localDatabase = _serviceProvider.GetRequiredService<ILocalDatabase>();
 
-        var account = FiatAccount.New("Test", true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
+        var account = FiatAccount.New("Test", AccountCurrencyNickname.Empty, true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
         await accountRepository.SaveAccountAsync(account);
 
         var transaction = Transaction.New(new DateOnly(2025, 1, 1), "My Transaction", new CategoryId(),
@@ -44,7 +44,7 @@ public class AccountCacheTests : IntegrationTest
         var transactionRepository = _serviceProvider.GetRequiredService<ITransactionRepository>();
         var localDatabase = _serviceProvider.GetRequiredService<ILocalDatabase>();
 
-        var account = FiatAccount.New("Test", true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
+        var account = FiatAccount.New("Test", AccountCurrencyNickname.Empty, true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
         await accountRepository.SaveAccountAsync(account);
 
         var transaction = Transaction.New(new DateOnly(2025, 1, 1), "My Transaction", new CategoryId(),
@@ -77,10 +77,10 @@ public class AccountCacheTests : IntegrationTest
         var transactionRepository = _serviceProvider.GetRequiredService<ITransactionRepository>();
         var localDatabase = _serviceProvider.GetRequiredService<ILocalDatabase>();
 
-        var account1 = FiatAccount.New("Test 1", true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
+        var account1 = FiatAccount.New("Test 1", AccountCurrencyNickname.Empty, true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
         await accountRepository.SaveAccountAsync(account1);
 
-        var account2 = FiatAccount.New("Test 2", true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
+        var account2 = FiatAccount.New("Test 2", AccountCurrencyNickname.Empty, true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
         await accountRepository.SaveAccountAsync(account2);
 
         var transaction = Transaction.New(new DateOnly(2025, 1, 1), "My Transaction", new CategoryId(),
@@ -117,10 +117,10 @@ public class AccountCacheTests : IntegrationTest
         var transactionRepository = _serviceProvider.GetRequiredService<ITransactionRepository>();
         var localDatabase = _serviceProvider.GetRequiredService<ILocalDatabase>();
 
-        var account1 = FiatAccount.New("Test 1", true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
+        var account1 = FiatAccount.New("Test 1", AccountCurrencyNickname.Empty, true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
         await accountRepository.SaveAccountAsync(account1);
 
-        var account2 = FiatAccount.New("Test 2", true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
+        var account2 = FiatAccount.New("Test 2", AccountCurrencyNickname.Empty, true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
         await accountRepository.SaveAccountAsync(account2);
 
         var transaction = Transaction.New(new DateOnly(2025, 1, 1), "My Transaction", new CategoryId(),
@@ -158,7 +158,7 @@ public class AccountCacheTests : IntegrationTest
         var localDatabase = _serviceProvider.GetRequiredService<ILocalDatabase>();
         var today = DateOnly.FromDateTime(DateTime.Today);
 
-        var account1 = FiatAccount.New("Test 1", true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
+        var account1 = FiatAccount.New("Test 1", AccountCurrencyNickname.Empty, true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
         await accountRepository.SaveAccountAsync(account1);
 
         var transaction = Transaction.New(today.AddDays(5), "My Transaction", new CategoryId(),
@@ -183,7 +183,7 @@ public class AccountCacheTests : IntegrationTest
         var localDatabase = _serviceProvider.GetRequiredService<ILocalDatabase>();
         var today = DateOnly.FromDateTime(DateTime.Today);
 
-        var account1 = FiatAccount.New("Test 1", true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
+        var account1 = FiatAccount.New("Test 1", AccountCurrencyNickname.Empty, true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
         await accountRepository.SaveAccountAsync(account1);
 
         var transaction = Transaction.New(today.AddDays(5), "My Transaction", new CategoryId(),
@@ -220,7 +220,7 @@ public class AccountCacheTests : IntegrationTest
         var localDatabase = _serviceProvider.GetRequiredService<ILocalDatabase>();
         var today = DateOnly.FromDateTime(DateTime.Today);
 
-        var account1 = FiatAccount.New("Test 1", true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
+        var account1 = FiatAccount.New("Test 1", AccountCurrencyNickname.Empty, true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
         await accountRepository.SaveAccountAsync(account1);
 
         var transaction = Transaction.New(today.AddDays(5), "My Transaction", new CategoryId(),
@@ -258,7 +258,7 @@ public class AccountCacheTests : IntegrationTest
         var localDatabase = _serviceProvider.GetRequiredService<ILocalDatabase>();
         var today = DateOnly.FromDateTime(DateTime.Today);
 
-        var account1 = FiatAccount.New("Test 1", true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
+        var account1 = FiatAccount.New("Test 1", AccountCurrencyNickname.Empty, true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
         await accountRepository.SaveAccountAsync(account1);
 
         var transaction = Transaction.New(today.AddDays(5), "My Transaction", new CategoryId(),

@@ -66,6 +66,9 @@ public class AccountQueries : IAccountQueries
         }
 
         var icon = account.Icon != null ? Icon.RestoreFromId(account.Icon) : Icon.Empty;
+        var currencyDisplayName = !string.IsNullOrEmpty(account.CurrencyNickname)
+            ? account.CurrencyNickname
+            : account.AccountEntityType == AccountEntityType.Bitcoin ? "BTC" : account.Currency;
 
         return new AccountSummaryDTO(
             account.Id.ToString(),
@@ -76,6 +79,7 @@ public class AccountQueries : IAccountQueries
             icon.Unicode,
             icon.Color,
             account.Currency,
+            currencyDisplayName,
             account.AccountEntityType == AccountEntityType.Bitcoin,
             fiatTotal,
             satsTotal,

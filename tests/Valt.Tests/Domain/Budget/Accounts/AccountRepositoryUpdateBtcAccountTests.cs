@@ -34,7 +34,7 @@ public class AccountRepositoryUpdateBtcAccountTests : DatabaseTest
     {
         var repository = new AccountRepository(_localDatabase, _domainEventPublisher);
 
-        var account = BtcAccount.Create(_btcAccountId, "Btc Account", true, Icon.Empty, 1, 0, 1);
+        var account = BtcAccount.Create(_btcAccountId, "Btc Account", AccountCurrencyNickname.Empty, true, Icon.Empty, 1, 0, 1);
 
         account.ChangeInitialAmount(2);
 

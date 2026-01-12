@@ -140,6 +140,9 @@
     <data name="ManageAccount.Currency" xml:space="preserve">
         <value>Currency</value>
     </data>
+    <data name="ManageAccount.CurrencyNickname" xml:space="preserve">
+        <value>Currency Nickname</value>
+    </data>
     <data name="ManageAccount.InitialAmount" xml:space="preserve">
         <value>Initial Amount</value>
     </data>

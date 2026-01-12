@@ -102,6 +102,9 @@
     <data name="ManageAccount.Icon" xml:space="preserve">
         <value>Ícone</value>
     </data>
+    <data name="ManageAccount.CurrencyNickname" xml:space="preserve">
+        <value>Apelido da Moeda</value>
+    </data>
     <data name="ManageAccount.InitialAmount" xml:space="preserve">
         <value>Valor Inicial</value>
     </data>

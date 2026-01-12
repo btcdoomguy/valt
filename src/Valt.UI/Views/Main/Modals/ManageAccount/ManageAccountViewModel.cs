@@ -34,6 +34,9 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
     [ObservableProperty] [NotifyDataErrorInfo] [Required(ErrorMessage = "Inform a valid account name.")]
     private string _name = string.Empty;
 
+    [ObservableProperty] [NotifyDataErrorInfo] [MaxLength(15, ErrorMessage = "Currency nickname must be 15 characters or less.")]
+    private string _currencyNickname = string.Empty;
+
     [ObservableProperty] private bool _visible;
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(IconUiWrapper))]
@@ -117,6 +120,7 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
 
             _accountId = account.Id;
             Name = account.Name;
+            CurrencyNickname = account.CurrencyNickname.Value;
             Visible = account.Visible;
             Icon = account.Icon;
 
@@ -173,7 +177,7 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
             {
                 if (_accountId is null)
                 {
-                    account = FiatAccount.New(AccountName.New(Name), Visible, Icon,
+                    account = FiatAccount.New(AccountName.New(Name), CurrencyNickname, Visible, Icon,
                         FiatCurrency.GetFromCode(Currency), InitialFiatAmount);
                 }
                 else
@@ -187,6 +191,7 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
                         throw new WrongAccountTypeException(account.Id);
 
                     fiatAccount.Rename(Name);
+                    fiatAccount.ChangeCurrencyNickname(CurrencyNickname);
                     fiatAccount.ChangeVisibility(Visible);
                     fiatAccount.ChangeIcon(Icon);
                     fiatAccount.ChangeCurrency(FiatCurrency.GetFromCode(Currency));
@@ -197,7 +202,7 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
             {
                 if (_accountId is null)
                 {
-                    account = BtcAccount.New(AccountName.New(Name), Visible, Icon, InitialBtcAmount);
+                    account = BtcAccount.New(AccountName.New(Name), CurrencyNickname, Visible, Icon, InitialBtcAmount);
                 }
                 else
                 {
@@ -210,6 +215,7 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
                         throw new WrongAccountTypeException(account.Id);
 
                     btcAccount.Rename(Name);
+                    btcAccount.ChangeCurrencyNickname(CurrencyNickname);
                     btcAccount.ChangeVisibility(Visible);
                     btcAccount.ChangeIcon(Icon);
                     btcAccount.ChangeInitialAmount(InitialBtcAmount);

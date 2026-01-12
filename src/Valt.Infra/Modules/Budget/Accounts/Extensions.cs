@@ -29,6 +29,7 @@ public static class Extensions
     {
         return BtcAccount.Create(entity.Id.ToString(),
             entity.Name,
+            entity.CurrencyNickname ?? string.Empty,
             entity.Visible,
             entity.Icon is not null ? Icon.RestoreFromId(entity.Icon) : Icon.Empty,
             BtcValue.New(Convert.ToInt64(entity.InitialAmount)),
@@ -41,6 +42,7 @@ public static class Extensions
     {
         return FiatAccount.Create(entity.Id.ToString(),
             entity.Name,
+            entity.CurrencyNickname ?? string.Empty,
             entity.Visible,
             entity.Icon is not null ? Icon.RestoreFromId(entity.Icon) : Icon.Empty,
             FiatCurrency.GetFromCode(entity.Currency!),
@@ -76,6 +78,7 @@ public static class Extensions
             InitialAmount = btcAccount.InitialAmount.Sats,
             Icon = btcAccount.Icon.ToString(),
             Currency = null,
+            CurrencyNickname = string.IsNullOrEmpty(btcAccount.CurrencyNickname.Value) ? null : btcAccount.CurrencyNickname.Value,
             Name = btcAccount.Name,
             Version = btcAccount.Version,
             DisplayOrder = btcAccount.DisplayOrder,
@@ -92,6 +95,7 @@ public static class Extensions
             InitialAmount = fiatAccount.InitialAmount,
             Icon = fiatAccount.Icon.ToString(),
             Currency = fiatAccount.FiatCurrency.Code,
+            CurrencyNickname = string.IsNullOrEmpty(fiatAccount.CurrencyNickname.Value) ? null : fiatAccount.CurrencyNickname.Value,
             Name = fiatAccount.Name,
             Version = fiatAccount.Version,
             DisplayOrder = fiatAccount.DisplayOrder,

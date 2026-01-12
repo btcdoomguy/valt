@@ -102,7 +102,7 @@ public class FixedExpenseProviderTests : IntegrationTest
         await PrepareDataType1();
         
         //adds a transaction bound to the electricity entry
-        var brlAccount = FiatAccount.New("My account", true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
+        var brlAccount = FiatAccount.New("My account", AccountCurrencyNickname.Empty, true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
         var accountRepo = new AccountRepository(_localDatabase, _serviceProvider.GetRequiredService<IDomainEventPublisher>());
         
         await accountRepo.SaveAccountAsync(brlAccount);
