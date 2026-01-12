@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-        <LangVersion>13</LangVersion>
+        <LangVersion>14</LangVersion>
         <Authors>DoomLabs</Authors>
         <Product>Valt</Product>
         <AssemblyName>Valt</AssemblyName>
@@ -22,22 +22,22 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.3.7" />
-        <PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.3.7" />
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.7" />
-        <PackageReference Include="Avalonia.Desktop" Version="11.3.7" />
-        <PackageReference Include="Avalonia.Svg.Skia" Version="11.3.0" />
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.7" />
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.7" />
+        <PackageReference Include="Avalonia" />
+        <PackageReference Include="Avalonia.Controls.ColorPicker" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" />
+        <PackageReference Include="Avalonia.Desktop" />
+        <PackageReference Include="Avalonia.Svg.Skia" />
+        <PackageReference Include="Avalonia.Themes.Fluent" />
+        <PackageReference Include="Avalonia.Fonts.Inter" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.7" />
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-        <PackageReference Include="CsvHelper" Version="33.1.0" />
-        <PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-rc6.1" />
-        <PackageReference Include="MessageBox.Avalonia" Version="3.2.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.10" />
-        <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.116.1" />
-        <PackageReference Include="Svg.Controls.Skia.Avalonia" Version="11.3.6.2" />
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" />
+        <PackageReference Include="CommunityToolkit.Mvvm" />
+        <PackageReference Include="CsvHelper" />
+        <PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" />
+        <PackageReference Include="MessageBox.Avalonia" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux" />
+        <PackageReference Include="Svg.Controls.Skia.Avalonia" />
     </ItemGroup>
 
     <ItemGroup>
