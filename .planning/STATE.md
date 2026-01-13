@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-01-13)
 ## Current Position
 
 Phase: 4 of 4 (Transaction Export)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-01-13 — Milestone v1.1 created
+Plan: 1 of 1 in current phase
+Status: Phase complete
+Last activity: 2026-01-13 — Completed 04-01-PLAN.md
 
-Progress: ░░░░░░░░░░ 0%
+Progress: ██████████ 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
+- Total plans completed: 6
 - Average duration: ~10 min
 - Total execution time: —
 
@@ -30,7 +30,7 @@ Progress: ░░░░░░░░░░ 0%
 | 1. CSV Parser & Template | 1/1 | — | — |
 | 2. Import Wizard UI | 2/2 | — | — |
 | 3. Import Execution | 2/2 | 40 min | 20 min |
-| 4. Transaction Export | 0/? | — | — |
+| 4. Transaction Export | 1/1 | 12 min | 12 min |
 
 **Recent Trend:**
 - Last 5 plans: —
@@ -54,6 +54,9 @@ Recent decisions affecting current work:
 - Created Infra DTOs (CsvAccountMapping, CsvCategoryMapping) instead of using UI models to maintain clean architecture
 - Use simple English strings in executor for progress messages (MVP approach)
 - Restart all three background job types (App, ValtDatabase, PriceDatabase) after import
+- CSV export uses same CsvHelper config as import for format compatibility
+- Category simple names used in export (not nested Parent > Child format)
+- Account format: "AccountName [CurrencyCode]" for fiat, "AccountName [btc]" for bitcoin
 
 ### Deferred Issues
 
@@ -70,5 +73,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-13
-Stopped at: Milestone v1.1 initialization
+Stopped at: Completed 04-01-PLAN.md, milestone v1.1 complete
 Resume file: None
