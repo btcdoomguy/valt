@@ -2427,6 +2427,12 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string Menu_ExportTransactions {
+            get {
+                return ResourceManager.GetString("Menu_ExportTransactions", resourceCulture);
+            }
+        }
+
         public static string ImportWizard_SelectFile {
             get {
                 return ResourceManager.GetString("ImportWizard_SelectFile", resourceCulture);

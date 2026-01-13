@@ -1204,6 +1204,9 @@
     <data name="Menu_ImportTransactions" xml:space="preserve">
         <value>Importar Transações...</value>
     </data>
+    <data name="Menu_ExportTransactions" xml:space="preserve">
+        <value>Exportar Transações...</value>
+    </data>
     <data name="ImportWizard_SelectFile" xml:space="preserve">
         <value>Selecionar Arquivo CSV</value>
     </data>
