@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-01-13)
 
 **Core value:** Enable users to migrate their financial history from other tools into Valt without manual data entry.
-**Current focus:** v1.0 milestone complete — ready for next milestone planning
+**Current focus:** v1.1 Transaction Export
 
 ## Current Position
 
-Phase: 3 of 3 (Import Execution)
-Plan: 2 of 2 in current phase
-Status: v1.0 shipped
-Last activity: 2026-01-13 — v1.0 CSV Import Wizard milestone complete
+Phase: 4 of 4 (Transaction Export)
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-01-13 — Milestone v1.1 created
 
-Progress: ██████████ 100%
+Progress: ░░░░░░░░░░ 0%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: ~5 min
+- Total plans completed: 5
+- Average duration: ~10 min
 - Total execution time: —
 
 **By Phase:**
@@ -30,6 +30,7 @@ Progress: ██████████ 100%
 | 1. CSV Parser & Template | 1/1 | — | — |
 | 2. Import Wizard UI | 2/2 | — | — |
 | 3. Import Execution | 2/2 | 40 min | 20 min |
+| 4. Transaction Export | 0/? | — | — |
 
 **Recent Trend:**
 - Last 5 plans: —
@@ -62,8 +63,12 @@ None yet.
 
 None yet.
 
+### Roadmap Evolution
+
+- Milestone v1.1 created: Transaction Export, 1 phase (Phase 4)
+
 ## Session Continuity
 
 Last session: 2026-01-13
-Stopped at: Milestone complete — CSV Import Wizard fully functional
+Stopped at: Milestone v1.1 initialization
 Resume file: None
