@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -10,6 +12,7 @@ using Valt.Infra.Modules.Budget.Categories.Queries;
 using Valt.Infra.Services.CsvImport;
 using Valt.UI.Base;
 using Valt.UI.Lang;
+using Valt.UI.Views.Main.Modals.ImportWizard.Models;
 
 namespace Valt.UI.Views.Main.Modals.ImportWizard;
 
@@ -35,35 +38,14 @@ public partial class ImportWizardViewModel : ValtModalViewModel
     private readonly IAccountQueries? _accountQueries;
     private readonly ICategoryQueries? _categoryQueries;
 
+    #region Step Navigation
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanGoBack))]
     [NotifyPropertyChangedFor(nameof(CanGoNext))]
     [NotifyPropertyChangedFor(nameof(NextButtonText))]
     [NotifyPropertyChangedFor(nameof(IsOnProgressStep))]
     private WizardStep _currentStep = WizardStep.FileSelection;
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsFileSelected))]
-    [NotifyPropertyChangedFor(nameof(CanGoNext))]
-    private string? _selectedFilePath;
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CanGoNext))]
-    private CsvImportResult? _parseResult;
-
-    [ObservableProperty]
-    private int _validRowCount;
-
-    [ObservableProperty]
-    private int _errorCount;
-
-    [ObservableProperty]
-    private ObservableCollection<string> _parseErrors = new();
-
-    /// <summary>
-    /// Returns true if a file has been selected.
-    /// </summary>
-    public bool IsFileSelected => !string.IsNullOrEmpty(SelectedFilePath);
 
     /// <summary>
     /// Returns true if the user can navigate to the previous step.
@@ -95,6 +77,61 @@ public partial class ImportWizardViewModel : ValtModalViewModel
     /// </summary>
     public bool IsOnProgressStep => CurrentStep == WizardStep.Progress;
 
+    #endregion
+
+    #region Step 1 - File Selection
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsFileSelected))]
+    [NotifyPropertyChangedFor(nameof(CanGoNext))]
+    private string? _selectedFilePath;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanGoNext))]
+    private CsvImportResult? _parseResult;
+
+    [ObservableProperty]
+    private int _validRowCount;
+
+    [ObservableProperty]
+    private int _errorCount;
+
+    [ObservableProperty]
+    private ObservableCollection<string> _parseErrors = new();
+
+    /// <summary>
+    /// Returns true if a file has been selected.
+    /// </summary>
+    public bool IsFileSelected => !string.IsNullOrEmpty(SelectedFilePath);
+
+    #endregion
+
+    #region Step 2 - Account Mapping
+
+    [ObservableProperty]
+    private ObservableCollection<AccountMappingItem> _accountMappings = new();
+
+    [ObservableProperty]
+    private int _newAccountCount;
+
+    [ObservableProperty]
+    private int _existingAccountCount;
+
+    #endregion
+
+    #region Step 3 - Category Preview
+
+    [ObservableProperty]
+    private ObservableCollection<CategoryMappingItem> _categoryMappings = new();
+
+    [ObservableProperty]
+    private int _newCategoryCount;
+
+    [ObservableProperty]
+    private int _existingCategoryCount;
+
+    #endregion
+
     /// <summary>
     /// Design-time constructor for XAML preview.
     /// </summary>
@@ -118,6 +155,8 @@ public partial class ImportWizardViewModel : ValtModalViewModel
         _accountQueries = accountQueries;
         _categoryQueries = categoryQueries;
     }
+
+    #region Step 1 Commands
 
     /// <summary>
     /// Opens a file picker to select a CSV file and parses it.
@@ -220,14 +259,101 @@ public partial class ImportWizardViewModel : ValtModalViewModel
         }
     }
 
+    #endregion
+
+    #region Step 2-3 Processing
+
+    /// <summary>
+    /// Processes account and category mappings from parsed CSV data.
+    /// Called when transitioning from Step 1 to Step 2.
+    /// </summary>
+    private async Task ProcessMappingsAsync()
+    {
+        if (ParseResult is null || _accountQueries is null || _categoryQueries is null)
+            return;
+
+        // Get existing accounts and categories
+        var existingAccounts = (await _accountQueries.GetAccountsAsync(showHiddenAccounts: true)).ToList();
+        var existingCategories = (await _categoryQueries.GetCategoriesAsync()).Items;
+
+        // Extract unique account names from CSV (both from and to accounts)
+        var csvAccountNames = ParseResult.Rows
+            .SelectMany(r => new[] { r.AccountName, r.ToAccountName })
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        // Extract unique category names from CSV
+        var csvCategoryNames = ParseResult.Rows
+            .Select(r => r.CategoryName)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        // Build account mappings
+        AccountMappings.Clear();
+        foreach (var csvName in csvAccountNames)
+        {
+            // Try to match by name (case-insensitive, ignoring bracket suffix)
+            var cleanName = GetCleanAccountName(csvName!);
+            var existingAccount = existingAccounts.FirstOrDefault(a =>
+                a.Name.Equals(cleanName, StringComparison.OrdinalIgnoreCase));
+
+            var mapping = AccountMappingItem.Create(csvName!, existingAccount);
+            AccountMappings.Add(mapping);
+        }
+
+        NewAccountCount = AccountMappings.Count(m => m.IsNew);
+        ExistingAccountCount = AccountMappings.Count(m => !m.IsNew);
+
+        // Build category mappings
+        CategoryMappings.Clear();
+        foreach (var csvName in csvCategoryNames)
+        {
+            // Try to match by name (case-insensitive)
+            var existingCategory = existingCategories.FirstOrDefault(c =>
+                c.SimpleName.Equals(csvName, StringComparison.OrdinalIgnoreCase) ||
+                c.Name.Equals(csvName, StringComparison.OrdinalIgnoreCase));
+
+            var mapping = CategoryMappingItem.Create(csvName, existingCategory);
+            CategoryMappings.Add(mapping);
+        }
+
+        NewCategoryCount = CategoryMappings.Count(m => m.IsNew);
+        ExistingCategoryCount = CategoryMappings.Count(m => !m.IsNew);
+    }
+
+    /// <summary>
+    /// Removes the bracket suffix from account names (e.g., "Checking [USD]" -> "Checking").
+    /// </summary>
+    private static string GetCleanAccountName(string csvAccountName)
+    {
+        var bracketStart = csvAccountName.LastIndexOf('[');
+        if (bracketStart > 0)
+        {
+            return csvAccountName.Substring(0, bracketStart).Trim();
+        }
+        return csvAccountName;
+    }
+
+    #endregion
+
+    #region Navigation Commands
+
     /// <summary>
     /// Advances to the next step or starts the import process on the Summary step.
     /// </summary>
     [RelayCommand]
-    private void GoNext()
+    private async Task GoNext()
     {
         if (!CanGoNext)
             return;
+
+        // Process mappings when leaving Step 1
+        if (CurrentStep == WizardStep.FileSelection)
+        {
+            await ProcessMappingsAsync();
+        }
 
         if (CurrentStep == WizardStep.Summary)
         {
@@ -261,4 +387,6 @@ public partial class ImportWizardViewModel : ValtModalViewModel
     {
         CloseWindow?.Invoke();
     }
+
+    #endregion
 }

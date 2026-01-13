@@ -222,22 +222,58 @@
                     </StackPanel>
 
                     <!-- Step 2: Account Mapping -->
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
-                                IsVisible="{Binding CurrentStep, Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=1}">
-                        <TextBlock Text="Step 2: Account Mapping" FontSize="18" FontWeight="SemiBold"
-                                   HorizontalAlignment="Center" Margin="0,0,0,10" />
-                        <TextBlock Text="Map CSV account names to your Valt accounts."
-                                   HorizontalAlignment="Center" TextWrapping="Wrap" />
-                    </StackPanel>
+                    <Grid RowDefinitions="Auto,*,Auto"
+                          IsVisible="{Binding CurrentStep, Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=1}">
+                        <!-- Summary counts -->
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="20" Margin="0,0,0,15">
+                            <TextBlock Text="{Binding NewAccountCount, StringFormat={x:Static local:language.ImportWizard_NewAccounts}}"
+                                       Foreground="{DynamicResource SystemAccentColor}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding ExistingAccountCount, StringFormat={x:Static local:language.ImportWizard_ExistingAccounts}}"
+                                       Foreground="{DynamicResource SystemBaseMediumColor}" />
+                        </StackPanel>
+
+                        <!-- Account Mapping DataGrid -->
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding AccountMappings}"
+                                  AutoGenerateColumns="False" IsReadOnly="True"
+                                  GridLinesVisibility="Horizontal"
+                                  HeadersVisibility="Column"
+                                  CanUserResizeColumns="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="{x:Static local:language.ImportWizard_CsvAccountName}"
+                                                    Binding="{Binding CsvAccountName}" Width="*" />
+                                <DataGridTextColumn Header="{x:Static local:language.ImportWizard_AccountType}"
+                                                    Binding="{Binding AccountTypeDisplay}" Width="80" />
+                                <DataGridTextColumn Header="{x:Static local:language.ImportWizard_Status}"
+                                                    Binding="{Binding StatusDisplay}" Width="80" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
 
                     <!-- Step 3: Category Preview -->
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
-                                IsVisible="{Binding CurrentStep, Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=2}">
-                        <TextBlock Text="Step 3: Category Preview" FontSize="18" FontWeight="SemiBold"
-                                   HorizontalAlignment="Center" Margin="0,0,0,10" />
-                        <TextBlock Text="Review and assign categories to imported transactions."
-                                   HorizontalAlignment="Center" TextWrapping="Wrap" />
-                    </StackPanel>
+                    <Grid RowDefinitions="Auto,*,Auto"
+                          IsVisible="{Binding CurrentStep, Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=2}">
+                        <!-- Summary counts -->
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="20" Margin="0,0,0,15">
+                            <TextBlock Text="{Binding NewCategoryCount, StringFormat={x:Static local:language.ImportWizard_NewCategories}}"
+                                       Foreground="{DynamicResource SystemAccentColor}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding ExistingCategoryCount, StringFormat={x:Static local:language.ImportWizard_ExistingCategories}}"
+                                       Foreground="{DynamicResource SystemBaseMediumColor}" />
+                        </StackPanel>
+
+                        <!-- Category Mapping DataGrid -->
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding CategoryMappings}"
+                                  AutoGenerateColumns="False" IsReadOnly="True"
+                                  GridLinesVisibility="Horizontal"
+                                  HeadersVisibility="Column"
+                                  CanUserResizeColumns="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="{x:Static local:language.ImportWizard_CsvCategoryName}"
+                                                    Binding="{Binding CsvCategoryName}" Width="*" />
+                                <DataGridTextColumn Header="{x:Static local:language.ImportWizard_Status}"
+                                                    Binding="{Binding StatusDisplay}" Width="100" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
 
                     <!-- Step 4: Summary -->
                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"

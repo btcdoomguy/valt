@@ -1245,4 +1245,28 @@
     <data name="ImportWizard_ShowErrors" xml:space="preserve">
         <value>Show errors</value>
     </data>
+    <data name="ImportWizard_NewAccounts" xml:space="preserve">
+        <value>{0} new accounts</value>
+    </data>
+    <data name="ImportWizard_ExistingAccounts" xml:space="preserve">
+        <value>{0} existing accounts</value>
+    </data>
+    <data name="ImportWizard_NewCategories" xml:space="preserve">
+        <value>{0} new categories</value>
+    </data>
+    <data name="ImportWizard_ExistingCategories" xml:space="preserve">
+        <value>{0} existing categories</value>
+    </data>
+    <data name="ImportWizard_CsvAccountName" xml:space="preserve">
+        <value>CSV Account Name</value>
+    </data>
+    <data name="ImportWizard_AccountType" xml:space="preserve">
+        <value>Type</value>
+    </data>
+    <data name="ImportWizard_Status" xml:space="preserve">
+        <value>Status</value>
+    </data>
+    <data name="ImportWizard_CsvCategoryName" xml:space="preserve">
+        <value>CSV Category</value>
+    </data>
 </root>

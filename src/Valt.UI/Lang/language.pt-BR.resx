@@ -1225,4 +1225,28 @@
     <data name="ImportWizard_ShowErrors" xml:space="preserve">
         <value>Mostrar erros</value>
     </data>
+    <data name="ImportWizard_NewAccounts" xml:space="preserve">
+        <value>{0} novas contas</value>
+    </data>
+    <data name="ImportWizard_ExistingAccounts" xml:space="preserve">
+        <value>{0} contas existentes</value>
+    </data>
+    <data name="ImportWizard_NewCategories" xml:space="preserve">
+        <value>{0} novas categorias</value>
+    </data>
+    <data name="ImportWizard_ExistingCategories" xml:space="preserve">
+        <value>{0} categorias existentes</value>
+    </data>
+    <data name="ImportWizard_CsvAccountName" xml:space="preserve">
+        <value>Nome da Conta (CSV)</value>
+    </data>
+    <data name="ImportWizard_AccountType" xml:space="preserve">
+        <value>Tipo</value>
+    </data>
+    <data name="ImportWizard_Status" xml:space="preserve">
+        <value>Status</value>
+    </data>
+    <data name="ImportWizard_CsvCategoryName" xml:space="preserve">
+        <value>Categoria (CSV)</value>
+    </data>
 </root>

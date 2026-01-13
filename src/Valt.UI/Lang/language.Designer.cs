@@ -2468,5 +2468,53 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("ImportWizard_ShowErrors", resourceCulture);
             }
         }
+
+        public static string ImportWizard_NewAccounts {
+            get {
+                return ResourceManager.GetString("ImportWizard_NewAccounts", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_ExistingAccounts {
+            get {
+                return ResourceManager.GetString("ImportWizard_ExistingAccounts", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_NewCategories {
+            get {
+                return ResourceManager.GetString("ImportWizard_NewCategories", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_ExistingCategories {
+            get {
+                return ResourceManager.GetString("ImportWizard_ExistingCategories", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_CsvAccountName {
+            get {
+                return ResourceManager.GetString("ImportWizard_CsvAccountName", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_AccountType {
+            get {
+                return ResourceManager.GetString("ImportWizard_AccountType", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_Status {
+            get {
+                return ResourceManager.GetString("ImportWizard_Status", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_CsvCategoryName {
+            get {
+                return ResourceManager.GetString("ImportWizard_CsvCategoryName", resourceCulture);
+            }
+        }
     }
 }
