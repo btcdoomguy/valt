@@ -45,10 +45,11 @@ The solution follows clean architecture with three layers:
   - `Settings/` - Persistent settings (currency, display preferences)
   - `Modules/Reports/` - Report generators (MonthlyTotals, ExpensesByCategory, AllTimeHigh, Statistics)
   - `Services/Updates/` - GitHub update checker for version management
+  - `Services/CsvImport/` - CSV import services (parser, executor, template generator)
 
 - **Valt.UI** - Avalonia desktop application:
   - `Views/Main/Tabs/` - Three main tabs (Transactions, Reports, AvgPrice)
-  - `Views/Main/Modals/` - 17 modal dialogs for various operations
+  - `Views/Main/Modals/` - 18 modal dialogs for various operations
   - `Base/` - Base ViewModel classes (`ValtViewModel`, `ValtModalViewModel`, `ValtTabViewModel`, `ValtValidatorViewModel`)
   - `State/` - Application state objects (RatesState, AccountsTotalState, FilterState, LiveRateState)
   - `UserControls/` - Reusable controls (BtcInput, FiatInput, CustomTitleBar, etc.)
@@ -136,6 +137,34 @@ Key entities:
 - `AllTimeHighReport` - Peak portfolio value tracking
 - `StatisticsReport` - Median expenses, wealth coverage calculation
 
+### CSV Import Services
+
+The CSV Import feature provides bulk transaction import from CSV files:
+
+**Services:**
+- `ICsvImportParser` / `CsvImportParser` - Parses CSV files with strict validation using CsvHelper library
+- `ICsvTemplateGenerator` / `CsvTemplateGenerator` - Generates sample CSV templates demonstrating all transaction types
+- `ICsvImportExecutor` / `CsvImportExecutor` - Executes the import: creates accounts, categories, and transactions
+
+**CSV Format:**
+- Required columns: `date` (YYYY-MM-DD), `description`, `amount`, `account`, `category`
+- Optional columns: `to_account`, `to_amount` (for transfers)
+- Account naming: `AccountName [CurrencyCode]` for fiat (e.g., "Checking [USD]"), `AccountName [btc]` for bitcoin
+- Amount conventions: negative = debit, positive = credit
+
+**DTOs:**
+- `CsvImportRow` - Parsed CSV row with date, description, amount, account, category, optional transfer fields
+- `CsvImportResult` - Parsing result with success status, rows, and errors (supports partial success)
+- `CsvImportExecutionResult` - Execution outcome with counts of created entities
+- `CsvImportProgress` - Progress tracking (current row, total, action, percentage)
+- `CsvAccountMapping` / `CsvCategoryMapping` - Mapping configurations for accounts and categories
+
+**Key Features:**
+- Smart account type detection from bracket suffixes ([USD], [btc], etc.)
+- Automatic transaction detail type inference based on source/destination account types
+- Background job suspension during import to prevent interference
+- Real-time progress reporting via `IProgress<CsvImportProgress>`
+
 ### Version Checking
 `GitHubUpdateChecker` checks for new releases from the GitHub repository and supports in-app updates.
 
@@ -146,14 +175,31 @@ Key entities:
 2. **Reports**: Charts (monthly totals, expenses by category), all-time high dashboard
 3. **Average Price**: Cost basis profiles, buy/sell/setup line management
 
-### Modal Dialogs (17)
+### Modal Dialogs (18)
 - Database: `InitialSelection`, `CreateDatabase`, `InputPassword`, `ChangePassword`
 - Accounts: `ManageAccount`, `IconSelector`
 - Transactions: `TransactionEditor`, `MathExpression`, `ChangeCategoryTransactions`
 - Categories: `ManageCategories`
 - Fixed Expenses: `ManageFixedExpenses`, `FixedExpenseEditor`, `FixedExpenseHistory`
 - AvgPrice: `ManageAvgPriceProfiles`, `AvgPriceLineEditor`
+- Import: `ImportWizard` - Multi-step CSV import wizard
 - System: `Settings`, `StatusDisplay`, `About`
+
+### Import Wizard
+
+A 5-step wizard for importing transactions from CSV files:
+
+1. **File Selection** - Select CSV file, download template, view parsing results/errors
+2. **Account Mapping** - Map CSV account names to existing or new accounts (auto-detects BTC vs fiat)
+3. **Category Preview** - Map CSV categories to existing or create new ones
+4. **Summary** - Review import counts before execution
+5. **Progress** - Real-time progress tracking during import
+
+**Key Components:**
+- `ImportWizardViewModel` - Main wizard ViewModel with step navigation and import execution
+- `ImportWizardView.axaml` - Fluent-styled modal with step indicator and navigation buttons
+- `AccountMappingItem` / `CategoryMappingItem` - UI models for mapping configuration
+- `StepConverters` - XAML converters for step indicator styling
 
 ### Custom Controls
 - `BtcInput` - Bitcoin/satoshi input with format toggle
@@ -269,6 +315,7 @@ Tests are organized by layer:
 - `Jobs/` - Background job tests
 - `Architecture/` - Architecture constraint tests
 - `HistoricPriceCrawlers/`, `LivePriceCrawlers/` - External service integration tests
+- `CsvImport/` - CSV import parser, executor, and template generator tests
 
 ## UI Framework
 
@@ -304,7 +351,7 @@ src/
 │   ├── Crawlers/        # Price data providers
 │   ├── Kernel/          # Background jobs, events, scopes
 │   ├── Settings/        # Persistent settings
-│   └── Services/        # Updates, utilities
+│   └── Services/        # Updates, CsvImport (parser, executor, templates)
 └── Valt.UI/             # Presentation layer
     ├── Base/            # ViewModel base classes
     ├── Views/Main/      # Tabs and modals

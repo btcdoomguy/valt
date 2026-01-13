@@ -3,7 +3,7 @@ using Valt.Infra.Modules.Budget.Accounts;
 
 namespace Valt.Infra.Modules.Configuration;
 
-public class ConfigurationManager
+public class ConfigurationManager : IConfigurationManager
 {
     private readonly ILocalDatabase _localDatabase;
 

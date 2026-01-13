@@ -6,6 +6,7 @@ using Valt.Core.Modules.Budget.Categories.Contracts;
 using Valt.Core.Modules.Budget.Transactions;
 using Valt.Core.Modules.Budget.Transactions.Contracts;
 using Valt.Core.Modules.Budget.Transactions.Details;
+using Valt.Infra.Modules.Configuration;
 
 namespace Valt.Infra.Services.CsvImport;
 
@@ -17,15 +18,18 @@ public class CsvImportExecutor : ICsvImportExecutor
     private readonly IAccountRepository _accountRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly ITransactionRepository _transactionRepository;
+    private readonly IConfigurationManager _configurationManager;
 
     public CsvImportExecutor(
         IAccountRepository accountRepository,
         ICategoryRepository categoryRepository,
-        ITransactionRepository transactionRepository)
+        ITransactionRepository transactionRepository,
+        IConfigurationManager configurationManager)
     {
         _accountRepository = accountRepository;
         _categoryRepository = categoryRepository;
         _transactionRepository = transactionRepository;
+        _configurationManager = configurationManager;
     }
 
     public async Task<CsvImportExecutionResult> ExecuteAsync(
@@ -107,6 +111,17 @@ public class CsvImportExecutor : ICsvImportExecutor
             {
                 errors.Add($"Failed to create account '{mapping.CsvAccountName}': {ex.Message}");
             }
+        }
+
+        // Register all fiat currencies from account mappings to the configuration
+        var fiatCurrencies = accountMappings
+            .Where(m => !m.IsBtcAccount && !string.IsNullOrWhiteSpace(m.Currency))
+            .Select(m => m.Currency!)
+            .Distinct(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var currency in fiatCurrencies)
+        {
+            _configurationManager.AddFiatCurrency(currency);
         }
 
         // Phase 2: Create new categories

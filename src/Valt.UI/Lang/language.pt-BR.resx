@@ -1175,7 +1175,7 @@
     </data>
     <!-- Import Wizard -->
     <data name="ImportWizard_Title" xml:space="preserve">
-        <value>Importar Transacoes</value>
+        <value>Importar Transações</value>
     </data>
     <data name="ImportWizard_Step1" xml:space="preserve">
         <value>Arquivo</value>
@@ -1196,13 +1196,13 @@
         <value>Voltar</value>
     </data>
     <data name="ImportWizard_Next" xml:space="preserve">
-        <value>Proximo</value>
+        <value>Próximo</value>
     </data>
     <data name="ImportWizard_Import" xml:space="preserve">
         <value>Importar</value>
     </data>
     <data name="Menu_ImportTransactions" xml:space="preserve">
-        <value>Importar Transacoes...</value>
+        <value>Importar Transações...</value>
     </data>
     <data name="ImportWizard_SelectFile" xml:space="preserve">
         <value>Selecionar Arquivo CSV</value>
@@ -1214,7 +1214,7 @@
         <value>Arquivo:</value>
     </data>
     <data name="ImportWizard_ValidRows" xml:space="preserve">
-        <value>{0} linhas validas</value>
+        <value>{0} linhas válidas</value>
     </data>
     <data name="ImportWizard_Errors" xml:space="preserve">
         <value>{0} erros</value>
@@ -1250,10 +1250,10 @@
         <value>Categoria (CSV)</value>
     </data>
     <data name="ImportWizard_SummaryTitle" xml:space="preserve">
-        <value>Resumo da Importacao</value>
+        <value>Resumo da Importação</value>
     </data>
     <data name="ImportWizard_SummaryTransactions" xml:space="preserve">
-        <value>Transacoes a importar</value>
+        <value>Transações a importar</value>
     </data>
     <data name="ImportWizard_SummaryAccounts" xml:space="preserve">
         <value>Contas</value>
@@ -1265,19 +1265,19 @@
         <value>novas</value>
     </data>
     <data name="ImportWizard_SummaryNewItemsWarning" xml:space="preserve">
-        <value>Novas contas e categorias serao criadas automaticamente durante a importacao.</value>
+        <value>Novas contas e categorias serão criadas automaticamente durante a importação.</value>
     </data>
     <data name="ImportWizard_SummaryReadyToImport" xml:space="preserve">
-        <value>Clique em Importar para iniciar o processo de importacao.</value>
+        <value>Clique em Importar para iniciar o processo de importação.</value>
     </data>
     <data name="ImportWizard_Importing" xml:space="preserve">
-        <value>Importando transacoes...</value>
+        <value>Importando transações...</value>
     </data>
     <data name="ImportWizard_ImportComplete" xml:space="preserve">
-        <value>Importacao concluida!</value>
+        <value>Importação concluída!</value>
     </data>
     <data name="ImportWizard_ProgressTransactions" xml:space="preserve">
-        <value>transacoes</value>
+        <value>transações</value>
     </data>
     <data name="CloseButton" xml:space="preserve">
         <value>Fechar</value>

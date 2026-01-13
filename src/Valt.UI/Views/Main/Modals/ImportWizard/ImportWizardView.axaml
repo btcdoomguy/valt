@@ -37,7 +37,8 @@
                                          CloseClick="CustomTitleBarCloseClicked" />
 
             <!-- Step Indicator -->
-            <Border Grid.Row="1" Padding="20,15" Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+            <Border Grid.Row="1" Padding="20,15"
+                    Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
                 <Grid ColumnDefinitions="*,Auto,*,Auto,*,Auto,*,Auto,*">
                     <!-- Step 1: File -->
                     <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" Spacing="4">
@@ -48,7 +49,8 @@
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Foreground="White" />
                         </Border>
-                        <TextBlock Text="{x:Static local:language.ImportWizard_Step1}" FontSize="11" HorizontalAlignment="Center"
+                        <TextBlock Text="{x:Static local:language.ImportWizard_Step1}" FontSize="11"
+                                   HorizontalAlignment="Center"
                                    Foreground="{DynamicResource SystemAccentColorDark1Brush}" />
                     </StackPanel>
 
@@ -56,7 +58,9 @@
                     <Border Grid.Column="1" Width="40" Height="2" VerticalAlignment="Center" Margin="0,-16,0,0"
                             Background="{DynamicResource SystemBaseMediumColor}">
                         <Border.Opacity>
-                            <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepConnectorConverter.Instance}" ConverterParameter="1" />
+                            <Binding Path="CurrentStep"
+                                     Converter="{x:Static importWizard:StepConnectorConverter.Instance}"
+                                     ConverterParameter="1" />
                         </Border.Opacity>
                     </Border>
 
@@ -65,15 +69,20 @@
                         <Border Width="32" Height="32" CornerRadius="16"
                                 HorizontalAlignment="Center">
                             <Border.Background>
-                                <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepBackgroundConverter.Instance}" ConverterParameter="1" />
+                                <Binding Path="CurrentStep"
+                                         Converter="{x:Static importWizard:StepBackgroundConverter.Instance}"
+                                         ConverterParameter="1" />
                             </Border.Background>
                             <TextBlock Text="2" FontWeight="SemiBold" FontSize="14"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Foreground="White" />
                         </Border>
-                        <TextBlock Text="{x:Static local:language.ImportWizard_Step2}" FontSize="11" HorizontalAlignment="Center">
+                        <TextBlock Text="{x:Static local:language.ImportWizard_Step2}" FontSize="11"
+                                   HorizontalAlignment="Center">
                             <TextBlock.Foreground>
-                                <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepForegroundConverter.Instance}" ConverterParameter="1" />
+                                <Binding Path="CurrentStep"
+                                         Converter="{x:Static importWizard:StepForegroundConverter.Instance}"
+                                         ConverterParameter="1" />
                             </TextBlock.Foreground>
                         </TextBlock>
                     </StackPanel>
@@ -82,7 +91,9 @@
                     <Border Grid.Column="3" Width="40" Height="2" VerticalAlignment="Center" Margin="0,-16,0,0"
                             Background="{DynamicResource SystemBaseMediumColor}">
                         <Border.Opacity>
-                            <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepConnectorConverter.Instance}" ConverterParameter="2" />
+                            <Binding Path="CurrentStep"
+                                     Converter="{x:Static importWizard:StepConnectorConverter.Instance}"
+                                     ConverterParameter="2" />
                         </Border.Opacity>
                     </Border>
 
@@ -91,15 +102,20 @@
                         <Border Width="32" Height="32" CornerRadius="16"
                                 HorizontalAlignment="Center">
                             <Border.Background>
-                                <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepBackgroundConverter.Instance}" ConverterParameter="2" />
+                                <Binding Path="CurrentStep"
+                                         Converter="{x:Static importWizard:StepBackgroundConverter.Instance}"
+                                         ConverterParameter="2" />
                             </Border.Background>
                             <TextBlock Text="3" FontWeight="SemiBold" FontSize="14"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Foreground="White" />
                         </Border>
-                        <TextBlock Text="{x:Static local:language.ImportWizard_Step3}" FontSize="11" HorizontalAlignment="Center">
+                        <TextBlock Text="{x:Static local:language.ImportWizard_Step3}" FontSize="11"
+                                   HorizontalAlignment="Center">
                             <TextBlock.Foreground>
-                                <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepForegroundConverter.Instance}" ConverterParameter="2" />
+                                <Binding Path="CurrentStep"
+                                         Converter="{x:Static importWizard:StepForegroundConverter.Instance}"
+                                         ConverterParameter="2" />
                             </TextBlock.Foreground>
                         </TextBlock>
                     </StackPanel>
@@ -108,7 +124,9 @@
                     <Border Grid.Column="5" Width="40" Height="2" VerticalAlignment="Center" Margin="0,-16,0,0"
                             Background="{DynamicResource SystemBaseMediumColor}">
                         <Border.Opacity>
-                            <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepConnectorConverter.Instance}" ConverterParameter="3" />
+                            <Binding Path="CurrentStep"
+                                     Converter="{x:Static importWizard:StepConnectorConverter.Instance}"
+                                     ConverterParameter="3" />
                         </Border.Opacity>
                     </Border>
 
@@ -117,15 +135,20 @@
                         <Border Width="32" Height="32" CornerRadius="16"
                                 HorizontalAlignment="Center">
                             <Border.Background>
-                                <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepBackgroundConverter.Instance}" ConverterParameter="3" />
+                                <Binding Path="CurrentStep"
+                                         Converter="{x:Static importWizard:StepBackgroundConverter.Instance}"
+                                         ConverterParameter="3" />
                             </Border.Background>
                             <TextBlock Text="4" FontWeight="SemiBold" FontSize="14"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Foreground="White" />
                         </Border>
-                        <TextBlock Text="{x:Static local:language.ImportWizard_Step4}" FontSize="11" HorizontalAlignment="Center">
+                        <TextBlock Text="{x:Static local:language.ImportWizard_Step4}" FontSize="11"
+                                   HorizontalAlignment="Center">
                             <TextBlock.Foreground>
-                                <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepForegroundConverter.Instance}" ConverterParameter="3" />
+                                <Binding Path="CurrentStep"
+                                         Converter="{x:Static importWizard:StepForegroundConverter.Instance}"
+                                         ConverterParameter="3" />
                             </TextBlock.Foreground>
                         </TextBlock>
                     </StackPanel>
@@ -134,7 +157,9 @@
                     <Border Grid.Column="7" Width="40" Height="2" VerticalAlignment="Center" Margin="0,-16,0,0"
                             Background="{DynamicResource SystemBaseMediumColor}">
                         <Border.Opacity>
-                            <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepConnectorConverter.Instance}" ConverterParameter="4" />
+                            <Binding Path="CurrentStep"
+                                     Converter="{x:Static importWizard:StepConnectorConverter.Instance}"
+                                     ConverterParameter="4" />
                         </Border.Opacity>
                     </Border>
 
@@ -143,15 +168,20 @@
                         <Border Width="32" Height="32" CornerRadius="16"
                                 HorizontalAlignment="Center">
                             <Border.Background>
-                                <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepBackgroundConverter.Instance}" ConverterParameter="4" />
+                                <Binding Path="CurrentStep"
+                                         Converter="{x:Static importWizard:StepBackgroundConverter.Instance}"
+                                         ConverterParameter="4" />
                             </Border.Background>
                             <TextBlock Text="5" FontWeight="SemiBold" FontSize="14"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Foreground="White" />
                         </Border>
-                        <TextBlock Text="{x:Static local:language.ImportWizard_Step5}" FontSize="11" HorizontalAlignment="Center">
+                        <TextBlock Text="{x:Static local:language.ImportWizard_Step5}" FontSize="11"
+                                   HorizontalAlignment="Center">
                             <TextBlock.Foreground>
-                                <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepForegroundConverter.Instance}" ConverterParameter="4" />
+                                <Binding Path="CurrentStep"
+                                         Converter="{x:Static importWizard:StepForegroundConverter.Instance}"
+                                         ConverterParameter="4" />
                             </TextBlock.Foreground>
                         </TextBlock>
                     </StackPanel>
@@ -188,17 +218,17 @@
 
                             <!-- Valid Rows Count -->
                             <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding ValidRowCount}">
-                                <TextBlock Text="{Binding ValidRowCount, StringFormat={x:Static local:language.ImportWizard_ValidRows}}"
-                                           Foreground="{DynamicResource SystemAccentColor}" FontWeight="SemiBold" />
+                                <TextBlock
+                                    Text="{Binding ValidRowCount, StringFormat={x:Static local:language.ImportWizard_ValidRows}}"
+                                    Foreground="{DynamicResource SystemAccentColor}" FontWeight="SemiBold" />
                             </StackPanel>
 
                             <!-- Error Count -->
                             <StackPanel IsVisible="{Binding ErrorCount}" Spacing="5">
                                 <StackPanel Orientation="Horizontal" Spacing="5">
-                                    <TextBlock Text="&#xE7BA;" FontFamily="{StaticResource MaterialDesignIconsFont}"
-                                               Foreground="Orange" VerticalAlignment="Center" />
-                                    <TextBlock Text="{Binding ErrorCount, StringFormat={x:Static local:language.ImportWizard_Errors}}"
-                                               Foreground="Orange" FontWeight="SemiBold" />
+                                    <TextBlock
+                                        Text="{Binding ErrorCount, StringFormat={x:Static local:language.ImportWizard_Errors}}"
+                                        Foreground="Orange" FontWeight="SemiBold" />
                                 </StackPanel>
 
                                 <!-- Error List -->
@@ -219,6 +249,15 @@
                                 </Expander>
                             </StackPanel>
                         </StackPanel>
+
+                        <StackPanel IsVisible="{Binding !IsFileSelected}">
+                            <Border Classes="hint-box" Height="80">
+                                <TextBlock
+                                    Text="Dica: baixe o modelo acima e utilize alguma ferramenta de IA para adaptar qualquer formato de arquivo para usar o layout CSV acima. Os dados precisam seguir estritamente esse formato do arquivo CSV modelo."
+                                    TextWrapping="Wrap">
+                                </TextBlock>
+                            </Border>
+                        </StackPanel>
                     </StackPanel>
 
                     <!-- Step 2: Account Mapping -->
@@ -226,10 +265,12 @@
                           IsVisible="{Binding CurrentStep, Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=1}">
                         <!-- Summary counts -->
                         <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="20" Margin="0,0,0,15">
-                            <TextBlock Text="{Binding NewAccountCount, StringFormat={x:Static local:language.ImportWizard_NewAccounts}}"
-                                       Foreground="{DynamicResource SystemAccentColor}" FontWeight="SemiBold" />
-                            <TextBlock Text="{Binding ExistingAccountCount, StringFormat={x:Static local:language.ImportWizard_ExistingAccounts}}"
-                                       Foreground="{DynamicResource SystemBaseMediumColor}" />
+                            <TextBlock
+                                Text="{Binding NewAccountCount, StringFormat={x:Static local:language.ImportWizard_NewAccounts}}"
+                                Foreground="{DynamicResource SystemAccentColor}" FontWeight="SemiBold" />
+                            <TextBlock
+                                Text="{Binding ExistingAccountCount, StringFormat={x:Static local:language.ImportWizard_ExistingAccounts}}"
+                                Foreground="{DynamicResource SystemBaseMediumColor}" />
                         </StackPanel>
 
                         <!-- Account Mapping DataGrid -->
@@ -254,10 +295,12 @@
                           IsVisible="{Binding CurrentStep, Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=2}">
                         <!-- Summary counts -->
                         <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="20" Margin="0,0,0,15">
-                            <TextBlock Text="{Binding NewCategoryCount, StringFormat={x:Static local:language.ImportWizard_NewCategories}}"
-                                       Foreground="{DynamicResource SystemAccentColor}" FontWeight="SemiBold" />
-                            <TextBlock Text="{Binding ExistingCategoryCount, StringFormat={x:Static local:language.ImportWizard_ExistingCategories}}"
-                                       Foreground="{DynamicResource SystemBaseMediumColor}" />
+                            <TextBlock
+                                Text="{Binding NewCategoryCount, StringFormat={x:Static local:language.ImportWizard_NewCategories}}"
+                                Foreground="{DynamicResource SystemAccentColor}" FontWeight="SemiBold" />
+                            <TextBlock
+                                Text="{Binding ExistingCategoryCount, StringFormat={x:Static local:language.ImportWizard_ExistingCategories}}"
+                                Foreground="{DynamicResource SystemBaseMediumColor}" />
                         </StackPanel>
 
                         <!-- Category Mapping DataGrid -->
@@ -280,14 +323,16 @@
                                 IsVisible="{Binding CurrentStep, Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=3}"
                                 Spacing="20">
                         <!-- Summary Title -->
-                        <TextBlock Text="{x:Static local:language.ImportWizard_SummaryTitle}" FontSize="16" FontWeight="SemiBold" />
+                        <TextBlock Text="{x:Static local:language.ImportWizard_SummaryTitle}" FontSize="16"
+                                   FontWeight="SemiBold" />
 
                         <!-- Summary Cards -->
                         <Border Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
                                 CornerRadius="8" Padding="20">
                             <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
                                 <!-- Transactions -->
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static local:language.ImportWizard_SummaryTransactions}"
+                                <TextBlock Grid.Row="0" Grid.Column="0"
+                                           Text="{x:Static local:language.ImportWizard_SummaryTransactions}"
                                            VerticalAlignment="Center" Margin="0,5" />
                                 <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SummaryTransactionCount}"
                                            FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,5" />
@@ -295,8 +340,11 @@
                                 <!-- Accounts -->
                                 <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,5">
                                     <Run Text="{x:Static local:language.ImportWizard_SummaryAccounts}" />
-                                    <Run Text=" (" /><Run Text="{Binding NewAccountCount}" Foreground="{DynamicResource SystemAccentColor}" />
-                                    <Run Text=" " /><Run Text="{x:Static local:language.ImportWizard_SummaryNew}" /><Run Text=")" />
+                                    <Run Text=" (" />
+                                    <Run Text="{Binding NewAccountCount}"
+                                         Foreground="{DynamicResource SystemAccentColor}" />
+                                    <Run Text=" " /><Run Text="{x:Static local:language.ImportWizard_SummaryNew}" />
+                                    <Run Text=")" />
                                 </TextBlock>
                                 <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SummaryAccountCount}"
                                            FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,5" />
@@ -304,8 +352,11 @@
                                 <!-- Categories -->
                                 <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,5">
                                     <Run Text="{x:Static local:language.ImportWizard_SummaryCategories}" />
-                                    <Run Text=" (" /><Run Text="{Binding NewCategoryCount}" Foreground="{DynamicResource SystemAccentColor}" />
-                                    <Run Text=" " /><Run Text="{x:Static local:language.ImportWizard_SummaryNew}" /><Run Text=")" />
+                                    <Run Text=" (" />
+                                    <Run Text="{Binding NewCategoryCount}"
+                                         Foreground="{DynamicResource SystemAccentColor}" />
+                                    <Run Text=" " /><Run Text="{x:Static local:language.ImportWizard_SummaryNew}" />
+                                    <Run Text=")" />
                                 </TextBlock>
                                 <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SummaryCategoryCount}"
                                            FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,5" />
@@ -314,8 +365,6 @@
 
                         <!-- Warning about new items -->
                         <StackPanel Orientation="Horizontal" Spacing="10" IsVisible="{Binding NewAccountCount}">
-                            <TextBlock Text="&#xE7BA;" FontFamily="{StaticResource MaterialDesignIconsFont}"
-                                       Foreground="{DynamicResource SystemAccentColor}" VerticalAlignment="Center" />
                             <TextBlock Text="{x:Static local:language.ImportWizard_SummaryNewItemsWarning}"
                                        TextWrapping="Wrap" Foreground="{DynamicResource SystemBaseMediumColor}" />
                         </StackPanel>
@@ -358,7 +407,8 @@
             </Border>
 
             <!-- Button Bar -->
-            <Border Grid.Row="3" Padding="20,10" Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+            <Border Grid.Row="3" Padding="20,10"
+                    Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
                 <Grid ColumnDefinitions="*,Auto,Auto,Auto">
                     <!-- Cancel button on the left -->
                     <Button Grid.Column="0" Content="{x:Static local:language.CancelButton}" Width="100"

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Valt.Infra.Kernel.BackgroundJobs;
 using Valt.Infra.Modules.Budget.Accounts.Queries;
 using Valt.Infra.Modules.Budget.Categories.Queries;
@@ -14,6 +15,7 @@ using Valt.Infra.Services.CsvImport;
 using Valt.UI.Base;
 using Valt.UI.Lang;
 using Valt.UI.Views.Main.Modals.ImportWizard.Models;
+using Valt.UI.Views.Main.Tabs.Transactions;
 
 namespace Valt.UI.Views.Main.Modals.ImportWizard;
 
@@ -409,6 +411,7 @@ public partial class ImportWizardViewModel : ValtModalViewModel
             {
                 ImportProgress = p.Percentage;
                 ImportedCount = p.CurrentRow;
+                TotalToImport = p.TotalRows;
                 ImportStatusMessage = p.CurrentAction;
             });
 
@@ -461,6 +464,7 @@ public partial class ImportWizardViewModel : ValtModalViewModel
     [RelayCommand]
     private void CloseAfterImport()
     {
+        WeakReferenceMessenger.Default.Send(new TransactionListChanged());
         CloseWindow?.Invoke();
     }
 

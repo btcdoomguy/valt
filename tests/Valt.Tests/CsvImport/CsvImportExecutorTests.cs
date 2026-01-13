@@ -9,6 +9,7 @@ using Valt.Core.Modules.Budget.Transactions;
 using Valt.Core.Modules.Budget.Transactions.Contracts;
 using Valt.Core.Modules.Budget.Transactions.Details;
 using Valt.Infra.Kernel;
+using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Services.CsvImport;
 
 namespace Valt.Tests.CsvImport;
@@ -23,6 +24,7 @@ public class CsvImportExecutorTests
     private IAccountRepository _accountRepository = null!;
     private ICategoryRepository _categoryRepository = null!;
     private ITransactionRepository _transactionRepository = null!;
+    private IConfigurationManager _configurationManager = null!;
     private CsvImportExecutor _executor = null!;
 
     [OneTimeSetUp]
@@ -37,7 +39,8 @@ public class CsvImportExecutorTests
         _accountRepository = Substitute.For<IAccountRepository>();
         _categoryRepository = Substitute.For<ICategoryRepository>();
         _transactionRepository = Substitute.For<ITransactionRepository>();
-        _executor = new CsvImportExecutor(_accountRepository, _categoryRepository, _transactionRepository);
+        _configurationManager = Substitute.For<IConfigurationManager>();
+        _executor = new CsvImportExecutor(_accountRepository, _categoryRepository, _transactionRepository, _configurationManager);
     }
 
     #region Account Creation Tests
@@ -511,6 +514,165 @@ public class CsvImportExecutorTests
         Assert.That(result.TransactionsCreated, Is.EqualTo(1));
         Assert.That(result.Errors, Has.Count.EqualTo(1));
         Assert.That(result.Errors[0], Does.Contain("UnknownCategory"));
+    }
+
+    #endregion
+
+    #region Fiat Currency Registration Tests
+
+    [Test]
+    public async Task Should_Add_Fiat_Currency_To_Configuration_For_New_Fiat_Account()
+    {
+        // Arrange
+        var row = CreateCsvRow("Checking [EUR]", null, 100m, "Salary", "Income");
+        var accountMappings = new List<CsvAccountMapping>
+        {
+            new("Checking [EUR]", null, IsNew: true, IsBtcAccount: false, Currency: "EUR")
+        };
+        var categoryMappings = new List<CsvCategoryMapping>
+        {
+            new("Income", null, IsNew: true)
+        };
+
+        // Act
+        await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings);
+
+        // Assert
+        _configurationManager.Received(1).AddFiatCurrency("EUR");
+    }
+
+    [Test]
+    public async Task Should_Add_Fiat_Currency_To_Configuration_For_Existing_Fiat_Account()
+    {
+        // Arrange
+        var existingAccountId = IdGenerator.Generate();
+        var existingCategoryId = IdGenerator.Generate();
+        var row = CreateCsvRow("Checking [BRL]", null, -100m, "Expense", "Food");
+        var accountMappings = new List<CsvAccountMapping>
+        {
+            new("Checking [BRL]", existingAccountId, IsNew: false, IsBtcAccount: false, Currency: "BRL")
+        };
+        var categoryMappings = new List<CsvCategoryMapping>
+        {
+            new("Food", existingCategoryId, IsNew: false)
+        };
+
+        // Act
+        await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings);
+
+        // Assert
+        _configurationManager.Received(1).AddFiatCurrency("BRL");
+    }
+
+    [Test]
+    public async Task Should_Add_Multiple_Fiat_Currencies_To_Configuration()
+    {
+        // Arrange
+        var usdAccountId = IdGenerator.Generate();
+        var eurAccountId = IdGenerator.Generate();
+        var existingCategoryId = IdGenerator.Generate();
+        var rows = new[]
+        {
+            CreateCsvRow("Checking [USD]", null, -100m, "Expense 1", "Food"),
+            CreateCsvRow("Euro Account [EUR]", null, -50m, "Expense 2", "Food")
+        };
+        var accountMappings = new List<CsvAccountMapping>
+        {
+            new("Checking [USD]", usdAccountId, IsNew: false, IsBtcAccount: false, Currency: "USD"),
+            new("Euro Account [EUR]", eurAccountId, IsNew: false, IsBtcAccount: false, Currency: "EUR")
+        };
+        var categoryMappings = new List<CsvCategoryMapping>
+        {
+            new("Food", existingCategoryId, IsNew: false)
+        };
+
+        // Act
+        await _executor.ExecuteAsync(rows, accountMappings, categoryMappings);
+
+        // Assert
+        _configurationManager.Received(1).AddFiatCurrency("USD");
+        _configurationManager.Received(1).AddFiatCurrency("EUR");
+    }
+
+    [Test]
+    public async Task Should_Not_Add_Duplicate_Fiat_Currencies_To_Configuration()
+    {
+        // Arrange
+        var account1Id = IdGenerator.Generate();
+        var account2Id = IdGenerator.Generate();
+        var existingCategoryId = IdGenerator.Generate();
+        var rows = new[]
+        {
+            CreateCsvRow("Checking [USD]", null, -100m, "Expense 1", "Food"),
+            CreateCsvRow("Savings [USD]", null, -50m, "Expense 2", "Food")
+        };
+        var accountMappings = new List<CsvAccountMapping>
+        {
+            new("Checking [USD]", account1Id, IsNew: false, IsBtcAccount: false, Currency: "USD"),
+            new("Savings [USD]", account2Id, IsNew: false, IsBtcAccount: false, Currency: "USD")
+        };
+        var categoryMappings = new List<CsvCategoryMapping>
+        {
+            new("Food", existingCategoryId, IsNew: false)
+        };
+
+        // Act
+        await _executor.ExecuteAsync(rows, accountMappings, categoryMappings);
+
+        // Assert - Should only be called once for USD even though there are two USD accounts
+        _configurationManager.Received(1).AddFiatCurrency("USD");
+    }
+
+    [Test]
+    public async Task Should_Not_Call_AddFiatCurrency_For_Btc_Accounts()
+    {
+        // Arrange
+        var row = CreateCsvRow("Wallet [btc]", null, 100000m, "Mining", "Income");
+        var accountMappings = new List<CsvAccountMapping>
+        {
+            new("Wallet [btc]", null, IsNew: true, IsBtcAccount: true, Currency: null)
+        };
+        var categoryMappings = new List<CsvCategoryMapping>
+        {
+            new("Income", null, IsNew: true)
+        };
+
+        // Act
+        await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings);
+
+        // Assert
+        _configurationManager.DidNotReceive().AddFiatCurrency(Arg.Any<string>());
+    }
+
+    [Test]
+    public async Task Should_Add_Fiat_Currency_For_Mixed_Btc_And_Fiat_Accounts()
+    {
+        // Arrange
+        var fiatAccountId = IdGenerator.Generate();
+        var btcAccountId = IdGenerator.Generate();
+        var existingCategoryId = IdGenerator.Generate();
+        var rows = new[]
+        {
+            CreateCsvRow("Checking [GBP]", null, -100m, "Expense", "Food"),
+            CreateCsvRow("Wallet [btc]", null, 100000m, "Mining", "Income")
+        };
+        var accountMappings = new List<CsvAccountMapping>
+        {
+            new("Checking [GBP]", fiatAccountId, IsNew: false, IsBtcAccount: false, Currency: "GBP"),
+            new("Wallet [btc]", btcAccountId, IsNew: false, IsBtcAccount: true, Currency: null)
+        };
+        var categoryMappings = new List<CsvCategoryMapping>
+        {
+            new("Food", existingCategoryId, IsNew: false),
+            new("Income", existingCategoryId, IsNew: false)
+        };
+
+        // Act
+        await _executor.ExecuteAsync(rows, accountMappings, categoryMappings);
+
+        // Assert - Only GBP should be added, not BTC
+        _configurationManager.Received(1).AddFiatCurrency("GBP");
+        _configurationManager.Received(1).AddFiatCurrency(Arg.Any<string>()); // Total calls should be 1
     }
 
     #endregion
