@@ -160,58 +160,103 @@
 
             <!-- Main Content Area - Step Content -->
             <Border Grid.Row="2" Classes="form-fields-area" Margin="20,10">
-                <ContentControl Content="{Binding CurrentStep}">
-                    <ContentControl.ContentTemplate>
-                        <DataTemplate>
-                            <Panel>
-                                <!-- Step 1: File Selection -->
-                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
-                                            IsVisible="{Binding Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=0}">
-                                    <TextBlock Text="Step 1: File Selection" FontSize="18" FontWeight="SemiBold"
-                                               HorizontalAlignment="Center" Margin="0,0,0,10" />
-                                    <TextBlock Text="Select a CSV file to import transactions from."
-                                               HorizontalAlignment="Center" TextWrapping="Wrap" />
+                <Panel>
+                    <!-- Step 1: File Selection -->
+                    <StackPanel VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                                IsVisible="{Binding CurrentStep, Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=0}"
+                                Spacing="15">
+                        <!-- Instructions -->
+                        <TextBlock Text="{x:Static local:language.ImportWizard_Step1Instructions}"
+                                   TextWrapping="Wrap" Margin="0,0,0,10"
+                                   Foreground="{DynamicResource SystemBaseMediumColor}" />
+
+                        <!-- Buttons Row -->
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Button Content="{x:Static local:language.ImportWizard_SelectFile}"
+                                    Command="{Binding SelectFileCommand}"
+                                    Classes="accent" />
+                            <Button Content="{x:Static local:language.ImportWizard_DownloadTemplate}"
+                                    Command="{Binding DownloadTemplateCommand}" />
+                        </StackPanel>
+
+                        <!-- File Path Display -->
+                        <StackPanel IsVisible="{Binding IsFileSelected}" Spacing="10">
+                            <TextBlock>
+                                <Run Text="{x:Static local:language.ImportWizard_FileSelected}" />
+                                <Run Text="{Binding SelectedFilePath}" FontWeight="SemiBold" />
+                            </TextBlock>
+
+                            <!-- Valid Rows Count -->
+                            <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding ValidRowCount}">
+                                <TextBlock Text="{Binding ValidRowCount, StringFormat={x:Static local:language.ImportWizard_ValidRows}}"
+                                           Foreground="{DynamicResource SystemAccentColor}" FontWeight="SemiBold" />
+                            </StackPanel>
+
+                            <!-- Error Count -->
+                            <StackPanel IsVisible="{Binding ErrorCount}" Spacing="5">
+                                <StackPanel Orientation="Horizontal" Spacing="5">
+                                    <TextBlock Text="&#xE7BA;" FontFamily="{StaticResource MaterialDesignIconsFont}"
+                                               Foreground="Orange" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding ErrorCount, StringFormat={x:Static local:language.ImportWizard_Errors}}"
+                                               Foreground="Orange" FontWeight="SemiBold" />
                                 </StackPanel>
 
-                                <!-- Step 2: Account Mapping -->
-                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
-                                            IsVisible="{Binding Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=1}">
-                                    <TextBlock Text="Step 2: Account Mapping" FontSize="18" FontWeight="SemiBold"
-                                               HorizontalAlignment="Center" Margin="0,0,0,10" />
-                                    <TextBlock Text="Map CSV account names to your Valt accounts."
-                                               HorizontalAlignment="Center" TextWrapping="Wrap" />
-                                </StackPanel>
+                                <!-- Error List -->
+                                <Expander Header="{x:Static local:language.ImportWizard_ShowErrors}" IsExpanded="False">
+                                    <Border Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                                            CornerRadius="4" Padding="10" MaxHeight="150">
+                                        <ScrollViewer>
+                                            <ItemsControl ItemsSource="{Binding ParseErrors}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="0,2"
+                                                                   Foreground="Orange" FontSize="12" />
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                    </Border>
+                                </Expander>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
 
-                                <!-- Step 3: Category Preview -->
-                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
-                                            IsVisible="{Binding Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=2}">
-                                    <TextBlock Text="Step 3: Category Preview" FontSize="18" FontWeight="SemiBold"
-                                               HorizontalAlignment="Center" Margin="0,0,0,10" />
-                                    <TextBlock Text="Review and assign categories to imported transactions."
-                                               HorizontalAlignment="Center" TextWrapping="Wrap" />
-                                </StackPanel>
+                    <!-- Step 2: Account Mapping -->
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                IsVisible="{Binding CurrentStep, Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=1}">
+                        <TextBlock Text="Step 2: Account Mapping" FontSize="18" FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" Margin="0,0,0,10" />
+                        <TextBlock Text="Map CSV account names to your Valt accounts."
+                                   HorizontalAlignment="Center" TextWrapping="Wrap" />
+                    </StackPanel>
 
-                                <!-- Step 4: Summary -->
-                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
-                                            IsVisible="{Binding Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=3}">
-                                    <TextBlock Text="Step 4: Summary" FontSize="18" FontWeight="SemiBold"
-                                               HorizontalAlignment="Center" Margin="0,0,0,10" />
-                                    <TextBlock Text="Review the import summary before proceeding."
-                                               HorizontalAlignment="Center" TextWrapping="Wrap" />
-                                </StackPanel>
+                    <!-- Step 3: Category Preview -->
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                IsVisible="{Binding CurrentStep, Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=2}">
+                        <TextBlock Text="Step 3: Category Preview" FontSize="18" FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" Margin="0,0,0,10" />
+                        <TextBlock Text="Review and assign categories to imported transactions."
+                                   HorizontalAlignment="Center" TextWrapping="Wrap" />
+                    </StackPanel>
 
-                                <!-- Step 5: Progress -->
-                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
-                                            IsVisible="{Binding Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=4}">
-                                    <TextBlock Text="Step 5: Importing..." FontSize="18" FontWeight="SemiBold"
-                                               HorizontalAlignment="Center" Margin="0,0,0,10" />
-                                    <TextBlock Text="Import in progress. Please wait..."
-                                               HorizontalAlignment="Center" TextWrapping="Wrap" />
-                                </StackPanel>
-                            </Panel>
-                        </DataTemplate>
-                    </ContentControl.ContentTemplate>
-                </ContentControl>
+                    <!-- Step 4: Summary -->
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                IsVisible="{Binding CurrentStep, Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=3}">
+                        <TextBlock Text="Step 4: Summary" FontSize="18" FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" Margin="0,0,0,10" />
+                        <TextBlock Text="Review the import summary before proceeding."
+                                   HorizontalAlignment="Center" TextWrapping="Wrap" />
+                    </StackPanel>
+
+                    <!-- Step 5: Progress -->
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                IsVisible="{Binding CurrentStep, Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=4}">
+                        <TextBlock Text="Step 5: Importing..." FontSize="18" FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" Margin="0,0,0,10" />
+                        <TextBlock Text="Import in progress. Please wait..."
+                                   HorizontalAlignment="Center" TextWrapping="Wrap" />
+                    </StackPanel>
+                </Panel>
             </Border>
 
             <!-- Button Bar -->

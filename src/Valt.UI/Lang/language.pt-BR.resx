@@ -1204,4 +1204,25 @@
     <data name="Menu_ImportTransactions" xml:space="preserve">
         <value>Importar Transacoes...</value>
     </data>
+    <data name="ImportWizard_SelectFile" xml:space="preserve">
+        <value>Selecionar Arquivo CSV</value>
+    </data>
+    <data name="ImportWizard_DownloadTemplate" xml:space="preserve">
+        <value>Baixar Modelo</value>
+    </data>
+    <data name="ImportWizard_FileSelected" xml:space="preserve">
+        <value>Arquivo:</value>
+    </data>
+    <data name="ImportWizard_ValidRows" xml:space="preserve">
+        <value>{0} linhas validas</value>
+    </data>
+    <data name="ImportWizard_Errors" xml:space="preserve">
+        <value>{0} erros</value>
+    </data>
+    <data name="ImportWizard_Step1Instructions" xml:space="preserve">
+        <value>Selecione um arquivo CSV no formato do modelo, ou baixe o modelo para ver as colunas esperadas.</value>
+    </data>
+    <data name="ImportWizard_ShowErrors" xml:space="preserve">
+        <value>Mostrar erros</value>
+    </data>
 </root>

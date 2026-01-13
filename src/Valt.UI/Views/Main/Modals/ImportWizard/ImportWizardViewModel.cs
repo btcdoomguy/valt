@@ -1,3 +1,8 @@
+using System;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Threading.Tasks;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Valt.Infra.Modules.Budget.Accounts.Queries;
@@ -43,7 +48,17 @@ public partial class ImportWizardViewModel : ValtModalViewModel
     private string? _selectedFilePath;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanGoNext))]
     private CsvImportResult? _parseResult;
+
+    [ObservableProperty]
+    private int _validRowCount;
+
+    [ObservableProperty]
+    private int _errorCount;
+
+    [ObservableProperty]
+    private ObservableCollection<string> _parseErrors = new();
 
     /// <summary>
     /// Returns true if a file has been selected.
@@ -60,7 +75,7 @@ public partial class ImportWizardViewModel : ValtModalViewModel
     /// </summary>
     public bool CanGoNext => CurrentStep switch
     {
-        WizardStep.FileSelection => IsFileSelected,
+        WizardStep.FileSelection => ParseResult is not null && ParseResult.Rows.Count > 0,
         WizardStep.AccountMapping => true,
         WizardStep.CategoryPreview => true,
         WizardStep.Summary => true,
@@ -105,6 +120,107 @@ public partial class ImportWizardViewModel : ValtModalViewModel
     }
 
     /// <summary>
+    /// Opens a file picker to select a CSV file and parses it.
+    /// </summary>
+    [RelayCommand]
+    private async Task SelectFile()
+    {
+        if (OwnerWindow is null)
+            return;
+
+        var options = new FilePickerOpenOptions
+        {
+            Title = "Select CSV File",
+            AllowMultiple = false,
+            FileTypeFilter =
+            [
+                new FilePickerFileType("CSV Files")
+                {
+                    Patterns = ["*.csv"]
+                },
+                new FilePickerFileType("All Files")
+                {
+                    Patterns = ["*"]
+                }
+            ]
+        };
+
+        var result = await OwnerWindow.StorageProvider.OpenFilePickerAsync(options);
+
+        if (result.Count == 0)
+            return;
+
+        var filePath = result[0].Path.LocalPath;
+        SelectedFilePath = filePath;
+
+        ParseFile();
+    }
+
+    /// <summary>
+    /// Downloads the CSV template file.
+    /// </summary>
+    [RelayCommand]
+    private async Task DownloadTemplate()
+    {
+        if (OwnerWindow is null || _csvTemplateGenerator is null)
+            return;
+
+        var options = new FilePickerSaveOptions
+        {
+            Title = "Download Template",
+            SuggestedFileName = "valt-import-template.csv",
+            FileTypeChoices =
+            [
+                new FilePickerFileType("CSV Files")
+                {
+                    Patterns = ["*.csv"]
+                }
+            ]
+        };
+
+        var result = await OwnerWindow.StorageProvider.SaveFilePickerAsync(options);
+
+        if (result is null)
+            return;
+
+        var filePath = result.Path.LocalPath;
+        var template = _csvTemplateGenerator.GenerateTemplate();
+        await File.WriteAllTextAsync(filePath, template);
+    }
+
+    /// <summary>
+    /// Parses the selected CSV file.
+    /// </summary>
+    private void ParseFile()
+    {
+        if (string.IsNullOrEmpty(SelectedFilePath) || _csvImportParser is null)
+            return;
+
+        try
+        {
+            using var stream = File.OpenRead(SelectedFilePath);
+            ParseResult = _csvImportParser.Parse(stream);
+
+            ValidRowCount = ParseResult.Rows.Count;
+            ErrorCount = ParseResult.Errors.Count;
+
+            ParseErrors.Clear();
+            foreach (var error in ParseResult.Errors)
+            {
+                ParseErrors.Add(error);
+            }
+        }
+        catch (Exception ex)
+        {
+            ParseResult = CsvImportResult.Failure(ex.Message);
+            ValidRowCount = 0;
+            ErrorCount = 1;
+            ParseErrors.Clear();
+            ParseErrors.Add(ex.Message);
+        }
+    }
+
+    /// <summary>
     /// Advances to the next step or starts the import process on the Summary step.
     /// </summary>
     [RelayCommand]
@@ -117,7 +233,7 @@ public partial class ImportWizardViewModel : ValtModalViewModel
         {
             // Start import process
             CurrentStep = WizardStep.Progress;
-            // Import logic will be implemented in Phase 2 Plan 2
+            // Import logic will be implemented in Phase 3
         }
         else if (CurrentStep < WizardStep.Progress)
         {

@@ -1224,4 +1224,25 @@
     <data name="Menu_ImportTransactions" xml:space="preserve">
         <value>Import Transactions...</value>
     </data>
+    <data name="ImportWizard_SelectFile" xml:space="preserve">
+        <value>Select CSV File</value>
+    </data>
+    <data name="ImportWizard_DownloadTemplate" xml:space="preserve">
+        <value>Download Template</value>
+    </data>
+    <data name="ImportWizard_FileSelected" xml:space="preserve">
+        <value>File:</value>
+    </data>
+    <data name="ImportWizard_ValidRows" xml:space="preserve">
+        <value>{0} valid rows</value>
+    </data>
+    <data name="ImportWizard_Errors" xml:space="preserve">
+        <value>{0} errors</value>
+    </data>
+    <data name="ImportWizard_Step1Instructions" xml:space="preserve">
+        <value>Select a CSV file matching the template format, or download the template to see the expected columns.</value>
+    </data>
+    <data name="ImportWizard_ShowErrors" xml:space="preserve">
+        <value>Show errors</value>
+    </data>
 </root>

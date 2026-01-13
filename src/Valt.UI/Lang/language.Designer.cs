@@ -2426,5 +2426,47 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Menu_ImportTransactions", resourceCulture);
             }
         }
+
+        public static string ImportWizard_SelectFile {
+            get {
+                return ResourceManager.GetString("ImportWizard_SelectFile", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_DownloadTemplate {
+            get {
+                return ResourceManager.GetString("ImportWizard_DownloadTemplate", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_FileSelected {
+            get {
+                return ResourceManager.GetString("ImportWizard_FileSelected", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_ValidRows {
+            get {
+                return ResourceManager.GetString("ImportWizard_ValidRows", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_Errors {
+            get {
+                return ResourceManager.GetString("ImportWizard_Errors", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_Step1Instructions {
+            get {
+                return ResourceManager.GetString("ImportWizard_Step1Instructions", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_ShowErrors {
+            get {
+                return ResourceManager.GetString("ImportWizard_ShowErrors", resourceCulture);
+            }
+        }
     }
 }
