@@ -35,7 +35,7 @@ internal class DatabaseInitializer : IDatabaseInitializer
     {
         var fiatAccount = FiatAccount.New(_initialCategoryNameLanguageProvider.Get(InitialCategoryNames.FiatAccount, initialDataLanguage),
             AccountCurrencyNickname.Empty, true, new Icon("MaterialSymbolsOutlined", "account_balanced", '\ue84f', Color.FromArgb(-16731500)),
-            FiatCurrency.Brl, FiatValue.Empty);
+            FiatCurrency.Usd, FiatValue.Empty);
         await _accountRepository.SaveAccountAsync(fiatAccount);
 
         var btcAccount = BtcAccount.New(_initialCategoryNameLanguageProvider.Get(InitialCategoryNames.BtcAccount, initialDataLanguage),
