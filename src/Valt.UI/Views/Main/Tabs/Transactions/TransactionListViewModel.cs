@@ -17,6 +17,7 @@ using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Budget.Accounts;
+using Valt.Core.Modules.Budget.Categories;
 using Valt.Core.Modules.Budget.Transactions;
 using Valt.Core.Modules.Budget.Transactions.Contracts;
 using Valt.Infra.DataAccess;
@@ -306,7 +307,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     }
 
     [RelayCommand]
-    private async Task RenameAll()
+    private async Task ChangeNamesAndCategories()
     {
         var ownerWindow = GetUserControlOwnerWindow()!;
 
@@ -331,7 +332,15 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
             if (transaction is null)
                 continue;
 
-            transaction.Rename(result.Name!);
+            if (result.RenameEnabled && !string.IsNullOrWhiteSpace(result.Name))
+            {
+                transaction.Rename(result.Name);
+            }
+
+            if (result.ChangeCategoryEnabled && result.CategoryId is not null)
+            {
+                transaction.ChangeCategory(new CategoryId(result.CategoryId));
+            }
 
             await _transactionRepository.SaveTransactionAsync(transaction);
         }

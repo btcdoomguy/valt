@@ -83,13 +83,24 @@ public class Transaction : AggregateRoot<TransactionId>
     {
         if (Name == name && CategoryId == categoryId)
             return;
-        
+
         var previousName = Name;
         var previousCategoryId = CategoryId;
 
         Name = name;
         CategoryId = categoryId;
         AddEvent(new TransactionNameAndCategoryChangedEvent(this, previousName, previousCategoryId));
+        AddEvent(new TransactionEditedEvent(this));
+    }
+
+    public void ChangeCategory(CategoryId categoryId)
+    {
+        if (CategoryId == categoryId)
+            return;
+
+        var previousCategoryId = CategoryId;
+        CategoryId = categoryId;
+        AddEvent(new TransactionNameAndCategoryChangedEvent(this, Name, previousCategoryId));
         AddEvent(new TransactionEditedEvent(this));
     }
 

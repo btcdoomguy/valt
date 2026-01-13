@@ -337,15 +337,41 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     $"{CurrencyDisplay.FormatFiat(statisticsData.MedianMonthlyExpenses, fiatCurrency.Code)}")
             };
 
-            // Add expenses in sats if we have valid rate data
-            var expensesInSats = ConvertFiatToSats(statisticsData.MedianMonthlyExpenses, fiatCurrency);
-            if (expensesInSats.HasValue)
+            // Add previous period median and evolution if available
+            if (statisticsData.HasMedianMonthlyExpensesPreviousPeriod && statisticsData.MedianMonthlyExpensesPreviousPeriod is not null)
             {
-                var satsFormatted = expensesInSats.Value.ToString("N0", CultureInfo.CurrentCulture) + " sats";
-                rows.Add(new RowItem(language.Reports_Statistics_MedianExpensesSats, satsFormatted));
+                rows.Add(new RowItem(language.Reports_Statistics_MedianExpensesPrevious,
+                    $"{CurrencyDisplay.FormatFiat(statisticsData.MedianMonthlyExpensesPreviousPeriod, fiatCurrency.Code)}"));
+
+                if (statisticsData.MedianMonthlyExpensesEvolution.HasValue)
+                {
+                    var evolutionSign = statisticsData.MedianMonthlyExpensesEvolution.Value >= 0 ? "+" : "";
+                    var evolutionFormatted = $"{evolutionSign}{statisticsData.MedianMonthlyExpensesEvolution.Value}%";
+                    rows.Add(new RowItem(language.Reports_Statistics_MedianExpensesEvolution, evolutionFormatted, language.Reports_Statistics_MedianExpensesEvolution_Tooltip));
+                }
             }
 
-            rows.Add(new RowItem(language.Reports_Statistics_WealthCoverage, statisticsData.WealthCoverageFormatted));
+            // Add sat-based median data if available (from AutoSatAmount calculations)
+            if (statisticsData.HasMedianMonthlyExpensesSats && statisticsData.MedianMonthlyExpensesSats.HasValue)
+            {
+                var satMedianFormatted = statisticsData.MedianMonthlyExpensesSats.Value.ToString("N0", CultureInfo.CurrentCulture) + " sats";
+                rows.Add(new RowItem(language.Reports_Statistics_MedianExpensesSatsLabel, satMedianFormatted));
+
+                if (statisticsData.MedianMonthlyExpensesPreviousPeriodSats.HasValue)
+                {
+                    var prevSatMedianFormatted = statisticsData.MedianMonthlyExpensesPreviousPeriodSats.Value.ToString("N0", CultureInfo.CurrentCulture) + " sats";
+                    rows.Add(new RowItem(language.Reports_Statistics_MedianExpensesSatsPrevious, prevSatMedianFormatted));
+
+                    if (statisticsData.MedianMonthlyExpensesSatsEvolution.HasValue)
+                    {
+                        var satEvolutionSign = statisticsData.MedianMonthlyExpensesSatsEvolution.Value >= 0 ? "+" : "";
+                        var satEvolutionFormatted = $"{satEvolutionSign}{statisticsData.MedianMonthlyExpensesSatsEvolution.Value}%";
+                        rows.Add(new RowItem(language.Reports_Statistics_MedianExpensesSatsEvolution, satEvolutionFormatted, language.Reports_Statistics_MedianExpensesSatsEvolution_Tooltip));
+                    }
+                }
+            }
+
+            rows.Add(new RowItem(language.Reports_Statistics_WealthCoverage, statisticsData.WealthCoverageFormatted, language.Reports_Statistics_WealthCoverage_Tooltip));
 
             StatisticsData = new DashboardData(language.Reports_Statistics_Title, rows);
 
@@ -364,37 +390,6 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         {
             IsStatisticsLoading = false;
         }
-    }
-
-    private long? ConvertFiatToSats(decimal fiatValue, FiatCurrency fiatCurrency)
-    {
-        var bitcoinPriceUsd = _ratesState.BitcoinPrice;
-        var fiatRates = _ratesState.FiatRates;
-
-        if (bitcoinPriceUsd is null or 0 || fiatRates is null)
-            return null;
-
-        // Convert fiat value to USD
-        decimal valueInUsd;
-        if (fiatCurrency.Code == FiatCurrency.Usd.Code)
-        {
-            valueInUsd = fiatValue;
-        }
-        else if (fiatRates.TryGetValue(fiatCurrency.Code, out var rate) && rate != 0)
-        {
-            // fiatRates contains the rate of each currency relative to USD (e.g., BRL rate = 5.0 means 1 USD = 5 BRL)
-            valueInUsd = fiatValue / rate;
-        }
-        else
-        {
-            return null;
-        }
-
-        // Convert USD to BTC then to sats
-        var btcValue = valueInUsd / bitcoinPriceUsd.Value;
-        var sats = (long)(btcValue * 100_000_000m);
-
-        return sats;
     }
 
     private void UpdateWealthData()

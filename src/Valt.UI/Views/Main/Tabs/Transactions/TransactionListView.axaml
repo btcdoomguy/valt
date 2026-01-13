@@ -176,7 +176,7 @@
                     </MenuItem>
                     <MenuItem Header="{x:Static local:language.Transactions_Menu_RenameAll}"
                               IsVisible="{Binding !IsSingleItemSelected}"
-                              Command="{Binding RenameAllCommand}">
+                              Command="{Binding ChangeNamesAndCategoriesCommand}">
                     </MenuItem>
                     <MenuItem Header="{x:Static local:language.Transactions_Menu_Delete}"
                               Command="{Binding DeleteTransactionCommand}"

@@ -13,6 +13,7 @@ public class FiatAccountBuilder
 {
     private AccountId _id = new();
     private AccountName _name = "Test Account";
+    private AccountCurrencyNickname _currencyNickname = AccountCurrencyNickname.Empty;
     private FiatCurrency _fiatCurrency = FiatCurrency.Usd;
     private Icon _icon = Icon.Empty;
     private FiatValue _value = FiatValue.Empty;
@@ -22,6 +23,7 @@ public class FiatAccountBuilder
     // Public properties for backward compatibility with property initializer syntax
     public AccountId Id { get => _id; set => _id = value; }
     public AccountName Name { get => _name; set => _name = value; }
+    public AccountCurrencyNickname CurrencyNickname { get => _currencyNickname; set => _currencyNickname = value; }
     public FiatCurrency FiatCurrency { get => _fiatCurrency; set => _fiatCurrency = value; }
     public Icon Icon { get => _icon; set => _icon = value; }
     public FiatValue Value { get => _value; set => _value = value; }
@@ -39,6 +41,18 @@ public class FiatAccountBuilder
     public FiatAccountBuilder WithName(string name)
     {
         _name = name;
+        return this;
+    }
+
+    public FiatAccountBuilder WithCurrencyNickname(string nickname)
+    {
+        _currencyNickname = nickname;
+        return this;
+    }
+
+    public FiatAccountBuilder WithCurrencyNickname(AccountCurrencyNickname nickname)
+    {
+        _currencyNickname = nickname;
         return this;
     }
 
@@ -84,6 +98,7 @@ public class FiatAccountBuilder
         {
             Id = _id.ToObjectId(),
             Currency = _fiatCurrency.Code,
+            CurrencyNickname = string.IsNullOrEmpty(_currencyNickname.Value) ? null : _currencyNickname.Value,
             InitialAmount = _value,
             Icon = _icon.ToString(),
             Name = _name,

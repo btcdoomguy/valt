@@ -14,6 +14,7 @@ public partial class AccountViewModel : ObservableObject
     public bool Visible { get; set; }
     public string? Icon { get; set; }
     public string? Currency { get; set; }
+    public string? CurrencyDisplayName { get; set; }
     public bool IsBtcAccount { get; set; }
     public decimal? FiatTotal { get; set; }
     public long? SatsTotal { get; set; }
@@ -26,7 +27,8 @@ public partial class AccountViewModel : ObservableObject
     public bool IsHidden => !Visible;
 
     public AccountViewModel(string id, string type, string name, bool visible, string? icon, string? currency,
-        bool isBtcAccount, decimal? fiatTotal, long? satsTotal, bool hasFutureTotal, decimal? futureFiatTotal, long? futureSatsTotal)
+        string? currencyDisplayName, bool isBtcAccount, decimal? fiatTotal, long? satsTotal, bool hasFutureTotal,
+        decimal? futureFiatTotal, long? futureSatsTotal)
     {
         Id = id;
         Type = type;
@@ -34,6 +36,7 @@ public partial class AccountViewModel : ObservableObject
         Visible = visible;
         Icon = icon;
         Currency = currency;
+        CurrencyDisplayName = currencyDisplayName;
         IsBtcAccount = isBtcAccount;
         FiatTotal = fiatTotal;
         SatsTotal = satsTotal;
@@ -50,6 +53,7 @@ public partial class AccountViewModel : ObservableObject
         Visible = dto.Visible;
         Icon = dto.Icon;
         Currency = dto.Currency;
+        CurrencyDisplayName = dto.CurrencyDisplayName;
         IsBtcAccount = dto.IsBtcAccount;
         FiatTotal = dto.FiatTotal;
         SatsTotal = dto.SatsTotal;

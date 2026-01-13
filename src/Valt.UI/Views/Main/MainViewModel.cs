@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -7,6 +9,7 @@ using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Platform.Storage;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
@@ -22,6 +25,7 @@ using Valt.Infra.Kernel.BackgroundJobs;
 using Valt.Infra.Modules.Budget;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
+using Valt.Infra.Services.CsvExport;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
 using Valt.UI.Lang;
@@ -36,6 +40,7 @@ using Valt.UI.Views.Main.Modals.InitialSelection;
 using Valt.UI.Views.Main.Modals.ManageCategories;
 using Valt.UI.Views.Main.Modals.Settings;
 using Valt.UI.Views.Main.Modals.StatusDisplay;
+using Valt.UI.Views.Main.Modals.ImportWizard;
 
 namespace Valt.UI.Views.Main;
 
@@ -53,6 +58,7 @@ public partial class MainViewModel : ValtViewModel
     private readonly LiveRatesViewModel _liveRatesViewModel;
     private readonly UpdateIndicatorViewModel _updateIndicatorViewModel;
     private readonly IAllTimeHighReport _allTimeHighReport;
+    private readonly ICsvExportService _csvExportService;
     private readonly IClock _clock;
     private readonly ILogger<MainViewModel> _logger;
 
@@ -137,6 +143,7 @@ public partial class MainViewModel : ValtViewModel
         UpdateIndicatorViewModel updateIndicatorViewModel,
         LiveRateState liveRateState,
         IAllTimeHighReport allTimeHighReport,
+        ICsvExportService csvExportService,
         IClock clock,
         ILogger<MainViewModel> logger)
     {
@@ -151,6 +158,7 @@ public partial class MainViewModel : ValtViewModel
         _liveRatesViewModel = liveRatesViewModel;
         _updateIndicatorViewModel = updateIndicatorViewModel;
         _allTimeHighReport = allTimeHighReport;
+        _csvExportService = csvExportService;
         _clock = clock;
         _logger = logger;
 
@@ -213,12 +221,60 @@ public partial class MainViewModel : ValtViewModel
     }
 
     [RelayCommand]
+    private async Task OpenImportWizard()
+    {
+        var modal =
+            (ImportWizardView)await _modalFactory.CreateAsync(ApplicationModalNames.ImportWizard, Window)!;
+
+        await modal.ShowDialog(Window!);
+    }
+
+    [RelayCommand]
+    private async Task ExportTransactions()
+    {
+        if (Window is null) return;
+
+        var options = new FilePickerSaveOptions
+        {
+            Title = "Export Transactions",
+            SuggestedFileName = "valt-transactions.csv",
+            FileTypeChoices =
+            [
+                new FilePickerFileType("CSV Files") { Patterns = ["*.csv"] }
+            ]
+        };
+
+        var result = await Window.StorageProvider.SaveFilePickerAsync(options);
+        if (result is null) return;
+
+        var csv = await _csvExportService.ExportTransactionsAsync();
+        await File.WriteAllTextAsync(result.Path.LocalPath, csv);
+    }
+
+    [RelayCommand]
     private async Task About()
     {
         var modal =
             (AboutView)await _modalFactory.CreateAsync(ApplicationModalNames.About, Window)!;
 
         await modal.ShowDialog(Window!);
+    }
+
+    [RelayCommand]
+    private void HowToUse()
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "https://btcdoomguy.github.io/valt-docs/",
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error opening User Guide URL");
+        }
     }
 
     [RelayCommand]

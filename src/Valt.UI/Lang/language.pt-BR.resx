@@ -27,6 +27,15 @@
     <data name="ChangeCategoryTransactionTitle" xml:space="preserve">
         <value>Renomear</value>
     </data>
+    <data name="ChangeCategoryTransactions_Title" xml:space="preserve">
+        <value>Editar Transações em Massa</value>
+    </data>
+    <data name="ChangeCategoryTransactions_Rename" xml:space="preserve">
+        <value>Renomear todas as transações</value>
+    </data>
+    <data name="ChangeCategoryTransactions_ChangeCategory" xml:space="preserve">
+        <value>Alterar categoria de todas as transações</value>
+    </data>
     <data name="CreateDatabaseTitle" xml:space="preserve">
         <value>Criar novo banco de dados</value>
     </data>
@@ -101,6 +110,9 @@
     </data>
     <data name="ManageAccount.Icon" xml:space="preserve">
         <value>Ícone</value>
+    </data>
+    <data name="ManageAccount.CurrencyNickname" xml:space="preserve">
+        <value>Apelido da Moeda</value>
     </data>
     <data name="ManageAccount.InitialAmount" xml:space="preserve">
         <value>Valor Inicial</value>
@@ -229,7 +241,7 @@
         <value>Editar</value>
     </data>
     <data name="Transactions.Menu.RenameAll" xml:space="preserve">
-        <value>Renomear todos</value>
+        <value>Editar todos</value>
     </data>
     <data name="Transactions.MoveDown" xml:space="preserve">
         <value>Mover para baixo</value>
@@ -639,6 +651,9 @@
     <data name="Main.Menu.About" xml:space="preserve">
         <value>Sobre</value>
     </data>
+    <data name="Main.Menu.HowToUse" xml:space="preserve">
+        <value>Guia do Usuário</value>
+    </data>
     <data name="About.Title" xml:space="preserve">
         <value>Sobre</value>
     </data>
@@ -717,11 +732,32 @@
     <data name="Reports.Statistics.MedianExpenses" xml:space="preserve">
         <value>Despesas medianas (12m)</value>
     </data>
-    <data name="Reports.Statistics.MedianExpensesSats" xml:space="preserve">
-        <value>Despesas em sats</value>
-    </data>
     <data name="Reports.Statistics.WealthCoverage" xml:space="preserve">
         <value>Cobertura do patrimônio</value>
+    </data>
+    <data name="Reports.Statistics.WealthCoverage.Tooltip" xml:space="preserve">
+        <value>Tempo que você consegue se sustentar com o patrimônio atual sem novas entradas</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesPrevious" xml:space="preserve">
+        <value>Despesas medianas (12m ant)</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesEvolution" xml:space="preserve">
+        <value>Evolução anual</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesEvolution.Tooltip" xml:space="preserve">
+        <value>Sua inflação medida em fiat. Esse é o aumento das suas despesas relativo ao mesmo período do ano anterior. Números negativos significam queda no custo de vida medido em moeda fiduciária</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesSatsLabel" xml:space="preserve">
+        <value>Mediana sats (12m)</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesSatsPrevious" xml:space="preserve">
+        <value>Mediana sats (12m ant)</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesSatsEvolution" xml:space="preserve">
+        <value>Evolução anual (sats)</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesSatsEvolution.Tooltip" xml:space="preserve">
+        <value>Sua inflação medida em bitcoin. Esse é o aumento das suas despesas relativo ao mesmo período do ano anterior. Números negativos significam queda no custo de vida medido em bitcoin</value>
     </data>
     <data name="Reports.MonthlyTotals.Obs" xml:space="preserve">
         <value>* o total atual é baseado nos valores do dia anterior</value>
@@ -1136,5 +1172,156 @@
     </data>
     <data name="Error.IncompatibleVersion" xml:space="preserve">
         <value>Este banco de dados requer a versão {0} ou superior do aplicativo. Você está executando a versão {1}. Por favor, atualize o aplicativo.</value>
+    </data>
+    <!-- Import Wizard -->
+    <data name="ImportWizard_Title" xml:space="preserve">
+        <value>Importar Transações</value>
+    </data>
+    <data name="ImportWizard_Step1" xml:space="preserve">
+        <value>Arquivo</value>
+    </data>
+    <data name="ImportWizard_Step2" xml:space="preserve">
+        <value>Contas</value>
+    </data>
+    <data name="ImportWizard_Step3" xml:space="preserve">
+        <value>Categorias</value>
+    </data>
+    <data name="ImportWizard_Step4" xml:space="preserve">
+        <value>Resumo</value>
+    </data>
+    <data name="ImportWizard_Step5" xml:space="preserve">
+        <value>Importar</value>
+    </data>
+    <data name="ImportWizard_Back" xml:space="preserve">
+        <value>Voltar</value>
+    </data>
+    <data name="ImportWizard_Next" xml:space="preserve">
+        <value>Próximo</value>
+    </data>
+    <data name="ImportWizard_Import" xml:space="preserve">
+        <value>Importar</value>
+    </data>
+    <data name="Menu_ImportTransactions" xml:space="preserve">
+        <value>Importar Transações...</value>
+    </data>
+    <data name="Menu_ExportTransactions" xml:space="preserve">
+        <value>Exportar Transações...</value>
+    </data>
+    <data name="ImportWizard_SelectFile" xml:space="preserve">
+        <value>Selecionar Arquivo CSV</value>
+    </data>
+    <data name="ImportWizard_DownloadTemplate" xml:space="preserve">
+        <value>Baixar Modelo</value>
+    </data>
+    <data name="ImportWizard_FileSelected" xml:space="preserve">
+        <value>Arquivo:</value>
+    </data>
+    <data name="ImportWizard_ValidRows" xml:space="preserve">
+        <value>{0} linhas válidas</value>
+    </data>
+    <data name="ImportWizard_Errors" xml:space="preserve">
+        <value>{0} erros</value>
+    </data>
+    <data name="ImportWizard_Step1Instructions" xml:space="preserve">
+        <value>Selecione um arquivo CSV no formato do modelo, ou baixe o modelo para ver as colunas esperadas.</value>
+    </data>
+    <data name="ImportWizard_ShowErrors" xml:space="preserve">
+        <value>Mostrar erros</value>
+    </data>
+    <data name="ImportWizard_NewAccounts" xml:space="preserve">
+        <value>{0} novas contas</value>
+    </data>
+    <data name="ImportWizard_ExistingAccounts" xml:space="preserve">
+        <value>{0} contas existentes</value>
+    </data>
+    <data name="ImportWizard_NewCategories" xml:space="preserve">
+        <value>{0} novas categorias</value>
+    </data>
+    <data name="ImportWizard_ExistingCategories" xml:space="preserve">
+        <value>{0} categorias existentes</value>
+    </data>
+    <data name="ImportWizard_CsvAccountName" xml:space="preserve">
+        <value>Nome da Conta (CSV)</value>
+    </data>
+    <data name="ImportWizard_AccountType" xml:space="preserve">
+        <value>Tipo</value>
+    </data>
+    <data name="ImportWizard_Status" xml:space="preserve">
+        <value>Status</value>
+    </data>
+    <data name="ImportWizard_CsvCategoryName" xml:space="preserve">
+        <value>Categoria (CSV)</value>
+    </data>
+    <data name="ImportWizard_SummaryTitle" xml:space="preserve">
+        <value>Resumo da Importação</value>
+    </data>
+    <data name="ImportWizard_SummaryTransactions" xml:space="preserve">
+        <value>Transações a importar</value>
+    </data>
+    <data name="ImportWizard_SummaryAccounts" xml:space="preserve">
+        <value>Contas</value>
+    </data>
+    <data name="ImportWizard_SummaryCategories" xml:space="preserve">
+        <value>Categorias</value>
+    </data>
+    <data name="ImportWizard_SummaryNew" xml:space="preserve">
+        <value>novas</value>
+    </data>
+    <data name="ImportWizard_SummaryNewItemsWarning" xml:space="preserve">
+        <value>Novas contas e categorias serão criadas automaticamente durante a importação.</value>
+    </data>
+    <data name="ImportWizard_SummaryReadyToImport" xml:space="preserve">
+        <value>Clique em Importar para iniciar o processo de importação.</value>
+    </data>
+    <data name="ImportWizard_Importing" xml:space="preserve">
+        <value>Importando transações...</value>
+    </data>
+    <data name="ImportWizard_ImportComplete" xml:space="preserve">
+        <value>Importação concluída!</value>
+    </data>
+    <data name="ImportWizard_ProgressTransactions" xml:space="preserve">
+        <value>itens</value>
+    </data>
+    <data name="CsvImport_CreatingAccounts" xml:space="preserve">
+        <value>Criando contas...</value>
+    </data>
+    <data name="CsvImport_CreatedAccount" xml:space="preserve">
+        <value>Conta criada: {0}</value>
+    </data>
+    <data name="CsvImport_FailedToCreateAccount" xml:space="preserve">
+        <value>Falha ao criar conta '{0}': {1}</value>
+    </data>
+    <data name="CsvImport_CreatingCategories" xml:space="preserve">
+        <value>Criando categorias...</value>
+    </data>
+    <data name="CsvImport_CreatedCategory" xml:space="preserve">
+        <value>Categoria criada: {0}</value>
+    </data>
+    <data name="CsvImport_FailedToCreateCategory" xml:space="preserve">
+        <value>Falha ao criar categoria '{0}': {1}</value>
+    </data>
+    <data name="CsvImport_ImportingTransaction" xml:space="preserve">
+        <value>Importando transação {0} de {1}...</value>
+    </data>
+    <data name="CsvImport_AccountNotFound" xml:space="preserve">
+        <value>Linha {0}: Conta '{1}' não encontrada nos mapeamentos</value>
+    </data>
+    <data name="CsvImport_ToAccountNotFound" xml:space="preserve">
+        <value>Linha {0}: Conta destino '{1}' não encontrada nos mapeamentos</value>
+    </data>
+    <data name="CsvImport_CategoryNotFound" xml:space="preserve">
+        <value>Linha {0}: Categoria '{1}' não encontrada nos mapeamentos</value>
+    </data>
+    <data name="CsvImport_LineError" xml:space="preserve">
+        <value>Linha {0}: {1}</value>
+    </data>
+    <data name="CsvImport_UnableToDetermineType" xml:space="preserve">
+        <value>Não foi possível determinar o tipo de transação para a linha {0}</value>
+    </data>
+    <data name="CsvImport_SetInitialValue" xml:space="preserve">
+        <value>Valor inicial definido para a conta: {0}</value>
+    </data>
+    <data name="CloseButton" xml:space="preserve">
+        <value>Fechar</value>
     </data>
 </root>

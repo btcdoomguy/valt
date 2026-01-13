@@ -38,6 +38,7 @@ public partial class TransactionsViewModel
                     Unicode: '\uEA07',
                     Color: Color.FromArgb(255, 255, 0, 0),
                     Currency: null,
+                    CurrencyDisplayName: "BTC",
                     IsBtcAccount: true,
                     FiatTotal: null,
                     SatsTotal: 100000,
@@ -52,7 +53,7 @@ public partial class TransactionsViewModel
                 Color: Color.FromArgb(255, 255, 0, 255),
                 Icon: new Icon("MaterialDesign", "account-box-line", '\uEA07', Color.FromArgb(255, 255, 0, 255))
                     .ToString(),
-                Currency: "BRL", IsBtcAccount: false, FiatTotal: 1000, SatsTotal: null,
+                Currency: "BRL", CurrencyDisplayName: "BRL", IsBtcAccount: false, FiatTotal: 1000, SatsTotal: null,
                 HasFutureTotal: false,
                 FutureFiatTotal: 1000, FutureSatsTotal: null)),
             new AccountViewModel(new AccountSummaryDTO(Id: IdGenerator.Generate(),
@@ -64,6 +65,7 @@ public partial class TransactionsViewModel
                 Icon: new Icon("MaterialDesign", "account-box-line", '\uEA07', Color.FromArgb(255, 255, 255, 0))
                     .ToString(),
                 Currency: "BRL",
+                CurrencyDisplayName: "BRL",
                 IsBtcAccount: false,
                 FiatTotal: 1000, SatsTotal: null,
                 HasFutureTotal: false,

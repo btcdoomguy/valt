@@ -7,6 +7,7 @@ public class AccountEntity
     [BsonId] public ObjectId Id { get; set; } = null!;
     [BsonField("tp")] public int AccountEntityTypeId { get; set; }
     [BsonField("name")] public string Name { get; set; } = null!;
+    [BsonField("nick")] public string? CurrencyNickname { get; set; }
     [BsonField("visi")] public bool Visible { get; set; }
     [BsonField("icon")] public string? Icon { get; set; }
     [BsonField("curr")] public string? Currency { get; set; }

@@ -7,9 +7,9 @@
         xmlns:manageAccount1="clr-namespace:Valt.UI.Views.Main.Modals.ManageAccount"
         mc:Ignorable="d"
         d:DesignWidth="500"
-        d:DesignHeight="510"
+        d:DesignHeight="590"
         MaxWidth="500"
-        MaxHeight="510"
+        MaxHeight="590"
         x:Class="Valt.UI.Views.Main.Modals.ManageAccount.ManageAccountView"
         x:DataType="manageAccount1:ManageAccountViewModel"
         Title="{x:Static local:language.ManageAccount_Title}"
@@ -28,7 +28,7 @@
             <userControls:CustomTitleBar Title="{x:Static local:language.ManageAccount_Title}" 
                                          TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
-            <Border Classes="form-fields-area" Height="430">
+            <Border Classes="form-fields-area" Height="510">
                 <StackPanel>
                     <!-- Name Field -->
                     <StackPanel Classes="form-field">
@@ -70,6 +70,12 @@
                         <ComboBox ItemsSource="{Binding AvailableCurrencies}"
                                   IsEnabled="{Binding CanEditAccountStructure}"
                                   SelectedItem="{Binding Currency}" />
+                    </StackPanel>
+
+                    <!-- Currency Nickname Field -->
+                    <StackPanel Classes="form-field">
+                        <TextBlock Text="{x:Static local:language.ManageAccount_CurrencyNickname}" />
+                        <TextBox Text="{Binding CurrencyNickname}" MaxLength="15" />
                     </StackPanel>
 
                     <!-- Initial Amount (Fiat) -->

@@ -13,6 +13,7 @@ public class BtcAccountBuilder
 {
     private AccountId _id = new();
     private AccountName _name = "Test BTC Account";
+    private AccountCurrencyNickname _currencyNickname = AccountCurrencyNickname.Empty;
     private Icon _icon = Icon.Empty;
     private BtcValue _value = BtcValue.Empty;
     private bool _visible = true;
@@ -21,6 +22,7 @@ public class BtcAccountBuilder
     // Public properties for backward compatibility with property initializer syntax
     public AccountId Id { get => _id; set => _id = value; }
     public AccountName Name { get => _name; set => _name = value; }
+    public AccountCurrencyNickname CurrencyNickname { get => _currencyNickname; set => _currencyNickname = value; }
     public Icon Icon { get => _icon; set => _icon = value; }
     public BtcValue Value { get => _value; set => _value = value; }
     public bool Visible { get => _visible; set => _visible = value; }
@@ -37,6 +39,18 @@ public class BtcAccountBuilder
     public BtcAccountBuilder WithName(string name)
     {
         _name = name;
+        return this;
+    }
+
+    public BtcAccountBuilder WithCurrencyNickname(string nickname)
+    {
+        _currencyNickname = nickname;
+        return this;
+    }
+
+    public BtcAccountBuilder WithCurrencyNickname(AccountCurrencyNickname nickname)
+    {
+        _currencyNickname = nickname;
         return this;
     }
 
@@ -82,6 +96,7 @@ public class BtcAccountBuilder
         {
             Id = new ObjectId(_id),
             Currency = null,
+            CurrencyNickname = string.IsNullOrEmpty(_currencyNickname.Value) ? null : _currencyNickname.Value,
             InitialAmount = _value.Sats,
             Icon = _icon.ToString(),
             Name = _name,

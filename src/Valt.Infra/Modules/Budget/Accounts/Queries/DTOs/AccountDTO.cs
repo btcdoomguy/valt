@@ -11,7 +11,9 @@ public record AccountDTO(
     char Unicode,
     Color Color,
     string? Currency,
-    bool IsBtcAccount)
+    bool IsBtcAccount,
+    decimal? InitialAmountFiat,
+    long? InitialAmountSats)
 {
     public override string ToString() => Name;
 }

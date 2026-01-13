@@ -17,7 +17,7 @@ internal class LivePricesUpdaterJob : IBackgroundJob
     private readonly IBitcoinPriceProvider _bitcoinPriceProvider;
     private readonly IPriceDatabase _priceDatabase;
     private readonly ILocalHistoricalPriceProvider _localHistoricalPriceProvider;
-    private readonly ConfigurationManager _configurationManager;
+    private readonly IConfigurationManager _configurationManager;
     private readonly ILogger<LivePricesUpdaterJob> _logger;
 
     private decimal? _lastClosingPrice;
@@ -35,7 +35,7 @@ internal class LivePricesUpdaterJob : IBackgroundJob
         IBitcoinPriceProvider bitcoinPriceProvider,
         IPriceDatabase priceDatabase,
         ILocalHistoricalPriceProvider localHistoricalPriceProvider,
-        ConfigurationManager configurationManager,
+        IConfigurationManager configurationManager,
         ILogger<LivePricesUpdaterJob> logger)
     {
         _fiatPriceProviderSelector = fiatPriceProviderSelector;

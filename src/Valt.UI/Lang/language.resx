@@ -38,6 +38,15 @@
     <data name="ChangeCategoryTransactionTitle" xml:space="preserve">
         <value>New Name</value>
     </data>
+    <data name="ChangeCategoryTransactions_Title" xml:space="preserve">
+        <value>Bulk Edit Transactions</value>
+    </data>
+    <data name="ChangeCategoryTransactions_Rename" xml:space="preserve">
+        <value>Rename all transactions</value>
+    </data>
+    <data name="ChangeCategoryTransactions_ChangeCategory" xml:space="preserve">
+        <value>Change category for all transactions</value>
+    </data>
     <data name="CreateDatabaseTitle" xml:space="preserve">
         <value>Create new database</value>
     </data>
@@ -139,6 +148,9 @@
     </data>
     <data name="ManageAccount.Currency" xml:space="preserve">
         <value>Currency</value>
+    </data>
+    <data name="ManageAccount.CurrencyNickname" xml:space="preserve">
+        <value>Currency Nickname</value>
     </data>
     <data name="ManageAccount.InitialAmount" xml:space="preserve">
         <value>Initial Amount</value>
@@ -276,7 +288,7 @@
         <value>Copy</value>
     </data>
     <data name="Transactions.Menu.RenameAll" xml:space="preserve">
-        <value>Rename all</value>
+        <value>Edit all</value>
     </data>
     <data name="Transactions.Menu.Delete" xml:space="preserve">
         <value>Delete</value>
@@ -668,6 +680,9 @@
     <data name="Main.Menu.About" xml:space="preserve">
         <value>About</value>
     </data>
+    <data name="Main.Menu.HowToUse" xml:space="preserve">
+        <value>User Guide</value>
+    </data>
     <data name="About.Title" xml:space="preserve">
         <value>About</value>
     </data>
@@ -755,11 +770,32 @@
     <data name="Reports.Statistics.MedianExpenses" xml:space="preserve">
         <value>Median expenses (12mo)</value>
     </data>
-    <data name="Reports.Statistics.MedianExpensesSats" xml:space="preserve">
-        <value>Expenses as sats</value>
-    </data>
     <data name="Reports.Statistics.WealthCoverage" xml:space="preserve">
         <value>Wealth coverage</value>
+    </data>
+    <data name="Reports.Statistics.WealthCoverage.Tooltip" xml:space="preserve">
+        <value>How long you can sustain yourself with your current wealth without new income</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesPrevious" xml:space="preserve">
+        <value>Median expenses (prev 12mo)</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesEvolution" xml:space="preserve">
+        <value>YoY evolution</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesEvolution.Tooltip" xml:space="preserve">
+        <value>Your inflation measured in fiat. This is the increase in your expenses relative to the same period last year. Negative numbers mean a decrease in cost of living measured in fiat currency</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesSatsLabel" xml:space="preserve">
+        <value>Median sats (12mo)</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesSatsPrevious" xml:space="preserve">
+        <value>Median sats (prev 12mo)</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesSatsEvolution" xml:space="preserve">
+        <value>Sats YoY evolution</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesSatsEvolution.Tooltip" xml:space="preserve">
+        <value>Your inflation measured in bitcoin. This is the increase in your expenses relative to the same period last year. Negative numbers mean a decrease in cost of living measured in bitcoin</value>
     </data>
     <data name="Reports.MonthlyTotals.Obs" xml:space="preserve">
         <value>* latest totals are calculated based on yesterday amounts</value>
@@ -1156,5 +1192,156 @@
     </data>
     <data name="Error.IncompatibleVersion" xml:space="preserve">
         <value>This database requires app version {0} or higher. You are running version {1}. Please update the application.</value>
+    </data>
+    <!-- Import Wizard -->
+    <data name="ImportWizard_Title" xml:space="preserve">
+        <value>Import Transactions</value>
+    </data>
+    <data name="ImportWizard_Step1" xml:space="preserve">
+        <value>File</value>
+    </data>
+    <data name="ImportWizard_Step2" xml:space="preserve">
+        <value>Accounts</value>
+    </data>
+    <data name="ImportWizard_Step3" xml:space="preserve">
+        <value>Categories</value>
+    </data>
+    <data name="ImportWizard_Step4" xml:space="preserve">
+        <value>Summary</value>
+    </data>
+    <data name="ImportWizard_Step5" xml:space="preserve">
+        <value>Import</value>
+    </data>
+    <data name="ImportWizard_Back" xml:space="preserve">
+        <value>Back</value>
+    </data>
+    <data name="ImportWizard_Next" xml:space="preserve">
+        <value>Next</value>
+    </data>
+    <data name="ImportWizard_Import" xml:space="preserve">
+        <value>Import</value>
+    </data>
+    <data name="Menu_ImportTransactions" xml:space="preserve">
+        <value>Import Transactions...</value>
+    </data>
+    <data name="Menu_ExportTransactions" xml:space="preserve">
+        <value>Export Transactions...</value>
+    </data>
+    <data name="ImportWizard_SelectFile" xml:space="preserve">
+        <value>Select CSV File</value>
+    </data>
+    <data name="ImportWizard_DownloadTemplate" xml:space="preserve">
+        <value>Download Template</value>
+    </data>
+    <data name="ImportWizard_FileSelected" xml:space="preserve">
+        <value>File:</value>
+    </data>
+    <data name="ImportWizard_ValidRows" xml:space="preserve">
+        <value>{0} valid rows</value>
+    </data>
+    <data name="ImportWizard_Errors" xml:space="preserve">
+        <value>{0} errors</value>
+    </data>
+    <data name="ImportWizard_Step1Instructions" xml:space="preserve">
+        <value>Select a CSV file matching the template format, or download the template to see the expected columns.</value>
+    </data>
+    <data name="ImportWizard_ShowErrors" xml:space="preserve">
+        <value>Show errors</value>
+    </data>
+    <data name="ImportWizard_NewAccounts" xml:space="preserve">
+        <value>{0} new accounts</value>
+    </data>
+    <data name="ImportWizard_ExistingAccounts" xml:space="preserve">
+        <value>{0} existing accounts</value>
+    </data>
+    <data name="ImportWizard_NewCategories" xml:space="preserve">
+        <value>{0} new categories</value>
+    </data>
+    <data name="ImportWizard_ExistingCategories" xml:space="preserve">
+        <value>{0} existing categories</value>
+    </data>
+    <data name="ImportWizard_CsvAccountName" xml:space="preserve">
+        <value>CSV Account Name</value>
+    </data>
+    <data name="ImportWizard_AccountType" xml:space="preserve">
+        <value>Type</value>
+    </data>
+    <data name="ImportWizard_Status" xml:space="preserve">
+        <value>Status</value>
+    </data>
+    <data name="ImportWizard_CsvCategoryName" xml:space="preserve">
+        <value>CSV Category</value>
+    </data>
+    <data name="ImportWizard_SummaryTitle" xml:space="preserve">
+        <value>Import Summary</value>
+    </data>
+    <data name="ImportWizard_SummaryTransactions" xml:space="preserve">
+        <value>Transactions to import</value>
+    </data>
+    <data name="ImportWizard_SummaryAccounts" xml:space="preserve">
+        <value>Accounts</value>
+    </data>
+    <data name="ImportWizard_SummaryCategories" xml:space="preserve">
+        <value>Categories</value>
+    </data>
+    <data name="ImportWizard_SummaryNew" xml:space="preserve">
+        <value>new</value>
+    </data>
+    <data name="ImportWizard_SummaryNewItemsWarning" xml:space="preserve">
+        <value>New accounts and categories will be created automatically during import.</value>
+    </data>
+    <data name="ImportWizard_SummaryReadyToImport" xml:space="preserve">
+        <value>Click Import to begin the import process.</value>
+    </data>
+    <data name="ImportWizard_Importing" xml:space="preserve">
+        <value>Importing transactions...</value>
+    </data>
+    <data name="ImportWizard_ImportComplete" xml:space="preserve">
+        <value>Import complete!</value>
+    </data>
+    <data name="ImportWizard_ProgressTransactions" xml:space="preserve">
+        <value>items</value>
+    </data>
+    <data name="CsvImport_CreatingAccounts" xml:space="preserve">
+        <value>Creating accounts...</value>
+    </data>
+    <data name="CsvImport_CreatedAccount" xml:space="preserve">
+        <value>Created account: {0}</value>
+    </data>
+    <data name="CsvImport_FailedToCreateAccount" xml:space="preserve">
+        <value>Failed to create account '{0}': {1}</value>
+    </data>
+    <data name="CsvImport_CreatingCategories" xml:space="preserve">
+        <value>Creating categories...</value>
+    </data>
+    <data name="CsvImport_CreatedCategory" xml:space="preserve">
+        <value>Created category: {0}</value>
+    </data>
+    <data name="CsvImport_FailedToCreateCategory" xml:space="preserve">
+        <value>Failed to create category '{0}': {1}</value>
+    </data>
+    <data name="CsvImport_ImportingTransaction" xml:space="preserve">
+        <value>Importing transaction {0} of {1}...</value>
+    </data>
+    <data name="CsvImport_AccountNotFound" xml:space="preserve">
+        <value>Line {0}: Account '{1}' not found in mappings</value>
+    </data>
+    <data name="CsvImport_ToAccountNotFound" xml:space="preserve">
+        <value>Line {0}: To-account '{1}' not found in mappings</value>
+    </data>
+    <data name="CsvImport_CategoryNotFound" xml:space="preserve">
+        <value>Line {0}: Category '{1}' not found in mappings</value>
+    </data>
+    <data name="CsvImport_LineError" xml:space="preserve">
+        <value>Line {0}: {1}</value>
+    </data>
+    <data name="CsvImport_UnableToDetermineType" xml:space="preserve">
+        <value>Unable to determine transaction type for row at line {0}</value>
+    </data>
+    <data name="CsvImport_SetInitialValue" xml:space="preserve">
+        <value>Set initial value for account: {0}</value>
+    </data>
+    <data name="CloseButton" xml:space="preserve">
+        <value>Close</value>
     </data>
 </root>

@@ -11,6 +11,7 @@ public record AccountSummaryDTO(
     char Unicode,
     Color Color,
     string? Currency,
+    string? CurrencyDisplayName,
     bool IsBtcAccount,
     decimal? FiatTotal,
     long? SatsTotal,
