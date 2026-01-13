@@ -17,7 +17,7 @@ None
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: CSV Parser & Template** - Build CSV parsing service and sample template generator
-- [ ] **Phase 2: Import Wizard UI** - Create the 5-step wizard modal with account mapping and category preview
+- [x] **Phase 2: Import Wizard UI** - Create the 5-step wizard modal with account mapping and category preview
 - [ ] **Phase 3: Import Execution** - Transaction creation, background job integration, and error handling
 
 ## Phase Details
@@ -45,10 +45,11 @@ Plans:
 **Goal**: Implement transaction creation from parsed CSV data, integrate with background job system, handle errors
 **Depends on**: Phase 2
 **Research**: Unlikely (internal transaction creation, existing background job system)
-**Plans**: TBD
+**Status**: Planned
 
 Plans:
-- [ ] 03-01: TBD
+- [ ] 03-01: CsvImportExecutor Service - Interface, result types, account/category/transaction creation logic
+- [ ] 03-02: ViewModel Integration & Tests - Connect UI to executor, background job pause/resume, unit tests
 
 ## Progress
 
@@ -59,4 +60,4 @@ Phases execute in numeric order: 1 → 2 → 3
 |-------|----------------|--------|-----------|
 | 1. CSV Parser & Template | 1/1 | Complete | 2026-01-13 |
 | 2. Import Wizard UI | 2/2 | Complete | 2026-01-13 |
-| 3. Import Execution | 0/TBD | Not started | - |
+| 3. Import Execution | 0/2 | Planned | - |
