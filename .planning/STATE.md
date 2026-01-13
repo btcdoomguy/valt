@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-01-13)
 
 **Core value:** Enable users to migrate their financial history from other tools into Valt without manual data entry.
-**Current focus:** Phase 3 — Import Execution
+**Current focus:** v1.0 milestone complete — ready for next milestone planning
 
 ## Current Position
 
 Phase: 3 of 3 (Import Execution)
 Plan: 2 of 2 in current phase
-Status: Milestone complete
-Last activity: 2026-01-13 — Completed 03-02-PLAN.md (ViewModel Integration & Tests)
+Status: v1.0 shipped
+Last activity: 2026-01-13 — v1.0 CSV Import Wizard milestone complete
 
 Progress: ██████████ 100%
 

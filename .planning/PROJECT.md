@@ -17,16 +17,20 @@ Enable users to migrate their financial history from other tools into Valt witho
 - ✓ Categories support hierarchical organization — existing
 - ✓ Modal system with wizard-style flows — existing
 - ✓ CsvHelper library available for CSV parsing — existing
+- ✓ Parse CSV files with strict column format (date, description, amount, account, to_account, to_amount, category) — v1.0
+- ✓ Generate sample template CSV demonstrating all transaction types — v1.0
+- ✓ 5-step wizard: File Selection → Account Mapping → Category Preview → Summary → Import Progress — v1.0
+- ✓ Infer transaction type from account types and to_account presence — v1.0
+- ✓ Stop background jobs during import, restart after completion — v1.0
+- ✓ Localization for en-US and pt-BR — v1.0
 
 ### Active
 
-- [ ] Parse CSV files with strict column format (date, description, amount, account, to_account, to_amount, category)
-- [ ] Generate sample template CSV demonstrating all transaction types
-- [ ] 5-step wizard: File Selection → Account Mapping → Category Preview → Summary → Import Progress
-- [ ] Infer transaction type from account types and to_account presence
-- [ ] Block import if account names conflict with existing accounts
-- [ ] Stop background jobs during import, restart after completion
-- [ ] Localization for en-US and pt-BR
+(None - milestone complete)
+
+### Deferred
+
+- Account name conflict blocking (simplified: new accounts created if name differs)
 
 ### Out of Scope
 
@@ -60,10 +64,13 @@ The import feature integrates with existing patterns:
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Strict CSV format | Simplifies parsing, template provides clear guidance | — Pending |
-| Block on account name conflict | Prevents accidental data merge/corruption | — Pending |
-| Stop background jobs during import | Prevents race conditions with transaction processing | — Pending |
-| Wizard-style modal | Guides users through complex multi-step process | — Pending |
+| Strict CSV format | Simplifies parsing, template provides clear guidance | ✓ Good |
+| Account matching by clean name | Case-insensitive, strips bracket suffix for comparison | ✓ Good |
+| Stop background jobs during import | Prevents race conditions with transaction processing | ✓ Good |
+| Wizard-style modal | Guides users through complex multi-step process | ✓ Good |
+| Infra DTOs for executor | Clean architecture: Infra doesn't depend on UI layer | ✓ Good |
+| IProgress callback for updates | Real-time progress reporting to UI during import | ✓ Good |
+| Per-row error collection | Enables partial success when some rows are invalid | ✓ Good |
 
 ---
-*Last updated: 2026-01-13 after initialization*
+*Last updated: 2026-01-13 after v1.0 milestone*
