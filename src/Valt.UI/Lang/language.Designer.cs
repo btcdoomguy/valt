@@ -2583,6 +2583,84 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string CsvImport_CreatingAccounts {
+            get {
+                return ResourceManager.GetString("CsvImport_CreatingAccounts", resourceCulture);
+            }
+        }
+
+        public static string CsvImport_CreatedAccount {
+            get {
+                return ResourceManager.GetString("CsvImport_CreatedAccount", resourceCulture);
+            }
+        }
+
+        public static string CsvImport_FailedToCreateAccount {
+            get {
+                return ResourceManager.GetString("CsvImport_FailedToCreateAccount", resourceCulture);
+            }
+        }
+
+        public static string CsvImport_CreatingCategories {
+            get {
+                return ResourceManager.GetString("CsvImport_CreatingCategories", resourceCulture);
+            }
+        }
+
+        public static string CsvImport_CreatedCategory {
+            get {
+                return ResourceManager.GetString("CsvImport_CreatedCategory", resourceCulture);
+            }
+        }
+
+        public static string CsvImport_FailedToCreateCategory {
+            get {
+                return ResourceManager.GetString("CsvImport_FailedToCreateCategory", resourceCulture);
+            }
+        }
+
+        public static string CsvImport_ImportingTransaction {
+            get {
+                return ResourceManager.GetString("CsvImport_ImportingTransaction", resourceCulture);
+            }
+        }
+
+        public static string CsvImport_AccountNotFound {
+            get {
+                return ResourceManager.GetString("CsvImport_AccountNotFound", resourceCulture);
+            }
+        }
+
+        public static string CsvImport_ToAccountNotFound {
+            get {
+                return ResourceManager.GetString("CsvImport_ToAccountNotFound", resourceCulture);
+            }
+        }
+
+        public static string CsvImport_CategoryNotFound {
+            get {
+                return ResourceManager.GetString("CsvImport_CategoryNotFound", resourceCulture);
+            }
+        }
+
+        public static string CsvImport_LineError {
+            get {
+                return ResourceManager.GetString("CsvImport_LineError", resourceCulture);
+            }
+        }
+
+        public static string CsvImport_UnableToDetermineType {
+            get {
+                return ResourceManager.GetString("CsvImport_UnableToDetermineType", resourceCulture);
+            }
+        }
+
+        public static string CsvImport_SetInitialValue {
+            get {
+                return ResourceManager.GetString("CsvImport_SetInitialValue", resourceCulture);
+            }
+        }
+
         public static string CloseButton {
             get {
                 return ResourceManager.GetString("CloseButton", resourceCulture);

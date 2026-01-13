@@ -29,7 +29,7 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
     private readonly IModalFactory _modalFactory;
     private readonly IAvgPriceQueries _avgPriceQueries;
     private readonly IAvgPriceRepository _avgPriceRepository;
-    private readonly ConfigurationManager? _configurationManager;
+    private readonly IConfigurationManager? _configurationManager;
 
     [ObservableProperty] private string? _id;
     [ObservableProperty] private string _name;
@@ -108,7 +108,7 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
     public ManageAvgPriceProfilesViewModel(IModalFactory modalFactory,
         IAvgPriceQueries avgPriceQueries,
         IAvgPriceRepository avgPriceRepository,
-        ConfigurationManager configurationManager)
+        IConfigurationManager configurationManager)
     {
         _modalFactory = modalFactory;
         _avgPriceQueries = avgPriceQueries;

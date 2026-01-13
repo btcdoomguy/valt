@@ -102,6 +102,7 @@ public partial class ImportWizardViewModel : ValtModalViewModel
     private CsvImportResult? _parseResult;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SummaryTransactionCount))]
     private int _validRowCount;
 
     [ObservableProperty]
@@ -372,6 +373,10 @@ public partial class ImportWizardViewModel : ValtModalViewModel
 
         NewCategoryCount = CategoryMappings.Count(m => m.IsNew);
         ExistingCategoryCount = CategoryMappings.Count(m => !m.IsNew);
+
+        // Notify summary properties that depend on collection counts
+        OnPropertyChanged(nameof(SummaryAccountCount));
+        OnPropertyChanged(nameof(SummaryCategoryCount));
     }
 
     /// <summary>
@@ -432,11 +437,33 @@ public partial class ImportWizardViewModel : ValtModalViewModel
                     m.IsNew))
                 .ToList();
 
-            var result = await _csvImportExecutor!.ExecuteAsync(
-                ParseResult!.Rows,
-                accountMappings,
-                categoryMappings,
-                progress);
+            // Capture parsed rows to avoid closure over ParseResult
+            var rows = ParseResult!.Rows;
+
+            // Create localized messages for the executor
+            var messages = new CsvImportMessages(
+                CreatingAccounts: language.CsvImport_CreatingAccounts,
+                CreatedAccount: language.CsvImport_CreatedAccount,
+                FailedToCreateAccount: language.CsvImport_FailedToCreateAccount,
+                CreatingCategories: language.CsvImport_CreatingCategories,
+                CreatedCategory: language.CsvImport_CreatedCategory,
+                FailedToCreateCategory: language.CsvImport_FailedToCreateCategory,
+                ImportingTransaction: language.CsvImport_ImportingTransaction,
+                AccountNotFound: language.CsvImport_AccountNotFound,
+                ToAccountNotFound: language.CsvImport_ToAccountNotFound,
+                CategoryNotFound: language.CsvImport_CategoryNotFound,
+                LineError: language.CsvImport_LineError,
+                UnableToDetermineType: language.CsvImport_UnableToDetermineType,
+                SetInitialValue: language.CsvImport_SetInitialValue);
+
+            // Run import on background thread to keep UI responsive
+            var result = await Task.Run(async () =>
+                await _csvImportExecutor!.ExecuteAsync(
+                    rows,
+                    accountMappings,
+                    categoryMappings,
+                    messages,
+                    progress));
 
             if (result.Success)
             {

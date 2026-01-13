@@ -65,7 +65,7 @@ public class CsvImportExecutorTests
             .Do(x => savedAccount = x.Arg<FiatAccount>());
 
         // Act
-        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings);
+        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings, CreateTestMessages());
 
         // Assert
         Assert.That(result.AccountsCreated, Is.EqualTo(1));
@@ -79,7 +79,7 @@ public class CsvImportExecutorTests
     public async Task Should_Create_New_Btc_Account_When_IsNew()
     {
         // Arrange
-        var row = CreateCsvRow("Wallet [btc]", null, 100000m, "Mining Reward", "Income");
+        var row = CreateCsvRow("Wallet [btc]", null, 0.001m, "Mining Reward", "Income"); // 0.001 BTC = 100k sats
         var accountMappings = new List<CsvAccountMapping>
         {
             new("Wallet [btc]", null, IsNew: true, IsBtcAccount: true, Currency: null)
@@ -95,7 +95,7 @@ public class CsvImportExecutorTests
             .Do(x => savedAccount = x.Arg<BtcAccount>());
 
         // Act
-        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings);
+        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings, CreateTestMessages());
 
         // Assert
         Assert.That(result.AccountsCreated, Is.EqualTo(1));
@@ -125,7 +125,7 @@ public class CsvImportExecutorTests
             .Do(x => savedTransaction = x.Arg<Transaction>());
 
         // Act
-        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings);
+        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings, CreateTestMessages());
 
         // Assert
         Assert.That(result.AccountsCreated, Is.EqualTo(0));
@@ -161,7 +161,7 @@ public class CsvImportExecutorTests
             .Do(x => savedCategory = x.Arg<Category>());
 
         // Act
-        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings);
+        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings, CreateTestMessages());
 
         // Assert
         Assert.That(result.CategoriesCreated, Is.EqualTo(1));
@@ -196,7 +196,7 @@ public class CsvImportExecutorTests
             .Do(x => savedTransaction = x.Arg<Transaction>());
 
         // Act
-        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings);
+        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings, CreateTestMessages());
 
         // Assert
         Assert.That(result.Success, Is.True);
@@ -230,7 +230,7 @@ public class CsvImportExecutorTests
             .Do(x => savedTransaction = x.Arg<Transaction>());
 
         // Act
-        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings);
+        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings, CreateTestMessages());
 
         // Assert
         Assert.That(savedTransaction, Is.Not.Null);
@@ -246,7 +246,7 @@ public class CsvImportExecutorTests
         // Arrange
         var existingAccountId = IdGenerator.Generate();
         var existingCategoryId = IdGenerator.Generate();
-        var row = CreateCsvRow("Wallet [btc]", null, 100000m, "Mining reward", "Income");
+        var row = CreateCsvRow("Wallet [btc]", null, 0.001m, "Mining reward", "Income"); // 0.001 BTC = 100k sats
         var accountMappings = new List<CsvAccountMapping>
         {
             new("Wallet [btc]", existingAccountId, IsNew: false, IsBtcAccount: true, Currency: null)
@@ -262,14 +262,14 @@ public class CsvImportExecutorTests
             .Do(x => savedTransaction = x.Arg<Transaction>());
 
         // Act
-        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings);
+        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings, CreateTestMessages());
 
         // Assert
         Assert.That(savedTransaction, Is.Not.Null);
         var details = savedTransaction!.TransactionDetails as BitcoinDetails;
         Assert.That(details, Is.Not.Null);
         Assert.That(details!.Credit, Is.True);
-        Assert.That(details.Amount.Sats, Is.EqualTo(100000));
+        Assert.That(details.Amount.Sats, Is.EqualTo(100_000)); // 0.001 BTC = 100k sats
     }
 
     [Test]
@@ -296,7 +296,7 @@ public class CsvImportExecutorTests
             .Do(x => savedTransaction = x.Arg<Transaction>());
 
         // Act
-        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings);
+        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings, CreateTestMessages());
 
         // Assert
         Assert.That(savedTransaction, Is.Not.Null);
@@ -314,7 +314,7 @@ public class CsvImportExecutorTests
         var checkingAccountId = IdGenerator.Generate();
         var walletAccountId = IdGenerator.Generate();
         var existingCategoryId = IdGenerator.Generate();
-        var row = CreateCsvRow("Checking [USD]", "Wallet [btc]", -1000m, "Buy Bitcoin", "Investment", 0.01m * 100_000_000m); // 0.01 BTC in sats
+        var row = CreateCsvRow("Checking [USD]", "Wallet [btc]", -1000m, "Buy Bitcoin", "Investment", 0.01m); // 0.01 BTC
         var accountMappings = new List<CsvAccountMapping>
         {
             new("Checking [USD]", checkingAccountId, IsNew: false, IsBtcAccount: false, Currency: "USD"),
@@ -331,7 +331,7 @@ public class CsvImportExecutorTests
             .Do(x => savedTransaction = x.Arg<Transaction>());
 
         // Act
-        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings);
+        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings, CreateTestMessages());
 
         // Assert
         Assert.That(savedTransaction, Is.Not.Null);
@@ -340,7 +340,7 @@ public class CsvImportExecutorTests
         Assert.That(details!.FromAccountId.Value, Is.EqualTo(checkingAccountId));
         Assert.That(details.ToAccountId.Value, Is.EqualTo(walletAccountId));
         Assert.That(details.FromAmount.Value, Is.EqualTo(1000m));
-        Assert.That(details.ToAmount.Sats, Is.EqualTo(1_000_000));
+        Assert.That(details.ToAmount.Sats, Is.EqualTo(1_000_000)); // 0.01 BTC = 1M sats
     }
 
     [Test]
@@ -350,7 +350,7 @@ public class CsvImportExecutorTests
         var walletAccountId = IdGenerator.Generate();
         var checkingAccountId = IdGenerator.Generate();
         var existingCategoryId = IdGenerator.Generate();
-        var row = CreateCsvRow("Wallet [btc]", "Checking [USD]", -1_000_000m, "Sell Bitcoin", "Investment", 1000m); // 0.01 BTC sold for $1000
+        var row = CreateCsvRow("Wallet [btc]", "Checking [USD]", -0.01m, "Sell Bitcoin", "Investment", 1000m); // 0.01 BTC sold for $1000
         var accountMappings = new List<CsvAccountMapping>
         {
             new("Wallet [btc]", walletAccountId, IsNew: false, IsBtcAccount: true, Currency: null),
@@ -367,7 +367,7 @@ public class CsvImportExecutorTests
             .Do(x => savedTransaction = x.Arg<Transaction>());
 
         // Act
-        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings);
+        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings, CreateTestMessages());
 
         // Assert
         Assert.That(savedTransaction, Is.Not.Null);
@@ -386,7 +386,7 @@ public class CsvImportExecutorTests
         var wallet1AccountId = IdGenerator.Generate();
         var wallet2AccountId = IdGenerator.Generate();
         var existingCategoryId = IdGenerator.Generate();
-        var row = CreateCsvRow("Wallet1 [btc]", "Wallet2 [btc]", -100_000m, "Move to cold storage", "Transfer");
+        var row = CreateCsvRow("Wallet1 [btc]", "Wallet2 [btc]", -0.001m, "Move to cold storage", "Transfer"); // 0.001 BTC = 100k sats
         var accountMappings = new List<CsvAccountMapping>
         {
             new("Wallet1 [btc]", wallet1AccountId, IsNew: false, IsBtcAccount: true, Currency: null),
@@ -403,7 +403,7 @@ public class CsvImportExecutorTests
             .Do(x => savedTransaction = x.Arg<Transaction>());
 
         // Act
-        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings);
+        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings, CreateTestMessages());
 
         // Assert
         Assert.That(savedTransaction, Is.Not.Null);
@@ -411,7 +411,7 @@ public class CsvImportExecutorTests
         Assert.That(details, Is.Not.Null);
         Assert.That(details!.FromAccountId.Value, Is.EqualTo(wallet1AccountId));
         Assert.That(details.ToAccountId.Value, Is.EqualTo(wallet2AccountId));
-        Assert.That(details.Amount.Sats, Is.EqualTo(100_000));
+        Assert.That(details.Amount.Sats, Is.EqualTo(100_000)); // 0.001 BTC = 100k sats
     }
 
     #endregion
@@ -443,7 +443,7 @@ public class CsvImportExecutorTests
         var progress = new Progress<CsvImportProgress>(p => progressReports.Add(p));
 
         // Act
-        var result = await _executor.ExecuteAsync(rows, accountMappings, categoryMappings, progress);
+        var result = await _executor.ExecuteAsync(rows, accountMappings, categoryMappings, CreateTestMessages(), progress);
 
         // Allow async progress reporting to complete
         await Task.Delay(50);
@@ -477,7 +477,7 @@ public class CsvImportExecutorTests
         };
 
         // Act
-        var result = await _executor.ExecuteAsync(rows, accountMappings, categoryMappings);
+        var result = await _executor.ExecuteAsync(rows, accountMappings, categoryMappings, CreateTestMessages());
 
         // Assert
         Assert.That(result.TransactionsCreated, Is.EqualTo(2)); // 2 valid, 1 skipped
@@ -508,7 +508,7 @@ public class CsvImportExecutorTests
         };
 
         // Act
-        var result = await _executor.ExecuteAsync(rows, accountMappings, categoryMappings);
+        var result = await _executor.ExecuteAsync(rows, accountMappings, categoryMappings, CreateTestMessages());
 
         // Assert
         Assert.That(result.TransactionsCreated, Is.EqualTo(1));
@@ -535,7 +535,7 @@ public class CsvImportExecutorTests
         };
 
         // Act
-        await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings);
+        await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings, CreateTestMessages());
 
         // Assert
         _configurationManager.Received(1).AddFiatCurrency("EUR");
@@ -558,7 +558,7 @@ public class CsvImportExecutorTests
         };
 
         // Act
-        await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings);
+        await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings, CreateTestMessages());
 
         // Assert
         _configurationManager.Received(1).AddFiatCurrency("BRL");
@@ -587,7 +587,7 @@ public class CsvImportExecutorTests
         };
 
         // Act
-        await _executor.ExecuteAsync(rows, accountMappings, categoryMappings);
+        await _executor.ExecuteAsync(rows, accountMappings, categoryMappings, CreateTestMessages());
 
         // Assert
         _configurationManager.Received(1).AddFiatCurrency("USD");
@@ -617,7 +617,7 @@ public class CsvImportExecutorTests
         };
 
         // Act
-        await _executor.ExecuteAsync(rows, accountMappings, categoryMappings);
+        await _executor.ExecuteAsync(rows, accountMappings, categoryMappings, CreateTestMessages());
 
         // Assert - Should only be called once for USD even though there are two USD accounts
         _configurationManager.Received(1).AddFiatCurrency("USD");
@@ -627,7 +627,7 @@ public class CsvImportExecutorTests
     public async Task Should_Not_Call_AddFiatCurrency_For_Btc_Accounts()
     {
         // Arrange
-        var row = CreateCsvRow("Wallet [btc]", null, 100000m, "Mining", "Income");
+        var row = CreateCsvRow("Wallet [btc]", null, 0.001m, "Mining", "Income"); // 0.001 BTC
         var accountMappings = new List<CsvAccountMapping>
         {
             new("Wallet [btc]", null, IsNew: true, IsBtcAccount: true, Currency: null)
@@ -638,7 +638,7 @@ public class CsvImportExecutorTests
         };
 
         // Act
-        await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings);
+        await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings, CreateTestMessages());
 
         // Assert
         _configurationManager.DidNotReceive().AddFiatCurrency(Arg.Any<string>());
@@ -654,7 +654,7 @@ public class CsvImportExecutorTests
         var rows = new[]
         {
             CreateCsvRow("Checking [GBP]", null, -100m, "Expense", "Food"),
-            CreateCsvRow("Wallet [btc]", null, 100000m, "Mining", "Income")
+            CreateCsvRow("Wallet [btc]", null, 0.001m, "Mining", "Income") // 0.001 BTC
         };
         var accountMappings = new List<CsvAccountMapping>
         {
@@ -668,11 +668,165 @@ public class CsvImportExecutorTests
         };
 
         // Act
-        await _executor.ExecuteAsync(rows, accountMappings, categoryMappings);
+        await _executor.ExecuteAsync(rows, accountMappings, categoryMappings, CreateTestMessages());
 
         // Assert - Only GBP should be added, not BTC
         _configurationManager.Received(1).AddFiatCurrency("GBP");
         _configurationManager.Received(1).AddFiatCurrency(Arg.Any<string>()); // Total calls should be 1
+    }
+
+    #endregion
+
+    #region InitialValue Tests
+
+    [Test]
+    public async Task Should_Set_Fiat_Account_InitialValue_When_Category_Is_InitialValue()
+    {
+        // Arrange
+        var existingAccountId = IdGenerator.Generate();
+        var row = CreateCsvRow("Checking [USD]", null, 1000m, "InitialValue", "InitialValue");
+        var accountMappings = new List<CsvAccountMapping>
+        {
+            new("Checking [USD]", existingAccountId, IsNew: false, IsBtcAccount: false, Currency: "USD")
+        };
+        var categoryMappings = new List<CsvCategoryMapping>(); // InitialValue doesn't need mapping
+
+        var fiatAccount = FiatAccount.Create(
+            new AccountId(existingAccountId),
+            AccountName.New("Checking"),
+            AccountCurrencyNickname.Empty,
+            visible: true,
+            Icon.Empty,
+            FiatCurrency.Usd,
+            FiatValue.Empty,
+            displayOrder: 0,
+            version: 0);
+
+        _accountRepository.GetAccountByIdAsync(Arg.Any<AccountId>()).Returns(fiatAccount);
+
+        // Act
+        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings, CreateTestMessages());
+
+        // Assert
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.TransactionsCreated, Is.EqualTo(0)); // InitialValue doesn't create a transaction
+        await _transactionRepository.DidNotReceive().SaveTransactionAsync(Arg.Any<Transaction>());
+        await _accountRepository.Received(1).SaveAccountAsync(Arg.Any<FiatAccount>());
+        Assert.That(fiatAccount.InitialAmount.Value, Is.EqualTo(1000m));
+    }
+
+    [Test]
+    public async Task Should_Set_Btc_Account_InitialValue_When_Category_Is_InitialValue()
+    {
+        // Arrange
+        var existingAccountId = IdGenerator.Generate();
+        var row = CreateCsvRow("Wallet [btc]", null, 0.001m, "InitialValue", "InitialValue"); // 0.001 BTC = 100k sats
+        var accountMappings = new List<CsvAccountMapping>
+        {
+            new("Wallet [btc]", existingAccountId, IsNew: false, IsBtcAccount: true, Currency: null)
+        };
+        var categoryMappings = new List<CsvCategoryMapping>(); // InitialValue doesn't need mapping
+
+        var btcAccount = BtcAccount.Create(
+            new AccountId(existingAccountId),
+            AccountName.New("Wallet"),
+            AccountCurrencyNickname.Empty,
+            visible: true,
+            Icon.Empty,
+            BtcValue.Empty,
+            displayOrder: 0,
+            version: 0);
+
+        _accountRepository.GetAccountByIdAsync(Arg.Any<AccountId>()).Returns(btcAccount);
+
+        // Act
+        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings, CreateTestMessages());
+
+        // Assert
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.TransactionsCreated, Is.EqualTo(0)); // InitialValue doesn't create a transaction
+        await _transactionRepository.DidNotReceive().SaveTransactionAsync(Arg.Any<Transaction>());
+        await _accountRepository.Received(1).SaveAccountAsync(Arg.Any<BtcAccount>());
+        Assert.That(btcAccount.InitialAmount.Sats, Is.EqualTo(100_000)); // 0.001 BTC = 100k sats
+    }
+
+    [Test]
+    public async Task Should_Handle_InitialValue_Case_Insensitively()
+    {
+        // Arrange
+        var existingAccountId = IdGenerator.Generate();
+        var row = CreateCsvRow("Checking [USD]", null, 500m, "INITIALVALUE", "initialvalue"); // Mixed case
+        var accountMappings = new List<CsvAccountMapping>
+        {
+            new("Checking [USD]", existingAccountId, IsNew: false, IsBtcAccount: false, Currency: "USD")
+        };
+        var categoryMappings = new List<CsvCategoryMapping>();
+
+        var fiatAccount = FiatAccount.Create(
+            new AccountId(existingAccountId),
+            AccountName.New("Checking"),
+            AccountCurrencyNickname.Empty,
+            visible: true,
+            Icon.Empty,
+            FiatCurrency.Usd,
+            FiatValue.Empty,
+            displayOrder: 0,
+            version: 0);
+
+        _accountRepository.GetAccountByIdAsync(Arg.Any<AccountId>()).Returns(fiatAccount);
+
+        // Act
+        var result = await _executor.ExecuteAsync(new[] { row }, accountMappings, categoryMappings, CreateTestMessages());
+
+        // Assert
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.TransactionsCreated, Is.EqualTo(0));
+        await _accountRepository.Received(1).SaveAccountAsync(Arg.Any<FiatAccount>());
+        Assert.That(fiatAccount.InitialAmount.Value, Is.EqualTo(500m));
+    }
+
+    [Test]
+    public async Task Should_Handle_Mixed_InitialValue_And_Regular_Transactions()
+    {
+        // Arrange
+        var checkingAccountId = IdGenerator.Generate();
+        var existingCategoryId = IdGenerator.Generate();
+        var rows = new[]
+        {
+            CreateCsvRow("Checking [USD]", null, 1000m, "InitialValue", "InitialValue", lineNumber: 2),
+            CreateCsvRow("Checking [USD]", null, -50m, "Grocery", "Food", lineNumber: 3)
+        };
+        var accountMappings = new List<CsvAccountMapping>
+        {
+            new("Checking [USD]", checkingAccountId, IsNew: false, IsBtcAccount: false, Currency: "USD")
+        };
+        var categoryMappings = new List<CsvCategoryMapping>
+        {
+            new("Food", existingCategoryId, IsNew: false)
+        };
+
+        var fiatAccount = FiatAccount.Create(
+            new AccountId(checkingAccountId),
+            AccountName.New("Checking"),
+            AccountCurrencyNickname.Empty,
+            visible: true,
+            Icon.Empty,
+            FiatCurrency.Usd,
+            FiatValue.Empty,
+            displayOrder: 0,
+            version: 0);
+
+        _accountRepository.GetAccountByIdAsync(Arg.Any<AccountId>()).Returns(fiatAccount);
+
+        // Act
+        var result = await _executor.ExecuteAsync(rows, accountMappings, categoryMappings, CreateTestMessages());
+
+        // Assert
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.TransactionsCreated, Is.EqualTo(1)); // Only one regular transaction
+        await _transactionRepository.Received(1).SaveTransactionAsync(Arg.Any<Transaction>());
+        await _accountRepository.Received(1).SaveAccountAsync(Arg.Any<FiatAccount>());
+        Assert.That(fiatAccount.InitialAmount.Value, Is.EqualTo(1000m));
     }
 
     #endregion
@@ -697,6 +851,24 @@ public class CsvImportExecutorTests
             toAmount,
             categoryName,
             lineNumber);
+    }
+
+    private static CsvImportMessages CreateTestMessages()
+    {
+        return new CsvImportMessages(
+            CreatingAccounts: "Creating accounts...",
+            CreatedAccount: "Created account: {0}",
+            FailedToCreateAccount: "Failed to create account '{0}': {1}",
+            CreatingCategories: "Creating categories...",
+            CreatedCategory: "Created category: {0}",
+            FailedToCreateCategory: "Failed to create category '{0}': {1}",
+            ImportingTransaction: "Importing transaction {0} of {1}...",
+            AccountNotFound: "Line {0}: Account '{1}' not found in mappings",
+            ToAccountNotFound: "Line {0}: To-account '{1}' not found in mappings",
+            CategoryNotFound: "Line {0}: Category '{1}' not found in mappings",
+            LineError: "Line {0}: {1}",
+            UnableToDetermineType: "Unable to determine transaction type for row at line {0}",
+            SetInitialValue: "Set initial value for account: {0}");
     }
 
     #endregion

@@ -1300,7 +1300,46 @@
         <value>Import complete!</value>
     </data>
     <data name="ImportWizard_ProgressTransactions" xml:space="preserve">
-        <value>transactions</value>
+        <value>items</value>
+    </data>
+    <data name="CsvImport_CreatingAccounts" xml:space="preserve">
+        <value>Creating accounts...</value>
+    </data>
+    <data name="CsvImport_CreatedAccount" xml:space="preserve">
+        <value>Created account: {0}</value>
+    </data>
+    <data name="CsvImport_FailedToCreateAccount" xml:space="preserve">
+        <value>Failed to create account '{0}': {1}</value>
+    </data>
+    <data name="CsvImport_CreatingCategories" xml:space="preserve">
+        <value>Creating categories...</value>
+    </data>
+    <data name="CsvImport_CreatedCategory" xml:space="preserve">
+        <value>Created category: {0}</value>
+    </data>
+    <data name="CsvImport_FailedToCreateCategory" xml:space="preserve">
+        <value>Failed to create category '{0}': {1}</value>
+    </data>
+    <data name="CsvImport_ImportingTransaction" xml:space="preserve">
+        <value>Importing transaction {0} of {1}...</value>
+    </data>
+    <data name="CsvImport_AccountNotFound" xml:space="preserve">
+        <value>Line {0}: Account '{1}' not found in mappings</value>
+    </data>
+    <data name="CsvImport_ToAccountNotFound" xml:space="preserve">
+        <value>Line {0}: To-account '{1}' not found in mappings</value>
+    </data>
+    <data name="CsvImport_CategoryNotFound" xml:space="preserve">
+        <value>Line {0}: Category '{1}' not found in mappings</value>
+    </data>
+    <data name="CsvImport_LineError" xml:space="preserve">
+        <value>Line {0}: {1}</value>
+    </data>
+    <data name="CsvImport_UnableToDetermineType" xml:space="preserve">
+        <value>Unable to determine transaction type for row at line {0}</value>
+    </data>
+    <data name="CsvImport_SetInitialValue" xml:space="preserve">
+        <value>Set initial value for account: {0}</value>
     </data>
     <data name="CloseButton" xml:space="preserve">
         <value>Close</value>

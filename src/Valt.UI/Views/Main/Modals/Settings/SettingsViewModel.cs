@@ -30,7 +30,7 @@ public partial class SettingsViewModel : ValtModalViewModel
     private readonly ITransactionTermService _transactionTermService;
     private readonly IModalFactory _modalFactory;
     private readonly ILocalStorageService _localStorageService;
-    private readonly ConfigurationManager? _configurationManager;
+    private readonly IConfigurationManager? _configurationManager;
 
     [ObservableProperty] private string _mainFiatCurrency;
     [ObservableProperty] private bool _showHiddenAccounts;
@@ -101,7 +101,7 @@ public partial class SettingsViewModel : ValtModalViewModel
         ITransactionTermService transactionTermService,
         IModalFactory modalFactory,
         ILocalStorageService localStorageService,
-        ConfigurationManager configurationManager)
+        IConfigurationManager configurationManager)
     {
         _currencySettings = currencySettings;
         _displaySettings = displaySettings;

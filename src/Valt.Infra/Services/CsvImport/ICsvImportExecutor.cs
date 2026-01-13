@@ -12,6 +12,7 @@ public interface ICsvImportExecutor
     /// <param name="rows">Parsed CSV rows to import</param>
     /// <param name="accountMappings">Account mapping configuration (new vs existing accounts)</param>
     /// <param name="categoryMappings">Category mapping configuration (new vs existing categories)</param>
+    /// <param name="messages">Localized messages for progress and error reporting</param>
     /// <param name="progress">Optional progress reporter for UI updates</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Result containing counts of created entities and any errors</returns>
@@ -19,6 +20,7 @@ public interface ICsvImportExecutor
         IReadOnlyList<CsvImportRow> rows,
         IReadOnlyList<CsvAccountMapping> accountMappings,
         IReadOnlyList<CsvCategoryMapping> categoryMappings,
+        CsvImportMessages messages,
         IProgress<CsvImportProgress>? progress = null,
         CancellationToken cancellationToken = default);
 }

@@ -34,11 +34,14 @@ public class AccountQueries : IAccountQueries
         return Task.FromResult(accounts.Select(account =>
         {
             var icon = account.Icon != null ? Icon.RestoreFromId(account.Icon) : Icon.Empty;
-            
+            var isBtc = account.AccountEntityType == AccountEntityType.Bitcoin;
+
             return new AccountDTO(account.Id.ToString(),
                 account.AccountEntityType.ToString(),
                 account.Name, account.Visible, account.Icon, icon.Unicode, icon.Color, account.Currency,
-                account.AccountEntityType == AccountEntityType.Bitcoin);
+                isBtc,
+                InitialAmountFiat: isBtc ? null : account.InitialAmount,
+                InitialAmountSats: isBtc ? Convert.ToInt64(account.InitialAmount) : null);
         }));
     }
 

@@ -7,6 +7,7 @@ using Valt.Core.Modules.Budget.Transactions;
 using Valt.Core.Modules.Budget.Transactions.Contracts;
 using Valt.Core.Modules.Budget.Transactions.Details;
 using Valt.Infra.Modules.Configuration;
+using Valt.Infra.Services.CsvExport;
 
 namespace Valt.Infra.Services.CsvImport;
 
@@ -32,10 +33,17 @@ public class CsvImportExecutor : ICsvImportExecutor
         _configurationManager = configurationManager;
     }
 
+    /// <summary>
+    /// Checks if a category name is the reserved InitialValue category.
+    /// </summary>
+    private static bool IsInitialValueCategory(string categoryName)
+        => string.Equals(categoryName, CsvExportService.InitialValueCategory, StringComparison.OrdinalIgnoreCase);
+
     public async Task<CsvImportExecutionResult> ExecuteAsync(
         IReadOnlyList<CsvImportRow> rows,
         IReadOnlyList<CsvAccountMapping> accountMappings,
         IReadOnlyList<CsvCategoryMapping> categoryMappings,
+        CsvImportMessages messages,
         IProgress<CsvImportProgress>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -53,7 +61,7 @@ public class CsvImportExecutor : ICsvImportExecutor
         var currentStep = 0;
 
         // Phase 1: Create new accounts
-        progress?.Report(new CsvImportProgress(currentStep, totalSteps, "Creating accounts..."));
+        progress?.Report(new CsvImportProgress(currentStep, totalSteps, messages.CreatingAccounts));
 
         foreach (var mapping in accountMappings)
         {
@@ -95,7 +103,7 @@ public class CsvImportExecutor : ICsvImportExecutor
                     accountTypeLookup[mapping.CsvAccountName] = mapping.IsBtcAccount;
                     accountsCreated++;
                     currentStep++;
-                    progress?.Report(new CsvImportProgress(currentStep, totalSteps, $"Created account: {cleanName}"));
+                    progress?.Report(new CsvImportProgress(currentStep, totalSteps, string.Format(messages.CreatedAccount, cleanName)));
                 }
                 else
                 {
@@ -109,7 +117,7 @@ public class CsvImportExecutor : ICsvImportExecutor
             }
             catch (Exception ex)
             {
-                errors.Add($"Failed to create account '{mapping.CsvAccountName}': {ex.Message}");
+                errors.Add(string.Format(messages.FailedToCreateAccount, mapping.CsvAccountName, ex.Message));
             }
         }
 
@@ -125,7 +133,7 @@ public class CsvImportExecutor : ICsvImportExecutor
         }
 
         // Phase 2: Create new categories
-        progress?.Report(new CsvImportProgress(currentStep, totalSteps, "Creating categories..."));
+        progress?.Report(new CsvImportProgress(currentStep, totalSteps, messages.CreatingCategories));
 
         foreach (var mapping in categoryMappings)
         {
@@ -143,7 +151,7 @@ public class CsvImportExecutor : ICsvImportExecutor
                     categoryIdLookup[mapping.CsvCategoryName] = category.Id;
                     categoriesCreated++;
                     currentStep++;
-                    progress?.Report(new CsvImportProgress(currentStep, totalSteps, $"Created category: {mapping.CsvCategoryName}"));
+                    progress?.Report(new CsvImportProgress(currentStep, totalSteps, string.Format(messages.CreatedCategory, mapping.CsvCategoryName)));
                 }
                 else
                 {
@@ -156,28 +164,38 @@ public class CsvImportExecutor : ICsvImportExecutor
             }
             catch (Exception ex)
             {
-                errors.Add($"Failed to create category '{mapping.CsvCategoryName}': {ex.Message}");
+                errors.Add(string.Format(messages.FailedToCreateCategory, mapping.CsvCategoryName, ex.Message));
             }
         }
 
-        // Phase 3: Create transactions
+        // Phase 3: Create transactions (or set initial values for InitialValue rows)
         for (var i = 0; i < rows.Count; i++)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var row = rows[i];
             currentStep++;
-            progress?.Report(new CsvImportProgress(currentStep, totalSteps, $"Importing transaction {i + 1} of {rows.Count}..."));
+            progress?.Report(new CsvImportProgress(currentStep, totalSteps, string.Format(messages.ImportingTransaction, i + 1, rows.Count)));
 
             try
             {
                 // Look up account IDs
                 if (!accountIdLookup.TryGetValue(row.AccountName, out var fromAccountId))
                 {
-                    errors.Add($"Line {row.LineNumber}: Account '{row.AccountName}' not found in mappings");
+                    errors.Add(string.Format(messages.AccountNotFound, row.LineNumber, row.AccountName));
                     continue;
                 }
 
                 var fromIsBtc = accountTypeLookup[row.AccountName];
+
+                // Check if this is an InitialValue row - handle specially
+                if (IsInitialValueCategory(row.CategoryName))
+                {
+                    await SetAccountInitialValueAsync(fromAccountId, fromIsBtc, row.Amount);
+                    var cleanName = ExtractCleanName(row.AccountName);
+                    progress?.Report(new CsvImportProgress(currentStep, totalSteps, string.Format(messages.SetInitialValue, cleanName)));
+                    // Note: We don't increment transactionsCreated since this isn't a transaction
+                    continue;
+                }
 
                 AccountId? toAccountId = null;
                 bool? toIsBtc = null;
@@ -185,7 +203,7 @@ public class CsvImportExecutor : ICsvImportExecutor
                 {
                     if (!accountIdLookup.TryGetValue(row.ToAccountName, out var toId))
                     {
-                        errors.Add($"Line {row.LineNumber}: To-account '{row.ToAccountName}' not found in mappings");
+                        errors.Add(string.Format(messages.ToAccountNotFound, row.LineNumber, row.ToAccountName));
                         continue;
                     }
                     toAccountId = toId;
@@ -195,12 +213,12 @@ public class CsvImportExecutor : ICsvImportExecutor
                 // Look up category ID
                 if (!categoryIdLookup.TryGetValue(row.CategoryName, out var categoryId))
                 {
-                    errors.Add($"Line {row.LineNumber}: Category '{row.CategoryName}' not found in mappings");
+                    errors.Add(string.Format(messages.CategoryNotFound, row.LineNumber, row.CategoryName));
                     continue;
                 }
 
                 // Create transaction details based on account types
-                var details = CreateTransactionDetails(row, fromAccountId, fromIsBtc, toAccountId, toIsBtc);
+                var details = CreateTransactionDetails(row, fromAccountId, fromIsBtc, toAccountId, toIsBtc, messages);
 
                 // Create the transaction
                 var transaction = Transaction.New(
@@ -216,7 +234,7 @@ public class CsvImportExecutor : ICsvImportExecutor
             }
             catch (Exception ex)
             {
-                errors.Add($"Line {row.LineNumber}: {ex.Message}");
+                errors.Add(string.Format(messages.LineError, row.LineNumber, ex.Message));
             }
         }
 
@@ -239,7 +257,8 @@ public class CsvImportExecutor : ICsvImportExecutor
         AccountId fromAccountId,
         bool fromIsBtc,
         AccountId? toAccountId,
-        bool? toIsBtc)
+        bool? toIsBtc,
+        CsvImportMessages messages)
     {
         var amount = row.Amount;
         var toAmount = row.ToAmount;
@@ -252,7 +271,7 @@ public class CsvImportExecutor : ICsvImportExecutor
                 // Bitcoin credit/debit
                 return new BitcoinDetails(
                     fromAccountId,
-                    BtcValue.ParseSats(Math.Abs(amount)),
+                    BtcValue.ParseBitcoin(Math.Abs(amount)),
                     credit: amount > 0);
             }
             else
@@ -272,7 +291,7 @@ public class CsvImportExecutor : ICsvImportExecutor
             return new BitcoinToBitcoinDetails(
                 fromAccountId,
                 toAccountId,
-                BtcValue.ParseSats(Math.Abs(amount)));
+                BtcValue.ParseBitcoin(Math.Abs(amount)));
         }
 
         if (!fromIsBtc && toIsBtc == false)
@@ -292,7 +311,7 @@ public class CsvImportExecutor : ICsvImportExecutor
                 fromAccountId,
                 toAccountId,
                 FiatValue.New(Math.Abs(amount)),
-                BtcValue.ParseSats(Math.Abs(toAmount ?? 0)));
+                BtcValue.ParseBitcoin(Math.Abs(toAmount ?? 0)));
         }
 
         if (fromIsBtc && toIsBtc == false)
@@ -301,11 +320,11 @@ public class CsvImportExecutor : ICsvImportExecutor
             return new BitcoinToFiatDetails(
                 fromAccountId,
                 toAccountId,
-                BtcValue.ParseSats(Math.Abs(amount)),
+                BtcValue.ParseBitcoin(Math.Abs(amount)),
                 FiatValue.New(Math.Abs(toAmount ?? 0)));
         }
 
-        throw new InvalidOperationException($"Unable to determine transaction type for row at line {row.LineNumber}");
+        throw new InvalidOperationException(string.Format(messages.UnableToDetermineType, row.LineNumber));
     }
 
     /// <summary>
@@ -319,5 +338,26 @@ public class CsvImportExecutor : ICsvImportExecutor
             return csvAccountName[..bracketStart].Trim();
         }
         return csvAccountName.Trim();
+    }
+
+    /// <summary>
+    /// Sets the initial value for an account. Used when importing InitialValue rows.
+    /// </summary>
+    private async Task SetAccountInitialValueAsync(AccountId accountId, bool isBtcAccount, decimal amount)
+    {
+        var account = await _accountRepository.GetAccountByIdAsync(accountId);
+        if (account is null)
+            return;
+
+        if (isBtcAccount && account is BtcAccount btcAccount)
+        {
+            btcAccount.ChangeInitialAmount(BtcValue.ParseBitcoin(amount));
+            await _accountRepository.SaveAccountAsync(btcAccount);
+        }
+        else if (!isBtcAccount && account is FiatAccount fiatAccount)
+        {
+            fiatAccount.ChangeInitialAmount(FiatValue.New(amount));
+            await _accountRepository.SaveAccountAsync(fiatAccount);
+        }
     }
 }

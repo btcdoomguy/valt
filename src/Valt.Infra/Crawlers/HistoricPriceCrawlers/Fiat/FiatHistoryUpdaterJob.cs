@@ -15,7 +15,7 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
 
     private readonly IPriceDatabase _priceDatabase;
     private readonly ILocalDatabase _localDatabase;
-    private readonly ConfigurationManager _configurationManager;
+    private readonly IConfigurationManager _configurationManager;
     private readonly ILogger<FiatHistoryUpdaterJob> _logger;
 
     private readonly IFiatHistoricalDataProvider? _initialSeedProvider;
@@ -31,7 +31,7 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
         IPriceDatabase priceDatabase,
         ILocalDatabase localDatabase,
         IEnumerable<IFiatHistoricalDataProvider> providers,
-        ConfigurationManager configurationManager,
+        IConfigurationManager configurationManager,
         ILogger<FiatHistoryUpdaterJob> logger)
     {
         _priceDatabase = priceDatabase;

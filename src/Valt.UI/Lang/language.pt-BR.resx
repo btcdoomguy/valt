@@ -1280,7 +1280,46 @@
         <value>Importação concluída!</value>
     </data>
     <data name="ImportWizard_ProgressTransactions" xml:space="preserve">
-        <value>transações</value>
+        <value>itens</value>
+    </data>
+    <data name="CsvImport_CreatingAccounts" xml:space="preserve">
+        <value>Criando contas...</value>
+    </data>
+    <data name="CsvImport_CreatedAccount" xml:space="preserve">
+        <value>Conta criada: {0}</value>
+    </data>
+    <data name="CsvImport_FailedToCreateAccount" xml:space="preserve">
+        <value>Falha ao criar conta '{0}': {1}</value>
+    </data>
+    <data name="CsvImport_CreatingCategories" xml:space="preserve">
+        <value>Criando categorias...</value>
+    </data>
+    <data name="CsvImport_CreatedCategory" xml:space="preserve">
+        <value>Categoria criada: {0}</value>
+    </data>
+    <data name="CsvImport_FailedToCreateCategory" xml:space="preserve">
+        <value>Falha ao criar categoria '{0}': {1}</value>
+    </data>
+    <data name="CsvImport_ImportingTransaction" xml:space="preserve">
+        <value>Importando transação {0} de {1}...</value>
+    </data>
+    <data name="CsvImport_AccountNotFound" xml:space="preserve">
+        <value>Linha {0}: Conta '{1}' não encontrada nos mapeamentos</value>
+    </data>
+    <data name="CsvImport_ToAccountNotFound" xml:space="preserve">
+        <value>Linha {0}: Conta destino '{1}' não encontrada nos mapeamentos</value>
+    </data>
+    <data name="CsvImport_CategoryNotFound" xml:space="preserve">
+        <value>Linha {0}: Categoria '{1}' não encontrada nos mapeamentos</value>
+    </data>
+    <data name="CsvImport_LineError" xml:space="preserve">
+        <value>Linha {0}: {1}</value>
+    </data>
+    <data name="CsvImport_UnableToDetermineType" xml:space="preserve">
+        <value>Não foi possível determinar o tipo de transação para a linha {0}</value>
+    </data>
+    <data name="CsvImport_SetInitialValue" xml:space="preserve">
+        <value>Valor inicial definido para a conta: {0}</value>
     </data>
     <data name="CloseButton" xml:space="preserve">
         <value>Fechar</value>

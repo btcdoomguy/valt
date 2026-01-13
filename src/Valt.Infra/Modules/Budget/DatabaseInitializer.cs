@@ -16,13 +16,13 @@ internal class DatabaseInitializer : IDatabaseInitializer
     private readonly ICategoryRepository _categoryRepository;
     private readonly MigrationManager _migrationManager;
     private readonly IInitialCategoryNameLanguageProvider _initialCategoryNameLanguageProvider;
-    private readonly ConfigurationManager _configurationManager;
+    private readonly IConfigurationManager _configurationManager;
 
     public DatabaseInitializer(IAccountRepository accountRepository,
         ICategoryRepository categoryRepository,
         MigrationManager migrationManager,
         IInitialCategoryNameLanguageProvider initialCategoryNameLanguageProvider,
-        ConfigurationManager configurationManager)
+        IConfigurationManager configurationManager)
     {
         _accountRepository = accountRepository;
         _categoryRepository = categoryRepository;

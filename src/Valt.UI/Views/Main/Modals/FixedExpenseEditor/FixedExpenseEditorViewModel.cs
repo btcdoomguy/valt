@@ -35,7 +35,7 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
     private readonly ICategoryQueries _categoryQueries;
     private readonly DisplaySettings _displaySettings;
     private readonly ITransactionTermService _transactionTermService;
-    private readonly ConfigurationManager? _configurationManager;
+    private readonly IConfigurationManager? _configurationManager;
 
     public AvaloniaList<CategoryDTO> AvailableCategories { get; set; } = new();
     public AvaloniaList<AccountDTO> AvailableAccounts { get; set; } = new();
@@ -198,7 +198,7 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
         ICategoryQueries categoryQueries,
         DisplaySettings displaySettings,
         ITransactionTermService transactionTermService,
-        ConfigurationManager configurationManager)
+        IConfigurationManager configurationManager)
     {
         _fixedExpenseRepository = fixedExpenseRepository;
         _accountQueries = accountQueries;

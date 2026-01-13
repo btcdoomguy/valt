@@ -24,9 +24,9 @@ public interface IDatabaseVersionChecker
 
 internal class DatabaseVersionChecker : IDatabaseVersionChecker
 {
-    private readonly ConfigurationManager _configurationManager;
+    private readonly IConfigurationManager _configurationManager;
 
-    public DatabaseVersionChecker(ConfigurationManager configurationManager)
+    public DatabaseVersionChecker(IConfigurationManager configurationManager)
     {
         _configurationManager = configurationManager;
     }

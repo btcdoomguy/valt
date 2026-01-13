@@ -25,7 +25,7 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
     private readonly IAccountRepository? _accountRepository;
     private readonly ITransactionRepository? _transactionRepository;
     private readonly IModalFactory? _modalFactory;
-    private readonly ConfigurationManager? _configurationManager;
+    private readonly IConfigurationManager? _configurationManager;
 
     #region Form Data
 
@@ -94,7 +94,7 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
     public ManageAccountViewModel(IAccountRepository accountRepository,
         ITransactionRepository transactionRepository,
         IModalFactory modalFactory,
-        ConfigurationManager configurationManager)
+        IConfigurationManager configurationManager)
     {
         _accountRepository = accountRepository;
         _transactionRepository = transactionRepository;

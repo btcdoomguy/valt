@@ -2,6 +2,7 @@ using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Valt.Infra.Modules.Budget.Accounts.Queries;
+using Valt.Infra.Modules.Budget.Accounts.Queries.DTOs;
 using Valt.Infra.Modules.Budget.Categories.Queries;
 using Valt.Infra.Modules.Budget.Transactions.Queries;
 using Valt.Infra.Modules.Budget.Transactions.Queries.DTOs;
@@ -14,6 +15,12 @@ namespace Valt.Infra.Services.CsvExport;
 /// </summary>
 internal class CsvExportService : ICsvExportService
 {
+    /// <summary>
+    /// Reserved category name for initial account values.
+    /// When importing, rows with this category set the account's initial value instead of creating a transaction.
+    /// </summary>
+    public const string InitialValueCategory = "InitialValue";
+
     private readonly ITransactionQueries _transactionQueries;
     private readonly IAccountQueries _accountQueries;
     private readonly ICategoryQueries _categoryQueries;
@@ -40,6 +47,9 @@ internal class CsvExportService : ICsvExportService
         var accountDict = accounts.ToDictionary(a => a.Id);
         var categoryDict = categories.ToDictionary(c => c.Id);
 
+        // Determine the first transaction date for each account
+        var firstTransactionDateByAccount = GetFirstTransactionDateByAccount(transactionsResult.Items.ToList(), accountDict);
+
         // Configure CSV writer with same settings as import template
         var config = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
@@ -59,6 +69,16 @@ internal class CsvExportService : ICsvExportService
         csv.WriteField("category");
         csv.NextRecord();
 
+        // Write initial value rows for accounts with non-zero initial amounts
+        foreach (var account in accounts)
+        {
+            var initialValueRow = CreateInitialValueRow(account, firstTransactionDateByAccount);
+            if (initialValueRow != null)
+            {
+                WriteRow(csv, initialValueRow);
+            }
+        }
+
         // Write each transaction
         foreach (var transaction in transactionsResult.Items)
         {
@@ -69,9 +89,77 @@ internal class CsvExportService : ICsvExportService
         return stringWriter.ToString();
     }
 
+    private static Dictionary<string, DateOnly> GetFirstTransactionDateByAccount(
+        List<TransactionDTO> transactions,
+        Dictionary<string, AccountDTO> accountDict)
+    {
+        var result = new Dictionary<string, DateOnly>();
+
+        foreach (var transaction in transactions)
+        {
+            // Track the from account
+            if (!result.ContainsKey(transaction.FromAccountId) ||
+                transaction.Date < result[transaction.FromAccountId])
+            {
+                result[transaction.FromAccountId] = transaction.Date;
+            }
+
+            // Track the to account if present
+            if (transaction.ToAccountId != null)
+            {
+                if (!result.ContainsKey(transaction.ToAccountId) ||
+                    transaction.Date < result[transaction.ToAccountId])
+                {
+                    result[transaction.ToAccountId] = transaction.Date;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private static CsvExportRow? CreateInitialValueRow(
+        AccountDTO account,
+        Dictionary<string, DateOnly> firstTransactionDateByAccount)
+    {
+        // Check if account has a non-zero initial amount
+        bool hasInitialAmount;
+        string amountStr;
+
+        if (account.IsBtcAccount)
+        {
+            hasInitialAmount = account.InitialAmountSats.HasValue && account.InitialAmountSats.Value != 0;
+            if (!hasInitialAmount) return null;
+
+            var btcValue = account.InitialAmountSats!.Value / 100_000_000m;
+            amountStr = btcValue.ToString("F8", CultureInfo.InvariantCulture);
+        }
+        else
+        {
+            hasInitialAmount = account.InitialAmountFiat.HasValue && account.InitialAmountFiat.Value != 0;
+            if (!hasInitialAmount) return null;
+
+            amountStr = account.InitialAmountFiat!.Value.ToString("F2", CultureInfo.InvariantCulture);
+        }
+
+        // Determine the date - use first transaction date for this account, or today if no transactions
+        var date = firstTransactionDateByAccount.TryGetValue(account.Id, out var firstDate)
+            ? firstDate
+            : DateOnly.FromDateTime(DateTime.Today);
+
+        return new CsvExportRow(
+            Date: date.ToString("yyyy-MM-dd"),
+            Description: InitialValueCategory,
+            Amount: amountStr,
+            Account: FormatAccountName(account),
+            ToAccount: string.Empty,
+            ToAmount: string.Empty,
+            Category: InitialValueCategory);
+    }
+
     private static CsvExportRow MapTransactionToRow(
         TransactionDTO transaction,
-        Dictionary<string, Modules.Budget.Accounts.Queries.DTOs.AccountDTO> accountDict,
+        Dictionary<string, AccountDTO> accountDict,
         Dictionary<string, Modules.Budget.Categories.Queries.DTOs.CategoryDTO> categoryDict)
     {
         var fromAccount = accountDict.GetValueOrDefault(transaction.FromAccountId);
@@ -100,7 +188,7 @@ internal class CsvExportService : ICsvExportService
             Category: categoryName);
     }
 
-    private static string FormatAccountName(Modules.Budget.Accounts.Queries.DTOs.AccountDTO? account)
+    private static string FormatAccountName(AccountDTO? account)
     {
         if (account == null) return string.Empty;
 
@@ -111,8 +199,8 @@ internal class CsvExportService : ICsvExportService
 
     private static (string Amount, string ToAmount) FormatAmounts(
         TransactionDTO transaction,
-        Modules.Budget.Accounts.Queries.DTOs.AccountDTO? fromAccount,
-        Modules.Budget.Accounts.Queries.DTOs.AccountDTO? toAccount)
+        AccountDTO? fromAccount,
+        AccountDTO? toAccount)
     {
         var isFromBtc = fromAccount?.IsBtcAccount ?? false;
         var isToBtc = toAccount?.IsBtcAccount ?? false;

@@ -43,15 +43,24 @@
                     <!-- Step 1: File -->
                     <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" Spacing="4">
                         <Border Width="32" Height="32" CornerRadius="16"
-                                Background="{DynamicResource SystemAccentColorDark1Brush}"
                                 HorizontalAlignment="Center">
+                            <Border.Background>
+                                <Binding Path="CurrentStep"
+                                         Converter="{x:Static importWizard:StepBackgroundConverter.Instance}"
+                                         ConverterParameter="0" />
+                            </Border.Background>
                             <TextBlock Text="1" FontWeight="SemiBold" FontSize="14"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Foreground="White" />
                         </Border>
                         <TextBlock Text="{x:Static local:language.ImportWizard_Step1}" FontSize="11"
-                                   HorizontalAlignment="Center"
-                                   Foreground="{DynamicResource SystemAccentColorDark1Brush}" />
+                                   HorizontalAlignment="Center">
+                            <TextBlock.Foreground>
+                                <Binding Path="CurrentStep"
+                                         Converter="{x:Static importWizard:StepForegroundConverter.Instance}"
+                                         ConverterParameter="0" />
+                            </TextBlock.Foreground>
+                        </TextBlock>
                     </StackPanel>
 
                     <!-- Connector 1-2 -->

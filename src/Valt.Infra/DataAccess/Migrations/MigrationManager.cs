@@ -7,11 +7,11 @@ namespace Valt.Infra.DataAccess.Migrations;
 internal class MigrationManager
 {
     private readonly IEnumerable<IMigrationScript> _migrationScripts;
-    private readonly ConfigurationManager _configurationManager;
+    private readonly IConfigurationManager _configurationManager;
     private readonly IPriceDatabase _priceDatabase;
 
     public MigrationManager(IEnumerable<IMigrationScript> migrationScripts,
-        ConfigurationManager configurationManager,
+        IConfigurationManager configurationManager,
         IPriceDatabase priceDatabase)
     {
         _migrationScripts = migrationScripts;

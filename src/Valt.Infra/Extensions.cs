@@ -123,7 +123,7 @@ public static class Extensions
         services.AddSingleton<BackgroundJobCoordinator>();
 
         services.AddSingleton<IDatabaseInitializer, DatabaseInitializer>();
-        services.AddSingleton<ConfigurationManager>();
+        services.AddSingleton<IConfigurationManager, ConfigurationManager>();
         services.AddSingleton<MigrationManager>();
         services.AddSingleton<IDatabaseVersionChecker, DatabaseVersionChecker>();
 
