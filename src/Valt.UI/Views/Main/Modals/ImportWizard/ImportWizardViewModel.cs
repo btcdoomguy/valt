@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Valt.Infra.Kernel.BackgroundJobs;
 using Valt.Infra.Modules.Budget.Accounts.Queries;
 using Valt.Infra.Modules.Budget.Categories.Queries;
 using Valt.Infra.Services.CsvImport;
@@ -37,6 +38,8 @@ public partial class ImportWizardViewModel : ValtModalViewModel
     private readonly ICsvTemplateGenerator? _csvTemplateGenerator;
     private readonly IAccountQueries? _accountQueries;
     private readonly ICategoryQueries? _categoryQueries;
+    private readonly ICsvImportExecutor? _csvImportExecutor;
+    private readonly BackgroundJobManager? _backgroundJobManager;
 
     #region Step Navigation
 
@@ -190,12 +193,16 @@ public partial class ImportWizardViewModel : ValtModalViewModel
         ICsvImportParser csvImportParser,
         ICsvTemplateGenerator csvTemplateGenerator,
         IAccountQueries accountQueries,
-        ICategoryQueries categoryQueries)
+        ICategoryQueries categoryQueries,
+        ICsvImportExecutor csvImportExecutor,
+        BackgroundJobManager backgroundJobManager)
     {
         _csvImportParser = csvImportParser;
         _csvTemplateGenerator = csvTemplateGenerator;
         _accountQueries = accountQueries;
         _categoryQueries = categoryQueries;
+        _csvImportExecutor = csvImportExecutor;
+        _backgroundJobManager = backgroundJobManager;
     }
 
     #region Step 1 Commands
@@ -383,7 +390,7 @@ public partial class ImportWizardViewModel : ValtModalViewModel
     #region Step 5 - Import Process
 
     /// <summary>
-    /// Starts the import process (placeholder for Phase 3).
+    /// Starts the import process by executing the CSV import.
     /// </summary>
     private async Task StartImportAsync()
     {
@@ -393,13 +400,59 @@ public partial class ImportWizardViewModel : ValtModalViewModel
         ImportProgress = 0;
         ImportStatusMessage = language.ImportWizard_Importing;
 
-        // TODO: Actual import logic will be implemented in Phase 3
-        // For now, just show the progress step as a placeholder
+        // Stop background jobs during import
+        await _backgroundJobManager!.StopAll();
 
-        // Simulate progress for UI testing (to be removed in Phase 3)
-        await Task.Delay(100);
-        ImportProgress = 100;
-        ImportStatusMessage = language.ImportWizard_ImportComplete;
+        try
+        {
+            var progress = new Progress<CsvImportProgress>(p =>
+            {
+                ImportProgress = p.Percentage;
+                ImportedCount = p.CurrentRow;
+                ImportStatusMessage = p.CurrentAction;
+            });
+
+            // Convert UI mapping items to service mapping records
+            var accountMappings = AccountMappings
+                .Select(m => new CsvAccountMapping(
+                    m.CsvAccountName,
+                    m.ExistingAccount?.Id,
+                    m.IsNew,
+                    m.IsBtcAccount,
+                    m.Currency))
+                .ToList();
+
+            var categoryMappings = CategoryMappings
+                .Select(m => new CsvCategoryMapping(
+                    m.CsvCategoryName,
+                    m.ExistingCategory?.Id,
+                    m.IsNew))
+                .ToList();
+
+            var result = await _csvImportExecutor!.ExecuteAsync(
+                ParseResult!.Rows,
+                accountMappings,
+                categoryMappings,
+                progress);
+
+            if (result.Success)
+            {
+                ImportStatusMessage = language.ImportWizard_ImportComplete;
+                ImportProgress = 100;
+            }
+            else
+            {
+                ImportStatusMessage = $"Import completed with errors: {result.Errors.Count} issues";
+                // Could show errors in a list, but for MVP just show count
+            }
+        }
+        finally
+        {
+            // Restart background jobs (all job types)
+            _backgroundJobManager.StartAllJobs(BackgroundJobTypes.App);
+            _backgroundJobManager.StartAllJobs(BackgroundJobTypes.ValtDatabase);
+            _backgroundJobManager.StartAllJobs(BackgroundJobTypes.PriceDatabase);
+        }
     }
 
     /// <summary>
