@@ -1,0 +1,242 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:importWizard="clr-namespace:Valt.UI.Views.Main.Modals.ImportWizard"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Views.Main.Modals.ImportWizard.ImportWizardView"
+        x:DataType="importWizard:ImportWizardViewModel"
+        Title="Import Transactions"
+        WindowStartupLocation="CenterOwner"
+        Width="700"
+        Height="550"
+        MinWidth="700"
+        MinHeight="550"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <importWizard:ImportWizardViewModel />
+    </Design.DataContext>
+
+    <Window.Resources>
+        <!-- Step indicator circle styles -->
+        <SolidColorBrush x:Key="StepActiveBrush" Color="{DynamicResource SystemAccentColor}" />
+        <SolidColorBrush x:Key="StepInactiveBrush" Color="{DynamicResource SystemBaseMediumColor}" />
+        <SolidColorBrush x:Key="StepCompletedBrush" Color="{DynamicResource SystemAccentColor}" />
+    </Window.Resources>
+
+    <Border>
+        <Grid RowDefinitions="Auto,Auto,*,Auto">
+            <!-- Title Bar -->
+            <userControls:CustomTitleBar Grid.Row="0"
+                                         Title="Import Transactions"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+
+            <!-- Step Indicator -->
+            <Border Grid.Row="1" Padding="20,15" Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+                <Grid ColumnDefinitions="*,Auto,*,Auto,*,Auto,*,Auto,*">
+                    <!-- Step 1: File -->
+                    <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" Spacing="4">
+                        <Border Width="32" Height="32" CornerRadius="16"
+                                Background="{DynamicResource SystemAccentColorDark1Brush}"
+                                HorizontalAlignment="Center">
+                            <TextBlock Text="1" FontWeight="SemiBold" FontSize="14"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Foreground="White" />
+                        </Border>
+                        <TextBlock Text="File" FontSize="11" HorizontalAlignment="Center"
+                                   Foreground="{DynamicResource SystemAccentColorDark1Brush}" />
+                    </StackPanel>
+
+                    <!-- Connector 1-2 -->
+                    <Border Grid.Column="1" Width="40" Height="2" VerticalAlignment="Center" Margin="0,-16,0,0"
+                            Background="{DynamicResource SystemBaseMediumColor}">
+                        <Border.Opacity>
+                            <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepConnectorConverter.Instance}" ConverterParameter="1" />
+                        </Border.Opacity>
+                    </Border>
+
+                    <!-- Step 2: Accounts -->
+                    <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Center" Spacing="4">
+                        <Border Width="32" Height="32" CornerRadius="16"
+                                HorizontalAlignment="Center">
+                            <Border.Background>
+                                <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepBackgroundConverter.Instance}" ConverterParameter="1" />
+                            </Border.Background>
+                            <TextBlock Text="2" FontWeight="SemiBold" FontSize="14"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Foreground="White" />
+                        </Border>
+                        <TextBlock Text="Accounts" FontSize="11" HorizontalAlignment="Center">
+                            <TextBlock.Foreground>
+                                <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepForegroundConverter.Instance}" ConverterParameter="1" />
+                            </TextBlock.Foreground>
+                        </TextBlock>
+                    </StackPanel>
+
+                    <!-- Connector 2-3 -->
+                    <Border Grid.Column="3" Width="40" Height="2" VerticalAlignment="Center" Margin="0,-16,0,0"
+                            Background="{DynamicResource SystemBaseMediumColor}">
+                        <Border.Opacity>
+                            <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepConnectorConverter.Instance}" ConverterParameter="2" />
+                        </Border.Opacity>
+                    </Border>
+
+                    <!-- Step 3: Categories -->
+                    <StackPanel Grid.Column="4" Orientation="Vertical" HorizontalAlignment="Center" Spacing="4">
+                        <Border Width="32" Height="32" CornerRadius="16"
+                                HorizontalAlignment="Center">
+                            <Border.Background>
+                                <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepBackgroundConverter.Instance}" ConverterParameter="2" />
+                            </Border.Background>
+                            <TextBlock Text="3" FontWeight="SemiBold" FontSize="14"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Foreground="White" />
+                        </Border>
+                        <TextBlock Text="Categories" FontSize="11" HorizontalAlignment="Center">
+                            <TextBlock.Foreground>
+                                <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepForegroundConverter.Instance}" ConverterParameter="2" />
+                            </TextBlock.Foreground>
+                        </TextBlock>
+                    </StackPanel>
+
+                    <!-- Connector 3-4 -->
+                    <Border Grid.Column="5" Width="40" Height="2" VerticalAlignment="Center" Margin="0,-16,0,0"
+                            Background="{DynamicResource SystemBaseMediumColor}">
+                        <Border.Opacity>
+                            <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepConnectorConverter.Instance}" ConverterParameter="3" />
+                        </Border.Opacity>
+                    </Border>
+
+                    <!-- Step 4: Summary -->
+                    <StackPanel Grid.Column="6" Orientation="Vertical" HorizontalAlignment="Center" Spacing="4">
+                        <Border Width="32" Height="32" CornerRadius="16"
+                                HorizontalAlignment="Center">
+                            <Border.Background>
+                                <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepBackgroundConverter.Instance}" ConverterParameter="3" />
+                            </Border.Background>
+                            <TextBlock Text="4" FontWeight="SemiBold" FontSize="14"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Foreground="White" />
+                        </Border>
+                        <TextBlock Text="Summary" FontSize="11" HorizontalAlignment="Center">
+                            <TextBlock.Foreground>
+                                <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepForegroundConverter.Instance}" ConverterParameter="3" />
+                            </TextBlock.Foreground>
+                        </TextBlock>
+                    </StackPanel>
+
+                    <!-- Connector 4-5 -->
+                    <Border Grid.Column="7" Width="40" Height="2" VerticalAlignment="Center" Margin="0,-16,0,0"
+                            Background="{DynamicResource SystemBaseMediumColor}">
+                        <Border.Opacity>
+                            <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepConnectorConverter.Instance}" ConverterParameter="4" />
+                        </Border.Opacity>
+                    </Border>
+
+                    <!-- Step 5: Import -->
+                    <StackPanel Grid.Column="8" Orientation="Vertical" HorizontalAlignment="Center" Spacing="4">
+                        <Border Width="32" Height="32" CornerRadius="16"
+                                HorizontalAlignment="Center">
+                            <Border.Background>
+                                <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepBackgroundConverter.Instance}" ConverterParameter="4" />
+                            </Border.Background>
+                            <TextBlock Text="5" FontWeight="SemiBold" FontSize="14"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Foreground="White" />
+                        </Border>
+                        <TextBlock Text="Import" FontSize="11" HorizontalAlignment="Center">
+                            <TextBlock.Foreground>
+                                <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepForegroundConverter.Instance}" ConverterParameter="4" />
+                            </TextBlock.Foreground>
+                        </TextBlock>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Main Content Area - Step Content -->
+            <Border Grid.Row="2" Classes="form-fields-area" Margin="20,10">
+                <ContentControl Content="{Binding CurrentStep}">
+                    <ContentControl.ContentTemplate>
+                        <DataTemplate>
+                            <Panel>
+                                <!-- Step 1: File Selection -->
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                            IsVisible="{Binding Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=0}">
+                                    <TextBlock Text="Step 1: File Selection" FontSize="18" FontWeight="SemiBold"
+                                               HorizontalAlignment="Center" Margin="0,0,0,10" />
+                                    <TextBlock Text="Select a CSV file to import transactions from."
+                                               HorizontalAlignment="Center" TextWrapping="Wrap" />
+                                </StackPanel>
+
+                                <!-- Step 2: Account Mapping -->
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                            IsVisible="{Binding Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=1}">
+                                    <TextBlock Text="Step 2: Account Mapping" FontSize="18" FontWeight="SemiBold"
+                                               HorizontalAlignment="Center" Margin="0,0,0,10" />
+                                    <TextBlock Text="Map CSV account names to your Valt accounts."
+                                               HorizontalAlignment="Center" TextWrapping="Wrap" />
+                                </StackPanel>
+
+                                <!-- Step 3: Category Preview -->
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                            IsVisible="{Binding Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=2}">
+                                    <TextBlock Text="Step 3: Category Preview" FontSize="18" FontWeight="SemiBold"
+                                               HorizontalAlignment="Center" Margin="0,0,0,10" />
+                                    <TextBlock Text="Review and assign categories to imported transactions."
+                                               HorizontalAlignment="Center" TextWrapping="Wrap" />
+                                </StackPanel>
+
+                                <!-- Step 4: Summary -->
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                            IsVisible="{Binding Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=3}">
+                                    <TextBlock Text="Step 4: Summary" FontSize="18" FontWeight="SemiBold"
+                                               HorizontalAlignment="Center" Margin="0,0,0,10" />
+                                    <TextBlock Text="Review the import summary before proceeding."
+                                               HorizontalAlignment="Center" TextWrapping="Wrap" />
+                                </StackPanel>
+
+                                <!-- Step 5: Progress -->
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                            IsVisible="{Binding Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=4}">
+                                    <TextBlock Text="Step 5: Importing..." FontSize="18" FontWeight="SemiBold"
+                                               HorizontalAlignment="Center" Margin="0,0,0,10" />
+                                    <TextBlock Text="Import in progress. Please wait..."
+                                               HorizontalAlignment="Center" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Panel>
+                        </DataTemplate>
+                    </ContentControl.ContentTemplate>
+                </ContentControl>
+            </Border>
+
+            <!-- Button Bar -->
+            <Border Grid.Row="3" Padding="20,10" Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+                <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                    <!-- Cancel button on the left -->
+                    <Button Grid.Column="0" Content="Cancel" Width="100"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding CancelCommand}"
+                            IsVisible="{Binding !IsOnProgressStep}" />
+
+                    <!-- Back and Next buttons on the right -->
+                    <Button Grid.Column="2" Content="Back" Width="100"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding GoBackCommand}"
+                            IsVisible="{Binding CanGoBack}"
+                            Margin="0,0,10,0" />
+
+                    <Button Grid.Column="3" Content="{Binding NextButtonText}" Width="100"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding GoNextCommand}"
+                            IsEnabled="{Binding CanGoNext}"
+                            IsVisible="{Binding !IsOnProgressStep}"
+                            Classes="accent" />
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>
