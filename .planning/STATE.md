@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-13)
 ## Current Position
 
 Phase: 3 of 3 (Import Execution)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-01-13 — Completed 03-01-PLAN.md (CsvImportExecutor Service)
+Plan: 2 of 2 in current phase
+Status: Milestone complete
+Last activity: 2026-01-13 — Completed 03-02-PLAN.md (ViewModel Integration & Tests)
 
-Progress: ████████░░ 80%
+Progress: ██████████ 100%
 
 ## Performance Metrics
 
@@ -29,7 +29,7 @@ Progress: ████████░░ 80%
 |-------|-------|-------|----------|
 | 1. CSV Parser & Template | 1/1 | — | — |
 | 2. Import Wizard UI | 2/2 | — | — |
-| 3. Import Execution | 1/2 | 5 min | 5 min |
+| 3. Import Execution | 2/2 | 40 min | 20 min |
 
 **Recent Trend:**
 - Last 5 plans: —
@@ -51,6 +51,8 @@ Recent decisions affecting current work:
 - Account matching by clean name (stripped bracket suffix, case-insensitive)
 - Category matching by SimpleName or Name (case-insensitive)
 - Created Infra DTOs (CsvAccountMapping, CsvCategoryMapping) instead of using UI models to maintain clean architecture
+- Use simple English strings in executor for progress messages (MVP approach)
+- Restart all three background job types (App, ValtDatabase, PriceDatabase) after import
 
 ### Deferred Issues
 
@@ -63,5 +65,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-13
-Stopped at: Completed 03-01-PLAN.md (CsvImportExecutor Service)
+Stopped at: Milestone complete — CSV Import Wizard fully functional
 Resume file: None
