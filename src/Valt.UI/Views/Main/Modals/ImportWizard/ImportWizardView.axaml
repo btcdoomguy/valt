@@ -3,11 +3,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
         xmlns:importWizard="clr-namespace:Valt.UI.Views.Main.Modals.ImportWizard"
         mc:Ignorable="d"
         x:Class="Valt.UI.Views.Main.Modals.ImportWizard.ImportWizardView"
         x:DataType="importWizard:ImportWizardViewModel"
-        Title="Import Transactions"
+        Title="{x:Static local:language.ImportWizard_Title}"
         WindowStartupLocation="CenterOwner"
         Width="700"
         Height="550"
@@ -31,7 +32,7 @@
         <Grid RowDefinitions="Auto,Auto,*,Auto">
             <!-- Title Bar -->
             <userControls:CustomTitleBar Grid.Row="0"
-                                         Title="Import Transactions"
+                                         Title="{x:Static local:language.ImportWizard_Title}"
                                          TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
 
@@ -47,7 +48,7 @@
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Foreground="White" />
                         </Border>
-                        <TextBlock Text="File" FontSize="11" HorizontalAlignment="Center"
+                        <TextBlock Text="{x:Static local:language.ImportWizard_Step1}" FontSize="11" HorizontalAlignment="Center"
                                    Foreground="{DynamicResource SystemAccentColorDark1Brush}" />
                     </StackPanel>
 
@@ -70,7 +71,7 @@
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Foreground="White" />
                         </Border>
-                        <TextBlock Text="Accounts" FontSize="11" HorizontalAlignment="Center">
+                        <TextBlock Text="{x:Static local:language.ImportWizard_Step2}" FontSize="11" HorizontalAlignment="Center">
                             <TextBlock.Foreground>
                                 <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepForegroundConverter.Instance}" ConverterParameter="1" />
                             </TextBlock.Foreground>
@@ -96,7 +97,7 @@
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Foreground="White" />
                         </Border>
-                        <TextBlock Text="Categories" FontSize="11" HorizontalAlignment="Center">
+                        <TextBlock Text="{x:Static local:language.ImportWizard_Step3}" FontSize="11" HorizontalAlignment="Center">
                             <TextBlock.Foreground>
                                 <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepForegroundConverter.Instance}" ConverterParameter="2" />
                             </TextBlock.Foreground>
@@ -122,7 +123,7 @@
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Foreground="White" />
                         </Border>
-                        <TextBlock Text="Summary" FontSize="11" HorizontalAlignment="Center">
+                        <TextBlock Text="{x:Static local:language.ImportWizard_Step4}" FontSize="11" HorizontalAlignment="Center">
                             <TextBlock.Foreground>
                                 <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepForegroundConverter.Instance}" ConverterParameter="3" />
                             </TextBlock.Foreground>
@@ -148,7 +149,7 @@
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Foreground="White" />
                         </Border>
-                        <TextBlock Text="Import" FontSize="11" HorizontalAlignment="Center">
+                        <TextBlock Text="{x:Static local:language.ImportWizard_Step5}" FontSize="11" HorizontalAlignment="Center">
                             <TextBlock.Foreground>
                                 <Binding Path="CurrentStep" Converter="{x:Static importWizard:StepForegroundConverter.Instance}" ConverterParameter="4" />
                             </TextBlock.Foreground>
@@ -217,13 +218,13 @@
             <Border Grid.Row="3" Padding="20,10" Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
                 <Grid ColumnDefinitions="*,Auto,Auto,Auto">
                     <!-- Cancel button on the left -->
-                    <Button Grid.Column="0" Content="Cancel" Width="100"
+                    <Button Grid.Column="0" Content="{x:Static local:language.CancelButton}" Width="100"
                             HorizontalContentAlignment="Center"
                             Command="{Binding CancelCommand}"
                             IsVisible="{Binding !IsOnProgressStep}" />
 
                     <!-- Back and Next buttons on the right -->
-                    <Button Grid.Column="2" Content="Back" Width="100"
+                    <Button Grid.Column="2" Content="{x:Static local:language.ImportWizard_Back}" Width="100"
                             HorizontalContentAlignment="Center"
                             Command="{Binding GoBackCommand}"
                             IsVisible="{Binding CanGoBack}"

@@ -55,6 +55,10 @@
                                 <MenuItem Header="{x:Static local:language.Main_Menu_Categories}"
                                           Command="{Binding ManageCategoriesCommand}">
                                 </MenuItem>
+                                <MenuItem Header="{x:Static local:language.Menu_ImportTransactions}"
+                                          Command="{Binding OpenImportWizardCommand}">
+                                </MenuItem>
+                                <Separator />
                                 <MenuItem Header="{x:Static local:language.Main_Menu_Settings}"
                                           Command="{Binding ManageSettingsCommand}">
                                 </MenuItem>

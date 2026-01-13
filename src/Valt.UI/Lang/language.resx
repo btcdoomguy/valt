@@ -1193,4 +1193,35 @@
     <data name="Error.IncompatibleVersion" xml:space="preserve">
         <value>This database requires app version {0} or higher. You are running version {1}. Please update the application.</value>
     </data>
+    <!-- Import Wizard -->
+    <data name="ImportWizard_Title" xml:space="preserve">
+        <value>Import Transactions</value>
+    </data>
+    <data name="ImportWizard_Step1" xml:space="preserve">
+        <value>File</value>
+    </data>
+    <data name="ImportWizard_Step2" xml:space="preserve">
+        <value>Accounts</value>
+    </data>
+    <data name="ImportWizard_Step3" xml:space="preserve">
+        <value>Categories</value>
+    </data>
+    <data name="ImportWizard_Step4" xml:space="preserve">
+        <value>Summary</value>
+    </data>
+    <data name="ImportWizard_Step5" xml:space="preserve">
+        <value>Import</value>
+    </data>
+    <data name="ImportWizard_Back" xml:space="preserve">
+        <value>Back</value>
+    </data>
+    <data name="ImportWizard_Next" xml:space="preserve">
+        <value>Next</value>
+    </data>
+    <data name="ImportWizard_Import" xml:space="preserve">
+        <value>Import</value>
+    </data>
+    <data name="Menu_ImportTransactions" xml:space="preserve">
+        <value>Import Transactions...</value>
+    </data>
 </root>

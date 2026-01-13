@@ -37,6 +37,7 @@ using Valt.UI.Views.Main.Modals.InitialSelection;
 using Valt.UI.Views.Main.Modals.ManageCategories;
 using Valt.UI.Views.Main.Modals.Settings;
 using Valt.UI.Views.Main.Modals.StatusDisplay;
+using Valt.UI.Views.Main.Modals.ImportWizard;
 
 namespace Valt.UI.Views.Main;
 
@@ -209,6 +210,15 @@ public partial class MainViewModel : ValtViewModel
     {
         var modal =
             (SettingsView)await _modalFactory.CreateAsync(ApplicationModalNames.Settings, Window)!;
+
+        await modal.ShowDialog(Window!);
+    }
+
+    [RelayCommand]
+    private async Task OpenImportWizard()
+    {
+        var modal =
+            (ImportWizardView)await _modalFactory.CreateAsync(ApplicationModalNames.ImportWizard, Window)!;
 
         await modal.ShowDialog(Window!);
     }

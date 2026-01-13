@@ -19,5 +19,6 @@ public enum ApplicationModalNames
     About = 14,
     AvgPriceProfileManager = 15,
     AvgPriceLineEditor = 16,
-    FixedExpenseHistory = 17
+    FixedExpenseHistory = 17,
+    ImportWizard = 18
 }

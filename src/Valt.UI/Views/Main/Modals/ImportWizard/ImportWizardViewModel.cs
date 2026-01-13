@@ -4,6 +4,7 @@ using Valt.Infra.Modules.Budget.Accounts.Queries;
 using Valt.Infra.Modules.Budget.Categories.Queries;
 using Valt.Infra.Services.CsvImport;
 using Valt.UI.Base;
+using Valt.UI.Lang;
 
 namespace Valt.UI.Views.Main.Modals.ImportWizard;
 
@@ -71,8 +72,8 @@ public partial class ImportWizardViewModel : ValtModalViewModel
     /// Returns the text for the Next button based on the current step.
     /// </summary>
     public string NextButtonText => CurrentStep == WizardStep.Summary
-        ? "Import"
-        : "Next";
+        ? language.ImportWizard_Import
+        : language.ImportWizard_Next;
 
     /// <summary>
     /// Returns true if we are on the Progress step (import in progress).

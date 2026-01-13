@@ -2366,5 +2366,65 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Error.IncompatibleVersion", resourceCulture);
             }
         }
+
+        public static string ImportWizard_Title {
+            get {
+                return ResourceManager.GetString("ImportWizard_Title", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_Step1 {
+            get {
+                return ResourceManager.GetString("ImportWizard_Step1", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_Step2 {
+            get {
+                return ResourceManager.GetString("ImportWizard_Step2", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_Step3 {
+            get {
+                return ResourceManager.GetString("ImportWizard_Step3", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_Step4 {
+            get {
+                return ResourceManager.GetString("ImportWizard_Step4", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_Step5 {
+            get {
+                return ResourceManager.GetString("ImportWizard_Step5", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_Back {
+            get {
+                return ResourceManager.GetString("ImportWizard_Back", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_Next {
+            get {
+                return ResourceManager.GetString("ImportWizard_Next", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_Import {
+            get {
+                return ResourceManager.GetString("ImportWizard_Import", resourceCulture);
+            }
+        }
+
+        public static string Menu_ImportTransactions {
+            get {
+                return ResourceManager.GetString("Menu_ImportTransactions", resourceCulture);
+            }
+        }
     }
 }

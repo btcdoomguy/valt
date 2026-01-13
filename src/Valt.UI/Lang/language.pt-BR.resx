@@ -1173,4 +1173,35 @@
     <data name="Error.IncompatibleVersion" xml:space="preserve">
         <value>Este banco de dados requer a versão {0} ou superior do aplicativo. Você está executando a versão {1}. Por favor, atualize o aplicativo.</value>
     </data>
+    <!-- Import Wizard -->
+    <data name="ImportWizard_Title" xml:space="preserve">
+        <value>Importar Transacoes</value>
+    </data>
+    <data name="ImportWizard_Step1" xml:space="preserve">
+        <value>Arquivo</value>
+    </data>
+    <data name="ImportWizard_Step2" xml:space="preserve">
+        <value>Contas</value>
+    </data>
+    <data name="ImportWizard_Step3" xml:space="preserve">
+        <value>Categorias</value>
+    </data>
+    <data name="ImportWizard_Step4" xml:space="preserve">
+        <value>Resumo</value>
+    </data>
+    <data name="ImportWizard_Step5" xml:space="preserve">
+        <value>Importar</value>
+    </data>
+    <data name="ImportWizard_Back" xml:space="preserve">
+        <value>Voltar</value>
+    </data>
+    <data name="ImportWizard_Next" xml:space="preserve">
+        <value>Proximo</value>
+    </data>
+    <data name="ImportWizard_Import" xml:space="preserve">
+        <value>Importar</value>
+    </data>
+    <data name="Menu_ImportTransactions" xml:space="preserve">
+        <value>Importar Transacoes...</value>
+    </data>
 </root>
