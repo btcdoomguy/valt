@@ -5,29 +5,29 @@
 See: .planning/PROJECT.md (updated 2026-01-13)
 
 **Core value:** Enable users to migrate their financial history from other tools into Valt without manual data entry.
-**Current focus:** Phase 1 — CSV Parser & Template
+**Current focus:** Phase 2 — Import Wizard UI
 
 ## Current Position
 
-Phase: 1 of 3 (CSV Parser & Template)
+Phase: 2 of 3 (Import Wizard UI)
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-01-13 — Project initialized
+Last activity: 2026-01-13 — Completed Phase 1 Plan 01-01 (CSV Parser & Template)
 
-Progress: ░░░░░░░░░░ 0%
+Progress: ███░░░░░░░ 33%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
+- Total plans completed: 1
 - Average duration: —
-- Total execution time: 0 hours
+- Total execution time: —
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| — | — | — | — |
+| 1. CSV Parser & Template | 1/1 | — | — |
 
 **Recent Trend:**
 - Last 5 plans: —
@@ -40,7 +40,9 @@ Progress: ░░░░░░░░░░ 0%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-(None yet)
+- Used CsvHelper library for robust CSV parsing
+- Parser collects row-level errors without throwing (partial success support)
+- Template includes 7 sample rows covering all 6 transaction types
 
 ### Deferred Issues
 
@@ -53,5 +55,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-13
-Stopped at: Project initialization complete
+Stopped at: Phase 1 complete
 Resume file: None
