@@ -209,6 +209,7 @@ public static class Extensions
         //csv import
         services.AddSingleton<ICsvImportParser, CsvImportParser>();
         services.AddSingleton<ICsvTemplateGenerator, CsvTemplateGenerator>();
+        services.AddSingleton<ICsvImportExecutor, CsvImportExecutor>();
 
         return services;
     }
