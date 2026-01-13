@@ -276,21 +276,83 @@
                     </Grid>
 
                     <!-- Step 4: Summary -->
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
-                                IsVisible="{Binding CurrentStep, Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=3}">
-                        <TextBlock Text="Step 4: Summary" FontSize="18" FontWeight="SemiBold"
-                                   HorizontalAlignment="Center" Margin="0,0,0,10" />
-                        <TextBlock Text="Review the import summary before proceeding."
-                                   HorizontalAlignment="Center" TextWrapping="Wrap" />
+                    <StackPanel VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                                IsVisible="{Binding CurrentStep, Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=3}"
+                                Spacing="20">
+                        <!-- Summary Title -->
+                        <TextBlock Text="{x:Static local:language.ImportWizard_SummaryTitle}" FontSize="16" FontWeight="SemiBold" />
+
+                        <!-- Summary Cards -->
+                        <Border Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                                CornerRadius="8" Padding="20">
+                            <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                                <!-- Transactions -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static local:language.ImportWizard_SummaryTransactions}"
+                                           VerticalAlignment="Center" Margin="0,5" />
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SummaryTransactionCount}"
+                                           FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,5" />
+
+                                <!-- Accounts -->
+                                <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,5">
+                                    <Run Text="{x:Static local:language.ImportWizard_SummaryAccounts}" />
+                                    <Run Text=" (" /><Run Text="{Binding NewAccountCount}" Foreground="{DynamicResource SystemAccentColor}" />
+                                    <Run Text=" " /><Run Text="{x:Static local:language.ImportWizard_SummaryNew}" /><Run Text=")" />
+                                </TextBlock>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SummaryAccountCount}"
+                                           FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,5" />
+
+                                <!-- Categories -->
+                                <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,5">
+                                    <Run Text="{x:Static local:language.ImportWizard_SummaryCategories}" />
+                                    <Run Text=" (" /><Run Text="{Binding NewCategoryCount}" Foreground="{DynamicResource SystemAccentColor}" />
+                                    <Run Text=" " /><Run Text="{x:Static local:language.ImportWizard_SummaryNew}" /><Run Text=")" />
+                                </TextBlock>
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SummaryCategoryCount}"
+                                           FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,5" />
+                            </Grid>
+                        </Border>
+
+                        <!-- Warning about new items -->
+                        <StackPanel Orientation="Horizontal" Spacing="10" IsVisible="{Binding NewAccountCount}">
+                            <TextBlock Text="&#xE7BA;" FontFamily="{StaticResource MaterialDesignIconsFont}"
+                                       Foreground="{DynamicResource SystemAccentColor}" VerticalAlignment="Center" />
+                            <TextBlock Text="{x:Static local:language.ImportWizard_SummaryNewItemsWarning}"
+                                       TextWrapping="Wrap" Foreground="{DynamicResource SystemBaseMediumColor}" />
+                        </StackPanel>
+
+                        <!-- Ready to import message -->
+                        <TextBlock Text="{x:Static local:language.ImportWizard_SummaryReadyToImport}"
+                                   TextWrapping="Wrap" Foreground="{DynamicResource SystemBaseMediumColor}" />
                     </StackPanel>
 
                     <!-- Step 5: Progress -->
                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
-                                IsVisible="{Binding CurrentStep, Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=4}">
-                        <TextBlock Text="Step 5: Importing..." FontSize="18" FontWeight="SemiBold"
-                                   HorizontalAlignment="Center" Margin="0,0,0,10" />
-                        <TextBlock Text="Import in progress. Please wait..."
-                                   HorizontalAlignment="Center" TextWrapping="Wrap" />
+                                IsVisible="{Binding CurrentStep, Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=4}"
+                                Spacing="20" MinWidth="400">
+                        <!-- Status Message -->
+                        <TextBlock Text="{Binding ImportStatusMessage}" FontSize="16" FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" />
+
+                        <!-- Progress Bar -->
+                        <ProgressBar Value="{Binding ImportProgress}" Minimum="0" Maximum="100"
+                                     Height="20" />
+
+                        <!-- Progress Text -->
+                        <TextBlock HorizontalAlignment="Center">
+                            <Run Text="{Binding ImportedCount}" />
+                            <Run Text=" / " />
+                            <Run Text="{Binding TotalToImport}" />
+                            <Run Text=" " />
+                            <Run Text="{x:Static local:language.ImportWizard_ProgressTransactions}" />
+                        </TextBlock>
+
+                        <!-- Close button when complete -->
+                        <Button Content="{x:Static local:language.CloseButton}"
+                                Command="{Binding CloseAfterImportCommand}"
+                                IsVisible="{Binding IsImportComplete}"
+                                HorizontalAlignment="Center" Width="120"
+                                HorizontalContentAlignment="Center"
+                                Classes="accent" />
                     </StackPanel>
                 </Panel>
             </Border>

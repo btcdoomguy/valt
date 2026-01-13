@@ -45,6 +45,7 @@ public partial class ImportWizardViewModel : ValtModalViewModel
     [NotifyPropertyChangedFor(nameof(CanGoNext))]
     [NotifyPropertyChangedFor(nameof(NextButtonText))]
     [NotifyPropertyChangedFor(nameof(IsOnProgressStep))]
+    [NotifyPropertyChangedFor(nameof(IsImportComplete))]
     private WizardStep _currentStep = WizardStep.FileSelection;
 
     /// <summary>
@@ -76,6 +77,11 @@ public partial class ImportWizardViewModel : ValtModalViewModel
     /// Returns true if we are on the Progress step (import in progress).
     /// </summary>
     public bool IsOnProgressStep => CurrentStep == WizardStep.Progress;
+
+    /// <summary>
+    /// Returns true if the import has completed.
+    /// </summary>
+    public bool IsImportComplete => CurrentStep == WizardStep.Progress && ImportProgress >= 100;
 
     #endregion
 
@@ -129,6 +135,42 @@ public partial class ImportWizardViewModel : ValtModalViewModel
 
     [ObservableProperty]
     private int _existingCategoryCount;
+
+    #endregion
+
+    #region Step 4 - Summary
+
+    /// <summary>
+    /// Gets the total transaction count for summary display.
+    /// </summary>
+    public int SummaryTransactionCount => ValidRowCount;
+
+    /// <summary>
+    /// Gets the total account count (new + existing) for summary display.
+    /// </summary>
+    public int SummaryAccountCount => AccountMappings.Count;
+
+    /// <summary>
+    /// Gets the total category count (new + existing) for summary display.
+    /// </summary>
+    public int SummaryCategoryCount => CategoryMappings.Count;
+
+    #endregion
+
+    #region Step 5 - Progress
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsImportComplete))]
+    private int _importProgress;
+
+    [ObservableProperty]
+    private string _importStatusMessage = string.Empty;
+
+    [ObservableProperty]
+    private int _importedCount;
+
+    [ObservableProperty]
+    private int _totalToImport;
 
     #endregion
 
@@ -338,6 +380,39 @@ public partial class ImportWizardViewModel : ValtModalViewModel
 
     #endregion
 
+    #region Step 5 - Import Process
+
+    /// <summary>
+    /// Starts the import process (placeholder for Phase 3).
+    /// </summary>
+    private async Task StartImportAsync()
+    {
+        // Initialize progress tracking
+        TotalToImport = ValidRowCount;
+        ImportedCount = 0;
+        ImportProgress = 0;
+        ImportStatusMessage = language.ImportWizard_Importing;
+
+        // TODO: Actual import logic will be implemented in Phase 3
+        // For now, just show the progress step as a placeholder
+
+        // Simulate progress for UI testing (to be removed in Phase 3)
+        await Task.Delay(100);
+        ImportProgress = 100;
+        ImportStatusMessage = language.ImportWizard_ImportComplete;
+    }
+
+    /// <summary>
+    /// Closes the wizard after successful import.
+    /// </summary>
+    [RelayCommand]
+    private void CloseAfterImport()
+    {
+        CloseWindow?.Invoke();
+    }
+
+    #endregion
+
     #region Navigation Commands
 
     /// <summary>
@@ -359,7 +434,7 @@ public partial class ImportWizardViewModel : ValtModalViewModel
         {
             // Start import process
             CurrentStep = WizardStep.Progress;
-            // Import logic will be implemented in Phase 3
+            await StartImportAsync();
         }
         else if (CurrentStep < WizardStep.Progress)
         {

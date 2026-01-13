@@ -1269,4 +1269,37 @@
     <data name="ImportWizard_CsvCategoryName" xml:space="preserve">
         <value>CSV Category</value>
     </data>
+    <data name="ImportWizard_SummaryTitle" xml:space="preserve">
+        <value>Import Summary</value>
+    </data>
+    <data name="ImportWizard_SummaryTransactions" xml:space="preserve">
+        <value>Transactions to import</value>
+    </data>
+    <data name="ImportWizard_SummaryAccounts" xml:space="preserve">
+        <value>Accounts</value>
+    </data>
+    <data name="ImportWizard_SummaryCategories" xml:space="preserve">
+        <value>Categories</value>
+    </data>
+    <data name="ImportWizard_SummaryNew" xml:space="preserve">
+        <value>new</value>
+    </data>
+    <data name="ImportWizard_SummaryNewItemsWarning" xml:space="preserve">
+        <value>New accounts and categories will be created automatically during import.</value>
+    </data>
+    <data name="ImportWizard_SummaryReadyToImport" xml:space="preserve">
+        <value>Click Import to begin the import process.</value>
+    </data>
+    <data name="ImportWizard_Importing" xml:space="preserve">
+        <value>Importing transactions...</value>
+    </data>
+    <data name="ImportWizard_ImportComplete" xml:space="preserve">
+        <value>Import complete!</value>
+    </data>
+    <data name="ImportWizard_ProgressTransactions" xml:space="preserve">
+        <value>transactions</value>
+    </data>
+    <data name="CloseButton" xml:space="preserve">
+        <value>Close</value>
+    </data>
 </root>

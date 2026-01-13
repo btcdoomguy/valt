@@ -2516,5 +2516,71 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("ImportWizard_CsvCategoryName", resourceCulture);
             }
         }
+
+        public static string ImportWizard_SummaryTitle {
+            get {
+                return ResourceManager.GetString("ImportWizard_SummaryTitle", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_SummaryTransactions {
+            get {
+                return ResourceManager.GetString("ImportWizard_SummaryTransactions", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_SummaryAccounts {
+            get {
+                return ResourceManager.GetString("ImportWizard_SummaryAccounts", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_SummaryCategories {
+            get {
+                return ResourceManager.GetString("ImportWizard_SummaryCategories", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_SummaryNew {
+            get {
+                return ResourceManager.GetString("ImportWizard_SummaryNew", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_SummaryNewItemsWarning {
+            get {
+                return ResourceManager.GetString("ImportWizard_SummaryNewItemsWarning", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_SummaryReadyToImport {
+            get {
+                return ResourceManager.GetString("ImportWizard_SummaryReadyToImport", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_Importing {
+            get {
+                return ResourceManager.GetString("ImportWizard_Importing", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_ImportComplete {
+            get {
+                return ResourceManager.GetString("ImportWizard_ImportComplete", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_ProgressTransactions {
+            get {
+                return ResourceManager.GetString("ImportWizard_ProgressTransactions", resourceCulture);
+            }
+        }
+
+        public static string CloseButton {
+            get {
+                return ResourceManager.GetString("CloseButton", resourceCulture);
+            }
+        }
     }
 }
