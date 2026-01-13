@@ -44,6 +44,7 @@ using Valt.Infra.Modules.Reports.AllTimeHigh;
 using Valt.Infra.Modules.Reports.ExpensesByCategory;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.Infra.Modules.Reports.Statistics;
+using Valt.Infra.Services.CsvImport;
 using Valt.Infra.Services.Updates;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
@@ -204,6 +205,10 @@ public static class Extensions
         services.AddSingleton<ITransactionAutoSatAmountCalculator, TransactionAutoSatAmountCalculator>();
         services.AddSingleton<IAvgPriceTotalizer, AvgPriceTotalizer>();
         services.AddSingleton<IUpdateChecker, GitHubUpdateChecker>();
+
+        //csv import
+        services.AddSingleton<ICsvImportParser, CsvImportParser>();
+        services.AddSingleton<ICsvTemplateGenerator, CsvTemplateGenerator>();
 
         return services;
     }
