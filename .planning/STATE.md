@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-13)
 ## Current Position
 
 Phase: 2 of 3 (Import Wizard UI)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-01-13 — Completed 02-01-PLAN.md (Import Wizard Modal Infrastructure)
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-01-13 — Completed 02-02-PLAN.md (Wizard Step Content)
 
-Progress: █████░░░░░ 50%
+Progress: ██████░░░░ 60%
 
 ## Performance Metrics
 
@@ -47,6 +47,9 @@ Recent decisions affecting current work:
 - Step indicator uses numbered circles with accent highlighting and connector lines
 - Menu item placed after Categories with separator before Settings
 - Dedicated StepConverters for cleaner AXAML styling
+- Account matching by clean name (stripped bracket suffix, case-insensitive)
+- Category matching by SimpleName or Name (case-insensitive)
+- Placeholder import completes immediately - Phase 3 implements real logic
 
 ### Deferred Issues
 
@@ -59,5 +62,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-13
-Stopped at: Completed 02-01-PLAN.md
+Stopped at: Completed 02-02-PLAN.md (Phase 2 complete)
 Resume file: None
