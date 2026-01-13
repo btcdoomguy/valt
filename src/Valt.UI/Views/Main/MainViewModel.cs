@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -219,6 +220,23 @@ public partial class MainViewModel : ValtViewModel
             (AboutView)await _modalFactory.CreateAsync(ApplicationModalNames.About, Window)!;
 
         await modal.ShowDialog(Window!);
+    }
+
+    [RelayCommand]
+    private void HowToUse()
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "https://btcdoomguy.github.io/valt-docs/",
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error opening User Guide URL");
+        }
     }
 
     [RelayCommand]

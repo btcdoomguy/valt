@@ -1359,6 +1359,12 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string Main_Menu_HowToUse {
+            get {
+                return ResourceManager.GetString("Main.Menu.HowToUse", resourceCulture);
+            }
+        }
+        
         public static string About_Title {
             get {
                 return ResourceManager.GetString("About.Title", resourceCulture);

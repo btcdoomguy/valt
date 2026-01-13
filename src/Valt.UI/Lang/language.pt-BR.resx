@@ -651,6 +651,9 @@
     <data name="Main.Menu.About" xml:space="preserve">
         <value>Sobre</value>
     </data>
+    <data name="Main.Menu.HowToUse" xml:space="preserve">
+        <value>Guia do Usuário</value>
+    </data>
     <data name="About.Title" xml:space="preserve">
         <value>Sobre</value>
     </data>
