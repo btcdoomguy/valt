@@ -44,6 +44,7 @@ using Valt.Infra.Modules.Reports.AllTimeHigh;
 using Valt.Infra.Modules.Reports.ExpensesByCategory;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.Infra.Modules.Reports.Statistics;
+using Valt.Infra.Services.CsvExport;
 using Valt.Infra.Services.CsvImport;
 using Valt.Infra.Services.Updates;
 using Valt.Infra.Settings;
@@ -210,6 +211,9 @@ public static class Extensions
         services.AddSingleton<ICsvImportParser, CsvImportParser>();
         services.AddSingleton<ICsvTemplateGenerator, CsvTemplateGenerator>();
         services.AddSingleton<ICsvImportExecutor, CsvImportExecutor>();
+
+        //csv export
+        services.AddSingleton<ICsvExportService, CsvExportService>();
 
         return services;
     }
