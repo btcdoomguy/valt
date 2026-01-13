@@ -35,10 +35,11 @@ Plans:
 **Goal**: Create 5-step wizard modal (File Selection → Account Mapping → Category Preview → Summary → Import Progress)
 **Depends on**: Phase 1
 **Research**: Unlikely (existing modal/wizard patterns in codebase)
-**Plans**: TBD
+**Status**: In progress
 
 Plans:
-- [ ] 02-01: TBD
+- [x] 02-01: Import Wizard Modal Infrastructure - ViewModel, View, registration, menu trigger
+- [ ] 02-02: Wizard Step Content - File selection, account mapping, category preview, summary, progress
 
 ### Phase 3: Import Execution
 **Goal**: Implement transaction creation from parsed CSV data, integrate with background job system, handle errors
@@ -57,5 +58,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. CSV Parser & Template | 1/1 | Complete | 2026-01-13 |
-| 2. Import Wizard UI | 0/TBD | Not started | - |
+| 2. Import Wizard UI | 1/2 | In progress | - |
 | 3. Import Execution | 0/TBD | Not started | - |
