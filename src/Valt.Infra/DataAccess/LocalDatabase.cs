@@ -217,6 +217,7 @@ internal sealed class LocalDatabase : ILocalDatabase
         var collection = GetOpenDatabase().GetCollection<FixedExpenseRecordEntity>("budget_fixedexpenserecords");
 
         collection.EnsureIndex(x => x.ReferenceDate);
+        collection.EnsureIndex(x => x.Transaction);
 
         return collection;
     }

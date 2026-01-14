@@ -441,6 +441,10 @@ public partial class MainViewModel : ValtViewModel
             // Run LivePricesUpdater synchronously to ensure rates are available before UI is shown
             await _backgroundJobManager.TriggerJobManuallyOnCurrentThreadAsync(BackgroundJobSystemNames.LivePricesUpdater);
 
+            // Trigger history updater jobs to run in the background
+            _backgroundJobManager.TriggerJobManually(BackgroundJobSystemNames.BitcoinHistoryUpdater);
+            _backgroundJobManager.TriggerJobManually(BackgroundJobSystemNames.FiatHistoryUpdater);
+
             return true;
         }
         catch (LiteException ex)
