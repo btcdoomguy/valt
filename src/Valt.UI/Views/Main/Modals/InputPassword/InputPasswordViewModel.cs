@@ -16,6 +16,9 @@ public partial class InputPasswordViewModel : ValtModalValidatorViewModel
     [ObservableProperty]
     private bool _startInSecureMode;
 
+    [ObservableProperty]
+    private bool _hideSecureModeCheckbox;
+
     #endregion
 
     [RelayCommand]

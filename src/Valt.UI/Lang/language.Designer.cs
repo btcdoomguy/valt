@@ -2385,6 +2385,12 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string Error_InvalidPassword {
+            get {
+                return ResourceManager.GetString("Error.InvalidPassword", resourceCulture);
+            }
+        }
+
         public static string ImportWizard_Title {
             get {
                 return ResourceManager.GetString("ImportWizard_Title", resourceCulture);

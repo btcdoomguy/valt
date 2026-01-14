@@ -41,6 +41,7 @@ using Valt.UI.Views.Main.Modals.ManageCategories;
 using Valt.UI.Views.Main.Modals.Settings;
 using Valt.UI.Views.Main.Modals.StatusDisplay;
 using Valt.UI.Views.Main.Modals.ImportWizard;
+using Valt.UI.Views.Main.Modals.InputPassword;
 
 namespace Valt.UI.Views.Main;
 
@@ -208,8 +209,31 @@ public partial class MainViewModel : ValtViewModel
     }
 
     [RelayCommand]
-    private void ToggleSecureMode()
+    private async Task ToggleSecureMode()
     {
+        // If leaving secure mode, require password verification
+        if (_secureModeState.IsEnabled)
+        {
+            var inputPasswordModal =
+                (InputPasswordView)await _modalFactory.CreateAsync(ApplicationModalNames.InputPassword, Window)!;
+
+            // Hide the "Start in Secure Mode" checkbox when verifying password to leave
+            var viewModel = (InputPasswordViewModel)inputPasswordModal.DataContext!;
+            viewModel.HideSecureModeCheckbox = true;
+
+            var result = await inputPasswordModal.ShowDialog<InputPasswordViewModel.Response?>(Window!);
+
+            if (result?.Password is null)
+                return;
+
+            // Verify password before allowing to leave secure mode
+            if (!_secureModeState.VerifyPassword(result.Password))
+            {
+                await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_InvalidPassword, Window!);
+                return;
+            }
+        }
+
         _secureModeState.IsEnabled = !_secureModeState.IsEnabled;
         OnPropertyChanged(nameof(SecureModeIcon));
     }
@@ -365,6 +389,9 @@ public partial class MainViewModel : ValtViewModel
 
             openedFile = true;
             SetTransactionsTab();
+
+            // Store the password hash for secure mode verification
+            _secureModeState.SetPassword(result.Password);
 
             // Initialize secure mode state based on user preference from login
             _secureModeState.IsEnabled = result.StartInSecureMode;

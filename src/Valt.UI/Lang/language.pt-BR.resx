@@ -1182,6 +1182,9 @@
     <data name="Error.IncompatibleVersion" xml:space="preserve">
         <value>Este banco de dados requer a versão {0} ou superior do aplicativo. Você está executando a versão {1}. Por favor, atualize o aplicativo.</value>
     </data>
+    <data name="Error.InvalidPassword" xml:space="preserve">
+        <value>Senha inválida</value>
+    </data>
     <!-- Import Wizard -->
     <data name="ImportWizard_Title" xml:space="preserve">
         <value>Importar Transações</value>
