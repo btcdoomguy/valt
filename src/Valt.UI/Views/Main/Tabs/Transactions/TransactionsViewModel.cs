@@ -62,18 +62,23 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
     [ObservableProperty] private AvaloniaList<AccountViewModel> _accounts = new();
     [ObservableProperty] private AvaloniaList<FixedExpensesEntryViewModel> _fixedExpenseEntries = new();
-    [ObservableProperty] private string _remainingFixedExpensesAmount = "~ R$ 12.345,67";
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayRemainingFixedExpensesAmount))]
+    private string _remainingFixedExpensesAmount = "~ R$ 12.345,67";
     [ObservableProperty] private string? _remainingFixedExpensesTooltip;
 
     [ObservableProperty] private AccountViewModel? _selectedAccount;
     [ObservableProperty] private FixedExpensesEntryViewModel? _selectedFixedExpense;
 
     [ObservableProperty] private string _allWealthInSats = "12.34567890";
-    [ObservableProperty] private string _wealthInBtcRatio = "65.3%";
-    [ObservableProperty] private string _wealthInSats = "11.34567890";
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayWealthInBtcRatio))]
+    private string _wealthInBtcRatio = "65.3%";
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayWealthInSats))]
+    private string _wealthInSats = "11.34567890";
     [ObservableProperty] private string _wealthNotInSats = "1.00000000";
-    [ObservableProperty] private string _wealthInFiat = "R$ 12.000.000,00";
-    [ObservableProperty] private string _allWealthInFiat = "R$ 13.000.000,00";
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayWealthInFiat))]
+    private string _wealthInFiat = "R$ 12.000.000,00";
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayAllWealthInFiat))]
+    private string _allWealthInFiat = "R$ 13.000.000,00";
 
     [ObservableProperty] private FiatCurrency _mainFiatCurrency = FiatCurrency.Brl;
 

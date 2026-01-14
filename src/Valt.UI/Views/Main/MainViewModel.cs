@@ -436,10 +436,10 @@ public partial class MainViewModel : ValtViewModel
             if (!_priceDatabase.HasDatabaseOpen)
                 _priceDatabase!.OpenDatabase();
 
-            _backgroundJobManager!.StartAllJobs(jobType: BackgroundJobTypes.PriceDatabase);
+            _backgroundJobManager!.StartAllJobs(jobType: BackgroundJobTypes.PriceDatabase, triggerInitialRun: false);
 
-            while (_backgroundJobManager.IsRunningTasksOf(BackgroundJobTypes.PriceDatabase))
-                await Task.Delay(100);
+            // Run LivePricesUpdater synchronously to ensure rates are available before UI is shown
+            await _backgroundJobManager.TriggerJobManuallyOnCurrentThreadAsync(BackgroundJobSystemNames.LivePricesUpdater);
 
             return true;
         }
