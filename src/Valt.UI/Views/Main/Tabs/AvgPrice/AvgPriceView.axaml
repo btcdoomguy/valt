@@ -136,46 +136,54 @@
 
                 <!-- Totals DataGrid -->
                 <Grid MinHeight="400">
-                    <DataGrid ItemsSource="{Binding TotalsRows}"
-                              AutoGenerateColumns="False"
-                              IsReadOnly="True"
-                              CanUserReorderColumns="False"
-                              CanUserResizeColumns="True"
-                              CanUserSortColumns="False"
-                              GridLinesVisibility="All"
-                              IsVisible="{Binding !IsTotalsLoading}">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Totals_Period}"
-                                                Binding="{Binding Period}"
-                                                Width="100" />
-                            <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Totals_Bought}"
-                                                Binding="{Binding AmountBought}"
-                                                Width="*" />
-                            <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Totals_Sold}"
-                                                Binding="{Binding AmountSold}"
-                                                Width="*" />
-                            <DataGridTemplateColumn Header="{x:Static lang:language.AvgPrice_Totals_ProfitLoss}"
-                                                    Width="*">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate DataType="models:AvgPriceTotalsRowViewModel">
-                                        <TextBlock Text="{Binding ProfitLoss}"
-                                                   Foreground="{Binding ProfitLossColor}"
-                                                   VerticalAlignment="Center"
-                                                   Margin="8,0" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Totals_Volume}"
-                                                Binding="{Binding Volume}"
-                                                Width="*" />
-                        </DataGrid.Columns>
-                    </DataGrid>
-                    <TextBlock Text="{x:Static lang:language.Loading}"
+                    <Panel IsVisible="{Binding !IsSecureModeEnabled}">
+                        <DataGrid ItemsSource="{Binding TotalsRows}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  CanUserReorderColumns="False"
+                                  CanUserResizeColumns="True"
+                                  CanUserSortColumns="False"
+                                  GridLinesVisibility="All"
+                                  IsVisible="{Binding !IsTotalsLoading}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Totals_Period}"
+                                                    Binding="{Binding Period}"
+                                                    Width="100" />
+                                <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Totals_Bought}"
+                                                    Binding="{Binding AmountBought}"
+                                                    Width="*" />
+                                <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Totals_Sold}"
+                                                    Binding="{Binding AmountSold}"
+                                                    Width="*" />
+                                <DataGridTemplateColumn Header="{x:Static lang:language.AvgPrice_Totals_ProfitLoss}"
+                                                        Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate DataType="models:AvgPriceTotalsRowViewModel">
+                                            <TextBlock Text="{Binding ProfitLoss}"
+                                                       Foreground="{Binding ProfitLossColor}"
+                                                       VerticalAlignment="Center"
+                                                       Margin="8,0" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="{x:Static lang:language.AvgPrice_Totals_Volume}"
+                                                    Binding="{Binding Volume}"
+                                                    Width="*" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <TextBlock Text="{x:Static lang:language.Loading}"
+                                   FontSize="14"
+                                   Foreground="{DynamicResource Text400Brush}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   IsVisible="{Binding IsTotalsLoading}" />
+                    </Panel>
+                    <TextBlock Text="---"
                                FontSize="14"
                                Foreground="{DynamicResource Text400Brush}"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"
-                               IsVisible="{Binding IsTotalsLoading}" />
+                               IsVisible="{Binding IsSecureModeEnabled}" />
                 </Grid>
 
                 <!-- Current Position Summary -->
@@ -191,7 +199,7 @@
                                        Foreground="{DynamicResource Text400Brush}"
                                        VerticalAlignment="Center" />
                             <TextBlock Grid.Column="1"
-                                       Text="{Binding CurrentPosition}"
+                                       Text="{Binding DisplayCurrentPosition}"
                                        FontSize="20"
                                        FontWeight="SemiBold"
                                        FontFamily="Consolas, Menlo, Monaco, monospace"
@@ -205,7 +213,7 @@
                                        Foreground="{DynamicResource Text400Brush}"
                                        VerticalAlignment="Center" />
                             <TextBlock Grid.Column="1"
-                                       Text="{Binding CurrentAvgPrice}"
+                                       Text="{Binding DisplayCurrentAvgPrice}"
                                        FontSize="20"
                                        FontWeight="SemiBold"
                                        FontFamily="Consolas, Menlo, Monaco, monospace"

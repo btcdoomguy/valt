@@ -221,7 +221,7 @@ public partial class ImportWizardViewModel : ValtModalViewModel
 
         var options = new FilePickerOpenOptions
         {
-            Title = "Select CSV File",
+            Title = language.ImportWizard_SelectCsvFileTitle,
             AllowMultiple = false,
             FileTypeFilter =
             [
@@ -258,7 +258,7 @@ public partial class ImportWizardViewModel : ValtModalViewModel
 
         var options = new FilePickerSaveOptions
         {
-            Title = "Download Template",
+            Title = language.ImportWizard_DownloadTemplateTitle,
             SuggestedFileName = "valt-import-template.csv",
             FileTypeChoices =
             [
@@ -472,7 +472,7 @@ public partial class ImportWizardViewModel : ValtModalViewModel
             }
             else
             {
-                ImportStatusMessage = $"Import completed with errors: {result.Errors.Count} issues";
+                ImportStatusMessage = string.Format(language.ImportWizard_ImportCompletedWithErrors, result.Errors.Count);
                 // Could show errors in a list, but for MVP just show count
             }
         }

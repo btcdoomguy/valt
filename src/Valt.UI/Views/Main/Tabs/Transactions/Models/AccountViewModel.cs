@@ -22,6 +22,11 @@ public partial class AccountViewModel : ObservableObject
     public decimal? FutureFiatTotal { get; set; }
     public long? FutureSatsTotal { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FormattedTotal))]
+    [NotifyPropertyChangedFor(nameof(FormattedFutureTotal))]
+    private bool _secureModeEnabled;
+
     public Icon? RenderIcon => Icon is not null ? Core.Common.Icon.RestoreFromId(Icon) : null;
 
     public bool IsHidden => !Visible;
@@ -66,6 +71,9 @@ public partial class AccountViewModel : ObservableObject
     {
         get
         {
+            if (SecureModeEnabled)
+                return "---";
+
             if (FiatTotal is not null && Currency is not null)
             {
                 return CurrencyDisplay.FormatFiat(FiatTotal.Value, Currency);
@@ -74,11 +82,14 @@ public partial class AccountViewModel : ObservableObject
             return SatsTotal is not null ? CurrencyDisplay.FormatSatsAsBitcoin(SatsTotal.Value) : string.Empty;
         }
     }
-    
+
     public string FormattedFutureTotal
     {
         get
         {
+            if (SecureModeEnabled)
+                return "---";
+
             if (FutureFiatTotal is not null && Currency is not null)
             {
                 return CurrencyDisplay.FormatFiat(FutureFiatTotal.Value, Currency);

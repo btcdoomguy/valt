@@ -55,24 +55,30 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     private readonly IClock _clock;
     private readonly ILogger<TransactionsViewModel> _logger;
     private readonly IAccountQueries? _accountQueries;
+    private readonly SecureModeState _secureModeState;
 
     //instances of the sub contents
     private readonly TransactionListViewModel _transactionListViewModel = null!;
 
     [ObservableProperty] private AvaloniaList<AccountViewModel> _accounts = new();
     [ObservableProperty] private AvaloniaList<FixedExpensesEntryViewModel> _fixedExpenseEntries = new();
-    [ObservableProperty] private string _remainingFixedExpensesAmount = "~ R$ 12.345,67";
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayRemainingFixedExpensesAmount))]
+    private string _remainingFixedExpensesAmount = "~ R$ 12.345,67";
     [ObservableProperty] private string? _remainingFixedExpensesTooltip;
 
     [ObservableProperty] private AccountViewModel? _selectedAccount;
     [ObservableProperty] private FixedExpensesEntryViewModel? _selectedFixedExpense;
 
     [ObservableProperty] private string _allWealthInSats = "12.34567890";
-    [ObservableProperty] private string _wealthInBtcRatio = "65.3%";
-    [ObservableProperty] private string _wealthInSats = "11.34567890";
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayWealthInBtcRatio))]
+    private string _wealthInBtcRatio = "65.3%";
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayWealthInSats))]
+    private string _wealthInSats = "11.34567890";
     [ObservableProperty] private string _wealthNotInSats = "1.00000000";
-    [ObservableProperty] private string _wealthInFiat = "R$ 12.000.000,00";
-    [ObservableProperty] private string _allWealthInFiat = "R$ 13.000.000,00";
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayWealthInFiat))]
+    private string _wealthInFiat = "R$ 12.000.000,00";
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayAllWealthInFiat))]
+    private string _allWealthInFiat = "R$ 13.000.000,00";
 
     [ObservableProperty] private FiatCurrency _mainFiatCurrency = FiatCurrency.Brl;
 
@@ -90,9 +96,11 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         ITransactionTabFactory transactionTabFactory,
         IFixedExpenseRecordService fixedExpenseRecordService,
         IClock clock,
-        ILogger<TransactionsViewModel> logger)
+        ILogger<TransactionsViewModel> logger,
+        SecureModeState secureModeState)
     {
         _accountQueries = accountQueries;
+        _secureModeState = secureModeState;
         _modalFactory = modalFactory;
         _accountRepository = accountRepository;
         _fixedExpenseProvider = fixedExpenseProvider;
@@ -110,6 +118,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
         _accountsTotalState.PropertyChanged += AccountsTotalStateOnPropertyChanged;
         _filterState.PropertyChanged += FilterStateOnPropertyChanged;
+        _secureModeState.PropertyChanged += SecureModeStateOnPropertyChanged;
 
         _ = InitializeAsync();
 
@@ -147,6 +156,30 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     {
         OnPropertyChanged(nameof(FixedExpenseCurrentMonthDescription));
     }
+
+    private void SecureModeStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            OnPropertyChanged(nameof(DisplayWealthInSats));
+            OnPropertyChanged(nameof(DisplayWealthInFiat));
+            OnPropertyChanged(nameof(DisplayAllWealthInFiat));
+            OnPropertyChanged(nameof(DisplayWealthInBtcRatio));
+            OnPropertyChanged(nameof(DisplayRemainingFixedExpensesAmount));
+
+            // Update account display for secure mode
+            foreach (var account in Accounts)
+            {
+                account.SecureModeEnabled = _secureModeState.IsEnabled;
+            }
+        });
+    }
+
+    public string DisplayWealthInSats => _secureModeState.IsEnabled ? "---" : WealthInSats;
+    public string DisplayWealthInFiat => _secureModeState.IsEnabled ? "---" : WealthInFiat;
+    public string DisplayAllWealthInFiat => _secureModeState.IsEnabled ? "---" : AllWealthInFiat;
+    public string DisplayWealthInBtcRatio => _secureModeState.IsEnabled ? "---" : WealthInBtcRatio;
+    public string DisplayRemainingFixedExpensesAmount => _secureModeState.IsEnabled ? "---" : RemainingFixedExpensesAmount;
 
     private void AccountsTotalStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -198,7 +231,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         WeakReferenceMessenger.Default.Send(accounts);
 
         Accounts.Clear();
-        Accounts.AddRange(accounts.Items.Select(x => new AccountViewModel(x)));
+        Accounts.AddRange(accounts.Items.Select(x => new AccountViewModel(x) { SecureModeEnabled = _secureModeState.IsEnabled }));
 
         if (currentSelectedAccountId is not null)
             SelectedAccount =
@@ -569,6 +602,8 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
         if (_filterState is not null)
             _filterState.PropertyChanged -= FilterStateOnPropertyChanged;
+
+        _secureModeState.PropertyChanged -= SecureModeStateOnPropertyChanged;
 
         WeakReferenceMessenger.Default.Unregister<TransactionListChanged>(this);
         WeakReferenceMessenger.Default.Unregister<FilterDateRangeChanged>(this);

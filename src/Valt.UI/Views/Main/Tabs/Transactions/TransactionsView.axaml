@@ -60,7 +60,7 @@
                             <TextBlock Grid.Column="1"
                                        Classes="wealth-value"
                                        Foreground="{DynamicResource Accent200Brush}"
-                                       Text="{Binding WealthInSats}" />
+                                       Text="{Binding DisplayWealthInSats}" />
                         </Grid>
 
                         <!-- My Other (Fiat) -->
@@ -71,7 +71,7 @@
                                        Text="{x:Static local:language.Transactions_MyOther}" />
                             <TextBlock Grid.Column="1"
                                        Classes="wealth-value"
-                                       Text="{Binding WealthInFiat}" />
+                                       Text="{Binding DisplayWealthInFiat}" />
                         </Grid>
 
                         <!-- Total in Fiat -->
@@ -82,7 +82,7 @@
                                        Text="{x:Static local:language.Transactions_TotalInFiat}" />
                             <TextBlock Grid.Column="1"
                                        Classes="wealth-value"
-                                       Text="{Binding AllWealthInFiat}" />
+                                       Text="{Binding DisplayAllWealthInFiat}" />
                         </Grid>
 
                         <!-- BTC Ratio -->
@@ -94,7 +94,7 @@
                             <TextBlock Grid.Column="1"
                                        Classes="wealth-value"
                                        Foreground="{DynamicResource Accent300Brush}"
-                                       Text="{Binding WealthInBtcRatio}" />
+                                       Text="{Binding DisplayWealthInBtcRatio}" />
                         </Grid>
                     </StackPanel>
                 </Border>
@@ -355,7 +355,7 @@
                                        FontWeight="SemiBold"
                                        VerticalAlignment="Center"
                                        Foreground="{DynamicResource Accent200Brush}"
-                                       Text="{Binding RemainingFixedExpensesAmount}"
+                                       Text="{Binding DisplayRemainingFixedExpensesAmount}"
                                        ToolTip.Tip="{Binding RemainingFixedExpensesTooltip}" />
                         </Grid>
                     </Border>

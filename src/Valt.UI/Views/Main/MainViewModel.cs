@@ -41,6 +41,7 @@ using Valt.UI.Views.Main.Modals.ManageCategories;
 using Valt.UI.Views.Main.Modals.Settings;
 using Valt.UI.Views.Main.Modals.StatusDisplay;
 using Valt.UI.Views.Main.Modals.ImportWizard;
+using Valt.UI.Views.Main.Modals.InputPassword;
 
 namespace Valt.UI.Views.Main;
 
@@ -61,6 +62,7 @@ public partial class MainViewModel : ValtViewModel
     private readonly ICsvExportService _csvExportService;
     private readonly IClock _clock;
     private readonly ILogger<MainViewModel> _logger;
+    private readonly SecureModeState _secureModeState;
 
     public MainView? Window { get; set; }
 
@@ -106,6 +108,8 @@ public partial class MainViewModel : ValtViewModel
     public UpdateIndicatorViewModel UpdateIndicator => _updateIndicatorViewModel;
     public AvaloniaList<JobInfo> Jobs { get; set; }
 
+    public string SecureModeIcon => _secureModeState?.IsEnabled == true ? "\xE897" : "\xE898";
+
     #region Event subscribers
 
     private void LocalDatabaseOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -145,7 +149,8 @@ public partial class MainViewModel : ValtViewModel
         IAllTimeHighReport allTimeHighReport,
         ICsvExportService csvExportService,
         IClock clock,
-        ILogger<MainViewModel> logger)
+        ILogger<MainViewModel> logger,
+        SecureModeState secureModeState)
     {
         _pageFactory = pageFactory;
         _modalFactory = modalFactory;
@@ -161,6 +166,7 @@ public partial class MainViewModel : ValtViewModel
         _csvExportService = csvExportService;
         _clock = clock;
         _logger = logger;
+        _secureModeState = secureModeState;
 
         _localDatabase.PropertyChanged += LocalDatabaseOnPropertyChanged;
 
@@ -200,6 +206,36 @@ public partial class MainViewModel : ValtViewModel
     private void SetAvgPriceTab()
     {
         SelectedTabComponent = _pageFactory.Create(MainViewTabNames.AvgPricePageContent);
+    }
+
+    [RelayCommand]
+    private async Task ToggleSecureMode()
+    {
+        // If leaving secure mode, require password verification
+        if (_secureModeState.IsEnabled)
+        {
+            var inputPasswordModal =
+                (InputPasswordView)await _modalFactory.CreateAsync(ApplicationModalNames.InputPassword, Window)!;
+
+            // Hide the "Start in Secure Mode" checkbox when verifying password to leave
+            var viewModel = (InputPasswordViewModel)inputPasswordModal.DataContext!;
+            viewModel.HideSecureModeCheckbox = true;
+
+            var result = await inputPasswordModal.ShowDialog<InputPasswordViewModel.Response?>(Window!);
+
+            if (result?.Password is null)
+                return;
+
+            // Verify password before allowing to leave secure mode
+            if (!_secureModeState.VerifyPassword(result.Password))
+            {
+                await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_InvalidPassword, Window!);
+                return;
+            }
+        }
+
+        _secureModeState.IsEnabled = !_secureModeState.IsEnabled;
+        OnPropertyChanged(nameof(SecureModeIcon));
     }
 
     [RelayCommand]
@@ -354,6 +390,13 @@ public partial class MainViewModel : ValtViewModel
             openedFile = true;
             SetTransactionsTab();
 
+            // Store the password hash for secure mode verification
+            _secureModeState.SetPassword(result.Password);
+
+            // Initialize secure mode state based on user preference from login
+            _secureModeState.IsEnabled = result.StartInSecureMode;
+            OnPropertyChanged(nameof(SecureModeIcon));
+
             //this avoids some race conditions with the jobs and current UI state
             Dispatcher.UIThread.Invoke(() =>
             {
@@ -393,10 +436,14 @@ public partial class MainViewModel : ValtViewModel
             if (!_priceDatabase.HasDatabaseOpen)
                 _priceDatabase!.OpenDatabase();
 
-            _backgroundJobManager!.StartAllJobs(jobType: BackgroundJobTypes.PriceDatabase);
+            _backgroundJobManager!.StartAllJobs(jobType: BackgroundJobTypes.PriceDatabase, triggerInitialRun: false);
 
-            while (_backgroundJobManager.IsRunningTasksOf(BackgroundJobTypes.PriceDatabase))
-                await Task.Delay(100);
+            // Run LivePricesUpdater synchronously to ensure rates are available before UI is shown
+            await _backgroundJobManager.TriggerJobManuallyOnCurrentThreadAsync(BackgroundJobSystemNames.LivePricesUpdater);
+
+            // Trigger history updater jobs to run in the background
+            _backgroundJobManager.TriggerJobManually(BackgroundJobSystemNames.BitcoinHistoryUpdater);
+            _backgroundJobManager.TriggerJobManually(BackgroundJobSystemNames.FiatHistoryUpdater);
 
             return true;
         }

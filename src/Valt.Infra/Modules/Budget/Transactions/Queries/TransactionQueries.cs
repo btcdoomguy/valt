@@ -48,18 +48,47 @@ public class TransactionQueries : ITransactionQueries
             query = query.Where(x => categoryIds.Contains(x.CategoryId));
         }
 
+        // Apply search filter after loading, to support searching by name, category, and account
+        List<LiteDB.ObjectId>? matchingCategoryIds = null;
+        List<LiteDB.ObjectId>? matchingAccountIds = null;
+
         if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
         {
-            query = query.Where(x => x.Name.StartsWith(filter.SearchTerm));
+            var searchTerm = filter.SearchTerm;
+
+            // Find categories that match the search term
+            var allCategoriesList = _localDatabase.GetCategories().FindAll().ToList();
+            matchingCategoryIds = allCategoriesList
+                .Where(c => c.Name.Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase))
+                .Select(c => c.Id)
+                .ToList();
+
+            // Find accounts that match the search term
+            matchingAccountIds = allAccounts.FindAll()
+                .Where(a => a.Name.Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase))
+                .Select(a => a.Id)
+                .ToList();
+
+            // Filter by name, category, or account
+            query = query.Where(x =>
+                x.Name.Contains(searchTerm) ||
+                matchingCategoryIds.Contains(x.CategoryId) ||
+                matchingAccountIds.Contains(x.FromAccountId) ||
+                (x.ToAccountId != null && matchingAccountIds.Contains(x.ToAccountId)));
         }
 
         var result = query.ToList();
 
+        // Batch load all FixedExpenseRecords for transactions to avoid N+1 queries
+        var transactionIds = result.Select(t => t.Id).ToList();
+        var fixedExpenseRecords = _localDatabase.GetFixedExpenseRecords()
+            .Include(x => x.FixedExpense)
+            .Find(x => x.Transaction != null && transactionIds.Contains(x.Transaction.Id))
+            .ToDictionary(x => x.Transaction!.Id);
+
         var dtos = result.Select(transactionEntity =>
         {
-            //TODO: optimize to avoid N-1
-            var fixedExpenseRecord = _localDatabase.GetFixedExpenseRecords().Include(x => x.FixedExpense)
-                .FindOne(x => x.Transaction != null && x.Transaction.Id == transactionEntity.Id);
+            fixedExpenseRecords.TryGetValue(transactionEntity.Id, out var fixedExpenseRecord);
 
             var category = allCategories.Items.SingleOrDefault(x => x.Id == transactionEntity.CategoryId.ToString())!;
             var fromAccount = allAccounts.FindById(transactionEntity.FromAccountId);

@@ -96,6 +96,9 @@
     <data name="InputPassword.Password" xml:space="preserve">
         <value>Senha</value>
     </data>
+    <data name="InputPassword.StartInSecureMode" xml:space="preserve">
+        <value>Iniciar em Modo Seguro</value>
+    </data>
     <data name="New" xml:space="preserve">
         <value>Novo</value>
     </data>
@@ -669,6 +672,12 @@
     <data name="Offline.Line2" xml:space="preserve">
         <value>Você está vendo os últimos preços disponíveis.</value>
     </data>
+    <data name="SecureMode.ToggleTooltip" xml:space="preserve">
+        <value>Alternar Modo Seguro</value>
+    </data>
+    <data name="Reports.SecureModeMessage" xml:space="preserve">
+        <value>Saia do Modo Seguro para ver os dados</value>
+    </data>
     <data name="Reports.Summary" xml:space="preserve">
         <value>Resumo</value>
     </data>
@@ -1173,6 +1182,9 @@
     <data name="Error.IncompatibleVersion" xml:space="preserve">
         <value>Este banco de dados requer a versão {0} ou superior do aplicativo. Você está executando a versão {1}. Por favor, atualize o aplicativo.</value>
     </data>
+    <data name="Error.InvalidPassword" xml:space="preserve">
+        <value>Senha inválida</value>
+    </data>
     <!-- Import Wizard -->
     <data name="ImportWizard_Title" xml:space="preserve">
         <value>Importar Transações</value>
@@ -1281,6 +1293,18 @@
     </data>
     <data name="ImportWizard_ProgressTransactions" xml:space="preserve">
         <value>itens</value>
+    </data>
+    <data name="ImportWizard_Hint" xml:space="preserve">
+        <value>Dica: baixe o modelo acima e utilize alguma ferramenta de IA para adaptar qualquer formato de arquivo para usar o layout CSV acima. Os dados precisam seguir estritamente esse formato do arquivo CSV modelo.</value>
+    </data>
+    <data name="ImportWizard_SelectCsvFileTitle" xml:space="preserve">
+        <value>Selecionar Arquivo CSV</value>
+    </data>
+    <data name="ImportWizard_DownloadTemplateTitle" xml:space="preserve">
+        <value>Baixar Modelo</value>
+    </data>
+    <data name="ImportWizard_ImportCompletedWithErrors" xml:space="preserve">
+        <value>Importação concluída com erros: {0} problemas</value>
     </data>
     <data name="CsvImport_CreatingAccounts" xml:space="preserve">
         <value>Criando contas...</value>

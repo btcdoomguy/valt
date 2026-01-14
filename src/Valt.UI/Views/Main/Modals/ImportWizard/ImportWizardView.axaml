@@ -262,7 +262,7 @@
                         <StackPanel IsVisible="{Binding !IsFileSelected}">
                             <Border Classes="hint-box" Height="80">
                                 <TextBlock
-                                    Text="Dica: baixe o modelo acima e utilize alguma ferramenta de IA para adaptar qualquer formato de arquivo para usar o layout CSV acima. Os dados precisam seguir estritamente esse formato do arquivo CSV modelo."
+                                    Text="{x:Static local:language.ImportWizard_Hint}"
                                     TextWrapping="Wrap">
                                 </TextBlock>
                             </Border>

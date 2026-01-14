@@ -19,6 +19,7 @@ using Valt.UI.Services.MessageBoxes;
 using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Modals.AvgPriceLineEditor;
 using Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles;
+using Valt.UI.State;
 using Valt.UI.Views.Main.Tabs.AvgPrice.Models;
 
 namespace Valt.UI.Views.Main.Tabs.AvgPrice;
@@ -30,6 +31,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
     private readonly IAvgPriceTotalizer _avgPriceTotalizer;
     private readonly IModalFactory _modalFactory;
     private readonly IClock _clock;
+    private readonly SecureModeState? _secureModeState;
 
     [ObservableProperty] private AvaloniaList<AvgPriceProfileDTO> _profiles = new();
     [ObservableProperty] private AvgPriceProfileDTO? _selectedProfile;
@@ -47,6 +49,10 @@ public partial class AvgPriceViewModel : ValtTabViewModel
     // Current position summary (from last line)
     [ObservableProperty] private string _currentPosition = "-";
     [ObservableProperty] private string _currentAvgPrice = "-";
+
+    public string DisplayCurrentPosition => _secureModeState?.IsEnabled == true ? "---" : CurrentPosition;
+    public string DisplayCurrentAvgPrice => _secureModeState?.IsEnabled == true ? "---" : CurrentAvgPrice;
+    public bool IsSecureModeEnabled => _secureModeState?.IsEnabled == true;
 
     public override MainViewTabNames TabName => MainViewTabNames.AvgPricePageContent;
 
@@ -78,13 +84,22 @@ public partial class AvgPriceViewModel : ValtTabViewModel
         IAvgPriceRepository avgPriceRepository,
         IAvgPriceTotalizer avgPriceTotalizer,
         IModalFactory modalFactory,
-        IClock clock)
+        IClock clock,
+        SecureModeState secureModeState)
     {
         _avgPriceQueries = avgPriceQueries;
         _avgPriceRepository = avgPriceRepository;
         _avgPriceTotalizer = avgPriceTotalizer;
         _modalFactory = modalFactory;
         _clock = clock;
+        _secureModeState = secureModeState;
+
+        _secureModeState.PropertyChanged += (_, _) =>
+        {
+            OnPropertyChanged(nameof(DisplayCurrentPosition));
+            OnPropertyChanged(nameof(DisplayCurrentAvgPrice));
+            OnPropertyChanged(nameof(IsSecureModeEnabled));
+        };
 
         TotalsFilterDate = _clock.GetCurrentDateTimeUtc();
     }
