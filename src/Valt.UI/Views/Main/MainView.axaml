@@ -101,6 +101,15 @@
                     </Button>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Classes="icon-only transparent link"
+                            FontFamily="{DynamicResource MaterialDesign}"
+                            FontSize="28"
+                            Padding="8"
+                            Margin="0, 24, 10, 0"
+                            VerticalAlignment="Top"
+                            Content="{Binding SecureModeIcon}"
+                            Command="{Binding ToggleSecureModeCommand}"
+                            ToolTip.Tip="{x:Static local:language.SecureMode_ToggleTooltip}" />
                     <Border IsVisible="{Binding IsOffline}"
                             Margin="0, 10, 10, 0"
                             Padding="8, 14"

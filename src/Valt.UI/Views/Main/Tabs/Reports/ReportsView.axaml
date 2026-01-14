@@ -20,7 +20,8 @@
     <Design.DataContext>
         <reports1:ReportsViewModel />
     </Design.DataContext>
-    <ScrollViewer>
+    <Grid>
+        <ScrollViewer IsVisible="{Binding !IsSecureModeEnabled}">
         <StackPanel Margin="16">
             <!--Summary-->
             <Expander Classes="section" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsExpanded="True">
@@ -303,5 +304,17 @@
                 </StackPanel>
             </Expander>
         </StackPanel>
-    </ScrollViewer>
+        </ScrollViewer>
+        <!-- Secure Mode Overlay -->
+        <Border IsVisible="{Binding IsSecureModeEnabled}"
+                Background="{DynamicResource Background800Brush}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+            <TextBlock Text="{x:Static lang:language.Reports_SecureModeMessage}"
+                       FontSize="18"
+                       Foreground="{DynamicResource Text400Brush}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center" />
+        </Border>
+    </Grid>
 </UserControl>

@@ -131,6 +131,9 @@
     <data name="InputPassword.Password" xml:space="preserve">
         <value>Password</value>
     </data>
+    <data name="InputPassword.StartInSecureMode" xml:space="preserve">
+        <value>Start in Secure Mode</value>
+    </data>
     <data name="ManageAccount.Title" xml:space="preserve">
         <value>Add/edit account</value>
     </data>
@@ -706,6 +709,12 @@
     </data>
     <data name="Offline.Line2" xml:space="preserve">
         <value>You are seeing the last recorded prices.</value>
+    </data>
+    <data name="SecureMode.ToggleTooltip" xml:space="preserve">
+        <value>Toggle Secure Mode</value>
+    </data>
+    <data name="Reports.SecureModeMessage" xml:space="preserve">
+        <value>Leave Secure Mode to see the data</value>
     </data>
     <data name="Reports.Summary" xml:space="preserve">
         <value>Summary</value>
@@ -1301,6 +1310,18 @@
     </data>
     <data name="ImportWizard_ProgressTransactions" xml:space="preserve">
         <value>items</value>
+    </data>
+    <data name="ImportWizard_Hint" xml:space="preserve">
+        <value>Tip: Download the template above and use any AI tool to convert any file format to the required CSV layout. Data must strictly follow the template format.</value>
+    </data>
+    <data name="ImportWizard_SelectCsvFileTitle" xml:space="preserve">
+        <value>Select CSV File</value>
+    </data>
+    <data name="ImportWizard_DownloadTemplateTitle" xml:space="preserve">
+        <value>Download Template</value>
+    </data>
+    <data name="ImportWizard_ImportCompletedWithErrors" xml:space="preserve">
+        <value>Import completed with errors: {0} issues</value>
     </data>
     <data name="CsvImport_CreatingAccounts" xml:space="preserve">
         <value>Creating accounts...</value>

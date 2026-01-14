@@ -192,6 +192,7 @@ public static class Extensions
         services.AddSingleton<AccountsTotalState>();
         services.AddSingleton<FilterState>();
         services.AddSingleton<LiveRateState>();
+        services.AddSingleton<SecureModeState>();
 
         return services;
     }

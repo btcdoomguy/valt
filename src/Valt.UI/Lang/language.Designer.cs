@@ -260,7 +260,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("InputPassword.Password", resourceCulture);
             }
         }
-        
+
+        public static string InputPassword_StartInSecureMode {
+            get {
+                return ResourceManager.GetString("InputPassword.StartInSecureMode", resourceCulture);
+            }
+        }
+
         public static string ManageAccount_Title {
             get {
                 return ResourceManager.GetString("ManageAccount.Title", resourceCulture);
@@ -1412,7 +1418,19 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Offline.Line2", resourceCulture);
             }
         }
-        
+
+        public static string SecureMode_ToggleTooltip {
+            get {
+                return ResourceManager.GetString("SecureMode.ToggleTooltip", resourceCulture);
+            }
+        }
+
+        public static string Reports_SecureModeMessage {
+            get {
+                return ResourceManager.GetString("Reports.SecureModeMessage", resourceCulture);
+            }
+        }
+
         public static string Reports_Summary {
             get {
                 return ResourceManager.GetString("Reports.Summary", resourceCulture);
@@ -2580,6 +2598,30 @@ namespace Valt.UI.Lang {
         public static string ImportWizard_ProgressTransactions {
             get {
                 return ResourceManager.GetString("ImportWizard_ProgressTransactions", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_Hint {
+            get {
+                return ResourceManager.GetString("ImportWizard_Hint", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_SelectCsvFileTitle {
+            get {
+                return ResourceManager.GetString("ImportWizard_SelectCsvFileTitle", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_DownloadTemplateTitle {
+            get {
+                return ResourceManager.GetString("ImportWizard_DownloadTemplateTitle", resourceCulture);
+            }
+        }
+
+        public static string ImportWizard_ImportCompletedWithErrors {
+            get {
+                return ResourceManager.GetString("ImportWizard_ImportCompletedWithErrors", resourceCulture);
             }
         }
 

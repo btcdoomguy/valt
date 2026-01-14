@@ -99,7 +99,7 @@ public partial class InitialSelectionViewModel : ValtModalViewModel
 
         await UpdateRecentFilesAsync(SelectedFile);
 
-        CloseDialog?.Invoke(new Response() { File = SelectedFile!, Password = inputPasswordResult.Password });
+        CloseDialog?.Invoke(new Response() { File = SelectedFile!, Password = inputPasswordResult.Password, StartInSecureMode = inputPasswordResult.StartInSecureMode });
     }
 
     [RelayCommand]
@@ -126,7 +126,7 @@ public partial class InitialSelectionViewModel : ValtModalViewModel
 
         await UpdateRecentFilesAsync(pathResponse);
 
-        CloseDialog?.Invoke(new Response() { File = pathResponse!, Password = inputPasswordResult.Password });
+        CloseDialog?.Invoke(new Response() { File = pathResponse!, Password = inputPasswordResult.Password, StartInSecureMode = inputPasswordResult.StartInSecureMode });
     }
 
     [RelayCommand]
@@ -180,5 +180,6 @@ public partial class InitialSelectionViewModel : ValtModalViewModel
         public bool IsNew { get; init; }
         public string? InitialDataLanguage { get; init; }
         public List<string>? SelectedCurrencies { get; init; }
+        public bool StartInSecureMode { get; init; }
     }
 }

@@ -61,6 +61,7 @@ public partial class MainViewModel : ValtViewModel
     private readonly ICsvExportService _csvExportService;
     private readonly IClock _clock;
     private readonly ILogger<MainViewModel> _logger;
+    private readonly SecureModeState _secureModeState;
 
     public MainView? Window { get; set; }
 
@@ -106,6 +107,8 @@ public partial class MainViewModel : ValtViewModel
     public UpdateIndicatorViewModel UpdateIndicator => _updateIndicatorViewModel;
     public AvaloniaList<JobInfo> Jobs { get; set; }
 
+    public string SecureModeIcon => _secureModeState?.IsEnabled == true ? "\xE897" : "\xE898";
+
     #region Event subscribers
 
     private void LocalDatabaseOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -145,7 +148,8 @@ public partial class MainViewModel : ValtViewModel
         IAllTimeHighReport allTimeHighReport,
         ICsvExportService csvExportService,
         IClock clock,
-        ILogger<MainViewModel> logger)
+        ILogger<MainViewModel> logger,
+        SecureModeState secureModeState)
     {
         _pageFactory = pageFactory;
         _modalFactory = modalFactory;
@@ -161,6 +165,7 @@ public partial class MainViewModel : ValtViewModel
         _csvExportService = csvExportService;
         _clock = clock;
         _logger = logger;
+        _secureModeState = secureModeState;
 
         _localDatabase.PropertyChanged += LocalDatabaseOnPropertyChanged;
 
@@ -200,6 +205,13 @@ public partial class MainViewModel : ValtViewModel
     private void SetAvgPriceTab()
     {
         SelectedTabComponent = _pageFactory.Create(MainViewTabNames.AvgPricePageContent);
+    }
+
+    [RelayCommand]
+    private void ToggleSecureMode()
+    {
+        _secureModeState.IsEnabled = !_secureModeState.IsEnabled;
+        OnPropertyChanged(nameof(SecureModeIcon));
     }
 
     [RelayCommand]
@@ -353,6 +365,10 @@ public partial class MainViewModel : ValtViewModel
 
             openedFile = true;
             SetTransactionsTab();
+
+            // Initialize secure mode state based on user preference from login
+            _secureModeState.IsEnabled = result.StartInSecureMode;
+            OnPropertyChanged(nameof(SecureModeIcon));
 
             //this avoids some race conditions with the jobs and current UI state
             Dispatcher.UIThread.Invoke(() =>

@@ -45,6 +45,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly ILogger<ReportsViewModel> _logger;
     private readonly AccountsTotalState _accountsTotalState;
     private readonly RatesState _ratesState;
+    private readonly SecureModeState _secureModeState;
 
     private const long TotalBtcSupplySats = 21_000_000_00_000_000L; // 21 million BTC in sats
 
@@ -70,6 +71,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private bool _isMonthlyTotalsLoading = true;
     [ObservableProperty] private bool _isSpendingByCategoriesLoading = true;
 
+    public bool IsSecureModeEnabled => _secureModeState.IsEnabled;
+
     // Pie chart filter collections
     [ObservableProperty] private AvaloniaList<SelectItem> _availableAccounts = new();
     [ObservableProperty] private AvaloniaList<SelectItem> _selectedAccounts = new();
@@ -91,7 +94,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         IClock clock,
         ILogger<ReportsViewModel> logger,
         AccountsTotalState accountsTotalState,
-        RatesState ratesState)
+        RatesState ratesState,
+        SecureModeState secureModeState)
     {
         _allTimeHighReport = allTimeHighReport;
         _monthlyTotalsReport = monthlyTotalsReport;
@@ -104,6 +108,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _logger = logger;
         _accountsTotalState = accountsTotalState;
         _ratesState = ratesState;
+        _secureModeState = secureModeState;
+
+        _secureModeState.PropertyChanged += (_, _) => OnPropertyChanged(nameof(IsSecureModeEnabled));
 
         FilterMainDate = CategoryFilterMainDate = _clock.GetCurrentDateTimeUtc();
         FilterRange = new DateRange(new DateTime(FilterMainDate.Year, 1, 1), new DateTime(FilterMainDate.Year, 12, 31));
