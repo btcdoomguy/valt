@@ -116,7 +116,9 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <!-- Had to create a clickable area using the background transparent to proper render the contextmenu on right click otherwise clickable area doesn't work! -->
-                                <Border Padding="3,3" Background="Transparent">
+                                <Border Padding="3,3" Background="Transparent"
+                                        BorderBrush="{DynamicResource Background700Brush}"
+                                        BorderThickness="0,0,0,1">
                                     <Grid ColumnDefinitions="44, *" Opacity="{Binding Visible, Converter={StaticResource BoolToOpacityConverter}}">
                                         <Label
                                             Grid.Column="0"
