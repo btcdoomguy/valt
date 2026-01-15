@@ -1,281 +1,16 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <!-- Theme-aware colors using ThemeDictionaries -->
-    <ResourceDictionary.ThemeDictionaries>
-        <!-- Dark Theme -->
-        <ResourceDictionary x:Key="Dark">
-            <Color x:Key="Accent100Color">#ffe2bb</Color>
-            <Color x:Key="Accent200Color">#ffcc88</Color>
-            <Color x:Key="Accent300Color">#ffb755</Color>
-            <Color x:Key="Accent400Color">#ffa122</Color>
-            <Color x:Key="Accent500Color">#e98805</Color>
-            <Color x:Key="Accent600Color">#b26a09</Color>
-            <Color x:Key="Accent700Color">#7e4d0a</Color>
-            <Color x:Key="Accent800Color">#4d3008</Color>
-            <Color x:Key="Accent900Color">#1e1304</Color>
-            <Color x:Key="Secondary100Color">#bbd8ff</Color>
-            <Color x:Key="Secondary200Color">#88bbff</Color>
-            <Color x:Key="Secondary300Color">#559dff</Color>
-            <Color x:Key="Secondary400Color">#2280ff</Color>
-            <Color x:Key="Secondary500Color">#0566e9</Color>
-            <Color x:Key="Secondary600Color">#0951b2</Color>
-            <Color x:Key="Secondary700Color">#0a3b7e</Color>
-            <Color x:Key="Secondary800Color">#08254d</Color>
-            <Color x:Key="Secondary900Color">#040f1e</Color>
-            <Color x:Key="Text100Color">#fdfdfc</Color>
-            <Color x:Key="Text200Color">#eeebe8</Color>
-            <Color x:Key="Text300Color">#cfccc9</Color>
-            <Color x:Key="Text400Color">#a8a6a4</Color>
-            <Color x:Key="Text500Color">#83807c</Color>
-            <Color x:Key="Text600Color">#6b6761</Color>
-            <Color x:Key="Text700Color">#544e45</Color>
-            <Color x:Key="Text800Color">#3b342b</Color>
-            <Color x:Key="Text900Color">#1f1a14</Color>
-            <Color x:Key="Background100Color">#fcfcfc</Color>
-            <Color x:Key="Background200Color">#ebebeb</Color>
-            <Color x:Key="Background300Color">#cccccc</Color>
-            <Color x:Key="Background400Color">#a6a6a6</Color>
-            <Color x:Key="Background500Color">#808080</Color>
-            <Color x:Key="Background600Color">#666666</Color>
-            <Color x:Key="Background700Color">#4d4d4d</Color>
-            <Color x:Key="Background800Color">#333333</Color>
-            <Color x:Key="Background900Color">#1a1a1a</Color>
-            <Color x:Key="Disabled100Color">#fcfcfc</Color>
-            <Color x:Key="Disabled200Color">#ebebeb</Color>
-            <Color x:Key="Disabled300Color">#cccccc</Color>
-            <Color x:Key="Disabled400Color">#a6a6a6</Color>
-            <Color x:Key="Disabled500Color">#808080</Color>
-            <Color x:Key="Disabled600Color">#666666</Color>
-            <Color x:Key="Disabled700Color">#4d4d4d</Color>
-            <Color x:Key="Disabled800Color">#333333</Color>
-            <Color x:Key="Disabled900Color">#1a1a1a</Color>
-            <Color x:Key="Divider100Color">#fdfdfc</Color>
-            <Color x:Key="Divider200Color">#eeebe8</Color>
-            <Color x:Key="Divider300Color">#cfccc9</Color>
-            <Color x:Key="Divider400Color">#a8a6a4</Color>
-            <Color x:Key="Divider500Color">#83807c</Color>
-            <Color x:Key="Divider600Color">#6b6761</Color>
-            <Color x:Key="Divider700Color">#544e45</Color>
-            <Color x:Key="Divider800Color">#3b342b</Color>
-            <Color x:Key="Divider900Color">#1f1a14</Color>
-            <Color x:Key="Icon100Color">#bbd8ff</Color>
-            <Color x:Key="Icon200Color">#88bbff</Color>
-            <Color x:Key="Icon300Color">#559dff</Color>
-            <Color x:Key="Icon400Color">#2280ff</Color>
-            <Color x:Key="Icon500Color">#0566e9</Color>
-            <Color x:Key="Icon600Color">#0951b2</Color>
-            <Color x:Key="Icon700Color">#0a3b7e</Color>
-            <Color x:Key="Icon800Color">#08254d</Color>
-            <Color x:Key="Icon900Color">#040f1e</Color>
-            <Color x:Key="SemanticInfo100Color">#8888ff</Color>
-            <Color x:Key="SemanticInfo200Color">#5555ff</Color>
-            <Color x:Key="SemanticInfo300Color">#2222ff</Color>
-            <Color x:Key="SemanticInfo400Color">#0606e8</Color>
-            <Color x:Key="SemanticInfo500Color">#0909b2</Color>
-            <Color x:Key="SemanticInfo600Color">#0a0a7e</Color>
-            <Color x:Key="SemanticInfo700Color">#08084d</Color>
-            <Color x:Key="SemanticInfo800Color">#04041e</Color>
-            <Color x:Key="SemanticInfo900Color">#000000</Color>
-            <Color x:Key="SemanticNegative100Color">#ff8888</Color>
-            <Color x:Key="SemanticNegative200Color">#ff5555</Color>
-            <Color x:Key="SemanticNegative300Color">#ff2222</Color>
-            <Color x:Key="SemanticNegative400Color">#e80606</Color>
-            <Color x:Key="SemanticNegative500Color">#b20909</Color>
-            <Color x:Key="SemanticNegative600Color">#7e0a0a</Color>
-            <Color x:Key="SemanticNegative700Color">#4d0808</Color>
-            <Color x:Key="SemanticNegative800Color">#1e0404</Color>
-            <Color x:Key="SemanticNegative900Color">#000000</Color>
-            <Color x:Key="SemanticPositive100Color">#88ff88</Color>
-            <Color x:Key="SemanticPositive200Color">#55ff55</Color>
-            <Color x:Key="SemanticPositive300Color">#22ff22</Color>
-            <Color x:Key="SemanticPositive400Color">#06e806</Color>
-            <Color x:Key="SemanticPositive500Color">#09b209</Color>
-            <Color x:Key="SemanticPositive600Color">#0a7e0a</Color>
-            <Color x:Key="SemanticPositive700Color">#084d08</Color>
-            <Color x:Key="SemanticPositive800Color">#041e04</Color>
-            <Color x:Key="SemanticPositive900Color">#000000</Color>
-            <Color x:Key="SemanticSpecial100Color">#ff88ff</Color>
-            <Color x:Key="SemanticSpecial200Color">#ff55ff</Color>
-            <Color x:Key="SemanticSpecial300Color">#ff22ff</Color>
-            <Color x:Key="SemanticSpecial400Color">#e806e8</Color>
-            <Color x:Key="SemanticSpecial500Color">#b209b2</Color>
-            <Color x:Key="SemanticSpecial600Color">#7e0a7e</Color>
-            <Color x:Key="SemanticSpecial700Color">#4d084d</Color>
-            <Color x:Key="SemanticSpecial800Color">#1e041e</Color>
-            <Color x:Key="SemanticSpecial900Color">#000000</Color>
-            <Color x:Key="SemanticWarning100Color">#fbffd5</Color>
-            <Color x:Key="SemanticWarning200Color">#f6ffa2</Color>
-            <Color x:Key="SemanticWarning300Color">#f1ff6f</Color>
-            <Color x:Key="SemanticWarning400Color">#eafb40</Color>
-            <Color x:Key="SemanticWarning500Color">#dff414</Color>
-            <Color x:Key="SemanticWarning600Color">#b5c60f</Color>
-            <Color x:Key="SemanticWarning700Color">#86930f</Color>
-            <Color x:Key="SemanticWarning800Color">#5a620d</Color>
-            <Color x:Key="SemanticWarning900Color">#2f3309</Color>
-            <Color x:Key="BlackColor">#1f1a14</Color>
-            <Color x:Key="WhiteColor">#ffffff</Color>
-            <Color x:Key="LiveRatesBackgroundColor">#0D0D0D</Color>
-            <Color x:Key="LiveRatesBorderGradientStartColor">#2A2A2A</Color>
-            <Color x:Key="LiveRatesBorderGradientEndColor">#1A1A1A</Color>
-            <Color x:Key="LiveRatesVariationBackgroundColor">#1A1A1A</Color>
-            <Color x:Key="ButtonOverlayLightColor">#69FFFFFF</Color>
-            <Color x:Key="ButtonOverlayMediumColor">#49FFFFFF</Color>
-            <Color x:Key="StepIndicatorActiveColor">#0078D4</Color>
-            <Color x:Key="StepIndicatorInactiveColor">#6B6B6B</Color>
-            <Color x:Key="StepIndicatorInactiveLightColor">#9E9E9E</Color>
-            <Color x:Key="MessageBoxInfoColor">#2196F3</Color>
-            <Color x:Key="MessageBoxWarningColor">#FF9800</Color>
-            <Color x:Key="MessageBoxErrorColor">#F44336</Color>
-            <Color x:Key="MessageBoxQuestionColor">#9C27B0</Color>
-            <Color x:Key="ColorPickerSelectedBorderColor">#FFE98805</Color>
-            <Color x:Key="ModalTopBarBackgroundColor">#444444</Color>
-            <Color x:Key="TopBarButtonBackgroundColor">#5B3800</Color>
-            <Color x:Key="TopBarButtonBackgroundHoverColor">#7A5500</Color>
-            <Color x:Key="TopBarButtonBackgroundSelectedColor">#FF9E00</Color>
-            <Color x:Key="TopBarButtonForegroundColor">#FFA500</Color>
-            <Color x:Key="TopBarButtonForegroundHoverColor">#FFFFFF</Color>
-            <Color x:Key="FooterGradientStartColor">#000000</Color>
-            <Color x:Key="IconSelectorDefaultColor">#FFFFFF</Color>
-        </ResourceDictionary>
+    <!--
+         Color Resources - Brush Definitions
 
-        <!-- Light Theme -->
-        <ResourceDictionary x:Key="Light">
-            <Color x:Key="Accent100Color">#ffe2bb</Color>
-            <Color x:Key="Accent200Color">#ffcc88</Color>
-            <Color x:Key="Accent300Color">#ffb755</Color>
-            <Color x:Key="Accent400Color">#ffa122</Color>
-            <Color x:Key="Accent500Color">#e98805</Color>
-            <Color x:Key="Accent600Color">#b26a09</Color>
-            <Color x:Key="Accent700Color">#7e4d0a</Color>
-            <Color x:Key="Accent800Color">#4d3008</Color>
-            <Color x:Key="Accent900Color">#1e1304</Color>
-            <Color x:Key="Secondary100Color">#bbd8ff</Color>
-            <Color x:Key="Secondary200Color">#88bbff</Color>
-            <Color x:Key="Secondary300Color">#559dff</Color>
-            <Color x:Key="Secondary400Color">#2280ff</Color>
-            <Color x:Key="Secondary500Color">#0566e9</Color>
-            <Color x:Key="Secondary600Color">#0951b2</Color>
-            <Color x:Key="Secondary700Color">#0a3b7e</Color>
-            <Color x:Key="Secondary800Color">#08254d</Color>
-            <Color x:Key="Secondary900Color">#040f1e</Color>
-            <Color x:Key="Text100Color">#1f1a14</Color>
-            <Color x:Key="Text200Color">#3b342b</Color>
-            <Color x:Key="Text300Color">#544e45</Color>
-            <Color x:Key="Text400Color">#6b6761</Color>
-            <Color x:Key="Text500Color">#83807c</Color>
-            <Color x:Key="Text600Color">#a8a6a4</Color>
-            <Color x:Key="Text700Color">#cfccc9</Color>
-            <Color x:Key="Text800Color">#eeebe8</Color>
-            <Color x:Key="Text900Color">#fdfdfc</Color>
-            <Color x:Key="Background100Color">#1a1a1a</Color>
-            <Color x:Key="Background200Color">#333333</Color>
-            <Color x:Key="Background300Color">#4d4d4d</Color>
-            <Color x:Key="Background400Color">#666666</Color>
-            <Color x:Key="Background500Color">#808080</Color>
-            <Color x:Key="Background600Color">#a6a6a6</Color>
-            <Color x:Key="Background700Color">#cccccc</Color>
-            <Color x:Key="Background800Color">#ebebeb</Color>
-            <Color x:Key="Background900Color">#fcfcfc</Color>
-            <Color x:Key="Disabled100Color">#1a1a1a</Color>
-            <Color x:Key="Disabled200Color">#333333</Color>
-            <Color x:Key="Disabled300Color">#4d4d4d</Color>
-            <Color x:Key="Disabled400Color">#666666</Color>
-            <Color x:Key="Disabled500Color">#808080</Color>
-            <Color x:Key="Disabled600Color">#a6a6a6</Color>
-            <Color x:Key="Disabled700Color">#cccccc</Color>
-            <Color x:Key="Disabled800Color">#ebebeb</Color>
-            <Color x:Key="Disabled900Color">#fcfcfc</Color>
-            <Color x:Key="Divider100Color">#1f1a14</Color>
-            <Color x:Key="Divider200Color">#3b342b</Color>
-            <Color x:Key="Divider300Color">#544e45</Color>
-            <Color x:Key="Divider400Color">#6b6761</Color>
-            <Color x:Key="Divider500Color">#83807c</Color>
-            <Color x:Key="Divider600Color">#a8a6a4</Color>
-            <Color x:Key="Divider700Color">#cfccc9</Color>
-            <Color x:Key="Divider800Color">#eeebe8</Color>
-            <Color x:Key="Divider900Color">#fdfdfc</Color>
-            <Color x:Key="Icon100Color">#bbd8ff</Color>
-            <Color x:Key="Icon200Color">#88bbff</Color>
-            <Color x:Key="Icon300Color">#559dff</Color>
-            <Color x:Key="Icon400Color">#2280ff</Color>
-            <Color x:Key="Icon500Color">#0566e9</Color>
-            <Color x:Key="Icon600Color">#0951b2</Color>
-            <Color x:Key="Icon700Color">#0a3b7e</Color>
-            <Color x:Key="Icon800Color">#08254d</Color>
-            <Color x:Key="Icon900Color">#040f1e</Color>
-            <Color x:Key="SemanticInfo100Color">#8888ff</Color>
-            <Color x:Key="SemanticInfo200Color">#5555ff</Color>
-            <Color x:Key="SemanticInfo300Color">#2222ff</Color>
-            <Color x:Key="SemanticInfo400Color">#0606e8</Color>
-            <Color x:Key="SemanticInfo500Color">#0909b2</Color>
-            <Color x:Key="SemanticInfo600Color">#0a0a7e</Color>
-            <Color x:Key="SemanticInfo700Color">#08084d</Color>
-            <Color x:Key="SemanticInfo800Color">#04041e</Color>
-            <Color x:Key="SemanticInfo900Color">#000000</Color>
-            <Color x:Key="SemanticNegative100Color">#ff8888</Color>
-            <Color x:Key="SemanticNegative200Color">#ff5555</Color>
-            <Color x:Key="SemanticNegative300Color">#ff2222</Color>
-            <Color x:Key="SemanticNegative400Color">#e80606</Color>
-            <Color x:Key="SemanticNegative500Color">#b20909</Color>
-            <Color x:Key="SemanticNegative600Color">#7e0a0a</Color>
-            <Color x:Key="SemanticNegative700Color">#4d0808</Color>
-            <Color x:Key="SemanticNegative800Color">#1e0404</Color>
-            <Color x:Key="SemanticNegative900Color">#000000</Color>
-            <Color x:Key="SemanticPositive100Color">#88ff88</Color>
-            <Color x:Key="SemanticPositive200Color">#55ff55</Color>
-            <Color x:Key="SemanticPositive300Color">#22ff22</Color>
-            <Color x:Key="SemanticPositive400Color">#06e806</Color>
-            <Color x:Key="SemanticPositive500Color">#09b209</Color>
-            <Color x:Key="SemanticPositive600Color">#0a7e0a</Color>
-            <Color x:Key="SemanticPositive700Color">#084d08</Color>
-            <Color x:Key="SemanticPositive800Color">#041e04</Color>
-            <Color x:Key="SemanticPositive900Color">#000000</Color>
-            <Color x:Key="SemanticSpecial100Color">#ff88ff</Color>
-            <Color x:Key="SemanticSpecial200Color">#ff55ff</Color>
-            <Color x:Key="SemanticSpecial300Color">#ff22ff</Color>
-            <Color x:Key="SemanticSpecial400Color">#e806e8</Color>
-            <Color x:Key="SemanticSpecial500Color">#b209b2</Color>
-            <Color x:Key="SemanticSpecial600Color">#7e0a7e</Color>
-            <Color x:Key="SemanticSpecial700Color">#4d084d</Color>
-            <Color x:Key="SemanticSpecial800Color">#1e041e</Color>
-            <Color x:Key="SemanticSpecial900Color">#000000</Color>
-            <Color x:Key="SemanticWarning100Color">#fbffd5</Color>
-            <Color x:Key="SemanticWarning200Color">#f6ffa2</Color>
-            <Color x:Key="SemanticWarning300Color">#f1ff6f</Color>
-            <Color x:Key="SemanticWarning400Color">#eafb40</Color>
-            <Color x:Key="SemanticWarning500Color">#dff414</Color>
-            <Color x:Key="SemanticWarning600Color">#b5c60f</Color>
-            <Color x:Key="SemanticWarning700Color">#86930f</Color>
-            <Color x:Key="SemanticWarning800Color">#5a620d</Color>
-            <Color x:Key="SemanticWarning900Color">#2f3309</Color>
-            <Color x:Key="BlackColor">#fdfdfc</Color>
-            <Color x:Key="WhiteColor">#1f1a14</Color>
-            <Color x:Key="LiveRatesBackgroundColor">#F5F5F5</Color>
-            <Color x:Key="LiveRatesBorderGradientStartColor">#E0E0E0</Color>
-            <Color x:Key="LiveRatesBorderGradientEndColor">#EBEBEB</Color>
-            <Color x:Key="LiveRatesVariationBackgroundColor">#EBEBEB</Color>
-            <Color x:Key="ButtonOverlayLightColor">#30000000</Color>
-            <Color x:Key="ButtonOverlayMediumColor">#20000000</Color>
-            <Color x:Key="StepIndicatorActiveColor">#0078D4</Color>
-            <Color x:Key="StepIndicatorInactiveColor">#B0B0B0</Color>
-            <Color x:Key="StepIndicatorInactiveLightColor">#808080</Color>
-            <Color x:Key="MessageBoxInfoColor">#2196F3</Color>
-            <Color x:Key="MessageBoxWarningColor">#FF9800</Color>
-            <Color x:Key="MessageBoxErrorColor">#F44336</Color>
-            <Color x:Key="MessageBoxQuestionColor">#9C27B0</Color>
-            <Color x:Key="ColorPickerSelectedBorderColor">#FFE98805</Color>
-            <Color x:Key="ModalTopBarBackgroundColor">#E0E0E0</Color>
-            <Color x:Key="TopBarButtonBackgroundColor">#FFE0B0</Color>
-            <Color x:Key="TopBarButtonBackgroundHoverColor">#FFCC80</Color>
-            <Color x:Key="TopBarButtonBackgroundSelectedColor">#FFA000</Color>
-            <Color x:Key="TopBarButtonForegroundColor">#7E4D0A</Color>
-            <Color x:Key="TopBarButtonForegroundHoverColor">#4D3008</Color>
-            <Color x:Key="FooterGradientStartColor">#FFFFFF</Color>
-            <Color x:Key="IconSelectorDefaultColor">#1F1A14</Color>
-        </ResourceDictionary>
-    </ResourceDictionary.ThemeDictionaries>
+         This file defines brushes that reference color keys.
+         The actual color values are provided by theme files in Styles/Themes/.
 
-    <!-- Brushes that reference theme-aware colors -->
+         Theme files (DefaultTheme.axaml, OceanTheme.axaml, etc.) are loaded
+         dynamically by ThemeService at runtime.
+    -->
+
+    <!-- Accent Brushes -->
     <SolidColorBrush x:Key="Accent100Brush" Color="{DynamicResource Accent100Color}" />
     <SolidColorBrush x:Key="Accent200Brush" Color="{DynamicResource Accent200Color}" />
     <SolidColorBrush x:Key="Accent300Brush" Color="{DynamicResource Accent300Color}" />
@@ -285,6 +20,8 @@
     <SolidColorBrush x:Key="Accent700Brush" Color="{DynamicResource Accent700Color}" />
     <SolidColorBrush x:Key="Accent800Brush" Color="{DynamicResource Accent800Color}" />
     <SolidColorBrush x:Key="Accent900Brush" Color="{DynamicResource Accent900Color}" />
+
+    <!-- Secondary Brushes -->
     <SolidColorBrush x:Key="Secondary100Brush" Color="{DynamicResource Secondary100Color}" />
     <SolidColorBrush x:Key="Secondary200Brush" Color="{DynamicResource Secondary200Color}" />
     <SolidColorBrush x:Key="Secondary300Brush" Color="{DynamicResource Secondary300Color}" />
@@ -294,6 +31,8 @@
     <SolidColorBrush x:Key="Secondary700Brush" Color="{DynamicResource Secondary700Color}" />
     <SolidColorBrush x:Key="Secondary800Brush" Color="{DynamicResource Secondary800Color}" />
     <SolidColorBrush x:Key="Secondary900Brush" Color="{DynamicResource Secondary900Color}" />
+
+    <!-- Text Brushes -->
     <SolidColorBrush x:Key="Text100Brush" Color="{DynamicResource Text100Color}" />
     <SolidColorBrush x:Key="Text200Brush" Color="{DynamicResource Text200Color}" />
     <SolidColorBrush x:Key="Text300Brush" Color="{DynamicResource Text300Color}" />
@@ -303,6 +42,8 @@
     <SolidColorBrush x:Key="Text700Brush" Color="{DynamicResource Text700Color}" />
     <SolidColorBrush x:Key="Text800Brush" Color="{DynamicResource Text800Color}" />
     <SolidColorBrush x:Key="Text900Brush" Color="{DynamicResource Text900Color}" />
+
+    <!-- Background Brushes -->
     <SolidColorBrush x:Key="Background100Brush" Color="{DynamicResource Background100Color}" />
     <SolidColorBrush x:Key="Background200Brush" Color="{DynamicResource Background200Color}" />
     <SolidColorBrush x:Key="Background300Brush" Color="{DynamicResource Background300Color}" />
@@ -312,6 +53,8 @@
     <SolidColorBrush x:Key="Background700Brush" Color="{DynamicResource Background700Color}" />
     <SolidColorBrush x:Key="Background800Brush" Color="{DynamicResource Background800Color}" />
     <SolidColorBrush x:Key="Background900Brush" Color="{DynamicResource Background900Color}" />
+
+    <!-- Disabled Brushes -->
     <SolidColorBrush x:Key="Disabled100Brush" Color="{DynamicResource Disabled100Color}" />
     <SolidColorBrush x:Key="Disabled200Brush" Color="{DynamicResource Disabled200Color}" />
     <SolidColorBrush x:Key="Disabled300Brush" Color="{DynamicResource Disabled300Color}" />
@@ -321,6 +64,8 @@
     <SolidColorBrush x:Key="Disabled700Brush" Color="{DynamicResource Disabled700Color}" />
     <SolidColorBrush x:Key="Disabled800Brush" Color="{DynamicResource Disabled800Color}" />
     <SolidColorBrush x:Key="Disabled900Brush" Color="{DynamicResource Disabled900Color}" />
+
+    <!-- Divider Brushes -->
     <SolidColorBrush x:Key="Divider100Brush" Color="{DynamicResource Divider100Color}" />
     <SolidColorBrush x:Key="Divider200Brush" Color="{DynamicResource Divider200Color}" />
     <SolidColorBrush x:Key="Divider300Brush" Color="{DynamicResource Divider300Color}" />
@@ -330,6 +75,8 @@
     <SolidColorBrush x:Key="Divider700Brush" Color="{DynamicResource Divider700Color}" />
     <SolidColorBrush x:Key="Divider800Brush" Color="{DynamicResource Divider800Color}" />
     <SolidColorBrush x:Key="Divider900Brush" Color="{DynamicResource Divider900Color}" />
+
+    <!-- Icon Brushes -->
     <SolidColorBrush x:Key="Icon100Brush" Color="{DynamicResource Icon100Color}" />
     <SolidColorBrush x:Key="Icon200Brush" Color="{DynamicResource Icon200Color}" />
     <SolidColorBrush x:Key="Icon300Brush" Color="{DynamicResource Icon300Color}" />
@@ -339,6 +86,8 @@
     <SolidColorBrush x:Key="Icon700Brush" Color="{DynamicResource Icon700Color}" />
     <SolidColorBrush x:Key="Icon800Brush" Color="{DynamicResource Icon800Color}" />
     <SolidColorBrush x:Key="Icon900Brush" Color="{DynamicResource Icon900Color}" />
+
+    <!-- Semantic Info Brushes -->
     <SolidColorBrush x:Key="SemanticInfo100Brush" Color="{DynamicResource SemanticInfo100Color}" />
     <SolidColorBrush x:Key="SemanticInfo200Brush" Color="{DynamicResource SemanticInfo200Color}" />
     <SolidColorBrush x:Key="SemanticInfo300Brush" Color="{DynamicResource SemanticInfo300Color}" />
@@ -348,6 +97,8 @@
     <SolidColorBrush x:Key="SemanticInfo700Brush" Color="{DynamicResource SemanticInfo700Color}" />
     <SolidColorBrush x:Key="SemanticInfo800Brush" Color="{DynamicResource SemanticInfo800Color}" />
     <SolidColorBrush x:Key="SemanticInfo900Brush" Color="{DynamicResource SemanticInfo900Color}" />
+
+    <!-- Semantic Negative Brushes -->
     <SolidColorBrush x:Key="SemanticNegative100Brush" Color="{DynamicResource SemanticNegative100Color}" />
     <SolidColorBrush x:Key="SemanticNegative200Brush" Color="{DynamicResource SemanticNegative200Color}" />
     <SolidColorBrush x:Key="SemanticNegative300Brush" Color="{DynamicResource SemanticNegative300Color}" />
@@ -357,6 +108,8 @@
     <SolidColorBrush x:Key="SemanticNegative700Brush" Color="{DynamicResource SemanticNegative700Color}" />
     <SolidColorBrush x:Key="SemanticNegative800Brush" Color="{DynamicResource SemanticNegative800Color}" />
     <SolidColorBrush x:Key="SemanticNegative900Brush" Color="{DynamicResource SemanticNegative900Color}" />
+
+    <!-- Semantic Positive Brushes -->
     <SolidColorBrush x:Key="SemanticPositive100Brush" Color="{DynamicResource SemanticPositive100Color}" />
     <SolidColorBrush x:Key="SemanticPositive200Brush" Color="{DynamicResource SemanticPositive200Color}" />
     <SolidColorBrush x:Key="SemanticPositive300Brush" Color="{DynamicResource SemanticPositive300Color}" />
@@ -366,6 +119,8 @@
     <SolidColorBrush x:Key="SemanticPositive700Brush" Color="{DynamicResource SemanticPositive700Color}" />
     <SolidColorBrush x:Key="SemanticPositive800Brush" Color="{DynamicResource SemanticPositive800Color}" />
     <SolidColorBrush x:Key="SemanticPositive900Brush" Color="{DynamicResource SemanticPositive900Color}" />
+
+    <!-- Semantic Special Brushes -->
     <SolidColorBrush x:Key="SemanticSpecial100Brush" Color="{DynamicResource SemanticSpecial100Color}" />
     <SolidColorBrush x:Key="SemanticSpecial200Brush" Color="{DynamicResource SemanticSpecial200Color}" />
     <SolidColorBrush x:Key="SemanticSpecial300Brush" Color="{DynamicResource SemanticSpecial300Color}" />
@@ -375,6 +130,8 @@
     <SolidColorBrush x:Key="SemanticSpecial700Brush" Color="{DynamicResource SemanticSpecial700Color}" />
     <SolidColorBrush x:Key="SemanticSpecial800Brush" Color="{DynamicResource SemanticSpecial800Color}" />
     <SolidColorBrush x:Key="SemanticSpecial900Brush" Color="{DynamicResource SemanticSpecial900Color}" />
+
+    <!-- Semantic Warning Brushes -->
     <SolidColorBrush x:Key="SemanticWarning100Brush" Color="{DynamicResource SemanticWarning100Color}" />
     <SolidColorBrush x:Key="SemanticWarning200Brush" Color="{DynamicResource SemanticWarning200Color}" />
     <SolidColorBrush x:Key="SemanticWarning300Brush" Color="{DynamicResource SemanticWarning300Color}" />
@@ -384,8 +141,12 @@
     <SolidColorBrush x:Key="SemanticWarning700Brush" Color="{DynamicResource SemanticWarning700Color}" />
     <SolidColorBrush x:Key="SemanticWarning800Brush" Color="{DynamicResource SemanticWarning800Color}" />
     <SolidColorBrush x:Key="SemanticWarning900Brush" Color="{DynamicResource SemanticWarning900Color}" />
+
+    <!-- Special Brushes -->
     <SolidColorBrush x:Key="BlackBrush" Color="{DynamicResource BlackColor}" />
     <SolidColorBrush x:Key="WhiteBrush" Color="{DynamicResource WhiteColor}" />
+
+    <!-- UI Element Brushes -->
     <SolidColorBrush x:Key="LiveRatesBackgroundBrush" Color="{DynamicResource LiveRatesBackgroundColor}" />
     <SolidColorBrush x:Key="LiveRatesVariationBackgroundBrush" Color="{DynamicResource LiveRatesVariationBackgroundColor}" />
     <SolidColorBrush x:Key="ButtonOverlayLightBrush" Color="{DynamicResource ButtonOverlayLightColor}" />
