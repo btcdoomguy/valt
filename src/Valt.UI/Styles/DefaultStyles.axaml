@@ -527,6 +527,49 @@
         <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
         <Setter Property="FontSize" Value="22" />
         <Setter Property="Margin" Value="0" />
+        <Setter Property="Background" Value="{DynamicResource TopBarButtonBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TopBarButtonForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Accent700Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="8, 6" />
+        <!-- Style the main border background -->
+        <Style Selector="^ /template/ Border#PART_Border">
+            <Setter Property="Background" Value="{DynamicResource TopBarButtonBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Accent700Brush}" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.1" />
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0.1" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <!-- Hover state - entire button -->
+        <Style Selector="^:pointerover /template/ Border#PART_Border">
+            <Setter Property="Background" Value="{DynamicResource TopBarButtonBackgroundHoverBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Accent500Brush}" />
+        </Style>
+        <Style Selector="^:pointerover">
+            <Setter Property="Foreground" Value="{DynamicResource TopBarButtonForegroundHoverBrush}" />
+        </Style>
+        <!-- Pressed state -->
+        <Style Selector="^:pressed /template/ Border#PART_Border">
+            <Setter Property="Background" Value="{DynamicResource TopBarButtonBackgroundSelectedBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Accent300Brush}" />
+        </Style>
+        <Style Selector="^:pressed">
+            <Setter Property="Foreground" Value="{DynamicResource BlackBrush}" />
+        </Style>
+        <!-- Style the dropdown indicator arrow -->
+        <Style Selector="^ /template/ PathIcon#DropDownGlyph">
+            <Setter Property="Foreground" Value="{DynamicResource TopBarButtonForegroundBrush}" />
+        </Style>
+        <Style Selector="^:pointerover /template/ PathIcon#DropDownGlyph">
+            <Setter Property="Foreground" Value="{DynamicResource TopBarButtonForegroundHoverBrush}" />
+        </Style>
+        <Style Selector="^:pressed /template/ PathIcon#DropDownGlyph">
+            <Setter Property="Foreground" Value="{DynamicResource BlackBrush}" />
+        </Style>
     </Style>
 
     <!-- ═══════════════════════════════════════════════════════════════════════════════

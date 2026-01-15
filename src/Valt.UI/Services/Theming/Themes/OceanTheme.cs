@@ -45,27 +45,27 @@ public static class OceanTheme
         resources["Text800Color"] = Color.Parse("#2D3748");
         resources["Text900Color"] = Color.Parse("#1A202C");
 
-        // Background (Near Black - cool tinted, with high contrast for borders)
-        resources["Background100Color"] = Color.Parse("#5A6578");  // Lightest - very visible borders
-        resources["Background200Color"] = Color.Parse("#4A5568");  // Light borders
-        resources["Background300Color"] = Color.Parse("#3D4452");  // Medium borders
-        resources["Background400Color"] = Color.Parse("#2D3748");  // Subtle borders
-        resources["Background500Color"] = Color.Parse("#252D3D");  // Border color
-        resources["Background600Color"] = Color.Parse("#1A2030");  // Elevated surface
-        resources["Background700Color"] = Color.Parse("#121820");  // Card background
-        resources["Background800Color"] = Color.Parse("#0A0E14");  // Main background
-        resources["Background900Color"] = Color.Parse("#060A0F");  // Darkest background
+        // Background (Deep teal-tinted - visible cyan/teal tint)
+        resources["Background100Color"] = Color.Parse("#5A7A7A");  // Lightest - teal tinted borders
+        resources["Background200Color"] = Color.Parse("#4A6868");  // Light borders
+        resources["Background300Color"] = Color.Parse("#3C5656");  // Medium borders
+        resources["Background400Color"] = Color.Parse("#2F4545");  // Subtle borders
+        resources["Background500Color"] = Color.Parse("#263838");  // Border color
+        resources["Background600Color"] = Color.Parse("#1E2E2E");  // Elevated surface
+        resources["Background700Color"] = Color.Parse("#182626");  // Card background
+        resources["Background800Color"] = Color.Parse("#121E1E");  // Main background
+        resources["Background900Color"] = Color.Parse("#080E0E");  // Darkest background
 
         // Disabled (matches Background scale)
-        resources["Disabled100Color"] = Color.Parse("#5A6578");
-        resources["Disabled200Color"] = Color.Parse("#4A5568");
-        resources["Disabled300Color"] = Color.Parse("#3D4452");
-        resources["Disabled400Color"] = Color.Parse("#2D3748");
-        resources["Disabled500Color"] = Color.Parse("#252D3D");
-        resources["Disabled600Color"] = Color.Parse("#1A2030");
-        resources["Disabled700Color"] = Color.Parse("#121820");
-        resources["Disabled800Color"] = Color.Parse("#0A0E14");
-        resources["Disabled900Color"] = Color.Parse("#060A0F");
+        resources["Disabled100Color"] = Color.Parse("#5A7A7A");
+        resources["Disabled200Color"] = Color.Parse("#4A6868");
+        resources["Disabled300Color"] = Color.Parse("#3C5656");
+        resources["Disabled400Color"] = Color.Parse("#2F4545");
+        resources["Disabled500Color"] = Color.Parse("#263838");
+        resources["Disabled600Color"] = Color.Parse("#1E2E2E");
+        resources["Disabled700Color"] = Color.Parse("#182626");
+        resources["Disabled800Color"] = Color.Parse("#121E1E");
+        resources["Disabled900Color"] = Color.Parse("#080E0E");
 
         // Divider (Cool Gray)
         resources["Divider100Color"] = Color.Parse("#E2E8F0");
@@ -149,27 +149,27 @@ public static class OceanTheme
         resources["WhiteColor"] = Color.Parse("#F7FAFC");
 
         // UI Element Colors
-        resources["LiveRatesBackgroundColor"] = Color.Parse("#060A0F");
+        resources["LiveRatesBackgroundColor"] = Color.Parse("#121E1E");
         resources["LiveRatesBorderGradientStartColor"] = Color.Parse("#2C7A7B");  // Teal accent for border
-        resources["LiveRatesBorderGradientEndColor"] = Color.Parse("#1E2532");
-        resources["LiveRatesVariationBackgroundColor"] = Color.Parse("#0A0E14");
+        resources["LiveRatesBorderGradientEndColor"] = Color.Parse("#263838");
+        resources["LiveRatesVariationBackgroundColor"] = Color.Parse("#182626");
         resources["ButtonOverlayLightColor"] = Color.Parse("#40FFFFFF");
         resources["ButtonOverlayMediumColor"] = Color.Parse("#26FFFFFF");
         resources["StepIndicatorActiveColor"] = Color.Parse("#319795");
-        resources["StepIndicatorInactiveColor"] = Color.Parse("#4A5568");
-        resources["StepIndicatorInactiveLightColor"] = Color.Parse("#718096");
+        resources["StepIndicatorInactiveColor"] = Color.Parse("#3C5656");
+        resources["StepIndicatorInactiveLightColor"] = Color.Parse("#5A7A7A");
         resources["MessageBoxInfoColor"] = Color.Parse("#4299E1");
         resources["MessageBoxWarningColor"] = Color.Parse("#D69E2E");
         resources["MessageBoxErrorColor"] = Color.Parse("#E53E3E");
         resources["MessageBoxQuestionColor"] = Color.Parse("#805AD5");
         resources["ColorPickerSelectedBorderColor"] = Color.Parse("#38B2AC");
-        resources["ModalTopBarBackgroundColor"] = Color.Parse("#1E2532");  // Same as Background500
+        resources["ModalTopBarBackgroundColor"] = Color.Parse("#1E2E2E");
         resources["TopBarButtonBackgroundColor"] = Color.Parse("#1D4044");
         resources["TopBarButtonBackgroundHoverColor"] = Color.Parse("#285E61");
         resources["TopBarButtonBackgroundSelectedColor"] = Color.Parse("#38B2AC");
         resources["TopBarButtonForegroundColor"] = Color.Parse("#4FD1C5");
         resources["TopBarButtonForegroundHoverColor"] = Color.Parse("#F7FAFC");
-        resources["FooterGradientStartColor"] = Color.Parse("#04060A");
+        resources["FooterGradientStartColor"] = Color.Parse("#080E0E");
         resources["IconSelectorDefaultColor"] = Color.Parse("#F7FAFC");
 
         return resources;

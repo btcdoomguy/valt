@@ -159,4 +159,11 @@
     <SolidColorBrush x:Key="MessageBoxErrorBrush" Color="{DynamicResource MessageBoxErrorColor}" />
     <SolidColorBrush x:Key="MessageBoxQuestionBrush" Color="{DynamicResource MessageBoxQuestionColor}" />
     <SolidColorBrush x:Key="ColorPickerSelectedBorderBrush" Color="{DynamicResource ColorPickerSelectedBorderColor}" />
+
+    <!-- Top Bar Button Brushes -->
+    <SolidColorBrush x:Key="TopBarButtonBackgroundBrush" Color="{DynamicResource TopBarButtonBackgroundColor}" />
+    <SolidColorBrush x:Key="TopBarButtonBackgroundHoverBrush" Color="{DynamicResource TopBarButtonBackgroundHoverColor}" />
+    <SolidColorBrush x:Key="TopBarButtonBackgroundSelectedBrush" Color="{DynamicResource TopBarButtonBackgroundSelectedColor}" />
+    <SolidColorBrush x:Key="TopBarButtonForegroundBrush" Color="{DynamicResource TopBarButtonForegroundColor}" />
+    <SolidColorBrush x:Key="TopBarButtonForegroundHoverBrush" Color="{DynamicResource TopBarButtonForegroundHoverColor}" />
 </ResourceDictionary>

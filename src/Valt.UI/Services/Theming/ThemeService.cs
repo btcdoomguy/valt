@@ -19,7 +19,11 @@ public class ThemeService : IThemeService
     private static readonly List<ThemeDefinition> Themes =
     [
         new ThemeDefinition("Default", "Default", () => DefaultTheme.Create()),
-        new ThemeDefinition("Ocean", "Ocean", () => OceanTheme.Create())
+        new ThemeDefinition("Ocean", "Ocean", () => OceanTheme.Create()),
+        new ThemeDefinition("MidnightGalaxy", "Midnight Galaxy", () => MidnightGalaxyTheme.Create()),
+        new ThemeDefinition("GoldenHour", "Golden Hour", () => GoldenHourTheme.Create()),
+        new ThemeDefinition("ArcticFrost", "Arctic Frost", () => ArcticFrostTheme.Create()),
+        new ThemeDefinition("ForestCanopy", "Forest Canopy", () => ForestCanopyTheme.Create())
     ];
 
     private readonly ILocalStorageService _localStorageService;
