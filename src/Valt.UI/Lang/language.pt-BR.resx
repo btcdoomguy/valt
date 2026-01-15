@@ -294,6 +294,9 @@
     <data name="ManageTransactions.CopyTitle" xml:space="preserve">
         <value>Copiar transação</value>
     </data>
+    <data name="Settings.Theme" xml:space="preserve">
+        <value>Tema</value>
+    </data>
     <data name="Settings.Culture" xml:space="preserve">
         <value>Idioma e formato</value>
     </data>

@@ -86,17 +86,20 @@ public partial class ValtMessageBox : Window
     private void SetIcon(MessageBoxIcon icon)
     {
         // Material Design icon codes
-        var (iconChar, color) = icon switch
+        var (iconChar, resourceKey) = icon switch
         {
-            MessageBoxIcon.Info => ("\uE88E", "#2196F3"),      // info icon - blue
-            MessageBoxIcon.Warning => ("\uE002", "#FF9800"),   // warning icon - orange
-            MessageBoxIcon.Error => ("\uE000", "#F44336"),     // error icon - red
-            MessageBoxIcon.Question => ("\uE887", "#9C27B0"), // help icon - purple
-            _ => ("", "#FFFFFF")
+            MessageBoxIcon.Info => ("\uE88E", "MessageBoxInfoBrush"),      // info icon - blue
+            MessageBoxIcon.Warning => ("\uE002", "MessageBoxWarningBrush"),   // warning icon - orange
+            MessageBoxIcon.Error => ("\uE000", "MessageBoxErrorBrush"),     // error icon - red
+            MessageBoxIcon.Question => ("\uE887", "MessageBoxQuestionBrush"), // help icon - purple
+            _ => ("", (string?)null)
         };
 
         IconText.Text = iconChar;
-        IconText.Foreground = new SolidColorBrush(Color.Parse(color));
+        if (resourceKey != null && Application.Current!.TryGetResource(resourceKey, Avalonia.Styling.ThemeVariant.Default, out var brush))
+            IconText.Foreground = (IBrush)brush!;
+        else
+            IconText.Foreground = new SolidColorBrush(Colors.White);
         IconText.IsVisible = icon != MessageBoxIcon.None;
     }
 

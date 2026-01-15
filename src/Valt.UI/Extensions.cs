@@ -4,6 +4,7 @@ using Valt.Infra.Kernel.Scopes;
 using Valt.Infra.Modules.Budget.Categories;
 using Valt.UI.Base;
 using Valt.UI.Services;
+using Valt.UI.Services.Theming;
 using Valt.UI.State;
 using Valt.UI.Views;
 using Valt.UI.Views.Main;
@@ -193,6 +194,9 @@ public static class Extensions
         services.AddSingleton<FilterState>();
         services.AddSingleton<LiveRateState>();
         services.AddSingleton<SecureModeState>();
+
+        //theming
+        services.AddSingleton<IThemeService, ThemeService>();
 
         return services;
     }

@@ -127,6 +127,11 @@
 
     <Style Selector="TextBlock">
         <Setter Property="Padding" Value="2" />
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+    </Style>
+
+    <Style Selector="Label">
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
     </Style>
 
     <Style Selector="TextBlock.titlebar-text">
@@ -146,6 +151,34 @@
 
     <Style Selector="TextBlock.only-text">
         <Setter Property="Padding" Value="2, 6, 8, 0" />
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         INPUT CONTROLS - Ensure text visibility
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="TextBox">
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+    </Style>
+
+    <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="{DynamicResource Accent500Brush}" />
+    </Style>
+
+    <Style Selector="ComboBox">
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+    </Style>
+
+    <Style Selector="ComboBox /template/ ContentControl#ContentPresenter">
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+    </Style>
+
+    <Style Selector="NumericUpDown">
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+    </Style>
+
+    <Style Selector="NumericUpDown /template/ TextBox">
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
     </Style>
 
     <!-- ═══════════════════════════════════════════════════════════════════════════════
@@ -266,7 +299,7 @@
         <Setter Property="Content" Value="&#xEA5F;" />
         <Setter Property="BorderThickness" Value="0" />
         <Style Selector="^:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="#69FFFFFF" />
+            <Setter Property="Background" Value="{DynamicResource ButtonOverlayLightBrush}" />
             <Setter Property="BorderBrush" Value="White" />
         </Style>
     </Style>
@@ -290,7 +323,7 @@
 
     <Style Selector="Button.rounded">
         <Setter Property="Padding" Value="5, 2, 0, 0" />
-        <Setter Property="Background" Value="#49FFFFFF" />
+        <Setter Property="Background" Value="{DynamicResource ButtonOverlayMediumBrush}" />
         <Setter Property="FontSize" Value="30" />
         <Setter Property="Width" Value="40" />
         <Setter Property="Height" Value="40" />
@@ -305,7 +338,7 @@
             </Setter>
         </Style>
         <Style Selector="^:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="#69FFFFFF" />
+            <Setter Property="Background" Value="{DynamicResource ButtonOverlayLightBrush}" />
             <Setter Property="BorderBrush" Value="White" />
         </Style>
     </Style>
@@ -494,6 +527,49 @@
         <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
         <Setter Property="FontSize" Value="22" />
         <Setter Property="Margin" Value="0" />
+        <Setter Property="Background" Value="{DynamicResource TopBarButtonBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TopBarButtonForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Accent700Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="8, 6" />
+        <!-- Style the main border background -->
+        <Style Selector="^ /template/ Border#PART_Border">
+            <Setter Property="Background" Value="{DynamicResource TopBarButtonBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Accent700Brush}" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.1" />
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0.1" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <!-- Hover state - entire button -->
+        <Style Selector="^:pointerover /template/ Border#PART_Border">
+            <Setter Property="Background" Value="{DynamicResource TopBarButtonBackgroundHoverBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Accent500Brush}" />
+        </Style>
+        <Style Selector="^:pointerover">
+            <Setter Property="Foreground" Value="{DynamicResource TopBarButtonForegroundHoverBrush}" />
+        </Style>
+        <!-- Pressed state -->
+        <Style Selector="^:pressed /template/ Border#PART_Border">
+            <Setter Property="Background" Value="{DynamicResource TopBarButtonBackgroundSelectedBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Accent300Brush}" />
+        </Style>
+        <Style Selector="^:pressed">
+            <Setter Property="Foreground" Value="{DynamicResource BlackBrush}" />
+        </Style>
+        <!-- Style the dropdown indicator arrow -->
+        <Style Selector="^ /template/ PathIcon#DropDownGlyph">
+            <Setter Property="Foreground" Value="{DynamicResource TopBarButtonForegroundBrush}" />
+        </Style>
+        <Style Selector="^:pointerover /template/ PathIcon#DropDownGlyph">
+            <Setter Property="Foreground" Value="{DynamicResource TopBarButtonForegroundHoverBrush}" />
+        </Style>
+        <Style Selector="^:pressed /template/ PathIcon#DropDownGlyph">
+            <Setter Property="Foreground" Value="{DynamicResource BlackBrush}" />
+        </Style>
     </Style>
 
     <!-- ═══════════════════════════════════════════════════════════════════════════════
@@ -505,6 +581,12 @@
         <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+    </Style>
+
+    <!-- DataGrid cell foreground - ensure text is visible -->
+    <Style Selector="DataGridCell">
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
     </Style>
 
     <!-- Alternating row colors -->
@@ -545,6 +627,8 @@
 
     <!-- DataGrid column header styling - override template to remove sort icon reserved space -->
     <Style Selector="DataGridColumnHeader">
+        <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Padding" Value="4, 6" />
@@ -806,6 +890,20 @@
          LIST BOX
          ═══════════════════════════════════════════════════════════════════════════════ -->
 
+    <!-- Override Fluent theme's default ListBox/ListBoxItem colors -->
+    <Style Selector="ListBox">
+        <Setter Property="Background" Value="{DynamicResource Background900Brush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+    </Style>
+
+    <Style Selector="ListBoxItem">
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+    </Style>
+
+    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+    </Style>
+
     <Style Selector="ListBox.regularListBox">
         <Setter Property="Background" Value="{DynamicResource Background900Brush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
@@ -907,6 +1005,26 @@
     <!-- ═══════════════════════════════════════════════════════════════════════════════
          EXPANDER - Reports Section Headers
          ═══════════════════════════════════════════════════════════════════════════════ -->
+
+    <!-- Override Fluent theme's default Expander colors -->
+    <Style Selector="Expander">
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+    </Style>
+
+    <Style Selector="Expander /template/ ToggleButton#PART_toggle">
+        <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+    </Style>
+
+    <Style Selector="Expander /template/ ToggleButton#PART_toggle:pointerover">
+        <Setter Property="Background" Value="{DynamicResource Background600Brush}" />
+    </Style>
+
+    <Style Selector="Expander /template/ Border#ExpanderContent">
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+    </Style>
 
     <Style Selector="Expander.section">
         <Setter Property="Margin" Value="0, 0, 0, 12" />

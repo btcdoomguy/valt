@@ -40,21 +40,21 @@
         <GradientStop Offset="0" Color="{DynamicResource Background900Color}"></GradientStop>
         <GradientStop Offset="1" Color="{DynamicResource Background800Color}"></GradientStop>
     </LinearGradientBrush>
-    <SolidColorBrush x:Key="ModalTopBarBackground">#444444</SolidColorBrush>
-    <SolidColorBrush x:Key="TopBarButtonBackground">#5B3800</SolidColorBrush>
-    <SolidColorBrush x:Key="TopBarButtonBackgroundHover">#7A5500</SolidColorBrush>
-    <SolidColorBrush x:Key="TopBarButtonBackgroundSelected">#FF9E00</SolidColorBrush>
-    <SolidColorBrush x:Key="TopBarButtonForeground">Orange</SolidColorBrush>
-    <SolidColorBrush x:Key="TopBarButtonForegroundHover">#FFF</SolidColorBrush>
+    <SolidColorBrush x:Key="ModalTopBarBackground" Color="{DynamicResource ModalTopBarBackgroundColor}" />
+    <SolidColorBrush x:Key="TopBarButtonBackground" Color="{DynamicResource TopBarButtonBackgroundColor}" />
+    <SolidColorBrush x:Key="TopBarButtonBackgroundHover" Color="{DynamicResource TopBarButtonBackgroundHoverColor}" />
+    <SolidColorBrush x:Key="TopBarButtonBackgroundSelected" Color="{DynamicResource TopBarButtonBackgroundSelectedColor}" />
+    <SolidColorBrush x:Key="TopBarButtonForeground" Color="{DynamicResource TopBarButtonForegroundColor}" />
+    <SolidColorBrush x:Key="TopBarButtonForegroundHover" Color="{DynamicResource TopBarButtonForegroundHoverColor}" />
     
     <!--Footer-->
     <LinearGradientBrush x:Key="FooterBackgroundBrush" StartPoint="0%, 0%" EndPoint="0%, 100%">
-        <GradientStop Offset="0" Color="Black"></GradientStop>
+        <GradientStop Offset="0" Color="{DynamicResource FooterGradientStartColor}"></GradientStop>
         <GradientStop Offset="1" Color="{DynamicResource Background900Color}"></GradientStop>
     </LinearGradientBrush>
 
     <!--Defaults-->
-    <SolidColorBrush x:Key="IconSelectorDefaultColor">#FFF</SolidColorBrush>
+    <SolidColorBrush x:Key="IconSelectorDefaultColorBrush" Color="{DynamicResource IconSelectorDefaultColor}" />
 
     <!--Debt gradient-->
     <SolidColorBrush x:Key="DebtBar" Color="{DynamicResource DebtBaseColor}"></SolidColorBrush>

@@ -14,6 +14,7 @@ using Valt.Infra;
 using Valt.Infra.Kernel.BackgroundJobs;
 using Valt.Infra.Settings;
 using Valt.UI.Services.LocalStorage;
+using Valt.UI.Services.Theming;
 using Valt.UI.Views.Main;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
 using MainViewModel = Valt.UI.Views.Main.MainViewModel;
@@ -58,6 +59,9 @@ public partial class App : Application
         //initialize all setting classes
         _ = serviceProvider.GetService<CurrencySettings>();
         _ = serviceProvider.GetService<DisplaySettings>();
+
+        // Initialize theme service (it loads and applies the theme from local storage)
+        _ = serviceProvider.GetRequiredService<IThemeService>();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

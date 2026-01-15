@@ -1,223 +1,169 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Color x:Key="Accent100Color">#ffe2bb</Color>
+    <!--
+         Color Resources - Brush Definitions
+
+         This file defines brushes that reference color keys.
+         The actual color values are provided by theme files in Styles/Themes/.
+
+         Theme files (DefaultTheme.axaml, OceanTheme.axaml, etc.) are loaded
+         dynamically by ThemeService at runtime.
+    -->
+
+    <!-- Accent Brushes -->
     <SolidColorBrush x:Key="Accent100Brush" Color="{DynamicResource Accent100Color}" />
-    <Color x:Key="Accent200Color">#ffcc88</Color>
     <SolidColorBrush x:Key="Accent200Brush" Color="{DynamicResource Accent200Color}" />
-    <Color x:Key="Accent300Color">#ffb755</Color>
     <SolidColorBrush x:Key="Accent300Brush" Color="{DynamicResource Accent300Color}" />
-    <Color x:Key="Accent400Color">#ffa122</Color>
     <SolidColorBrush x:Key="Accent400Brush" Color="{DynamicResource Accent400Color}" />
-    <Color x:Key="Accent500Color">#e98805</Color>
     <SolidColorBrush x:Key="Accent500Brush" Color="{DynamicResource Accent500Color}" />
-    <Color x:Key="Accent600Color">#b26a09</Color>
     <SolidColorBrush x:Key="Accent600Brush" Color="{DynamicResource Accent600Color}" />
-    <Color x:Key="Accent700Color">#7e4d0a</Color>
     <SolidColorBrush x:Key="Accent700Brush" Color="{DynamicResource Accent700Color}" />
-    <Color x:Key="Accent800Color">#4d3008</Color>
     <SolidColorBrush x:Key="Accent800Brush" Color="{DynamicResource Accent800Color}" />
-    <Color x:Key="Accent900Color">#1e1304</Color>
     <SolidColorBrush x:Key="Accent900Brush" Color="{DynamicResource Accent900Color}" />
-    <Color x:Key="Secondary100Color">#bbd8ff</Color>
+
+    <!-- Secondary Brushes -->
     <SolidColorBrush x:Key="Secondary100Brush" Color="{DynamicResource Secondary100Color}" />
-    <Color x:Key="Secondary200Color">#88bbff</Color>
     <SolidColorBrush x:Key="Secondary200Brush" Color="{DynamicResource Secondary200Color}" />
-    <Color x:Key="Secondary300Color">#559dff</Color>
     <SolidColorBrush x:Key="Secondary300Brush" Color="{DynamicResource Secondary300Color}" />
-    <Color x:Key="Secondary400Color">#2280ff</Color>
     <SolidColorBrush x:Key="Secondary400Brush" Color="{DynamicResource Secondary400Color}" />
-    <Color x:Key="Secondary500Color">#0566e9</Color>
     <SolidColorBrush x:Key="Secondary500Brush" Color="{DynamicResource Secondary500Color}" />
-    <Color x:Key="Secondary600Color">#0951b2</Color>
     <SolidColorBrush x:Key="Secondary600Brush" Color="{DynamicResource Secondary600Color}" />
-    <Color x:Key="Secondary700Color">#0a3b7e</Color>
     <SolidColorBrush x:Key="Secondary700Brush" Color="{DynamicResource Secondary700Color}" />
-    <Color x:Key="Secondary800Color">#08254d</Color>
     <SolidColorBrush x:Key="Secondary800Brush" Color="{DynamicResource Secondary800Color}" />
-    <Color x:Key="Secondary900Color">#040f1e</Color>
     <SolidColorBrush x:Key="Secondary900Brush" Color="{DynamicResource Secondary900Color}" />
-    <Color x:Key="Text100Color">#fdfdfc</Color>
+
+    <!-- Text Brushes -->
     <SolidColorBrush x:Key="Text100Brush" Color="{DynamicResource Text100Color}" />
-    <Color x:Key="Text200Color">#eeebe8</Color>
     <SolidColorBrush x:Key="Text200Brush" Color="{DynamicResource Text200Color}" />
-    <Color x:Key="Text300Color">#cfccc9</Color>
     <SolidColorBrush x:Key="Text300Brush" Color="{DynamicResource Text300Color}" />
-    <Color x:Key="Text400Color">#a8a6a4</Color>
     <SolidColorBrush x:Key="Text400Brush" Color="{DynamicResource Text400Color}" />
-    <Color x:Key="Text500Color">#83807c</Color>
     <SolidColorBrush x:Key="Text500Brush" Color="{DynamicResource Text500Color}" />
-    <Color x:Key="Text600Color">#6b6761</Color>
     <SolidColorBrush x:Key="Text600Brush" Color="{DynamicResource Text600Color}" />
-    <Color x:Key="Text700Color">#544e45</Color>
     <SolidColorBrush x:Key="Text700Brush" Color="{DynamicResource Text700Color}" />
-    <Color x:Key="Text800Color">#3b342b</Color>
     <SolidColorBrush x:Key="Text800Brush" Color="{DynamicResource Text800Color}" />
-    <Color x:Key="Text900Color">#1f1a14</Color>
     <SolidColorBrush x:Key="Text900Brush" Color="{DynamicResource Text900Color}" />
-    <Color x:Key="Background100Color">#fcfcfc</Color>
+
+    <!-- Background Brushes -->
     <SolidColorBrush x:Key="Background100Brush" Color="{DynamicResource Background100Color}" />
-    <Color x:Key="Background200Color">#ebebeb</Color>
     <SolidColorBrush x:Key="Background200Brush" Color="{DynamicResource Background200Color}" />
-    <Color x:Key="Background300Color">#cccccc</Color>
     <SolidColorBrush x:Key="Background300Brush" Color="{DynamicResource Background300Color}" />
-    <Color x:Key="Background400Color">#a6a6a6</Color>
     <SolidColorBrush x:Key="Background400Brush" Color="{DynamicResource Background400Color}" />
-    <Color x:Key="Background500Color">#808080</Color>
     <SolidColorBrush x:Key="Background500Brush" Color="{DynamicResource Background500Color}" />
-    <Color x:Key="Background600Color">#666666</Color>
     <SolidColorBrush x:Key="Background600Brush" Color="{DynamicResource Background600Color}" />
-    <Color x:Key="Background700Color">#4d4d4d</Color>
     <SolidColorBrush x:Key="Background700Brush" Color="{DynamicResource Background700Color}" />
-    <Color x:Key="Background800Color">#333333</Color>
     <SolidColorBrush x:Key="Background800Brush" Color="{DynamicResource Background800Color}" />
-    <Color x:Key="Background900Color">#1a1a1a</Color>
     <SolidColorBrush x:Key="Background900Brush" Color="{DynamicResource Background900Color}" />
-    <Color x:Key="Disabled100Color">#fcfcfc</Color>
+
+    <!-- Disabled Brushes -->
     <SolidColorBrush x:Key="Disabled100Brush" Color="{DynamicResource Disabled100Color}" />
-    <Color x:Key="Disabled200Color">#ebebeb</Color>
     <SolidColorBrush x:Key="Disabled200Brush" Color="{DynamicResource Disabled200Color}" />
-    <Color x:Key="Disabled300Color">#cccccc</Color>
     <SolidColorBrush x:Key="Disabled300Brush" Color="{DynamicResource Disabled300Color}" />
-    <Color x:Key="Disabled400Color">#a6a6a6</Color>
     <SolidColorBrush x:Key="Disabled400Brush" Color="{DynamicResource Disabled400Color}" />
-    <Color x:Key="Disabled500Color">#808080</Color>
     <SolidColorBrush x:Key="Disabled500Brush" Color="{DynamicResource Disabled500Color}" />
-    <Color x:Key="Disabled600Color">#666666</Color>
     <SolidColorBrush x:Key="Disabled600Brush" Color="{DynamicResource Disabled600Color}" />
-    <Color x:Key="Disabled700Color">#4d4d4d</Color>
     <SolidColorBrush x:Key="Disabled700Brush" Color="{DynamicResource Disabled700Color}" />
-    <Color x:Key="Disabled800Color">#333333</Color>
     <SolidColorBrush x:Key="Disabled800Brush" Color="{DynamicResource Disabled800Color}" />
-    <Color x:Key="Disabled900Color">#1a1a1a</Color>
     <SolidColorBrush x:Key="Disabled900Brush" Color="{DynamicResource Disabled900Color}" />
-    <Color x:Key="Divider100Color">#fdfdfc</Color>
+
+    <!-- Divider Brushes -->
     <SolidColorBrush x:Key="Divider100Brush" Color="{DynamicResource Divider100Color}" />
-    <Color x:Key="Divider200Color">#eeebe8</Color>
     <SolidColorBrush x:Key="Divider200Brush" Color="{DynamicResource Divider200Color}" />
-    <Color x:Key="Divider300Color">#cfccc9</Color>
     <SolidColorBrush x:Key="Divider300Brush" Color="{DynamicResource Divider300Color}" />
-    <Color x:Key="Divider400Color">#a8a6a4</Color>
     <SolidColorBrush x:Key="Divider400Brush" Color="{DynamicResource Divider400Color}" />
-    <Color x:Key="Divider500Color">#83807c</Color>
     <SolidColorBrush x:Key="Divider500Brush" Color="{DynamicResource Divider500Color}" />
-    <Color x:Key="Divider600Color">#6b6761</Color>
     <SolidColorBrush x:Key="Divider600Brush" Color="{DynamicResource Divider600Color}" />
-    <Color x:Key="Divider700Color">#544e45</Color>
     <SolidColorBrush x:Key="Divider700Brush" Color="{DynamicResource Divider700Color}" />
-    <Color x:Key="Divider800Color">#3b342b</Color>
     <SolidColorBrush x:Key="Divider800Brush" Color="{DynamicResource Divider800Color}" />
-    <Color x:Key="Divider900Color">#1f1a14</Color>
     <SolidColorBrush x:Key="Divider900Brush" Color="{DynamicResource Divider900Color}" />
-    <Color x:Key="Icon100Color">#bbd8ff</Color>
+
+    <!-- Icon Brushes -->
     <SolidColorBrush x:Key="Icon100Brush" Color="{DynamicResource Icon100Color}" />
-    <Color x:Key="Icon200Color">#88bbff</Color>
     <SolidColorBrush x:Key="Icon200Brush" Color="{DynamicResource Icon200Color}" />
-    <Color x:Key="Icon300Color">#559dff</Color>
     <SolidColorBrush x:Key="Icon300Brush" Color="{DynamicResource Icon300Color}" />
-    <Color x:Key="Icon400Color">#2280ff</Color>
     <SolidColorBrush x:Key="Icon400Brush" Color="{DynamicResource Icon400Color}" />
-    <Color x:Key="Icon500Color">#0566e9</Color>
     <SolidColorBrush x:Key="Icon500Brush" Color="{DynamicResource Icon500Color}" />
-    <Color x:Key="Icon600Color">#0951b2</Color>
     <SolidColorBrush x:Key="Icon600Brush" Color="{DynamicResource Icon600Color}" />
-    <Color x:Key="Icon700Color">#0a3b7e</Color>
     <SolidColorBrush x:Key="Icon700Brush" Color="{DynamicResource Icon700Color}" />
-    <Color x:Key="Icon800Color">#08254d</Color>
     <SolidColorBrush x:Key="Icon800Brush" Color="{DynamicResource Icon800Color}" />
-    <Color x:Key="Icon900Color">#040f1e</Color>
     <SolidColorBrush x:Key="Icon900Brush" Color="{DynamicResource Icon900Color}" />
-    <Color x:Key="SemanticInfo100Color">#8888ff</Color>
+
+    <!-- Semantic Info Brushes -->
     <SolidColorBrush x:Key="SemanticInfo100Brush" Color="{DynamicResource SemanticInfo100Color}" />
-    <Color x:Key="SemanticInfo200Color">#5555ff</Color>
     <SolidColorBrush x:Key="SemanticInfo200Brush" Color="{DynamicResource SemanticInfo200Color}" />
-    <Color x:Key="SemanticInfo300Color">#2222ff</Color>
     <SolidColorBrush x:Key="SemanticInfo300Brush" Color="{DynamicResource SemanticInfo300Color}" />
-    <Color x:Key="SemanticInfo400Color">#0606e8</Color>
     <SolidColorBrush x:Key="SemanticInfo400Brush" Color="{DynamicResource SemanticInfo400Color}" />
-    <Color x:Key="SemanticInfo500Color">#0909b2</Color>
     <SolidColorBrush x:Key="SemanticInfo500Brush" Color="{DynamicResource SemanticInfo500Color}" />
-    <Color x:Key="SemanticInfo600Color">#0a0a7e</Color>
     <SolidColorBrush x:Key="SemanticInfo600Brush" Color="{DynamicResource SemanticInfo600Color}" />
-    <Color x:Key="SemanticInfo700Color">#08084d</Color>
     <SolidColorBrush x:Key="SemanticInfo700Brush" Color="{DynamicResource SemanticInfo700Color}" />
-    <Color x:Key="SemanticInfo800Color">#04041e</Color>
     <SolidColorBrush x:Key="SemanticInfo800Brush" Color="{DynamicResource SemanticInfo800Color}" />
-    <Color x:Key="SemanticInfo900Color">#000000</Color>
     <SolidColorBrush x:Key="SemanticInfo900Brush" Color="{DynamicResource SemanticInfo900Color}" />
-    <Color x:Key="SemanticNegative100Color">#ff8888</Color>
+
+    <!-- Semantic Negative Brushes -->
     <SolidColorBrush x:Key="SemanticNegative100Brush" Color="{DynamicResource SemanticNegative100Color}" />
-    <Color x:Key="SemanticNegative200Color">#ff5555</Color>
     <SolidColorBrush x:Key="SemanticNegative200Brush" Color="{DynamicResource SemanticNegative200Color}" />
-    <Color x:Key="SemanticNegative300Color">#ff2222</Color>
     <SolidColorBrush x:Key="SemanticNegative300Brush" Color="{DynamicResource SemanticNegative300Color}" />
-    <Color x:Key="SemanticNegative400Color">#e80606</Color>
     <SolidColorBrush x:Key="SemanticNegative400Brush" Color="{DynamicResource SemanticNegative400Color}" />
-    <Color x:Key="SemanticNegative500Color">#b20909</Color>
     <SolidColorBrush x:Key="SemanticNegative500Brush" Color="{DynamicResource SemanticNegative500Color}" />
-    <Color x:Key="SemanticNegative600Color">#7e0a0a</Color>
     <SolidColorBrush x:Key="SemanticNegative600Brush" Color="{DynamicResource SemanticNegative600Color}" />
-    <Color x:Key="SemanticNegative700Color">#4d0808</Color>
     <SolidColorBrush x:Key="SemanticNegative700Brush" Color="{DynamicResource SemanticNegative700Color}" />
-    <Color x:Key="SemanticNegative800Color">#1e0404</Color>
     <SolidColorBrush x:Key="SemanticNegative800Brush" Color="{DynamicResource SemanticNegative800Color}" />
-    <Color x:Key="SemanticNegative900Color">#000000</Color>
     <SolidColorBrush x:Key="SemanticNegative900Brush" Color="{DynamicResource SemanticNegative900Color}" />
-    <Color x:Key="SemanticPositive100Color">#88ff88</Color>
+
+    <!-- Semantic Positive Brushes -->
     <SolidColorBrush x:Key="SemanticPositive100Brush" Color="{DynamicResource SemanticPositive100Color}" />
-    <Color x:Key="SemanticPositive200Color">#55ff55</Color>
     <SolidColorBrush x:Key="SemanticPositive200Brush" Color="{DynamicResource SemanticPositive200Color}" />
-    <Color x:Key="SemanticPositive300Color">#22ff22</Color>
     <SolidColorBrush x:Key="SemanticPositive300Brush" Color="{DynamicResource SemanticPositive300Color}" />
-    <Color x:Key="SemanticPositive400Color">#06e806</Color>
     <SolidColorBrush x:Key="SemanticPositive400Brush" Color="{DynamicResource SemanticPositive400Color}" />
-    <Color x:Key="SemanticPositive500Color">#09b209</Color>
     <SolidColorBrush x:Key="SemanticPositive500Brush" Color="{DynamicResource SemanticPositive500Color}" />
-    <Color x:Key="SemanticPositive600Color">#0a7e0a</Color>
     <SolidColorBrush x:Key="SemanticPositive600Brush" Color="{DynamicResource SemanticPositive600Color}" />
-    <Color x:Key="SemanticPositive700Color">#084d08</Color>
     <SolidColorBrush x:Key="SemanticPositive700Brush" Color="{DynamicResource SemanticPositive700Color}" />
-    <Color x:Key="SemanticPositive800Color">#041e04</Color>
     <SolidColorBrush x:Key="SemanticPositive800Brush" Color="{DynamicResource SemanticPositive800Color}" />
-    <Color x:Key="SemanticPositive900Color">#000000</Color>
     <SolidColorBrush x:Key="SemanticPositive900Brush" Color="{DynamicResource SemanticPositive900Color}" />
-    <Color x:Key="SemanticSpecial100Color">#ff88ff</Color>
+
+    <!-- Semantic Special Brushes -->
     <SolidColorBrush x:Key="SemanticSpecial100Brush" Color="{DynamicResource SemanticSpecial100Color}" />
-    <Color x:Key="SemanticSpecial200Color">#ff55ff</Color>
     <SolidColorBrush x:Key="SemanticSpecial200Brush" Color="{DynamicResource SemanticSpecial200Color}" />
-    <Color x:Key="SemanticSpecial300Color">#ff22ff</Color>
     <SolidColorBrush x:Key="SemanticSpecial300Brush" Color="{DynamicResource SemanticSpecial300Color}" />
-    <Color x:Key="SemanticSpecial400Color">#e806e8</Color>
     <SolidColorBrush x:Key="SemanticSpecial400Brush" Color="{DynamicResource SemanticSpecial400Color}" />
-    <Color x:Key="SemanticSpecial500Color">#b209b2</Color>
     <SolidColorBrush x:Key="SemanticSpecial500Brush" Color="{DynamicResource SemanticSpecial500Color}" />
-    <Color x:Key="SemanticSpecial600Color">#7e0a7e</Color>
     <SolidColorBrush x:Key="SemanticSpecial600Brush" Color="{DynamicResource SemanticSpecial600Color}" />
-    <Color x:Key="SemanticSpecial700Color">#4d084d</Color>
     <SolidColorBrush x:Key="SemanticSpecial700Brush" Color="{DynamicResource SemanticSpecial700Color}" />
-    <Color x:Key="SemanticSpecial800Color">#1e041e</Color>
     <SolidColorBrush x:Key="SemanticSpecial800Brush" Color="{DynamicResource SemanticSpecial800Color}" />
-    <Color x:Key="SemanticSpecial900Color">#000000</Color>
     <SolidColorBrush x:Key="SemanticSpecial900Brush" Color="{DynamicResource SemanticSpecial900Color}" />
-    <Color x:Key="SemanticWarning100Color">#fbffd5</Color>
+
+    <!-- Semantic Warning Brushes -->
     <SolidColorBrush x:Key="SemanticWarning100Brush" Color="{DynamicResource SemanticWarning100Color}" />
-    <Color x:Key="SemanticWarning200Color">#f6ffa2</Color>
     <SolidColorBrush x:Key="SemanticWarning200Brush" Color="{DynamicResource SemanticWarning200Color}" />
-    <Color x:Key="SemanticWarning300Color">#f1ff6f</Color>
     <SolidColorBrush x:Key="SemanticWarning300Brush" Color="{DynamicResource SemanticWarning300Color}" />
-    <Color x:Key="SemanticWarning400Color">#eafb40</Color>
     <SolidColorBrush x:Key="SemanticWarning400Brush" Color="{DynamicResource SemanticWarning400Color}" />
-    <Color x:Key="SemanticWarning500Color">#dff414</Color>
     <SolidColorBrush x:Key="SemanticWarning500Brush" Color="{DynamicResource SemanticWarning500Color}" />
-    <Color x:Key="SemanticWarning600Color">#b5c60f</Color>
     <SolidColorBrush x:Key="SemanticWarning600Brush" Color="{DynamicResource SemanticWarning600Color}" />
-    <Color x:Key="SemanticWarning700Color">#86930f</Color>
     <SolidColorBrush x:Key="SemanticWarning700Brush" Color="{DynamicResource SemanticWarning700Color}" />
-    <Color x:Key="SemanticWarning800Color">#5a620d</Color>
     <SolidColorBrush x:Key="SemanticWarning800Brush" Color="{DynamicResource SemanticWarning800Color}" />
-    <Color x:Key="SemanticWarning900Color">#2f3309</Color>
     <SolidColorBrush x:Key="SemanticWarning900Brush" Color="{DynamicResource SemanticWarning900Color}" />
-    <Color x:Key="BlackColor">#1f1a14</Color>
+
+    <!-- Special Brushes -->
     <SolidColorBrush x:Key="BlackBrush" Color="{DynamicResource BlackColor}" />
-    <Color x:Key="WhiteColor">#ffffff</Color>
     <SolidColorBrush x:Key="WhiteBrush" Color="{DynamicResource WhiteColor}" />
+
+    <!-- UI Element Brushes -->
+    <SolidColorBrush x:Key="LiveRatesBackgroundBrush" Color="{DynamicResource LiveRatesBackgroundColor}" />
+    <SolidColorBrush x:Key="LiveRatesVariationBackgroundBrush" Color="{DynamicResource LiveRatesVariationBackgroundColor}" />
+    <SolidColorBrush x:Key="ButtonOverlayLightBrush" Color="{DynamicResource ButtonOverlayLightColor}" />
+    <SolidColorBrush x:Key="ButtonOverlayMediumBrush" Color="{DynamicResource ButtonOverlayMediumColor}" />
+    <SolidColorBrush x:Key="StepIndicatorActiveBrush" Color="{DynamicResource StepIndicatorActiveColor}" />
+    <SolidColorBrush x:Key="StepIndicatorInactiveBrush" Color="{DynamicResource StepIndicatorInactiveColor}" />
+    <SolidColorBrush x:Key="StepIndicatorInactiveLightBrush" Color="{DynamicResource StepIndicatorInactiveLightColor}" />
+    <SolidColorBrush x:Key="MessageBoxInfoBrush" Color="{DynamicResource MessageBoxInfoColor}" />
+    <SolidColorBrush x:Key="MessageBoxWarningBrush" Color="{DynamicResource MessageBoxWarningColor}" />
+    <SolidColorBrush x:Key="MessageBoxErrorBrush" Color="{DynamicResource MessageBoxErrorColor}" />
+    <SolidColorBrush x:Key="MessageBoxQuestionBrush" Color="{DynamicResource MessageBoxQuestionColor}" />
+    <SolidColorBrush x:Key="ColorPickerSelectedBorderBrush" Color="{DynamicResource ColorPickerSelectedBorderColor}" />
+
+    <!-- Top Bar Button Brushes -->
+    <SolidColorBrush x:Key="TopBarButtonBackgroundBrush" Color="{DynamicResource TopBarButtonBackgroundColor}" />
+    <SolidColorBrush x:Key="TopBarButtonBackgroundHoverBrush" Color="{DynamicResource TopBarButtonBackgroundHoverColor}" />
+    <SolidColorBrush x:Key="TopBarButtonBackgroundSelectedBrush" Color="{DynamicResource TopBarButtonBackgroundSelectedColor}" />
+    <SolidColorBrush x:Key="TopBarButtonForegroundBrush" Color="{DynamicResource TopBarButtonForegroundColor}" />
+    <SolidColorBrush x:Key="TopBarButtonForegroundHoverBrush" Color="{DynamicResource TopBarButtonForegroundHoverColor}" />
 </ResourceDictionary>

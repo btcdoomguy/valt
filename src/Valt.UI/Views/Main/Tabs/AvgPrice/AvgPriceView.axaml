@@ -187,7 +187,9 @@
                 </Grid>
 
                 <!-- Current Position Summary -->
-                <Border Background="{DynamicResource Surface200Brush}"
+                <Border Background="{DynamicResource Background700Brush}"
+                        BorderBrush="{DynamicResource Background500Brush}"
+                        BorderThickness="1"
                         CornerRadius="8"
                         Padding="16"
                         Margin="0,10,0,0">

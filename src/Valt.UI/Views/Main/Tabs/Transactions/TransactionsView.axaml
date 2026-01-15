@@ -129,7 +129,7 @@
                                         <StackPanel Grid.Column="1" Spacing="-1">
                                             <Label FontSize="14" Padding="0" Content="{Binding Name}" />
                                             <Label FontSize="11" Padding="0"
-                                                   Foreground="{DynamicResource Background300Brush}"
+                                                   Foreground="{DynamicResource Text400Brush}"
                                                    IsVisible="{Binding !IsBtcAccount}"
                                                    Content="{Binding CurrencyDisplayName}" />
                                             <Label FontSize="11" Padding="0"

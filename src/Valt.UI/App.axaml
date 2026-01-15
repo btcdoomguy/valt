@@ -3,7 +3,7 @@
              x:Class="Valt.UI.App"
              xmlns:local="using:Valt.UI"
              RequestedThemeVariant="Dark">
-    <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+    <!-- Theme variant is set dynamically by ThemeService. Default is Dark. -->
 
     <Application.DataTemplates>
         <local:ViewLocator />
@@ -12,6 +12,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <!-- Color resources with ThemeDictionaries for Dark/Light theme support -->
                 <MergeResourceInclude Source="Styles/ColorResources.axaml" />
                 <MergeResourceInclude Source="Styles/CustomResources.axaml" />
             </ResourceDictionary.MergedDictionaries>
