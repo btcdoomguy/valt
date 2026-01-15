@@ -27,15 +27,15 @@
         </Style>
     </UserControl.Styles>
 
-    <Border Background="#0D0D0D"
+    <Border Background="{DynamicResource LiveRatesBackgroundBrush}"
             BorderThickness="1"
             CornerRadius="8"
             Padding="10, 4">
         <Border.BorderBrush>
             <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                <GradientStop Color="#2A2A2A" Offset="0" />
-                <GradientStop Color="#1A1A1A" Offset="0.5" />
-                <GradientStop Color="#2A2A2A" Offset="1" />
+                <GradientStop Color="{DynamicResource LiveRatesBorderGradientStartColor}" Offset="0" />
+                <GradientStop Color="{DynamicResource LiveRatesBorderGradientEndColor}" Offset="0.5" />
+                <GradientStop Color="{DynamicResource LiveRatesBorderGradientStartColor}" Offset="1" />
             </LinearGradientBrush>
         </Border.BorderBrush>
 
@@ -60,7 +60,7 @@
                                Margin="12, 0" />
 
                     <Border Grid.Column="2"
-                            Background="#1A1A1A"
+                            Background="{DynamicResource LiveRatesVariationBackgroundBrush}"
                             CornerRadius="3"
                             Padding="5, 1"
                             MinWidth="54">
@@ -89,7 +89,7 @@
                                Margin="12, 0" />
 
                     <Border Grid.Column="2"
-                            Background="#1A1A1A"
+                            Background="{DynamicResource LiveRatesVariationBackgroundBrush}"
                             CornerRadius="3"
                             Padding="5, 1"
                             MinWidth="54">
@@ -118,7 +118,7 @@
                                Margin="12, 0" />
 
                     <Border Grid.Column="2"
-                            Background="#1A1A1A"
+                            Background="{DynamicResource LiveRatesVariationBackgroundBrush}"
                             CornerRadius="3"
                             Padding="5, 1"
                             MinWidth="54">

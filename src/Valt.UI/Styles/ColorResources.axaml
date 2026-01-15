@@ -220,4 +220,56 @@
     <SolidColorBrush x:Key="BlackBrush" Color="{DynamicResource BlackColor}" />
     <Color x:Key="WhiteColor">#ffffff</Color>
     <SolidColorBrush x:Key="WhiteBrush" Color="{DynamicResource WhiteColor}" />
+
+    <!-- LiveRates Component -->
+    <Color x:Key="LiveRatesBackgroundColor">#0D0D0D</Color>
+    <Color x:Key="LiveRatesBorderGradientStartColor">#2A2A2A</Color>
+    <Color x:Key="LiveRatesBorderGradientEndColor">#1A1A1A</Color>
+    <Color x:Key="LiveRatesVariationBackgroundColor">#1A1A1A</Color>
+    <SolidColorBrush x:Key="LiveRatesBackgroundBrush" Color="{DynamicResource LiveRatesBackgroundColor}" />
+    <SolidColorBrush x:Key="LiveRatesVariationBackgroundBrush" Color="{DynamicResource LiveRatesVariationBackgroundColor}" />
+
+    <!-- Button Overlays (semi-transparent) -->
+    <Color x:Key="ButtonOverlayLightColor">#69FFFFFF</Color>
+    <Color x:Key="ButtonOverlayMediumColor">#49FFFFFF</Color>
+    <SolidColorBrush x:Key="ButtonOverlayLightBrush" Color="{DynamicResource ButtonOverlayLightColor}" />
+    <SolidColorBrush x:Key="ButtonOverlayMediumBrush" Color="{DynamicResource ButtonOverlayMediumColor}" />
+
+    <!-- Step Indicators (Import Wizard) -->
+    <Color x:Key="StepIndicatorActiveColor">#0078D4</Color>
+    <Color x:Key="StepIndicatorInactiveColor">#6B6B6B</Color>
+    <Color x:Key="StepIndicatorInactiveLightColor">#9E9E9E</Color>
+    <SolidColorBrush x:Key="StepIndicatorActiveBrush" Color="{DynamicResource StepIndicatorActiveColor}" />
+    <SolidColorBrush x:Key="StepIndicatorInactiveBrush" Color="{DynamicResource StepIndicatorInactiveColor}" />
+    <SolidColorBrush x:Key="StepIndicatorInactiveLightBrush" Color="{DynamicResource StepIndicatorInactiveLightColor}" />
+
+    <!-- MessageBox Icons -->
+    <Color x:Key="MessageBoxInfoColor">#2196F3</Color>
+    <Color x:Key="MessageBoxWarningColor">#FF9800</Color>
+    <Color x:Key="MessageBoxErrorColor">#F44336</Color>
+    <Color x:Key="MessageBoxQuestionColor">#9C27B0</Color>
+    <SolidColorBrush x:Key="MessageBoxInfoBrush" Color="{DynamicResource MessageBoxInfoColor}" />
+    <SolidColorBrush x:Key="MessageBoxWarningBrush" Color="{DynamicResource MessageBoxWarningColor}" />
+    <SolidColorBrush x:Key="MessageBoxErrorBrush" Color="{DynamicResource MessageBoxErrorColor}" />
+    <SolidColorBrush x:Key="MessageBoxQuestionBrush" Color="{DynamicResource MessageBoxQuestionColor}" />
+
+    <!-- Color Picker Selection -->
+    <Color x:Key="ColorPickerSelectedBorderColor">#FFE98805</Color>
+    <SolidColorBrush x:Key="ColorPickerSelectedBorderBrush" Color="{DynamicResource ColorPickerSelectedBorderColor}" />
+
+    <!-- Modal TopBar -->
+    <Color x:Key="ModalTopBarBackgroundColor">#444444</Color>
+
+    <!-- TopBar Buttons -->
+    <Color x:Key="TopBarButtonBackgroundColor">#5B3800</Color>
+    <Color x:Key="TopBarButtonBackgroundHoverColor">#7A5500</Color>
+    <Color x:Key="TopBarButtonBackgroundSelectedColor">#FF9E00</Color>
+    <Color x:Key="TopBarButtonForegroundColor">#FFA500</Color>
+    <Color x:Key="TopBarButtonForegroundHoverColor">#FFFFFF</Color>
+
+    <!-- Footer -->
+    <Color x:Key="FooterGradientStartColor">#000000</Color>
+
+    <!-- Icon Selector -->
+    <Color x:Key="IconSelectorDefaultColor">#FFFFFF</Color>
 </ResourceDictionary>

@@ -1,7 +1,9 @@
 using System;
 using System.Globalization;
+using Avalonia;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
+using Avalonia.Styling;
 
 namespace Valt.UI.Views.Main.Modals.ImportWizard;
 
@@ -13,18 +15,23 @@ public class StepBackgroundConverter : IValueConverter
 {
     public static readonly StepBackgroundConverter Instance = new();
 
-    private static readonly SolidColorBrush ActiveBrush = new(Color.Parse("#0078D4")); // Accent color
-    private static readonly SolidColorBrush InactiveBrush = new(Color.Parse("#6B6B6B")); // Gray
+    private static SolidColorBrush GetActiveBrush() =>
+        Application.Current!.TryGetResource("StepIndicatorActiveBrush", ThemeVariant.Default, out var brush)
+            ? (SolidColorBrush)brush! : new SolidColorBrush(Color.Parse("#0078D4"));
+
+    private static SolidColorBrush GetInactiveBrush() =>
+        Application.Current!.TryGetResource("StepIndicatorInactiveBrush", ThemeVariant.Default, out var brush)
+            ? (SolidColorBrush)brush! : new SolidColorBrush(Color.Parse("#6B6B6B"));
 
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is not WizardStep currentStep || parameter is not string stepParam)
-            return InactiveBrush;
+            return GetInactiveBrush();
 
         if (!int.TryParse(stepParam, out var targetStep))
-            return InactiveBrush;
+            return GetInactiveBrush();
 
-        return (int)currentStep >= targetStep ? ActiveBrush : InactiveBrush;
+        return (int)currentStep >= targetStep ? GetActiveBrush() : GetInactiveBrush();
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -41,18 +48,23 @@ public class StepForegroundConverter : IValueConverter
 {
     public static readonly StepForegroundConverter Instance = new();
 
-    private static readonly SolidColorBrush ActiveBrush = new(Color.Parse("#0078D4")); // Accent color
-    private static readonly SolidColorBrush InactiveBrush = new(Color.Parse("#9E9E9E")); // Lighter gray
+    private static SolidColorBrush GetForegroundActiveBrush() =>
+        Application.Current!.TryGetResource("StepIndicatorActiveBrush", ThemeVariant.Default, out var brush)
+            ? (SolidColorBrush)brush! : new SolidColorBrush(Color.Parse("#0078D4"));
+
+    private static SolidColorBrush GetForegroundInactiveBrush() =>
+        Application.Current!.TryGetResource("StepIndicatorInactiveLightBrush", ThemeVariant.Default, out var brush)
+            ? (SolidColorBrush)brush! : new SolidColorBrush(Color.Parse("#9E9E9E"));
 
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is not WizardStep currentStep || parameter is not string stepParam)
-            return InactiveBrush;
+            return GetForegroundInactiveBrush();
 
         if (!int.TryParse(stepParam, out var targetStep))
-            return InactiveBrush;
+            return GetForegroundInactiveBrush();
 
-        return (int)currentStep >= targetStep ? ActiveBrush : InactiveBrush;
+        return (int)currentStep >= targetStep ? GetForegroundActiveBrush() : GetForegroundInactiveBrush();
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

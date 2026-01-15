@@ -17,7 +17,11 @@ public partial class ColorPalettePicker : UserControl
         set => SetValue(SelectedColorProperty, value);
     }
 
-    private static readonly SolidColorBrush SelectedBorderBrush = new(Color.Parse("#FFE98805"));
+    private static SolidColorBrush? _selectedBorderBrush;
+    private static SolidColorBrush SelectedBorderBrush =>
+        _selectedBorderBrush ??= Application.Current!.TryGetResource("ColorPickerSelectedBorderBrush", Avalonia.Styling.ThemeVariant.Default, out var brush)
+            ? (SolidColorBrush)brush! : new SolidColorBrush(Color.Parse("#FFE98805"));
+
     private static readonly SolidColorBrush UnselectedBorderBrush = new(Colors.Transparent);
 
     private readonly List<Button> _colorButtons = [];

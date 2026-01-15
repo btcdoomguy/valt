@@ -266,7 +266,7 @@
         <Setter Property="Content" Value="&#xEA5F;" />
         <Setter Property="BorderThickness" Value="0" />
         <Style Selector="^:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="#69FFFFFF" />
+            <Setter Property="Background" Value="{DynamicResource ButtonOverlayLightBrush}" />
             <Setter Property="BorderBrush" Value="White" />
         </Style>
     </Style>
@@ -290,7 +290,7 @@
 
     <Style Selector="Button.rounded">
         <Setter Property="Padding" Value="5, 2, 0, 0" />
-        <Setter Property="Background" Value="#49FFFFFF" />
+        <Setter Property="Background" Value="{DynamicResource ButtonOverlayMediumBrush}" />
         <Setter Property="FontSize" Value="30" />
         <Setter Property="Width" Value="40" />
         <Setter Property="Height" Value="40" />
@@ -305,7 +305,7 @@
             </Setter>
         </Style>
         <Style Selector="^:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="#69FFFFFF" />
+            <Setter Property="Background" Value="{DynamicResource ButtonOverlayLightBrush}" />
             <Setter Property="BorderBrush" Value="White" />
         </Style>
     </Style>
