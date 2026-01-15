@@ -54,6 +54,20 @@ public class LocalStorageService : ILocalStorageService
         return Task.CompletedTask;
     }
 
+    public string LoadTheme()
+    {
+        EnsureLoaded();
+        return _valtSettings!.Theme;
+    }
+
+    public Task ChangeThemeAsync(string theme)
+    {
+        EnsureLoaded();
+        _valtSettings!.Theme = theme;
+        Save();
+        return Task.CompletedTask;
+    }
+
     public DataGridSettings LoadDataGridSettings()
     {
         EnsureLoaded();
@@ -92,6 +106,7 @@ public class LocalStorageService : ILocalStorageService
     private class ValtSettings
     {
         public string Culture { get; set; } = GetDefaultCulture();
+        public string Theme { get; set; } = "Dark";
         public DataGridSettings DataGridSettings { get; set; } = new();
         public List<string> RecentFiles { get; set; } = new();
 

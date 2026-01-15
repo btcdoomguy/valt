@@ -10,6 +10,8 @@ public interface ILocalStorageService
     Task ChangeRecentFilesAsync(ICollection<string> recentFiles);
     string LoadCulture();
     Task ChangeCultureAsync(string culture);
+    string LoadTheme();
+    Task ChangeThemeAsync(string theme);
     DataGridSettings LoadDataGridSettings();
     Task SaveDataGridSettingsAsync(DataGridSettings settings);
 }

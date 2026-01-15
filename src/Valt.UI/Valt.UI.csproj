@@ -18,7 +18,6 @@
 
     <ItemGroup>
         <AvaloniaResource Include="Assets\**"/>
-        <AvaloniaResource Remove="Themes\**" />
     </ItemGroup>
 
     <ItemGroup>

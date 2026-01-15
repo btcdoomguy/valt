@@ -60,6 +60,15 @@
                                            TextWrapping="Wrap" />
                                 <CheckBox IsChecked="{Binding ShowHiddenAccounts}" />
                             </DockPanel>
+                            <DockPanel>
+                                <TextBlock Width="220" TextAlignment="Right" Margin="0,0,5,0"
+                                           VerticalAlignment="Center"
+                                           Text="{x:Static local:language.Settings_Theme}"
+                                           TextWrapping="Wrap" />
+                                <ComboBox ItemsSource="{Binding AvailableThemes}"
+                                          DisplayMemberBinding="{Binding DisplayName}"
+                                          SelectedItem="{Binding SelectedTheme}" Width="200" />
+                            </DockPanel>
                         </StackPanel>
                     </TabItem>
 

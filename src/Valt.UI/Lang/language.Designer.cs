@@ -1389,6 +1389,12 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string Settings_Theme {
+            get {
+                return ResourceManager.GetString("Settings.Theme", resourceCulture);
+            }
+        }
+
         public static string Settings_Tab_General {
             get {
                 return ResourceManager.GetString("Settings.Tab.General", resourceCulture);

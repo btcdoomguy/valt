@@ -695,6 +695,9 @@
     <data name="Settings.RequiresRestart" xml:space="preserve">
         <value>(requires restart)</value>
     </data>
+    <data name="Settings.Theme" xml:space="preserve">
+        <value>Theme</value>
+    </data>
     <data name="Settings.Tab.General" xml:space="preserve">
         <value>General</value>
     </data>

@@ -18,6 +18,7 @@ using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.LocalStorage;
 using Valt.UI.Services.MessageBoxes;
+using Valt.UI.Services.Theming;
 using Valt.UI.Views.Main.Modals.ChangePassword;
 
 namespace Valt.UI.Views.Main.Modals.Settings;
@@ -31,10 +32,12 @@ public partial class SettingsViewModel : ValtModalViewModel
     private readonly IModalFactory _modalFactory;
     private readonly ILocalStorageService _localStorageService;
     private readonly IConfigurationManager? _configurationManager;
+    private readonly IThemeService? _themeService;
 
     [ObservableProperty] private string _mainFiatCurrency;
     [ObservableProperty] private bool _showHiddenAccounts;
     [ObservableProperty] private string _currentCulture;
+    [ObservableProperty] private ThemeDefinition? _selectedTheme;
 
     private List<string> _initialSelectedCurrencies = new();
     private HashSet<string> _currenciesInUse = new();
@@ -62,6 +65,8 @@ public partial class SettingsViewModel : ValtModalViewModel
             }).ToList();
         }
     }
+
+    public IReadOnlyList<ThemeDefinition> AvailableThemes => _themeService?.AvailableThemes ?? Array.Empty<ThemeDefinition>();
 
     public static List<ComboBoxValue> Cultures
     {
@@ -91,17 +96,19 @@ public partial class SettingsViewModel : ValtModalViewModel
         //Design-time constructor
         MainFiatCurrency = "BRL";
         ShowHiddenAccounts = false;
+        CurrentCulture = "en-US";
 
         SelectedFiatCurrencies.CollectionChanged += OnSelectedFiatCurrenciesChanged;
     }
-    
+
     public SettingsViewModel(CurrencySettings currencySettings,
         DisplaySettings displaySettings,
         ILocalDatabase localDatabase,
         ITransactionTermService transactionTermService,
         IModalFactory modalFactory,
         ILocalStorageService localStorageService,
-        IConfigurationManager configurationManager)
+        IConfigurationManager configurationManager,
+        IThemeService themeService)
     {
         _currencySettings = currencySettings;
         _displaySettings = displaySettings;
@@ -110,10 +117,13 @@ public partial class SettingsViewModel : ValtModalViewModel
         _modalFactory = modalFactory;
         _localStorageService = localStorageService;
         _configurationManager = configurationManager;
+        _themeService = themeService;
 
         MainFiatCurrency = _currencySettings.MainFiatCurrency;
         ShowHiddenAccounts = _displaySettings.ShowHiddenAccounts;
         CurrentCulture = _localStorageService.LoadCulture();
+        SelectedTheme = _themeService.AvailableThemes.FirstOrDefault(t => t.Name == _themeService.CurrentTheme)
+                        ?? _themeService.AvailableThemes.First();
 
         // Initialize currencies
         InitializeFiatCurrencies();
@@ -222,6 +232,16 @@ public partial class SettingsViewModel : ValtModalViewModel
 
         _displaySettings.ShowHiddenAccounts = ShowHiddenAccounts;
         _displaySettings.Save();
+
+        // Apply and save theme if changed
+        if (SelectedTheme != null && _themeService != null)
+        {
+            if (_themeService.CurrentTheme != SelectedTheme.Name)
+            {
+                _themeService.ApplyTheme(SelectedTheme.Name);
+                _themeService.SaveTheme(SelectedTheme.Name);
+            }
+        }
 
         await _localStorageService.ChangeCultureAsync(CurrentCulture);
 
