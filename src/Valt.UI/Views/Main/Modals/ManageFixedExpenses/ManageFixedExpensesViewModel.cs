@@ -167,10 +167,11 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
     [RelayCommand]
     private async Task AddFixedExpense()
     {
+        var currentWindow = GetWindow!();
         var window = (FixedExpenseEditorView)await _modalFactory.CreateAsync(ApplicationModalNames.FixedExpenseEditor,
-            OwnerWindow, null)!;
+            currentWindow, null)!;
 
-        _ = await window.ShowDialog<FixedExpenseEditorViewModel.Response?>(OwnerWindow!);
+        _ = await window.ShowDialog<FixedExpenseEditorViewModel.Response?>(currentWindow);
 
         await FetchFixedExpensesAsync();
     }
@@ -181,13 +182,14 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
         if (SelectedFixedExpense is null)
             return;
 
+        var currentWindow = GetWindow!();
         var window = (FixedExpenseEditorView)await _modalFactory.CreateAsync(ApplicationModalNames.FixedExpenseEditor,
-            OwnerWindow, new FixedExpenseEditorViewModel.Request()
+            currentWindow, new FixedExpenseEditorViewModel.Request()
             {
                 FixedExpenseId = SelectedFixedExpense?.Id
             })!;
 
-        _ = await window.ShowDialog<FixedExpenseEditorViewModel.Response?>(OwnerWindow!);
+        _ = await window.ShowDialog<FixedExpenseEditorViewModel.Response?>(currentWindow);
 
         await FetchFixedExpensesAsync();
     }
@@ -198,13 +200,14 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
         if (SelectedFixedExpense is null)
             return;
 
+        var currentWindow = GetWindow!();
         var window = (FixedExpenseHistoryView)await _modalFactory.CreateAsync(ApplicationModalNames.FixedExpenseHistory,
-            OwnerWindow, new FixedExpenseHistoryViewModel.Request
+            currentWindow, new FixedExpenseHistoryViewModel.Request
             {
                 FixedExpenseId = SelectedFixedExpense.Id
             })!;
 
-        _ = await window.ShowDialog<object?>(OwnerWindow!);
+        _ = await window.ShowDialog<object?>(currentWindow);
     }
 
     [RelayCommand]
@@ -214,7 +217,7 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
             return;
 
         var response = await MessageBoxHelper.ShowQuestionAsync(language.ManageFixedExpenses_Delete_Alert,
-            language.ManageFixedExpenses_Delete_Message, OwnerWindow!);
+            language.ManageFixedExpenses_Delete_Message, GetWindow!());
 
         if (!response)
             return;

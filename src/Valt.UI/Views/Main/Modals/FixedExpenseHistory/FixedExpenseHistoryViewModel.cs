@@ -127,12 +127,13 @@ public partial class FixedExpenseHistoryViewModel : ValtModalViewModel
             TransactionId = new TransactionId(SelectedTransaction.TransactionId)
         };
 
+        var currentWindow = GetWindow!();
         var modal = (TransactionEditorView)await _modalFactory.CreateAsync(
             ApplicationModalNames.TransactionEditor,
-            OwnerWindow,
+            currentWindow,
             request)!;
 
-        var result = await modal.ShowDialog<TransactionEditorViewModel.Response?>(OwnerWindow!);
+        var result = await modal.ShowDialog<TransactionEditorViewModel.Response?>(currentWindow);
 
         if (result is not null && Parameter is Request originalRequest)
         {
