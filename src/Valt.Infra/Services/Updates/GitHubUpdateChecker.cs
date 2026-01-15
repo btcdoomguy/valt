@@ -6,7 +6,7 @@ namespace Valt.Infra.Services.Updates;
 
 internal class GitHubUpdateChecker : IUpdateChecker
 {
-    private const string GitHubApiUrl = "https://api.github.com/repos/btcdoomguy/valt/releases/latest";
+    private const string GitHubApiUrl = "https://api.github.com/repos/btcdoomguy/valt/releases?per_page=10";
     private readonly ILogger<GitHubUpdateChecker> _logger;
 
     public GitHubUpdateChecker(ILogger<GitHubUpdateChecker> logger)
@@ -17,8 +17,10 @@ internal class GitHubUpdateChecker : IUpdateChecker
     public async Task<UpdateInfo?> CheckForUpdateAsync(Version currentVersion)
     {
         using var client = new HttpClient();
-        client.Timeout = TimeSpan.FromSeconds(10);
+        client.Timeout = TimeSpan.FromSeconds(30);
         client.DefaultRequestHeaders.Add("User-Agent", "Valt-Desktop-App");
+        client.DefaultRequestHeaders.Add("Accept", "application/vnd.github+json");
+        client.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
 
         try
         {
@@ -28,11 +30,18 @@ internal class GitHubUpdateChecker : IUpdateChecker
             var json = await response.Content.ReadAsStringAsync();
 
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var release = JsonSerializer.Deserialize<GitHubReleaseResponse>(json, options);
+            var releases = JsonSerializer.Deserialize<List<GitHubReleaseResponse>>(json, options);
 
+            if (releases is null || releases.Count == 0)
+            {
+                _logger.LogWarning("Failed to deserialize GitHub releases response or no releases found");
+                return null;
+            }
+
+            var release = releases.FirstOrDefault(r => !r.Draft && !r.Prerelease);
             if (release is null)
             {
-                _logger.LogWarning("Failed to deserialize GitHub release response");
+                _logger.LogDebug("No stable release found");
                 return null;
             }
 
@@ -87,6 +96,12 @@ internal class GitHubUpdateChecker : IUpdateChecker
 
         [JsonPropertyName("name")]
         public string Name { get; init; } = string.Empty;
+
+        [JsonPropertyName("draft")]
+        public bool Draft { get; init; }
+
+        [JsonPropertyName("prerelease")]
+        public bool Prerelease { get; init; }
 
         [JsonPropertyName("body")]
         public string? Body { get; init; }
