@@ -1,0 +1,1369 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="OkButton" xml:space="preserve">
+        <value>Aceptar</value>
+    </data>
+    <data name="CancelButton" xml:space="preserve">
+        <value>Cancelar</value>
+    </data>
+    <data name="SaveButton" xml:space="preserve">
+        <value>Guardar</value>
+    </data>
+    <data name="SaveAndAddButton" xml:space="preserve">
+        <value>Guardar y agregar nuevo</value>
+    </data>
+    <data name="ChangeCategoryTransactionTitle" xml:space="preserve">
+        <value>Nuevo nombre</value>
+    </data>
+    <data name="ChangeCategoryTransactions_Title" xml:space="preserve">
+        <value>Editar transacciones en masa</value>
+    </data>
+    <data name="ChangeCategoryTransactions_Rename" xml:space="preserve">
+        <value>Renombrar todas las transacciones</value>
+    </data>
+    <data name="ChangeCategoryTransactions_ChangeCategory" xml:space="preserve">
+        <value>Cambiar categoría de todas las transacciones</value>
+    </data>
+    <data name="CreateDatabaseTitle" xml:space="preserve">
+        <value>Crear nueva base de datos</value>
+    </data>
+    <data name="CreateDatabase.TextLine1" xml:space="preserve">
+        <value>VALT utiliza un archivo simple como base de datos para almacenar tu información.</value>
+    </data>
+    <data name="CreateDatabase.TextLine2" xml:space="preserve">
+        <value>Por favor, establece una contraseña segura para encriptar este archivo.</value>
+    </data>
+    <data name="CreateDatabase.TextLine3" xml:space="preserve">
+        <value>NOTA: perder tu contraseña es irreversible. ¡Guárdala en un lugar seguro!</value>
+    </data>
+    <data name="CreateDatabase.FilePath" xml:space="preserve">
+        <value>Ruta del archivo</value>
+    </data>
+    <data name="CreateDatabase.Password" xml:space="preserve">
+        <value>Contraseña</value>
+    </data>
+    <data name="CreateDatabase.ConfirmPassword" xml:space="preserve">
+        <value>Confirmar contraseña</value>
+    </data>
+    <data name="CreateDatabase.InitialDataLanguage" xml:space="preserve">
+        <value>Idioma para datos iniciales</value>
+    </data>
+    <data name="CreateDatabase.FiatCurrencies" xml:space="preserve">
+        <value>Monedas fiduciarias</value>
+    </data>
+    <data name="CreateDatabase.FiatCurrencies.Info" xml:space="preserve">
+        <value>USD siempre está incluido. Selecciona monedas adicionales:</value>
+    </data>
+    <data name="CreateDatabase.FiatCurrencies.SelectTitle" xml:space="preserve">
+        <value>Monedas adicionales</value>
+    </data>
+    <data name="Settings.FiatCurrencies" xml:space="preserve">
+        <value>Monedas disponibles</value>
+    </data>
+    <data name="Settings.FiatCurrencies.Info" xml:space="preserve">
+        <value>USD siempre está incluido. Las monedas en uso no se pueden eliminar.</value>
+    </data>
+    <data name="Settings.FiatCurrencies.CannotRemove" xml:space="preserve">
+        <value>No se puede eliminar la moneda "{0}" porque está en uso.</value>
+    </data>
+    <data name="Settings.FiatCurrencies.ConfirmAdd.Title" xml:space="preserve">
+        <value>Agregar monedas</value>
+    </data>
+    <data name="Settings.FiatCurrencies.ConfirmAdd.Message" xml:space="preserve">
+        <value>Agregar nuevas monedas descargará datos de precios históricos. ¿Continuar?</value>
+    </data>
+    <data name="IconSelector.ClearSelection" xml:space="preserve">
+        <value>Limpiar selección</value>
+    </data>
+    <data name="IconSelector.Color" xml:space="preserve">
+        <value>Color</value>
+    </data>
+    <data name="IconSelector.Loading" xml:space="preserve">
+        <value>Cargando...</value>
+    </data>
+    <data name="Loading" xml:space="preserve">
+        <value>Cargando...</value>
+    </data>
+    <data name="IconSelector.Title" xml:space="preserve">
+        <value>Seleccionar icono</value>
+    </data>
+    <data name="Search" xml:space="preserve">
+        <value>Buscar</value>
+    </data>
+    <data name="New" xml:space="preserve">
+        <value>Nuevo</value>
+    </data>
+    <data name="Open" xml:space="preserve">
+        <value>Abrir</value>
+    </data>
+    <data name="InitialSelection.Title" xml:space="preserve">
+        <value>¡Bienvenido a Valt!</value>
+    </data>
+    <data name="InitialSelection.CreateOrLoadMessage" xml:space="preserve">
+        <value>Crear o cargar un archivo de base de datos:</value>
+    </data>
+    <data name="InputPassword.DatabasePassword" xml:space="preserve">
+        <value>Contraseña de la base de datos</value>
+    </data>
+    <data name="InputPassword.Password" xml:space="preserve">
+        <value>Contraseña</value>
+    </data>
+    <data name="InputPassword.StartInSecureMode" xml:space="preserve">
+        <value>Iniciar en Modo Seguro</value>
+    </data>
+    <data name="ManageAccount.Title" xml:space="preserve">
+        <value>Agregar/editar cuenta</value>
+    </data>
+    <data name="ManageAccount.Name" xml:space="preserve">
+        <value>Nombre</value>
+    </data>
+    <data name="ManageAccount.Icon" xml:space="preserve">
+        <value>Icono</value>
+    </data>
+    <data name="ManageAccount.Visible" xml:space="preserve">
+        <value>Visible</value>
+    </data>
+    <data name="ManageAccount.AccountType" xml:space="preserve">
+        <value>Tipo de cuenta</value>
+    </data>
+    <data name="ManageAccount.Currency" xml:space="preserve">
+        <value>Moneda</value>
+    </data>
+    <data name="ManageAccount.CurrencyNickname" xml:space="preserve">
+        <value>Apodo de la moneda</value>
+    </data>
+    <data name="ManageAccount.InitialAmount" xml:space="preserve">
+        <value>Monto inicial</value>
+    </data>
+    <data name="ManageCategories.Title" xml:space="preserve">
+        <value>Categorías</value>
+    </data>
+    <data name="ManageCategories.Name" xml:space="preserve">
+        <value>Nombre</value>
+    </data>
+    <data name="ManageCategories.Icon" xml:space="preserve">
+        <value>Icono</value>
+    </data>
+    <data name="ManageCategories.Delete" xml:space="preserve">
+        <value>Eliminar</value>
+    </data>
+    <data name="ManageCategories.Tip" xml:space="preserve">
+        <value>CONSEJO: arrastra y suelta una categoría dentro de otra para agruparlas.</value>
+    </data>
+    <data name="ManageTransactions.Debt" xml:space="preserve">
+        <value>Débito</value>
+    </data>
+    <data name="ManageTransactions.Credit" xml:space="preserve">
+        <value>Crédito</value>
+    </data>
+    <data name="ManageTransactions.Transfer" xml:space="preserve">
+        <value>Transferencia</value>
+    </data>
+    <data name="ManageTransactions.Name" xml:space="preserve">
+        <value>Nombre</value>
+    </data>
+    <data name="ManageTransactions.Category" xml:space="preserve">
+        <value>Categoría</value>
+    </data>
+    <data name="ManageTransactions.From" xml:space="preserve">
+        <value>Desde</value>
+    </data>
+    <data name="ManageTransactions.Amount" xml:space="preserve">
+        <value>Monto</value>
+    </data>
+    <data name="ManageTransactions.To" xml:space="preserve">
+        <value>Hacia</value>
+    </data>
+    <data name="AddNew" xml:space="preserve">
+        <value>Agregar nuevo</value>
+    </data>
+    <data name="SaveChanges" xml:space="preserve">
+        <value>Guardar cambios</value>
+    </data>
+    <data name="MathExpression.Title" xml:space="preserve">
+        <value>Calcular expresión</value>
+    </data>
+    <data name="MathExpression.Description" xml:space="preserve">
+        <value>Ingresa tu expresión abajo (123+456):</value>
+    </data>
+    <data name="Settings.Title" xml:space="preserve">
+        <value>Configuración</value>
+    </data>
+    <data name="Settings.MainFiatCurrency" xml:space="preserve">
+        <value>Moneda fiat principal</value>
+    </data>
+    <data name="Settings.ShowHiddenAccounts" xml:space="preserve">
+        <value>Mostrar cuentas ocultas</value>
+    </data>
+    <data name="Settings.ClearAccountTotalsCache" xml:space="preserve">
+        <value>Limpiar caché de totales de cuenta</value>
+    </data>
+    <data name="Settings.ClearTransactionTermCache" xml:space="preserve">
+        <value>Limpiar caché de términos de transacción</value>
+    </data>
+    <data name="StatusDisplay.Title" xml:space="preserve">
+        <value>Estado del servicio</value>
+    </data>
+    <data name="Transactions.Ratio" xml:space="preserve">
+        <value>Patrimonio en BTC</value>
+    </data>
+    <data name="Transactions.TotalInFiat" xml:space="preserve">
+        <value>Total</value>
+    </data>
+    <data name="Transactions.Total" xml:space="preserve">
+        <value>Total en BTC</value>
+    </data>
+    <data name="Transactions.ViewAllAccounts" xml:space="preserve">
+        <value>Ver todas las cuentas</value>
+    </data>
+    <data name="Transactions.Edit" xml:space="preserve">
+        <value>Editar</value>
+    </data>
+    <data name="Transactions.Hide" xml:space="preserve">
+        <value>Ocultar</value>
+    </data>
+    <data name="Transactions.Show" xml:space="preserve">
+        <value>Mostrar</value>
+    </data>
+    <data name="Transactions.Delete" xml:space="preserve">
+        <value>Eliminar</value>
+    </data>
+    <data name="Transactions.MoveUp" xml:space="preserve">
+        <value>Mover arriba</value>
+    </data>
+    <data name="Transactions.MoveDown" xml:space="preserve">
+        <value>Mover abajo</value>
+    </data>
+    <data name="Transactions.EnterSearchTerm" xml:space="preserve">
+        <value>Ingresa término de búsqueda...</value>
+    </data>
+    <data name="Transactions.AddTransaction" xml:space="preserve">
+        <value>+ Agregar transacción</value>
+    </data>
+    <data name="Transactions.Columns.Date" xml:space="preserve">
+        <value>Fecha</value>
+    </data>
+    <data name="Transactions.Columns.Description" xml:space="preserve">
+        <value>Descripción</value>
+    </data>
+    <data name="Transactions.Columns.Category" xml:space="preserve">
+        <value>Categoría</value>
+    </data>
+    <data name="Transactions.Columns.OriginAccount" xml:space="preserve">
+        <value>Cuenta origen</value>
+    </data>
+    <data name="Transactions.Columns.TargetAccount" xml:space="preserve">
+        <value>Cuenta destino</value>
+    </data>
+    <data name="Transactions.Columns.Sats" xml:space="preserve">
+        <value>Sats</value>
+    </data>
+    <data name="Transactions.Columns.SatsPriceToday" xml:space="preserve">
+        <value>Precio actual en sats</value>
+    </data>
+    <data name="Transactions.Menu.Edit" xml:space="preserve">
+        <value>Editar</value>
+    </data>
+    <data name="Transactions.Menu.Copy" xml:space="preserve">
+        <value>Copiar</value>
+    </data>
+    <data name="Transactions.Menu.RenameAll" xml:space="preserve">
+        <value>Editar todos</value>
+    </data>
+    <data name="Transactions.Menu.Delete" xml:space="preserve">
+        <value>Eliminar</value>
+    </data>
+    <data name="Main.Transactions" xml:space="preserve">
+        <value>Transacciones</value>
+    </data>
+    <data name="Main.Reports" xml:space="preserve">
+        <value>Informes</value>
+    </data>
+    <data name="Main.Menu" xml:space="preserve">
+        <value>Administrar</value>
+    </data>
+    <data name="Main.Menu.Categories" xml:space="preserve">
+        <value>Categorías</value>
+    </data>
+    <data name="Main.Menu.Settings" xml:space="preserve">
+        <value>Configuración</value>
+    </data>
+    <data name="Transactions.MyStack" xml:space="preserve">
+        <value>BTC</value>
+    </data>
+    <data name="Transactions.MyOther" xml:space="preserve">
+        <value>Fiat</value>
+    </data>
+    <data name="ManageTransactions.SelectToday" xml:space="preserve">
+        <value>Restablecer fecha</value>
+    </data>
+    <data name="ManageTransactions.AddTitle" xml:space="preserve">
+        <value>Agregar transacción</value>
+    </data>
+    <data name="ManageTransactions.EditTitle" xml:space="preserve">
+        <value>Editar transacción</value>
+    </data>
+    <data name="ManageTransactions.CopyTitle" xml:space="preserve">
+        <value>Copiar transacción</value>
+    </data>
+    <data name="Settings.Culture" xml:space="preserve">
+        <value>Idioma y formato de visualización</value>
+    </data>
+    <data name="ManageCategories.RemoveFromGroup" xml:space="preserve">
+        <value>Quitar del grupo</value>
+    </data>
+    <data name="ManageTransactions.FixedExpense" xml:space="preserve">
+        <value>Relacionado con gasto fijo</value>
+    </data>
+    <data name="ManageFixedExpenses.Title" xml:space="preserve">
+        <value>Gastos fijos</value>
+    </data>
+    <data name="FixedExpenses.Columns.Name" xml:space="preserve">
+        <value>Nombre</value>
+    </data>
+    <data name="FixedExpenses.Columns.Category" xml:space="preserve">
+        <value>Categoría</value>
+    </data>
+    <data name="FixedExpenses.Columns.DefaultAccount" xml:space="preserve">
+        <value>Cuenta predeterminada</value>
+    </data>
+    <data name="FixedExpenses.Columns.Currency" xml:space="preserve">
+        <value>Moneda</value>
+    </data>
+    <data name="FixedExpenses.Columns.AmountType" xml:space="preserve">
+        <value>Tipo</value>
+    </data>
+    <data name="FixedExpenses.Columns.FixedAmount" xml:space="preserve">
+        <value>Monto fijo</value>
+    </data>
+    <data name="FixedExpenses.Columns.RangedAmountMin" xml:space="preserve">
+        <value>Monto mínimo</value>
+    </data>
+    <data name="FixedExpenses.Columns.RangedAmountMax" xml:space="preserve">
+        <value>Monto máximo</value>
+    </data>
+    <data name="FixedExpenses.Columns.Period" xml:space="preserve">
+        <value>Frecuencia</value>
+    </data>
+    <data name="FixedExpenses.Columns.Day" xml:space="preserve">
+        <value>Día</value>
+    </data>
+    <data name="FixedExpenses.Columns.Enabled" xml:space="preserve">
+        <value>Habilitado</value>
+    </data>
+    <data name="FixedExpenses.Columns.Amount" xml:space="preserve">
+        <value>Monto</value>
+    </data>
+    <data name="FixedExpenses.Period.Monthly" xml:space="preserve">
+        <value>Mensual</value>
+    </data>
+    <data name="FixedExpenses.Period.Yearly" xml:space="preserve">
+        <value>Anual</value>
+    </data>
+    <data name="Transactions.ManageFixedExpenses" xml:space="preserve">
+        <value>Administrar</value>
+    </data>
+    <data name="FixedExpensesEditor.EditTitle" xml:space="preserve">
+        <value>Editar gasto fijo</value>
+    </data>
+    <data name="FixedExpensesEditor.AddTitle" xml:space="preserve">
+        <value>Agregar gasto fijo</value>
+    </data>
+    <data name="ManageFixedExpenses.Name" xml:space="preserve">
+        <value>Nombre</value>
+    </data>
+    <data name="ManageFixedExpenses.Category" xml:space="preserve">
+        <value>Categoría</value>
+    </data>
+    <data name="ManageFixedExpenses.CurrencyDefinition" xml:space="preserve">
+        <value>Definición de moneda</value>
+    </data>
+    <data name="ManageFixedExpenses.CurrencyDefinition.AttachedToDefaultAccount" xml:space="preserve">
+        <value>Desde cuenta predeterminada</value>
+    </data>
+    <data name="ManageFixedExpenses.CurrencyDefinition.AttachedToCurrency" xml:space="preserve">
+        <value>Configuración directa</value>
+    </data>
+    <data name="ManageFixedExpenses.DefaultAccount" xml:space="preserve">
+        <value>Cuenta predeterminada</value>
+    </data>
+    <data name="ManageFixedExpenses.Currency" xml:space="preserve">
+        <value>Moneda</value>
+    </data>
+    <data name="ManageFixedExpenses.AmountDefinition" xml:space="preserve">
+        <value>Definición de monto</value>
+    </data>
+    <data name="ManageFixedExpenses.AmountDefinition.Fixed" xml:space="preserve">
+        <value>Fijo</value>
+    </data>
+    <data name="ManageFixedExpenses.AmountDefinition.Variable" xml:space="preserve">
+        <value>Variable</value>
+    </data>
+    <data name="ManageFixedExpenses.AmountDefinition.Hint" xml:space="preserve">
+        <value>Usa Monto Fijo si el gasto recurrente tiene un valor fijo (como servicios de internet). Usa Monto Variable si el monto cambia (como facturas de electricidad). Debes definir un rango del monto variable para estimar mejor tus gastos anuales.</value>
+    </data>
+    <data name="ManageFixedExpenses.Amount.Fixed" xml:space="preserve">
+        <value>Valor</value>
+    </data>
+    <data name="ManageFixedExpenses.Amount.From" xml:space="preserve">
+        <value>Desde</value>
+    </data>
+    <data name="ManageFixedExpenses.Amount.To" xml:space="preserve">
+        <value>Hasta</value>
+    </data>
+    <data name="ManageFixedExpenses.PeriodRange" xml:space="preserve">
+        <value>Frecuencia</value>
+    </data>
+    <data name="ManageFixedExpenses.PeriodRange.Monthly" xml:space="preserve">
+        <value>Mensual</value>
+    </data>
+    <data name="ManageFixedExpenses.PeriodRange.Yearly" xml:space="preserve">
+        <value>Anual</value>
+    </data>
+    <data name="ManageFixedExpenses.Day" xml:space="preserve">
+        <value>Día del mes</value>
+    </data>
+    <data name="ManageFixedExpenses.StartPeriod" xml:space="preserve">
+        <value>Comienza en</value>
+    </data>
+    <data name="ManageFixedExpenses.Enabled" xml:space="preserve">
+        <value>Habilitado</value>
+    </data>
+    <data name="ManageFixedExpenses.CurrencyMode" xml:space="preserve">
+        <value>Modo</value>
+    </data>
+    <data name="FixedExpenseEditor.Validation.DefaultAccountRequired" xml:space="preserve">
+        <value>Selecciona una cuenta predeterminada</value>
+    </data>
+    <data name="FixedExpenseEditor.Validation.CurrencyRequired" xml:space="preserve">
+        <value>Selecciona la moneda</value>
+    </data>
+    <data name="FixedExpenseEditor.Validation.FixedAmountRequired" xml:space="preserve">
+        <value>Establece un monto válido</value>
+    </data>
+    <data name="FixedExpenseEditor.Validation.RangedAmountMinRequired" xml:space="preserve">
+        <value>Establece un monto mínimo válido</value>
+    </data>
+    <data name="FixedExpenseEditor.Validation.RangedAmountMaxRequired" xml:space="preserve">
+        <value>Establece un monto máximo válido</value>
+    </data>
+    <data name="FixedExpenseEditor.Validation.InvalidRangedAmountMinMax" xml:space="preserve">
+        <value>Rango inválido</value>
+    </data>
+    <data name="ManageFixedExpenses.Delete.Alert" xml:space="preserve">
+        <value>Eliminar gasto fijo</value>
+    </data>
+    <data name="ManageFixedExpenses.Delete.Message" xml:space="preserve">
+        <value>Al eliminar el gasto fijo, todas las transacciones vinculadas perderán el vínculo. ¿Deseas continuar?</value>
+    </data>
+    <data name="Yes" xml:space="preserve">
+        <value>Sí</value>
+    </data>
+    <data name="No" xml:space="preserve">
+        <value>No</value>
+    </data>
+    <data name="ManageFixedExpenses.MonthlyExpenses" xml:space="preserve">
+        <value>Gastos fijos mensuales:</value>
+    </data>
+    <data name="ManageFixedExpenses.YearlyExpenses" xml:space="preserve">
+        <value>Gastos fijos anuales:</value>
+    </data>
+    <data name="Transactions.Columns.Amount" xml:space="preserve">
+        <value>Monto</value>
+    </data>
+    <data name="Transactions.Menu.BindToFixedExpenseCaption" xml:space="preserve">
+        <value>Vincular a</value>
+    </data>
+    <data name="Transactions.Menu.UnbindToFixedExpenseCaption" xml:space="preserve">
+        <value>Desvincular de</value>
+    </data>
+    <data name="ManageTransactions.Properties.BoundToFixedExpense" xml:space="preserve">
+        <value>Vinculado a:</value>
+    </data>
+    <data name="TransactionFixedExpenses.AddTransaction" xml:space="preserve">
+        <value>Crear transacción</value>
+    </data>
+    <data name="TransactionFixedExpenses.EditTransaction" xml:space="preserve">
+        <value>Editar transacción</value>
+    </data>
+    <data name="TransactionFixedExpenses.IgnoreForThisMonth" xml:space="preserve">
+        <value>Ignorar para esta fecha</value>
+    </data>
+    <data name="TransactionFixedExpenses.MarkAsPaid" xml:space="preserve">
+        <value>Marcar como pagado</value>
+    </data>
+    <data name="TransactionFixedExpenses.UndoIgnoreForThisMonth" xml:space="preserve">
+        <value>Deshacer ignorar</value>
+    </data>
+    <data name="TransactionFixedExpenses.UndoMarkAsPaid" xml:space="preserve">
+        <value>Desmarcar como pagado</value>
+    </data>
+    <data name="TransactionFixedExpenses.AddOrEditTransaction" xml:space="preserve">
+        <value>Crear/abrir transacción</value>
+    </data>
+    <data name="FixedExpenseEditor.Validation.InvalidRangePeriodStart" xml:space="preserve">
+        <value>No se puede establecer el inicio del nuevo período antes del último registro</value>
+    </data>
+    <data name="FixedExpenseEditor.ChangeRecurrence" xml:space="preserve">
+        <value>Cambiar...</value>
+    </data>
+    <data name="FixedExpenseEditor.CancelChangeRecurrence" xml:space="preserve">
+        <value>Cancelar</value>
+    </data>
+    <data name="ManageFixedExpenses.RecurrenceSection" xml:space="preserve">
+        <value>Recurrencia</value>
+    </data>
+    <data name="ManageFixedExpenses.InformationSection" xml:space="preserve">
+        <value>Información</value>
+    </data>
+    <data name="FixedExpenses.Period.Weekly" xml:space="preserve">
+        <value>Semanal</value>
+    </data>
+    <data name="FixedExpenses.Period.Biweekly" xml:space="preserve">
+        <value>Quincenal</value>
+    </data>
+    <data name="DaysOfWeek.Sunday" xml:space="preserve">
+        <value>Domingo</value>
+    </data>
+    <data name="DaysOfWeek.Monday" xml:space="preserve">
+        <value>Lunes</value>
+    </data>
+    <data name="DaysOfWeek.Tuesday" xml:space="preserve">
+        <value>Martes</value>
+    </data>
+    <data name="DaysOfWeek.Wednesday" xml:space="preserve">
+        <value>Miércoles</value>
+    </data>
+    <data name="DaysOfWeek.Thursday" xml:space="preserve">
+        <value>Jueves</value>
+    </data>
+    <data name="DaysOfWeek.Friday" xml:space="preserve">
+        <value>Viernes</value>
+    </data>
+    <data name="DaysOfWeek.Saturday" xml:space="preserve">
+        <value>Sábado</value>
+    </data>
+    <data name="ManageFixedExpenses.DayOfWeek" xml:space="preserve">
+        <value>Día de la semana</value>
+    </data>
+    <data name="ManageFixedExpenses.PeriodRange.Weekly" xml:space="preserve">
+        <value>Semanal</value>
+    </data>
+    <data name="ManageFixedExpenses.PeriodRange.Biweekly" xml:space="preserve">
+        <value>Quincenal</value>
+    </data>
+    <data name="Empty" xml:space="preserve">
+        <value>-</value>
+    </data>
+    <data name="ManageTransactions.Properties.PriceInSats" xml:space="preserve">
+        <value>Precio en sats:</value>
+    </data>
+    <data name="ChangePasswordTitle" xml:space="preserve">
+        <value>Cambiar contraseña</value>
+    </data>
+    <data name="ChangePassword.OldPassword" xml:space="preserve">
+        <value>Contraseña anterior</value>
+    </data>
+    <data name="ChangePassword.Password" xml:space="preserve">
+        <value>Nueva contraseña</value>
+    </data>
+    <data name="ChangePassword.ConfirmPassword" xml:space="preserve">
+        <value>Confirmar nueva contraseña</value>
+    </data>
+    <data name="Settings.ChangeDatabasePassword" xml:space="preserve">
+        <value>Cambiar contraseña de la base de datos</value>
+    </data>
+    <data name="ChangePassword.TextLine1" xml:space="preserve">
+        <value>Cambiar la contraseña recreará el archivo de base de datos. Se generará una copia de seguridad en la misma carpeta.</value>
+    </data>
+    <data name="RemainingFixedExpenses.Title" xml:space="preserve">
+        <value>Restante:</value>
+    </data>
+    <data name="Edit" xml:space="preserve">
+        <value>Editar</value>
+    </data>
+    <data name="LoadingMessage" xml:space="preserve">
+        <value>Actualizando base de datos de precios. Por favor espera...</value>
+    </data>
+    <data name="InstallPriceDatabase.Title" xml:space="preserve">
+        <value>Instalar base de datos de precios</value>
+    </data>
+    <data name="Error" xml:space="preserve">
+        <value>Error</value>
+    </data>
+    <data name="InstallPriceDatabase.Error.Title" xml:space="preserve">
+        <value>Error</value>
+    </data>
+    <data name="InstallPriceDatabase.Error.Info" xml:space="preserve">
+        <value>No se puede instalar la base de datos de precios. Por favor verifica tu conexión a internet.</value>
+    </data>
+    <data name="InstallPriceDatabase.Info" xml:space="preserve">
+        <value>Para finalizar el proceso de instalación, Valt necesita crear tu base de datos local de precios. Para ello, se requiere conexión a internet. El proceso tomará unos segundos.</value>
+    </data>
+    <data name="ValtFile.Error" xml:space="preserve">
+        <value>Error al abrir archivo VALT: {0}</value>
+    </data>
+    <data name="ValtPriceFile.Error" xml:space="preserve">
+        <value>Error al abrir archivo de base de datos de precios: {0}</value>
+    </data>
+    <data name="InstallingBitcoinPriceMessage" xml:space="preserve">
+        <value>Descargando historial de precios de bitcoin...</value>
+    </data>
+    <data name="InstallingFiatPriceMessage" xml:space="preserve">
+        <value>Descargando historial de precios de monedas fiat...</value>
+    </data>
+    <data name="Transactions.Columns.Sats.Hint" xml:space="preserve">
+        <value>Muestra la transacción en sats, basado en el precio de cierre de bitcoin en esa fecha</value>
+    </data>
+    <data name="Transactions.Columns.SatsPriceToday.Hint" xml:space="preserve">
+        <value>Valor fiat actual de los sats calculados en la columna de sats</value>
+    </data>
+    <data name="BootDatabase.BtcAccount" xml:space="preserve">
+        <value>Almacenamiento frío</value>
+    </data>
+    <data name="BootDatabase.FiatAccount" xml:space="preserve">
+        <value>Cuenta bancaria</value>
+    </data>
+    <data name="BootDatabase.Category.Food" xml:space="preserve">
+        <value>Comida</value>
+    </data>
+    <data name="BootDatabase.Category.UtilityBills" xml:space="preserve">
+        <value>Servicios públicos</value>
+    </data>
+    <data name="BootDatabase.Category.Services" xml:space="preserve">
+        <value>Servicios</value>
+    </data>
+    <data name="BootDatabase.Category.Gadgets" xml:space="preserve">
+        <value>Electrónicos</value>
+    </data>
+    <data name="BootDatabase.Category.Health" xml:space="preserve">
+        <value>Salud</value>
+    </data>
+    <data name="BootDatabase.Category.Transport" xml:space="preserve">
+        <value>Transporte</value>
+    </data>
+    <data name="BootDatabase.Category.Travel" xml:space="preserve">
+        <value>Viajes</value>
+    </data>
+    <data name="BootDatabase.Category.Entertainment" xml:space="preserve">
+        <value>Entretenimiento</value>
+    </data>
+    <data name="BootDatabase.Category.Groceries" xml:space="preserve">
+        <value>Supermercado</value>
+    </data>
+    <data name="BootDatabase.Category.Paycheck" xml:space="preserve">
+        <value>Salario</value>
+    </data>
+    <data name="Transactions.AddTransaction.ToolTip" xml:space="preserve">
+        <value>También puedes presionar F2 para agregar una nueva transacción</value>
+    </data>
+    <data name="Main.Menu.About" xml:space="preserve">
+        <value>Acerca de</value>
+    </data>
+    <data name="Main.Menu.HowToUse" xml:space="preserve">
+        <value>Guía del usuario</value>
+    </data>
+    <data name="About.Title" xml:space="preserve">
+        <value>Acerca de</value>
+    </data>
+    <data name="About.Tip" xml:space="preserve">
+        <value>Si te gusta la app, envíame algunos sats para pagar las cuentas:</value>
+    </data>
+    <data name="Settings.RequiresRestart" xml:space="preserve">
+        <value>(requiere reinicio)</value>
+    </data>
+    <data name="Settings.Theme" xml:space="preserve">
+        <value>Tema</value>
+    </data>
+    <data name="Settings.Tab.General" xml:space="preserve">
+        <value>General</value>
+    </data>
+    <data name="Settings.Tab.Currencies" xml:space="preserve">
+        <value>Monedas</value>
+    </data>
+    <data name="Settings.Tab.Advanced" xml:space="preserve">
+        <value>Avanzado</value>
+    </data>
+    <data name="Offline.Line1" xml:space="preserve">
+        <value>Las cotizaciones están sin conexión.</value>
+    </data>
+    <data name="Offline.Line2" xml:space="preserve">
+        <value>Estás viendo los últimos precios registrados.</value>
+    </data>
+    <data name="SecureMode.ToggleTooltip" xml:space="preserve">
+        <value>Alternar Modo Seguro</value>
+    </data>
+    <data name="Reports.SecureModeMessage" xml:space="preserve">
+        <value>Sal del Modo Seguro para ver los datos</value>
+    </data>
+    <data name="Reports.Summary" xml:space="preserve">
+        <value>Resumen</value>
+    </data>
+    <data name="Reports.MonthlyTotals" xml:space="preserve">
+        <value>Totales mensuales</value>
+    </data>
+    <data name="Reports.MonthlyTotals.TotalWealth" xml:space="preserve">
+        <value>Patrimonio total</value>
+    </data>
+    <data name="Reports.MonthlyTotals.Date" xml:space="preserve">
+        <value>Fecha</value>
+    </data>
+    <data name="Reports.MonthlyTotals.PreviousMonth" xml:space="preserve">
+        <value>% del mes anterior</value>
+    </data>
+    <data name="Reports.MonthlyTotals.PreviousYear" xml:space="preserve">
+        <value>% del año anterior</value>
+    </data>
+    <data name="Reports.AllTimeHigh.Title" xml:space="preserve">
+        <value>Tu máximo histórico</value>
+    </data>
+    <data name="Reports.AllTimeHigh.AllTimeHigh" xml:space="preserve">
+        <value>Máximo histórico</value>
+    </data>
+    <data name="Reports.AllTimeHigh.Date" xml:space="preserve">
+        <value>Fecha</value>
+    </data>
+    <data name="Reports.AllTimeHigh.DeclineFromAth" xml:space="preserve">
+        <value>Diferencia actual</value>
+    </data>
+    <data name="Reports.AllTimeHigh.MaxDrawdownDate" xml:space="preserve">
+        <value>Fecha de máxima caída</value>
+    </data>
+    <data name="Reports.AllTimeHigh.MaxDrawdownPercent" xml:space="preserve">
+        <value>Máxima caída</value>
+    </data>
+    <data name="Reports.Wealth.Title" xml:space="preserve">
+        <value>Patrimonio</value>
+    </data>
+    <data name="Reports.Wealth.TotalInBtc.Tooltip" xml:space="preserve">
+        <value>Este es tu patrimonio total representado en bitcoin como unidad de cuenta</value>
+    </data>
+    <data name="Reports.BtcStack.Title" xml:space="preserve">
+        <value>Tu Stack</value>
+    </data>
+    <data name="Reports.BtcStack.CurrentStack" xml:space="preserve">
+        <value>Stack actual</value>
+    </data>
+    <data name="Reports.BtcStack.PercentOfSupply" xml:space="preserve">
+        <value>% del suministro total</value>
+    </data>
+    <data name="Reports.BtcStack.PeopleWithSameStack" xml:space="preserve">
+        <value>Ranking global</value>
+    </data>
+    <data name="Reports.BtcStack.PeopleWithSameStack.Tooltip" xml:space="preserve">
+        <value>Número máximo de personas que pueden tener el mismo stack que tú</value>
+    </data>
+    <data name="Reports.Statistics.Title" xml:space="preserve">
+        <value>Estadísticas</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpenses" xml:space="preserve">
+        <value>Gastos medianos (12m)</value>
+    </data>
+    <data name="Reports.Statistics.WealthCoverage" xml:space="preserve">
+        <value>Cobertura de patrimonio</value>
+    </data>
+    <data name="Reports.Statistics.WealthCoverage.Tooltip" xml:space="preserve">
+        <value>Cuánto tiempo puedes mantenerte con tu patrimonio actual sin nuevos ingresos</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesPrevious" xml:space="preserve">
+        <value>Gastos medianos (12m ant)</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesEvolution" xml:space="preserve">
+        <value>Evolución interanual</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesEvolution.Tooltip" xml:space="preserve">
+        <value>Tu inflación medida en fiat. Este es el aumento de tus gastos respecto al mismo período del año anterior. Números negativos significan reducción del costo de vida medido en moneda fiduciaria</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesSatsLabel" xml:space="preserve">
+        <value>Mediana sats (12m)</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesSatsPrevious" xml:space="preserve">
+        <value>Mediana sats (12m ant)</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesSatsEvolution" xml:space="preserve">
+        <value>Evolución interanual (sats)</value>
+    </data>
+    <data name="Reports.Statistics.MedianExpensesSatsEvolution.Tooltip" xml:space="preserve">
+        <value>Tu inflación medida en bitcoin. Este es el aumento de tus gastos respecto al mismo período del año anterior. Números negativos significan reducción del costo de vida medido en bitcoin</value>
+    </data>
+    <data name="Reports.MonthlyTotals.Obs" xml:space="preserve">
+        <value>* los totales actuales se calculan basándose en los montos de ayer</value>
+    </data>
+    <data name="Reports.MonthlyTotals.Income" xml:space="preserve">
+        <value>Ingresos (Fiat)</value>
+    </data>
+    <data name="Reports.MonthlyTotals.Expenses" xml:space="preserve">
+        <value>Gastos (Fiat)</value>
+    </data>
+    <data name="Reports.MonthlyTotals.BitcoinPurchased" xml:space="preserve">
+        <value>BTC comprado</value>
+    </data>
+    <data name="Reports.MonthlyTotals.BitcoinSold" xml:space="preserve">
+        <value>BTC vendido</value>
+    </data>
+    <data name="Reports.MonthlyTotals.BitcoinIncome" xml:space="preserve">
+        <value>Ingresos en BTC</value>
+    </data>
+    <data name="Reports.MonthlyTotals.BitcoinExpenses" xml:space="preserve">
+        <value>Gastos en BTC</value>
+    </data>
+    <data name="Reports.SpendingByCategories.Title" xml:space="preserve">
+        <value>Gastos por categorías</value>
+    </data>
+    <data name="Reports.SpendingByCategories.Accounts" xml:space="preserve">
+        <value>Cuentas</value>
+    </data>
+    <data name="Reports.SpendingByCategories.Categories" xml:space="preserve">
+        <value>Categorías</value>
+    </data>
+    <data name="Total" xml:space="preserve">
+        <value>Total</value>
+    </data>
+    <data name="Main.AvgPrice" xml:space="preserve">
+        <value>Precios promedio</value>
+    </data>
+    <data name="Reports.MonthlyTotals.AllIncomeInFiat" xml:space="preserve">
+        <value>Ingresos totales</value>
+    </data>
+    <data name="Reports.MonthlyTotals.AllExpensesInFiat" xml:space="preserve">
+        <value>Gastos totales</value>
+    </data>
+    <data name="AvgPriceLineEditor.AddTitle" xml:space="preserve">
+        <value>Agregar línea</value>
+    </data>
+    <data name="AvgPriceLineEditor.EditTitle" xml:space="preserve">
+        <value>Editar línea</value>
+    </data>
+    <data name="AvgPriceLineEditor.Date" xml:space="preserve">
+        <value>Fecha</value>
+    </data>
+    <data name="AvgPriceLineEditor.Type" xml:space="preserve">
+        <value>Tipo</value>
+    </data>
+    <data name="AvgPriceLineEditor.Buy" xml:space="preserve">
+        <value>Compra</value>
+    </data>
+    <data name="AvgPriceLineEditor.Sell" xml:space="preserve">
+        <value>Venta</value>
+    </data>
+    <data name="AvgPriceLineEditor.Setup" xml:space="preserve">
+        <value>Configuración</value>
+    </data>
+    <data name="AvgPriceLineEditor.Quantity" xml:space="preserve">
+        <value>Cantidad</value>
+    </data>
+    <data name="AvgPriceLineEditor.Amount" xml:space="preserve">
+        <value>Monto</value>
+    </data>
+    <data name="AvgPriceLineEditor.AvgCost" xml:space="preserve">
+        <value>Costo promedio</value>
+    </data>
+    <data name="AvgPriceLineEditor.Comment" xml:space="preserve">
+        <value>Comentario</value>
+    </data>
+    <data name="AvgPrice.ManageProfiles" xml:space="preserve">
+        <value>Administrar</value>
+    </data>
+    <data name="AvgPrice.AddOperation" xml:space="preserve">
+        <value>+ Agregar operación</value>
+    </data>
+    <data name="AvgPrice.Menu.Edit" xml:space="preserve">
+        <value>Editar</value>
+    </data>
+    <data name="AvgPrice.Menu.Delete" xml:space="preserve">
+        <value>Eliminar</value>
+    </data>
+    <data name="AvgPrice.Menu.MoveUp" xml:space="preserve">
+        <value>Mover arriba</value>
+    </data>
+    <data name="AvgPrice.Menu.MoveDown" xml:space="preserve">
+        <value>Mover abajo</value>
+    </data>
+    <data name="AvgPrice.DeleteConfirm.Title" xml:space="preserve">
+        <value>Eliminar operación</value>
+    </data>
+    <data name="AvgPrice.DeleteConfirm.Message" xml:space="preserve">
+        <value>¿Estás seguro de que deseas eliminar esta operación? Esta acción no se puede deshacer.</value>
+    </data>
+    <data name="AvgPrice.Column.Date" xml:space="preserve">
+        <value>Fecha</value>
+    </data>
+    <data name="AvgPrice.Column.Type" xml:space="preserve">
+        <value>Tipo</value>
+    </data>
+    <data name="AvgPrice.Column.Quantity" xml:space="preserve">
+        <value>Cantidad</value>
+    </data>
+    <data name="AvgPrice.Column.Amount" xml:space="preserve">
+        <value>Monto</value>
+    </data>
+    <data name="AvgPrice.Column.UnitPrice" xml:space="preserve">
+        <value>Precio unitario</value>
+    </data>
+    <data name="AvgPrice.Column.TotalQuantity" xml:space="preserve">
+        <value>Cant. total</value>
+    </data>
+    <data name="AvgPrice.Column.TotalCost" xml:space="preserve">
+        <value>Costo total</value>
+    </data>
+    <data name="AvgPrice.Column.AvgCost" xml:space="preserve">
+        <value>Costo prom.</value>
+    </data>
+    <data name="AvgPrice.Column.Comment" xml:space="preserve">
+        <value>Comentario</value>
+    </data>
+    <data name="AvgPrice.LineType.Buy" xml:space="preserve">
+        <value>Compra</value>
+    </data>
+    <data name="AvgPrice.LineType.Sell" xml:space="preserve">
+        <value>Venta</value>
+    </data>
+    <data name="AvgPrice.LineType.Setup" xml:space="preserve">
+        <value>Configuración</value>
+    </data>
+    <data name="AvgPrice.Totals.Period" xml:space="preserve">
+        <value>Período</value>
+    </data>
+    <data name="AvgPrice.Totals.Bought" xml:space="preserve">
+        <value>Comprado</value>
+    </data>
+    <data name="AvgPrice.Totals.Sold" xml:space="preserve">
+        <value>Vendido</value>
+    </data>
+    <data name="AvgPrice.Totals.ProfitLoss" xml:space="preserve">
+        <value>G/P</value>
+    </data>
+    <data name="AvgPrice.Totals.Volume" xml:space="preserve">
+        <value>Volumen</value>
+    </data>
+    <data name="AvgPrice.Totals.YearlyTotal" xml:space="preserve">
+        <value>TOTAL</value>
+    </data>
+    <data name="AvgPrice.CurrentPosition" xml:space="preserve">
+        <value>Posición actual</value>
+    </data>
+    <data name="AvgPrice.AveragePrice" xml:space="preserve">
+        <value>Precio promedio</value>
+    </data>
+    <data name="AvgPrice.Profiles.Title" xml:space="preserve">
+        <value>Perfiles de precio promedio</value>
+    </data>
+    <data name="AvgPrice.Profiles.ProfileName" xml:space="preserve">
+        <value>Nombre del perfil</value>
+    </data>
+    <data name="AvgPrice.Profiles.AssetType" xml:space="preserve">
+        <value>Tipo de activo</value>
+    </data>
+    <data name="AvgPrice.Profiles.Bitcoin" xml:space="preserve">
+        <value>Bitcoin</value>
+    </data>
+    <data name="AvgPrice.Profiles.CustomAsset" xml:space="preserve">
+        <value>Activo personalizado</value>
+    </data>
+    <data name="AvgPrice.Profiles.CustomAssetDetails" xml:space="preserve">
+        <value>Detalles del activo personalizado</value>
+    </data>
+    <data name="AvgPrice.Profiles.AssetName" xml:space="preserve">
+        <value>Nombre del activo</value>
+    </data>
+    <data name="AvgPrice.Profiles.Decimals" xml:space="preserve">
+        <value>Decimales</value>
+    </data>
+    <data name="AvgPrice.Profiles.FiatCurrency" xml:space="preserve">
+        <value>Moneda fiduciaria</value>
+    </data>
+    <data name="AvgPrice.Profiles.CalculationMethod" xml:space="preserve">
+        <value>Método de cálculo</value>
+    </data>
+    <data name="AvgPrice.Profiles.Icon" xml:space="preserve">
+        <value>Icono</value>
+    </data>
+    <data name="AvgPrice.Profiles.Visible" xml:space="preserve">
+        <value>Visible</value>
+    </data>
+    <data name="AvgPrice.Profiles.DeleteConfirm.Title" xml:space="preserve">
+        <value>Eliminar perfil</value>
+    </data>
+    <data name="AvgPrice.Profiles.DeleteConfirm.Message" xml:space="preserve">
+        <value>Este perfil tiene {0} registro(s). ¿Estás seguro de que deseas eliminarlo? Todos los registros relacionados serán eliminados permanentemente.</value>
+    </data>
+    <data name="InitialSelection.FirstMessage" xml:space="preserve">
+        <value>Necesitas crear o seleccionar tu archivo de base de datos personal para almacenar tus datos financieros de forma segura.</value>
+    </data>
+    <data name="JobLogViewer.Title" xml:space="preserve">
+        <value>Registro de trabajo: {0}</value>
+    </data>
+    <data name="JobLogViewer.ClearLog" xml:space="preserve">
+        <value>Limpiar registro</value>
+    </data>
+    <data name="JobLogViewer.NoLogs" xml:space="preserve">
+        <value>No hay entradas de registro aún.</value>
+    </data>
+    <data name="Help.KeyboardShortcuts" xml:space="preserve">
+        <value>Atajos de teclado</value>
+    </data>
+    <data name="Help.Tips" xml:space="preserve">
+        <value>Consejos</value>
+    </data>
+    <data name="TransactionEditor.Help.SwitchToDebt" xml:space="preserve">
+        <value>Cambiar a débito</value>
+    </data>
+    <data name="TransactionEditor.Help.SwitchToCredit" xml:space="preserve">
+        <value>Cambiar a crédito</value>
+    </data>
+    <data name="TransactionEditor.Help.SwitchToTransfer" xml:space="preserve">
+        <value>Cambiar a transferencia</value>
+    </data>
+    <data name="TransactionEditor.Help.PreviousDay" xml:space="preserve">
+        <value>Ir al día anterior</value>
+    </data>
+    <data name="TransactionEditor.Help.NextDay" xml:space="preserve">
+        <value>Ir al día siguiente</value>
+    </data>
+    <data name="TransactionEditor.Help.Tip1" xml:space="preserve">
+        <value>Comienza a escribir en el campo Nombre para ver sugerencias basadas en tu historial de transacciones.</value>
+    </data>
+    <data name="TransactionEditor.Help.Tip2" xml:space="preserve">
+        <value>También puedes escribir en los menús desplegables de Categoría y Cuenta para completar los datos rápidamente.</value>
+    </data>
+    <data name="AvgPrice.Help.BrazilianRule" xml:space="preserve">
+        <value>Regla brasileña: El precio promedio se calcula de forma simple, donde las ganancias usan el precio promedio como base. Sigue las reglas contables brasileñas.</value>
+    </data>
+    <data name="AvgPrice.Help.FIFO" xml:space="preserve">
+        <value>FIFO (primero en entrar, primero en salir): Sigue los estándares estadounidenses para calcular ganancias, donde cada compra se considera una pila separada y las ganancias se calculan por separado según el orden de compra.</value>
+    </data>
+    <data name="ManageTransactions.Notes" xml:space="preserve">
+        <value>Notas</value>
+    </data>
+    <data name="ManageTransactions.Notes.Placeholder" xml:space="preserve">
+        <value>Agregar notas sobre esta transacción...</value>
+    </data>
+    <data name="ManageTransactions.Properties" xml:space="preserve">
+        <value>Propiedades</value>
+    </data>
+    <data name="Transactions.Columns.Notes" xml:space="preserve">
+        <value>Notas</value>
+    </data>
+    <!-- Common Validation Messages -->
+    <data name="Validation.NameRequired" xml:space="preserve">
+        <value>El nombre es obligatorio</value>
+    </data>
+    <data name="Validation.CategoryRequired" xml:space="preserve">
+        <value>La categoría es obligatoria</value>
+    </data>
+    <data name="Validation.DateRequired" xml:space="preserve">
+        <value>La fecha es obligatoria</value>
+    </data>
+    <data name="Validation.ValueRequired" xml:space="preserve">
+        <value>El valor es obligatorio</value>
+    </data>
+    <data name="Validation.IconRequired" xml:space="preserve">
+        <value>El icono es obligatorio</value>
+    </data>
+    <data name="Validation.StartDateRequired" xml:space="preserve">
+        <value>La fecha de inicio es obligatoria</value>
+    </data>
+    <data name="Validation.NewNameRequired" xml:space="preserve">
+        <value>El nuevo nombre es obligatorio</value>
+    </data>
+    <!-- Account Validation Messages -->
+    <data name="Validation.AccountNameRequired" xml:space="preserve">
+        <value>Ingresa un nombre de cuenta válido</value>
+    </data>
+    <data name="Validation.OriginAccountRequired" xml:space="preserve">
+        <value>La cuenta de origen es obligatoria</value>
+    </data>
+    <data name="Validation.DestinationAccountRequired" xml:space="preserve">
+        <value>La cuenta de destino es obligatoria</value>
+    </data>
+    <!-- Password Validation Messages -->
+    <data name="Validation.PasswordRequired" xml:space="preserve">
+        <value>La contraseña es obligatoria</value>
+    </data>
+    <data name="Validation.OldPasswordRequired" xml:space="preserve">
+        <value>La contraseña anterior es obligatoria</value>
+    </data>
+    <data name="Validation.PasswordMinLength" xml:space="preserve">
+        <value>La contraseña debe tener al menos 6 caracteres</value>
+    </data>
+    <data name="Validation.OldPasswordMinLength" xml:space="preserve">
+        <value>La contraseña anterior debe tener al menos 6 caracteres</value>
+    </data>
+    <data name="Validation.PasswordsDoNotMatch" xml:space="preserve">
+        <value>Las contraseñas no coinciden</value>
+    </data>
+    <!-- AvgPrice Validation Messages -->
+    <data name="Validation.QuantityRequired" xml:space="preserve">
+        <value>La cantidad es obligatoria</value>
+    </data>
+    <data name="Validation.QuantityGreaterThanZero" xml:space="preserve">
+        <value>La cantidad debe ser mayor que cero</value>
+    </data>
+    <data name="Validation.AmountRequired" xml:space="preserve">
+        <value>El monto es obligatorio</value>
+    </data>
+    <data name="Validation.PrecisionRange" xml:space="preserve">
+        <value>La precisión debe estar entre 0 y 15</value>
+    </data>
+    <!-- Database Validation Messages -->
+    <data name="Validation.DatabasePathRequired" xml:space="preserve">
+        <value>Ingresa una ruta válida para almacenar el archivo de base de datos</value>
+    </data>
+    <!-- Error Dialog Titles -->
+    <data name="Error.ValidationError" xml:space="preserve">
+        <value>Error de validación</value>
+    </data>
+    <!-- Error Messages -->
+    <data name="Error.TransactionNotFound" xml:space="preserve">
+        <value>Transacción no encontrada</value>
+    </data>
+    <data name="Error.AccountNotFound" xml:space="preserve">
+        <value>Cuenta no encontrada</value>
+    </data>
+    <data name="Error.FixedExpenseNotFound" xml:space="preserve">
+        <value>Gasto fijo no encontrado</value>
+    </data>
+    <data name="Error.ProfileNotFound" xml:space="preserve">
+        <value>Perfil no encontrado</value>
+    </data>
+    <data name="Error.FileNotFound" xml:space="preserve">
+        <value>El archivo seleccionado no existe</value>
+    </data>
+    <!-- Dialog Buttons -->
+    <data name="Button.Refresh" xml:space="preserve">
+        <value>Actualizar</value>
+    </data>
+    <data name="FixedExpenseHistory.Transactions" xml:space="preserve">
+        <value>Transacciones</value>
+    </data>
+    <data name="FixedExpenseHistory.PriceHistory" xml:space="preserve">
+        <value>Historial de precios</value>
+    </data>
+    <data name="FixedExpenseHistory.ReferenceDate" xml:space="preserve">
+        <value>Fecha ref.</value>
+    </data>
+    <data name="FixedExpenseHistory.PeriodStart" xml:space="preserve">
+        <value>Inicio del período</value>
+    </data>
+    <data name="FixedExpenseHistory.Account" xml:space="preserve">
+        <value>Cuenta</value>
+    </data>
+    <data name="FixedExpenseHistory.ViewHistory" xml:space="preserve">
+        <value>Ver historial</value>
+    </data>
+    <!-- Update Notification -->
+    <data name="Update_Available" xml:space="preserve">
+        <value>Actualización disponible: {0}</value>
+    </data>
+    <data name="Update_NewVersionAvailable" xml:space="preserve">
+        <value>¡Nueva versión disponible!</value>
+    </data>
+    <data name="Update_DownloadButton" xml:space="preserve">
+        <value>Descargar</value>
+    </data>
+    <data name="Update_ViewOnGitHub" xml:space="preserve">
+        <value>Ver en GitHub</value>
+    </data>
+    <data name="Update_Downloading" xml:space="preserve">
+        <value>Descargando...</value>
+    </data>
+    <data name="Update_DownloadError" xml:space="preserve">
+        <value>Error en la descarga. Por favor intenta de nuevo o descarga desde GitHub.</value>
+    </data>
+    <data name="Update_NoPlatformAsset" xml:space="preserve">
+        <value>No hay descarga disponible para tu plataforma. Por favor descarga desde GitHub.</value>
+    </data>
+    <data name="Update_SaveDialogTitle" xml:space="preserve">
+        <value>Guardar archivo de actualización</value>
+    </data>
+    <data name="BootDatabase.Category.Housing" xml:space="preserve">
+        <value>Vivienda</value>
+    </data>
+    <data name="Error.IncompatibleVersion" xml:space="preserve">
+        <value>Esta base de datos requiere la versión {0} o superior de la aplicación. Estás ejecutando la versión {1}. Por favor actualiza la aplicación.</value>
+    </data>
+    <data name="Error.InvalidPassword" xml:space="preserve">
+        <value>Contraseña inválida</value>
+    </data>
+    <!-- Import Wizard -->
+    <data name="ImportWizard_Title" xml:space="preserve">
+        <value>Importar transacciones</value>
+    </data>
+    <data name="ImportWizard_Step1" xml:space="preserve">
+        <value>Archivo</value>
+    </data>
+    <data name="ImportWizard_Step2" xml:space="preserve">
+        <value>Cuentas</value>
+    </data>
+    <data name="ImportWizard_Step3" xml:space="preserve">
+        <value>Categorías</value>
+    </data>
+    <data name="ImportWizard_Step4" xml:space="preserve">
+        <value>Resumen</value>
+    </data>
+    <data name="ImportWizard_Step5" xml:space="preserve">
+        <value>Importar</value>
+    </data>
+    <data name="ImportWizard_Back" xml:space="preserve">
+        <value>Atrás</value>
+    </data>
+    <data name="ImportWizard_Next" xml:space="preserve">
+        <value>Siguiente</value>
+    </data>
+    <data name="ImportWizard_Import" xml:space="preserve">
+        <value>Importar</value>
+    </data>
+    <data name="Menu_ImportTransactions" xml:space="preserve">
+        <value>Importar transacciones...</value>
+    </data>
+    <data name="Menu_ExportTransactions" xml:space="preserve">
+        <value>Exportar transacciones...</value>
+    </data>
+    <data name="ImportWizard_SelectFile" xml:space="preserve">
+        <value>Seleccionar archivo CSV</value>
+    </data>
+    <data name="ImportWizard_DownloadTemplate" xml:space="preserve">
+        <value>Descargar plantilla</value>
+    </data>
+    <data name="ImportWizard_FileSelected" xml:space="preserve">
+        <value>Archivo:</value>
+    </data>
+    <data name="ImportWizard_ValidRows" xml:space="preserve">
+        <value>{0} filas válidas</value>
+    </data>
+    <data name="ImportWizard_Errors" xml:space="preserve">
+        <value>{0} errores</value>
+    </data>
+    <data name="ImportWizard_Step1Instructions" xml:space="preserve">
+        <value>Selecciona un archivo CSV que coincida con el formato de la plantilla, o descarga la plantilla para ver las columnas esperadas.</value>
+    </data>
+    <data name="ImportWizard_ShowErrors" xml:space="preserve">
+        <value>Mostrar errores</value>
+    </data>
+    <data name="ImportWizard_NewAccounts" xml:space="preserve">
+        <value>{0} cuentas nuevas</value>
+    </data>
+    <data name="ImportWizard_ExistingAccounts" xml:space="preserve">
+        <value>{0} cuentas existentes</value>
+    </data>
+    <data name="ImportWizard_NewCategories" xml:space="preserve">
+        <value>{0} categorías nuevas</value>
+    </data>
+    <data name="ImportWizard_ExistingCategories" xml:space="preserve">
+        <value>{0} categorías existentes</value>
+    </data>
+    <data name="ImportWizard_CsvAccountName" xml:space="preserve">
+        <value>Nombre de cuenta (CSV)</value>
+    </data>
+    <data name="ImportWizard_AccountType" xml:space="preserve">
+        <value>Tipo</value>
+    </data>
+    <data name="ImportWizard_Status" xml:space="preserve">
+        <value>Estado</value>
+    </data>
+    <data name="ImportWizard_CsvCategoryName" xml:space="preserve">
+        <value>Categoría (CSV)</value>
+    </data>
+    <data name="ImportWizard_SummaryTitle" xml:space="preserve">
+        <value>Resumen de importación</value>
+    </data>
+    <data name="ImportWizard_SummaryTransactions" xml:space="preserve">
+        <value>Transacciones a importar</value>
+    </data>
+    <data name="ImportWizard_SummaryAccounts" xml:space="preserve">
+        <value>Cuentas</value>
+    </data>
+    <data name="ImportWizard_SummaryCategories" xml:space="preserve">
+        <value>Categorías</value>
+    </data>
+    <data name="ImportWizard_SummaryNew" xml:space="preserve">
+        <value>nuevas</value>
+    </data>
+    <data name="ImportWizard_SummaryNewItemsWarning" xml:space="preserve">
+        <value>Las cuentas y categorías nuevas se crearán automáticamente durante la importación.</value>
+    </data>
+    <data name="ImportWizard_SummaryReadyToImport" xml:space="preserve">
+        <value>Haz clic en Importar para comenzar el proceso de importación.</value>
+    </data>
+    <data name="ImportWizard_Importing" xml:space="preserve">
+        <value>Importando transacciones...</value>
+    </data>
+    <data name="ImportWizard_ImportComplete" xml:space="preserve">
+        <value>¡Importación completada!</value>
+    </data>
+    <data name="ImportWizard_ProgressTransactions" xml:space="preserve">
+        <value>elementos</value>
+    </data>
+    <data name="ImportWizard_Hint" xml:space="preserve">
+        <value>Consejo: Descarga la plantilla de arriba y usa cualquier herramienta de IA para convertir cualquier formato de archivo al diseño CSV requerido. Los datos deben seguir estrictamente el formato de la plantilla.</value>
+    </data>
+    <data name="ImportWizard_SelectCsvFileTitle" xml:space="preserve">
+        <value>Seleccionar archivo CSV</value>
+    </data>
+    <data name="ImportWizard_DownloadTemplateTitle" xml:space="preserve">
+        <value>Descargar plantilla</value>
+    </data>
+    <data name="ImportWizard_ImportCompletedWithErrors" xml:space="preserve">
+        <value>Importación completada con errores: {0} problemas</value>
+    </data>
+    <data name="CsvImport_CreatingAccounts" xml:space="preserve">
+        <value>Creando cuentas...</value>
+    </data>
+    <data name="CsvImport_CreatedAccount" xml:space="preserve">
+        <value>Cuenta creada: {0}</value>
+    </data>
+    <data name="CsvImport_FailedToCreateAccount" xml:space="preserve">
+        <value>Error al crear cuenta '{0}': {1}</value>
+    </data>
+    <data name="CsvImport_CreatingCategories" xml:space="preserve">
+        <value>Creando categorías...</value>
+    </data>
+    <data name="CsvImport_CreatedCategory" xml:space="preserve">
+        <value>Categoría creada: {0}</value>
+    </data>
+    <data name="CsvImport_FailedToCreateCategory" xml:space="preserve">
+        <value>Error al crear categoría '{0}': {1}</value>
+    </data>
+    <data name="CsvImport_ImportingTransaction" xml:space="preserve">
+        <value>Importando transacción {0} de {1}...</value>
+    </data>
+    <data name="CsvImport_AccountNotFound" xml:space="preserve">
+        <value>Línea {0}: Cuenta '{1}' no encontrada en los mapeos</value>
+    </data>
+    <data name="CsvImport_ToAccountNotFound" xml:space="preserve">
+        <value>Línea {0}: Cuenta destino '{1}' no encontrada en los mapeos</value>
+    </data>
+    <data name="CsvImport_CategoryNotFound" xml:space="preserve">
+        <value>Línea {0}: Categoría '{1}' no encontrada en los mapeos</value>
+    </data>
+    <data name="CsvImport_LineError" xml:space="preserve">
+        <value>Línea {0}: {1}</value>
+    </data>
+    <data name="CsvImport_UnableToDetermineType" xml:space="preserve">
+        <value>No se puede determinar el tipo de transacción para la fila en la línea {0}</value>
+    </data>
+    <data name="CsvImport_SetInitialValue" xml:space="preserve">
+        <value>Establecer valor inicial para la cuenta: {0}</value>
+    </data>
+    <data name="CloseButton" xml:space="preserve">
+        <value>Cerrar</value>
+    </data>
+</root>
