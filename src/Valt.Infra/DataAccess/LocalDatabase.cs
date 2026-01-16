@@ -9,6 +9,7 @@ using Valt.Infra.Modules.Budget.Categories;
 using Valt.Infra.Modules.Budget.FixedExpenses;
 using Valt.Infra.Modules.Budget.Transactions;
 using Valt.Infra.Modules.Configuration;
+using Valt.Infra.Modules.Goals;
 using Valt.Infra.Settings;
 
 namespace Valt.Infra.DataAccess;
@@ -253,6 +254,20 @@ internal sealed class LocalDatabase : ILocalDatabase
         var collection = GetOpenDatabase().GetCollection<SettingEntity>("system_settings");
 
         collection.EnsureIndex(x => x.Property);
+
+        return collection;
+    }
+
+    #endregion
+
+    #region Goals module
+
+    public ILiteCollection<GoalEntity> GetGoals()
+    {
+        var collection = GetOpenDatabase().GetCollection<GoalEntity>("goals");
+
+        collection.EnsureIndex(x => x.RefDate);
+        collection.EnsureIndex(x => x.IsUpToDate);
 
         return collection;
     }

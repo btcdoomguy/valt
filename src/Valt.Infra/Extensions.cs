@@ -8,6 +8,7 @@ using Valt.Core.Modules.Budget.Accounts.Contracts;
 using Valt.Core.Modules.Budget.Categories.Contracts;
 using Valt.Core.Modules.Budget.FixedExpenses.Contracts;
 using Valt.Core.Modules.Budget.Transactions.Contracts;
+using Valt.Core.Modules.Goals.Contracts;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Bitcoin;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Bitcoin.Providers;
@@ -39,6 +40,9 @@ using Valt.Infra.Modules.Budget.Transactions;
 using Valt.Infra.Modules.Budget.Transactions.Queries;
 using Valt.Infra.Modules.Budget.Transactions.Services;
 using Valt.Infra.Modules.Configuration;
+using Valt.Infra.Modules.Goals;
+using Valt.Infra.Modules.Goals.Queries;
+using Valt.Infra.Modules.Goals.Services;
 using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
 using Valt.Infra.Modules.Reports.ExpensesByCategory;
@@ -182,6 +186,7 @@ public static class Extensions
         services.AddSingleton<ICategoryRepository, CategoryRepository>();
         services.AddSingleton<IFixedExpenseRepository, FixedExpenseRepository>();
         services.AddSingleton<ITransactionRepository, TransactionRepository>();
+        services.AddSingleton<IGoalRepository, GoalRepository>();
 
         return services;
     }
@@ -193,6 +198,7 @@ public static class Extensions
         services.AddSingleton<ICategoryQueries, CategoryQueries>();
         services.AddSingleton<IFixedExpenseQueries, FixedExpenseQueries>();
         services.AddSingleton<ITransactionQueries, TransactionQueries>();
+        services.AddSingleton<IGoalQueries, GoalQueries>();
 
         return services;
     }
@@ -214,6 +220,10 @@ public static class Extensions
 
         //csv export
         services.AddSingleton<ICsvExportService, CsvExportService>();
+
+        //goals
+        services.AddSingleton<IGoalProgressCalculator, StackBitcoinProgressCalculator>();
+        services.AddSingleton<IGoalProgressCalculatorFactory, GoalProgressCalculatorFactory>();
 
         return services;
     }
