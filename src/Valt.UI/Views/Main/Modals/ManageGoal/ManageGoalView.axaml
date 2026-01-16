@@ -82,6 +82,12 @@
                             <DataTemplate DataType="editors:DcaGoalTypeEditorViewModel">
                                 <editors:DcaGoalTypeEditor />
                             </DataTemplate>
+                            <DataTemplate DataType="editors:IncomeFiatGoalTypeEditorViewModel">
+                                <editors:IncomeFiatGoalTypeEditor />
+                            </DataTemplate>
+                            <DataTemplate DataType="editors:IncomeBtcGoalTypeEditorViewModel">
+                                <editors:IncomeBtcGoalTypeEditor />
+                            </DataTemplate>
                         </ContentControl.DataTemplates>
                     </ContentControl>
                 </StackPanel>

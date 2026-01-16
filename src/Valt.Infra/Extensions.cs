@@ -225,6 +225,8 @@ public static class Extensions
         services.AddSingleton<IGoalProgressCalculator, StackBitcoinProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculator, SpendingLimitProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculator, DcaProgressCalculator>();
+        services.AddSingleton<IGoalProgressCalculator, IncomeFiatProgressCalculator>();
+        services.AddSingleton<IGoalProgressCalculator, IncomeBtcProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculatorFactory, GoalProgressCalculatorFactory>();
 
         return services;

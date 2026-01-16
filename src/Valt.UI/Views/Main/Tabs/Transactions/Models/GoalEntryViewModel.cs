@@ -27,6 +27,8 @@ public class GoalEntryViewModel
                 GoalTypeNames.StackBitcoin => language.GoalType_StackBitcoin,
                 GoalTypeNames.SpendingLimit => language.GoalType_SpendingLimit,
                 GoalTypeNames.Dca => language.GoalType_Dca,
+                GoalTypeNames.IncomeFiat => language.GoalType_IncomeFiat,
+                GoalTypeNames.IncomeBtc => language.GoalType_IncomeBtc,
                 _ => _goal.GoalType.TypeName.ToString()
             };
 
@@ -59,6 +61,8 @@ public class GoalEntryViewModel
                 StackBitcoinGoalType stackBitcoin => CurrencyDisplay.FormatSatsAsBitcoin(stackBitcoin.TargetAmount.Sats),
                 SpendingLimitGoalType spendingLimit => CurrencyDisplay.FormatFiat(spendingLimit.TargetAmount, spendingLimit.Currency),
                 DcaGoalType dca => dca.TargetPurchaseCount.ToString(),
+                IncomeFiatGoalType incomeFiat => CurrencyDisplay.FormatFiat(incomeFiat.TargetAmount, incomeFiat.Currency),
+                IncomeBtcGoalType incomeBtc => CurrencyDisplay.FormatSatsAsBitcoin(incomeBtc.TargetAmount.Sats),
                 _ => string.Empty
             };
         }
@@ -82,6 +86,14 @@ public class GoalEntryViewModel
                     language.GoalDescription_Dca,
                     Math.Min(dca.CalculatedPurchaseCount, dca.TargetPurchaseCount),
                     dca.TargetPurchaseCount),
+                IncomeFiatGoalType incomeFiat => string.Format(
+                    language.GoalDescription_IncomeFiat,
+                    CurrencyDisplay.FormatFiat(Math.Min(incomeFiat.CalculatedIncome, incomeFiat.TargetAmount), incomeFiat.Currency),
+                    CurrencyDisplay.FormatFiat(incomeFiat.TargetAmount, incomeFiat.Currency)),
+                IncomeBtcGoalType incomeBtc => string.Format(
+                    language.GoalDescription_IncomeBtc,
+                    CurrencyDisplay.FormatSatsAsNumber(Math.Min(incomeBtc.CalculatedSats, incomeBtc.TargetAmount.Sats)),
+                    CurrencyDisplay.FormatSatsAsNumber(incomeBtc.TargetAmount.Sats)),
                 _ => string.Empty
             };
         }

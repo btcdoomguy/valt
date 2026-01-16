@@ -48,6 +48,8 @@ internal static class Extensions
             GoalTypeNames.StackBitcoin => SerializeStackBitcoinGoalType((StackBitcoinGoalType)goalType),
             GoalTypeNames.SpendingLimit => SerializeSpendingLimitGoalType((SpendingLimitGoalType)goalType),
             GoalTypeNames.Dca => SerializeDcaGoalType((DcaGoalType)goalType),
+            GoalTypeNames.IncomeFiat => SerializeIncomeFiatGoalType((IncomeFiatGoalType)goalType),
+            GoalTypeNames.IncomeBtc => SerializeIncomeBtcGoalType((IncomeBtcGoalType)goalType),
             _ => throw new NotSupportedException($"Goal type {goalType.TypeName} is not supported")
         };
     }
@@ -59,6 +61,8 @@ internal static class Extensions
             GoalTypeNames.StackBitcoin => DeserializeStackBitcoinGoalType(json),
             GoalTypeNames.SpendingLimit => DeserializeSpendingLimitGoalType(json),
             GoalTypeNames.Dca => DeserializeDcaGoalType(json),
+            GoalTypeNames.IncomeFiat => DeserializeIncomeFiatGoalType(json),
+            GoalTypeNames.IncomeBtc => DeserializeIncomeBtcGoalType(json),
             _ => throw new NotSupportedException($"Goal type {typeName} is not supported")
         };
     }
@@ -113,5 +117,40 @@ internal static class Extensions
         var dto = JsonSerializer.Deserialize<DcaGoalTypeDto>(json)
             ?? throw new InvalidOperationException("Failed to deserialize DcaGoalType");
         return new DcaGoalType(dto.TargetPurchaseCount, dto.CalculatedPurchaseCount);
+    }
+
+    private static string SerializeIncomeFiatGoalType(IncomeFiatGoalType goalType)
+    {
+        var dto = new IncomeFiatGoalTypeDto
+        {
+            TargetAmount = goalType.TargetAmount,
+            Currency = goalType.Currency,
+            CalculatedIncome = goalType.CalculatedIncome
+        };
+        return JsonSerializer.Serialize(dto);
+    }
+
+    private static IncomeFiatGoalType DeserializeIncomeFiatGoalType(string json)
+    {
+        var dto = JsonSerializer.Deserialize<IncomeFiatGoalTypeDto>(json)
+            ?? throw new InvalidOperationException("Failed to deserialize IncomeFiatGoalType");
+        return new IncomeFiatGoalType(dto.TargetAmount, dto.Currency, dto.CalculatedIncome);
+    }
+
+    private static string SerializeIncomeBtcGoalType(IncomeBtcGoalType goalType)
+    {
+        var dto = new IncomeBtcGoalTypeDto
+        {
+            TargetSats = goalType.TargetSats,
+            CalculatedSats = goalType.CalculatedSats
+        };
+        return JsonSerializer.Serialize(dto);
+    }
+
+    private static IncomeBtcGoalType DeserializeIncomeBtcGoalType(string json)
+    {
+        var dto = JsonSerializer.Deserialize<IncomeBtcGoalTypeDto>(json)
+            ?? throw new InvalidOperationException("Failed to deserialize IncomeBtcGoalType");
+        return new IncomeBtcGoalType(dto.TargetSats, dto.CalculatedSats);
     }
 }

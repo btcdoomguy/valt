@@ -58,7 +58,9 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     [
         new(language.GoalType_StackBitcoin, GoalTypeNames.StackBitcoin.ToString()),
         new(language.GoalType_SpendingLimit, GoalTypeNames.SpendingLimit.ToString()),
-        new(language.GoalType_Dca, GoalTypeNames.Dca.ToString())
+        new(language.GoalType_Dca, GoalTypeNames.Dca.ToString()),
+        new(language.GoalType_IncomeFiat, GoalTypeNames.IncomeFiat.ToString()),
+        new(language.GoalType_IncomeBtc, GoalTypeNames.IncomeBtc.ToString())
     ];
 
     public static List<ComboBoxValue> AvailableMonths =>
@@ -109,6 +111,10 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
                 ? new SpendingLimitGoalTypeEditorViewModel(_configurationManager)
                 : new SpendingLimitGoalTypeEditorViewModel(),
             GoalTypeNames.Dca => new DcaGoalTypeEditorViewModel(),
+            GoalTypeNames.IncomeFiat => _configurationManager != null
+                ? new IncomeFiatGoalTypeEditorViewModel(_configurationManager)
+                : new IncomeFiatGoalTypeEditorViewModel(),
+            GoalTypeNames.IncomeBtc => new IncomeBtcGoalTypeEditorViewModel(),
             _ => throw new ArgumentOutOfRangeException(nameof(goalTypeName))
         };
     }

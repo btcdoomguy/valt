@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+             xmlns:local="clr-namespace:Valt.UI.Lang"
+             xmlns:editors="clr-namespace:Valt.UI.Views.Main.Modals.ManageGoal.GoalTypeEditors"
+             mc:Ignorable="d"
+             d:DesignWidth="400"
+             d:DesignHeight="100"
+             x:Class="Valt.UI.Views.Main.Modals.ManageGoal.GoalTypeEditors.IncomeFiatGoalTypeEditor"
+             x:DataType="editors:IncomeFiatGoalTypeEditorViewModel">
+    <StackPanel>
+        <TextBlock Text="{Binding Description}"
+                   FontSize="11"
+                   Opacity="0.7"
+                   TextWrapping="Wrap"
+                   Margin="0, 0, 0, 8" />
+        <StackPanel Classes="form-field">
+            <TextBlock Text="{x:Static local:language.ManageGoal_TargetIncomeAmount}" />
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <userControls:FiatInput FiatValue="{Binding TargetFiatAmount, Mode=TwoWay}" Width="150" />
+                <ComboBox ItemsSource="{Binding AvailableCurrencies}"
+                          SelectedValue="{Binding SelectedCurrency}"
+                          DisplayMemberBinding="{Binding Text}"
+                          SelectedValueBinding="{Binding Value}"
+                          Width="100" />
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

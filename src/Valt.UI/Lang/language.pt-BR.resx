@@ -1430,4 +1430,25 @@
     <data name="ManageGoal_TargetPurchaseCount" xml:space="preserve">
         <value>Meta de Compras</value>
     </data>
+    <data name="GoalType_IncomeFiat" xml:space="preserve">
+        <value>Renda em Fiat</value>
+    </data>
+    <data name="GoalType_IncomeFiat_Description" xml:space="preserve">
+        <value>Acompanhe metas de renda para uma moeda específica</value>
+    </data>
+    <data name="GoalDescription_IncomeFiat" xml:space="preserve">
+        <value>Ganhou {0} de {1}</value>
+    </data>
+    <data name="GoalType_IncomeBtc" xml:space="preserve">
+        <value>Renda em Bitcoin</value>
+    </data>
+    <data name="GoalType_IncomeBtc_Description" xml:space="preserve">
+        <value>Acompanhe metas de renda em bitcoin (ex: trabalho, mineração, recompensas)</value>
+    </data>
+    <data name="GoalDescription_IncomeBtc" xml:space="preserve">
+        <value>{0}/{1} sats ganhos</value>
+    </data>
+    <data name="ManageGoal_TargetIncomeAmount" xml:space="preserve">
+        <value>Meta de Renda</value>
+    </data>
 </root>

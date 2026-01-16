@@ -2391,6 +2391,48 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string GoalType_IncomeFiat {
+            get {
+                return ResourceManager.GetString("GoalType_IncomeFiat", resourceCulture);
+            }
+        }
+
+        public static string GoalType_IncomeFiat_Description {
+            get {
+                return ResourceManager.GetString("GoalType_IncomeFiat_Description", resourceCulture);
+            }
+        }
+
+        public static string GoalDescription_IncomeFiat {
+            get {
+                return ResourceManager.GetString("GoalDescription_IncomeFiat", resourceCulture);
+            }
+        }
+
+        public static string GoalType_IncomeBtc {
+            get {
+                return ResourceManager.GetString("GoalType_IncomeBtc", resourceCulture);
+            }
+        }
+
+        public static string GoalType_IncomeBtc_Description {
+            get {
+                return ResourceManager.GetString("GoalType_IncomeBtc_Description", resourceCulture);
+            }
+        }
+
+        public static string GoalDescription_IncomeBtc {
+            get {
+                return ResourceManager.GetString("GoalDescription_IncomeBtc", resourceCulture);
+            }
+        }
+
+        public static string ManageGoal_TargetIncomeAmount {
+            get {
+                return ResourceManager.GetString("ManageGoal_TargetIncomeAmount", resourceCulture);
+            }
+        }
+
         public static string ManageGoal_TargetPurchaseCount {
             get {
                 return ResourceManager.GetString("ManageGoal_TargetPurchaseCount", resourceCulture);

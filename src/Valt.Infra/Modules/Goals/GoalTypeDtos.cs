@@ -31,3 +31,24 @@ internal class DcaGoalTypeDto
     [JsonPropertyName("calculatedPurchaseCount")]
     public int CalculatedPurchaseCount { get; set; }
 }
+
+internal class IncomeFiatGoalTypeDto
+{
+    [JsonPropertyName("targetAmount")]
+    public decimal TargetAmount { get; set; }
+
+    [JsonPropertyName("currency")]
+    public string Currency { get; set; } = null!;
+
+    [JsonPropertyName("calculatedIncome")]
+    public decimal CalculatedIncome { get; set; }
+}
+
+internal class IncomeBtcGoalTypeDto
+{
+    [JsonPropertyName("targetSats")]
+    public long TargetSats { get; set; }
+
+    [JsonPropertyName("calculatedSats")]
+    public long CalculatedSats { get; set; }
+}
