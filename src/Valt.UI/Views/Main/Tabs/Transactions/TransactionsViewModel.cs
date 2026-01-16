@@ -20,6 +20,8 @@ using Valt.Core.Modules.Budget.Categories;
 using Valt.Core.Modules.Budget.FixedExpenses;
 using Valt.Core.Modules.Budget.FixedExpenses.Contracts;
 using Valt.Core.Modules.Budget.Transactions;
+using Valt.Core.Modules.Goals;
+using Valt.Core.Modules.Goals.Contracts;
 using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Accounts.Queries;
@@ -35,6 +37,7 @@ using Valt.UI.State;
 using Valt.UI.Views.Main.Modals.ManageAccount;
 using Valt.UI.Views.Main.Modals.FixedExpenseEditor;
 using Valt.UI.Views.Main.Modals.ManageFixedExpenses;
+using Valt.UI.Views.Main.Modals.ManageGoal;
 using Valt.UI.Views.Main.Modals.TransactionEditor;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
@@ -56,18 +59,21 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     private readonly ILogger<TransactionsViewModel> _logger;
     private readonly IAccountQueries? _accountQueries;
     private readonly SecureModeState _secureModeState;
+    private readonly IGoalRepository? _goalRepository;
 
     //instances of the sub contents
     private readonly TransactionListViewModel _transactionListViewModel = null!;
 
     [ObservableProperty] private AvaloniaList<AccountViewModel> _accounts = new();
     [ObservableProperty] private AvaloniaList<FixedExpensesEntryViewModel> _fixedExpenseEntries = new();
+    [ObservableProperty] private AvaloniaList<GoalEntryViewModel> _goalEntries = new();
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayRemainingFixedExpensesAmount))]
     private string _remainingFixedExpensesAmount = "~ R$ 12.345,67";
     [ObservableProperty] private string? _remainingFixedExpensesTooltip;
 
     [ObservableProperty] private AccountViewModel? _selectedAccount;
     [ObservableProperty] private FixedExpensesEntryViewModel? _selectedFixedExpense;
+    [ObservableProperty] private GoalEntryViewModel? _selectedGoal;
 
     [ObservableProperty] private string _allWealthInSats = "12.34567890";
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayWealthInBtcRatio))]
@@ -97,7 +103,8 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         IFixedExpenseRecordService fixedExpenseRecordService,
         IClock clock,
         ILogger<TransactionsViewModel> logger,
-        SecureModeState secureModeState)
+        SecureModeState secureModeState,
+        IGoalRepository goalRepository)
     {
         _accountQueries = accountQueries;
         _secureModeState = secureModeState;
@@ -113,6 +120,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         _fixedExpenseRecordService = fixedExpenseRecordService;
         _clock = clock;
         _logger = logger;
+        _goalRepository = goalRepository;
 
         _transactionListViewModel = (TransactionListViewModel)transactionTabFactory.Create(TransactionsTabNames.List);
 
@@ -126,6 +134,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
         WeakReferenceMessenger.Default.Register<TransactionListChanged>(this, OnTransactionListChangedReceive);
         WeakReferenceMessenger.Default.Register<FilterDateRangeChanged>(this, OnCurrentDateRangeChangedReceive);
+        WeakReferenceMessenger.Default.Register<GoalListChanged>(this, OnGoalListChangedReceive);
 
         WeakReferenceMessenger.Default.Register<SettingsChangedMessage>(this, (recipient, message) =>
         {
@@ -144,6 +153,12 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     private void OnCurrentDateRangeChangedReceive(object recipient, FilterDateRangeChanged message)
     {
         _ = FetchFixedExpenses();
+        _ = FetchGoals();
+    }
+
+    private void OnGoalListChangedReceive(object recipient, GoalListChanged message)
+    {
+        _ = FetchGoals();
     }
 
     private void OnTransactionListChangedReceive(object recipient, TransactionListChanged message)
@@ -155,6 +170,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     private void FilterStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         OnPropertyChanged(nameof(FixedExpenseCurrentMonthDescription));
+        OnPropertyChanged(nameof(GoalsCurrentMonthDescription));
     }
 
     private void SecureModeStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -213,6 +229,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         {
             _ = FetchAccounts();
             _ = FetchFixedExpenses();
+            _ = FetchGoals();
             _transactionListViewModel.FetchTransactionsCommand.Execute(null);
 
             SelectedAccount = Accounts.FirstOrDefault();
@@ -292,6 +309,38 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching fixed expenses");
+        }
+    }
+
+    private async Task FetchGoals()
+    {
+        if (_filterState is null) return;
+        if (_goalRepository is null) return;
+
+        try
+        {
+            var currentDate = DateOnly.FromDateTime(_filterState.MainDate);
+            var allGoals = await _goalRepository.GetAllAsync();
+
+            var goalsForPeriod = allGoals
+                .Where(g =>
+                {
+                    var range = g.GetPeriodRange();
+                    return currentDate >= range.Start && currentDate <= range.End;
+                })
+                .OrderBy(g => g.GoalType.TypeName)
+                .ThenBy(g => g.RefDate)
+                .ToList();
+
+            GoalEntries.Clear();
+            foreach (var goal in goalsForPeriod)
+            {
+                GoalEntries.Add(new GoalEntryViewModel(goal));
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching goals");
         }
     }
 
@@ -585,6 +634,48 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
     #endregion
 
+    #region Goal operations
+
+    public string GoalsCurrentMonthDescription =>
+        $"({DateOnly.FromDateTime(_filterState!.MainDate).ToString("MM/yy")})";
+
+    [RelayCommand]
+    private async Task AddGoal()
+    {
+        var ownerWindow = GetUserControlOwnerWindow!();
+
+        var window =
+            (ManageGoalView)await _modalFactory!.CreateAsync(ApplicationModalNames.ManageGoal, ownerWindow)!;
+
+        var result = await window.ShowDialog<ManageGoalViewModel.Response?>(ownerWindow!);
+
+        if (result is null)
+            return;
+
+        await FetchGoals();
+        WeakReferenceMessenger.Default.Send(new GoalListChanged());
+    }
+
+    [RelayCommand]
+    private async Task EditGoal(GoalEntryViewModel? entry)
+    {
+        if (entry is null)
+            return;
+
+        var ownerWindow = GetUserControlOwnerWindow!();
+
+        var window = (ManageGoalView)await _modalFactory!.CreateAsync(
+            ApplicationModalNames.ManageGoal,
+            ownerWindow, entry.Id)!;
+
+        _ = await window.ShowDialog<ManageGoalViewModel.Response?>(ownerWindow!);
+
+        await FetchGoals();
+        WeakReferenceMessenger.Default.Send(new GoalListChanged());
+    }
+
+    #endregion
+
     partial void OnSelectedAccountChanged(AccountViewModel? value)
     {
         WeakReferenceMessenger.Default.Send(new AccountSelectedChanged(value));
@@ -608,6 +699,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         WeakReferenceMessenger.Default.Unregister<TransactionListChanged>(this);
         WeakReferenceMessenger.Default.Unregister<FilterDateRangeChanged>(this);
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
+        WeakReferenceMessenger.Default.Unregister<GoalListChanged>(this);
     }
 
     public override MainViewTabNames TabName => MainViewTabNames.TransactionsPageContent;

@@ -1397,4 +1397,11 @@
     <data name="GoalType_StackBitcoin" xml:space="preserve">
         <value>Stack Bitcoin</value>
     </data>
+    <!-- Goals Panel -->
+    <data name="Goals_Title" xml:space="preserve">
+        <value>Goals</value>
+    </data>
+    <data name="Goals_Edit" xml:space="preserve">
+        <value>Edit</value>
+    </data>
 </root>

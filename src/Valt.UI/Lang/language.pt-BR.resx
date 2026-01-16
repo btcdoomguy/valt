@@ -1351,4 +1351,37 @@
     <data name="CloseButton" xml:space="preserve">
         <value>Fechar</value>
     </data>
+    <!-- Goal Modal -->
+    <data name="ManageGoal_Title" xml:space="preserve">
+        <value>Adicionar/editar meta</value>
+    </data>
+    <data name="ManageGoal_Period" xml:space="preserve">
+        <value>Período</value>
+    </data>
+    <data name="ManageGoal_Year" xml:space="preserve">
+        <value>Ano</value>
+    </data>
+    <data name="ManageGoal_Month" xml:space="preserve">
+        <value>Mês</value>
+    </data>
+    <data name="ManageGoal_GoalType" xml:space="preserve">
+        <value>Tipo de Meta</value>
+    </data>
+    <data name="ManageGoal_TargetBtcAmount" xml:space="preserve">
+        <value>Valor Alvo (BTC)</value>
+    </data>
+    <data name="Error.GoalNotFound" xml:space="preserve">
+        <value>Meta não encontrada</value>
+    </data>
+    <!-- Goal Types -->
+    <data name="GoalType_StackBitcoin" xml:space="preserve">
+        <value>Stackar Bitcoin</value>
+    </data>
+    <!-- Goals Panel -->
+    <data name="Goals_Title" xml:space="preserve">
+        <value>Metas</value>
+    </data>
+    <data name="Goals_Edit" xml:space="preserve">
+        <value>Editar</value>
+    </data>
 </root>

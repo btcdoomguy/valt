@@ -2768,5 +2768,17 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("CloseButton", resourceCulture);
             }
         }
+
+        public static string Goals_Title {
+            get {
+                return ResourceManager.GetString("Goals_Title", resourceCulture);
+            }
+        }
+
+        public static string Goals_Edit {
+            get {
+                return ResourceManager.GetString("Goals_Edit", resourceCulture);
+            }
+        }
     }
 }
