@@ -76,17 +76,21 @@ public partial class SettingsViewModel : ValtModalViewModel
                 .Where(c => !string.IsNullOrEmpty(c.Name)) //exclude invariant culture
                 .OrderBy(c => c.DisplayName)
                 .Select(c => new ComboBoxValue(c.DisplayName, c.Name)).ToList();
-            
-            //prioritize pt-br and en-US
+
+            //prioritize pt-br, en-US and es (Spanish)
             var ptBr = cultures.SingleOrDefault(x => x.Value == "pt-BR")!;
             var enUs = cultures.SingleOrDefault(x => x.Value == "en-US")!;
-            
+            var es = cultures.SingleOrDefault(x => x.Value == "es")!;
+
             cultures.Remove(ptBr);
             cultures.Insert(0, ptBr);
-            
+
+            cultures.Remove(es);
+            cultures.Insert(0, es);
+
             cultures.Remove(enUs);
             cultures.Insert(0, enUs);
-            
+
             return cultures;
         }
     } 

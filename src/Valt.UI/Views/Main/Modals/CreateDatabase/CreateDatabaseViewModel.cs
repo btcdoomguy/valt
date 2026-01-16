@@ -51,13 +51,16 @@ public partial class CreateDatabaseViewModel : ValtModalValidatorViewModel
     public static List<ComboBoxValue> AvailableLanguages =>
     [
         new("English (en-US)", "en-US"),
+        new("Español (es)", "es"),
         new("Português (pt-BR)", "pt-BR"),
     ];
 
     private static string GetDefaultLanguage()
     {
         var current = CultureInfo.CurrentCulture.Name;
-        return current == "pt-BR" ? "pt-BR" : "en-US";
+        if (current == "pt-BR") return "pt-BR";
+        if (current.StartsWith("es")) return "es";
+        return "en-US";
     }
 
     [RelayCommand]

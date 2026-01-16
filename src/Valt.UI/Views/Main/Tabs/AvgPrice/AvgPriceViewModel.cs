@@ -50,6 +50,9 @@ public partial class AvgPriceViewModel : ValtTabViewModel
     [ObservableProperty] private string _currentPosition = "-";
     [ObservableProperty] private string _currentAvgPrice = "-";
 
+    partial void OnCurrentPositionChanged(string value) => OnPropertyChanged(nameof(DisplayCurrentPosition));
+    partial void OnCurrentAvgPriceChanged(string value) => OnPropertyChanged(nameof(DisplayCurrentAvgPrice));
+
     public string DisplayCurrentPosition => _secureModeState?.IsEnabled == true ? "---" : CurrentPosition;
     public string DisplayCurrentAvgPrice => _secureModeState?.IsEnabled == true ? "---" : CurrentAvgPrice;
     public bool IsSecureModeEnabled => _secureModeState?.IsEnabled == true;

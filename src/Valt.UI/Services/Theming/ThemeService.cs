@@ -23,7 +23,9 @@ public class ThemeService : IThemeService
         new ThemeDefinition("MidnightGalaxy", "Midnight Galaxy", () => MidnightGalaxyTheme.Create()),
         new ThemeDefinition("GoldenHour", "Golden Hour", () => GoldenHourTheme.Create()),
         new ThemeDefinition("ArcticFrost", "Arctic Frost", () => ArcticFrostTheme.Create()),
-        new ThemeDefinition("ForestCanopy", "Forest Canopy", () => ForestCanopyTheme.Create())
+        new ThemeDefinition("ForestCanopy", "Forest Canopy", () => ForestCanopyTheme.Create()),
+        new ThemeDefinition("CrimsonEmber", "Crimson Ember", () => CrimsonEmberTheme.Create()),
+        new ThemeDefinition("Monochrome", "Monochrome", () => MonochromeTheme.Create())
     ];
 
     private readonly ILocalStorageService _localStorageService;
