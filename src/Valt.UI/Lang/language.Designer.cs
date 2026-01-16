@@ -2288,7 +2288,55 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Error.FileNotFound", resourceCulture);
             }
         }
-        
+
+        public static string Error_GoalNotFound {
+            get {
+                return ResourceManager.GetString("Error.GoalNotFound", resourceCulture);
+            }
+        }
+
+        public static string ManageGoal_Title {
+            get {
+                return ResourceManager.GetString("ManageGoal_Title", resourceCulture);
+            }
+        }
+
+        public static string ManageGoal_Period {
+            get {
+                return ResourceManager.GetString("ManageGoal_Period", resourceCulture);
+            }
+        }
+
+        public static string ManageGoal_Year {
+            get {
+                return ResourceManager.GetString("ManageGoal_Year", resourceCulture);
+            }
+        }
+
+        public static string ManageGoal_Month {
+            get {
+                return ResourceManager.GetString("ManageGoal_Month", resourceCulture);
+            }
+        }
+
+        public static string ManageGoal_GoalType {
+            get {
+                return ResourceManager.GetString("ManageGoal_GoalType", resourceCulture);
+            }
+        }
+
+        public static string ManageGoal_TargetBtcAmount {
+            get {
+                return ResourceManager.GetString("ManageGoal_TargetBtcAmount", resourceCulture);
+            }
+        }
+
+        public static string GoalType_StackBitcoin {
+            get {
+                return ResourceManager.GetString("GoalType_StackBitcoin", resourceCulture);
+            }
+        }
+
         public static string Button_Refresh {
             get {
                 return ResourceManager.GetString("Button.Refresh", resourceCulture);

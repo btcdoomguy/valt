@@ -1,0 +1,84 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        xmlns:manageGoal="clr-namespace:Valt.UI.Views.Main.Modals.ManageGoal"
+        mc:Ignorable="d"
+        d:DesignWidth="450"
+        d:DesignHeight="470"
+        MaxWidth="450"
+        MaxHeight="470"
+        x:Class="Valt.UI.Views.Main.Modals.ManageGoal.ManageGoalView"
+        x:DataType="manageGoal:ManageGoalViewModel"
+        Title="{x:Static local:language.ManageGoal_Title}"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <manageGoal:ManageGoalViewModel />
+    </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" />
+    </Window.KeyBindings>
+    <Border>
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="{x:Static local:language.ManageGoal_Title}"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+            <Border Classes="form-fields-area" Height="390">
+                <StackPanel>
+                    <!-- Period Field -->
+                    <StackPanel Classes="form-field">
+                        <TextBlock Text="{x:Static local:language.ManageGoal_Period}"
+                                   Margin="0, 8, 0, 0" />
+                        <ComboBox ItemsSource="{Binding AvailablePeriods}"
+                                  SelectedItem="{Binding SelectedPeriod}"
+                                  Width="200" />
+                    </StackPanel>
+
+                    <!-- Year Field -->
+                    <StackPanel Classes="form-field">
+                        <TextBlock Text="{x:Static local:language.ManageGoal_Year}" />
+                        <ComboBox ItemsSource="{Binding AvailableYears}"
+                                  SelectedItem="{Binding SelectedYear}"
+                                  Width="100" />
+                    </StackPanel>
+
+                    <!-- Month Field (only visible for Monthly period) -->
+                    <StackPanel Classes="form-field" IsVisible="{Binding ShowMonthSelector}">
+                        <TextBlock Text="{x:Static local:language.ManageGoal_Month}" />
+                        <ComboBox ItemsSource="{Binding AvailableMonths}"
+                                  SelectedValue="{Binding SelectedMonth}"
+                                  DisplayMemberBinding="{Binding Text}"
+                                  SelectedValueBinding="{Binding Value}"
+                                  Width="150" />
+                    </StackPanel>
+
+                    <!-- Goal Type Field -->
+                    <StackPanel Classes="form-field">
+                        <TextBlock Text="{x:Static local:language.ManageGoal_GoalType}" />
+                        <ComboBox ItemsSource="{Binding AvailableGoalTypes}"
+                                  SelectedValue="{Binding SelectedGoalType}"
+                                  DisplayMemberBinding="{Binding Text}"
+                                  SelectedValueBinding="{Binding Value}"
+                                  Width="200" />
+                    </StackPanel>
+
+                    <!-- StackBitcoin Goal Type Input -->
+                    <StackPanel Classes="form-field" IsVisible="{Binding ShowStackBitcoinInput}">
+                        <TextBlock Text="{x:Static local:language.ManageGoal_TargetBtcAmount}" />
+                        <userControls:BtcInput BtcValue="{Binding TargetBtcAmount, Mode=TwoWay}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10"
+                        Margin="0, 0, 0, 0">
+                <Button Width="100" Content="{x:Static local:language.OkButton}" HorizontalContentAlignment="Center" Command="{Binding OkCommand}"></Button>
+                <Button Width="100" Content="{x:Static local:language.CancelButton}" HorizontalContentAlignment="Center" Command="{Binding CancelCommand}"></Button>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

@@ -20,5 +20,6 @@ public enum ApplicationModalNames
     AvgPriceProfileManager = 15,
     AvgPriceLineEditor = 16,
     FixedExpenseHistory = 17,
-    ImportWizard = 18
+    ImportWizard = 18,
+    ManageGoal = 19
 }

@@ -31,6 +31,7 @@ using Valt.UI.Services.LocalStorage;
 using Valt.UI.Views.Main.Modals.AvgPriceLineEditor;
 using Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles;
 using Valt.UI.Views.Main.Modals.ImportWizard;
+using Valt.UI.Views.Main.Modals.ManageGoal;
 using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Tabs.Transactions;
 
@@ -97,6 +98,7 @@ public static class Extensions
         services.AddTransient<AvgPriceLineEditorViewModel>();
         services.AddTransient<FixedExpenseHistoryViewModel>();
         services.AddTransient<ImportWizardViewModel>();
+        services.AddTransient<ManageGoalViewModel>();
 
         //other
         services.AddSingleton<IInitialCategoryNameLanguageProvider, InitialCategoryNameLanguageProvider>();
@@ -182,6 +184,10 @@ public static class Extensions
                 ApplicationModalNames.ImportWizard => new ImportWizardView()
                 {
                     DataContext = services.GetRequiredService<ImportWizardViewModel>(),
+                },
+                ApplicationModalNames.ManageGoal => new ManageGoalView()
+                {
+                    DataContext = services.GetRequiredService<ManageGoalViewModel>(),
                 },
                 _ => throw new ArgumentOutOfRangeException(nameof(modalNames), modalNames, null)
             };
