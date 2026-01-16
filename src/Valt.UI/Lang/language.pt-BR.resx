@@ -1373,9 +1373,19 @@
     <data name="Error.GoalNotFound" xml:space="preserve">
         <value>Meta não encontrada</value>
     </data>
+    <!-- Goal Periods -->
+    <data name="GoalPeriod_Monthly" xml:space="preserve">
+        <value>Mensal</value>
+    </data>
+    <data name="GoalPeriod_Yearly" xml:space="preserve">
+        <value>Anual</value>
+    </data>
     <!-- Goal Types -->
     <data name="GoalType_StackBitcoin" xml:space="preserve">
         <value>Stackar Bitcoin</value>
+    </data>
+    <data name="GoalType_StackBitcoin_Description" xml:space="preserve">
+        <value>Define uma quantidade específica para stackar no período selecionado comparado à quantidade anterior</value>
     </data>
     <!-- Goals Panel -->
     <data name="Goals_Title" xml:space="preserve">
@@ -1383,5 +1393,17 @@
     </data>
     <data name="Goals_Edit" xml:space="preserve">
         <value>Editar</value>
+    </data>
+    <data name="Goals_Close" xml:space="preserve">
+        <value>Fechar</value>
+    </data>
+    <data name="Goals_Conclude" xml:space="preserve">
+        <value>Concluir</value>
+    </data>
+    <data name="Goals_Reopen" xml:space="preserve">
+        <value>Reabrir</value>
+    </data>
+    <data name="GoalDescription_StackBitcoin" xml:space="preserve">
+        <value>{0}/{1} sats</value>
     </data>
 </root>

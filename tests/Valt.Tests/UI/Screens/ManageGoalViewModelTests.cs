@@ -47,7 +47,7 @@ public class ManageGoalViewModelTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.That(vm.SelectedPeriod, Is.EqualTo(GoalPeriods.Monthly));
+            Assert.That(vm.SelectedPeriod, Is.EqualTo(GoalPeriods.Monthly.ToString()));
             Assert.That(vm.SelectedGoalType, Is.EqualTo(GoalTypeNames.StackBitcoin.ToString()));
             Assert.That(vm.SelectedMonth, Is.EqualTo(DateTime.Today.Month.ToString()));
             Assert.That(vm.SelectedYear, Is.EqualTo(DateTime.Today.Year));
@@ -63,7 +63,7 @@ public class ManageGoalViewModelTests
         var vm = CreateViewModel();
 
         // Act
-        vm.SelectedPeriod = GoalPeriods.Monthly;
+        vm.SelectedPeriod = GoalPeriods.Monthly.ToString();
 
         // Assert
         Assert.That(vm.ShowMonthSelector, Is.True);
@@ -76,7 +76,7 @@ public class ManageGoalViewModelTests
         var vm = CreateViewModel();
 
         // Act
-        vm.SelectedPeriod = GoalPeriods.Yearly;
+        vm.SelectedPeriod = GoalPeriods.Yearly.ToString();
 
         // Assert
         Assert.That(vm.ShowMonthSelector, Is.False);
@@ -102,8 +102,8 @@ public class ManageGoalViewModelTests
         var periods = ManageGoalViewModel.AvailablePeriods;
         Assert.Multiple(() =>
         {
-            Assert.That(periods, Contains.Item(GoalPeriods.Monthly));
-            Assert.That(periods, Contains.Item(GoalPeriods.Yearly));
+            Assert.That(periods.Any(p => p.Value == GoalPeriods.Monthly.ToString()), Is.True);
+            Assert.That(periods.Any(p => p.Value == GoalPeriods.Yearly.ToString()), Is.True);
         });
     }
 
@@ -136,7 +136,7 @@ public class ManageGoalViewModelTests
     {
         // Arrange
         var vm = CreateViewModel();
-        vm.SelectedPeriod = GoalPeriods.Monthly;
+        vm.SelectedPeriod = GoalPeriods.Monthly.ToString();
         vm.SelectedGoalType = GoalTypeNames.StackBitcoin.ToString();
         vm.SelectedYear = 2024;
         vm.SelectedMonth = "6";
@@ -171,7 +171,7 @@ public class ManageGoalViewModelTests
     {
         // Arrange
         var vm = CreateViewModel();
-        vm.SelectedPeriod = GoalPeriods.Yearly;
+        vm.SelectedPeriod = GoalPeriods.Yearly.ToString();
         vm.SelectedGoalType = GoalTypeNames.StackBitcoin.ToString();
         vm.SelectedYear = 2025;
         vm.SelectedMonth = "8"; // This should be ignored for yearly goals
@@ -202,7 +202,7 @@ public class ManageGoalViewModelTests
     {
         // Arrange
         var vm = CreateViewModel();
-        vm.SelectedPeriod = GoalPeriods.Monthly;
+        vm.SelectedPeriod = GoalPeriods.Monthly.ToString();
         vm.SelectedGoalType = GoalTypeNames.StackBitcoin.ToString();
         vm.TargetBtcAmount = BtcValue.New(500_000);
         vm.CloseDialog = _ => { };
@@ -242,7 +242,7 @@ public class ManageGoalViewModelTests
         Assert.Multiple(() =>
         {
             Assert.That(vm.IsEditMode, Is.True);
-            Assert.That(vm.SelectedPeriod, Is.EqualTo(GoalPeriods.Monthly));
+            Assert.That(vm.SelectedPeriod, Is.EqualTo(GoalPeriods.Monthly.ToString()));
             Assert.That(vm.SelectedYear, Is.EqualTo(2024));
             Assert.That(vm.SelectedMonth, Is.EqualTo("3"));
             Assert.That(vm.SelectedGoalType, Is.EqualTo(GoalTypeNames.StackBitcoin.ToString()));
@@ -274,7 +274,7 @@ public class ManageGoalViewModelTests
         Assert.Multiple(() =>
         {
             Assert.That(vm.IsEditMode, Is.True);
-            Assert.That(vm.SelectedPeriod, Is.EqualTo(GoalPeriods.Yearly));
+            Assert.That(vm.SelectedPeriod, Is.EqualTo(GoalPeriods.Yearly.ToString()));
             Assert.That(vm.SelectedYear, Is.EqualTo(2025));
             Assert.That(vm.TargetBtcAmount.Sats, Is.EqualTo(10_000_000));
         });
@@ -420,7 +420,7 @@ public class ManageGoalViewModelTests
         vm.PropertyChanged += (_, args) => changedProperties.Add(args.PropertyName!);
 
         // Act
-        vm.SelectedPeriod = GoalPeriods.Yearly;
+        vm.SelectedPeriod = GoalPeriods.Yearly.ToString();
 
         // Assert
         Assert.That(changedProperties, Contains.Item(nameof(vm.ShowMonthSelector)));
@@ -450,7 +450,7 @@ public class ManageGoalViewModelTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.That(vm.SelectedPeriod, Is.EqualTo(GoalPeriods.Monthly));
+            Assert.That(vm.SelectedPeriod, Is.EqualTo(GoalPeriods.Monthly.ToString()));
             Assert.That(vm.SelectedGoalType, Is.EqualTo(GoalTypeNames.StackBitcoin.ToString()));
             Assert.That(vm.TargetBtcAmount.Sats, Is.EqualTo(1_000_000));
         });

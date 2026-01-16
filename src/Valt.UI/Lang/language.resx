@@ -1393,9 +1393,19 @@
     <data name="Error.GoalNotFound" xml:space="preserve">
         <value>Goal not found</value>
     </data>
+    <!-- Goal Periods -->
+    <data name="GoalPeriod_Monthly" xml:space="preserve">
+        <value>Monthly</value>
+    </data>
+    <data name="GoalPeriod_Yearly" xml:space="preserve">
+        <value>Yearly</value>
+    </data>
     <!-- Goal Types -->
     <data name="GoalType_StackBitcoin" xml:space="preserve">
         <value>Stack Bitcoin</value>
+    </data>
+    <data name="GoalType_StackBitcoin_Description" xml:space="preserve">
+        <value>Defines a specific quantity to stack on the selected period compared to the previous quantity</value>
     </data>
     <!-- Goals Panel -->
     <data name="Goals_Title" xml:space="preserve">
@@ -1403,5 +1413,17 @@
     </data>
     <data name="Goals_Edit" xml:space="preserve">
         <value>Edit</value>
+    </data>
+    <data name="Goals_Close" xml:space="preserve">
+        <value>Close</value>
+    </data>
+    <data name="Goals_Conclude" xml:space="preserve">
+        <value>Conclude</value>
+    </data>
+    <data name="Goals_Reopen" xml:space="preserve">
+        <value>Reopen</value>
+    </data>
+    <data name="GoalDescription_StackBitcoin" xml:space="preserve">
+        <value>{0}/{1} sats</value>
     </data>
 </root>

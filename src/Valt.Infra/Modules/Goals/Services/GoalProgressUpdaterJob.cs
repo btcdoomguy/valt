@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Modules.Goals;
@@ -8,6 +9,8 @@ using Valt.Infra.Modules.Goals.Queries;
 using Valt.Infra.Modules.Goals.Queries.DTOs;
 
 namespace Valt.Infra.Modules.Goals.Services;
+
+public record GoalProgressUpdated();
 
 internal class GoalProgressUpdaterJob : IBackgroundJob
 {
@@ -21,7 +24,7 @@ internal class GoalProgressUpdaterJob : IBackgroundJob
     public string Name => "Goal Progress Updater";
     public BackgroundJobSystemNames SystemName => BackgroundJobSystemNames.GoalProgressUpdater;
     public BackgroundJobTypes JobType => BackgroundJobTypes.ValtDatabase;
-    public TimeSpan Interval => TimeSpan.FromSeconds(30);
+    public TimeSpan Interval => TimeSpan.FromSeconds(5);
 
     public GoalProgressUpdaterJob(
         ILocalDatabase localDatabase,
@@ -76,7 +79,7 @@ internal class GoalProgressUpdaterJob : IBackgroundJob
                     staleGoal.To);
 
                 var calculator = _calculatorFactory.GetCalculator(staleGoal.TypeName);
-                var progress = await calculator.CalculateProgressAsync(input);
+                var result = await calculator.CalculateProgressAsync(input);
 
                 var goal = await _goalRepository.GetByIdAsync(new GoalId(staleGoal.Id));
                 if (goal is null)
@@ -85,14 +88,16 @@ internal class GoalProgressUpdaterJob : IBackgroundJob
                     continue;
                 }
 
-                goal.UpdateProgress(progress, _clock.GetCurrentDateTimeUtc());
+                goal.UpdateProgress(result.Progress, result.UpdatedGoalType, _clock.GetCurrentDateTimeUtc());
                 await _goalRepository.SaveAsync(goal);
 
                 _logger.LogInformation("[GoalProgressUpdaterJob] Updated goal {Id} with progress {Progress}%",
-                    staleGoal.Id, progress);
+                    staleGoal.Id, result.Progress);
             }
 
             _logger.LogInformation("[GoalProgressUpdaterJob] Successfully updated {Count} goals", staleGoals.Count);
+
+            WeakReferenceMessenger.Default.Send(new GoalProgressUpdated());
         }
         catch (Exception ex)
         {

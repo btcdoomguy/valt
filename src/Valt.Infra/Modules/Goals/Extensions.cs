@@ -45,7 +45,7 @@ internal static class Extensions
     {
         return goalType.TypeName switch
         {
-            GoalTypeNames.StackBitcoin => JsonSerializer.Serialize((StackBitcoinGoalType)goalType),
+            GoalTypeNames.StackBitcoin => SerializeStackBitcoinGoalType((StackBitcoinGoalType)goalType),
             _ => throw new NotSupportedException($"Goal type {goalType.TypeName} is not supported")
         };
     }
@@ -54,9 +54,25 @@ internal static class Extensions
     {
         return typeName switch
         {
-            GoalTypeNames.StackBitcoin => JsonSerializer.Deserialize<StackBitcoinGoalType>(json)
-                ?? throw new InvalidOperationException("Failed to deserialize StackBitcoinGoalType"),
+            GoalTypeNames.StackBitcoin => DeserializeStackBitcoinGoalType(json),
             _ => throw new NotSupportedException($"Goal type {typeName} is not supported")
         };
+    }
+
+    private static string SerializeStackBitcoinGoalType(StackBitcoinGoalType goalType)
+    {
+        var dto = new StackBitcoinGoalTypeDto
+        {
+            TargetSats = goalType.TargetSats,
+            CalculatedSats = goalType.CalculatedSats
+        };
+        return JsonSerializer.Serialize(dto);
+    }
+
+    private static StackBitcoinGoalType DeserializeStackBitcoinGoalType(string json)
+    {
+        var dto = JsonSerializer.Deserialize<StackBitcoinGoalTypeDto>(json)
+            ?? throw new InvalidOperationException("Failed to deserialize StackBitcoinGoalType");
+        return new StackBitcoinGoalType(dto.TargetSats, dto.CalculatedSats);
     }
 }

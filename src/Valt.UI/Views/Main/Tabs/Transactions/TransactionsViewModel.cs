@@ -27,6 +27,7 @@ using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Accounts.Queries;
 using Valt.Infra.Modules.Budget.Accounts.Queries.DTOs;
 using Valt.Infra.Modules.Budget.FixedExpenses;
+using Valt.Infra.Modules.Goals.Services;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
@@ -135,6 +136,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         WeakReferenceMessenger.Default.Register<TransactionListChanged>(this, OnTransactionListChangedReceive);
         WeakReferenceMessenger.Default.Register<FilterDateRangeChanged>(this, OnCurrentDateRangeChangedReceive);
         WeakReferenceMessenger.Default.Register<GoalListChanged>(this, OnGoalListChangedReceive);
+        WeakReferenceMessenger.Default.Register<GoalProgressUpdated>(this, OnGoalProgressUpdatedReceive);
 
         WeakReferenceMessenger.Default.Register<SettingsChangedMessage>(this, (recipient, message) =>
         {
@@ -157,6 +159,11 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     }
 
     private void OnGoalListChangedReceive(object recipient, GoalListChanged message)
+    {
+        _ = FetchGoals();
+    }
+
+    private void OnGoalProgressUpdatedReceive(object recipient, GoalProgressUpdated message)
     {
         _ = FetchGoals();
     }
@@ -674,6 +681,57 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         WeakReferenceMessenger.Default.Send(new GoalListChanged());
     }
 
+    [RelayCommand]
+    private async Task CloseGoal(GoalEntryViewModel? entry)
+    {
+        if (entry is null)
+            return;
+
+        var goal = await _goalRepository!.GetByIdAsync(new GoalId(entry.Id));
+        if (goal is null)
+            return;
+
+        goal.Close();
+        await _goalRepository.SaveAsync(goal);
+
+        await FetchGoals();
+        WeakReferenceMessenger.Default.Send(new GoalListChanged());
+    }
+
+    [RelayCommand]
+    private async Task ConcludeGoal(GoalEntryViewModel? entry)
+    {
+        if (entry is null)
+            return;
+
+        var goal = await _goalRepository!.GetByIdAsync(new GoalId(entry.Id));
+        if (goal is null)
+            return;
+
+        goal.Conclude();
+        await _goalRepository.SaveAsync(goal);
+
+        await FetchGoals();
+        WeakReferenceMessenger.Default.Send(new GoalListChanged());
+    }
+
+    [RelayCommand]
+    private async Task ReopenGoal(GoalEntryViewModel? entry)
+    {
+        if (entry is null)
+            return;
+
+        var goal = await _goalRepository!.GetByIdAsync(new GoalId(entry.Id));
+        if (goal is null)
+            return;
+
+        goal.Reopen();
+        await _goalRepository.SaveAsync(goal);
+
+        await FetchGoals();
+        WeakReferenceMessenger.Default.Send(new GoalListChanged());
+    }
+
     #endregion
 
     partial void OnSelectedAccountChanged(AccountViewModel? value)
@@ -700,6 +758,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         WeakReferenceMessenger.Default.Unregister<FilterDateRangeChanged>(this);
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
         WeakReferenceMessenger.Default.Unregister<GoalListChanged>(this);
+        WeakReferenceMessenger.Default.Unregister<GoalProgressUpdated>(this);
     }
 
     public override MainViewTabNames TabName => MainViewTabNames.TransactionsPageContent;

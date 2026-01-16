@@ -64,6 +64,12 @@ The solution follows clean architecture with three layers:
 - **Strategy Pattern**: `IAvgPriceCalculationStrategy` for different cost basis calculation methods
 - **Weak Messaging**: `WeakReferenceMessenger` for loosely coupled state updates
 
+### Domain Layer Constraints
+
+- **No attributes in domain classes**: Domain entities, value objects, and goal types must not use serialization attributes (e.g., `[JsonPropertyName]`, `[JsonConstructor]`, `[BsonField]`). The domain layer should remain infrastructure-agnostic.
+- **Use DTOs for serialization**: Create separate DTO classes in the Infra layer to handle serialization. Map between domain objects and DTOs in the repository/extension classes.
+- Example: `StackBitcoinGoalType` (domain) maps to `StackBitcoinGoalTypeDto` (infra) for JSON serialization.
+
 ### Database
 
 - Uses LiteDB (embedded NoSQL database) with password protection
@@ -322,8 +328,24 @@ Tests are organized by layer:
 - Avalonia 11.3 with Fluent theme
 - LiveChartsCore.SkiaSharpView for charts in Reports
 - AXAML files for views with code-behind `.axaml.cs` files
-- Localization via `.resx` files in `Lang/` (en-US, pt-BR)
+- Localization via `.resx` files in `Lang/` (en-US, pt-BR, es)
 - Custom fonts: Geist (sans), GeistMono (mono), Phosphor (icons), MaterialDesign (icons)
+
+### Localization Requirements
+
+**IMPORTANT: When adding or modifying localization strings, you MUST update ALL THREE language files:**
+
+1. `language.resx` - English (en-US) - Primary/default language
+2. `language.pt-BR.resx` - Portuguese (Brazilian)
+3. `language.es.resx` - Spanish
+
+Also update `language.Designer.cs` with the new property for each new string.
+
+Steps for adding a new localized string:
+1. Add the `<data>` entry to `language.resx` (English)
+2. Add the `<data>` entry to `language.pt-BR.resx` (Portuguese translation)
+3. Add the `<data>` entry to `language.es.resx` (Spanish translation)
+4. Add the static property to `language.Designer.cs`
 
 ## Key Value Objects
 

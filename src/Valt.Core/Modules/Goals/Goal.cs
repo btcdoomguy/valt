@@ -60,9 +60,10 @@ public sealed class Goal : AggregateRoot<GoalId>
         AddEvent(new GoalUpdatedEvent(this));
     }
 
-    public void UpdateProgress(decimal progress, DateTime updatedAt)
+    public void UpdateProgress(decimal progress, IGoalType updatedGoalType, DateTime updatedAt)
     {
         Progress = progress;
+        GoalType = updatedGoalType;
         IsUpToDate = true;
         LastUpdatedAt = updatedAt;
         AddEvent(new GoalUpdatedEvent(this));
@@ -74,6 +75,34 @@ public sealed class Goal : AggregateRoot<GoalId>
             return;
 
         State = GoalStates.MarkedAsCompleted;
+        AddEvent(new GoalUpdatedEvent(this));
+    }
+
+    public void Close()
+    {
+        if (State != GoalStates.Open)
+            return;
+
+        State = GoalStates.Closed;
+        AddEvent(new GoalUpdatedEvent(this));
+    }
+
+    public void Conclude()
+    {
+        if (State != GoalStates.Completed && State != GoalStates.Open)
+            return;
+
+        State = GoalStates.MarkedAsCompleted;
+        AddEvent(new GoalUpdatedEvent(this));
+    }
+
+    public void Reopen()
+    {
+        if (State != GoalStates.MarkedAsCompleted && State != GoalStates.Closed)
+            return;
+
+        State = GoalStates.Open;
+        IsUpToDate = false;
         AddEvent(new GoalUpdatedEvent(this));
     }
 

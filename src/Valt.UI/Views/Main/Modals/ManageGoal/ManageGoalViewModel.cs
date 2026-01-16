@@ -27,7 +27,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowMonthSelector))]
-    private GoalPeriods _selectedPeriod = GoalPeriods.Monthly;
+    private string _selectedPeriod = GoalPeriods.Monthly.ToString();
 
     [ObservableProperty]
     private string _selectedMonth = DateTime.Today.Month.ToString();
@@ -45,11 +45,15 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     [ObservableProperty]
     private bool _isEditMode;
 
-    public bool ShowMonthSelector => SelectedPeriod == GoalPeriods.Monthly;
+    public bool ShowMonthSelector => SelectedPeriod == GoalPeriods.Monthly.ToString();
 
     public bool ShowStackBitcoinInput => SelectedGoalType == GoalTypeNames.StackBitcoin.ToString();
 
-    public static List<GoalPeriods> AvailablePeriods => Enum.GetValues<GoalPeriods>().ToList();
+    public static List<ComboBoxValue> AvailablePeriods =>
+    [
+        new(language.GoalPeriod_Monthly, GoalPeriods.Monthly.ToString()),
+        new(language.GoalPeriod_Yearly, GoalPeriods.Yearly.ToString())
+    ];
 
     public static List<ComboBoxValue> AvailableGoalTypes =>
     [
@@ -72,7 +76,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     /// </summary>
     public ManageGoalViewModel()
     {
-        SelectedPeriod = GoalPeriods.Monthly;
+        SelectedPeriod = GoalPeriods.Monthly.ToString();
         SelectedGoalType = GoalTypeNames.StackBitcoin.ToString();
         TargetBtcAmount = BtcValue.New(1_000_000);
     }
@@ -81,7 +85,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     {
         _goalRepository = goalRepository;
 
-        SelectedPeriod = GoalPeriods.Monthly;
+        SelectedPeriod = GoalPeriods.Monthly.ToString();
         SelectedGoalType = GoalTypeNames.StackBitcoin.ToString();
     }
 
@@ -99,7 +103,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
 
             _goalId = goal.Id;
             IsEditMode = true;
-            SelectedPeriod = goal.Period;
+            SelectedPeriod = goal.Period.ToString();
             SelectedYear = goal.RefDate.Year;
             SelectedMonth = goal.RefDate.Month.ToString();
             SelectedGoalType = goal.GoalType.TypeName.ToString();
@@ -120,20 +124,21 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
 
         if (!HasErrors)
         {
-            var goalTypeName = Enum.Parse<GoalTypeNames>(SelectedGoalType);
-            IGoalType goalType = goalTypeName switch
-            {
-                GoalTypeNames.StackBitcoin => new StackBitcoinGoalType(TargetBtcAmount),
-                _ => throw new ArgumentOutOfRangeException()
-            };
-
-            var month = SelectedPeriod == GoalPeriods.Yearly ? 1 : int.Parse(SelectedMonth);
+            var period = Enum.Parse<GoalPeriods>(SelectedPeriod);
+            var month = period == GoalPeriods.Yearly ? 1 : int.Parse(SelectedMonth);
             var refDate = new DateOnly(SelectedYear, month, 1);
 
             Goal goal;
             if (_goalId is null)
             {
-                goal = Goal.New(refDate, SelectedPeriod, goalType);
+                var goalTypeName = Enum.Parse<GoalTypeNames>(SelectedGoalType);
+                IGoalType goalType = goalTypeName switch
+                {
+                    GoalTypeNames.StackBitcoin => new StackBitcoinGoalType(TargetBtcAmount),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+
+                goal = Goal.New(refDate, period, goalType);
             }
             else
             {
@@ -142,10 +147,20 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
                 if (existingGoal is null)
                     throw new EntityNotFoundException(nameof(Goal), _goalId);
 
+                // Preserve calculated values from existing goal type when editing
+                var goalTypeName = Enum.Parse<GoalTypeNames>(SelectedGoalType);
+                IGoalType goalType = goalTypeName switch
+                {
+                    GoalTypeNames.StackBitcoin => existingGoal.GoalType is StackBitcoinGoalType existing
+                        ? new StackBitcoinGoalType(TargetBtcAmount.Sats, existing.CalculatedSats)
+                        : new StackBitcoinGoalType(TargetBtcAmount),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+
                 goal = Goal.Create(
                     existingGoal.Id,
                     refDate,
-                    SelectedPeriod,
+                    period,
                     goalType,
                     existingGoal.Progress,
                     false,

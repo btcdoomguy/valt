@@ -1366,4 +1366,59 @@
     <data name="CloseButton" xml:space="preserve">
         <value>Cerrar</value>
     </data>
+    <!-- Goals -->
+    <data name="ManageGoal_Title" xml:space="preserve">
+        <value>Gestionar Meta</value>
+    </data>
+    <data name="ManageGoal_Period" xml:space="preserve">
+        <value>Período</value>
+    </data>
+    <data name="ManageGoal_Year" xml:space="preserve">
+        <value>Año</value>
+    </data>
+    <data name="ManageGoal_Month" xml:space="preserve">
+        <value>Mes</value>
+    </data>
+    <data name="ManageGoal_GoalType" xml:space="preserve">
+        <value>Tipo de Meta</value>
+    </data>
+    <data name="ManageGoal_TargetBtcAmount" xml:space="preserve">
+        <value>Cantidad Objetivo de BTC</value>
+    </data>
+    <data name="Error.GoalNotFound" xml:space="preserve">
+        <value>Meta no encontrada</value>
+    </data>
+    <!-- Goal Periods -->
+    <data name="GoalPeriod_Monthly" xml:space="preserve">
+        <value>Mensual</value>
+    </data>
+    <data name="GoalPeriod_Yearly" xml:space="preserve">
+        <value>Anual</value>
+    </data>
+    <!-- Goal Types -->
+    <data name="GoalType_StackBitcoin" xml:space="preserve">
+        <value>Acumular Bitcoin</value>
+    </data>
+    <data name="GoalType_StackBitcoin_Description" xml:space="preserve">
+        <value>Define una cantidad específica para acumular en el período seleccionado comparado con la cantidad anterior</value>
+    </data>
+    <!-- Goals Panel -->
+    <data name="Goals_Title" xml:space="preserve">
+        <value>Metas</value>
+    </data>
+    <data name="Goals_Edit" xml:space="preserve">
+        <value>Editar</value>
+    </data>
+    <data name="Goals_Close" xml:space="preserve">
+        <value>Cerrar</value>
+    </data>
+    <data name="Goals_Conclude" xml:space="preserve">
+        <value>Concluir</value>
+    </data>
+    <data name="Goals_Reopen" xml:space="preserve">
+        <value>Reabrir</value>
+    </data>
+    <data name="GoalDescription_StackBitcoin" xml:space="preserve">
+        <value>{0}/{1} sats</value>
+    </data>
 </root>

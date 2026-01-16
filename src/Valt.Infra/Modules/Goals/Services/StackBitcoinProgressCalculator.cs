@@ -19,10 +19,11 @@ internal class StackBitcoinProgressCalculator : IGoalProgressCalculator
         _localDatabase = localDatabase;
     }
 
-    public Task<decimal> CalculateProgressAsync(GoalProgressInput input)
+    public Task<GoalProgressResult> CalculateProgressAsync(GoalProgressInput input)
     {
-        var config = JsonSerializer.Deserialize<StackBitcoinGoalType>(input.GoalTypeJson)
-                     ?? throw new InvalidOperationException("Failed to deserialize StackBitcoinGoalType");
+        var dto = JsonSerializer.Deserialize<StackBitcoinGoalTypeDto>(input.GoalTypeJson)
+                  ?? throw new InvalidOperationException("Failed to deserialize StackBitcoinGoalType");
+        var config = new StackBitcoinGoalType(dto.TargetSats, dto.CalculatedSats);
 
         var fromDate = input.From.ToValtDateTime();
         var toDate = input.To.ToValtDateTime().AddDays(1).AddTicks(-1);
@@ -59,6 +60,9 @@ internal class StackBitcoinProgressCalculator : IGoalProgressCalculator
             ? Math.Min(100m, Math.Max(0m, (netBtcStacked * 100m) / config.TargetSats))
             : 0m;
 
-        return Task.FromResult(progress);
+        // Create updated goal type with calculated values
+        var updatedGoalType = config.WithCalculatedSats(netBtcStacked);
+
+        return Task.FromResult(new GoalProgressResult(progress, updatedGoalType));
     }
 }

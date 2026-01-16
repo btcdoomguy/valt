@@ -28,14 +28,7 @@ public class GoalEntryViewModel
                 _ => _goal.GoalType.TypeName.ToString()
             };
 
-            var periodDescription = _goal.Period switch
-            {
-                GoalPeriods.Monthly => $"{_goal.RefDate:MMM/yyyy}",
-                GoalPeriods.Yearly => _goal.RefDate.Year.ToString(),
-                _ => string.Empty
-            };
-
-            return $"{typeName} ({periodDescription})";
+            return typeName;
         }
     }
 
@@ -67,11 +60,40 @@ public class GoalEntryViewModel
         }
     }
 
-    public bool IsCompleted => _goal.State == GoalStates.MarkedAsCompleted || _goal.Progress >= 1m;
+    public string Description
+    {
+        get
+        {
+            return _goal.GoalType switch
+            {
+                StackBitcoinGoalType stackBitcoin => string.Format(
+                    language.GoalDescription_StackBitcoin,
+                    CurrencyDisplay.FormatSatsAsNumber(Math.Min(stackBitcoin.CalculatedSats, stackBitcoin.TargetAmount.Sats)),
+                    CurrencyDisplay.FormatSatsAsNumber(stackBitcoin.TargetAmount.Sats)),
+                _ => string.Empty
+            };
+        }
+    }
+
+    public bool IsCompleted => _goal.State == GoalStates.MarkedAsCompleted || _goal.Progress >= 100m;
 
     public GoalStates State => _goal.State;
 
     public GoalPeriods Period => _goal.Period;
 
     public DateOnly RefDate => _goal.RefDate;
+
+    // State-based UI properties
+    public bool IsClosed => _goal.State == GoalStates.Closed;
+    public bool IsMarkedAsComplete => _goal.State == GoalStates.MarkedAsCompleted;
+    public bool IsOpen => _goal.State == GoalStates.Open;
+    public bool IsProgressComplete => _goal.State == GoalStates.Completed || _goal.Progress >= 100m;
+
+    // Context menu visibility
+    public bool CanClose => _goal.State == GoalStates.Open;
+    public bool CanConclude => _goal.State == GoalStates.Completed || (_goal.State == GoalStates.Open && _goal.Progress >= 100m);
+    public bool CanReopen => _goal.State == GoalStates.MarkedAsCompleted || _goal.State == GoalStates.Closed;
+
+    // Show progress bar only for Open and Completed states (not for MarkedAsCompleted or Closed)
+    public bool ShowProgressBar => _goal.State != GoalStates.MarkedAsCompleted;
 }

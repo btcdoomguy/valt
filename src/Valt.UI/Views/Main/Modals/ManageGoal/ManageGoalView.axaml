@@ -7,9 +7,9 @@
         xmlns:manageGoal="clr-namespace:Valt.UI.Views.Main.Modals.ManageGoal"
         mc:Ignorable="d"
         d:DesignWidth="450"
-        d:DesignHeight="470"
+        d:DesignHeight="500"
         MaxWidth="450"
-        MaxHeight="470"
+        MaxHeight="500"
         x:Class="Valt.UI.Views.Main.Modals.ManageGoal.ManageGoalView"
         x:DataType="manageGoal:ManageGoalViewModel"
         Title="{x:Static local:language.ManageGoal_Title}"
@@ -28,14 +28,16 @@
             <userControls:CustomTitleBar Title="{x:Static local:language.ManageGoal_Title}"
                                          TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
-            <Border Classes="form-fields-area" Height="390">
+            <Border Classes="form-fields-area" Height="420">
                 <StackPanel>
                     <!-- Period Field -->
                     <StackPanel Classes="form-field">
                         <TextBlock Text="{x:Static local:language.ManageGoal_Period}"
                                    Margin="0, 8, 0, 0" />
                         <ComboBox ItemsSource="{Binding AvailablePeriods}"
-                                  SelectedItem="{Binding SelectedPeriod}"
+                                  SelectedValue="{Binding SelectedPeriod}"
+                                  DisplayMemberBinding="{Binding Text}"
+                                  SelectedValueBinding="{Binding Value}"
                                   Width="200" />
                     </StackPanel>
 
@@ -65,6 +67,12 @@
                                   DisplayMemberBinding="{Binding Text}"
                                   SelectedValueBinding="{Binding Value}"
                                   Width="200" />
+                        <TextBlock Text="{x:Static local:language.GoalType_StackBitcoin_Description}"
+                                   IsVisible="{Binding ShowStackBitcoinInput}"
+                                   FontSize="11"
+                                   Opacity="0.7"
+                                   TextWrapping="Wrap"
+                                   Margin="0, 4, 0, 0" />
                     </StackPanel>
 
                     <!-- StackBitcoin Goal Type Input -->

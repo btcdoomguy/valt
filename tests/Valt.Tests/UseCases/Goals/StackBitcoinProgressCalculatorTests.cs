@@ -1,5 +1,4 @@
 using LiteDB;
-using Valt.Core.Common;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.GoalTypes;
 using Valt.Infra;
@@ -24,14 +23,18 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
         _localDatabase.GetTransactions().DeleteAll();
     }
 
+    private static string SerializeGoalType(long targetSats, long calculatedSats = 0)
+    {
+        return JsonSerializer.Serialize(new { targetSats, calculatedSats });
+    }
+
     #region Progress Calculation Tests
 
     [Test]
     public async Task Should_Calculate_Progress_Based_On_BTC_Transactions()
     {
         // Arrange: Goal to stack 1,000,000 sats in January 2024
-        var goalTypeJson = JsonSerializer.Serialize(
-            new StackBitcoinGoalType(BtcValue.ParseSats(1_000_000)));
+        var goalTypeJson = SerializeGoalType(1_000_000);
 
         var input = new GoalProgressInput(
             GoalTypeNames.StackBitcoin,
@@ -44,18 +47,43 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
         AddBtcTransaction(new DateOnly(2024, 1, 15), 300_000);
 
         // Act
-        var progress = await _calculator.CalculateProgressAsync(input);
+        var result = await _calculator.CalculateProgressAsync(input);
 
         // Assert: 500,000 / 1,000,000 = 50%
-        Assert.That(progress, Is.EqualTo(50m));
+        Assert.That(result.Progress, Is.EqualTo(50m));
+        Assert.That(((StackBitcoinGoalType)result.UpdatedGoalType).CalculatedSats, Is.EqualTo(500_000L));
+    }
+
+    [Test]
+    public async Task Should_Return_CalculatedSats_With_Net_Amount()
+    {
+        // Arrange: Goal to stack 1,000,000 sats in January 2024
+        var goalTypeJson = SerializeGoalType(1_000_000);
+
+        var input = new GoalProgressInput(
+            GoalTypeNames.StackBitcoin,
+            goalTypeJson,
+            new DateOnly(2024, 1, 1),
+            new DateOnly(2024, 1, 31));
+
+        // Add BTC purchase
+        AddBtcTransaction(new DateOnly(2024, 1, 5), 800_000);
+        // Sell some BTC
+        AddBtcSale(new DateOnly(2024, 1, 15), 300_000);
+
+        // Act
+        var result = await _calculator.CalculateProgressAsync(input);
+
+        // Assert: Net = 800,000 - 300,000 = 500,000
+        Assert.That(result.Progress, Is.EqualTo(50m));
+        Assert.That(((StackBitcoinGoalType)result.UpdatedGoalType).CalculatedSats, Is.EqualTo(500_000L));
     }
 
     [Test]
     public async Task Should_Cap_Progress_At_100_Percent()
     {
         // Arrange: Goal to stack 100,000 sats
-        var goalTypeJson = JsonSerializer.Serialize(
-            new StackBitcoinGoalType(BtcValue.ParseSats(100_000)));
+        var goalTypeJson = SerializeGoalType(100_000);
 
         var input = new GoalProgressInput(
             GoalTypeNames.StackBitcoin,
@@ -67,18 +95,17 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
         AddBtcTransaction(new DateOnly(2024, 1, 5), 150_000);
 
         // Act
-        var progress = await _calculator.CalculateProgressAsync(input);
+        var result = await _calculator.CalculateProgressAsync(input);
 
         // Assert: Capped at 100%
-        Assert.That(progress, Is.EqualTo(100m));
+        Assert.That(result.Progress, Is.EqualTo(100m));
     }
 
     [Test]
     public async Task Should_Only_Count_Transactions_In_Period()
     {
         // Arrange
-        var goalTypeJson = JsonSerializer.Serialize(
-            new StackBitcoinGoalType(BtcValue.ParseSats(1_000_000)));
+        var goalTypeJson = SerializeGoalType(1_000_000);
 
         var input = new GoalProgressInput(
             GoalTypeNames.StackBitcoin,
@@ -92,18 +119,17 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
         AddBtcTransaction(new DateOnly(2024, 2, 10), 200_000);
 
         // Act
-        var progress = await _calculator.CalculateProgressAsync(input);
+        var result = await _calculator.CalculateProgressAsync(input);
 
         // Assert: Only February transaction counted = 20%
-        Assert.That(progress, Is.EqualTo(20m));
+        Assert.That(result.Progress, Is.EqualTo(20m));
     }
 
     [Test]
     public async Task Should_Return_Zero_When_No_Transactions()
     {
         // Arrange
-        var goalTypeJson = JsonSerializer.Serialize(
-            new StackBitcoinGoalType(BtcValue.ParseSats(1_000_000)));
+        var goalTypeJson = SerializeGoalType(1_000_000);
 
         var input = new GoalProgressInput(
             GoalTypeNames.StackBitcoin,
@@ -114,18 +140,17 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
         // No transactions added
 
         // Act
-        var progress = await _calculator.CalculateProgressAsync(input);
+        var result = await _calculator.CalculateProgressAsync(input);
 
         // Assert
-        Assert.That(progress, Is.EqualTo(0m));
+        Assert.That(result.Progress, Is.EqualTo(0m));
     }
 
     [Test]
     public async Task Should_Return_Zero_When_Target_Is_Zero()
     {
         // Arrange
-        var goalTypeJson = JsonSerializer.Serialize(
-            new StackBitcoinGoalType(BtcValue.ParseSats(0)));
+        var goalTypeJson = SerializeGoalType(0);
 
         var input = new GoalProgressInput(
             GoalTypeNames.StackBitcoin,
@@ -136,18 +161,17 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
         AddBtcTransaction(new DateOnly(2024, 1, 5), 100_000);
 
         // Act
-        var progress = await _calculator.CalculateProgressAsync(input);
+        var result = await _calculator.CalculateProgressAsync(input);
 
         // Assert
-        Assert.That(progress, Is.EqualTo(0m));
+        Assert.That(result.Progress, Is.EqualTo(0m));
     }
 
     [Test]
     public async Task Should_Include_Transaction_On_Start_Date()
     {
         // Arrange
-        var goalTypeJson = JsonSerializer.Serialize(
-            new StackBitcoinGoalType(BtcValue.ParseSats(1_000_000)));
+        var goalTypeJson = SerializeGoalType(1_000_000);
 
         var input = new GoalProgressInput(
             GoalTypeNames.StackBitcoin,
@@ -159,18 +183,17 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
         AddBtcTransaction(new DateOnly(2024, 1, 1), 250_000);
 
         // Act
-        var progress = await _calculator.CalculateProgressAsync(input);
+        var result = await _calculator.CalculateProgressAsync(input);
 
         // Assert
-        Assert.That(progress, Is.EqualTo(25m));
+        Assert.That(result.Progress, Is.EqualTo(25m));
     }
 
     [Test]
     public async Task Should_Include_Transaction_On_End_Date()
     {
         // Arrange
-        var goalTypeJson = JsonSerializer.Serialize(
-            new StackBitcoinGoalType(BtcValue.ParseSats(1_000_000)));
+        var goalTypeJson = SerializeGoalType(1_000_000);
 
         var input = new GoalProgressInput(
             GoalTypeNames.StackBitcoin,
@@ -182,18 +205,17 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
         AddBtcTransaction(new DateOnly(2024, 1, 31), 250_000);
 
         // Act
-        var progress = await _calculator.CalculateProgressAsync(input);
+        var result = await _calculator.CalculateProgressAsync(input);
 
         // Assert
-        Assert.That(progress, Is.EqualTo(25m));
+        Assert.That(result.Progress, Is.EqualTo(25m));
     }
 
     [Test]
     public async Task Should_Calculate_Net_Stacked_When_Selling_BTC()
     {
         // Arrange
-        var goalTypeJson = JsonSerializer.Serialize(
-            new StackBitcoinGoalType(BtcValue.ParseSats(1_000_000)));
+        var goalTypeJson = SerializeGoalType(1_000_000);
 
         var input = new GoalProgressInput(
             GoalTypeNames.StackBitcoin,
@@ -207,18 +229,17 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
         AddBtcSpendTransaction(new DateOnly(2024, 1, 10), 200_000);
 
         // Act
-        var progress = await _calculator.CalculateProgressAsync(input);
+        var result = await _calculator.CalculateProgressAsync(input);
 
         // Assert: Net = 500,000 - 200,000 = 300,000 / 1,000,000 = 30%
-        Assert.That(progress, Is.EqualTo(30m));
+        Assert.That(result.Progress, Is.EqualTo(30m));
     }
 
     [Test]
     public async Task Should_Not_Count_BitcoinToBitcoin_Transfers()
     {
         // Arrange
-        var goalTypeJson = JsonSerializer.Serialize(
-            new StackBitcoinGoalType(BtcValue.ParseSats(1_000_000)));
+        var goalTypeJson = SerializeGoalType(1_000_000);
 
         var input = new GoalProgressInput(
             GoalTypeNames.StackBitcoin,
@@ -232,18 +253,17 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
         AddBtcToBtcTransfer(new DateOnly(2024, 1, 10), 200_000);
 
         // Act
-        var progress = await _calculator.CalculateProgressAsync(input);
+        var result = await _calculator.CalculateProgressAsync(input);
 
         // Assert: Only the purchase should count (300,000 / 1,000,000 = 30%)
-        Assert.That(progress, Is.EqualTo(30m));
+        Assert.That(result.Progress, Is.EqualTo(30m));
     }
 
     [Test]
     public async Task Should_Count_Direct_Bitcoin_Income()
     {
         // Arrange
-        var goalTypeJson = JsonSerializer.Serialize(
-            new StackBitcoinGoalType(BtcValue.ParseSats(1_000_000)));
+        var goalTypeJson = SerializeGoalType(1_000_000);
 
         var input = new GoalProgressInput(
             GoalTypeNames.StackBitcoin,
@@ -257,18 +277,17 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
         AddDirectBtcIncome(new DateOnly(2024, 1, 10), 200_000);
 
         // Act
-        var progress = await _calculator.CalculateProgressAsync(input);
+        var result = await _calculator.CalculateProgressAsync(input);
 
         // Assert: Both should count (300,000 + 200,000 = 500,000 / 1,000,000 = 50%)
-        Assert.That(progress, Is.EqualTo(50m));
+        Assert.That(result.Progress, Is.EqualTo(50m));
     }
 
     [Test]
     public async Task Should_Subtract_Bitcoin_Sales_From_Progress()
     {
         // Arrange: Goal to stack 1,000,000 sats
-        var goalTypeJson = JsonSerializer.Serialize(
-            new StackBitcoinGoalType(BtcValue.ParseSats(1_000_000)));
+        var goalTypeJson = SerializeGoalType(1_000_000);
 
         var input = new GoalProgressInput(
             GoalTypeNames.StackBitcoin,
@@ -282,18 +301,17 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
         AddBtcSale(new DateOnly(2024, 1, 15), 400_000);
 
         // Act
-        var progress = await _calculator.CalculateProgressAsync(input);
+        var result = await _calculator.CalculateProgressAsync(input);
 
         // Assert: Net = 900,000 - 400,000 = 500,000 / 1,000,000 = 50%
-        Assert.That(progress, Is.EqualTo(50m));
+        Assert.That(result.Progress, Is.EqualTo(50m));
     }
 
     [Test]
     public async Task Should_Subtract_Bitcoin_Expenses_From_Progress()
     {
         // Arrange: Goal to stack 1,000,000 sats
-        var goalTypeJson = JsonSerializer.Serialize(
-            new StackBitcoinGoalType(BtcValue.ParseSats(1_000_000)));
+        var goalTypeJson = SerializeGoalType(1_000_000);
 
         var input = new GoalProgressInput(
             GoalTypeNames.StackBitcoin,
@@ -307,18 +325,17 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
         AddDirectBtcExpense(new DateOnly(2024, 1, 15), 300_000);
 
         // Act
-        var progress = await _calculator.CalculateProgressAsync(input);
+        var result = await _calculator.CalculateProgressAsync(input);
 
         // Assert: Net = 800,000 - 300,000 = 500,000 / 1,000,000 = 50%
-        Assert.That(progress, Is.EqualTo(50m));
+        Assert.That(result.Progress, Is.EqualTo(50m));
     }
 
     [Test]
     public async Task Should_Return_Zero_When_Sales_Exceed_Purchases()
     {
         // Arrange: Goal to stack 1,000,000 sats
-        var goalTypeJson = JsonSerializer.Serialize(
-            new StackBitcoinGoalType(BtcValue.ParseSats(1_000_000)));
+        var goalTypeJson = SerializeGoalType(1_000_000);
 
         var input = new GoalProgressInput(
             GoalTypeNames.StackBitcoin,
@@ -332,18 +349,17 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
         AddBtcSale(new DateOnly(2024, 1, 15), 500_000);
 
         // Act
-        var progress = await _calculator.CalculateProgressAsync(input);
+        var result = await _calculator.CalculateProgressAsync(input);
 
         // Assert: Net = 300,000 - 500,000 = -200,000, but capped at 0%
-        Assert.That(progress, Is.EqualTo(0m));
+        Assert.That(result.Progress, Is.EqualTo(0m));
     }
 
     [Test]
     public async Task Should_Calculate_Net_With_All_Transaction_Types()
     {
         // Arrange: Goal to stack 1,000,000 sats
-        var goalTypeJson = JsonSerializer.Serialize(
-            new StackBitcoinGoalType(BtcValue.ParseSats(1_000_000)));
+        var goalTypeJson = SerializeGoalType(1_000_000);
 
         var input = new GoalProgressInput(
             GoalTypeNames.StackBitcoin,
@@ -359,10 +375,10 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
         AddBtcToBtcTransfer(new DateOnly(2024, 1, 25), 300_000); // 0 (transfer, shouldn't count)
 
         // Act
-        var progress = await _calculator.CalculateProgressAsync(input);
+        var result = await _calculator.CalculateProgressAsync(input);
 
         // Assert: Net = (500,000 + 200,000) - (100,000 + 50,000) = 550,000 / 1,000,000 = 55%
-        Assert.That(progress, Is.EqualTo(55m));
+        Assert.That(result.Progress, Is.EqualTo(55m));
     }
 
     #endregion

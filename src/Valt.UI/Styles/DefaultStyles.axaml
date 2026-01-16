@@ -1046,4 +1046,13 @@
         <Setter Property="Margin" Value="0, 0, 10, 0" />
         <Setter Property="Padding" Value="0" />
     </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         PROGRESS BAR - Goals
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
+    <!-- Progress bar with green background when goal is complete -->
+    <Style Selector="ProgressBar.complete /template/ Border#PART_Indicator">
+        <Setter Property="Background" Value="{DynamicResource SemanticPositive500Brush}" />
+    </Style>
 </Styles>
