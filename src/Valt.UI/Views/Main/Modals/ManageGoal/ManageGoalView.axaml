@@ -8,9 +8,9 @@
         xmlns:editors="clr-namespace:Valt.UI.Views.Main.Modals.ManageGoal.GoalTypeEditors"
         mc:Ignorable="d"
         d:DesignWidth="450"
-        d:DesignHeight="500"
+        d:DesignHeight="510"
         MaxWidth="450"
-        MaxHeight="500"
+        MaxHeight="510"
         x:Class="Valt.UI.Views.Main.Modals.ManageGoal.ManageGoalView"
         x:DataType="manageGoal:ManageGoalViewModel"
         Title="{x:Static local:language.ManageGoal_Title}"
@@ -29,7 +29,7 @@
             <userControls:CustomTitleBar Title="{x:Static local:language.ManageGoal_Title}"
                                          TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
-            <Border Classes="form-fields-area" Height="420">
+            <Border Classes="form-fields-area" Height="430">
                 <StackPanel>
                     <!-- Period Field -->
                     <StackPanel Classes="form-field">
