@@ -5,16 +5,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Valt.Core.Common;
 using Valt.Core.Kernel.Exceptions;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.Contracts;
-using Valt.Core.Modules.Goals.GoalTypes;
 using Valt.Infra.Modules.Configuration;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
 using Valt.UI.Lang;
 using Valt.UI.Services.MessageBoxes;
+using Valt.UI.Views.Main.Modals.ManageGoal.GoalTypeEditors;
 
 namespace Valt.UI.Views.Main.Modals.ManageGoal;
 
@@ -26,6 +25,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     #region Form Data
 
     private GoalId? _goalId;
+    private IGoalType? _existingGoalType;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowMonthSelector))]
@@ -38,33 +38,15 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     private int _selectedYear = DateTime.Today.Year;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ShowStackBitcoinInput))]
-    [NotifyPropertyChangedFor(nameof(ShowSpendingLimitInput))]
-    [NotifyPropertyChangedFor(nameof(ShowDcaInput))]
     private string _selectedGoalType = GoalTypeNames.StackBitcoin.ToString();
 
     [ObservableProperty]
-    private BtcValue _targetBtcAmount = BtcValue.Empty;
-
-    [ObservableProperty]
-    private FiatValue _targetFiatAmount = FiatValue.Empty;
-
-    [ObservableProperty]
-    private string _selectedCurrency = FiatCurrency.Usd.Code;
-
-    [ObservableProperty]
-    private int _targetPurchaseCount = 4;
+    private IGoalTypeEditorViewModel? _currentGoalTypeEditor;
 
     [ObservableProperty]
     private bool _isEditMode;
 
     public bool ShowMonthSelector => SelectedPeriod == GoalPeriods.Monthly.ToString();
-
-    public bool ShowStackBitcoinInput => SelectedGoalType == GoalTypeNames.StackBitcoin.ToString();
-
-    public bool ShowSpendingLimitInput => SelectedGoalType == GoalTypeNames.SpendingLimit.ToString();
-
-    public bool ShowDcaInput => SelectedGoalType == GoalTypeNames.Dca.ToString();
 
     public static List<ComboBoxValue> AvailablePeriods =>
     [
@@ -78,11 +60,6 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
         new(language.GoalType_SpendingLimit, GoalTypeNames.SpendingLimit.ToString()),
         new(language.GoalType_Dca, GoalTypeNames.Dca.ToString())
     ];
-
-    public List<ComboBoxValue> AvailableCurrencies =>
-        (_configurationManager?.GetAvailableFiatCurrencies() ?? FiatCurrency.GetAll().Select(c => c.Code).ToList())
-            .Select(c => new ComboBoxValue(c, c))
-            .ToList();
 
     public static List<ComboBoxValue> AvailableMonths =>
         Enumerable.Range(1, 12)
@@ -102,7 +79,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     {
         SelectedPeriod = GoalPeriods.Monthly.ToString();
         SelectedGoalType = GoalTypeNames.StackBitcoin.ToString();
-        TargetBtcAmount = BtcValue.New(1_000_000);
+        CurrentGoalTypeEditor = new StackBitcoinGoalTypeEditorViewModel();
     }
 
     public ManageGoalViewModel(IGoalRepository goalRepository, IConfigurationManager configurationManager)
@@ -112,7 +89,28 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
 
         SelectedPeriod = GoalPeriods.Monthly.ToString();
         SelectedGoalType = GoalTypeNames.StackBitcoin.ToString();
-        SelectedCurrency = AvailableCurrencies.FirstOrDefault()?.Value ?? FiatCurrency.Usd.Code;
+        CurrentGoalTypeEditor = CreateEditorForGoalType(GoalTypeNames.StackBitcoin);
+    }
+
+    partial void OnSelectedGoalTypeChanged(string value)
+    {
+        if (Enum.TryParse<GoalTypeNames>(value, out var goalTypeName))
+        {
+            CurrentGoalTypeEditor = CreateEditorForGoalType(goalTypeName);
+        }
+    }
+
+    private IGoalTypeEditorViewModel CreateEditorForGoalType(GoalTypeNames goalTypeName)
+    {
+        return goalTypeName switch
+        {
+            GoalTypeNames.StackBitcoin => new StackBitcoinGoalTypeEditorViewModel(),
+            GoalTypeNames.SpendingLimit => _configurationManager != null
+                ? new SpendingLimitGoalTypeEditorViewModel(_configurationManager)
+                : new SpendingLimitGoalTypeEditorViewModel(),
+            GoalTypeNames.Dca => new DcaGoalTypeEditorViewModel(),
+            _ => throw new ArgumentOutOfRangeException(nameof(goalTypeName))
+        };
     }
 
     public override async Task OnBindParameterAsync()
@@ -128,25 +126,14 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
             }
 
             _goalId = goal.Id;
+            _existingGoalType = goal.GoalType;
             IsEditMode = true;
             SelectedPeriod = goal.Period.ToString();
             SelectedYear = goal.RefDate.Year;
             SelectedMonth = goal.RefDate.Month.ToString();
             SelectedGoalType = goal.GoalType.TypeName.ToString();
 
-            switch (goal.GoalType)
-            {
-                case StackBitcoinGoalType stackBitcoin:
-                    TargetBtcAmount = stackBitcoin.TargetAmount;
-                    break;
-                case SpendingLimitGoalType spendingLimit:
-                    TargetFiatAmount = FiatValue.New(spendingLimit.TargetAmount);
-                    SelectedCurrency = spendingLimit.Currency;
-                    break;
-                case DcaGoalType dca:
-                    TargetPurchaseCount = dca.TargetPurchaseCount;
-                    break;
-            }
+            CurrentGoalTypeEditor?.LoadFrom(goal.GoalType);
         }
     }
 
@@ -155,7 +142,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     {
         ValidateAllProperties();
 
-        if (!HasErrors)
+        if (!HasErrors && CurrentGoalTypeEditor != null)
         {
             var period = Enum.Parse<GoalPeriods>(SelectedPeriod);
             var month = period == GoalPeriods.Yearly ? 1 : int.Parse(SelectedMonth);
@@ -164,15 +151,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
             Goal goal;
             if (_goalId is null)
             {
-                var goalTypeName = Enum.Parse<GoalTypeNames>(SelectedGoalType);
-                IGoalType goalType = goalTypeName switch
-                {
-                    GoalTypeNames.StackBitcoin => new StackBitcoinGoalType(TargetBtcAmount),
-                    GoalTypeNames.SpendingLimit => new SpendingLimitGoalType(TargetFiatAmount.Value, SelectedCurrency),
-                    GoalTypeNames.Dca => new DcaGoalType(TargetPurchaseCount),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-
+                var goalType = CurrentGoalTypeEditor.CreateGoalType();
                 goal = Goal.New(refDate, period, goalType);
             }
             else
@@ -182,21 +161,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
                 if (existingGoal is null)
                     throw new EntityNotFoundException(nameof(Goal), _goalId);
 
-                // Preserve calculated values from existing goal type when editing
-                var goalTypeName = Enum.Parse<GoalTypeNames>(SelectedGoalType);
-                IGoalType goalType = goalTypeName switch
-                {
-                    GoalTypeNames.StackBitcoin => existingGoal.GoalType is StackBitcoinGoalType existing
-                        ? new StackBitcoinGoalType(TargetBtcAmount.Sats, existing.CalculatedSats)
-                        : new StackBitcoinGoalType(TargetBtcAmount),
-                    GoalTypeNames.SpendingLimit => existingGoal.GoalType is SpendingLimitGoalType existingSpending
-                        ? new SpendingLimitGoalType(TargetFiatAmount.Value, SelectedCurrency, existingSpending.CalculatedSpending)
-                        : new SpendingLimitGoalType(TargetFiatAmount.Value, SelectedCurrency),
-                    GoalTypeNames.Dca => existingGoal.GoalType is DcaGoalType existingDca
-                        ? new DcaGoalType(TargetPurchaseCount, existingDca.CalculatedPurchaseCount)
-                        : new DcaGoalType(TargetPurchaseCount),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
+                var goalType = CurrentGoalTypeEditor.CreateGoalTypePreservingCalculated(existingGoal.GoalType);
 
                 goal = Goal.Create(
                     existingGoal.Id,

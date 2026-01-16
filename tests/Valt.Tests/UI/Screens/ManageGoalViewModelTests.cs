@@ -8,6 +8,7 @@ using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Configuration;
 using Valt.Tests.Builders;
 using Valt.UI.Views.Main.Modals.ManageGoal;
+using Valt.UI.Views.Main.Modals.ManageGoal.GoalTypeEditors;
 
 namespace Valt.Tests.UI.Screens;
 
@@ -55,7 +56,7 @@ public class ManageGoalViewModelTests
             Assert.That(vm.SelectedGoalType, Is.EqualTo(GoalTypeNames.StackBitcoin.ToString()));
             Assert.That(vm.SelectedMonth, Is.EqualTo(DateTime.Today.Month.ToString()));
             Assert.That(vm.SelectedYear, Is.EqualTo(DateTime.Today.Year));
-            Assert.That(vm.TargetBtcAmount, Is.EqualTo(BtcValue.Empty));
+            Assert.That(vm.CurrentGoalTypeEditor, Is.InstanceOf<StackBitcoinGoalTypeEditorViewModel>());
             Assert.That(vm.IsEditMode, Is.False);
         });
     }
@@ -87,7 +88,7 @@ public class ManageGoalViewModelTests
     }
 
     [Test]
-    public void ShowStackBitcoinInput_Should_Return_True_When_GoalType_Is_StackBitcoin()
+    public void CurrentGoalTypeEditor_Should_Be_StackBitcoinGoalTypeEditorViewModel_When_GoalType_Is_StackBitcoin()
     {
         // Arrange
         var vm = CreateViewModel();
@@ -96,7 +97,33 @@ public class ManageGoalViewModelTests
         vm.SelectedGoalType = GoalTypeNames.StackBitcoin.ToString();
 
         // Assert
-        Assert.That(vm.ShowStackBitcoinInput, Is.True);
+        Assert.That(vm.CurrentGoalTypeEditor, Is.InstanceOf<StackBitcoinGoalTypeEditorViewModel>());
+    }
+
+    [Test]
+    public void CurrentGoalTypeEditor_Should_Be_SpendingLimitGoalTypeEditorViewModel_When_GoalType_Is_SpendingLimit()
+    {
+        // Arrange
+        var vm = CreateViewModel();
+
+        // Act
+        vm.SelectedGoalType = GoalTypeNames.SpendingLimit.ToString();
+
+        // Assert
+        Assert.That(vm.CurrentGoalTypeEditor, Is.InstanceOf<SpendingLimitGoalTypeEditorViewModel>());
+    }
+
+    [Test]
+    public void CurrentGoalTypeEditor_Should_Be_DcaGoalTypeEditorViewModel_When_GoalType_Is_Dca()
+    {
+        // Arrange
+        var vm = CreateViewModel();
+
+        // Act
+        vm.SelectedGoalType = GoalTypeNames.Dca.ToString();
+
+        // Assert
+        Assert.That(vm.CurrentGoalTypeEditor, Is.InstanceOf<DcaGoalTypeEditorViewModel>());
     }
 
     [Test]
@@ -144,7 +171,9 @@ public class ManageGoalViewModelTests
         vm.SelectedGoalType = GoalTypeNames.StackBitcoin.ToString();
         vm.SelectedYear = 2024;
         vm.SelectedMonth = "6";
-        vm.TargetBtcAmount = BtcValue.New(1_000_000);
+
+        var stackBitcoinEditor = (StackBitcoinGoalTypeEditorViewModel)vm.CurrentGoalTypeEditor!;
+        stackBitcoinEditor.TargetBtcAmount = BtcValue.New(1_000_000);
 
         Goal? savedGoal = null;
         _goalRepository.SaveAsync(Arg.Do<Goal>(g => savedGoal = g))
@@ -179,7 +208,9 @@ public class ManageGoalViewModelTests
         vm.SelectedGoalType = GoalTypeNames.StackBitcoin.ToString();
         vm.SelectedYear = 2025;
         vm.SelectedMonth = "8"; // This should be ignored for yearly goals
-        vm.TargetBtcAmount = BtcValue.New(5_000_000);
+
+        var stackBitcoinEditor = (StackBitcoinGoalTypeEditorViewModel)vm.CurrentGoalTypeEditor!;
+        stackBitcoinEditor.TargetBtcAmount = BtcValue.New(5_000_000);
 
         Goal? savedGoal = null;
         _goalRepository.SaveAsync(Arg.Do<Goal>(g => savedGoal = g))
@@ -208,7 +239,10 @@ public class ManageGoalViewModelTests
         var vm = CreateViewModel();
         vm.SelectedPeriod = GoalPeriods.Monthly.ToString();
         vm.SelectedGoalType = GoalTypeNames.StackBitcoin.ToString();
-        vm.TargetBtcAmount = BtcValue.New(500_000);
+
+        var stackBitcoinEditor = (StackBitcoinGoalTypeEditorViewModel)vm.CurrentGoalTypeEditor!;
+        stackBitcoinEditor.TargetBtcAmount = BtcValue.New(500_000);
+
         vm.CloseDialog = _ => { };
 
         // Act
@@ -250,7 +284,9 @@ public class ManageGoalViewModelTests
             Assert.That(vm.SelectedYear, Is.EqualTo(2024));
             Assert.That(vm.SelectedMonth, Is.EqualTo("3"));
             Assert.That(vm.SelectedGoalType, Is.EqualTo(GoalTypeNames.StackBitcoin.ToString()));
-            Assert.That(vm.TargetBtcAmount.Sats, Is.EqualTo(2_000_000));
+            Assert.That(vm.CurrentGoalTypeEditor, Is.InstanceOf<StackBitcoinGoalTypeEditorViewModel>());
+            var stackBitcoinEditor = (StackBitcoinGoalTypeEditorViewModel)vm.CurrentGoalTypeEditor!;
+            Assert.That(stackBitcoinEditor.TargetBtcAmount.Sats, Is.EqualTo(2_000_000));
         });
     }
 
@@ -280,7 +316,9 @@ public class ManageGoalViewModelTests
             Assert.That(vm.IsEditMode, Is.True);
             Assert.That(vm.SelectedPeriod, Is.EqualTo(GoalPeriods.Yearly.ToString()));
             Assert.That(vm.SelectedYear, Is.EqualTo(2025));
-            Assert.That(vm.TargetBtcAmount.Sats, Is.EqualTo(10_000_000));
+            Assert.That(vm.CurrentGoalTypeEditor, Is.InstanceOf<StackBitcoinGoalTypeEditorViewModel>());
+            var stackBitcoinEditor = (StackBitcoinGoalTypeEditorViewModel)vm.CurrentGoalTypeEditor!;
+            Assert.That(stackBitcoinEditor.TargetBtcAmount.Sats, Is.EqualTo(10_000_000));
         });
     }
 
@@ -321,7 +359,8 @@ public class ManageGoalViewModelTests
         // Modify values
         vm.SelectedYear = 2024;
         vm.SelectedMonth = "5";
-        vm.TargetBtcAmount = BtcValue.New(3_000_000);
+        var stackBitcoinEditor = (StackBitcoinGoalTypeEditorViewModel)vm.CurrentGoalTypeEditor!;
+        stackBitcoinEditor.TargetBtcAmount = BtcValue.New(3_000_000);
 
         Goal? savedGoal = null;
         _goalRepository.SaveAsync(Arg.Do<Goal>(g => savedGoal = g))
@@ -431,14 +470,22 @@ public class ManageGoalViewModelTests
     }
 
     [Test]
-    public void ShowStackBitcoinInput_Should_Be_True_For_StackBitcoin_Type()
+    public void Should_Change_CurrentGoalTypeEditor_When_SelectedGoalType_Changes()
     {
-        // Arrange & Act
+        // Arrange
         var vm = CreateViewModel();
-        vm.SelectedGoalType = GoalTypeNames.StackBitcoin.ToString();
 
-        // Assert
-        Assert.That(vm.ShowStackBitcoinInput, Is.True);
+        // Act & Assert for StackBitcoin
+        vm.SelectedGoalType = GoalTypeNames.StackBitcoin.ToString();
+        Assert.That(vm.CurrentGoalTypeEditor, Is.InstanceOf<StackBitcoinGoalTypeEditorViewModel>());
+
+        // Act & Assert for SpendingLimit
+        vm.SelectedGoalType = GoalTypeNames.SpendingLimit.ToString();
+        Assert.That(vm.CurrentGoalTypeEditor, Is.InstanceOf<SpendingLimitGoalTypeEditorViewModel>());
+
+        // Act & Assert for Dca
+        vm.SelectedGoalType = GoalTypeNames.Dca.ToString();
+        Assert.That(vm.CurrentGoalTypeEditor, Is.InstanceOf<DcaGoalTypeEditorViewModel>());
     }
 
     #endregion
@@ -456,7 +503,140 @@ public class ManageGoalViewModelTests
         {
             Assert.That(vm.SelectedPeriod, Is.EqualTo(GoalPeriods.Monthly.ToString()));
             Assert.That(vm.SelectedGoalType, Is.EqualTo(GoalTypeNames.StackBitcoin.ToString()));
-            Assert.That(vm.TargetBtcAmount.Sats, Is.EqualTo(1_000_000));
+            Assert.That(vm.CurrentGoalTypeEditor, Is.InstanceOf<StackBitcoinGoalTypeEditorViewModel>());
+        });
+    }
+
+    #endregion
+
+    #region SpendingLimit Goal Type Tests
+
+    [Test]
+    public async Task OkCommand_Should_Create_New_Goal_With_SpendingLimit_Type()
+    {
+        // Arrange
+        var vm = CreateViewModel();
+        vm.SelectedPeriod = GoalPeriods.Monthly.ToString();
+        vm.SelectedGoalType = GoalTypeNames.SpendingLimit.ToString();
+        vm.SelectedYear = 2024;
+        vm.SelectedMonth = "6";
+
+        var spendingLimitEditor = (SpendingLimitGoalTypeEditorViewModel)vm.CurrentGoalTypeEditor!;
+        spendingLimitEditor.TargetFiatAmount = FiatValue.New(5000m);
+        spendingLimitEditor.SelectedCurrency = "USD";
+
+        Goal? savedGoal = null;
+        _goalRepository.SaveAsync(Arg.Do<Goal>(g => savedGoal = g))
+            .Returns(Task.CompletedTask);
+
+        vm.CloseDialog = _ => { };
+
+        // Act
+        await vm.OkCommand.ExecuteAsync(null);
+
+        // Assert
+        Assert.That(savedGoal, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(savedGoal!.GoalType, Is.InstanceOf<SpendingLimitGoalType>());
+            var spendingLimit = (SpendingLimitGoalType)savedGoal.GoalType;
+            Assert.That(spendingLimit.TargetAmount, Is.EqualTo(5000m));
+            Assert.That(spendingLimit.Currency, Is.EqualTo("USD"));
+        });
+    }
+
+    [Test]
+    public async Task OnBindParameterAsync_Should_Load_SpendingLimit_Goal()
+    {
+        // Arrange
+        var goalId = new GoalId();
+        var existingGoal = GoalBuilder.AGoal()
+            .WithId(goalId)
+            .WithPeriod(GoalPeriods.Monthly)
+            .WithRefDate(new DateOnly(2024, 3, 1))
+            .WithGoalType(new SpendingLimitGoalType(3000m, "BRL"))
+            .Build();
+
+        _goalRepository.GetByIdAsync(Arg.Any<GoalId>()).Returns(Task.FromResult<Goal?>(existingGoal));
+
+        var vm = CreateViewModel();
+        vm.Parameter = goalId.Value;
+
+        // Act
+        await vm.OnBindParameterAsync();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(vm.CurrentGoalTypeEditor, Is.InstanceOf<SpendingLimitGoalTypeEditorViewModel>());
+            var spendingLimitEditor = (SpendingLimitGoalTypeEditorViewModel)vm.CurrentGoalTypeEditor!;
+            Assert.That(spendingLimitEditor.TargetFiatAmount.Value, Is.EqualTo(3000m));
+            Assert.That(spendingLimitEditor.SelectedCurrency, Is.EqualTo("BRL"));
+        });
+    }
+
+    #endregion
+
+    #region DCA Goal Type Tests
+
+    [Test]
+    public async Task OkCommand_Should_Create_New_Goal_With_Dca_Type()
+    {
+        // Arrange
+        var vm = CreateViewModel();
+        vm.SelectedPeriod = GoalPeriods.Monthly.ToString();
+        vm.SelectedGoalType = GoalTypeNames.Dca.ToString();
+        vm.SelectedYear = 2024;
+        vm.SelectedMonth = "6";
+
+        var dcaEditor = (DcaGoalTypeEditorViewModel)vm.CurrentGoalTypeEditor!;
+        dcaEditor.TargetPurchaseCount = 8;
+
+        Goal? savedGoal = null;
+        _goalRepository.SaveAsync(Arg.Do<Goal>(g => savedGoal = g))
+            .Returns(Task.CompletedTask);
+
+        vm.CloseDialog = _ => { };
+
+        // Act
+        await vm.OkCommand.ExecuteAsync(null);
+
+        // Assert
+        Assert.That(savedGoal, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(savedGoal!.GoalType, Is.InstanceOf<DcaGoalType>());
+            var dca = (DcaGoalType)savedGoal.GoalType;
+            Assert.That(dca.TargetPurchaseCount, Is.EqualTo(8));
+        });
+    }
+
+    [Test]
+    public async Task OnBindParameterAsync_Should_Load_Dca_Goal()
+    {
+        // Arrange
+        var goalId = new GoalId();
+        var existingGoal = GoalBuilder.AGoal()
+            .WithId(goalId)
+            .WithPeriod(GoalPeriods.Monthly)
+            .WithRefDate(new DateOnly(2024, 3, 1))
+            .WithGoalType(new DcaGoalType(12))
+            .Build();
+
+        _goalRepository.GetByIdAsync(Arg.Any<GoalId>()).Returns(Task.FromResult<Goal?>(existingGoal));
+
+        var vm = CreateViewModel();
+        vm.Parameter = goalId.Value;
+
+        // Act
+        await vm.OnBindParameterAsync();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(vm.CurrentGoalTypeEditor, Is.InstanceOf<DcaGoalTypeEditorViewModel>());
+            var dcaEditor = (DcaGoalTypeEditorViewModel)vm.CurrentGoalTypeEditor!;
+            Assert.That(dcaEditor.TargetPurchaseCount, Is.EqualTo(12));
         });
     }
 

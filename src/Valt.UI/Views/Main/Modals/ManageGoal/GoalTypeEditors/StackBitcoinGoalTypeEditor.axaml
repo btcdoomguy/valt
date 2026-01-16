@@ -1,0 +1,24 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+             xmlns:local="clr-namespace:Valt.UI.Lang"
+             xmlns:editors="clr-namespace:Valt.UI.Views.Main.Modals.ManageGoal.GoalTypeEditors"
+             mc:Ignorable="d"
+             d:DesignWidth="400"
+             d:DesignHeight="100"
+             x:Class="Valt.UI.Views.Main.Modals.ManageGoal.GoalTypeEditors.StackBitcoinGoalTypeEditor"
+             x:DataType="editors:StackBitcoinGoalTypeEditorViewModel">
+    <StackPanel>
+        <TextBlock Text="{Binding Description}"
+                   FontSize="11"
+                   Opacity="0.7"
+                   TextWrapping="Wrap"
+                   Margin="0, 0, 0, 8" />
+        <StackPanel Classes="form-field">
+            <TextBlock Text="{x:Static local:language.ManageGoal_TargetBtcAmount}" />
+            <userControls:BtcInput BtcValue="{Binding TargetBtcAmount, Mode=TwoWay}" />
+        </StackPanel>
+    </StackPanel>
+</UserControl>
