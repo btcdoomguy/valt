@@ -3,5 +3,6 @@ namespace Valt.Core.Modules.Goals;
 public enum GoalTypeNames
 {
     StackBitcoin = 0,
-    SpendingLimit = 1
+    SpendingLimit = 1,
+    Dca = 2
 }

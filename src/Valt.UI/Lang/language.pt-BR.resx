@@ -1418,4 +1418,16 @@
     <data name="GoalDescription_SpendingLimit" xml:space="preserve">
         <value>Gasto {0} de {1}</value>
     </data>
+    <data name="GoalType_Dca" xml:space="preserve">
+        <value>DCA</value>
+    </data>
+    <data name="GoalType_Dca_Description" xml:space="preserve">
+        <value>Acompanhe compras regulares de bitcoin (Dollar Cost Averaging)</value>
+    </data>
+    <data name="GoalDescription_Dca" xml:space="preserve">
+        <value>{0} de {1} compras</value>
+    </data>
+    <data name="ManageGoal_TargetPurchaseCount" xml:space="preserve">
+        <value>Meta de Compras</value>
+    </data>
 </root>

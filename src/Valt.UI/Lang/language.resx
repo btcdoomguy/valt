@@ -1438,4 +1438,16 @@
     <data name="GoalDescription_SpendingLimit" xml:space="preserve">
         <value>Spent {0} of {1}</value>
     </data>
+    <data name="GoalType_Dca" xml:space="preserve">
+        <value>DCA</value>
+    </data>
+    <data name="GoalType_Dca_Description" xml:space="preserve">
+        <value>Track regular bitcoin purchases (Dollar Cost Averaging)</value>
+    </data>
+    <data name="GoalDescription_Dca" xml:space="preserve">
+        <value>{0} of {1} purchases</value>
+    </data>
+    <data name="ManageGoal_TargetPurchaseCount" xml:space="preserve">
+        <value>Target Purchases</value>
+    </data>
 </root>

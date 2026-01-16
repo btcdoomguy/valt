@@ -2373,6 +2373,30 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string GoalType_Dca {
+            get {
+                return ResourceManager.GetString("GoalType_Dca", resourceCulture);
+            }
+        }
+
+        public static string GoalType_Dca_Description {
+            get {
+                return ResourceManager.GetString("GoalType_Dca_Description", resourceCulture);
+            }
+        }
+
+        public static string GoalDescription_Dca {
+            get {
+                return ResourceManager.GetString("GoalDescription_Dca", resourceCulture);
+            }
+        }
+
+        public static string ManageGoal_TargetPurchaseCount {
+            get {
+                return ResourceManager.GetString("ManageGoal_TargetPurchaseCount", resourceCulture);
+            }
+        }
+
         public static string Button_Refresh {
             get {
                 return ResourceManager.GetString("Button.Refresh", resourceCulture);

@@ -224,6 +224,7 @@ public static class Extensions
         //goals
         services.AddSingleton<IGoalProgressCalculator, StackBitcoinProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculator, SpendingLimitProgressCalculator>();
+        services.AddSingleton<IGoalProgressCalculator, DcaProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculatorFactory, GoalProgressCalculatorFactory>();
 
         return services;

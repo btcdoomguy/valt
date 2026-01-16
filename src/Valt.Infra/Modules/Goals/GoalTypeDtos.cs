@@ -22,3 +22,12 @@ internal class SpendingLimitGoalTypeDto
     [JsonPropertyName("calculatedSpending")]
     public decimal CalculatedSpending { get; set; }
 }
+
+internal class DcaGoalTypeDto
+{
+    [JsonPropertyName("targetPurchaseCount")]
+    public int TargetPurchaseCount { get; set; }
+
+    [JsonPropertyName("calculatedPurchaseCount")]
+    public int CalculatedPurchaseCount { get; set; }
+}

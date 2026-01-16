@@ -40,6 +40,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowStackBitcoinInput))]
     [NotifyPropertyChangedFor(nameof(ShowSpendingLimitInput))]
+    [NotifyPropertyChangedFor(nameof(ShowDcaInput))]
     private string _selectedGoalType = GoalTypeNames.StackBitcoin.ToString();
 
     [ObservableProperty]
@@ -52,6 +53,9 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     private string _selectedCurrency = FiatCurrency.Usd.Code;
 
     [ObservableProperty]
+    private int _targetPurchaseCount = 4;
+
+    [ObservableProperty]
     private bool _isEditMode;
 
     public bool ShowMonthSelector => SelectedPeriod == GoalPeriods.Monthly.ToString();
@@ -59,6 +63,8 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     public bool ShowStackBitcoinInput => SelectedGoalType == GoalTypeNames.StackBitcoin.ToString();
 
     public bool ShowSpendingLimitInput => SelectedGoalType == GoalTypeNames.SpendingLimit.ToString();
+
+    public bool ShowDcaInput => SelectedGoalType == GoalTypeNames.Dca.ToString();
 
     public static List<ComboBoxValue> AvailablePeriods =>
     [
@@ -69,7 +75,8 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     public static List<ComboBoxValue> AvailableGoalTypes =>
     [
         new(language.GoalType_StackBitcoin, GoalTypeNames.StackBitcoin.ToString()),
-        new(language.GoalType_SpendingLimit, GoalTypeNames.SpendingLimit.ToString())
+        new(language.GoalType_SpendingLimit, GoalTypeNames.SpendingLimit.ToString()),
+        new(language.GoalType_Dca, GoalTypeNames.Dca.ToString())
     ];
 
     public List<ComboBoxValue> AvailableCurrencies =>
@@ -136,6 +143,9 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
                     TargetFiatAmount = FiatValue.New(spendingLimit.TargetAmount);
                     SelectedCurrency = spendingLimit.Currency;
                     break;
+                case DcaGoalType dca:
+                    TargetPurchaseCount = dca.TargetPurchaseCount;
+                    break;
             }
         }
     }
@@ -159,6 +169,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
                 {
                     GoalTypeNames.StackBitcoin => new StackBitcoinGoalType(TargetBtcAmount),
                     GoalTypeNames.SpendingLimit => new SpendingLimitGoalType(TargetFiatAmount.Value, SelectedCurrency),
+                    GoalTypeNames.Dca => new DcaGoalType(TargetPurchaseCount),
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
@@ -181,6 +192,9 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
                     GoalTypeNames.SpendingLimit => existingGoal.GoalType is SpendingLimitGoalType existingSpending
                         ? new SpendingLimitGoalType(TargetFiatAmount.Value, SelectedCurrency, existingSpending.CalculatedSpending)
                         : new SpendingLimitGoalType(TargetFiatAmount.Value, SelectedCurrency),
+                    GoalTypeNames.Dca => existingGoal.GoalType is DcaGoalType existingDca
+                        ? new DcaGoalType(TargetPurchaseCount, existingDca.CalculatedPurchaseCount)
+                        : new DcaGoalType(TargetPurchaseCount),
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
