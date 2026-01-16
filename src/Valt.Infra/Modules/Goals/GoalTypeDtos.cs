@@ -10,3 +10,15 @@ internal class StackBitcoinGoalTypeDto
     [JsonPropertyName("calculatedSats")]
     public long CalculatedSats { get; set; }
 }
+
+internal class SpendingLimitGoalTypeDto
+{
+    [JsonPropertyName("targetAmount")]
+    public decimal TargetAmount { get; set; }
+
+    [JsonPropertyName("currency")]
+    public string Currency { get; set; } = null!;
+
+    [JsonPropertyName("calculatedSpending")]
+    public decimal CalculatedSpending { get; set; }
+}

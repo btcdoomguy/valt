@@ -25,6 +25,7 @@ public class GoalEntryViewModel
             var typeName = _goal.GoalType.TypeName switch
             {
                 GoalTypeNames.StackBitcoin => language.GoalType_StackBitcoin,
+                GoalTypeNames.SpendingLimit => language.GoalType_SpendingLimit,
                 _ => _goal.GoalType.TypeName.ToString()
             };
 
@@ -55,6 +56,7 @@ public class GoalEntryViewModel
             return _goal.GoalType switch
             {
                 StackBitcoinGoalType stackBitcoin => CurrencyDisplay.FormatSatsAsBitcoin(stackBitcoin.TargetAmount.Sats),
+                SpendingLimitGoalType spendingLimit => CurrencyDisplay.FormatFiat(spendingLimit.TargetAmount, spendingLimit.Currency),
                 _ => string.Empty
             };
         }
@@ -70,6 +72,10 @@ public class GoalEntryViewModel
                     language.GoalDescription_StackBitcoin,
                     CurrencyDisplay.FormatSatsAsNumber(Math.Min(stackBitcoin.CalculatedSats, stackBitcoin.TargetAmount.Sats)),
                     CurrencyDisplay.FormatSatsAsNumber(stackBitcoin.TargetAmount.Sats)),
+                SpendingLimitGoalType spendingLimit => string.Format(
+                    language.GoalDescription_SpendingLimit,
+                    CurrencyDisplay.FormatFiat(Math.Min(spendingLimit.CalculatedSpending, spendingLimit.TargetAmount), spendingLimit.Currency),
+                    CurrencyDisplay.FormatFiat(spendingLimit.TargetAmount, spendingLimit.Currency)),
                 _ => string.Empty
             };
         }

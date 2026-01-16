@@ -2331,6 +2331,12 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string ManageGoal_TargetFiatAmount {
+            get {
+                return ResourceManager.GetString("ManageGoal_TargetFiatAmount", resourceCulture);
+            }
+        }
+
         public static string GoalPeriod_Monthly {
             get {
                 return ResourceManager.GetString("GoalPeriod_Monthly", resourceCulture);
@@ -2352,6 +2358,18 @@ namespace Valt.UI.Lang {
         public static string GoalType_StackBitcoin_Description {
             get {
                 return ResourceManager.GetString("GoalType_StackBitcoin_Description", resourceCulture);
+            }
+        }
+
+        public static string GoalType_SpendingLimit {
+            get {
+                return ResourceManager.GetString("GoalType_SpendingLimit", resourceCulture);
+            }
+        }
+
+        public static string GoalType_SpendingLimit_Description {
+            get {
+                return ResourceManager.GetString("GoalType_SpendingLimit_Description", resourceCulture);
             }
         }
 
@@ -2820,6 +2838,12 @@ namespace Valt.UI.Lang {
         public static string GoalDescription_StackBitcoin {
             get {
                 return ResourceManager.GetString("GoalDescription_StackBitcoin", resourceCulture);
+            }
+        }
+
+        public static string GoalDescription_SpendingLimit {
+            get {
+                return ResourceManager.GetString("GoalDescription_SpendingLimit", resourceCulture);
             }
         }
     }

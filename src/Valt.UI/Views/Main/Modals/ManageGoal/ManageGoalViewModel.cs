@@ -10,6 +10,7 @@ using Valt.Core.Kernel.Exceptions;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.Contracts;
 using Valt.Core.Modules.Goals.GoalTypes;
+using Valt.Infra.Modules.Configuration;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
 using Valt.UI.Lang;
@@ -20,6 +21,7 @@ namespace Valt.UI.Views.Main.Modals.ManageGoal;
 public partial class ManageGoalViewModel : ValtModalValidatorViewModel
 {
     private readonly IGoalRepository? _goalRepository;
+    private readonly IConfigurationManager? _configurationManager;
 
     #region Form Data
 
@@ -37,10 +39,17 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowStackBitcoinInput))]
+    [NotifyPropertyChangedFor(nameof(ShowSpendingLimitInput))]
     private string _selectedGoalType = GoalTypeNames.StackBitcoin.ToString();
 
     [ObservableProperty]
     private BtcValue _targetBtcAmount = BtcValue.Empty;
+
+    [ObservableProperty]
+    private FiatValue _targetFiatAmount = FiatValue.Empty;
+
+    [ObservableProperty]
+    private string _selectedCurrency = FiatCurrency.Usd.Code;
 
     [ObservableProperty]
     private bool _isEditMode;
@@ -48,6 +57,8 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     public bool ShowMonthSelector => SelectedPeriod == GoalPeriods.Monthly.ToString();
 
     public bool ShowStackBitcoinInput => SelectedGoalType == GoalTypeNames.StackBitcoin.ToString();
+
+    public bool ShowSpendingLimitInput => SelectedGoalType == GoalTypeNames.SpendingLimit.ToString();
 
     public static List<ComboBoxValue> AvailablePeriods =>
     [
@@ -57,8 +68,14 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
 
     public static List<ComboBoxValue> AvailableGoalTypes =>
     [
-        new(language.GoalType_StackBitcoin, GoalTypeNames.StackBitcoin.ToString())
+        new(language.GoalType_StackBitcoin, GoalTypeNames.StackBitcoin.ToString()),
+        new(language.GoalType_SpendingLimit, GoalTypeNames.SpendingLimit.ToString())
     ];
+
+    public List<ComboBoxValue> AvailableCurrencies =>
+        (_configurationManager?.GetAvailableFiatCurrencies() ?? FiatCurrency.GetAll().Select(c => c.Code).ToList())
+            .Select(c => new ComboBoxValue(c, c))
+            .ToList();
 
     public static List<ComboBoxValue> AvailableMonths =>
         Enumerable.Range(1, 12)
@@ -81,12 +98,14 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
         TargetBtcAmount = BtcValue.New(1_000_000);
     }
 
-    public ManageGoalViewModel(IGoalRepository goalRepository)
+    public ManageGoalViewModel(IGoalRepository goalRepository, IConfigurationManager configurationManager)
     {
         _goalRepository = goalRepository;
+        _configurationManager = configurationManager;
 
         SelectedPeriod = GoalPeriods.Monthly.ToString();
         SelectedGoalType = GoalTypeNames.StackBitcoin.ToString();
+        SelectedCurrency = AvailableCurrencies.FirstOrDefault()?.Value ?? FiatCurrency.Usd.Code;
     }
 
     public override async Task OnBindParameterAsync()
@@ -113,6 +132,10 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
                 case StackBitcoinGoalType stackBitcoin:
                     TargetBtcAmount = stackBitcoin.TargetAmount;
                     break;
+                case SpendingLimitGoalType spendingLimit:
+                    TargetFiatAmount = FiatValue.New(spendingLimit.TargetAmount);
+                    SelectedCurrency = spendingLimit.Currency;
+                    break;
             }
         }
     }
@@ -135,6 +158,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
                 IGoalType goalType = goalTypeName switch
                 {
                     GoalTypeNames.StackBitcoin => new StackBitcoinGoalType(TargetBtcAmount),
+                    GoalTypeNames.SpendingLimit => new SpendingLimitGoalType(TargetFiatAmount.Value, SelectedCurrency),
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
@@ -154,6 +178,9 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
                     GoalTypeNames.StackBitcoin => existingGoal.GoalType is StackBitcoinGoalType existing
                         ? new StackBitcoinGoalType(TargetBtcAmount.Sats, existing.CalculatedSats)
                         : new StackBitcoinGoalType(TargetBtcAmount),
+                    GoalTypeNames.SpendingLimit => existingGoal.GoalType is SpendingLimitGoalType existingSpending
+                        ? new SpendingLimitGoalType(TargetFiatAmount.Value, SelectedCurrency, existingSpending.CalculatedSpending)
+                        : new SpendingLimitGoalType(TargetFiatAmount.Value, SelectedCurrency),
                     _ => throw new ArgumentOutOfRangeException()
                 };
 

@@ -2,5 +2,6 @@ namespace Valt.Core.Modules.Goals;
 
 public enum GoalTypeNames
 {
-    StackBitcoin = 0
+    StackBitcoin = 0,
+    SpendingLimit = 1
 }

@@ -5,6 +5,7 @@ using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.Contracts;
 using Valt.Core.Modules.Goals.GoalTypes;
 using Valt.Infra.Kernel;
+using Valt.Infra.Modules.Configuration;
 using Valt.Tests.Builders;
 using Valt.UI.Views.Main.Modals.ManageGoal;
 
@@ -14,6 +15,7 @@ namespace Valt.Tests.UI.Screens;
 public class ManageGoalViewModelTests
 {
     private IGoalRepository _goalRepository = null!;
+    private IConfigurationManager _configurationManager = null!;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -25,11 +27,13 @@ public class ManageGoalViewModelTests
     public void SetUp()
     {
         _goalRepository = Substitute.For<IGoalRepository>();
+        _configurationManager = Substitute.For<IConfigurationManager>();
+        _configurationManager.GetAvailableFiatCurrencies().Returns(new List<string> { "USD", "BRL", "EUR" });
     }
 
     private ManageGoalViewModel CreateViewModel()
     {
-        var vm = new ManageGoalViewModel(_goalRepository);
+        var vm = new ManageGoalViewModel(_goalRepository, _configurationManager);
         vm.GetWindow = () => null!;
         vm.CloseWindow = () => { };
         vm.CloseDialog = _ => { };

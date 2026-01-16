@@ -1370,6 +1370,9 @@
     <data name="ManageGoal_TargetBtcAmount" xml:space="preserve">
         <value>Valor Alvo (BTC)</value>
     </data>
+    <data name="ManageGoal_TargetFiatAmount" xml:space="preserve">
+        <value>Limite de Gastos</value>
+    </data>
     <data name="Error.GoalNotFound" xml:space="preserve">
         <value>Meta não encontrada</value>
     </data>
@@ -1386,6 +1389,12 @@
     </data>
     <data name="GoalType_StackBitcoin_Description" xml:space="preserve">
         <value>Define uma quantidade específica para stackar no período selecionado comparado à quantidade anterior</value>
+    </data>
+    <data name="GoalType_SpendingLimit" xml:space="preserve">
+        <value>Limite de Gastos</value>
+    </data>
+    <data name="GoalType_SpendingLimit_Description" xml:space="preserve">
+        <value>Acompanhe seus gastos em relação a um limite de orçamento para uma moeda específica</value>
     </data>
     <!-- Goals Panel -->
     <data name="Goals_Title" xml:space="preserve">
@@ -1405,5 +1414,8 @@
     </data>
     <data name="GoalDescription_StackBitcoin" xml:space="preserve">
         <value>{0}/{1} sats</value>
+    </data>
+    <data name="GoalDescription_SpendingLimit" xml:space="preserve">
+        <value>Gasto {0} de {1}</value>
     </data>
 </root>

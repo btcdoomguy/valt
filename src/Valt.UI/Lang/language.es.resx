@@ -1385,6 +1385,9 @@
     <data name="ManageGoal_TargetBtcAmount" xml:space="preserve">
         <value>Cantidad Objetivo de BTC</value>
     </data>
+    <data name="ManageGoal_TargetFiatAmount" xml:space="preserve">
+        <value>Límite de Gastos</value>
+    </data>
     <data name="Error.GoalNotFound" xml:space="preserve">
         <value>Meta no encontrada</value>
     </data>
@@ -1401,6 +1404,12 @@
     </data>
     <data name="GoalType_StackBitcoin_Description" xml:space="preserve">
         <value>Define una cantidad específica para acumular en el período seleccionado comparado con la cantidad anterior</value>
+    </data>
+    <data name="GoalType_SpendingLimit" xml:space="preserve">
+        <value>Límite de Gastos</value>
+    </data>
+    <data name="GoalType_SpendingLimit_Description" xml:space="preserve">
+        <value>Rastrea tus gastos contra un límite de presupuesto para una moneda específica</value>
     </data>
     <!-- Goals Panel -->
     <data name="Goals_Title" xml:space="preserve">
@@ -1420,5 +1429,8 @@
     </data>
     <data name="GoalDescription_StackBitcoin" xml:space="preserve">
         <value>{0}/{1} sats</value>
+    </data>
+    <data name="GoalDescription_SpendingLimit" xml:space="preserve">
+        <value>Gastado {0} de {1}</value>
     </data>
 </root>
