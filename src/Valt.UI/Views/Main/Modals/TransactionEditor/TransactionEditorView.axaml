@@ -207,10 +207,10 @@
                                 <StackPanel Classes="form-field" IsVisible="{Binding ShowTransferValueField}">
                                     <StackPanel Orientation="Horizontal" Spacing="4">
                                         <TextBlock Text="{x:Static local:language.ManageTransactions_Amount}" />
-                                        <StackPanel Orientation="Horizontal">
+                                        <StackPanel Orientation="Horizontal" Margin="8, -10, 0, 0">
                                             <Label FontFamily="{DynamicResource MaterialDesign}" FontSize="14"
                                                    Classes="icon" Content="&#xEB70;" Padding="0" />
-                                            <Label FontSize="11" Content="{Binding TransferRate}" Padding="2,0,0,0" />
+                                            <Label FontSize="11" Content="{Binding TransferRate}" Padding="8,0,0,0" />
                                         </StackPanel>
                                     </StackPanel>
                                     <Panel>
