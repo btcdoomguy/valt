@@ -189,7 +189,7 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
     }
 
     [Test]
-    public async Task Should_Only_Count_Positive_ToSatAmount()
+    public async Task Should_Calculate_Net_Stacked_When_Selling_BTC()
     {
         // Arrange
         var goalTypeJson = JsonSerializer.Serialize(
@@ -201,16 +201,168 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
             new DateOnly(2024, 1, 1),
             new DateOnly(2024, 1, 31));
 
-        // Add positive BTC transaction
+        // Add positive BTC transaction (purchase)
         AddBtcTransaction(new DateOnly(2024, 1, 5), 500_000);
-        // Add transaction with FromSatAmount (spending, not receiving)
+        // Sell some BTC (converts to fiat)
         AddBtcSpendTransaction(new DateOnly(2024, 1, 10), 200_000);
 
         // Act
         var progress = await _calculator.CalculateProgressAsync(input);
 
-        // Assert: Only the incoming 500,000 sats should count
+        // Assert: Net = 500,000 - 200,000 = 300,000 / 1,000,000 = 30%
+        Assert.That(progress, Is.EqualTo(30m));
+    }
+
+    [Test]
+    public async Task Should_Not_Count_BitcoinToBitcoin_Transfers()
+    {
+        // Arrange
+        var goalTypeJson = JsonSerializer.Serialize(
+            new StackBitcoinGoalType(BtcValue.ParseSats(1_000_000)));
+
+        var input = new GoalProgressInput(
+            GoalTypeNames.StackBitcoin,
+            goalTypeJson,
+            new DateOnly(2024, 1, 1),
+            new DateOnly(2024, 1, 31));
+
+        // Add BTC purchase
+        AddBtcTransaction(new DateOnly(2024, 1, 5), 300_000);
+        // Add BitcoinToBitcoin transfer (moving BTC between accounts, not stacking)
+        AddBtcToBtcTransfer(new DateOnly(2024, 1, 10), 200_000);
+
+        // Act
+        var progress = await _calculator.CalculateProgressAsync(input);
+
+        // Assert: Only the purchase should count (300,000 / 1,000,000 = 30%)
+        Assert.That(progress, Is.EqualTo(30m));
+    }
+
+    [Test]
+    public async Task Should_Count_Direct_Bitcoin_Income()
+    {
+        // Arrange
+        var goalTypeJson = JsonSerializer.Serialize(
+            new StackBitcoinGoalType(BtcValue.ParseSats(1_000_000)));
+
+        var input = new GoalProgressInput(
+            GoalTypeNames.StackBitcoin,
+            goalTypeJson,
+            new DateOnly(2024, 1, 1),
+            new DateOnly(2024, 1, 31));
+
+        // Add BTC purchase
+        AddBtcTransaction(new DateOnly(2024, 1, 5), 300_000);
+        // Add direct BTC income (earning BTC directly)
+        AddDirectBtcIncome(new DateOnly(2024, 1, 10), 200_000);
+
+        // Act
+        var progress = await _calculator.CalculateProgressAsync(input);
+
+        // Assert: Both should count (300,000 + 200,000 = 500,000 / 1,000,000 = 50%)
         Assert.That(progress, Is.EqualTo(50m));
+    }
+
+    [Test]
+    public async Task Should_Subtract_Bitcoin_Sales_From_Progress()
+    {
+        // Arrange: Goal to stack 1,000,000 sats
+        var goalTypeJson = JsonSerializer.Serialize(
+            new StackBitcoinGoalType(BtcValue.ParseSats(1_000_000)));
+
+        var input = new GoalProgressInput(
+            GoalTypeNames.StackBitcoin,
+            goalTypeJson,
+            new DateOnly(2024, 1, 1),
+            new DateOnly(2024, 1, 31));
+
+        // Add BTC purchase of 900,000 sats
+        AddBtcTransaction(new DateOnly(2024, 1, 5), 900_000);
+        // Sell 400,000 sats (convert to fiat)
+        AddBtcSale(new DateOnly(2024, 1, 15), 400_000);
+
+        // Act
+        var progress = await _calculator.CalculateProgressAsync(input);
+
+        // Assert: Net = 900,000 - 400,000 = 500,000 / 1,000,000 = 50%
+        Assert.That(progress, Is.EqualTo(50m));
+    }
+
+    [Test]
+    public async Task Should_Subtract_Bitcoin_Expenses_From_Progress()
+    {
+        // Arrange: Goal to stack 1,000,000 sats
+        var goalTypeJson = JsonSerializer.Serialize(
+            new StackBitcoinGoalType(BtcValue.ParseSats(1_000_000)));
+
+        var input = new GoalProgressInput(
+            GoalTypeNames.StackBitcoin,
+            goalTypeJson,
+            new DateOnly(2024, 1, 1),
+            new DateOnly(2024, 1, 31));
+
+        // Add BTC purchase of 800,000 sats
+        AddBtcTransaction(new DateOnly(2024, 1, 5), 800_000);
+        // Spend 300,000 sats directly (direct BTC expense)
+        AddDirectBtcExpense(new DateOnly(2024, 1, 15), 300_000);
+
+        // Act
+        var progress = await _calculator.CalculateProgressAsync(input);
+
+        // Assert: Net = 800,000 - 300,000 = 500,000 / 1,000,000 = 50%
+        Assert.That(progress, Is.EqualTo(50m));
+    }
+
+    [Test]
+    public async Task Should_Return_Zero_When_Sales_Exceed_Purchases()
+    {
+        // Arrange: Goal to stack 1,000,000 sats
+        var goalTypeJson = JsonSerializer.Serialize(
+            new StackBitcoinGoalType(BtcValue.ParseSats(1_000_000)));
+
+        var input = new GoalProgressInput(
+            GoalTypeNames.StackBitcoin,
+            goalTypeJson,
+            new DateOnly(2024, 1, 1),
+            new DateOnly(2024, 1, 31));
+
+        // Add BTC purchase of 300,000 sats
+        AddBtcTransaction(new DateOnly(2024, 1, 5), 300_000);
+        // Sell 500,000 sats (more than purchased in period)
+        AddBtcSale(new DateOnly(2024, 1, 15), 500_000);
+
+        // Act
+        var progress = await _calculator.CalculateProgressAsync(input);
+
+        // Assert: Net = 300,000 - 500,000 = -200,000, but capped at 0%
+        Assert.That(progress, Is.EqualTo(0m));
+    }
+
+    [Test]
+    public async Task Should_Calculate_Net_With_All_Transaction_Types()
+    {
+        // Arrange: Goal to stack 1,000,000 sats
+        var goalTypeJson = JsonSerializer.Serialize(
+            new StackBitcoinGoalType(BtcValue.ParseSats(1_000_000)));
+
+        var input = new GoalProgressInput(
+            GoalTypeNames.StackBitcoin,
+            goalTypeJson,
+            new DateOnly(2024, 1, 1),
+            new DateOnly(2024, 1, 31));
+
+        // Add various transactions
+        AddBtcTransaction(new DateOnly(2024, 1, 5), 500_000);    // +500,000 (purchase)
+        AddDirectBtcIncome(new DateOnly(2024, 1, 8), 200_000);   // +200,000 (income)
+        AddBtcSale(new DateOnly(2024, 1, 15), 100_000);          // -100,000 (sale)
+        AddDirectBtcExpense(new DateOnly(2024, 1, 20), 50_000);  // -50,000 (expense)
+        AddBtcToBtcTransfer(new DateOnly(2024, 1, 25), 300_000); // 0 (transfer, shouldn't count)
+
+        // Act
+        var progress = await _calculator.CalculateProgressAsync(input);
+
+        // Assert: Net = (500,000 + 200,000) - (100,000 + 50,000) = 550,000 / 1,000,000 = 55%
+        Assert.That(progress, Is.EqualTo(55m));
     }
 
     #endregion
@@ -224,9 +376,11 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
             Id = ObjectId.NewObjectId(),
             Date = date.ToValtDateTime(),
             Name = "BTC Purchase",
+            Type = TransactionEntityType.FiatToBitcoin,
             ToSatAmount = satAmount,
             CategoryId = ObjectId.NewObjectId(),
             FromAccountId = ObjectId.NewObjectId(),
+            ToAccountId = ObjectId.NewObjectId(),
             Version = 1
         });
     }
@@ -238,7 +392,72 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
             Id = ObjectId.NewObjectId(),
             Date = date.ToValtDateTime(),
             Name = "BTC Spend",
+            Type = TransactionEntityType.BitcoinToFiat,
             FromSatAmount = -satAmount,  // Negative to indicate spending
+            CategoryId = ObjectId.NewObjectId(),
+            FromAccountId = ObjectId.NewObjectId(),
+            Version = 1
+        });
+    }
+
+    private void AddBtcToBtcTransfer(DateOnly date, long satAmount)
+    {
+        _localDatabase.GetTransactions().Insert(new TransactionEntity
+        {
+            Id = ObjectId.NewObjectId(),
+            Date = date.ToValtDateTime(),
+            Name = "BTC Transfer",
+            Type = TransactionEntityType.BitcoinToBitcoin,
+            FromSatAmount = -satAmount,  // Negative from source account
+            ToSatAmount = satAmount,     // Positive to destination account
+            CategoryId = ObjectId.NewObjectId(),
+            FromAccountId = ObjectId.NewObjectId(),
+            ToAccountId = ObjectId.NewObjectId(),
+            Version = 1
+        });
+    }
+
+    private void AddDirectBtcIncome(DateOnly date, long satAmount)
+    {
+        _localDatabase.GetTransactions().Insert(new TransactionEntity
+        {
+            Id = ObjectId.NewObjectId(),
+            Date = date.ToValtDateTime(),
+            Name = "BTC Income",
+            Type = TransactionEntityType.Bitcoin,
+            FromSatAmount = satAmount,  // Positive to indicate income
+            CategoryId = ObjectId.NewObjectId(),
+            FromAccountId = ObjectId.NewObjectId(),
+            Version = 1
+        });
+    }
+
+    private void AddBtcSale(DateOnly date, long satAmount)
+    {
+        _localDatabase.GetTransactions().Insert(new TransactionEntity
+        {
+            Id = ObjectId.NewObjectId(),
+            Date = date.ToValtDateTime(),
+            Name = "BTC Sale",
+            Type = TransactionEntityType.BitcoinToFiat,
+            FromSatAmount = -satAmount,  // Negative to indicate BTC leaving
+            ToFiatAmount = 50000m,       // Fiat received (arbitrary value for test)
+            CategoryId = ObjectId.NewObjectId(),
+            FromAccountId = ObjectId.NewObjectId(),
+            ToAccountId = ObjectId.NewObjectId(),
+            Version = 1
+        });
+    }
+
+    private void AddDirectBtcExpense(DateOnly date, long satAmount)
+    {
+        _localDatabase.GetTransactions().Insert(new TransactionEntity
+        {
+            Id = ObjectId.NewObjectId(),
+            Date = date.ToValtDateTime(),
+            Name = "BTC Expense",
+            Type = TransactionEntityType.Bitcoin,
+            FromSatAmount = -satAmount,  // Negative to indicate expense
             CategoryId = ObjectId.NewObjectId(),
             FromAccountId = ObjectId.NewObjectId(),
             Version = 1

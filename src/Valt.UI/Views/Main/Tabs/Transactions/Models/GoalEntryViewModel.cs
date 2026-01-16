@@ -41,7 +41,10 @@ public class GoalEntryViewModel
 
     public decimal Progress => _goal.Progress;
 
-    public decimal ProgressPercentage => Math.Min(_goal.Progress * 100, 100);
+    /// <summary>
+    /// Progress is already stored as a percentage (0-100) by the calculator
+    /// </summary>
+    public decimal ProgressPercentage => Math.Min(_goal.Progress, 100);
 
     public string ProgressDisplay
     {
