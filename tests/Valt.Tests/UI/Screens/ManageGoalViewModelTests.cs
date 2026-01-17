@@ -7,6 +7,7 @@ using Valt.Core.Modules.Goals.Contracts;
 using Valt.Core.Modules.Goals.GoalTypes;
 using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Configuration;
+using Valt.Infra.Settings;
 using Valt.Tests.Builders;
 using Valt.UI.Views.Main.Modals.ManageGoal;
 using Valt.UI.Views.Main.Modals.ManageGoal.GoalTypeEditors;
@@ -14,11 +15,12 @@ using Valt.UI.Views.Main.Modals.ManageGoal.GoalTypeEditors;
 namespace Valt.Tests.UI.Screens;
 
 [TestFixture]
-public class ManageGoalViewModelTests
+public class ManageGoalViewModelTests : DatabaseTest
 {
     private IGoalRepository _goalRepository = null!;
     private IConfigurationManager _configurationManager = null!;
     private ICategoryRepository _categoryRepository = null!;
+    private CurrencySettings _currencySettings = null!;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -27,17 +29,18 @@ public class ManageGoalViewModelTests
     }
 
     [SetUp]
-    public void SetUp()
+    public new void SetUp()
     {
         _goalRepository = Substitute.For<IGoalRepository>();
         _configurationManager = Substitute.For<IConfigurationManager>();
         _categoryRepository = Substitute.For<ICategoryRepository>();
+        _currencySettings = new CurrencySettings(_localDatabase);
         _configurationManager.GetAvailableFiatCurrencies().Returns(new List<string> { "USD", "BRL", "EUR" });
     }
 
     private ManageGoalViewModel CreateViewModel()
     {
-        var vm = new ManageGoalViewModel(_goalRepository, _configurationManager, _categoryRepository);
+        var vm = new ManageGoalViewModel(_goalRepository, _configurationManager, _categoryRepository, _currencySettings);
         vm.GetWindow = () => null!;
         vm.CloseWindow = () => { };
         vm.CloseDialog = _ => { };
@@ -526,7 +529,6 @@ public class ManageGoalViewModelTests
 
         var spendingLimitEditor = (SpendingLimitGoalTypeEditorViewModel)vm.CurrentGoalTypeEditor!;
         spendingLimitEditor.TargetFiatAmount = FiatValue.New(5000m);
-        spendingLimitEditor.SelectedCurrency = "USD";
 
         Goal? savedGoal = null;
         _goalRepository.SaveAsync(Arg.Do<Goal>(g => savedGoal = g))
@@ -544,7 +546,6 @@ public class ManageGoalViewModelTests
             Assert.That(savedGoal!.GoalType, Is.InstanceOf<SpendingLimitGoalType>());
             var spendingLimit = (SpendingLimitGoalType)savedGoal.GoalType;
             Assert.That(spendingLimit.TargetAmount, Is.EqualTo(5000m));
-            Assert.That(spendingLimit.Currency, Is.EqualTo("USD"));
         });
     }
 
@@ -557,7 +558,7 @@ public class ManageGoalViewModelTests
             .WithId(goalId)
             .WithPeriod(GoalPeriods.Monthly)
             .WithRefDate(new DateOnly(2024, 3, 1))
-            .WithGoalType(new SpendingLimitGoalType(3000m, "BRL"))
+            .WithGoalType(new SpendingLimitGoalType(3000m))
             .Build();
 
         _goalRepository.GetByIdAsync(Arg.Any<GoalId>()).Returns(Task.FromResult<Goal?>(existingGoal));
@@ -574,7 +575,6 @@ public class ManageGoalViewModelTests
             Assert.That(vm.CurrentGoalTypeEditor, Is.InstanceOf<SpendingLimitGoalTypeEditorViewModel>());
             var spendingLimitEditor = (SpendingLimitGoalTypeEditorViewModel)vm.CurrentGoalTypeEditor!;
             Assert.That(spendingLimitEditor.TargetFiatAmount.Value, Is.EqualTo(3000m));
-            Assert.That(spendingLimitEditor.SelectedCurrency, Is.EqualTo("BRL"));
         });
     }
 

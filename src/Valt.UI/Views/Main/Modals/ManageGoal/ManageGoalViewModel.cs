@@ -10,6 +10,7 @@ using Valt.Core.Modules.Budget.Categories.Contracts;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.Contracts;
 using Valt.Infra.Modules.Configuration;
+using Valt.Infra.Settings;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
 using Valt.UI.Lang;
@@ -23,6 +24,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     private readonly IGoalRepository? _goalRepository;
     private readonly IConfigurationManager? _configurationManager;
     private readonly ICategoryRepository? _categoryRepository;
+    private readonly CurrencySettings? _currencySettings;
 
     #region Form Data
 
@@ -88,11 +90,16 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
         CurrentGoalTypeEditor = new StackBitcoinGoalTypeEditorViewModel();
     }
 
-    public ManageGoalViewModel(IGoalRepository goalRepository, IConfigurationManager configurationManager, ICategoryRepository categoryRepository)
+    public ManageGoalViewModel(
+        IGoalRepository goalRepository,
+        IConfigurationManager configurationManager,
+        ICategoryRepository categoryRepository,
+        CurrencySettings currencySettings)
     {
         _goalRepository = goalRepository;
         _configurationManager = configurationManager;
         _categoryRepository = categoryRepository;
+        _currencySettings = currencySettings;
 
         SelectedPeriod = GoalPeriods.Monthly.ToString();
         SelectedGoalType = GoalTypeNames.StackBitcoin.ToString();
@@ -112,16 +119,16 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
         return goalTypeName switch
         {
             GoalTypeNames.StackBitcoin => new StackBitcoinGoalTypeEditorViewModel(),
-            GoalTypeNames.SpendingLimit => _configurationManager != null
-                ? new SpendingLimitGoalTypeEditorViewModel(_configurationManager)
+            GoalTypeNames.SpendingLimit => _currencySettings != null
+                ? new SpendingLimitGoalTypeEditorViewModel(_currencySettings)
                 : new SpendingLimitGoalTypeEditorViewModel(),
             GoalTypeNames.Dca => new DcaGoalTypeEditorViewModel(),
-            GoalTypeNames.IncomeFiat => _configurationManager != null
-                ? new IncomeFiatGoalTypeEditorViewModel(_configurationManager)
+            GoalTypeNames.IncomeFiat => _currencySettings != null
+                ? new IncomeFiatGoalTypeEditorViewModel(_currencySettings)
                 : new IncomeFiatGoalTypeEditorViewModel(),
             GoalTypeNames.IncomeBtc => new IncomeBtcGoalTypeEditorViewModel(),
-            GoalTypeNames.ReduceExpenseCategory => _configurationManager != null && _categoryRepository != null
-                ? new ReduceExpenseCategoryGoalTypeEditorViewModel(_configurationManager, _categoryRepository)
+            GoalTypeNames.ReduceExpenseCategory => _currencySettings != null && _categoryRepository != null
+                ? new ReduceExpenseCategoryGoalTypeEditorViewModel(_currencySettings, _categoryRepository)
                 : new ReduceExpenseCategoryGoalTypeEditorViewModel(),
             GoalTypeNames.BitcoinHodl => new BitcoinHodlGoalTypeEditorViewModel(),
             _ => throw new ArgumentOutOfRangeException(nameof(goalTypeName))

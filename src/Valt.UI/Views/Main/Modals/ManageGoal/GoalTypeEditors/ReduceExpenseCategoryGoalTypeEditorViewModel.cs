@@ -6,7 +6,7 @@ using Valt.Core.Modules.Budget.Categories;
 using Valt.Core.Modules.Budget.Categories.Contracts;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.GoalTypes;
-using Valt.Infra.Modules.Configuration;
+using Valt.Infra.Settings;
 using Valt.UI.Helpers;
 using Valt.UI.Lang;
 
@@ -14,7 +14,7 @@ namespace Valt.UI.Views.Main.Modals.ManageGoal.GoalTypeEditors;
 
 public partial class ReduceExpenseCategoryGoalTypeEditorViewModel : ObservableObject, IGoalTypeEditorViewModel
 {
-    private readonly IConfigurationManager? _configurationManager;
+    private readonly CurrencySettings? _currencySettings;
     private readonly ICategoryRepository? _categoryRepository;
     private List<Category> _categories = [];
 
@@ -27,7 +27,7 @@ public partial class ReduceExpenseCategoryGoalTypeEditorViewModel : ObservableOb
     public string Description => language.GoalType_ReduceExpenseCategory_Description;
 
     public string MainFiatCurrency =>
-        _configurationManager?.GetAvailableFiatCurrencies().FirstOrDefault() ?? FiatCurrency.Usd.Code;
+        _currencySettings?.MainFiatCurrency ?? FiatCurrency.Usd.Code;
 
     public List<ComboBoxValue> AvailableCategories =>
         _categories.Select(c => new ComboBoxValue(c.Name.Value, c.Id.Value)).ToList();
@@ -36,9 +36,9 @@ public partial class ReduceExpenseCategoryGoalTypeEditorViewModel : ObservableOb
     {
     }
 
-    public ReduceExpenseCategoryGoalTypeEditorViewModel(IConfigurationManager configurationManager, ICategoryRepository categoryRepository)
+    public ReduceExpenseCategoryGoalTypeEditorViewModel(CurrencySettings currencySettings, ICategoryRepository categoryRepository)
     {
-        _configurationManager = configurationManager;
+        _currencySettings = currencySettings;
         _categoryRepository = categoryRepository;
         LoadCategoriesAsync();
     }

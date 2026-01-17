@@ -1409,7 +1409,7 @@
         <value>Límite de Gastos</value>
     </data>
     <data name="GoalType_SpendingLimit_Description" xml:space="preserve">
-        <value>Rastrea tus gastos contra un límite de presupuesto para una moneda específica</value>
+        <value>Rastrea tus gastos contra un límite de presupuesto en tu moneda principal</value>
     </data>
     <!-- Goals Panel -->
     <data name="Goals_Title" xml:space="preserve">
@@ -1458,7 +1458,7 @@
         <value>Ingresos en Fiat</value>
     </data>
     <data name="GoalType_IncomeFiat_Description" xml:space="preserve">
-        <value>Rastrea objetivos de ingresos para una moneda específica</value>
+        <value>Rastrea objetivos de ingresos en tu moneda principal</value>
     </data>
     <data name="GoalDescription_IncomeFiat" xml:space="preserve">
         <value>Ganado {0} de {1}</value>

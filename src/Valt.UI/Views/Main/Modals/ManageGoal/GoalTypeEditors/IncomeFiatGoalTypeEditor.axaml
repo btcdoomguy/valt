@@ -20,11 +20,7 @@
             <TextBlock Text="{x:Static local:language.ManageGoal_TargetIncomeAmount}" />
             <StackPanel Orientation="Horizontal" Spacing="10">
                 <userControls:FiatInput FiatValue="{Binding TargetFiatAmount, Mode=TwoWay}" Width="150" />
-                <ComboBox ItemsSource="{Binding AvailableCurrencies}"
-                          SelectedValue="{Binding SelectedCurrency}"
-                          DisplayMemberBinding="{Binding Text}"
-                          SelectedValueBinding="{Binding Value}"
-                          Width="100" />
+                <TextBlock Text="{Binding MainFiatCurrency}" VerticalAlignment="Center" />
             </StackPanel>
         </StackPanel>
     </StackPanel>

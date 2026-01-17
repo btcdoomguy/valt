@@ -4,6 +4,8 @@ public sealed class BitcoinHodlGoalType : IGoalType
 {
     public GoalTypeNames TypeName => GoalTypeNames.BitcoinHodl;
 
+    public bool RequiresPriceDataForCalculation => false;
+
     /// <summary>
     /// Maximum allowed sats to sell. 0 means no sales allowed (full HODL).
     /// </summary>

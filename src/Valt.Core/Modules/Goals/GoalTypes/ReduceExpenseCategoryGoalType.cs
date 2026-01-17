@@ -4,6 +4,8 @@ public sealed class ReduceExpenseCategoryGoalType : IGoalType
 {
     public GoalTypeNames TypeName => GoalTypeNames.ReduceExpenseCategory;
 
+    public bool RequiresPriceDataForCalculation => true;
+
     public decimal TargetAmount { get; }
 
     public string CategoryId { get; }

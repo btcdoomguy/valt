@@ -93,7 +93,6 @@ internal static class Extensions
         var dto = new SpendingLimitGoalTypeDto
         {
             TargetAmount = goalType.TargetAmount,
-            Currency = goalType.Currency,
             CalculatedSpending = goalType.CalculatedSpending
         };
         return JsonSerializer.Serialize(dto);
@@ -103,7 +102,7 @@ internal static class Extensions
     {
         var dto = JsonSerializer.Deserialize<SpendingLimitGoalTypeDto>(json)
             ?? throw new InvalidOperationException("Failed to deserialize SpendingLimitGoalType");
-        return new SpendingLimitGoalType(dto.TargetAmount, dto.Currency, dto.CalculatedSpending);
+        return new SpendingLimitGoalType(dto.TargetAmount, dto.CalculatedSpending);
     }
 
     private static string SerializeDcaGoalType(DcaGoalType goalType)
@@ -128,7 +127,6 @@ internal static class Extensions
         var dto = new IncomeFiatGoalTypeDto
         {
             TargetAmount = goalType.TargetAmount,
-            Currency = goalType.Currency,
             CalculatedIncome = goalType.CalculatedIncome
         };
         return JsonSerializer.Serialize(dto);
@@ -138,7 +136,7 @@ internal static class Extensions
     {
         var dto = JsonSerializer.Deserialize<IncomeFiatGoalTypeDto>(json)
             ?? throw new InvalidOperationException("Failed to deserialize IncomeFiatGoalType");
-        return new IncomeFiatGoalType(dto.TargetAmount, dto.Currency, dto.CalculatedIncome);
+        return new IncomeFiatGoalType(dto.TargetAmount, dto.CalculatedIncome);
     }
 
     private static string SerializeIncomeBtcGoalType(IncomeBtcGoalType goalType)

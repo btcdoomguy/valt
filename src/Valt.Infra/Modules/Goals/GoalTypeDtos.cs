@@ -16,9 +16,6 @@ internal class SpendingLimitGoalTypeDto
     [JsonPropertyName("targetAmount")]
     public decimal TargetAmount { get; set; }
 
-    [JsonPropertyName("currency")]
-    public string Currency { get; set; } = null!;
-
     [JsonPropertyName("calculatedSpending")]
     public decimal CalculatedSpending { get; set; }
 }
@@ -36,9 +33,6 @@ internal class IncomeFiatGoalTypeDto
 {
     [JsonPropertyName("targetAmount")]
     public decimal TargetAmount { get; set; }
-
-    [JsonPropertyName("currency")]
-    public string Currency { get; set; } = null!;
 
     [JsonPropertyName("calculatedIncome")]
     public decimal CalculatedIncome { get; set; }

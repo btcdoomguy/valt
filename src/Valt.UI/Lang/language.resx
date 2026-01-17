@@ -1414,7 +1414,7 @@
         <value>Spending Limit</value>
     </data>
     <data name="GoalType_SpendingLimit_Description" xml:space="preserve">
-        <value>Track spending against a budget limit for a specific currency</value>
+        <value>Track spending against a budget limit in your main fiat currency</value>
     </data>
     <!-- Goals Panel -->
     <data name="Goals_Title" xml:space="preserve">
@@ -1463,7 +1463,7 @@
         <value>Fiat Income</value>
     </data>
     <data name="GoalType_IncomeFiat_Description" xml:space="preserve">
-        <value>Track income targets for a specific currency</value>
+        <value>Track income targets in your main fiat currency</value>
     </data>
     <data name="GoalDescription_IncomeFiat" xml:space="preserve">
         <value>Earned {0} of {1}</value>

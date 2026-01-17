@@ -42,22 +42,22 @@
                                   Width="200" />
                     </StackPanel>
 
-                    <!-- Year Field -->
-                    <StackPanel Classes="form-field">
-                        <TextBlock Text="{x:Static local:language.ManageGoal_Year}" />
-                        <ComboBox ItemsSource="{Binding AvailableYears}"
-                                  SelectedItem="{Binding SelectedYear}"
-                                  Width="100" />
-                    </StackPanel>
-
-                    <!-- Month Field (only visible for Monthly period) -->
-                    <StackPanel Classes="form-field" IsVisible="{Binding ShowMonthSelector}">
-                        <TextBlock Text="{x:Static local:language.ManageGoal_Month}" />
-                        <ComboBox ItemsSource="{Binding AvailableMonths}"
-                                  SelectedValue="{Binding SelectedMonth}"
-                                  DisplayMemberBinding="{Binding Text}"
-                                  SelectedValueBinding="{Binding Value}"
-                                  Width="150" />
+                    <!-- Year and Month Fields -->
+                    <StackPanel Orientation="Horizontal" Spacing="20">
+                        <StackPanel Classes="form-field">
+                            <TextBlock Text="{x:Static local:language.ManageGoal_Year}" />
+                            <ComboBox ItemsSource="{Binding AvailableYears}"
+                                      SelectedItem="{Binding SelectedYear}"
+                                      Width="100" />
+                        </StackPanel>
+                        <StackPanel Classes="form-field" IsVisible="{Binding ShowMonthSelector}">
+                            <TextBlock Text="{x:Static local:language.ManageGoal_Month}" />
+                            <ComboBox ItemsSource="{Binding AvailableMonths}"
+                                      SelectedValue="{Binding SelectedMonth}"
+                                      DisplayMemberBinding="{Binding Text}"
+                                      SelectedValueBinding="{Binding Value}"
+                                      Width="150" />
+                        </StackPanel>
                     </StackPanel>
 
                     <!-- Goal Type Field -->

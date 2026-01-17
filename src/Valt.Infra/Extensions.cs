@@ -56,6 +56,7 @@ using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
 
 [assembly: InternalsVisibleTo("Valt.Tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 namespace Valt.Infra;
 
@@ -223,6 +224,7 @@ public static class Extensions
         services.AddSingleton<ICsvExportService, CsvExportService>();
 
         //goals
+        services.AddSingleton<IGoalTransactionReader, GoalTransactionReader>();
         services.AddSingleton<IGoalProgressCalculator, StackBitcoinProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculator, SpendingLimitProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculator, DcaProgressCalculator>();

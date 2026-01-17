@@ -4,6 +4,8 @@ public sealed class DcaGoalType : IGoalType
 {
     public GoalTypeNames TypeName => GoalTypeNames.Dca;
 
+    public bool RequiresPriceDataForCalculation => false;
+
     public int TargetPurchaseCount { get; }
 
     public int CalculatedPurchaseCount { get; }

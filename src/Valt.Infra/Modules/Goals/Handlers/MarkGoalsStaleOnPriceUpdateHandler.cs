@@ -37,32 +37,39 @@ public class MarkGoalsStaleOnPriceUpdateHandler :
 
     public void Receive(FiatHistoryPriceUpdatedMessage message)
     {
-        _logger.LogInformation("[MarkGoalsStaleOnPriceUpdate] Fiat history prices updated, marking goals as stale");
-        MarkAllGoalsStaleAndRefresh();
+        _logger.LogInformation("[MarkGoalsStaleOnPriceUpdate] Fiat history prices updated, marking price-dependent goals as stale");
+        MarkPriceDependentGoalsStaleAndRefresh();
     }
 
     public void Receive(BitcoinHistoryPriceUpdatedMessage message)
     {
-        _logger.LogInformation("[MarkGoalsStaleOnPriceUpdate] Bitcoin history prices updated, marking goals as stale");
-        MarkAllGoalsStaleAndRefresh();
+        _logger.LogInformation("[MarkGoalsStaleOnPriceUpdate] Bitcoin history prices updated, marking price-dependent goals as stale");
+        MarkPriceDependentGoalsStaleAndRefresh();
     }
 
-    private void MarkAllGoalsStaleAndRefresh()
+    private void MarkPriceDependentGoalsStaleAndRefresh()
     {
         try
         {
             var goals = _goalRepository.GetAllAsync().GetAwaiter().GetResult();
+            var markedCount = 0;
 
             foreach (var goal in goals)
             {
-                if (goal.IsUpToDate)
+                // Only mark goals that depend on price data for calculation
+                if (goal.IsUpToDate && goal.GoalType.RequiresPriceDataForCalculation)
                 {
                     goal.MarkAsStale();
                     _goalRepository.SaveAsync(goal).GetAwaiter().GetResult();
+                    markedCount++;
                 }
             }
 
-            _backgroundJobManager.TriggerJobManually(BackgroundJobSystemNames.GoalProgressUpdater);
+            if (markedCount > 0)
+            {
+                _logger.LogInformation("[MarkGoalsStaleOnPriceUpdate] Marked {Count} price-dependent goals as stale", markedCount);
+                _backgroundJobManager.TriggerJobManually(BackgroundJobSystemNames.GoalProgressUpdater);
+            }
         }
         catch (Exception ex)
         {

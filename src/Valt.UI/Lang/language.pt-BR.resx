@@ -1394,7 +1394,7 @@
         <value>Limite de Gastos</value>
     </data>
     <data name="GoalType_SpendingLimit_Description" xml:space="preserve">
-        <value>Acompanhe seus gastos em relação a um limite de orçamento para uma moeda específica</value>
+        <value>Acompanhe seus gastos em relação a um limite de orçamento na sua moeda principal</value>
     </data>
     <!-- Goals Panel -->
     <data name="Goals_Title" xml:space="preserve">
@@ -1443,7 +1443,7 @@
         <value>Renda em Fiat</value>
     </data>
     <data name="GoalType_IncomeFiat_Description" xml:space="preserve">
-        <value>Acompanhe metas de renda para uma moeda específica</value>
+        <value>Acompanhe metas de renda na sua moeda principal</value>
     </data>
     <data name="GoalDescription_IncomeFiat" xml:space="preserve">
         <value>Ganhou {0} de {1}</value>
@@ -1461,7 +1461,7 @@
         <value>Meta de Renda</value>
     </data>
     <data name="GoalType_ReduceExpenseCategory" xml:space="preserve">
-        <value>Orçamento por Categoria</value>
+        <value>Limite por Categoria</value>
     </data>
     <data name="GoalType_ReduceExpenseCategory_Description" xml:space="preserve">
         <value>Limite os gastos em uma categoria específica</value>

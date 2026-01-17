@@ -219,7 +219,7 @@
         <Panel Grid.Column="3">
             <Grid RowDefinitions="80, *, 4, *" Margin="0, 0, 10, 10">
                 <!-- Fixed Expenses Panel -->
-                <Grid Grid.Row="1" RowDefinitions="30, *, Auto">
+                <Grid Grid.Row="1" RowDefinitions="30, *, Auto" MinHeight="150">
                     <!-- Fixed Expenses Header -->
                     <Border Grid.Row="0"
                             Background="{DynamicResource Background800Brush}"
@@ -370,7 +370,7 @@
                               ResizeBehavior="PreviousAndNext" />
 
                 <!-- Goals Panel -->
-                <Grid Grid.Row="3" RowDefinitions="30, *">
+                <Grid Grid.Row="3" RowDefinitions="30, *" MinHeight="150">
                     <!-- Goals Header -->
                     <Border Grid.Row="0"
                             Background="{DynamicResource Background800Brush}"

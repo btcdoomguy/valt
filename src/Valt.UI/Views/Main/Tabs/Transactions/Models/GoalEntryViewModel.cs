@@ -66,9 +66,9 @@ public class GoalEntryViewModel
             return _goal.GoalType switch
             {
                 StackBitcoinGoalType stackBitcoin => CurrencyDisplay.FormatSatsAsBitcoin(stackBitcoin.TargetAmount.Sats),
-                SpendingLimitGoalType spendingLimit => CurrencyDisplay.FormatFiat(spendingLimit.TargetAmount, spendingLimit.Currency),
+                SpendingLimitGoalType spendingLimit => CurrencyDisplay.FormatFiat(spendingLimit.TargetAmount, _mainFiatCurrency),
                 DcaGoalType dca => dca.TargetPurchaseCount.ToString(),
-                IncomeFiatGoalType incomeFiat => CurrencyDisplay.FormatFiat(incomeFiat.TargetAmount, incomeFiat.Currency),
+                IncomeFiatGoalType incomeFiat => CurrencyDisplay.FormatFiat(incomeFiat.TargetAmount, _mainFiatCurrency),
                 IncomeBtcGoalType incomeBtc => CurrencyDisplay.FormatSatsAsBitcoin(incomeBtc.TargetAmount.Sats),
                 ReduceExpenseCategoryGoalType reduceExpense => CurrencyDisplay.FormatFiat(reduceExpense.TargetAmount, _mainFiatCurrency),
                 BitcoinHodlGoalType bitcoinHodl => bitcoinHodl.MaxSellableSats == 0
@@ -91,16 +91,16 @@ public class GoalEntryViewModel
                     CurrencyDisplay.FormatSatsAsNumber(stackBitcoin.TargetAmount.Sats)),
                 SpendingLimitGoalType spendingLimit => string.Format(
                     language.GoalDescription_SpendingLimit,
-                    CurrencyDisplay.FormatFiat(Math.Min(spendingLimit.CalculatedSpending, spendingLimit.TargetAmount), spendingLimit.Currency),
-                    CurrencyDisplay.FormatFiat(spendingLimit.TargetAmount, spendingLimit.Currency)),
+                    CurrencyDisplay.FormatFiat(Math.Min(spendingLimit.CalculatedSpending, spendingLimit.TargetAmount), _mainFiatCurrency),
+                    CurrencyDisplay.FormatFiat(spendingLimit.TargetAmount, _mainFiatCurrency)),
                 DcaGoalType dca => string.Format(
                     language.GoalDescription_Dca,
                     Math.Min(dca.CalculatedPurchaseCount, dca.TargetPurchaseCount),
                     dca.TargetPurchaseCount),
                 IncomeFiatGoalType incomeFiat => string.Format(
                     language.GoalDescription_IncomeFiat,
-                    CurrencyDisplay.FormatFiat(Math.Min(incomeFiat.CalculatedIncome, incomeFiat.TargetAmount), incomeFiat.Currency),
-                    CurrencyDisplay.FormatFiat(incomeFiat.TargetAmount, incomeFiat.Currency)),
+                    CurrencyDisplay.FormatFiat(Math.Min(incomeFiat.CalculatedIncome, incomeFiat.TargetAmount), _mainFiatCurrency),
+                    CurrencyDisplay.FormatFiat(incomeFiat.TargetAmount, _mainFiatCurrency)),
                 IncomeBtcGoalType incomeBtc => string.Format(
                     language.GoalDescription_IncomeBtc,
                     CurrencyDisplay.FormatSatsAsNumber(Math.Min(incomeBtc.CalculatedSats, incomeBtc.TargetAmount.Sats)),

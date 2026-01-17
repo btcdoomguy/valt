@@ -6,6 +6,8 @@ public sealed class IncomeBtcGoalType : IGoalType
 {
     public GoalTypeNames TypeName => GoalTypeNames.IncomeBtc;
 
+    public bool RequiresPriceDataForCalculation => false;
+
     public long TargetSats { get; }
 
     public long CalculatedSats { get; }

@@ -6,6 +6,8 @@ public sealed class StackBitcoinGoalType : IGoalType
 {
     public GoalTypeNames TypeName => GoalTypeNames.StackBitcoin;
 
+    public bool RequiresPriceDataForCalculation => false;
+
     public long TargetSats { get; }
 
     public long CalculatedSats { get; }

@@ -4,21 +4,20 @@ public sealed class IncomeFiatGoalType : IGoalType
 {
     public GoalTypeNames TypeName => GoalTypeNames.IncomeFiat;
 
-    public decimal TargetAmount { get; }
+    public bool RequiresPriceDataForCalculation => true;
 
-    public string Currency { get; }
+    public decimal TargetAmount { get; }
 
     public decimal CalculatedIncome { get; }
 
-    public IncomeFiatGoalType(decimal targetAmount, string currency, decimal calculatedIncome = 0)
+    public IncomeFiatGoalType(decimal targetAmount, decimal calculatedIncome = 0)
     {
         TargetAmount = targetAmount;
-        Currency = currency;
         CalculatedIncome = calculatedIncome;
     }
 
     public IncomeFiatGoalType WithCalculatedIncome(decimal calculatedIncome)
     {
-        return new IncomeFiatGoalType(TargetAmount, Currency, calculatedIncome);
+        return new IncomeFiatGoalType(TargetAmount, calculatedIncome);
     }
 }
