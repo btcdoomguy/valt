@@ -335,20 +335,39 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
                     var range = g.GetPeriodRange();
                     return currentDate >= range.Start && currentDate <= range.End;
                 })
-                .OrderBy(g => g.GoalType.TypeName)
+                .OrderBy(g => GetGoalSortOrder(g))
+                .ThenBy(g => g.GoalType.TypeName)
                 .ThenBy(g => g.RefDate)
                 .ToList();
 
             GoalEntries.Clear();
             foreach (var goal in goalsForPeriod)
             {
-                GoalEntries.Add(new GoalEntryViewModel(goal));
+                GoalEntries.Add(new GoalEntryViewModel(goal, _currencySettings!.MainFiatCurrency));
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching goals");
         }
+    }
+
+    /// <summary>
+    /// Returns a sort order value for goals:
+    /// 0 = Monthly Open/Completed goals
+    /// 1 = Yearly Open/Completed goals
+    /// 2 = MarkedAsCompleted goals
+    /// 3 = Closed goals
+    /// </summary>
+    private static int GetGoalSortOrder(Goal goal)
+    {
+        return goal.State switch
+        {
+            GoalStates.Open or GoalStates.Completed => goal.Period == GoalPeriods.Monthly ? 0 : 1,
+            GoalStates.MarkedAsCompleted => 2,
+            GoalStates.Closed => 3,
+            _ => 4
+        };
     }
 
     #region Account operations
@@ -727,6 +746,30 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
         goal.Reopen();
         await _goalRepository.SaveAsync(goal);
+
+        await FetchGoals();
+        WeakReferenceMessenger.Default.Send(new GoalListChanged());
+    }
+
+    [RelayCommand]
+    private async Task DeleteGoal(GoalEntryViewModel? entry)
+    {
+        if (entry is null)
+            return;
+
+        var confirmed = await MessageBoxHelper.ShowQuestionAsync(
+            language.Goals_DeleteConfirm_Title,
+            language.Goals_DeleteConfirm_Message,
+            GetUserControlOwnerWindow()!);
+
+        if (!confirmed)
+            return;
+
+        var goal = await _goalRepository!.GetByIdAsync(new GoalId(entry.Id));
+        if (goal is null)
+            return;
+
+        await _goalRepository.DeleteAsync(goal);
 
         await FetchGoals();
         WeakReferenceMessenger.Default.Send(new GoalListChanged());

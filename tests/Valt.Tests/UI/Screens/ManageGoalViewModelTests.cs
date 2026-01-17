@@ -1,6 +1,7 @@
 using NSubstitute;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Factories;
+using Valt.Core.Modules.Budget.Categories.Contracts;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.Contracts;
 using Valt.Core.Modules.Goals.GoalTypes;
@@ -17,6 +18,7 @@ public class ManageGoalViewModelTests
 {
     private IGoalRepository _goalRepository = null!;
     private IConfigurationManager _configurationManager = null!;
+    private ICategoryRepository _categoryRepository = null!;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -29,12 +31,13 @@ public class ManageGoalViewModelTests
     {
         _goalRepository = Substitute.For<IGoalRepository>();
         _configurationManager = Substitute.For<IConfigurationManager>();
+        _categoryRepository = Substitute.For<ICategoryRepository>();
         _configurationManager.GetAvailableFiatCurrencies().Returns(new List<string> { "USD", "BRL", "EUR" });
     }
 
     private ManageGoalViewModel CreateViewModel()
     {
-        var vm = new ManageGoalViewModel(_goalRepository, _configurationManager);
+        var vm = new ManageGoalViewModel(_goalRepository, _configurationManager, _categoryRepository);
         vm.GetWindow = () => null!;
         vm.CloseWindow = () => { };
         vm.CloseDialog = _ => { };

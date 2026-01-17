@@ -2901,6 +2901,24 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string Goals_Delete {
+            get {
+                return ResourceManager.GetString("Goals_Delete", resourceCulture);
+            }
+        }
+
+        public static string Goals_DeleteConfirm_Title {
+            get {
+                return ResourceManager.GetString("Goals_DeleteConfirm_Title", resourceCulture);
+            }
+        }
+
+        public static string Goals_DeleteConfirm_Message {
+            get {
+                return ResourceManager.GetString("Goals_DeleteConfirm_Message", resourceCulture);
+            }
+        }
+
         public static string GoalDescription_StackBitcoin {
             get {
                 return ResourceManager.GetString("GoalDescription_StackBitcoin", resourceCulture);
@@ -2910,6 +2928,72 @@ namespace Valt.UI.Lang {
         public static string GoalDescription_SpendingLimit {
             get {
                 return ResourceManager.GetString("GoalDescription_SpendingLimit", resourceCulture);
+            }
+        }
+
+        public static string GoalType_ReduceExpenseCategory {
+            get {
+                return ResourceManager.GetString("GoalType_ReduceExpenseCategory", resourceCulture);
+            }
+        }
+
+        public static string GoalType_ReduceExpenseCategory_Description {
+            get {
+                return ResourceManager.GetString("GoalType_ReduceExpenseCategory_Description", resourceCulture);
+            }
+        }
+
+        public static string GoalDescription_ReduceExpenseCategory {
+            get {
+                return ResourceManager.GetString("GoalDescription_ReduceExpenseCategory", resourceCulture);
+            }
+        }
+
+        public static string ManageGoal_Category {
+            get {
+                return ResourceManager.GetString("ManageGoal_Category", resourceCulture);
+            }
+        }
+
+        public static string GoalType_BitcoinHodl {
+            get {
+                return ResourceManager.GetString("GoalType_BitcoinHodl", resourceCulture);
+            }
+        }
+
+        public static string GoalType_BitcoinHodl_Description {
+            get {
+                return ResourceManager.GetString("GoalType_BitcoinHodl_Description", resourceCulture);
+            }
+        }
+
+        public static string GoalDescription_BitcoinHodl_NoSales {
+            get {
+                return ResourceManager.GetString("GoalDescription_BitcoinHodl_NoSales", resourceCulture);
+            }
+        }
+
+        public static string GoalDescription_BitcoinHodl_WithLimit {
+            get {
+                return ResourceManager.GetString("GoalDescription_BitcoinHodl_WithLimit", resourceCulture);
+            }
+        }
+
+        public static string GoalDescription_BitcoinHodl_Failed {
+            get {
+                return ResourceManager.GetString("GoalDescription_BitcoinHodl_Failed", resourceCulture);
+            }
+        }
+
+        public static string ManageGoal_MaxSellableSats {
+            get {
+                return ResourceManager.GetString("ManageGoal_MaxSellableSats", resourceCulture);
+            }
+        }
+
+        public static string GoalTarget_NoSales {
+            get {
+                return ResourceManager.GetString("GoalTarget_NoSales", resourceCulture);
             }
         }
     }

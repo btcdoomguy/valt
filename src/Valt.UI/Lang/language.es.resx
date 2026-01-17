@@ -1427,6 +1427,15 @@
     <data name="Goals_Reopen" xml:space="preserve">
         <value>Reabrir</value>
     </data>
+    <data name="Goals_Delete" xml:space="preserve">
+        <value>Eliminar</value>
+    </data>
+    <data name="Goals_DeleteConfirm_Title" xml:space="preserve">
+        <value>Eliminar Meta</value>
+    </data>
+    <data name="Goals_DeleteConfirm_Message" xml:space="preserve">
+        <value>¿Estás seguro de que deseas eliminar esta meta? Esta acción no se puede deshacer.</value>
+    </data>
     <data name="GoalDescription_StackBitcoin" xml:space="preserve">
         <value>{0}/{1} sats</value>
     </data>
@@ -1465,5 +1474,38 @@
     </data>
     <data name="ManageGoal_TargetIncomeAmount" xml:space="preserve">
         <value>Meta de Ingresos</value>
+    </data>
+    <data name="GoalType_ReduceExpenseCategory" xml:space="preserve">
+        <value>Presupuesto por Categoría</value>
+    </data>
+    <data name="GoalType_ReduceExpenseCategory_Description" xml:space="preserve">
+        <value>Limita el gasto en una categoría específica</value>
+    </data>
+    <data name="GoalDescription_ReduceExpenseCategory" xml:space="preserve">
+        <value>Gastado {0} de {1} límite</value>
+    </data>
+    <data name="ManageGoal_Category" xml:space="preserve">
+        <value>Categoría</value>
+    </data>
+    <data name="GoalType_BitcoinHodl" xml:space="preserve">
+        <value>HODL</value>
+    </data>
+    <data name="GoalType_BitcoinHodl_Description" xml:space="preserve">
+        <value>Rastrea ventas de bitcoin. Establece 0 para modo HODL completo (sin ventas permitidas)</value>
+    </data>
+    <data name="GoalDescription_BitcoinHodl_NoSales" xml:space="preserve">
+        <value>¡No se vendió bitcoin!</value>
+    </data>
+    <data name="GoalDescription_BitcoinHodl_WithLimit" xml:space="preserve">
+        <value>Vendido {0} de {1} máx</value>
+    </data>
+    <data name="GoalDescription_BitcoinHodl_Failed" xml:space="preserve">
+        <value>Vendido {0} sats</value>
+    </data>
+    <data name="ManageGoal_MaxSellableSats" xml:space="preserve">
+        <value>Máx Sats Vendibles (0 = sin ventas)</value>
+    </data>
+    <data name="GoalTarget_NoSales" xml:space="preserve">
+        <value>Sin ventas</value>
     </data>
 </root>

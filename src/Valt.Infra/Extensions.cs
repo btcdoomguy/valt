@@ -41,6 +41,7 @@ using Valt.Infra.Modules.Budget.Transactions.Queries;
 using Valt.Infra.Modules.Budget.Transactions.Services;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Modules.Goals;
+using Valt.Infra.Modules.Goals.Handlers;
 using Valt.Infra.Modules.Goals.Queries;
 using Valt.Infra.Modules.Goals.Services;
 using Valt.Infra.Modules.Reports;
@@ -227,7 +228,12 @@ public static class Extensions
         services.AddSingleton<IGoalProgressCalculator, DcaProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculator, IncomeFiatProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculator, IncomeBtcProgressCalculator>();
+        services.AddSingleton<IGoalProgressCalculator, ReduceExpenseCategoryProgressCalculator>();
+        services.AddSingleton<IGoalProgressCalculator, BitcoinHodlProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculatorFactory, GoalProgressCalculatorFactory>();
+
+        //goal price update handler (subscribes to price update messages)
+        services.AddSingleton<MarkGoalsStaleOnPriceUpdateHandler>();
 
         return services;
     }

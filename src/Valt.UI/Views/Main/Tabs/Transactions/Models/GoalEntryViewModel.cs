@@ -10,10 +10,12 @@ namespace Valt.UI.Views.Main.Tabs.Transactions.Models;
 public class GoalEntryViewModel
 {
     private readonly Goal _goal;
+    private readonly string _mainFiatCurrency;
 
-    public GoalEntryViewModel(Goal goal)
+    public GoalEntryViewModel(Goal goal, string mainFiatCurrency)
     {
         _goal = goal;
+        _mainFiatCurrency = mainFiatCurrency;
     }
 
     public string Id => _goal.Id.ToString();
@@ -22,14 +24,19 @@ public class GoalEntryViewModel
     {
         get
         {
-            var typeName = _goal.GoalType.TypeName switch
+            var typeName = _goal.GoalType switch
             {
-                GoalTypeNames.StackBitcoin => language.GoalType_StackBitcoin,
-                GoalTypeNames.SpendingLimit => language.GoalType_SpendingLimit,
-                GoalTypeNames.Dca => language.GoalType_Dca,
-                GoalTypeNames.IncomeFiat => language.GoalType_IncomeFiat,
-                GoalTypeNames.IncomeBtc => language.GoalType_IncomeBtc,
-                _ => _goal.GoalType.TypeName.ToString()
+                ReduceExpenseCategoryGoalType reduceExpense => $"{language.GoalType_ReduceExpenseCategory}: {reduceExpense.CategoryName}",
+                _ => _goal.GoalType.TypeName switch
+                {
+                    GoalTypeNames.StackBitcoin => language.GoalType_StackBitcoin,
+                    GoalTypeNames.SpendingLimit => language.GoalType_SpendingLimit,
+                    GoalTypeNames.Dca => language.GoalType_Dca,
+                    GoalTypeNames.IncomeFiat => language.GoalType_IncomeFiat,
+                    GoalTypeNames.IncomeBtc => language.GoalType_IncomeBtc,
+                    GoalTypeNames.BitcoinHodl => language.GoalType_BitcoinHodl,
+                    _ => _goal.GoalType.TypeName.ToString()
+                }
             };
 
             return typeName;
@@ -63,6 +70,10 @@ public class GoalEntryViewModel
                 DcaGoalType dca => dca.TargetPurchaseCount.ToString(),
                 IncomeFiatGoalType incomeFiat => CurrencyDisplay.FormatFiat(incomeFiat.TargetAmount, incomeFiat.Currency),
                 IncomeBtcGoalType incomeBtc => CurrencyDisplay.FormatSatsAsBitcoin(incomeBtc.TargetAmount.Sats),
+                ReduceExpenseCategoryGoalType reduceExpense => CurrencyDisplay.FormatFiat(reduceExpense.TargetAmount, _mainFiatCurrency),
+                BitcoinHodlGoalType bitcoinHodl => bitcoinHodl.MaxSellableSats == 0
+                    ? language.GoalTarget_NoSales
+                    : CurrencyDisplay.FormatSatsAsBitcoin(bitcoinHodl.MaxSellableSats),
                 _ => string.Empty
             };
         }
@@ -94,9 +105,29 @@ public class GoalEntryViewModel
                     language.GoalDescription_IncomeBtc,
                     CurrencyDisplay.FormatSatsAsNumber(Math.Min(incomeBtc.CalculatedSats, incomeBtc.TargetAmount.Sats)),
                     CurrencyDisplay.FormatSatsAsNumber(incomeBtc.TargetAmount.Sats)),
+                ReduceExpenseCategoryGoalType reduceExpense => string.Format(
+                    language.GoalDescription_ReduceExpenseCategory,
+                    CurrencyDisplay.FormatFiat(Math.Min(reduceExpense.CalculatedSpending, reduceExpense.TargetAmount), _mainFiatCurrency),
+                    CurrencyDisplay.FormatFiat(reduceExpense.TargetAmount, _mainFiatCurrency)),
+                BitcoinHodlGoalType bitcoinHodl => GetBitcoinHodlDescription(bitcoinHodl),
                 _ => string.Empty
             };
         }
+    }
+
+    private static string GetBitcoinHodlDescription(BitcoinHodlGoalType bitcoinHodl)
+    {
+        if (bitcoinHodl.MaxSellableSats == 0)
+        {
+            return bitcoinHodl.CalculatedSoldSats == 0
+                ? language.GoalDescription_BitcoinHodl_NoSales
+                : string.Format(language.GoalDescription_BitcoinHodl_Failed, CurrencyDisplay.FormatSatsAsNumber(bitcoinHodl.CalculatedSoldSats));
+        }
+
+        return string.Format(
+            language.GoalDescription_BitcoinHodl_WithLimit,
+            CurrencyDisplay.FormatSatsAsNumber(Math.Min(bitcoinHodl.CalculatedSoldSats, bitcoinHodl.MaxSellableSats)),
+            CurrencyDisplay.FormatSatsAsNumber(bitcoinHodl.MaxSellableSats));
     }
 
     public bool IsCompleted => _goal.State == GoalStates.MarkedAsCompleted || _goal.Progress >= 100m;

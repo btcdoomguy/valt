@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Valt.Core.Kernel.Exceptions;
+using Valt.Core.Modules.Budget.Categories.Contracts;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.Contracts;
 using Valt.Infra.Modules.Configuration;
@@ -21,6 +22,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
 {
     private readonly IGoalRepository? _goalRepository;
     private readonly IConfigurationManager? _configurationManager;
+    private readonly ICategoryRepository? _categoryRepository;
 
     #region Form Data
 
@@ -60,7 +62,9 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
         new(language.GoalType_SpendingLimit, GoalTypeNames.SpendingLimit.ToString()),
         new(language.GoalType_Dca, GoalTypeNames.Dca.ToString()),
         new(language.GoalType_IncomeFiat, GoalTypeNames.IncomeFiat.ToString()),
-        new(language.GoalType_IncomeBtc, GoalTypeNames.IncomeBtc.ToString())
+        new(language.GoalType_IncomeBtc, GoalTypeNames.IncomeBtc.ToString()),
+        new(language.GoalType_ReduceExpenseCategory, GoalTypeNames.ReduceExpenseCategory.ToString()),
+        new(language.GoalType_BitcoinHodl, GoalTypeNames.BitcoinHodl.ToString())
     ];
 
     public static List<ComboBoxValue> AvailableMonths =>
@@ -84,10 +88,11 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
         CurrentGoalTypeEditor = new StackBitcoinGoalTypeEditorViewModel();
     }
 
-    public ManageGoalViewModel(IGoalRepository goalRepository, IConfigurationManager configurationManager)
+    public ManageGoalViewModel(IGoalRepository goalRepository, IConfigurationManager configurationManager, ICategoryRepository categoryRepository)
     {
         _goalRepository = goalRepository;
         _configurationManager = configurationManager;
+        _categoryRepository = categoryRepository;
 
         SelectedPeriod = GoalPeriods.Monthly.ToString();
         SelectedGoalType = GoalTypeNames.StackBitcoin.ToString();
@@ -115,6 +120,10 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
                 ? new IncomeFiatGoalTypeEditorViewModel(_configurationManager)
                 : new IncomeFiatGoalTypeEditorViewModel(),
             GoalTypeNames.IncomeBtc => new IncomeBtcGoalTypeEditorViewModel(),
+            GoalTypeNames.ReduceExpenseCategory => _configurationManager != null && _categoryRepository != null
+                ? new ReduceExpenseCategoryGoalTypeEditorViewModel(_configurationManager, _categoryRepository)
+                : new ReduceExpenseCategoryGoalTypeEditorViewModel(),
+            GoalTypeNames.BitcoinHodl => new BitcoinHodlGoalTypeEditorViewModel(),
             _ => throw new ArgumentOutOfRangeException(nameof(goalTypeName))
         };
     }

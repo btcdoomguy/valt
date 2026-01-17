@@ -52,3 +52,27 @@ internal class IncomeBtcGoalTypeDto
     [JsonPropertyName("calculatedSats")]
     public long CalculatedSats { get; set; }
 }
+
+internal class ReduceExpenseCategoryGoalTypeDto
+{
+    [JsonPropertyName("targetAmount")]
+    public decimal TargetAmount { get; set; }
+
+    [JsonPropertyName("categoryId")]
+    public string CategoryId { get; set; } = null!;
+
+    [JsonPropertyName("categoryName")]
+    public string CategoryName { get; set; } = null!;
+
+    [JsonPropertyName("calculatedSpending")]
+    public decimal CalculatedSpending { get; set; }
+}
+
+internal class BitcoinHodlGoalTypeDto
+{
+    [JsonPropertyName("maxSellableSats")]
+    public long MaxSellableSats { get; set; }
+
+    [JsonPropertyName("calculatedSoldSats")]
+    public long CalculatedSoldSats { get; set; }
+}

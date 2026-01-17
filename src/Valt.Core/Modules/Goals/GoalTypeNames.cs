@@ -6,5 +6,7 @@ public enum GoalTypeNames
     SpendingLimit = 1,
     Dca = 2,
     IncomeFiat = 3,
-    IncomeBtc = 4
+    IncomeBtc = 4,
+    ReduceExpenseCategory = 5,
+    BitcoinHodl = 6
 }

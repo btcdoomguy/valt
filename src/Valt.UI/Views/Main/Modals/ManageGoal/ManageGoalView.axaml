@@ -88,6 +88,12 @@
                             <DataTemplate DataType="editors:IncomeBtcGoalTypeEditorViewModel">
                                 <editors:IncomeBtcGoalTypeEditor />
                             </DataTemplate>
+                            <DataTemplate DataType="editors:ReduceExpenseCategoryGoalTypeEditorViewModel">
+                                <editors:ReduceExpenseCategoryGoalTypeEditor />
+                            </DataTemplate>
+                            <DataTemplate DataType="editors:BitcoinHodlGoalTypeEditorViewModel">
+                                <editors:BitcoinHodlGoalTypeEditor />
+                            </DataTemplate>
                         </ContentControl.DataTemplates>
                     </ContentControl>
                 </StackPanel>

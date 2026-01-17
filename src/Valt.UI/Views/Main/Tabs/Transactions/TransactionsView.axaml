@@ -420,7 +420,7 @@
                                             <!-- Trophy icon for MarkedAsComplete goals -->
                                             <TextBlock Grid.Column="1"
                                                        IsVisible="{Binding IsMarkedAsComplete}"
-                                                       Text="&#xEFC3;"
+                                                       Text="&#xE420;"
                                                        FontFamily="{DynamicResource MaterialDesign}"
                                                        Foreground="{DynamicResource Accent200Brush}"
                                                        FontSize="18"
@@ -476,6 +476,12 @@
                                                 Command="{Binding ((vm1:TransactionsViewModel)DataContext).ReopenGoalCommand, ElementName=Root}"
                                                 CommandParameter="{Binding .}"
                                                 IsVisible="{Binding CanReopen}">
+                                            </MenuItem>
+                                            <Separator />
+                                            <MenuItem
+                                                Header="{x:Static local:language.Goals_Delete}"
+                                                Command="{Binding ((vm1:TransactionsViewModel)DataContext).DeleteGoalCommand, ElementName=Root}"
+                                                CommandParameter="{Binding .}">
                                             </MenuItem>
                                         </ContextMenu>
                                     </Border.ContextMenu>
