@@ -155,20 +155,22 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
     public ProgressionMode ProgressionMode => _goal.GoalType.ProgressionMode;
 
     // State-based UI properties
-    public bool IsClosed => _goal.State == GoalStates.Closed;
     public bool IsFailed => _goal.State == GoalStates.Failed;
     public bool IsOpen => _goal.State == GoalStates.Open;
     public bool IsProgressComplete => _goal.State == GoalStates.Completed || _goal.Progress >= 100m;
+
+    // Progress bar color properties
+    public bool IsZeroToSuccess => _goal.GoalType.ProgressionMode == ProgressionMode.ZeroToSuccess;
+    public bool IsDecreasingSuccess => _goal.GoalType.ProgressionMode == ProgressionMode.DecreasingSuccess;
 
     // Icon display properties
     public bool ShowSuccessIcon => _goal.State == GoalStates.Completed;
     public bool ShowFailedIcon => _goal.State == GoalStates.Failed;
 
     // Context menu visibility
-    public bool CanClose => _goal.State == GoalStates.Open;
-    public bool CanReopen => _goal.State == GoalStates.Completed || _goal.State == GoalStates.Failed || _goal.State == GoalStates.Closed;
+    public bool CanRecalculate => _goal.State == GoalStates.Completed || _goal.State == GoalStates.Failed;
 
-    // Show progress bar only for Open state (not for Completed, Failed, or Closed)
+    // Show progress bar only for Open state (not for Completed or Failed)
     public bool ShowProgressBar => _goal.State == GoalStates.Open;
 
     /// <summary>
@@ -187,14 +189,14 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(TargetDisplay));
         OnPropertyChanged(nameof(State));
         OnPropertyChanged(nameof(ProgressionMode));
-        OnPropertyChanged(nameof(IsClosed));
         OnPropertyChanged(nameof(IsFailed));
         OnPropertyChanged(nameof(IsOpen));
         OnPropertyChanged(nameof(IsProgressComplete));
+        OnPropertyChanged(nameof(IsZeroToSuccess));
+        OnPropertyChanged(nameof(IsDecreasingSuccess));
         OnPropertyChanged(nameof(ShowSuccessIcon));
         OnPropertyChanged(nameof(ShowFailedIcon));
-        OnPropertyChanged(nameof(CanClose));
-        OnPropertyChanged(nameof(CanReopen));
+        OnPropertyChanged(nameof(CanRecalculate));
         OnPropertyChanged(nameof(ShowProgressBar));
 
         // If progress changed, animate it

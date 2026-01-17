@@ -2,6 +2,7 @@ using LiteDB;
 using Valt.Core.Kernel.Abstractions.EventSystem;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.Contracts;
+using Valt.Core.Modules.Goals.Events;
 using Valt.Infra.DataAccess;
 
 namespace Valt.Infra.Modules.Goals;
@@ -51,6 +52,8 @@ internal sealed class GoalRepository : IGoalRepository
         {
             await _domainEventPublisher.PublishAsync(@event);
         }
+
+        await _domainEventPublisher.PublishAsync(new GoalDeletedEvent(goal));
 
         goal.ClearEvents();
     }

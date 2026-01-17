@@ -18,19 +18,21 @@ internal class GoalProgressUpdaterJob : IBackgroundJob
     private readonly IGoalQueries _goalQueries;
     private readonly IGoalRepository _goalRepository;
     private readonly IGoalProgressCalculatorFactory _calculatorFactory;
+    private readonly GoalProgressState _progressState;
     private readonly IClock _clock;
     private readonly ILogger<GoalProgressUpdaterJob> _logger;
 
     public string Name => "Goal Progress Updater";
     public BackgroundJobSystemNames SystemName => BackgroundJobSystemNames.GoalProgressUpdater;
     public BackgroundJobTypes JobType => BackgroundJobTypes.ValtDatabase;
-    public TimeSpan Interval => TimeSpan.FromSeconds(5);
+    public TimeSpan Interval => TimeSpan.FromSeconds(1);
 
     public GoalProgressUpdaterJob(
         ILocalDatabase localDatabase,
         IGoalQueries goalQueries,
         IGoalRepository goalRepository,
         IGoalProgressCalculatorFactory calculatorFactory,
+        GoalProgressState progressState,
         IClock clock,
         ILogger<GoalProgressUpdaterJob> logger)
     {
@@ -38,6 +40,7 @@ internal class GoalProgressUpdaterJob : IBackgroundJob
         _goalQueries = goalQueries;
         _goalRepository = goalRepository;
         _calculatorFactory = calculatorFactory;
+        _progressState = progressState;
         _clock = clock;
         _logger = logger;
     }
@@ -50,21 +53,41 @@ internal class GoalProgressUpdaterJob : IBackgroundJob
 
     public async Task RunAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("[GoalProgressUpdaterJob] Starting goal progress update cycle");
-
         if (!_localDatabase.HasDatabaseOpen)
         {
-            _logger.LogInformation("[GoalProgressUpdaterJob] Local database not open, skipping");
+            _logger.LogDebug("[GoalProgressUpdaterJob] Local database not open, skipping");
             return;
         }
 
+        // Bootstrap phase: query database for stale goals on first run
+        if (!_progressState.BootstrapCompleted)
+        {
+            _logger.LogInformation("[GoalProgressUpdaterJob] Bootstrap: checking database for stale goals");
+            await RunDatabaseQueryCycleAsync();
+            _progressState.MarkBootstrapCompleted();
+            return;
+        }
+
+        // Normal operation: only run if flag is set
+        if (!_progressState.HasStaleGoals)
+        {
+            return;
+        }
+
+        _logger.LogDebug("[GoalProgressUpdaterJob] Stale flag set, running update cycle");
+        _progressState.ClearStaleFlag();
+        await RunDatabaseQueryCycleAsync();
+    }
+
+    private async Task RunDatabaseQueryCycleAsync()
+    {
         try
         {
             var staleGoals = await _goalQueries.GetStaleGoalsAsync();
 
             if (staleGoals.Count == 0)
             {
-                _logger.LogInformation("[GoalProgressUpdaterJob] No stale goals to update");
+                _logger.LogDebug("[GoalProgressUpdaterJob] No stale goals to update");
                 return;
             }
 

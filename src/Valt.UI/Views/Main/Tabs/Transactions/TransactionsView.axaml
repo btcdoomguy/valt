@@ -407,34 +407,41 @@
                         BorderThickness="1">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Border Padding="4, 6" Background="Transparent"
-                                        Opacity="{Binding !IsClosed, Converter={StaticResource BoolToOpacityConverter}}">
+                                <Border Padding="4, 6" Background="Transparent">
                                     <StackPanel Orientation="Vertical" Spacing="4">
-                                        <!-- Goal name with status icon -->
+                                        <!-- Goal name with status label -->
                                         <Grid ColumnDefinitions="*, Auto">
                                             <TextBlock Grid.Column="0"
                                                        FontSize="13"
                                                        Text="{Binding FriendlyName}"
                                                        FontFamily="{DynamicResource Geist}"
                                                        TextTrimming="CharacterEllipsis" />
-                                            <!-- Trophy icon for Completed goals -->
-                                            <TextBlock Grid.Column="1"
-                                                       IsVisible="{Binding ShowSuccessIcon}"
-                                                       Text="&#xE420;"
-                                                       FontFamily="{DynamicResource MaterialDesign}"
-                                                       Foreground="{DynamicResource Accent200Brush}"
-                                                       FontSize="18"
-                                                       VerticalAlignment="Center"
-                                                       Margin="8, 0, 0, 0" />
-                                            <!-- Failed icon for Failed goals -->
-                                            <TextBlock Grid.Column="1"
-                                                       IsVisible="{Binding ShowFailedIcon}"
-                                                       Text="&#xE000;"
-                                                       FontFamily="{DynamicResource MaterialDesign}"
-                                                       Foreground="{DynamicResource DangerBrush}"
-                                                       FontSize="18"
-                                                       VerticalAlignment="Center"
-                                                       Margin="8, 0, 0, 0" />
+                                            <!-- SUCCESS label for Completed goals -->
+                                            <Border Grid.Column="1"
+                                                    IsVisible="{Binding ShowSuccessIcon}"
+                                                    Background="{DynamicResource SemanticPositive800Brush}"
+                                                    CornerRadius="3"
+                                                    Padding="6, 2"
+                                                    VerticalAlignment="Center"
+                                                    Margin="8, 0, 0, 0">
+                                                <TextBlock Text="{x:Static local:language.Goals_Success}"
+                                                           FontFamily="{DynamicResource GeistMono}"
+                                                           Foreground="{DynamicResource SemanticPositive200Brush}"
+                                                           FontSize="10" />
+                                            </Border>
+                                            <!-- FAILED label for Failed goals -->
+                                            <Border Grid.Column="1"
+                                                    IsVisible="{Binding ShowFailedIcon}"
+                                                    Background="{DynamicResource SemanticNegative800Brush}"
+                                                    CornerRadius="3"
+                                                    Padding="6, 2"
+                                                    VerticalAlignment="Center"
+                                                    Margin="8, 0, 0, 0">
+                                                <TextBlock Text="{x:Static local:language.Goals_Failed}"
+                                                           FontFamily="{DynamicResource GeistMono}"
+                                                           Foreground="{DynamicResource SemanticNegative200Brush}"
+                                                           FontSize="10" />
+                                            </Border>
                                         </Grid>
                                         <!-- Goal description (e.g., "123,456/1,000,000 sats") -->
                                         <TextBlock FontSize="11"
@@ -452,7 +459,8 @@
                                                          Height="12"
                                                          CornerRadius="6"
                                                          Margin="0, 0, 8, 0"
-                                                         Classes.complete="{Binding IsProgressComplete}" />
+                                                         Classes.complete="{Binding IsZeroToSuccess}"
+                                                         Classes.danger="{Binding IsDecreasingSuccess}" />
                                             <TextBlock Grid.Column="1"
                                                        FontSize="10"
                                                        Text="{Binding ProgressDisplay}"
@@ -467,18 +475,11 @@
                                                 Command="{Binding ((vm1:TransactionsViewModel)DataContext).EditGoalCommand, ElementName=Root}"
                                                 CommandParameter="{Binding .}">
                                             </MenuItem>
-                                            <Separator />
                                             <MenuItem
-                                                Header="{x:Static local:language.Goals_Close}"
-                                                Command="{Binding ((vm1:TransactionsViewModel)DataContext).CloseGoalCommand, ElementName=Root}"
+                                                Header="{x:Static local:language.Goals_Recalculate}"
+                                                Command="{Binding ((vm1:TransactionsViewModel)DataContext).RecalculateGoalCommand, ElementName=Root}"
                                                 CommandParameter="{Binding .}"
-                                                IsVisible="{Binding CanClose}">
-                                            </MenuItem>
-                                            <MenuItem
-                                                Header="{x:Static local:language.Goals_Reopen}"
-                                                Command="{Binding ((vm1:TransactionsViewModel)DataContext).ReopenGoalCommand, ElementName=Root}"
-                                                CommandParameter="{Binding .}"
-                                                IsVisible="{Binding CanReopen}">
+                                                IsVisible="{Binding CanRecalculate}">
                                             </MenuItem>
                                             <Separator />
                                             <MenuItem

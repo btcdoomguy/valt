@@ -61,6 +61,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     private readonly IAccountQueries? _accountQueries;
     private readonly SecureModeState _secureModeState;
     private readonly IGoalRepository? _goalRepository;
+    private readonly GoalProgressState? _goalProgressState;
 
     //instances of the sub contents
     private readonly TransactionListViewModel _transactionListViewModel = null!;
@@ -105,7 +106,8 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         IClock clock,
         ILogger<TransactionsViewModel> logger,
         SecureModeState secureModeState,
-        IGoalRepository goalRepository)
+        IGoalRepository goalRepository,
+        GoalProgressState goalProgressState)
     {
         _accountQueries = accountQueries;
         _secureModeState = secureModeState;
@@ -122,6 +124,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         _clock = clock;
         _logger = logger;
         _goalRepository = goalRepository;
+        _goalProgressState = goalProgressState;
 
         _transactionListViewModel = (TransactionListViewModel)transactionTabFactory.Create(TransactionsTabNames.List);
 
@@ -397,7 +400,6 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     /// 1 = Yearly Open goals
     /// 2 = Completed goals
     /// 3 = Failed goals
-    /// 4 = Closed goals
     /// </summary>
     private static int GetGoalSortOrder(Goal goal)
     {
@@ -406,8 +408,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
             GoalStates.Open => goal.Period == GoalPeriods.Monthly ? 0 : 1,
             GoalStates.Completed => 2,
             GoalStates.Failed => 3,
-            GoalStates.Closed => 4,
-            _ => 5
+            _ => 4
         };
     }
 
@@ -748,7 +749,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     }
 
     [RelayCommand]
-    private async Task CloseGoal(GoalEntryViewModel? entry)
+    private async Task RecalculateGoal(GoalEntryViewModel? entry)
     {
         if (entry is null)
             return;
@@ -757,25 +758,9 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         if (goal is null)
             return;
 
-        goal.Close();
+        goal.Recalculate();
         await _goalRepository.SaveAsync(goal);
-
-        await FetchGoals();
-        WeakReferenceMessenger.Default.Send(new GoalListChanged());
-    }
-
-    [RelayCommand]
-    private async Task ReopenGoal(GoalEntryViewModel? entry)
-    {
-        if (entry is null)
-            return;
-
-        var goal = await _goalRepository!.GetByIdAsync(new GoalId(entry.Id));
-        if (goal is null)
-            return;
-
-        goal.Reopen();
-        await _goalRepository.SaveAsync(goal);
+        _goalProgressState?.MarkAsStale();
 
         await FetchGoals();
         WeakReferenceMessenger.Default.Send(new GoalListChanged());

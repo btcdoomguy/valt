@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Modules.Goals.Contracts;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Messages;
-using Valt.Infra.Kernel.BackgroundJobs;
+using Valt.Infra.Modules.Goals.Services;
 
 namespace Valt.Infra.Modules.Goals.Handlers;
 
@@ -17,17 +17,17 @@ public class MarkGoalsStaleOnPriceUpdateHandler :
     IDisposable
 {
     private readonly IGoalRepository _goalRepository;
-    private readonly BackgroundJobManager _backgroundJobManager;
+    private readonly GoalProgressState _progressState;
     private readonly ILogger<MarkGoalsStaleOnPriceUpdateHandler> _logger;
     private bool _disposed;
 
     public MarkGoalsStaleOnPriceUpdateHandler(
         IGoalRepository goalRepository,
-        BackgroundJobManager backgroundJobManager,
+        GoalProgressState progressState,
         ILogger<MarkGoalsStaleOnPriceUpdateHandler> logger)
     {
         _goalRepository = goalRepository;
-        _backgroundJobManager = backgroundJobManager;
+        _progressState = progressState;
         _logger = logger;
 
         // Register to receive messages
@@ -68,7 +68,7 @@ public class MarkGoalsStaleOnPriceUpdateHandler :
             if (markedCount > 0)
             {
                 _logger.LogInformation("[MarkGoalsStaleOnPriceUpdate] Marked {Count} price-dependent goals as stale", markedCount);
-                _backgroundJobManager.TriggerJobManually(BackgroundJobSystemNames.GoalProgressUpdater);
+                _progressState.MarkAsStale();
             }
         }
         catch (Exception ex)

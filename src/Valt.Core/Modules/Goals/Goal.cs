@@ -68,29 +68,22 @@ public sealed class Goal : AggregateRoot<GoalId>
         LastUpdatedAt = updatedAt;
 
         // Auto-transition based on progression mode
+        // ZeroToSuccess: progress goes 0% → 100%, completes at 100%
+        // DecreasingSuccess: progress goes 0% → 100% (bad), fails at 100%
         if (State == GoalStates.Open)
         {
             if (updatedGoalType.ProgressionMode == ProgressionMode.ZeroToSuccess && progress >= 100m)
                 State = GoalStates.Completed;
-            else if (updatedGoalType.ProgressionMode == ProgressionMode.DecreasingSuccess && progress <= 0m)
+            else if (updatedGoalType.ProgressionMode == ProgressionMode.DecreasingSuccess && progress >= 100m)
                 State = GoalStates.Failed;
         }
 
         AddEvent(new GoalUpdatedEvent(this));
     }
 
-    public void Close()
+    public void Recalculate()
     {
-        if (State != GoalStates.Open)
-            return;
-
-        State = GoalStates.Closed;
-        AddEvent(new GoalUpdatedEvent(this));
-    }
-
-    public void Reopen()
-    {
-        if (State != GoalStates.Completed && State != GoalStates.Failed && State != GoalStates.Closed)
+        if (State != GoalStates.Completed && State != GoalStates.Failed)
             return;
 
         State = GoalStates.Open;

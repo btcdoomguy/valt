@@ -233,6 +233,7 @@ public static class Extensions
         services.AddSingleton<IGoalProgressCalculator, ReduceExpenseCategoryProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculator, BitcoinHodlProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculatorFactory, GoalProgressCalculatorFactory>();
+        services.AddSingleton<GoalProgressState>();
 
         //goal price update handler (subscribes to price update messages)
         services.AddSingleton<MarkGoalsStaleOnPriceUpdateHandler>();

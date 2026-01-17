@@ -25,10 +25,10 @@ internal class SpendingLimitProgressCalculator : IGoalProgressCalculator
         // Calculate total expenses in main fiat currency
         var totalSpending = _transactionReader.CalculateTotalExpenses(input.From, input.To);
 
-        // Calculate percentage (0-100%) - inverse: 100% means nothing spent, 0% means at/over limit
+        // Calculate percentage (0-100%): 0% = nothing spent, 100% = at/over limit (failed)
         var progress = config.TargetAmount > 0
-            ? Math.Max(0m, Math.Min(100m, 100m - ((totalSpending * 100m) / config.TargetAmount)))
-            : (totalSpending == 0 ? 100m : 0m);
+            ? Math.Min(100m, (totalSpending * 100m) / config.TargetAmount)
+            : (totalSpending == 0 ? 0m : 100m);
 
         // Create updated goal type with calculated values
         var updatedGoalType = config.WithCalculatedSpending(Math.Round(totalSpending, 2));

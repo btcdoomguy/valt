@@ -1,73 +1,94 @@
 # Goal Types Implementation Roadmap
 
-This document outlines the planned goal types to implement, in priority order. Each goal type should be implemented, reviewed, and committed individually.
+This document outlines the implemented goal types and their behavior. All goal types have been implemented.
 
 ---
 
-## 1. SpendingLimitGoalType (Budget Goal)
+## Progression Modes
 
-**Purpose**: Track that you don't exceed a spending limit in a period.
+Goals use a `ProgressionMode` enum to determine progress direction and state transitions:
+
+| Mode | Progress Direction | At 100% | UI Color |
+|------|-------------------|---------|----------|
+| **ZeroToSuccess** | 0% → 100% (good) | `Completed` | Green |
+| **DecreasingSuccess** | 0% → 100% (bad) | `Failed` | Red |
+
+---
+
+## 1. StackBitcoinGoalType ✅
+
+**Purpose**: Accumulate satoshis over a period.
+
+**ProgressionMode**: `ZeroToSuccess`
 
 ### Domain Model
 
 ```csharp
-// src/Valt.Core/Modules/Goals/GoalTypes/SpendingLimitGoalType.cs
-public class SpendingLimitGoalType : IGoalType
+public class StackBitcoinGoalType : IGoalType
 {
-    public GoalTypeNames TypeName => GoalTypeNames.SpendingLimit;
+    public GoalTypeNames TypeName => GoalTypeNames.StackBitcoin;
+    public ProgressionMode ProgressionMode => ProgressionMode.ZeroToSuccess;
 
-    public FiatValue LimitAmount { get; }        // Maximum allowed spending
-    public FiatCurrency Currency { get; }         // Currency for the limit
-    public long CalculatedSpending { get; }       // Actual spending in cents (to avoid decimals)
-
-    public FiatValue CalculatedSpendingValue => FiatValue.New(CalculatedSpending / 100m);
+    public BtcValue TargetAmount { get; }         // Target sats to accumulate
+    public long CalculatedSats { get; }           // Actual sats accumulated
 }
 ```
 
 ### Progress Calculation Logic
 
-- Query all expense transactions (negative fiat amounts) in the period
-- Filter by the specified currency
-- Sum the absolute values
-- Progress = 100 - ((spent / limit) * 100), capped between 0-100
-- **100% = nothing spent, 0% = at or over limit**
+- Query all bitcoin transactions in the period
+- Sum: FiatToBitcoin + Bitcoin income - BitcoinToFiat - Bitcoin expenses
+- Progress = (calculated / target) * 100, capped at 100
+- **0% = nothing accumulated, 100% = goal reached (Completed)**
+
+---
+
+## 2. SpendingLimitGoalType ✅
+
+**Purpose**: Track that you don't exceed a spending limit in a period.
+
+**ProgressionMode**: `DecreasingSuccess`
+
+### Domain Model
+
+```csharp
+public class SpendingLimitGoalType : IGoalType
+{
+    public GoalTypeNames TypeName => GoalTypeNames.SpendingLimit;
+    public ProgressionMode ProgressionMode => ProgressionMode.DecreasingSuccess;
+
+    public decimal TargetAmount { get; }          // Maximum allowed spending
+    public decimal CalculatedSpending { get; }    // Actual spending
+}
+```
+
+### Progress Calculation Logic
+
+- Query all expense transactions in the period
+- Sum the absolute values of expenses
+- Progress = (spent / limit) * 100, capped at 100
+- **0% = nothing spent (good), 100% = at/over limit (Failed)**
 
 ### Transaction Types to Include
 
 - `FiatDetails` with negative amount (expense)
 - `FiatToBitcoinDetails` (buying bitcoin is spending fiat)
-- `FiatToFiatDetails` where source account matches currency (transfer out)
-
-### Files to Create/Modify
-
-1. Add `SpendingLimit = 1` to `GoalTypeNames.cs`
-2. Create `SpendingLimitGoalType.cs` in Core
-3. Create `SpendingLimitGoalTypeDto.cs` in Infra
-4. Create `SpendingLimitProgressCalculator.cs` in Infra
-5. Update `Extensions.cs` with serialization mappings
-6. Update `Extensions.cs` DI registration
-7. Add localization strings for UI
-8. Update `ManageGoalViewModel` to support the new type
-9. Update `GoalEntryViewModel` for display
-
-### Localization Keys Needed
-
-- `GoalType_SpendingLimit` = "Spending Limit"
-- `GoalDescription_SpendingLimit` = "Spent {0} of {1} limit"
 
 ---
 
-## 2. DcaGoalType (Dollar Cost Averaging)
+## 3. DcaGoalType ✅
 
 **Purpose**: Ensure consistent bitcoin purchases regardless of price.
+
+**ProgressionMode**: `ZeroToSuccess`
 
 ### Domain Model
 
 ```csharp
-// src/Valt.Core/Modules/Goals/GoalTypes/DcaGoalType.cs
 public class DcaGoalType : IGoalType
 {
     public GoalTypeNames TypeName => GoalTypeNames.Dca;
+    public ProgressionMode ProgressionMode => ProgressionMode.ZeroToSuccess;
 
     public int TargetPurchaseCount { get; }       // Number of purchases to make
     public int CalculatedPurchaseCount { get; }   // Actual purchases made
@@ -79,151 +100,119 @@ public class DcaGoalType : IGoalType
 - Query all `FiatToBitcoin` transactions in the period
 - Count the number of transactions
 - Progress = (count / target) * 100, capped at 100
-
-### Transaction Types to Include
-
-- `FiatToBitcoinDetails` only (bitcoin purchases)
-
-### Files to Create/Modify
-
-1. Add `Dca = 2` to `GoalTypeNames.cs`
-2. Create `DcaGoalType.cs` in Core
-3. Create `DcaGoalTypeDto.cs` in Infra
-4. Create `DcaProgressCalculator.cs` in Infra
-5. Update `Extensions.cs` with serialization mappings
-6. Update `Extensions.cs` DI registration
-7. Add localization strings
-8. Update `ManageGoalViewModel`
-9. Update `GoalEntryViewModel`
-
-### Localization Keys Needed
-
-- `GoalType_Dca` = "DCA"
-- `GoalDescription_Dca` = "{0} of {1} purchases"
+- **0% = no purchases, 100% = target reached (Completed)**
 
 ---
 
-## 3. IncomeGoalType
+## 4. IncomeFiatGoalType ✅
 
-**Purpose**: Track income targets for a period.
+**Purpose**: Track fiat income targets for a period.
+
+**ProgressionMode**: `ZeroToSuccess`
 
 ### Domain Model
 
 ```csharp
-// src/Valt.Core/Modules/Goals/GoalTypes/IncomeGoalType.cs
-public class IncomeGoalType : IGoalType
+public class IncomeFiatGoalType : IGoalType
 {
-    public GoalTypeNames TypeName => GoalTypeNames.Income;
+    public GoalTypeNames TypeName => GoalTypeNames.IncomeFiat;
+    public ProgressionMode ProgressionMode => ProgressionMode.ZeroToSuccess;
 
-    public FiatValue TargetAmount { get; }        // Target income
-    public FiatCurrency Currency { get; }         // Currency for tracking
-    public long CalculatedIncome { get; }         // Actual income in cents
-
-    public FiatValue CalculatedIncomeValue => FiatValue.New(CalculatedIncome / 100m);
+    public decimal TargetAmount { get; }          // Target income
+    public decimal CalculatedIncome { get; }      // Actual income
 }
 ```
 
 ### Progress Calculation Logic
 
-- Query all income transactions (positive fiat amounts) in the period
-- Filter by the specified currency
+- Query all positive fiat transactions + BitcoinToFiat in the period
 - Sum the values
 - Progress = (income / target) * 100, capped at 100
-
-### Transaction Types to Include
-
-- `FiatDetails` with positive amount (income)
-- `BitcoinToFiatDetails` (selling bitcoin is fiat income)
-
-### Files to Create/Modify
-
-1. Add `Income = 3` to `GoalTypeNames.cs`
-2. Create `IncomeGoalType.cs` in Core
-3. Create `IncomeGoalTypeDto.cs` in Infra
-4. Create `IncomeProgressCalculator.cs` in Infra
-5. Update `Extensions.cs` with serialization mappings
-6. Update `Extensions.cs` DI registration
-7. Add localization strings
-8. Update `ManageGoalViewModel`
-9. Update `GoalEntryViewModel`
-
-### Localization Keys Needed
-
-- `GoalType_Income` = "Income"
-- `GoalDescription_Income` = "Earned {0} of {1}"
+- **0% = no income, 100% = target reached (Completed)**
 
 ---
 
-## 4. ReduceExpenseCategoryGoalType
+## 5. IncomeBtcGoalType ✅
+
+**Purpose**: Track bitcoin income targets for a period.
+
+**ProgressionMode**: `ZeroToSuccess`
+
+### Domain Model
+
+```csharp
+public class IncomeBtcGoalType : IGoalType
+{
+    public GoalTypeNames TypeName => GoalTypeNames.IncomeBtc;
+    public ProgressionMode ProgressionMode => ProgressionMode.ZeroToSuccess;
+
+    public BtcValue TargetAmount { get; }         // Target sats
+    public long CalculatedSats { get; }           // Actual sats received
+}
+```
+
+### Progress Calculation Logic
+
+- Query all bitcoin transactions with positive FromSatAmount
+- Sum the values
+- Progress = (income / target) * 100, capped at 100
+- **0% = no income, 100% = target reached (Completed)**
+
+---
+
+## 6. ReduceExpenseCategoryGoalType ✅
 
 **Purpose**: Reduce spending in a specific category.
 
+**ProgressionMode**: `DecreasingSuccess`
+
+**RequiresPriceData**: `true` (for multi-currency conversion)
+
 ### Domain Model
 
 ```csharp
-// src/Valt.Core/Modules/Goals/GoalTypes/ReduceExpenseCategoryGoalType.cs
 public class ReduceExpenseCategoryGoalType : IGoalType
 {
     public GoalTypeNames TypeName => GoalTypeNames.ReduceExpenseCategory;
+    public ProgressionMode ProgressionMode => ProgressionMode.DecreasingSuccess;
+    public bool RequiresPriceDataForCalculation => true;
 
-    public FiatValue LimitAmount { get; }         // Maximum for this category
-    public FiatCurrency Currency { get; }         // Currency for tracking
-    public long CategoryId { get; }               // Target category
-    public long CalculatedSpending { get; }       // Actual spending in cents
-
-    public FiatValue CalculatedSpendingValue => FiatValue.New(CalculatedSpending / 100m);
+    public decimal TargetAmount { get; }          // Maximum for this category
+    public string CategoryId { get; }             // Target category
+    public string CategoryName { get; }           // Display name
+    public decimal CalculatedSpending { get; }    // Actual spending
 }
 ```
 
 ### Progress Calculation Logic
 
-- Query all expense transactions in the period
-- Filter by category ID and currency
+- Query all expense transactions in the period for the specific category
+- Convert to main fiat currency using historical prices
 - Sum absolute values
-- Progress = 100 - ((spent / limit) * 100), capped between 0-100
-- **100% = nothing spent in category, 0% = at or over limit**
-
-### Transaction Types to Include
-
-- `FiatDetails` with negative amount and matching category
-- Other expense types if they have category assignments
-
-### Files to Create/Modify
-
-1. Add `ReduceExpenseCategory = 4` to `GoalTypeNames.cs`
-2. Create `ReduceExpenseCategoryGoalType.cs` in Core
-3. Create `ReduceExpenseCategoryGoalTypeDto.cs` in Infra
-4. Create `ReduceExpenseCategoryProgressCalculator.cs` in Infra
-5. Update `Extensions.cs` with serialization mappings
-6. Update `Extensions.cs` DI registration
-7. Add localization strings
-8. Update `ManageGoalViewModel` (needs category picker)
-9. Update `GoalEntryViewModel` (show category name)
-
-### Localization Keys Needed
-
-- `GoalType_ReduceExpenseCategory` = "Category Budget"
-- `GoalDescription_ReduceExpenseCategory` = "{0}: Spent {1} of {2} limit"
+- Progress = (spent / limit) * 100, capped at 100
+- **0% = nothing spent in category (good), 100% = at/over limit (Failed)**
 
 ### Special Considerations
 
-- Need to load categories list in the ManageGoal modal
-- Need to display category name in the goal entry
-- Consider what happens if category is deleted (show "Unknown Category"?)
+- Requires price data for multi-currency conversion
+- Goals with this type are marked stale when price data updates
+- Shows category name in the goal entry display
 
 ---
 
-## 5. BitcoinHodlGoalType
+## 7. BitcoinHodlGoalType ✅
 
 **Purpose**: Track that you don't sell bitcoin (diamond hands challenge).
+
+**ProgressionMode**: `DecreasingSuccess`
 
 ### Domain Model
 
 ```csharp
-// src/Valt.Core/Modules/Goals/GoalTypes/BitcoinHodlGoalType.cs
 public class BitcoinHodlGoalType : IGoalType
 {
     public GoalTypeNames TypeName => GoalTypeNames.BitcoinHodl;
+    public ProgressionMode ProgressionMode => ProgressionMode.DecreasingSuccess;
 
     public long MaxSellableSats { get; }          // 0 = no sales allowed, or max sats to sell
     public long CalculatedSoldSats { get; }       // Actual sats sold
@@ -234,64 +223,65 @@ public class BitcoinHodlGoalType : IGoalType
 
 - Query all `BitcoinToFiat` transactions in the period
 - Sum the absolute sat amounts sold
-- If MaxSellableSats == 0: Progress = soldSats == 0 ? 100 : 0
-- If MaxSellableSats > 0: Progress = 100 - ((sold / max) * 100), capped between 0-100
-- **100% = no sales (or under max), 0% = exceeded allowed sales**
-
-### Transaction Types to Include
-
-- `BitcoinToFiatDetails` only (bitcoin sales)
-
-### Files to Create/Modify
-
-1. Add `BitcoinHodl = 5` to `GoalTypeNames.cs`
-2. Create `BitcoinHodlGoalType.cs` in Core
-3. Create `BitcoinHodlGoalTypeDto.cs` in Infra
-4. Create `BitcoinHodlProgressCalculator.cs` in Infra
-5. Update `Extensions.cs` with serialization mappings
-6. Update `Extensions.cs` DI registration
-7. Add localization strings
-8. Update `ManageGoalViewModel`
-9. Update `GoalEntryViewModel`
-
-### Localization Keys Needed
-
-- `GoalType_BitcoinHodl` = "HODL"
-- `GoalDescription_BitcoinHodl_NoSales` = "No bitcoin sold!"
-- `GoalDescription_BitcoinHodl_WithLimit` = "Sold {0} of {1} max"
-- `GoalDescription_BitcoinHodl_Failed` = "Sold {0} sats"
+- If MaxSellableSats == 0: Progress = soldSats == 0 ? 0 : 100 (full HODL mode)
+- If MaxSellableSats > 0: Progress = (sold / max) * 100, capped at 100
+- **0% = no sales (good), 100% = exceeded allowed sales (Failed)**
 
 ---
 
-## Implementation Checklist Template
+## State Transitions
 
-For each goal type, follow this checklist:
+Goals automatically transition based on progress and progression mode:
 
-- [ ] Add enum value to `GoalTypeNames.cs`
-- [ ] Create domain class in `src/Valt.Core/Modules/Goals/GoalTypes/`
-- [ ] Create DTO class in `src/Valt.Infra/Modules/Goals/GoalTypeDtos.cs`
-- [ ] Create calculator in `src/Valt.Infra/Modules/Goals/Services/`
-- [ ] Add serialization in `src/Valt.Infra/Modules/Goals/Extensions.cs`
-- [ ] Register calculator in DI in `Extensions.cs`
-- [ ] Add strings to `language.resx` (English)
-- [ ] Add strings to `language.pt-BR.resx` (Portuguese)
-- [ ] Add strings to `language.es.resx` (Spanish)
-- [ ] Update `language.Designer.cs`
-- [ ] Update `ManageGoalViewModel.cs` for goal creation
-- [ ] Update `ManageGoalView.axaml` if new input fields needed
-- [ ] Update `GoalEntryViewModel.cs` for display
-- [ ] Write unit tests for the calculator
-- [ ] Write unit tests for the goal type
-- [ ] Run all tests: `dotnet test`
-- [ ] Run the app and test manually
-- [ ] Commit with descriptive message
+```
+                    ZeroToSuccess                    DecreasingSuccess
+                         │                                   │
+    Progress < 100%:   Open                               Open
+                         │                                   │
+    Progress >= 100%: Completed                           Failed
+                         │                                   │
+    User Recalculate:  Open                               Open
+```
+
+### Recalculate Action
+
+- Available for `Completed` or `Failed` goals
+- Resets state to `Open`
+- Marks goal as stale for recalculation
+- Useful when user wants to re-evaluate after editing transactions
+
+---
+
+## Implementation Summary
+
+| Goal Type | ProgressionMode | Progress Bar | At 100% | Status |
+|-----------|-----------------|--------------|---------|--------|
+| StackBitcoin | ZeroToSuccess | Green | Completed | ✅ |
+| DCA | ZeroToSuccess | Green | Completed | ✅ |
+| IncomeFiat | ZeroToSuccess | Green | Completed | ✅ |
+| IncomeBtc | ZeroToSuccess | Green | Completed | ✅ |
+| SpendingLimit | DecreasingSuccess | Red | Failed | ✅ |
+| ReduceExpenseCategory | DecreasingSuccess | Red | Failed | ✅ |
+| BitcoinHodl | DecreasingSuccess | Red | Failed | ✅ |
+
+---
+
+## Background Processing
+
+**GoalProgressUpdaterJob** runs every 1 second using a flag-based approach:
+
+1. Event handlers (transaction changes, goal events) call `GoalProgressState.MarkAsStale()`
+2. Job checks `HasStaleGoals` flag (no DB polling)
+3. If stale, retrieves and recalculates affected goals
+4. Auto-transitions state at 100% based on progression mode
+5. Publishes `GoalProgressUpdated` message for UI updates
 
 ---
 
 ## Notes
 
-- All goal types follow the same architectural pattern as `StackBitcoinGoalType`
+- All goal types follow the same architectural pattern
 - Domain classes must NOT have serialization attributes (use DTOs)
 - Progress is always 0-100 (percentage)
 - Use immutable patterns with `With*` factory methods for updates
-- Background job will automatically recalculate progress every 5 seconds for stale goals
+- `ProgressionMode` determines both progress direction and auto-transition behavior

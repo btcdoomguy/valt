@@ -93,7 +93,7 @@ public class GoalTests
     }
 
     [Test]
-    public void Should_Auto_Fail_DecreasingSuccess_Goal_When_Progress_Reaches_Zero()
+    public void Should_Auto_Fail_DecreasingSuccess_Goal_When_Progress_Reaches_100()
     {
         // Arrange
         var goal = GoalBuilder.AGoal()
@@ -104,9 +104,9 @@ public class GoalTests
         var updatedGoalType = new SpendingLimitGoalType(1000m, 1000m);
 
         // Act
-        goal.UpdateProgress(0m, updatedGoalType, DateTime.UtcNow);
+        goal.UpdateProgress(100m, updatedGoalType, DateTime.UtcNow);
 
-        // Assert - DecreasingSuccess goals auto-fail at 0%
+        // Assert - DecreasingSuccess goals auto-fail at 100% (budget exhausted)
         Assert.That(goal.State, Is.EqualTo(GoalStates.Failed));
     }
 
@@ -129,7 +129,7 @@ public class GoalTests
     }
 
     [Test]
-    public void Should_Not_Auto_Fail_DecreasingSuccess_Goal_When_Progress_Above_Zero()
+    public void Should_Not_Auto_Fail_DecreasingSuccess_Goal_When_Progress_Below_100()
     {
         // Arrange
         var goal = GoalBuilder.AGoal()
@@ -140,9 +140,9 @@ public class GoalTests
         var updatedGoalType = new SpendingLimitGoalType(1000m, 900m);
 
         // Act
-        goal.UpdateProgress(10m, updatedGoalType, DateTime.UtcNow);
+        goal.UpdateProgress(90m, updatedGoalType, DateTime.UtcNow);
 
-        // Assert - Still has budget remaining, should remain Open
+        // Assert - Not yet 100%, should remain Open
         Assert.That(goal.State, Is.EqualTo(GoalStates.Open));
     }
 
@@ -275,77 +275,10 @@ public class GoalTests
 
     #endregion
 
-    #region Close Tests
+    #region Recalculate Tests
 
     [Test]
-    public void Should_Close_Goal_When_State_Is_Open()
-    {
-        // Arrange
-        var goal = GoalBuilder.AGoal()
-            .WithState(GoalStates.Open)
-            .Build();
-
-        // Act
-        goal.Close();
-
-        // Assert
-        Assert.That(goal.State, Is.EqualTo(GoalStates.Closed));
-    }
-
-    [Test]
-    public void Should_Not_Close_Goal_When_State_Is_Completed()
-    {
-        // Arrange
-        var goal = GoalBuilder.AGoal()
-            .WithState(GoalStates.Completed)
-            .Build();
-
-        // Act
-        goal.Close();
-
-        // Assert - State unchanged
-        Assert.That(goal.State, Is.EqualTo(GoalStates.Completed));
-    }
-
-    [Test]
-    public void Should_Not_Close_Goal_When_State_Is_Failed()
-    {
-        // Arrange
-        var goal = GoalBuilder.AGoal()
-            .WithState(GoalStates.Failed)
-            .Build();
-
-        // Act
-        goal.Close();
-
-        // Assert - State unchanged
-        Assert.That(goal.State, Is.EqualTo(GoalStates.Failed));
-    }
-
-    [Test]
-    public void Should_Not_Close_Goal_When_Already_Closed()
-    {
-        // Arrange
-        var goal = GoalBuilder.AGoal()
-            .WithState(GoalStates.Closed)
-            .Build();
-
-        var eventCountBefore = goal.Events.Count;
-
-        // Act
-        goal.Close();
-
-        // Assert - State unchanged, no new event
-        Assert.That(goal.State, Is.EqualTo(GoalStates.Closed));
-        Assert.That(goal.Events.Count, Is.EqualTo(eventCountBefore));
-    }
-
-    #endregion
-
-    #region Reopen Tests
-
-    [Test]
-    public void Should_Reopen_Goal_When_State_Is_Completed()
+    public void Should_Recalculate_Goal_When_State_Is_Completed()
     {
         // Arrange
         var goal = GoalBuilder.AGoal()
@@ -354,7 +287,7 @@ public class GoalTests
             .Build();
 
         // Act
-        goal.Reopen();
+        goal.Recalculate();
 
         // Assert
         Assert.That(goal.State, Is.EqualTo(GoalStates.Open));
@@ -362,7 +295,7 @@ public class GoalTests
     }
 
     [Test]
-    public void Should_Reopen_Goal_When_State_Is_Failed()
+    public void Should_Recalculate_Goal_When_State_Is_Failed()
     {
         // Arrange
         var goal = GoalBuilder.AGoal()
@@ -371,7 +304,7 @@ public class GoalTests
             .Build();
 
         // Act
-        goal.Reopen();
+        goal.Recalculate();
 
         // Assert
         Assert.That(goal.State, Is.EqualTo(GoalStates.Open));
@@ -379,24 +312,7 @@ public class GoalTests
     }
 
     [Test]
-    public void Should_Reopen_Goal_When_State_Is_Closed()
-    {
-        // Arrange
-        var goal = GoalBuilder.AGoal()
-            .WithState(GoalStates.Closed)
-            .WithIsUpToDate(true)
-            .Build();
-
-        // Act
-        goal.Reopen();
-
-        // Assert
-        Assert.That(goal.State, Is.EqualTo(GoalStates.Open));
-        Assert.That(goal.IsUpToDate, Is.False);
-    }
-
-    [Test]
-    public void Should_Not_Reopen_Goal_When_State_Is_Open()
+    public void Should_Not_Recalculate_Goal_When_State_Is_Open()
     {
         // Arrange
         var goal = GoalBuilder.AGoal()
@@ -406,7 +322,7 @@ public class GoalTests
         var eventCountBefore = goal.Events.Count;
 
         // Act
-        goal.Reopen();
+        goal.Recalculate();
 
         // Assert - State unchanged, no new event
         Assert.That(goal.State, Is.EqualTo(GoalStates.Open));
@@ -414,16 +330,16 @@ public class GoalTests
     }
 
     [Test]
-    public void Should_Mark_Goal_As_Stale_When_Reopened()
+    public void Should_Mark_Goal_As_Stale_When_Recalculated()
     {
         // Arrange
         var goal = GoalBuilder.AGoal()
-            .WithState(GoalStates.Closed)
+            .WithState(GoalStates.Completed)
             .WithIsUpToDate(true)
             .Build();
 
         // Act
-        goal.Reopen();
+        goal.Recalculate();
 
         // Assert
         Assert.That(goal.IsUpToDate, Is.False);

@@ -1423,14 +1423,14 @@
     <data name="Goals_Edit" xml:space="preserve">
         <value>Edit</value>
     </data>
-    <data name="Goals_Close" xml:space="preserve">
-        <value>Close</value>
+    <data name="Goals_Recalculate" xml:space="preserve">
+        <value>Recalculate</value>
     </data>
-    <data name="Goals_Conclude" xml:space="preserve">
-        <value>Conclude</value>
+    <data name="Goals_Success" xml:space="preserve">
+        <value>SUCCESS</value>
     </data>
-    <data name="Goals_Reopen" xml:space="preserve">
-        <value>Reopen</value>
+    <data name="Goals_Failed" xml:space="preserve">
+        <value>FAILED</value>
     </data>
     <data name="Goals_Delete" xml:space="preserve">
         <value>Delete</value>
@@ -1445,7 +1445,7 @@
         <value>{0}/{1} sats</value>
     </data>
     <data name="GoalDescription_SpendingLimit" xml:space="preserve">
-        <value>Spent {0} of {1}</value>
+        <value>{0} of {1}</value>
     </data>
     <data name="GoalType_Dca" xml:space="preserve">
         <value>DCA</value>
@@ -1466,7 +1466,7 @@
         <value>Track income targets in your main fiat currency</value>
     </data>
     <data name="GoalDescription_IncomeFiat" xml:space="preserve">
-        <value>Earned {0} of {1}</value>
+        <value>{0} of {1}</value>
     </data>
     <data name="GoalType_IncomeBtc" xml:space="preserve">
         <value>Bitcoin Income</value>
@@ -1487,7 +1487,7 @@
         <value>Limit spending in a specific category</value>
     </data>
     <data name="GoalDescription_ReduceExpenseCategory" xml:space="preserve">
-        <value>Spent {0} of {1} limit</value>
+        <value>{0} of {1}</value>
     </data>
     <data name="ManageGoal_Category" xml:space="preserve">
         <value>Category</value>

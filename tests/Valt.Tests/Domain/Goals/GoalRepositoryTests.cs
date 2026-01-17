@@ -144,8 +144,8 @@ public class GoalRepositoryTests
         var retrievedGoal = await _repository.GetByIdAsync(goal.Id);
         Assert.That(retrievedGoal, Is.Not.Null);
 
-        // Close the goal to add an event (Close works from Open state)
-        retrievedGoal!.Close();
+        // Mark the goal as stale to add an event
+        retrievedGoal!.MarkAsStale();
         Assert.That(retrievedGoal.Events.Count, Is.GreaterThan(0));
 
         // Act
@@ -161,6 +161,7 @@ public class GoalRepositoryTests
         // Arrange
         var goal = GoalBuilder.AGoal()
             .WithState(GoalStates.Open)
+            .WithIsUpToDate(true)
             .Build();
 
         await _repository.SaveAsync(goal);
@@ -172,8 +173,8 @@ public class GoalRepositoryTests
         // Reset the mock to track only delete-related events
         _domainEventPublisher.ClearReceivedCalls();
 
-        // Close the goal to add an event
-        retrievedGoal!.Close();
+        // Mark the goal as stale to add an event
+        retrievedGoal!.MarkAsStale();
         Assert.That(retrievedGoal.Events.Count, Is.GreaterThan(0));
 
         // Act
@@ -220,8 +221,8 @@ public class GoalRepositoryTests
             .WithState(GoalStates.Open)
             .Build();
 
-        var closedGoal = GoalBuilder.AGoal()
-            .WithState(GoalStates.Closed)
+        var failedGoal = GoalBuilder.AGoal()
+            .WithState(GoalStates.Failed)
             .Build();
 
         var completedGoal = GoalBuilder.AGoal()
@@ -229,17 +230,17 @@ public class GoalRepositoryTests
             .Build();
 
         await _repository.SaveAsync(openGoal);
-        await _repository.SaveAsync(closedGoal);
+        await _repository.SaveAsync(failedGoal);
         await _repository.SaveAsync(completedGoal);
 
         // Act
         await _repository.DeleteAsync(openGoal);
-        await _repository.DeleteAsync(closedGoal);
+        await _repository.DeleteAsync(failedGoal);
         await _repository.DeleteAsync(completedGoal);
 
         // Assert
         Assert.That(await _repository.GetByIdAsync(openGoal.Id), Is.Null);
-        Assert.That(await _repository.GetByIdAsync(closedGoal.Id), Is.Null);
+        Assert.That(await _repository.GetByIdAsync(failedGoal.Id), Is.Null);
         Assert.That(await _repository.GetByIdAsync(completedGoal.Id), Is.Null);
     }
 

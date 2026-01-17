@@ -1075,8 +1075,13 @@
          PROGRESS BAR - Goals
          ═══════════════════════════════════════════════════════════════════════════════ -->
 
-    <!-- Progress bar with green background when goal is complete -->
+    <!-- Progress bar with green background when goal is complete (ZeroToSuccess) -->
     <Style Selector="ProgressBar.complete /template/ Border#PART_Indicator">
         <Setter Property="Background" Value="{DynamicResource SemanticPositive500Brush}" />
+    </Style>
+
+    <!-- Progress bar with red background for DecreasingSuccess goals -->
+    <Style Selector="ProgressBar.danger /template/ Border#PART_Indicator">
+        <Setter Property="Background" Value="{DynamicResource SemanticNegative400Brush}" />
     </Style>
 </Styles>

@@ -47,13 +47,13 @@ public class SpendingLimitProgressCalculatorTests
         // Act
         var result = await _calculator.CalculateProgressAsync(input);
 
-        // Assert: Progress is inverse: 100 - (500/1000 * 100) = 50%
+        // Assert: Progress = 500/1000 * 100 = 50%
         Assert.That(result.Progress, Is.EqualTo(50m));
         Assert.That(((SpendingLimitGoalType)result.UpdatedGoalType).CalculatedSpending, Is.EqualTo(500m));
     }
 
     [Test]
-    public async Task Should_Return_100_Progress_When_No_Spending()
+    public async Task Should_Return_0_Progress_When_No_Spending()
     {
         // Arrange: Goal to limit spending to $1000
         var goalTypeJson = SerializeGoalType(1000m);
@@ -72,12 +72,12 @@ public class SpendingLimitProgressCalculatorTests
         // Act
         var result = await _calculator.CalculateProgressAsync(input);
 
-        // Assert: Progress is 100% (nothing spent)
-        Assert.That(result.Progress, Is.EqualTo(100m));
+        // Assert: Progress is 0% (nothing spent = good)
+        Assert.That(result.Progress, Is.EqualTo(0m));
     }
 
     [Test]
-    public async Task Should_Return_0_Progress_When_At_Limit()
+    public async Task Should_Return_100_Progress_When_At_Limit()
     {
         // Arrange: Goal to limit spending to $1000
         var goalTypeJson = SerializeGoalType(1000m);
@@ -96,12 +96,12 @@ public class SpendingLimitProgressCalculatorTests
         // Act
         var result = await _calculator.CalculateProgressAsync(input);
 
-        // Assert: Progress is 0% (at limit)
-        Assert.That(result.Progress, Is.EqualTo(0m));
+        // Assert: Progress is 100% (at limit = failed)
+        Assert.That(result.Progress, Is.EqualTo(100m));
     }
 
     [Test]
-    public async Task Should_Return_0_Progress_When_Over_Limit()
+    public async Task Should_Return_100_Progress_When_Over_Limit()
     {
         // Arrange: Goal to limit spending to $100
         var goalTypeJson = SerializeGoalType(100m);
@@ -120,12 +120,12 @@ public class SpendingLimitProgressCalculatorTests
         // Act
         var result = await _calculator.CalculateProgressAsync(input);
 
-        // Assert: Progress is capped at 0%
-        Assert.That(result.Progress, Is.EqualTo(0m));
+        // Assert: Progress is capped at 100% (over limit = failed)
+        Assert.That(result.Progress, Is.EqualTo(100m));
     }
 
     [Test]
-    public async Task Should_Return_0_Progress_When_Target_Is_Zero_With_Spending()
+    public async Task Should_Return_100_Progress_When_Target_Is_Zero_With_Spending()
     {
         // Arrange
         var goalTypeJson = SerializeGoalType(0m);
@@ -143,12 +143,12 @@ public class SpendingLimitProgressCalculatorTests
         // Act
         var result = await _calculator.CalculateProgressAsync(input);
 
-        // Assert: 0% because there's spending but no limit
-        Assert.That(result.Progress, Is.EqualTo(0m));
+        // Assert: 100% because there's spending but no limit (instant fail)
+        Assert.That(result.Progress, Is.EqualTo(100m));
     }
 
     [Test]
-    public async Task Should_Return_100_Progress_When_Target_Is_Zero_With_No_Spending()
+    public async Task Should_Return_0_Progress_When_Target_Is_Zero_With_No_Spending()
     {
         // Arrange
         var goalTypeJson = SerializeGoalType(0m);
@@ -166,8 +166,8 @@ public class SpendingLimitProgressCalculatorTests
         // Act
         var result = await _calculator.CalculateProgressAsync(input);
 
-        // Assert: 100% because no spending
-        Assert.That(result.Progress, Is.EqualTo(100m));
+        // Assert: 0% because no spending
+        Assert.That(result.Progress, Is.EqualTo(0m));
     }
 
     [Test]

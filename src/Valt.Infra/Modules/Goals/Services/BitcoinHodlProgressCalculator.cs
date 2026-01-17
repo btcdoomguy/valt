@@ -37,17 +37,17 @@ internal class BitcoinHodlProgressCalculator : IGoalProgressCalculator
             .Where(x => x.Type == TransactionEntityType.BitcoinToFiat && x.FromSatAmount < 0)
             .Sum(x => Math.Abs(x.FromSatAmount ?? 0));
 
-        // Progress calculation:
-        // - If MaxSellableSats == 0: Progress = soldSats == 0 ? 100 : 0 (full HODL mode)
-        // - If MaxSellableSats > 0: Progress = 100 - ((sold / max) * 100), capped between 0-100
+        // Progress calculation (0-100%): 0% = nothing sold, 100% = at/over limit (failed)
+        // - If MaxSellableSats == 0: Progress = soldSats == 0 ? 0 : 100 (full HODL mode - any sale = instant fail)
+        // - If MaxSellableSats > 0: Progress = (sold / max) * 100, capped at 100
         decimal progress;
         if (config.MaxSellableSats == 0)
         {
-            progress = soldSats == 0 ? 100m : 0m;
+            progress = soldSats == 0 ? 0m : 100m;
         }
         else
         {
-            progress = Math.Max(0m, Math.Min(100m, 100m - ((soldSats * 100m) / config.MaxSellableSats)));
+            progress = Math.Min(100m, (soldSats * 100m) / config.MaxSellableSats);
         }
 
         // Create updated goal type with calculated values

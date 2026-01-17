@@ -28,10 +28,10 @@ internal class ReduceExpenseCategoryProgressCalculator : IGoalProgressCalculator
         // Calculate total spending for the specific category in main fiat currency
         var totalSpending = _transactionReader.CalculateTotalExpenses(input.From, input.To, targetCategoryId);
 
-        // Progress calculation: inverse percentage (100% = nothing spent, 0% = at or over limit)
+        // Calculate percentage (0-100%): 0% = nothing spent, 100% = at/over limit (failed)
         var progress = config.TargetAmount > 0
-            ? Math.Max(0m, Math.Min(100m, 100m - ((totalSpending * 100m) / config.TargetAmount)))
-            : (totalSpending == 0 ? 100m : 0m);
+            ? Math.Min(100m, (totalSpending * 100m) / config.TargetAmount)
+            : (totalSpending == 0 ? 0m : 100m);
 
         // Create updated goal type with calculated values
         var updatedGoalType = config.WithCalculatedSpending(Math.Round(totalSpending, 2));

@@ -1403,14 +1403,14 @@
     <data name="Goals_Edit" xml:space="preserve">
         <value>Editar</value>
     </data>
-    <data name="Goals_Close" xml:space="preserve">
-        <value>Fechar</value>
+    <data name="Goals_Recalculate" xml:space="preserve">
+        <value>Recalcular</value>
     </data>
-    <data name="Goals_Conclude" xml:space="preserve">
-        <value>Concluir</value>
+    <data name="Goals_Success" xml:space="preserve">
+        <value>SUCESSO</value>
     </data>
-    <data name="Goals_Reopen" xml:space="preserve">
-        <value>Reabrir</value>
+    <data name="Goals_Failed" xml:space="preserve">
+        <value>FALHOU</value>
     </data>
     <data name="Goals_Delete" xml:space="preserve">
         <value>Excluir</value>
@@ -1425,7 +1425,7 @@
         <value>{0}/{1} sats</value>
     </data>
     <data name="GoalDescription_SpendingLimit" xml:space="preserve">
-        <value>Gasto {0} de {1}</value>
+        <value>{0} de {1}</value>
     </data>
     <data name="GoalType_Dca" xml:space="preserve">
         <value>DCA</value>
@@ -1446,7 +1446,7 @@
         <value>Acompanhe metas de renda na sua moeda principal</value>
     </data>
     <data name="GoalDescription_IncomeFiat" xml:space="preserve">
-        <value>Ganhou {0} de {1}</value>
+        <value>{0} de {1}</value>
     </data>
     <data name="GoalType_IncomeBtc" xml:space="preserve">
         <value>Renda em Bitcoin</value>
@@ -1467,7 +1467,7 @@
         <value>Limite os gastos em uma categoria específica</value>
     </data>
     <data name="GoalDescription_ReduceExpenseCategory" xml:space="preserve">
-        <value>Gastou {0} de {1} limite</value>
+        <value>{0} de {1}</value>
     </data>
     <data name="ManageGoal_Category" xml:space="preserve">
         <value>Categoria</value>
