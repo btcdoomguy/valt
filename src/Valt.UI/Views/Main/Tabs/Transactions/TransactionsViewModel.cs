@@ -165,7 +165,45 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
     private void OnGoalProgressUpdatedReceive(object recipient, GoalProgressUpdated message)
     {
-        _ = FetchGoals();
+        _ = UpdateGoalProgress();
+    }
+
+    /// <summary>
+    /// Updates existing goal entries in place to enable progress animation.
+    /// Only adds/removes entries when the goal list changes.
+    /// </summary>
+    private async Task UpdateGoalProgress()
+    {
+        if (_filterState is null) return;
+        if (_goalRepository is null) return;
+
+        try
+        {
+            var currentDate = DateOnly.FromDateTime(_filterState.MainDate);
+            var allGoals = await _goalRepository.GetAllAsync();
+
+            var goalsForPeriod = allGoals
+                .Where(g =>
+                {
+                    var range = g.GetPeriodRange();
+                    return currentDate >= range.Start && currentDate <= range.End;
+                })
+                .ToDictionary(g => g.Id.ToString());
+
+            // Update existing entries in place (this triggers animation)
+            foreach (var entry in GoalEntries.ToList())
+            {
+                if (goalsForPeriod.TryGetValue(entry.Id, out var updatedGoal))
+                {
+                    entry.UpdateGoal(updatedGoal);
+                    goalsForPeriod.Remove(entry.Id);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating goal progress");
+        }
     }
 
     private void OnTransactionListChangedReceive(object recipient, TransactionListChanged message)
@@ -176,6 +214,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
     private void FilterStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        OnPropertyChanged(nameof(CurrentMonthYearDisplay));
         OnPropertyChanged(nameof(FixedExpenseCurrentMonthDescription));
         OnPropertyChanged(nameof(GoalsCurrentMonthDescription));
     }
@@ -511,6 +550,12 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     }
 
     #endregion
+
+    /// <summary>
+    /// Returns the current month and year formatted for display (e.g., "January 2026")
+    /// </summary>
+    public string CurrentMonthYearDisplay =>
+        DateOnly.FromDateTime(_filterState!.MainDate).ToString("MMMM yyyy", CultureInfo.CurrentCulture);
 
     #region Fixed Expense operations
 

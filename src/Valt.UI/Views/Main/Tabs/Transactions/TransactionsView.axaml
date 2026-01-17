@@ -218,6 +218,15 @@
         <!-- Right Column -->
         <Panel Grid.Column="3">
             <Grid RowDefinitions="80, *, 4, *" Margin="0, 0, 10, 10">
+                <!-- Current Month/Year Header -->
+                <TextBlock Grid.Row="0"
+                           Text="{Binding CurrentMonthYearDisplay}"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           FontFamily="{DynamicResource GeistMono}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Bottom"
+                           Margin="0, 0, 0, 8" />
                 <!-- Fixed Expenses Panel -->
                 <Grid Grid.Row="1" RowDefinitions="30, *, Auto" MinHeight="150">
                     <!-- Fixed Expenses Header -->
@@ -227,20 +236,16 @@
                             Padding="5, 0, 0, 0"
                             BorderThickness="1, 1, 1, 0"
                             CornerRadius="5, 5, 0, 0">
-                        <Grid ColumnDefinitions="*, 50">
-                            <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Stretch"
-                                        Margin="0, 5, 0, 0">
-                                <TextBlock FontSize="12" Text="{x:Static local:language.ManageFixedExpenses_Title}"></TextBlock>
-                                <TextBlock FontSize="12" Text="{Binding FixedExpenseCurrentMonthDescription}"></TextBlock>
-                            </StackPanel>
-                            <Button Grid.Column="1" FontSize="18" Classes="icon-only"
-                                    HorizontalAlignment="Right"
-                                    HorizontalContentAlignment="Right"
-                                    VerticalContentAlignment="Center"
-                                    Padding="4, 0, 4, 0"
+                        <Grid ColumnDefinitions="*, Auto">
+                            <TextBlock Grid.Column="0"
+                                       FontSize="12"
+                                       Text="{x:Static local:language.ManageFixedExpenses_Title}"
+                                       VerticalAlignment="Center" />
+                            <Button Grid.Column="1"
+                                    Classes="panel-header-icon"
                                     Content="&#xE745;"
-                                    FontFamily="{DynamicResource MaterialDesign}"
-                                    Height="30" Command="{Binding ManageFixedExpensesCommand}" />
+                                    Command="{Binding ManageFixedExpensesCommand}"
+                                    Margin="4, 0, 4, 0" />
                         </Grid>
                     </Border>
                     <!-- Fixed Expense List -->
@@ -378,21 +383,16 @@
                             Padding="5, 0, 0, 0"
                             BorderThickness="1, 1, 1, 0"
                             CornerRadius="5, 5, 0, 0">
-                        <Grid ColumnDefinitions="*, 50">
-                            <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Stretch"
-                                        Margin="0, 5, 0, 0">
-                                <TextBlock FontSize="12" Text="{x:Static local:language.Goals_Title}"></TextBlock>
-                                <TextBlock FontSize="12" Text=" "></TextBlock>
-                                <TextBlock FontSize="12" Text="{Binding GoalsCurrentMonthDescription}"></TextBlock>
-                            </StackPanel>
-                            <Button Grid.Column="1" FontSize="18" Classes="icon-only"
-                                    HorizontalAlignment="Right"
-                                    HorizontalContentAlignment="Right"
-                                    VerticalContentAlignment="Center"
-                                    Padding="4, 0, 4, 0"
+                        <Grid ColumnDefinitions="*, Auto">
+                            <TextBlock Grid.Column="0"
+                                       FontSize="12"
+                                       Text="{x:Static local:language.Goals_Title}"
+                                       VerticalAlignment="Center" />
+                            <Button Grid.Column="1"
+                                    Classes="panel-header-icon"
                                     Content="&#xE145;"
-                                    FontFamily="{DynamicResource MaterialDesign}"
-                                    Height="30" Command="{Binding AddGoalCommand}" />
+                                    Command="{Binding AddGoalCommand}"
+                                    Margin="4, 0, 4, 0" />
                         </Grid>
                     </Border>
                     <!-- Goals List -->
@@ -437,11 +437,11 @@
                                         <Grid ColumnDefinitions="*, Auto"
                                               IsVisible="{Binding ShowProgressBar}">
                                             <ProgressBar Grid.Column="0"
-                                                         Value="{Binding ProgressPercentage}"
+                                                         Value="{Binding AnimatedProgressPercentage}"
                                                          Minimum="0"
                                                          Maximum="100"
-                                                         Height="8"
-                                                         CornerRadius="4"
+                                                         Height="12"
+                                                         CornerRadius="6"
                                                          Margin="0, 0, 8, 0"
                                                          Classes.complete="{Binding IsProgressComplete}" />
                                             <TextBlock Grid.Column="1"

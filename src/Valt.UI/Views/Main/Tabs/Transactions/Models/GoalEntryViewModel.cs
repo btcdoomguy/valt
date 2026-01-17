@@ -1,4 +1,7 @@
 using System;
+using System.Threading;
+using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Valt.Core.Common;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.GoalTypes;
@@ -7,15 +10,26 @@ using Valt.UI.Lang;
 
 namespace Valt.UI.Views.Main.Tabs.Transactions.Models;
 
-public class GoalEntryViewModel
+public partial class GoalEntryViewModel : ObservableObject, IDisposable
 {
-    private readonly Goal _goal;
+    private Goal _goal;
     private readonly string _mainFiatCurrency;
+    private Timer? _animationTimer;
+    private decimal _animationStartValue;
+    private decimal _animationTargetValue;
+    private DateTime _animationStartTime;
+    private const int AnimationDurationMs = 3000;
+    private const int AnimationIntervalMs = 16; // ~60fps
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ProgressDisplay))]
+    private decimal _animatedProgressPercentage;
 
     public GoalEntryViewModel(Goal goal, string mainFiatCurrency)
     {
         _goal = goal;
         _mainFiatCurrency = mainFiatCurrency;
+        _animatedProgressPercentage = Math.Min(goal.Progress, 100);
     }
 
     public string Id => _goal.Id.ToString();
@@ -54,7 +68,7 @@ public class GoalEntryViewModel
     {
         get
         {
-            var percentage = ProgressPercentage;
+            var percentage = AnimatedProgressPercentage;
             return $"{percentage:F1}%";
         }
     }
@@ -151,4 +165,75 @@ public class GoalEntryViewModel
 
     // Show progress bar only for Open and Completed states (not for MarkedAsCompleted or Closed)
     public bool ShowProgressBar => _goal.State != GoalStates.MarkedAsCompleted;
+
+    /// <summary>
+    /// Updates the goal data and animates the progress bar to the new value over 3 seconds
+    /// </summary>
+    public void UpdateGoal(Goal newGoal)
+    {
+        var oldProgress = AnimatedProgressPercentage;
+        var newProgress = Math.Min(newGoal.Progress, 100);
+
+        _goal = newGoal;
+
+        // Notify that derived properties may have changed
+        OnPropertyChanged(nameof(FriendlyName));
+        OnPropertyChanged(nameof(Description));
+        OnPropertyChanged(nameof(TargetDisplay));
+        OnPropertyChanged(nameof(State));
+        OnPropertyChanged(nameof(IsClosed));
+        OnPropertyChanged(nameof(IsMarkedAsComplete));
+        OnPropertyChanged(nameof(IsOpen));
+        OnPropertyChanged(nameof(IsProgressComplete));
+        OnPropertyChanged(nameof(CanClose));
+        OnPropertyChanged(nameof(CanConclude));
+        OnPropertyChanged(nameof(CanReopen));
+        OnPropertyChanged(nameof(ShowProgressBar));
+
+        // If progress changed, animate it
+        if (oldProgress != newProgress)
+        {
+            StartProgressAnimation(oldProgress, newProgress);
+        }
+    }
+
+    private void StartProgressAnimation(decimal fromValue, decimal toValue)
+    {
+        // Stop any existing animation
+        _animationTimer?.Dispose();
+
+        _animationStartValue = fromValue;
+        _animationTargetValue = toValue;
+        _animationStartTime = DateTime.UtcNow;
+
+        _animationTimer = new Timer(OnAnimationTick, null, 0, AnimationIntervalMs);
+    }
+
+    private void OnAnimationTick(object? state)
+    {
+        var elapsed = (DateTime.UtcNow - _animationStartTime).TotalMilliseconds;
+        var progress = Math.Min(elapsed / AnimationDurationMs, 1.0);
+
+        // Cubic ease-out: 1 - (1 - t)^3
+        var easedProgress = 1 - Math.Pow(1 - progress, 3);
+
+        var currentValue = _animationStartValue + (decimal)easedProgress * (_animationTargetValue - _animationStartValue);
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            AnimatedProgressPercentage = currentValue;
+        });
+
+        if (progress >= 1.0)
+        {
+            _animationTimer?.Dispose();
+            _animationTimer = null;
+        }
+    }
+
+    public void Dispose()
+    {
+        _animationTimer?.Dispose();
+        _animationTimer = null;
+    }
 }
