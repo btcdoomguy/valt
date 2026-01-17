@@ -245,6 +245,7 @@
                                     Classes="panel-header-icon"
                                     Content="&#xE745;"
                                     Command="{Binding ManageFixedExpensesCommand}"
+                                    IsEnabled="{Binding !IsSecureModeEnabled}"
                                     Margin="4, 0, 4, 0" />
                         </Grid>
                     </Border>
@@ -311,7 +312,8 @@
                                             <MenuItem
                                                 Header="{x:Static local:language.Transactions_Menu_Edit}"
                                                 Command="{Binding ((vm1:TransactionsViewModel)DataContext).EditFixedExpenseCommand, ElementName=Root}"
-                                                CommandParameter="{Binding .}">
+                                                CommandParameter="{Binding .}"
+                                                IsEnabled="{Binding !((vm1:TransactionsViewModel)DataContext).IsSecureModeEnabled, ElementName=Root}">
                                             </MenuItem>
                                             <Separator />
                                             <MenuItem
@@ -392,6 +394,7 @@
                                     Classes="panel-header-icon"
                                     Content="&#xE145;"
                                     Command="{Binding AddGoalCommand}"
+                                    IsEnabled="{Binding !IsSecureModeEnabled}"
                                     Margin="4, 0, 4, 0" />
                         </Grid>
                     </Border>
@@ -411,11 +414,19 @@
                                     <StackPanel Orientation="Vertical" Spacing="4">
                                         <!-- Goal name with status label -->
                                         <Grid ColumnDefinitions="*, Auto">
-                                            <TextBlock Grid.Column="0"
-                                                       FontSize="13"
-                                                       Text="{Binding FriendlyName}"
-                                                       FontFamily="{DynamicResource Geist}"
-                                                       TextTrimming="CharacterEllipsis" />
+                                            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                                <TextBlock FontSize="13"
+                                                           Text="{Binding FriendlyName}"
+                                                           FontFamily="{DynamicResource Geist}"
+                                                           TextTrimming="CharacterEllipsis" />
+                                                <!-- (yearly) indicator for yearly goals -->
+                                                <TextBlock FontSize="13"
+                                                           Text="{x:Static local:language.Goals_YearlyIndicator}"
+                                                           FontFamily="{DynamicResource Geist}"
+                                                           Foreground="{DynamicResource Text400Brush}"
+                                                           IsVisible="{Binding IsYearly}"
+                                                           Margin="4, 0, 0, 0" />
+                                            </StackPanel>
                                             <!-- SUCCESS label for Completed goals -->
                                             <Border Grid.Column="1"
                                                     IsVisible="{Binding ShowSuccessIcon}"
@@ -443,12 +454,22 @@
                                                            FontSize="10" />
                                             </Border>
                                         </Grid>
-                                        <!-- Goal description (e.g., "123,456/1,000,000 sats") -->
-                                        <TextBlock FontSize="11"
-                                                   Text="{Binding Description}"
-                                                   FontFamily="{DynamicResource Geist}"
-                                                   Foreground="{DynamicResource Text400Brush}"
-                                                   TextTrimming="CharacterEllipsis" />
+                                        <!-- Goal description (e.g., "123,456/1,000,000 sats") - hidden in secure mode -->
+                                        <StackPanel Orientation="Horizontal"
+                                                    IsVisible="{Binding !((vm1:TransactionsViewModel)DataContext).IsSecureModeEnabled, ElementName=Root}">
+                                            <TextBlock FontSize="11"
+                                                       Text="{Binding Description}"
+                                                       FontFamily="{DynamicResource Geist}"
+                                                       Foreground="{DynamicResource Text400Brush}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <!-- Asterisk for goals requiring price data -->
+                                            <TextBlock FontSize="11"
+                                                       Text=" *"
+                                                       FontFamily="{DynamicResource Geist}"
+                                                       Foreground="{DynamicResource Text400Brush}"
+                                                       IsVisible="{Binding RequiresPriceData}"
+                                                       ToolTip.Tip="{x:Static local:language.Goals_PriceDataTooltip}" />
+                                        </StackPanel>
                                         <!-- Progress bar (hidden for MarkedAsComplete) -->
                                         <Grid ColumnDefinitions="*, Auto"
                                               IsVisible="{Binding ShowProgressBar}">
@@ -473,7 +494,8 @@
                                             <MenuItem
                                                 Header="{x:Static local:language.Goals_Edit}"
                                                 Command="{Binding ((vm1:TransactionsViewModel)DataContext).EditGoalCommand, ElementName=Root}"
-                                                CommandParameter="{Binding .}">
+                                                CommandParameter="{Binding .}"
+                                                IsEnabled="{Binding !((vm1:TransactionsViewModel)DataContext).IsSecureModeEnabled, ElementName=Root}">
                                             </MenuItem>
                                             <MenuItem
                                                 Header="{x:Static local:language.Goals_Recalculate}"
@@ -485,7 +507,8 @@
                                             <MenuItem
                                                 Header="{x:Static local:language.Goals_Delete}"
                                                 Command="{Binding ((vm1:TransactionsViewModel)DataContext).DeleteGoalCommand, ElementName=Root}"
-                                                CommandParameter="{Binding .}">
+                                                CommandParameter="{Binding .}"
+                                                IsEnabled="{Binding !((vm1:TransactionsViewModel)DataContext).IsSecureModeEnabled, ElementName=Root}">
                                             </MenuItem>
                                         </ContextMenu>
                                     </Border.ContextMenu>

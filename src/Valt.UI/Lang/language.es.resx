@@ -1436,6 +1436,12 @@
     <data name="Goals_DeleteConfirm_Message" xml:space="preserve">
         <value>¿Estás seguro de que deseas eliminar esta meta? Esta acción no se puede deshacer.</value>
     </data>
+    <data name="Goals_PriceDataTooltip" xml:space="preserve">
+        <value>Este valor puede estar desactualizado y se actualizará cuando las tasas de cambio diarias estén disponibles.</value>
+    </data>
+    <data name="Goals_YearlyIndicator" xml:space="preserve">
+        <value>(anual)</value>
+    </data>
     <data name="GoalDescription_StackBitcoin" xml:space="preserve">
         <value>{0}/{1} sats</value>
     </data>

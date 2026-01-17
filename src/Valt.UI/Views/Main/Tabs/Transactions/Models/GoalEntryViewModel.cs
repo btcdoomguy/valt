@@ -57,6 +57,8 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
         }
     }
 
+    public bool IsYearly => _goal.Period == GoalPeriods.Yearly;
+
     public decimal Progress => _goal.Progress;
 
     /// <summary>
@@ -173,6 +175,9 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
     // Show progress bar only for Open state (not for Completed or Failed)
     public bool ShowProgressBar => _goal.State == GoalStates.Open;
 
+    // Price data indicator - shows asterisk for goals that depend on exchange rates
+    public bool RequiresPriceData => _goal.GoalType.RequiresPriceDataForCalculation;
+
     /// <summary>
     /// Updates the goal data and animates the progress bar to the new value over 3 seconds
     /// </summary>
@@ -198,6 +203,7 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(ShowFailedIcon));
         OnPropertyChanged(nameof(CanRecalculate));
         OnPropertyChanged(nameof(ShowProgressBar));
+        OnPropertyChanged(nameof(RequiresPriceData));
 
         // If progress changed, animate it
         if (oldProgress != newProgress)

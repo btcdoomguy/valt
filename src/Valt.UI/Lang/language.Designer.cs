@@ -2852,7 +2852,19 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Goals_DeleteConfirm_Message", resourceCulture);
             }
         }
-        
+
+        public static string Goals_PriceDataTooltip {
+            get {
+                return ResourceManager.GetString("Goals_PriceDataTooltip", resourceCulture);
+            }
+        }
+
+        public static string Goals_YearlyIndicator {
+            get {
+                return ResourceManager.GetString("Goals_YearlyIndicator", resourceCulture);
+            }
+        }
+
         public static string GoalDescription_StackBitcoin {
             get {
                 return ResourceManager.GetString("GoalDescription_StackBitcoin", resourceCulture);
