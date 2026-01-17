@@ -189,10 +189,10 @@ public partial class BtcInput : UserControl
         var validChar = ((e.Key >= Key.D0 && e.Key <= Key.D9) ||
                          (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9) || (e.Key == Key.OemPeriod));
 
+        // In BTC mode, always use "." as decimal separator (invariant culture)
         if (!validChar ||
             e.Key == Key.OemPeriod && !_isBitcoin ||
-            e.Key == Key.OemPeriod && _isBitcoin &&
-            textBox.Text!.Contains(NumberFormatInfo.CurrentInfo.NumberDecimalSeparator))
+            e.Key == Key.OemPeriod && _isBitcoin && textBox.Text!.Contains("."))
         {
             e.Handled = true;
         }
@@ -219,7 +219,9 @@ public partial class BtcInput : UserControl
 
     private void UpdateBtcValue()
     {
-        if (decimal.TryParse(_displayValue, out decimal valueAsDecimal))
+        // In BTC mode, always use invariant culture (decimal separator is ".") to match ToBitcoinString()
+        var culture = _isBitcoin ? CultureInfo.InvariantCulture : CultureInfo.CurrentCulture;
+        if (decimal.TryParse(_displayValue, NumberStyles.Number, culture, out decimal valueAsDecimal))
         {
             long valueInSats = _isBitcoin ? (long)(valueAsDecimal * 100000000m) : (long)valueAsDecimal;
             if (valueInSats != BtcValue.Sats)

@@ -291,6 +291,30 @@
         <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
     </Style>
 
+    <!-- Panel header icon button - compact with neutral background like tab buttons -->
+    <Style Selector="Button.panel-header-icon">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="MinWidth" Value="24" />
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Background600Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Background400Brush}" />
+        </Style>
+        <Style Selector="^:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Background500Brush}" />
+        </Style>
+    </Style>
+
     <Style Selector="Button.calculator">
         <Setter Property="FontSize" Value="20" />
         <Setter Property="Padding" Value="2, 0, 2, 0" />
@@ -1045,5 +1069,19 @@
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Margin" Value="0, 0, 10, 0" />
         <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         PROGRESS BAR - Goals
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
+    <!-- Progress bar with green background when goal is complete (ZeroToSuccess) -->
+    <Style Selector="ProgressBar.complete /template/ Border#PART_Indicator">
+        <Setter Property="Background" Value="{DynamicResource SemanticPositive500Brush}" />
+    </Style>
+
+    <!-- Progress bar with red background for DecreasingSuccess goals -->
+    <Style Selector="ProgressBar.danger /template/ Border#PART_Indicator">
+        <Setter Property="Background" Value="{DynamicResource SemanticNegative400Brush}" />
     </Style>
 </Styles>

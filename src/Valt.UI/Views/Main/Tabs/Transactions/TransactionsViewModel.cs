@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
@@ -20,11 +21,14 @@ using Valt.Core.Modules.Budget.Categories;
 using Valt.Core.Modules.Budget.FixedExpenses;
 using Valt.Core.Modules.Budget.FixedExpenses.Contracts;
 using Valt.Core.Modules.Budget.Transactions;
+using Valt.Core.Modules.Goals;
+using Valt.Core.Modules.Goals.Contracts;
 using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Accounts.Queries;
 using Valt.Infra.Modules.Budget.Accounts.Queries.DTOs;
 using Valt.Infra.Modules.Budget.FixedExpenses;
+using Valt.Infra.Modules.Goals.Services;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
@@ -35,6 +39,7 @@ using Valt.UI.State;
 using Valt.UI.Views.Main.Modals.ManageAccount;
 using Valt.UI.Views.Main.Modals.FixedExpenseEditor;
 using Valt.UI.Views.Main.Modals.ManageFixedExpenses;
+using Valt.UI.Views.Main.Modals.ManageGoal;
 using Valt.UI.Views.Main.Modals.TransactionEditor;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
@@ -42,6 +47,10 @@ namespace Valt.UI.Views.Main.Tabs.Transactions;
 
 public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 {
+    // Animation settings - adjust these to change the wealth counter animation speed
+    private const int WealthAnimationDurationMs = 1500; // 3 seconds
+    private const int WealthAnimationIntervalMs = 16;   // ~60fps
+
     private readonly IModalFactory? _modalFactory;
     private readonly IAccountRepository? _accountRepository;
     private readonly IFixedExpenseProvider? _fixedExpenseProvider;
@@ -56,18 +65,43 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     private readonly ILogger<TransactionsViewModel> _logger;
     private readonly IAccountQueries? _accountQueries;
     private readonly SecureModeState _secureModeState;
+    private readonly IGoalRepository? _goalRepository;
+    private readonly GoalProgressState? _goalProgressState;
 
     //instances of the sub contents
     private readonly TransactionListViewModel _transactionListViewModel = null!;
 
+    // Animation fields for wealth values
+    private Timer? _wealthAnimationTimer;
+    private DateTime _wealthAnimationStartTime;
+
+    // Raw values for animation (source and target)
+    private long _animatedWealthInSats;
+    private long _targetWealthInSats;
+    private long _startWealthInSats;
+
+    private decimal _animatedWealthInFiat;
+    private decimal _targetWealthInFiat;
+    private decimal _startWealthInFiat;
+
+    private decimal _animatedAllWealthInFiat;
+    private decimal _targetAllWealthInFiat;
+    private decimal _startAllWealthInFiat;
+
+    private decimal _animatedWealthInBtcRatio;
+    private decimal _targetWealthInBtcRatio;
+    private decimal _startWealthInBtcRatio;
+
     [ObservableProperty] private AvaloniaList<AccountViewModel> _accounts = new();
     [ObservableProperty] private AvaloniaList<FixedExpensesEntryViewModel> _fixedExpenseEntries = new();
+    [ObservableProperty] private AvaloniaList<GoalEntryViewModel> _goalEntries = new();
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayRemainingFixedExpensesAmount))]
     private string _remainingFixedExpensesAmount = "~ R$ 12.345,67";
     [ObservableProperty] private string? _remainingFixedExpensesTooltip;
 
     [ObservableProperty] private AccountViewModel? _selectedAccount;
     [ObservableProperty] private FixedExpensesEntryViewModel? _selectedFixedExpense;
+    [ObservableProperty] private GoalEntryViewModel? _selectedGoal;
 
     [ObservableProperty] private string _allWealthInSats = "12.34567890";
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayWealthInBtcRatio))]
@@ -97,7 +131,9 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         IFixedExpenseRecordService fixedExpenseRecordService,
         IClock clock,
         ILogger<TransactionsViewModel> logger,
-        SecureModeState secureModeState)
+        SecureModeState secureModeState,
+        IGoalRepository goalRepository,
+        GoalProgressState goalProgressState)
     {
         _accountQueries = accountQueries;
         _secureModeState = secureModeState;
@@ -113,6 +149,8 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         _fixedExpenseRecordService = fixedExpenseRecordService;
         _clock = clock;
         _logger = logger;
+        _goalRepository = goalRepository;
+        _goalProgressState = goalProgressState;
 
         _transactionListViewModel = (TransactionListViewModel)transactionTabFactory.Create(TransactionsTabNames.List);
 
@@ -126,6 +164,8 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
         WeakReferenceMessenger.Default.Register<TransactionListChanged>(this, OnTransactionListChangedReceive);
         WeakReferenceMessenger.Default.Register<FilterDateRangeChanged>(this, OnCurrentDateRangeChangedReceive);
+        WeakReferenceMessenger.Default.Register<GoalListChanged>(this, OnGoalListChangedReceive);
+        WeakReferenceMessenger.Default.Register<GoalProgressUpdated>(this, OnGoalProgressUpdatedReceive);
 
         WeakReferenceMessenger.Default.Register<SettingsChangedMessage>(this, (recipient, message) =>
         {
@@ -144,6 +184,55 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     private void OnCurrentDateRangeChangedReceive(object recipient, FilterDateRangeChanged message)
     {
         _ = FetchFixedExpenses();
+        _ = FetchGoals();
+    }
+
+    private void OnGoalListChangedReceive(object recipient, GoalListChanged message)
+    {
+        _ = FetchGoals();
+    }
+
+    private void OnGoalProgressUpdatedReceive(object recipient, GoalProgressUpdated message)
+    {
+        _ = UpdateGoalProgress();
+    }
+
+    /// <summary>
+    /// Updates existing goal entries in place to enable progress animation.
+    /// Only adds/removes entries when the goal list changes.
+    /// </summary>
+    private async Task UpdateGoalProgress()
+    {
+        if (_filterState is null) return;
+        if (_goalRepository is null) return;
+
+        try
+        {
+            var currentDate = DateOnly.FromDateTime(_filterState.MainDate);
+            var allGoals = await _goalRepository.GetAllAsync();
+
+            var goalsForPeriod = allGoals
+                .Where(g =>
+                {
+                    var range = g.GetPeriodRange();
+                    return currentDate >= range.Start && currentDate <= range.End;
+                })
+                .ToDictionary(g => g.Id.ToString());
+
+            // Update existing entries in place (this triggers animation)
+            foreach (var entry in GoalEntries.ToList())
+            {
+                if (goalsForPeriod.TryGetValue(entry.Id, out var updatedGoal))
+                {
+                    entry.UpdateGoal(updatedGoal);
+                    goalsForPeriod.Remove(entry.Id);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating goal progress");
+        }
     }
 
     private void OnTransactionListChangedReceive(object recipient, TransactionListChanged message)
@@ -154,7 +243,9 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
     private void FilterStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        OnPropertyChanged(nameof(CurrentMonthYearDisplay));
         OnPropertyChanged(nameof(FixedExpenseCurrentMonthDescription));
+        OnPropertyChanged(nameof(GoalsCurrentMonthDescription));
     }
 
     private void SecureModeStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -166,6 +257,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
             OnPropertyChanged(nameof(DisplayAllWealthInFiat));
             OnPropertyChanged(nameof(DisplayWealthInBtcRatio));
             OnPropertyChanged(nameof(DisplayRemainingFixedExpensesAmount));
+            OnPropertyChanged(nameof(IsSecureModeEnabled));
 
             // Update account display for secure mode
             foreach (var account in Accounts)
@@ -175,11 +267,12 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         });
     }
 
-    public string DisplayWealthInSats => _secureModeState.IsEnabled ? "---" : WealthInSats;
-    public string DisplayWealthInFiat => _secureModeState.IsEnabled ? "---" : WealthInFiat;
-    public string DisplayAllWealthInFiat => _secureModeState.IsEnabled ? "---" : AllWealthInFiat;
-    public string DisplayWealthInBtcRatio => _secureModeState.IsEnabled ? "---" : WealthInBtcRatio;
+    public string DisplayWealthInSats => _secureModeState.IsEnabled ? "---" : CurrencyDisplay.FormatSatsAsBitcoin(_animatedWealthInSats);
+    public string DisplayWealthInFiat => _secureModeState.IsEnabled ? "---" : CurrencyDisplay.FormatFiat(_animatedWealthInFiat, _currencySettings?.MainFiatCurrency ?? "USD");
+    public string DisplayAllWealthInFiat => _secureModeState.IsEnabled ? "---" : CurrencyDisplay.FormatFiat(_animatedAllWealthInFiat, _currencySettings?.MainFiatCurrency ?? "USD");
+    public string DisplayWealthInBtcRatio => _secureModeState.IsEnabled ? "---" : _animatedWealthInBtcRatio.ToString("F1", CultureInfo.InvariantCulture) + "%";
     public string DisplayRemainingFixedExpensesAmount => _secureModeState.IsEnabled ? "---" : RemainingFixedExpensesAmount;
+    public bool IsSecureModeEnabled => _secureModeState.IsEnabled;
 
     private void AccountsTotalStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -188,9 +281,10 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
             if (_accountsTotalState is null) return;
             if (_currencySettings is null) return;
 
+            // Keep string properties updated for compatibility
             AllWealthInSats = CurrencyDisplay.FormatSatsAsBitcoin(_accountsTotalState.CurrentWealth.AllWealthInSats);
             WealthInSats = CurrencyDisplay.FormatSatsAsBitcoin(_accountsTotalState.CurrentWealth.WealthInSats);
-            WealthNotInSats =CurrencyDisplay.FormatSatsAsBitcoin(_accountsTotalState.CurrentWealth.AllWealthInSats -
+            WealthNotInSats = CurrencyDisplay.FormatSatsAsBitcoin(_accountsTotalState.CurrentWealth.AllWealthInSats -
                                                                  _accountsTotalState.CurrentWealth.WealthInSats);
             AllWealthInFiat = CurrencyDisplay.FormatFiat(_accountsTotalState.CurrentWealth.AllWealthInMainFiatCurrency,
                 _currencySettings.MainFiatCurrency);
@@ -198,7 +292,78 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
                 _currencySettings.MainFiatCurrency);
             WealthInBtcRatio =
                 _accountsTotalState.CurrentWealth.WealthInBtcRatio.ToString(CultureInfo.InvariantCulture) + "%";
+
+            // Start animation to new target values
+            StartWealthAnimation(
+                _accountsTotalState.CurrentWealth.WealthInSats,
+                _accountsTotalState.CurrentWealth.WealthInMainFiatCurrency,
+                _accountsTotalState.CurrentWealth.AllWealthInMainFiatCurrency,
+                _accountsTotalState.CurrentWealth.WealthInBtcRatio);
         });
+    }
+
+    private void StartWealthAnimation(long targetSats, decimal targetFiat, decimal targetAllFiat, decimal targetRatio)
+    {
+        // Store current animated values as start values
+        _startWealthInSats = _animatedWealthInSats;
+        _startWealthInFiat = _animatedWealthInFiat;
+        _startAllWealthInFiat = _animatedAllWealthInFiat;
+        _startWealthInBtcRatio = _animatedWealthInBtcRatio;
+
+        // Set target values
+        _targetWealthInSats = targetSats;
+        _targetWealthInFiat = targetFiat;
+        _targetAllWealthInFiat = targetAllFiat;
+        _targetWealthInBtcRatio = targetRatio;
+
+        // If all values are the same, no need to animate
+        if (_startWealthInSats == _targetWealthInSats &&
+            _startWealthInFiat == _targetWealthInFiat &&
+            _startAllWealthInFiat == _targetAllWealthInFiat &&
+            _startWealthInBtcRatio == _targetWealthInBtcRatio)
+        {
+            return;
+        }
+
+        // Stop any existing animation
+        _wealthAnimationTimer?.Dispose();
+
+        _wealthAnimationStartTime = DateTime.UtcNow;
+        _wealthAnimationTimer = new Timer(OnWealthAnimationTick, null, 0, WealthAnimationIntervalMs);
+    }
+
+    private void OnWealthAnimationTick(object? state)
+    {
+        var elapsed = (DateTime.UtcNow - _wealthAnimationStartTime).TotalMilliseconds;
+        var progress = Math.Min(elapsed / WealthAnimationDurationMs, 1.0);
+
+        // Cubic ease-out: 1 - (1 - t)^3
+        var easedProgress = 1 - Math.Pow(1 - progress, 3);
+
+        // Interpolate all values
+        var currentSats = _startWealthInSats + (long)(easedProgress * (_targetWealthInSats - _startWealthInSats));
+        var currentFiat = _startWealthInFiat + (decimal)easedProgress * (_targetWealthInFiat - _startWealthInFiat);
+        var currentAllFiat = _startAllWealthInFiat + (decimal)easedProgress * (_targetAllWealthInFiat - _startAllWealthInFiat);
+        var currentRatio = _startWealthInBtcRatio + (decimal)easedProgress * (_targetWealthInBtcRatio - _startWealthInBtcRatio);
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            _animatedWealthInSats = currentSats;
+            _animatedWealthInFiat = currentFiat;
+            _animatedAllWealthInFiat = currentAllFiat;
+            _animatedWealthInBtcRatio = currentRatio;
+
+            OnPropertyChanged(nameof(DisplayWealthInSats));
+            OnPropertyChanged(nameof(DisplayWealthInFiat));
+            OnPropertyChanged(nameof(DisplayAllWealthInFiat));
+            OnPropertyChanged(nameof(DisplayWealthInBtcRatio));
+        });
+
+        if (progress >= 1.0)
+        {
+            _wealthAnimationTimer?.Dispose();
+            _wealthAnimationTimer = null;
+        }
     }
 
     private async Task InitializeAsync()
@@ -213,6 +378,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         {
             _ = FetchAccounts();
             _ = FetchFixedExpenses();
+            _ = FetchGoals();
             _transactionListViewModel.FetchTransactionsCommand.Execute(null);
 
             SelectedAccount = Accounts.FirstOrDefault();
@@ -293,6 +459,57 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         {
             _logger.LogError(ex, "Error fetching fixed expenses");
         }
+    }
+
+    private async Task FetchGoals()
+    {
+        if (_filterState is null) return;
+        if (_goalRepository is null) return;
+
+        try
+        {
+            var currentDate = DateOnly.FromDateTime(_filterState.MainDate);
+            var allGoals = await _goalRepository.GetAllAsync();
+
+            var goalsForPeriod = allGoals
+                .Where(g =>
+                {
+                    var range = g.GetPeriodRange();
+                    return currentDate >= range.Start && currentDate <= range.End;
+                })
+                .OrderBy(g => GetGoalSortOrder(g))
+                .ThenBy(g => g.GoalType.TypeName)
+                .ThenBy(g => g.RefDate)
+                .ToList();
+
+            GoalEntries.Clear();
+            foreach (var goal in goalsForPeriod)
+            {
+                GoalEntries.Add(new GoalEntryViewModel(goal, _currencySettings!.MainFiatCurrency));
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching goals");
+        }
+    }
+
+    /// <summary>
+    /// Returns a sort order value for goals:
+    /// 0 = Monthly Open goals
+    /// 1 = Yearly Open goals
+    /// 2 = Completed goals
+    /// 3 = Failed goals
+    /// </summary>
+    private static int GetGoalSortOrder(Goal goal)
+    {
+        return goal.State switch
+        {
+            GoalStates.Open => goal.Period == GoalPeriods.Monthly ? 0 : 1,
+            GoalStates.Completed => 2,
+            GoalStates.Failed => 3,
+            _ => 4
+        };
     }
 
     #region Account operations
@@ -436,6 +653,12 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     }
 
     #endregion
+
+    /// <summary>
+    /// Returns the current month and year formatted for display (e.g., "January 2026")
+    /// </summary>
+    public string CurrentMonthYearDisplay =>
+        DateOnly.FromDateTime(_filterState!.MainDate).ToString("MMMM yyyy", CultureInfo.CurrentCulture);
 
     #region Fixed Expense operations
 
@@ -585,6 +808,90 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
     #endregion
 
+    #region Goal operations
+
+    public string GoalsCurrentMonthDescription =>
+        $"({DateOnly.FromDateTime(_filterState!.MainDate).ToString("MM/yy")})";
+
+    [RelayCommand]
+    private async Task AddGoal()
+    {
+        var ownerWindow = GetUserControlOwnerWindow!();
+
+        var window =
+            (ManageGoalView)await _modalFactory!.CreateAsync(ApplicationModalNames.ManageGoal, ownerWindow)!;
+
+        var result = await window.ShowDialog<ManageGoalViewModel.Response?>(ownerWindow!);
+
+        if (result is null)
+            return;
+
+        await FetchGoals();
+        WeakReferenceMessenger.Default.Send(new GoalListChanged());
+    }
+
+    [RelayCommand]
+    private async Task EditGoal(GoalEntryViewModel? entry)
+    {
+        if (entry is null)
+            return;
+
+        var ownerWindow = GetUserControlOwnerWindow!();
+
+        var window = (ManageGoalView)await _modalFactory!.CreateAsync(
+            ApplicationModalNames.ManageGoal,
+            ownerWindow, entry.Id)!;
+
+        _ = await window.ShowDialog<ManageGoalViewModel.Response?>(ownerWindow!);
+
+        await FetchGoals();
+        WeakReferenceMessenger.Default.Send(new GoalListChanged());
+    }
+
+    [RelayCommand]
+    private async Task RecalculateGoal(GoalEntryViewModel? entry)
+    {
+        if (entry is null)
+            return;
+
+        var goal = await _goalRepository!.GetByIdAsync(new GoalId(entry.Id));
+        if (goal is null)
+            return;
+
+        goal.Recalculate();
+        await _goalRepository.SaveAsync(goal);
+        _goalProgressState?.MarkAsStale();
+
+        await FetchGoals();
+        WeakReferenceMessenger.Default.Send(new GoalListChanged());
+    }
+
+    [RelayCommand]
+    private async Task DeleteGoal(GoalEntryViewModel? entry)
+    {
+        if (entry is null)
+            return;
+
+        var confirmed = await MessageBoxHelper.ShowQuestionAsync(
+            language.Goals_DeleteConfirm_Title,
+            language.Goals_DeleteConfirm_Message,
+            GetUserControlOwnerWindow()!);
+
+        if (!confirmed)
+            return;
+
+        var goal = await _goalRepository!.GetByIdAsync(new GoalId(entry.Id));
+        if (goal is null)
+            return;
+
+        await _goalRepository.DeleteAsync(goal);
+
+        await FetchGoals();
+        WeakReferenceMessenger.Default.Send(new GoalListChanged());
+    }
+
+    #endregion
+
     partial void OnSelectedAccountChanged(AccountViewModel? value)
     {
         WeakReferenceMessenger.Default.Send(new AccountSelectedChanged(value));
@@ -597,6 +904,9 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
     public void Dispose()
     {
+        _wealthAnimationTimer?.Dispose();
+        _wealthAnimationTimer = null;
+
         if (_accountsTotalState is not null)
             _accountsTotalState.PropertyChanged -= AccountsTotalStateOnPropertyChanged;
 
@@ -608,6 +918,8 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         WeakReferenceMessenger.Default.Unregister<TransactionListChanged>(this);
         WeakReferenceMessenger.Default.Unregister<FilterDateRangeChanged>(this);
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
+        WeakReferenceMessenger.Default.Unregister<GoalListChanged>(this);
+        WeakReferenceMessenger.Default.Unregister<GoalProgressUpdated>(this);
     }
 
     public override MainViewTabNames TabName => MainViewTabNames.TransactionsPageContent;

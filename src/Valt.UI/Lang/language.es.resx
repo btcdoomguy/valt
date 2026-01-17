@@ -1366,4 +1366,152 @@
     <data name="CloseButton" xml:space="preserve">
         <value>Cerrar</value>
     </data>
+    <!-- Goals -->
+    <data name="ManageGoal_Title" xml:space="preserve">
+        <value>Gestionar Meta</value>
+    </data>
+    <data name="ManageGoal_Period" xml:space="preserve">
+        <value>Período</value>
+    </data>
+    <data name="ManageGoal_Year" xml:space="preserve">
+        <value>Año</value>
+    </data>
+    <data name="ManageGoal_Month" xml:space="preserve">
+        <value>Mes</value>
+    </data>
+    <data name="ManageGoal_GoalType" xml:space="preserve">
+        <value>Tipo de Meta</value>
+    </data>
+    <data name="ManageGoal_TargetBtcAmount" xml:space="preserve">
+        <value>Cantidad Objetivo de BTC</value>
+    </data>
+    <data name="ManageGoal_TargetFiatAmount" xml:space="preserve">
+        <value>Límite de Gastos</value>
+    </data>
+    <data name="Error.GoalNotFound" xml:space="preserve">
+        <value>Meta no encontrada</value>
+    </data>
+    <!-- Goal Periods -->
+    <data name="GoalPeriod_Monthly" xml:space="preserve">
+        <value>Mensual</value>
+    </data>
+    <data name="GoalPeriod_Yearly" xml:space="preserve">
+        <value>Anual</value>
+    </data>
+    <!-- Goal Types -->
+    <data name="GoalType_StackBitcoin" xml:space="preserve">
+        <value>Acumular Bitcoin</value>
+    </data>
+    <data name="GoalType_StackBitcoin_Description" xml:space="preserve">
+        <value>Define una cantidad específica para acumular en el período seleccionado comparado con la cantidad anterior</value>
+    </data>
+    <data name="GoalType_SpendingLimit" xml:space="preserve">
+        <value>Límite de Gastos</value>
+    </data>
+    <data name="GoalType_SpendingLimit_Description" xml:space="preserve">
+        <value>Rastrea tus gastos contra un límite de presupuesto en tu moneda principal</value>
+    </data>
+    <!-- Goals Panel -->
+    <data name="Goals_Title" xml:space="preserve">
+        <value>Metas</value>
+    </data>
+    <data name="Goals_Edit" xml:space="preserve">
+        <value>Editar</value>
+    </data>
+    <data name="Goals_Recalculate" xml:space="preserve">
+        <value>Recalcular</value>
+    </data>
+    <data name="Goals_Success" xml:space="preserve">
+        <value>ÉXITO</value>
+    </data>
+    <data name="Goals_Failed" xml:space="preserve">
+        <value>FALLIDO</value>
+    </data>
+    <data name="Goals_Delete" xml:space="preserve">
+        <value>Eliminar</value>
+    </data>
+    <data name="Goals_DeleteConfirm_Title" xml:space="preserve">
+        <value>Eliminar Meta</value>
+    </data>
+    <data name="Goals_DeleteConfirm_Message" xml:space="preserve">
+        <value>¿Estás seguro de que deseas eliminar esta meta? Esta acción no se puede deshacer.</value>
+    </data>
+    <data name="Goals_PriceDataTooltip" xml:space="preserve">
+        <value>Este valor puede estar desactualizado y se actualizará cuando las tasas de cambio diarias estén disponibles.</value>
+    </data>
+    <data name="Goals_YearlyIndicator" xml:space="preserve">
+        <value>(anual)</value>
+    </data>
+    <data name="GoalDescription_StackBitcoin" xml:space="preserve">
+        <value>{0}/{1} sats</value>
+    </data>
+    <data name="GoalDescription_SpendingLimit" xml:space="preserve">
+        <value>{0} de {1}</value>
+    </data>
+    <data name="GoalType_Dca" xml:space="preserve">
+        <value>DCA</value>
+    </data>
+    <data name="GoalType_Dca_Description" xml:space="preserve">
+        <value>Rastrea compras regulares de bitcoin (Dollar Cost Averaging)</value>
+    </data>
+    <data name="GoalDescription_Dca" xml:space="preserve">
+        <value>{0} de {1} compras</value>
+    </data>
+    <data name="ManageGoal_TargetPurchaseCount" xml:space="preserve">
+        <value>Meta de Compras</value>
+    </data>
+    <data name="GoalType_IncomeFiat" xml:space="preserve">
+        <value>Ingresos en Fiat</value>
+    </data>
+    <data name="GoalType_IncomeFiat_Description" xml:space="preserve">
+        <value>Rastrea objetivos de ingresos en tu moneda principal</value>
+    </data>
+    <data name="GoalDescription_IncomeFiat" xml:space="preserve">
+        <value>{0} de {1}</value>
+    </data>
+    <data name="GoalType_IncomeBtc" xml:space="preserve">
+        <value>Ingresos en Bitcoin</value>
+    </data>
+    <data name="GoalType_IncomeBtc_Description" xml:space="preserve">
+        <value>Rastrea objetivos de ingresos en bitcoin (ej: trabajo, minería, recompensas)</value>
+    </data>
+    <data name="GoalDescription_IncomeBtc" xml:space="preserve">
+        <value>{0}/{1} sats ganados</value>
+    </data>
+    <data name="ManageGoal_TargetIncomeAmount" xml:space="preserve">
+        <value>Meta de Ingresos</value>
+    </data>
+    <data name="GoalType_ReduceExpenseCategory" xml:space="preserve">
+        <value>Presupuesto por Categoría</value>
+    </data>
+    <data name="GoalType_ReduceExpenseCategory_Description" xml:space="preserve">
+        <value>Limita el gasto en una categoría específica</value>
+    </data>
+    <data name="GoalDescription_ReduceExpenseCategory" xml:space="preserve">
+        <value>{0} de {1}</value>
+    </data>
+    <data name="ManageGoal_Category" xml:space="preserve">
+        <value>Categoría</value>
+    </data>
+    <data name="GoalType_BitcoinHodl" xml:space="preserve">
+        <value>HODL</value>
+    </data>
+    <data name="GoalType_BitcoinHodl_Description" xml:space="preserve">
+        <value>Rastrea ventas de bitcoin. Establece 0 para modo HODL completo (sin ventas permitidas)</value>
+    </data>
+    <data name="GoalDescription_BitcoinHodl_NoSales" xml:space="preserve">
+        <value>¡No se vendió bitcoin!</value>
+    </data>
+    <data name="GoalDescription_BitcoinHodl_WithLimit" xml:space="preserve">
+        <value>Vendido {0} de {1} máx</value>
+    </data>
+    <data name="GoalDescription_BitcoinHodl_Failed" xml:space="preserve">
+        <value>Vendido {0} sats</value>
+    </data>
+    <data name="ManageGoal_MaxSellableSats" xml:space="preserve">
+        <value>Máx Sats Vendibles (0 = sin ventas)</value>
+    </data>
+    <data name="GoalTarget_NoSales" xml:space="preserve">
+        <value>Sin ventas</value>
+    </data>
 </root>

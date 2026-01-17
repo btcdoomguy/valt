@@ -260,13 +260,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("InputPassword.Password", resourceCulture);
             }
         }
-
+        
         public static string InputPassword_StartInSecureMode {
             get {
                 return ResourceManager.GetString("InputPassword.StartInSecureMode", resourceCulture);
             }
         }
-
+        
         public static string ManageAccount_Title {
             get {
                 return ResourceManager.GetString("ManageAccount.Title", resourceCulture);
@@ -1394,7 +1394,7 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Settings.Theme", resourceCulture);
             }
         }
-
+        
         public static string Settings_Tab_General {
             get {
                 return ResourceManager.GetString("Settings.Tab.General", resourceCulture);
@@ -1424,19 +1424,19 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Offline.Line2", resourceCulture);
             }
         }
-
+        
         public static string SecureMode_ToggleTooltip {
             get {
                 return ResourceManager.GetString("SecureMode.ToggleTooltip", resourceCulture);
             }
         }
-
+        
         public static string Reports_SecureModeMessage {
             get {
                 return ResourceManager.GetString("Reports.SecureModeMessage", resourceCulture);
             }
         }
-
+        
         public static string Reports_Summary {
             get {
                 return ResourceManager.GetString("Reports.Summary", resourceCulture);
@@ -2390,334 +2390,622 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Error.IncompatibleVersion", resourceCulture);
             }
         }
-
+        
         public static string Error_InvalidPassword {
             get {
                 return ResourceManager.GetString("Error.InvalidPassword", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_Title {
             get {
                 return ResourceManager.GetString("ImportWizard_Title", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_Step1 {
             get {
                 return ResourceManager.GetString("ImportWizard_Step1", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_Step2 {
             get {
                 return ResourceManager.GetString("ImportWizard_Step2", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_Step3 {
             get {
                 return ResourceManager.GetString("ImportWizard_Step3", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_Step4 {
             get {
                 return ResourceManager.GetString("ImportWizard_Step4", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_Step5 {
             get {
                 return ResourceManager.GetString("ImportWizard_Step5", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_Back {
             get {
                 return ResourceManager.GetString("ImportWizard_Back", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_Next {
             get {
                 return ResourceManager.GetString("ImportWizard_Next", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_Import {
             get {
                 return ResourceManager.GetString("ImportWizard_Import", resourceCulture);
             }
         }
-
+        
         public static string Menu_ImportTransactions {
             get {
                 return ResourceManager.GetString("Menu_ImportTransactions", resourceCulture);
             }
         }
-
+        
         public static string Menu_ExportTransactions {
             get {
                 return ResourceManager.GetString("Menu_ExportTransactions", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_SelectFile {
             get {
                 return ResourceManager.GetString("ImportWizard_SelectFile", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_DownloadTemplate {
             get {
                 return ResourceManager.GetString("ImportWizard_DownloadTemplate", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_FileSelected {
             get {
                 return ResourceManager.GetString("ImportWizard_FileSelected", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_ValidRows {
             get {
                 return ResourceManager.GetString("ImportWizard_ValidRows", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_Errors {
             get {
                 return ResourceManager.GetString("ImportWizard_Errors", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_Step1Instructions {
             get {
                 return ResourceManager.GetString("ImportWizard_Step1Instructions", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_ShowErrors {
             get {
                 return ResourceManager.GetString("ImportWizard_ShowErrors", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_NewAccounts {
             get {
                 return ResourceManager.GetString("ImportWizard_NewAccounts", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_ExistingAccounts {
             get {
                 return ResourceManager.GetString("ImportWizard_ExistingAccounts", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_NewCategories {
             get {
                 return ResourceManager.GetString("ImportWizard_NewCategories", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_ExistingCategories {
             get {
                 return ResourceManager.GetString("ImportWizard_ExistingCategories", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_CsvAccountName {
             get {
                 return ResourceManager.GetString("ImportWizard_CsvAccountName", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_AccountType {
             get {
                 return ResourceManager.GetString("ImportWizard_AccountType", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_Status {
             get {
                 return ResourceManager.GetString("ImportWizard_Status", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_CsvCategoryName {
             get {
                 return ResourceManager.GetString("ImportWizard_CsvCategoryName", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_SummaryTitle {
             get {
                 return ResourceManager.GetString("ImportWizard_SummaryTitle", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_SummaryTransactions {
             get {
                 return ResourceManager.GetString("ImportWizard_SummaryTransactions", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_SummaryAccounts {
             get {
                 return ResourceManager.GetString("ImportWizard_SummaryAccounts", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_SummaryCategories {
             get {
                 return ResourceManager.GetString("ImportWizard_SummaryCategories", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_SummaryNew {
             get {
                 return ResourceManager.GetString("ImportWizard_SummaryNew", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_SummaryNewItemsWarning {
             get {
                 return ResourceManager.GetString("ImportWizard_SummaryNewItemsWarning", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_SummaryReadyToImport {
             get {
                 return ResourceManager.GetString("ImportWizard_SummaryReadyToImport", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_Importing {
             get {
                 return ResourceManager.GetString("ImportWizard_Importing", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_ImportComplete {
             get {
                 return ResourceManager.GetString("ImportWizard_ImportComplete", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_ProgressTransactions {
             get {
                 return ResourceManager.GetString("ImportWizard_ProgressTransactions", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_Hint {
             get {
                 return ResourceManager.GetString("ImportWizard_Hint", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_SelectCsvFileTitle {
             get {
                 return ResourceManager.GetString("ImportWizard_SelectCsvFileTitle", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_DownloadTemplateTitle {
             get {
                 return ResourceManager.GetString("ImportWizard_DownloadTemplateTitle", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_ImportCompletedWithErrors {
             get {
                 return ResourceManager.GetString("ImportWizard_ImportCompletedWithErrors", resourceCulture);
             }
         }
-
+        
         public static string CsvImport_CreatingAccounts {
             get {
                 return ResourceManager.GetString("CsvImport_CreatingAccounts", resourceCulture);
             }
         }
-
+        
         public static string CsvImport_CreatedAccount {
             get {
                 return ResourceManager.GetString("CsvImport_CreatedAccount", resourceCulture);
             }
         }
-
+        
         public static string CsvImport_FailedToCreateAccount {
             get {
                 return ResourceManager.GetString("CsvImport_FailedToCreateAccount", resourceCulture);
             }
         }
-
+        
         public static string CsvImport_CreatingCategories {
             get {
                 return ResourceManager.GetString("CsvImport_CreatingCategories", resourceCulture);
             }
         }
-
+        
         public static string CsvImport_CreatedCategory {
             get {
                 return ResourceManager.GetString("CsvImport_CreatedCategory", resourceCulture);
             }
         }
-
+        
         public static string CsvImport_FailedToCreateCategory {
             get {
                 return ResourceManager.GetString("CsvImport_FailedToCreateCategory", resourceCulture);
             }
         }
-
+        
         public static string CsvImport_ImportingTransaction {
             get {
                 return ResourceManager.GetString("CsvImport_ImportingTransaction", resourceCulture);
             }
         }
-
+        
         public static string CsvImport_AccountNotFound {
             get {
                 return ResourceManager.GetString("CsvImport_AccountNotFound", resourceCulture);
             }
         }
-
+        
         public static string CsvImport_ToAccountNotFound {
             get {
                 return ResourceManager.GetString("CsvImport_ToAccountNotFound", resourceCulture);
             }
         }
-
+        
         public static string CsvImport_CategoryNotFound {
             get {
                 return ResourceManager.GetString("CsvImport_CategoryNotFound", resourceCulture);
             }
         }
-
+        
         public static string CsvImport_LineError {
             get {
                 return ResourceManager.GetString("CsvImport_LineError", resourceCulture);
             }
         }
-
+        
         public static string CsvImport_UnableToDetermineType {
             get {
                 return ResourceManager.GetString("CsvImport_UnableToDetermineType", resourceCulture);
             }
         }
-
+        
         public static string CsvImport_SetInitialValue {
             get {
                 return ResourceManager.GetString("CsvImport_SetInitialValue", resourceCulture);
             }
         }
-
+        
         public static string CloseButton {
             get {
                 return ResourceManager.GetString("CloseButton", resourceCulture);
+            }
+        }
+        
+        public static string ManageGoal_Title {
+            get {
+                return ResourceManager.GetString("ManageGoal_Title", resourceCulture);
+            }
+        }
+        
+        public static string ManageGoal_Period {
+            get {
+                return ResourceManager.GetString("ManageGoal_Period", resourceCulture);
+            }
+        }
+        
+        public static string ManageGoal_Year {
+            get {
+                return ResourceManager.GetString("ManageGoal_Year", resourceCulture);
+            }
+        }
+        
+        public static string ManageGoal_Month {
+            get {
+                return ResourceManager.GetString("ManageGoal_Month", resourceCulture);
+            }
+        }
+        
+        public static string ManageGoal_GoalType {
+            get {
+                return ResourceManager.GetString("ManageGoal_GoalType", resourceCulture);
+            }
+        }
+        
+        public static string ManageGoal_TargetBtcAmount {
+            get {
+                return ResourceManager.GetString("ManageGoal_TargetBtcAmount", resourceCulture);
+            }
+        }
+        
+        public static string ManageGoal_TargetFiatAmount {
+            get {
+                return ResourceManager.GetString("ManageGoal_TargetFiatAmount", resourceCulture);
+            }
+        }
+        
+        public static string Error_GoalNotFound {
+            get {
+                return ResourceManager.GetString("Error.GoalNotFound", resourceCulture);
+            }
+        }
+        
+        public static string GoalPeriod_Monthly {
+            get {
+                return ResourceManager.GetString("GoalPeriod_Monthly", resourceCulture);
+            }
+        }
+        
+        public static string GoalPeriod_Yearly {
+            get {
+                return ResourceManager.GetString("GoalPeriod_Yearly", resourceCulture);
+            }
+        }
+        
+        public static string GoalType_StackBitcoin {
+            get {
+                return ResourceManager.GetString("GoalType_StackBitcoin", resourceCulture);
+            }
+        }
+        
+        public static string GoalType_StackBitcoin_Description {
+            get {
+                return ResourceManager.GetString("GoalType_StackBitcoin_Description", resourceCulture);
+            }
+        }
+        
+        public static string GoalType_SpendingLimit {
+            get {
+                return ResourceManager.GetString("GoalType_SpendingLimit", resourceCulture);
+            }
+        }
+        
+        public static string GoalType_SpendingLimit_Description {
+            get {
+                return ResourceManager.GetString("GoalType_SpendingLimit_Description", resourceCulture);
+            }
+        }
+        
+        public static string Goals_Title {
+            get {
+                return ResourceManager.GetString("Goals_Title", resourceCulture);
+            }
+        }
+        
+        public static string Goals_Edit {
+            get {
+                return ResourceManager.GetString("Goals_Edit", resourceCulture);
+            }
+        }
+        
+        public static string Goals_Recalculate {
+            get {
+                return ResourceManager.GetString("Goals_Recalculate", resourceCulture);
+            }
+        }
+        
+        public static string Goals_Success {
+            get {
+                return ResourceManager.GetString("Goals_Success", resourceCulture);
+            }
+        }
+        
+        public static string Goals_Failed {
+            get {
+                return ResourceManager.GetString("Goals_Failed", resourceCulture);
+            }
+        }
+        
+        public static string Goals_Delete {
+            get {
+                return ResourceManager.GetString("Goals_Delete", resourceCulture);
+            }
+        }
+        
+        public static string Goals_DeleteConfirm_Title {
+            get {
+                return ResourceManager.GetString("Goals_DeleteConfirm_Title", resourceCulture);
+            }
+        }
+        
+        public static string Goals_DeleteConfirm_Message {
+            get {
+                return ResourceManager.GetString("Goals_DeleteConfirm_Message", resourceCulture);
+            }
+        }
+
+        public static string Goals_PriceDataTooltip {
+            get {
+                return ResourceManager.GetString("Goals_PriceDataTooltip", resourceCulture);
+            }
+        }
+
+        public static string Goals_YearlyIndicator {
+            get {
+                return ResourceManager.GetString("Goals_YearlyIndicator", resourceCulture);
+            }
+        }
+
+        public static string GoalDescription_StackBitcoin {
+            get {
+                return ResourceManager.GetString("GoalDescription_StackBitcoin", resourceCulture);
+            }
+        }
+        
+        public static string GoalDescription_SpendingLimit {
+            get {
+                return ResourceManager.GetString("GoalDescription_SpendingLimit", resourceCulture);
+            }
+        }
+        
+        public static string GoalType_Dca {
+            get {
+                return ResourceManager.GetString("GoalType_Dca", resourceCulture);
+            }
+        }
+        
+        public static string GoalType_Dca_Description {
+            get {
+                return ResourceManager.GetString("GoalType_Dca_Description", resourceCulture);
+            }
+        }
+        
+        public static string GoalDescription_Dca {
+            get {
+                return ResourceManager.GetString("GoalDescription_Dca", resourceCulture);
+            }
+        }
+        
+        public static string ManageGoal_TargetPurchaseCount {
+            get {
+                return ResourceManager.GetString("ManageGoal_TargetPurchaseCount", resourceCulture);
+            }
+        }
+        
+        public static string GoalType_IncomeFiat {
+            get {
+                return ResourceManager.GetString("GoalType_IncomeFiat", resourceCulture);
+            }
+        }
+        
+        public static string GoalType_IncomeFiat_Description {
+            get {
+                return ResourceManager.GetString("GoalType_IncomeFiat_Description", resourceCulture);
+            }
+        }
+        
+        public static string GoalDescription_IncomeFiat {
+            get {
+                return ResourceManager.GetString("GoalDescription_IncomeFiat", resourceCulture);
+            }
+        }
+        
+        public static string GoalType_IncomeBtc {
+            get {
+                return ResourceManager.GetString("GoalType_IncomeBtc", resourceCulture);
+            }
+        }
+        
+        public static string GoalType_IncomeBtc_Description {
+            get {
+                return ResourceManager.GetString("GoalType_IncomeBtc_Description", resourceCulture);
+            }
+        }
+        
+        public static string GoalDescription_IncomeBtc {
+            get {
+                return ResourceManager.GetString("GoalDescription_IncomeBtc", resourceCulture);
+            }
+        }
+        
+        public static string ManageGoal_TargetIncomeAmount {
+            get {
+                return ResourceManager.GetString("ManageGoal_TargetIncomeAmount", resourceCulture);
+            }
+        }
+        
+        public static string GoalType_ReduceExpenseCategory {
+            get {
+                return ResourceManager.GetString("GoalType_ReduceExpenseCategory", resourceCulture);
+            }
+        }
+        
+        public static string GoalType_ReduceExpenseCategory_Description {
+            get {
+                return ResourceManager.GetString("GoalType_ReduceExpenseCategory_Description", resourceCulture);
+            }
+        }
+        
+        public static string GoalDescription_ReduceExpenseCategory {
+            get {
+                return ResourceManager.GetString("GoalDescription_ReduceExpenseCategory", resourceCulture);
+            }
+        }
+        
+        public static string ManageGoal_Category {
+            get {
+                return ResourceManager.GetString("ManageGoal_Category", resourceCulture);
+            }
+        }
+        
+        public static string GoalType_BitcoinHodl {
+            get {
+                return ResourceManager.GetString("GoalType_BitcoinHodl", resourceCulture);
+            }
+        }
+        
+        public static string GoalType_BitcoinHodl_Description {
+            get {
+                return ResourceManager.GetString("GoalType_BitcoinHodl_Description", resourceCulture);
+            }
+        }
+        
+        public static string GoalDescription_BitcoinHodl_NoSales {
+            get {
+                return ResourceManager.GetString("GoalDescription_BitcoinHodl_NoSales", resourceCulture);
+            }
+        }
+        
+        public static string GoalDescription_BitcoinHodl_WithLimit {
+            get {
+                return ResourceManager.GetString("GoalDescription_BitcoinHodl_WithLimit", resourceCulture);
+            }
+        }
+        
+        public static string GoalDescription_BitcoinHodl_Failed {
+            get {
+                return ResourceManager.GetString("GoalDescription_BitcoinHodl_Failed", resourceCulture);
+            }
+        }
+        
+        public static string ManageGoal_MaxSellableSats {
+            get {
+                return ResourceManager.GetString("ManageGoal_MaxSellableSats", resourceCulture);
+            }
+        }
+        
+        public static string GoalTarget_NoSales {
+            get {
+                return ResourceManager.GetString("GoalTarget_NoSales", resourceCulture);
             }
         }
     }

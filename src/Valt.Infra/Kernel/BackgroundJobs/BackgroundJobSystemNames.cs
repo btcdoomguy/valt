@@ -7,5 +7,6 @@ public enum BackgroundJobSystemNames
     FiatHistoryUpdater,
     AutoSatAmountUpdater,
     LivePricesUpdater,
-    AccountTotalsCalculator
+    AccountTotalsCalculator,
+    GoalProgressUpdater
 }

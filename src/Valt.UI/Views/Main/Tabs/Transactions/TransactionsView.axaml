@@ -217,44 +217,48 @@
 
         <!-- Right Column -->
         <Panel Grid.Column="3">
-            <Grid RowDefinitions="80, 30, *">
-                <StackPanel Grid.Row="1">
-                    <Border Background="{DynamicResource Background800Brush}"
+            <Grid RowDefinitions="80, *, 4, *" Margin="0, 0, 10, 10">
+                <!-- Current Month/Year Header -->
+                <TextBlock Grid.Row="0"
+                           Text="{Binding CurrentMonthYearDisplay}"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           FontFamily="{DynamicResource GeistMono}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Bottom"
+                           Margin="0, 0, 0, 8" />
+                <!-- Fixed Expenses Panel -->
+                <Grid Grid.Row="1" RowDefinitions="30, *, Auto" MinHeight="150">
+                    <!-- Fixed Expenses Header -->
+                    <Border Grid.Row="0"
+                            Background="{DynamicResource Background800Brush}"
                             BorderBrush="{DynamicResource Background500Brush}"
-                            Margin="0, 0, 10, 0"
                             Padding="5, 0, 0, 0"
                             BorderThickness="1, 1, 1, 0"
                             CornerRadius="5, 5, 0, 0">
-                        <Grid ColumnDefinitions="*, 50">
-                            <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Stretch"
-                                        Margin="0, 5, 0, 0">
-                                <TextBlock FontSize="12" Text="{x:Static local:language.ManageFixedExpenses_Title}"></TextBlock>
-                                <TextBlock FontSize="12" Text="{Binding FixedExpenseCurrentMonthDescription}"></TextBlock>
-
-                            </StackPanel>
-                            <Button Grid.Column="1" FontSize="18" Classes="icon-only"
-                                    HorizontalAlignment="Right"
-                                    HorizontalContentAlignment="Right"
-                                    VerticalContentAlignment="Center"
-                                    Padding="4, 0, 4, 0"
+                        <Grid ColumnDefinitions="*, Auto">
+                            <TextBlock Grid.Column="0"
+                                       FontSize="12"
+                                       Text="{x:Static local:language.ManageFixedExpenses_Title}"
+                                       VerticalAlignment="Center" />
+                            <Button Grid.Column="1"
+                                    Classes="panel-header-icon"
                                     Content="&#xE745;"
-                                    FontFamily="{DynamicResource MaterialDesign}"
-                                    Height="30" Command="{Binding ManageFixedExpensesCommand}" />
+                                    Command="{Binding ManageFixedExpensesCommand}"
+                                    IsEnabled="{Binding !IsSecureModeEnabled}"
+                                    Margin="4, 0, 4, 0" />
                         </Grid>
                     </Border>
                     <!-- Fixed Expense List -->
-                    <ListBox
+                    <ListBox Grid.Row="1"
                         x:Name="FixedExpenseList"
                         Classes="regularListBox"
                         ItemsSource="{Binding FixedExpenseEntries}"
                         SelectedItem="{Binding SelectedFixedExpense}"
                         SelectionMode="Single"
-                        VerticalAlignment="Top"
                         BorderBrush="{DynamicResource Background500Brush}"
                         CornerRadius="0"
-                        BorderThickness="1, 0, 1,0"
-                        Margin="0, 0, 10, 0"
-                        Height="400">
+                        BorderThickness="1, 0, 1, 0">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Border Padding="2, 4" Background="Transparent">
@@ -308,7 +312,8 @@
                                             <MenuItem
                                                 Header="{x:Static local:language.Transactions_Menu_Edit}"
                                                 Command="{Binding ((vm1:TransactionsViewModel)DataContext).EditFixedExpenseCommand, ElementName=Root}"
-                                                CommandParameter="{Binding .}">
+                                                CommandParameter="{Binding .}"
+                                                IsEnabled="{Binding !((vm1:TransactionsViewModel)DataContext).IsSecureModeEnabled, ElementName=Root}">
                                             </MenuItem>
                                             <Separator />
                                             <MenuItem
@@ -341,9 +346,10 @@
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
-                    <Border Background="{DynamicResource Background700Brush}"
+                    <!-- Remaining Fixed Expenses Footer -->
+                    <Border Grid.Row="2"
+                            Background="{DynamicResource Background700Brush}"
                             BorderBrush="{DynamicResource Background500Brush}"
-                            Margin="0, 0, 10, 0"
                             Padding="10, 8"
                             BorderThickness="1, 0, 1, 1"
                             CornerRadius="0, 0, 5, 5">
@@ -361,7 +367,156 @@
                                        ToolTip.Tip="{Binding RemainingFixedExpensesTooltip}" />
                         </Grid>
                     </Border>
-                </StackPanel>
+                </Grid>
+
+                <!-- GridSplitter between panels -->
+                <GridSplitter Grid.Row="2"
+                              Height="4"
+                              Background="{DynamicResource Background600Brush}"
+                              ResizeDirection="Rows"
+                              ResizeBehavior="PreviousAndNext" />
+
+                <!-- Goals Panel -->
+                <Grid Grid.Row="3" RowDefinitions="30, *" MinHeight="150">
+                    <!-- Goals Header -->
+                    <Border Grid.Row="0"
+                            Background="{DynamicResource Background800Brush}"
+                            BorderBrush="{DynamicResource Background500Brush}"
+                            Padding="5, 0, 0, 0"
+                            BorderThickness="1, 1, 1, 0"
+                            CornerRadius="5, 5, 0, 0">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <TextBlock Grid.Column="0"
+                                       FontSize="12"
+                                       Text="{x:Static local:language.Goals_Title}"
+                                       VerticalAlignment="Center" />
+                            <Button Grid.Column="1"
+                                    Classes="panel-header-icon"
+                                    Content="&#xE145;"
+                                    Command="{Binding AddGoalCommand}"
+                                    IsEnabled="{Binding !IsSecureModeEnabled}"
+                                    Margin="4, 0, 4, 0" />
+                        </Grid>
+                    </Border>
+                    <!-- Goals List -->
+                    <ListBox Grid.Row="1"
+                        x:Name="GoalsList"
+                        Classes="regularListBox"
+                        ItemsSource="{Binding GoalEntries}"
+                        SelectedItem="{Binding SelectedGoal}"
+                        SelectionMode="Single"
+                        BorderBrush="{DynamicResource Background500Brush}"
+                        CornerRadius="0, 0, 5, 5"
+                        BorderThickness="1">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="4, 6" Background="Transparent">
+                                    <StackPanel Orientation="Vertical" Spacing="4">
+                                        <!-- Goal name with status label -->
+                                        <Grid ColumnDefinitions="*, Auto">
+                                            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                                <TextBlock FontSize="13"
+                                                           Text="{Binding FriendlyName}"
+                                                           FontFamily="{DynamicResource Geist}"
+                                                           TextTrimming="CharacterEllipsis" />
+                                                <!-- (yearly) indicator for yearly goals -->
+                                                <TextBlock FontSize="13"
+                                                           Text="{x:Static local:language.Goals_YearlyIndicator}"
+                                                           FontFamily="{DynamicResource Geist}"
+                                                           Foreground="{DynamicResource Text400Brush}"
+                                                           IsVisible="{Binding IsYearly}"
+                                                           Margin="4, 0, 0, 0" />
+                                            </StackPanel>
+                                            <!-- SUCCESS label for Completed goals -->
+                                            <Border Grid.Column="1"
+                                                    IsVisible="{Binding ShowSuccessIcon}"
+                                                    Background="{DynamicResource SemanticPositive800Brush}"
+                                                    CornerRadius="3"
+                                                    Padding="6, 2"
+                                                    VerticalAlignment="Center"
+                                                    Margin="8, 0, 0, 0">
+                                                <TextBlock Text="{x:Static local:language.Goals_Success}"
+                                                           FontFamily="{DynamicResource GeistMono}"
+                                                           Foreground="{DynamicResource SemanticPositive200Brush}"
+                                                           FontSize="10" />
+                                            </Border>
+                                            <!-- FAILED label for Failed goals -->
+                                            <Border Grid.Column="1"
+                                                    IsVisible="{Binding ShowFailedIcon}"
+                                                    Background="{DynamicResource SemanticNegative800Brush}"
+                                                    CornerRadius="3"
+                                                    Padding="6, 2"
+                                                    VerticalAlignment="Center"
+                                                    Margin="8, 0, 0, 0">
+                                                <TextBlock Text="{x:Static local:language.Goals_Failed}"
+                                                           FontFamily="{DynamicResource GeistMono}"
+                                                           Foreground="{DynamicResource SemanticNegative200Brush}"
+                                                           FontSize="10" />
+                                            </Border>
+                                        </Grid>
+                                        <!-- Goal description (e.g., "123,456/1,000,000 sats") - hidden in secure mode -->
+                                        <StackPanel Orientation="Horizontal"
+                                                    IsVisible="{Binding !((vm1:TransactionsViewModel)DataContext).IsSecureModeEnabled, ElementName=Root}">
+                                            <TextBlock FontSize="11"
+                                                       Text="{Binding Description}"
+                                                       FontFamily="{DynamicResource Geist}"
+                                                       Foreground="{DynamicResource Text400Brush}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <!-- Asterisk for goals requiring price data -->
+                                            <TextBlock FontSize="11"
+                                                       Text=" *"
+                                                       FontFamily="{DynamicResource Geist}"
+                                                       Foreground="{DynamicResource Text400Brush}"
+                                                       IsVisible="{Binding RequiresPriceData}"
+                                                       ToolTip.Tip="{x:Static local:language.Goals_PriceDataTooltip}" />
+                                        </StackPanel>
+                                        <!-- Progress bar (hidden for MarkedAsComplete) -->
+                                        <Grid ColumnDefinitions="*, Auto"
+                                              IsVisible="{Binding ShowProgressBar}">
+                                            <ProgressBar Grid.Column="0"
+                                                         Value="{Binding AnimatedProgressPercentage}"
+                                                         Minimum="0"
+                                                         Maximum="100"
+                                                         Height="12"
+                                                         CornerRadius="6"
+                                                         Margin="0, 0, 8, 0"
+                                                         Classes.complete="{Binding IsZeroToSuccess}"
+                                                         Classes.danger="{Binding IsDecreasingSuccess}" />
+                                            <TextBlock Grid.Column="1"
+                                                       FontSize="10"
+                                                       Text="{Binding ProgressDisplay}"
+                                                       VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource Text400Brush}" />
+                                        </Grid>
+                                    </StackPanel>
+                                    <Border.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem
+                                                Header="{x:Static local:language.Goals_Edit}"
+                                                Command="{Binding ((vm1:TransactionsViewModel)DataContext).EditGoalCommand, ElementName=Root}"
+                                                CommandParameter="{Binding .}"
+                                                IsEnabled="{Binding !((vm1:TransactionsViewModel)DataContext).IsSecureModeEnabled, ElementName=Root}">
+                                            </MenuItem>
+                                            <MenuItem
+                                                Header="{x:Static local:language.Goals_Recalculate}"
+                                                Command="{Binding ((vm1:TransactionsViewModel)DataContext).RecalculateGoalCommand, ElementName=Root}"
+                                                CommandParameter="{Binding .}"
+                                                IsVisible="{Binding CanRecalculate}">
+                                            </MenuItem>
+                                            <Separator />
+                                            <MenuItem
+                                                Header="{x:Static local:language.Goals_Delete}"
+                                                Command="{Binding ((vm1:TransactionsViewModel)DataContext).DeleteGoalCommand, ElementName=Root}"
+                                                CommandParameter="{Binding .}"
+                                                IsEnabled="{Binding !((vm1:TransactionsViewModel)DataContext).IsSecureModeEnabled, ElementName=Root}">
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </Border.ContextMenu>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
             </Grid>
         </Panel>
     </Grid>

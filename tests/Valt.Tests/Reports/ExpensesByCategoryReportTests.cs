@@ -235,9 +235,9 @@ public class ExpensesByCategoryReportTests : DatabaseTest
 
         Assert.That(result.MainCurrency, Is.EqualTo(FiatCurrency.Brl));
 
-        // Food: $150 (USD transactions are kept in USD when target is BRL, based on report logic)
+        // Food: $150 USD * 5 (BRL rate) = 750 BRL
         var foodItem = result.Items.Single(x => x.CategoryId == _foodCategoryId);
-        Assert.That(foodItem.FiatTotal, Is.EqualTo(150m));
+        Assert.That(foodItem.FiatTotal, Is.EqualTo(750m));
 
         // Transport: 250 BRL (account currency matches target, kept as-is)
         var transportItem = result.Items.Single(x => x.CategoryId == _transportCategoryId);

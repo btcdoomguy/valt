@@ -16,6 +16,11 @@ public static class CurrencyDisplay
         return FormatSats(bitcoinValue);
     }
 
+    public static string FormatSatsAsNumber(long sats)
+    {
+        return FormatWithGroups(sats.ToString());
+    }
+
     public static string FormatFiat(decimal value, string currencyCode)
     {
         var currency = FiatCurrency.GetFromCode(currencyCode);

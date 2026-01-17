@@ -8,6 +8,7 @@ using Valt.Core.Modules.Budget.Accounts.Contracts;
 using Valt.Core.Modules.Budget.Categories.Contracts;
 using Valt.Core.Modules.Budget.FixedExpenses.Contracts;
 using Valt.Core.Modules.Budget.Transactions.Contracts;
+using Valt.Core.Modules.Goals.Contracts;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Bitcoin;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Bitcoin.Providers;
@@ -39,6 +40,10 @@ using Valt.Infra.Modules.Budget.Transactions;
 using Valt.Infra.Modules.Budget.Transactions.Queries;
 using Valt.Infra.Modules.Budget.Transactions.Services;
 using Valt.Infra.Modules.Configuration;
+using Valt.Infra.Modules.Goals;
+using Valt.Infra.Modules.Goals.Handlers;
+using Valt.Infra.Modules.Goals.Queries;
+using Valt.Infra.Modules.Goals.Services;
 using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
 using Valt.Infra.Modules.Reports.ExpensesByCategory;
@@ -51,6 +56,7 @@ using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
 
 [assembly: InternalsVisibleTo("Valt.Tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 namespace Valt.Infra;
 
@@ -182,6 +188,7 @@ public static class Extensions
         services.AddSingleton<ICategoryRepository, CategoryRepository>();
         services.AddSingleton<IFixedExpenseRepository, FixedExpenseRepository>();
         services.AddSingleton<ITransactionRepository, TransactionRepository>();
+        services.AddSingleton<IGoalRepository, GoalRepository>();
 
         return services;
     }
@@ -193,6 +200,7 @@ public static class Extensions
         services.AddSingleton<ICategoryQueries, CategoryQueries>();
         services.AddSingleton<IFixedExpenseQueries, FixedExpenseQueries>();
         services.AddSingleton<ITransactionQueries, TransactionQueries>();
+        services.AddSingleton<IGoalQueries, GoalQueries>();
 
         return services;
     }
@@ -214,6 +222,21 @@ public static class Extensions
 
         //csv export
         services.AddSingleton<ICsvExportService, CsvExportService>();
+
+        //goals
+        services.AddSingleton<IGoalTransactionReader, GoalTransactionReader>();
+        services.AddSingleton<IGoalProgressCalculator, StackBitcoinProgressCalculator>();
+        services.AddSingleton<IGoalProgressCalculator, SpendingLimitProgressCalculator>();
+        services.AddSingleton<IGoalProgressCalculator, DcaProgressCalculator>();
+        services.AddSingleton<IGoalProgressCalculator, IncomeFiatProgressCalculator>();
+        services.AddSingleton<IGoalProgressCalculator, IncomeBtcProgressCalculator>();
+        services.AddSingleton<IGoalProgressCalculator, ReduceExpenseCategoryProgressCalculator>();
+        services.AddSingleton<IGoalProgressCalculator, BitcoinHodlProgressCalculator>();
+        services.AddSingleton<IGoalProgressCalculatorFactory, GoalProgressCalculatorFactory>();
+        services.AddSingleton<GoalProgressState>();
+
+        //goal price update handler (subscribes to price update messages)
+        services.AddSingleton<MarkGoalsStaleOnPriceUpdateHandler>();
 
         return services;
     }

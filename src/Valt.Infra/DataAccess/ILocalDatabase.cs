@@ -6,6 +6,7 @@ using Valt.Infra.Modules.Budget.Categories;
 using Valt.Infra.Modules.Budget.FixedExpenses;
 using Valt.Infra.Modules.Budget.Transactions;
 using Valt.Infra.Modules.Configuration;
+using Valt.Infra.Modules.Goals;
 using Valt.Infra.Settings;
 
 namespace Valt.Infra.DataAccess;
@@ -55,6 +56,12 @@ public interface ILocalDatabase : INotifyPropertyChanged, IDisposable
     #region Settings module
 
     ILiteCollection<SettingEntity> GetSettings();
+
+    #endregion
+
+    #region Goals module
+
+    ILiteCollection<GoalEntity> GetGoals();
 
     #endregion
 }

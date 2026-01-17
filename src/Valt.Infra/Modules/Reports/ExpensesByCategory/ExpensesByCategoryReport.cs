@@ -123,16 +123,21 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
                             if (!categoryFiatTotals.ContainsKey(transaction.CategoryId))
                                 categoryFiatTotals[transaction.CategoryId] = 0;
 
-                            var accountCurrency = FiatCurrency.GetFromCode(account.Currency!);
-                            var accountRateToUsd = _provider.GetFiatRateAt(currentDate, accountCurrency);
-
                             if (account.Currency == _currency.Code)
                             {
                                 categoryFiatTotals[transaction.CategoryId] += transaction.FromFiatAmount.GetValueOrDefault();
                             }
                             else
                             {
-                                var convertedBalance = transaction.FromFiatAmount.GetValueOrDefault() / accountRateToUsd;
+                                // Convert: source currency -> USD -> target currency
+                                var accountCurrency = FiatCurrency.GetFromCode(account.Currency!);
+                                var sourceRateToUsd = _provider.GetFiatRateAt(currentDate, accountCurrency);
+                                var targetRateFromUsd = _provider.GetFiatRateAt(currentDate, _currency);
+
+                                if (sourceRateToUsd == 0 || targetRateFromUsd == 0)
+                                    continue; // Skip if no rate available
+
+                                var convertedBalance = targetRateFromUsd * (transaction.FromFiatAmount.GetValueOrDefault() / sourceRateToUsd);
                                 categoryFiatTotals[transaction.CategoryId] += convertedBalance;
                             }
                         }
