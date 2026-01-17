@@ -6,6 +6,8 @@ public sealed class SpendingLimitGoalType : IGoalType
 
     public bool RequiresPriceDataForCalculation => true;
 
+    public ProgressionMode ProgressionMode => ProgressionMode.DecreasingSuccess;
+
     public decimal TargetAmount { get; }
 
     public decimal CalculatedSpending { get; }

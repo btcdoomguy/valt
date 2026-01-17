@@ -144,7 +144,7 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
             CurrencyDisplay.FormatSatsAsNumber(bitcoinHodl.MaxSellableSats));
     }
 
-    public bool IsCompleted => _goal.State == GoalStates.MarkedAsCompleted || _goal.Progress >= 100m;
+    public bool IsCompleted => _goal.State == GoalStates.Completed;
 
     public GoalStates State => _goal.State;
 
@@ -152,19 +152,24 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
 
     public DateOnly RefDate => _goal.RefDate;
 
+    public ProgressionMode ProgressionMode => _goal.GoalType.ProgressionMode;
+
     // State-based UI properties
     public bool IsClosed => _goal.State == GoalStates.Closed;
-    public bool IsMarkedAsComplete => _goal.State == GoalStates.MarkedAsCompleted;
+    public bool IsFailed => _goal.State == GoalStates.Failed;
     public bool IsOpen => _goal.State == GoalStates.Open;
     public bool IsProgressComplete => _goal.State == GoalStates.Completed || _goal.Progress >= 100m;
 
+    // Icon display properties
+    public bool ShowSuccessIcon => _goal.State == GoalStates.Completed;
+    public bool ShowFailedIcon => _goal.State == GoalStates.Failed;
+
     // Context menu visibility
     public bool CanClose => _goal.State == GoalStates.Open;
-    public bool CanConclude => _goal.State == GoalStates.Completed || (_goal.State == GoalStates.Open && _goal.Progress >= 100m);
-    public bool CanReopen => _goal.State == GoalStates.MarkedAsCompleted || _goal.State == GoalStates.Closed;
+    public bool CanReopen => _goal.State == GoalStates.Completed || _goal.State == GoalStates.Failed || _goal.State == GoalStates.Closed;
 
-    // Show progress bar only for Open and Completed states (not for MarkedAsCompleted or Closed)
-    public bool ShowProgressBar => _goal.State != GoalStates.MarkedAsCompleted;
+    // Show progress bar only for Open state (not for Completed, Failed, or Closed)
+    public bool ShowProgressBar => _goal.State == GoalStates.Open;
 
     /// <summary>
     /// Updates the goal data and animates the progress bar to the new value over 3 seconds
@@ -181,12 +186,14 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(Description));
         OnPropertyChanged(nameof(TargetDisplay));
         OnPropertyChanged(nameof(State));
+        OnPropertyChanged(nameof(ProgressionMode));
         OnPropertyChanged(nameof(IsClosed));
-        OnPropertyChanged(nameof(IsMarkedAsComplete));
+        OnPropertyChanged(nameof(IsFailed));
         OnPropertyChanged(nameof(IsOpen));
         OnPropertyChanged(nameof(IsProgressComplete));
+        OnPropertyChanged(nameof(ShowSuccessIcon));
+        OnPropertyChanged(nameof(ShowFailedIcon));
         OnPropertyChanged(nameof(CanClose));
-        OnPropertyChanged(nameof(CanConclude));
         OnPropertyChanged(nameof(CanReopen));
         OnPropertyChanged(nameof(ShowProgressBar));
 

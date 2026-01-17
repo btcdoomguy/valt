@@ -410,19 +410,28 @@
                                 <Border Padding="4, 6" Background="Transparent"
                                         Opacity="{Binding !IsClosed, Converter={StaticResource BoolToOpacityConverter}}">
                                     <StackPanel Orientation="Vertical" Spacing="4">
-                                        <!-- Goal name with trophy icon for MarkedAsComplete -->
+                                        <!-- Goal name with status icon -->
                                         <Grid ColumnDefinitions="*, Auto">
                                             <TextBlock Grid.Column="0"
                                                        FontSize="13"
                                                        Text="{Binding FriendlyName}"
                                                        FontFamily="{DynamicResource Geist}"
                                                        TextTrimming="CharacterEllipsis" />
-                                            <!-- Trophy icon for MarkedAsComplete goals -->
+                                            <!-- Trophy icon for Completed goals -->
                                             <TextBlock Grid.Column="1"
-                                                       IsVisible="{Binding IsMarkedAsComplete}"
+                                                       IsVisible="{Binding ShowSuccessIcon}"
                                                        Text="&#xE420;"
                                                        FontFamily="{DynamicResource MaterialDesign}"
                                                        Foreground="{DynamicResource Accent200Brush}"
+                                                       FontSize="18"
+                                                       VerticalAlignment="Center"
+                                                       Margin="8, 0, 0, 0" />
+                                            <!-- Failed icon for Failed goals -->
+                                            <TextBlock Grid.Column="1"
+                                                       IsVisible="{Binding ShowFailedIcon}"
+                                                       Text="&#xE000;"
+                                                       FontFamily="{DynamicResource MaterialDesign}"
+                                                       Foreground="{DynamicResource DangerBrush}"
                                                        FontSize="18"
                                                        VerticalAlignment="Center"
                                                        Margin="8, 0, 0, 0" />
@@ -464,12 +473,6 @@
                                                 Command="{Binding ((vm1:TransactionsViewModel)DataContext).CloseGoalCommand, ElementName=Root}"
                                                 CommandParameter="{Binding .}"
                                                 IsVisible="{Binding CanClose}">
-                                            </MenuItem>
-                                            <MenuItem
-                                                Header="{x:Static local:language.Goals_Conclude}"
-                                                Command="{Binding ((vm1:TransactionsViewModel)DataContext).ConcludeGoalCommand, ElementName=Root}"
-                                                CommandParameter="{Binding .}"
-                                                IsVisible="{Binding CanConclude}">
                                             </MenuItem>
                                             <MenuItem
                                                 Header="{x:Static local:language.Goals_Reopen}"

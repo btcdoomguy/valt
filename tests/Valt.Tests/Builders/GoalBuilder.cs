@@ -4,6 +4,10 @@ using Valt.Core.Modules.Goals.GoalTypes;
 
 namespace Valt.Tests.Builders;
 
+/// <summary>
+/// Builder for creating Goal instances for testing.
+/// </summary>
+
 public class GoalBuilder
 {
     private GoalId _id = new();
@@ -88,4 +92,16 @@ public class GoalBuilder
     public static GoalBuilder AYearlyGoal() =>
         new GoalBuilder()
             .WithPeriod(GoalPeriods.Yearly);
+
+    public static GoalBuilder ASpendingLimitGoal(decimal targetAmount = 1000m) =>
+        new GoalBuilder()
+            .WithGoalType(new SpendingLimitGoalType(targetAmount));
+
+    public static GoalBuilder ABitcoinHodlGoal(long maxSellableSats = 0) =>
+        new GoalBuilder()
+            .WithGoalType(new BitcoinHodlGoalType(maxSellableSats));
+
+    public static GoalBuilder AReduceExpenseCategoryGoal(decimal targetAmount = 500m, string categoryId = "cat-1", string categoryName = "Test Category") =>
+        new GoalBuilder()
+            .WithGoalType(new ReduceExpenseCategoryGoalType(targetAmount, categoryId, categoryName));
 }

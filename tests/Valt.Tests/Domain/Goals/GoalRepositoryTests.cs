@@ -225,7 +225,7 @@ public class GoalRepositoryTests
             .Build();
 
         var completedGoal = GoalBuilder.AGoal()
-            .WithState(GoalStates.MarkedAsCompleted)
+            .WithState(GoalStates.Completed)
             .Build();
 
         await _repository.SaveAsync(openGoal);

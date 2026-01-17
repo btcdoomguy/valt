@@ -393,19 +393,21 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
     /// <summary>
     /// Returns a sort order value for goals:
-    /// 0 = Monthly Open/Completed goals
-    /// 1 = Yearly Open/Completed goals
-    /// 2 = MarkedAsCompleted goals
-    /// 3 = Closed goals
+    /// 0 = Monthly Open goals
+    /// 1 = Yearly Open goals
+    /// 2 = Completed goals
+    /// 3 = Failed goals
+    /// 4 = Closed goals
     /// </summary>
     private static int GetGoalSortOrder(Goal goal)
     {
         return goal.State switch
         {
-            GoalStates.Open or GoalStates.Completed => goal.Period == GoalPeriods.Monthly ? 0 : 1,
-            GoalStates.MarkedAsCompleted => 2,
-            GoalStates.Closed => 3,
-            _ => 4
+            GoalStates.Open => goal.Period == GoalPeriods.Monthly ? 0 : 1,
+            GoalStates.Completed => 2,
+            GoalStates.Failed => 3,
+            GoalStates.Closed => 4,
+            _ => 5
         };
     }
 
@@ -756,23 +758,6 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
             return;
 
         goal.Close();
-        await _goalRepository.SaveAsync(goal);
-
-        await FetchGoals();
-        WeakReferenceMessenger.Default.Send(new GoalListChanged());
-    }
-
-    [RelayCommand]
-    private async Task ConcludeGoal(GoalEntryViewModel? entry)
-    {
-        if (entry is null)
-            return;
-
-        var goal = await _goalRepository!.GetByIdAsync(new GoalId(entry.Id));
-        if (goal is null)
-            return;
-
-        goal.Conclude();
         await _goalRepository.SaveAsync(goal);
 
         await FetchGoals();

@@ -66,15 +66,16 @@ public sealed class Goal : AggregateRoot<GoalId>
         GoalType = updatedGoalType;
         IsUpToDate = true;
         LastUpdatedAt = updatedAt;
-        AddEvent(new GoalUpdatedEvent(this));
-    }
 
-    public void MarkAsCompleted()
-    {
-        if (State != GoalStates.Open)
-            return;
+        // Auto-transition based on progression mode
+        if (State == GoalStates.Open)
+        {
+            if (updatedGoalType.ProgressionMode == ProgressionMode.ZeroToSuccess && progress >= 100m)
+                State = GoalStates.Completed;
+            else if (updatedGoalType.ProgressionMode == ProgressionMode.DecreasingSuccess && progress <= 0m)
+                State = GoalStates.Failed;
+        }
 
-        State = GoalStates.MarkedAsCompleted;
         AddEvent(new GoalUpdatedEvent(this));
     }
 
@@ -87,18 +88,9 @@ public sealed class Goal : AggregateRoot<GoalId>
         AddEvent(new GoalUpdatedEvent(this));
     }
 
-    public void Conclude()
-    {
-        if (State != GoalStates.Completed && State != GoalStates.Open)
-            return;
-
-        State = GoalStates.MarkedAsCompleted;
-        AddEvent(new GoalUpdatedEvent(this));
-    }
-
     public void Reopen()
     {
-        if (State != GoalStates.MarkedAsCompleted && State != GoalStates.Closed)
+        if (State != GoalStates.Completed && State != GoalStates.Failed && State != GoalStates.Closed)
             return;
 
         State = GoalStates.Open;

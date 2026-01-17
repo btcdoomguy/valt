@@ -6,6 +6,8 @@ public sealed class DcaGoalType : IGoalType
 
     public bool RequiresPriceDataForCalculation => false;
 
+    public ProgressionMode ProgressionMode => ProgressionMode.ZeroToSuccess;
+
     public int TargetPurchaseCount { get; }
 
     public int CalculatedPurchaseCount { get; }

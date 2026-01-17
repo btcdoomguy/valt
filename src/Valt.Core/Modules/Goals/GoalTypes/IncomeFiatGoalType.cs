@@ -6,6 +6,8 @@ public sealed class IncomeFiatGoalType : IGoalType
 
     public bool RequiresPriceDataForCalculation => true;
 
+    public ProgressionMode ProgressionMode => ProgressionMode.ZeroToSuccess;
+
     public decimal TargetAmount { get; }
 
     public decimal CalculatedIncome { get; }

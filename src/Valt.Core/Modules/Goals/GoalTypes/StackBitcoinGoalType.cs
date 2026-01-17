@@ -8,6 +8,8 @@ public sealed class StackBitcoinGoalType : IGoalType
 
     public bool RequiresPriceDataForCalculation => false;
 
+    public ProgressionMode ProgressionMode => ProgressionMode.ZeroToSuccess;
+
     public long TargetSats { get; }
 
     public long CalculatedSats { get; }

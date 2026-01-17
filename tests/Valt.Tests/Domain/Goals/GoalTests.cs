@@ -75,11 +75,12 @@ public class GoalTests
     }
 
     [Test]
-    public void Should_Not_Auto_Complete_When_Progress_Reaches_100()
+    public void Should_Auto_Complete_ZeroToSuccess_Goal_When_Progress_Reaches_100()
     {
         // Arrange
         var goal = GoalBuilder.AGoal()
             .WithState(GoalStates.Open)
+            .WithGoalType(new StackBitcoinGoalType(1_000_000L))
             .Build();
 
         var updatedGoalType = new StackBitcoinGoalType(1_000_000L, 1_000_000L);
@@ -87,8 +88,98 @@ public class GoalTests
         // Act
         goal.UpdateProgress(100m, updatedGoalType, DateTime.UtcNow);
 
-        // Assert - Manual completion, state should remain Open
+        // Assert - ZeroToSuccess goals auto-complete at 100%
+        Assert.That(goal.State, Is.EqualTo(GoalStates.Completed));
+    }
+
+    [Test]
+    public void Should_Auto_Fail_DecreasingSuccess_Goal_When_Progress_Reaches_Zero()
+    {
+        // Arrange
+        var goal = GoalBuilder.AGoal()
+            .WithState(GoalStates.Open)
+            .WithGoalType(new SpendingLimitGoalType(1000m))
+            .Build();
+
+        var updatedGoalType = new SpendingLimitGoalType(1000m, 1000m);
+
+        // Act
+        goal.UpdateProgress(0m, updatedGoalType, DateTime.UtcNow);
+
+        // Assert - DecreasingSuccess goals auto-fail at 0%
+        Assert.That(goal.State, Is.EqualTo(GoalStates.Failed));
+    }
+
+    [Test]
+    public void Should_Not_Auto_Complete_ZeroToSuccess_Goal_When_Progress_Below_100()
+    {
+        // Arrange
+        var goal = GoalBuilder.AGoal()
+            .WithState(GoalStates.Open)
+            .WithGoalType(new StackBitcoinGoalType(1_000_000L))
+            .Build();
+
+        var updatedGoalType = new StackBitcoinGoalType(1_000_000L, 990_000L);
+
+        // Act
+        goal.UpdateProgress(99m, updatedGoalType, DateTime.UtcNow);
+
+        // Assert - Not yet 100%, should remain Open
         Assert.That(goal.State, Is.EqualTo(GoalStates.Open));
+    }
+
+    [Test]
+    public void Should_Not_Auto_Fail_DecreasingSuccess_Goal_When_Progress_Above_Zero()
+    {
+        // Arrange
+        var goal = GoalBuilder.AGoal()
+            .WithState(GoalStates.Open)
+            .WithGoalType(new SpendingLimitGoalType(1000m))
+            .Build();
+
+        var updatedGoalType = new SpendingLimitGoalType(1000m, 900m);
+
+        // Act
+        goal.UpdateProgress(10m, updatedGoalType, DateTime.UtcNow);
+
+        // Assert - Still has budget remaining, should remain Open
+        Assert.That(goal.State, Is.EqualTo(GoalStates.Open));
+    }
+
+    [Test]
+    public void Should_Not_Auto_Transition_When_Goal_Already_Completed()
+    {
+        // Arrange
+        var goal = GoalBuilder.AGoal()
+            .WithState(GoalStates.Completed)
+            .WithGoalType(new StackBitcoinGoalType(1_000_000L))
+            .Build();
+
+        var updatedGoalType = new StackBitcoinGoalType(1_000_000L, 500_000L);
+
+        // Act
+        goal.UpdateProgress(50m, updatedGoalType, DateTime.UtcNow);
+
+        // Assert - Already completed, should remain Completed even if progress drops
+        Assert.That(goal.State, Is.EqualTo(GoalStates.Completed));
+    }
+
+    [Test]
+    public void Should_Not_Auto_Transition_When_Goal_Already_Failed()
+    {
+        // Arrange
+        var goal = GoalBuilder.AGoal()
+            .WithState(GoalStates.Failed)
+            .WithGoalType(new SpendingLimitGoalType(1000m))
+            .Build();
+
+        var updatedGoalType = new SpendingLimitGoalType(1000m, 500m);
+
+        // Act
+        goal.UpdateProgress(50m, updatedGoalType, DateTime.UtcNow);
+
+        // Assert - Already failed, should remain Failed even if progress improves
+        Assert.That(goal.State, Is.EqualTo(GoalStates.Failed));
     }
 
     #endregion
@@ -184,70 +275,6 @@ public class GoalTests
 
     #endregion
 
-    #region MarkAsCompleted Tests
-
-    [Test]
-    public void Should_Mark_Goal_As_Completed()
-    {
-        // Arrange
-        var goal = GoalBuilder.AGoal()
-            .WithState(GoalStates.Open)
-            .Build();
-
-        // Act
-        goal.MarkAsCompleted();
-
-        // Assert
-        Assert.That(goal.State, Is.EqualTo(GoalStates.MarkedAsCompleted));
-    }
-
-    [Test]
-    public void Should_Not_Change_State_When_Already_Completed()
-    {
-        // Arrange
-        var goal = GoalBuilder.AGoal()
-            .WithState(GoalStates.Completed)
-            .Build();
-
-        // Act
-        goal.MarkAsCompleted();
-
-        // Assert - State unchanged
-        Assert.That(goal.State, Is.EqualTo(GoalStates.Completed));
-    }
-
-    [Test]
-    public void Should_Not_Change_State_When_MarkedAsCompleted()
-    {
-        // Arrange
-        var goal = GoalBuilder.AGoal()
-            .WithState(GoalStates.MarkedAsCompleted)
-            .Build();
-
-        // Act
-        goal.MarkAsCompleted();
-
-        // Assert - State unchanged
-        Assert.That(goal.State, Is.EqualTo(GoalStates.MarkedAsCompleted));
-    }
-
-    [Test]
-    public void Should_Not_Change_State_When_Closed()
-    {
-        // Arrange
-        var goal = GoalBuilder.AGoal()
-            .WithState(GoalStates.Closed)
-            .Build();
-
-        // Act
-        goal.MarkAsCompleted();
-
-        // Assert - State unchanged
-        Assert.That(goal.State, Is.EqualTo(GoalStates.Closed));
-    }
-
-    #endregion
-
     #region Close Tests
 
     [Test]
@@ -281,18 +308,18 @@ public class GoalTests
     }
 
     [Test]
-    public void Should_Not_Close_Goal_When_State_Is_MarkedAsCompleted()
+    public void Should_Not_Close_Goal_When_State_Is_Failed()
     {
         // Arrange
         var goal = GoalBuilder.AGoal()
-            .WithState(GoalStates.MarkedAsCompleted)
+            .WithState(GoalStates.Failed)
             .Build();
 
         // Act
         goal.Close();
 
         // Assert - State unchanged
-        Assert.That(goal.State, Is.EqualTo(GoalStates.MarkedAsCompleted));
+        Assert.That(goal.State, Is.EqualTo(GoalStates.Failed));
     }
 
     [Test]
@@ -315,81 +342,31 @@ public class GoalTests
 
     #endregion
 
-    #region Conclude Tests
+    #region Reopen Tests
 
     [Test]
-    public void Should_Conclude_Goal_When_State_Is_Completed()
+    public void Should_Reopen_Goal_When_State_Is_Completed()
     {
         // Arrange
         var goal = GoalBuilder.AGoal()
             .WithState(GoalStates.Completed)
+            .WithIsUpToDate(true)
             .Build();
 
         // Act
-        goal.Conclude();
+        goal.Reopen();
 
         // Assert
-        Assert.That(goal.State, Is.EqualTo(GoalStates.MarkedAsCompleted));
+        Assert.That(goal.State, Is.EqualTo(GoalStates.Open));
+        Assert.That(goal.IsUpToDate, Is.False);
     }
 
     [Test]
-    public void Should_Conclude_Goal_When_State_Is_Open()
+    public void Should_Reopen_Goal_When_State_Is_Failed()
     {
         // Arrange
         var goal = GoalBuilder.AGoal()
-            .WithState(GoalStates.Open)
-            .Build();
-
-        // Act
-        goal.Conclude();
-
-        // Assert
-        Assert.That(goal.State, Is.EqualTo(GoalStates.MarkedAsCompleted));
-    }
-
-    [Test]
-    public void Should_Not_Conclude_Goal_When_Already_MarkedAsCompleted()
-    {
-        // Arrange
-        var goal = GoalBuilder.AGoal()
-            .WithState(GoalStates.MarkedAsCompleted)
-            .Build();
-
-        var eventCountBefore = goal.Events.Count;
-
-        // Act
-        goal.Conclude();
-
-        // Assert - State unchanged, no new event
-        Assert.That(goal.State, Is.EqualTo(GoalStates.MarkedAsCompleted));
-        Assert.That(goal.Events.Count, Is.EqualTo(eventCountBefore));
-    }
-
-    [Test]
-    public void Should_Not_Conclude_Goal_When_State_Is_Closed()
-    {
-        // Arrange
-        var goal = GoalBuilder.AGoal()
-            .WithState(GoalStates.Closed)
-            .Build();
-
-        // Act
-        goal.Conclude();
-
-        // Assert - State unchanged
-        Assert.That(goal.State, Is.EqualTo(GoalStates.Closed));
-    }
-
-    #endregion
-
-    #region Reopen Tests
-
-    [Test]
-    public void Should_Reopen_Goal_When_State_Is_MarkedAsCompleted()
-    {
-        // Arrange
-        var goal = GoalBuilder.AGoal()
-            .WithState(GoalStates.MarkedAsCompleted)
+            .WithState(GoalStates.Failed)
             .WithIsUpToDate(true)
             .Build();
 
@@ -434,21 +411,6 @@ public class GoalTests
         // Assert - State unchanged, no new event
         Assert.That(goal.State, Is.EqualTo(GoalStates.Open));
         Assert.That(goal.Events.Count, Is.EqualTo(eventCountBefore));
-    }
-
-    [Test]
-    public void Should_Not_Reopen_Goal_When_State_Is_Completed()
-    {
-        // Arrange
-        var goal = GoalBuilder.AGoal()
-            .WithState(GoalStates.Completed)
-            .Build();
-
-        // Act
-        goal.Reopen();
-
-        // Assert - State unchanged
-        Assert.That(goal.State, Is.EqualTo(GoalStates.Completed));
     }
 
     [Test]

@@ -6,6 +6,8 @@ public sealed class BitcoinHodlGoalType : IGoalType
 
     public bool RequiresPriceDataForCalculation => false;
 
+    public ProgressionMode ProgressionMode => ProgressionMode.DecreasingSuccess;
+
     /// <summary>
     /// Maximum allowed sats to sell. 0 means no sales allowed (full HODL).
     /// </summary>
