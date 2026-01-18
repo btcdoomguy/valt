@@ -219,6 +219,7 @@ internal sealed class LocalDatabase : ILocalDatabase
 
         collection.EnsureIndex(x => x.ReferenceDate);
         collection.EnsureIndex(x => x.Transaction);
+        collection.EnsureIndex(x => x.FixedExpense);
 
         return collection;
     }
@@ -232,6 +233,7 @@ internal sealed class LocalDatabase : ILocalDatabase
         collection.EnsureIndex(x => x.ToAccountId);
         collection.EnsureIndex(x => x.CategoryId);
         collection.EnsureIndex(x => x.SatAmountStateId);
+        collection.EnsureIndex(x => x.Type);
 
         return collection;
     }
