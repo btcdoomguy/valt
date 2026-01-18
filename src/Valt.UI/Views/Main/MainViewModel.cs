@@ -45,7 +45,7 @@ using Valt.UI.Views.Main.Modals.InputPassword;
 
 namespace Valt.UI.Views.Main;
 
-public partial class MainViewModel : ValtViewModel
+public partial class MainViewModel : ValtViewModel, IDisposable
 {
     private readonly IPageFactory _pageFactory;
     private readonly IModalFactory _modalFactory;
@@ -398,9 +398,9 @@ public partial class MainViewModel : ValtViewModel
             OnPropertyChanged(nameof(SecureModeIcon));
 
             //this avoids some race conditions with the jobs and current UI state
-            Dispatcher.UIThread.Invoke(() =>
+            await Dispatcher.UIThread.InvokeAsync(async () =>
             {
-                _backgroundJobManager!.StartAllJobs(jobType: BackgroundJobTypes.ValtDatabase);
+                await _backgroundJobManager!.StartAllJobsAsync(jobType: BackgroundJobTypes.ValtDatabase);
             });
 
             // Check for updates (fire and forget - don't block startup)
@@ -436,7 +436,7 @@ public partial class MainViewModel : ValtViewModel
             if (!_priceDatabase.HasDatabaseOpen)
                 _priceDatabase!.OpenDatabase();
 
-            _backgroundJobManager!.StartAllJobs(jobType: BackgroundJobTypes.PriceDatabase, triggerInitialRun: false);
+            await _backgroundJobManager!.StartAllJobsAsync(jobType: BackgroundJobTypes.PriceDatabase, triggerInitialRun: false);
 
             // Run LivePricesUpdater synchronously to ensure rates are available before UI is shown
             await _backgroundJobManager.TriggerJobManuallyOnCurrentThreadAsync(BackgroundJobSystemNames.LivePricesUpdater);
@@ -588,5 +588,23 @@ public partial class MainViewModel : ValtViewModel
         ShowPepe = true;
         var uri = new Uri($"avares://Valt/Assets/Pepe/{assetName}");
         PepeMoodImage = new Bitmap(AssetLoader.Open(uri));
+    }
+
+    public void Dispose()
+    {
+        // Unregister from WeakReferenceMessenger
+        WeakReferenceMessenger.Default.UnregisterAll(this);
+
+        // Unsubscribe from local database PropertyChanged
+        if (_localDatabase is not null)
+            _localDatabase.PropertyChanged -= LocalDatabaseOnPropertyChanged;
+
+        // Unsubscribe from job PropertyChanged events
+        foreach (var job in Jobs)
+            job.PropertyChanged -= JobOnPropertyChanged;
+
+        // Dispose the Pepe image
+        PepeMoodImage?.Dispose();
+        PepeMoodImage = null;
     }
 }

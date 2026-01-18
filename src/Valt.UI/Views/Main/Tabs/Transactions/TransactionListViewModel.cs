@@ -27,6 +27,7 @@ using Valt.Infra.Modules.Budget.Transactions.Queries.DTOs;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
 using Valt.UI.Base;
+using static Valt.UI.Base.TaskExtensions;
 using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.LocalStorage;
@@ -544,7 +545,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         OnPropertyChanged(nameof(FilterMainDate));
         OnPropertyChanged(nameof(FilterRange));
-        _ = FetchTransactions();
+        FetchTransactions().SafeFireAndForget(logger: _logger, callerName: nameof(FetchTransactions));
     }
 
     partial void OnSelectedTransactionChanged(TransactionViewModel? value)

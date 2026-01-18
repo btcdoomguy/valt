@@ -20,63 +20,47 @@ internal class AccountCacheService : IAccountCacheService
     {
         var accountObjectId = accountId.AsObjectId();
         var account = _localDatabase.GetAccounts().FindById(accountObjectId);
-        
+
         _localDatabase.GetAccountCaches().Delete(accountObjectId);
 
-        AccountCacheEntity accountCache;
-        if (account.AccountEntityType == AccountEntityType.Fiat)
+        // Single query to get all transactions for this account (as From or To)
+        var transactions = _localDatabase.GetTransactions()
+            .Find(x => x.FromAccountId == accountObjectId || x.ToAccountId == accountObjectId)
+            .ToList();
+
+        decimal total = account.InitialAmount;
+        var isFiatAccount = account.AccountEntityType == AccountEntityType.Fiat;
+
+        // Calculate totals in a single pass through the transactions
+        foreach (var transaction in transactions)
         {
-            var fromTotal = _localDatabase.GetTransactions()
-                .Find(x => x.FromAccountId == accountObjectId)
-                .Select(x => x.FromFiatAmount)
-                .ToList()
-                .Sum(x => x);
-
-            var toTotal = _localDatabase.GetTransactions()
-                .Find(x => x.ToAccountId == accountObjectId)
-                .Select(x => x.ToFiatAmount)
-                .ToList()
-                .Sum(x => x);
-
-            var total = account.InitialAmount + fromTotal + toTotal;
-
-            accountCache = new AccountCacheEntity()
+            if (transaction.FromAccountId == accountObjectId)
             {
-                Id = accountId.AsObjectId(),
-                Total = total.GetValueOrDefault(),
-                CurrentTotal = 0,
-                CurrentDate = DateTime.MinValue
-            };
+                total += isFiatAccount
+                    ? transaction.FromFiatAmount.GetValueOrDefault()
+                    : transaction.FromSatAmount.GetValueOrDefault();
+            }
+
+            if (transaction.ToAccountId == accountObjectId)
+            {
+                total += isFiatAccount
+                    ? transaction.ToFiatAmount.GetValueOrDefault()
+                    : transaction.ToSatAmount.GetValueOrDefault();
+            }
         }
-        else
+
+        var accountCache = new AccountCacheEntity
         {
-            var fromTotal = _localDatabase.GetTransactions()
-                .Find(x => x.FromAccountId == accountObjectId)
-                .Select(x => x.FromSatAmount)
-                .ToList()
-                .Sum(x => x);
+            Id = accountId.AsObjectId(),
+            Total = total,
+            CurrentTotal = 0,
+            CurrentDate = DateTime.MinValue
+        };
 
-            var toTotal = _localDatabase.GetTransactions()
-                .Find(x => x.ToAccountId == accountObjectId)
-                .Select(x => x.ToSatAmount)
-                .ToList()
-                .Sum(x => x);
-
-            var total = account.InitialAmount + fromTotal + toTotal;
-
-            accountCache = new AccountCacheEntity()
-            {
-                Id = accountId.AsObjectId(),
-                Total = total.GetValueOrDefault(),
-                CurrentTotal = 0,
-                CurrentDate = DateTime.MinValue
-            };
-        }
-        
         _localDatabase.GetAccountCaches().Insert(accountCache);
-        
+
         var today = _clock.GetCurrentLocalDate();
-        
+
         await RefreshCurrentTotalForAccountAsync(accountObjectId, today);
     }
 

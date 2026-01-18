@@ -98,7 +98,7 @@ public partial class App : Application
             //otherwise the jobs will run with the IDE!
             var backgroundJobManager = serviceProvider.GetRequiredService<BackgroundJobManager>();
 
-            backgroundJobManager.StartAllJobs(jobType: BackgroundJobTypes.App);
+            _ = backgroundJobManager.StartAllJobsAsync(jobType: BackgroundJobTypes.App);
         }
     }
 

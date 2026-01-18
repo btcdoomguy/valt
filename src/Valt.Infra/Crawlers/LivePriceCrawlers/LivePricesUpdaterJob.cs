@@ -92,8 +92,8 @@ internal class LivePricesUpdaterJob : IBackgroundJob
 
             await Task.WhenAll(fiatTask, btcTask).ConfigureAwait(false);
 
-            _fiatUsdPrice = fiatTask.Result;
-            _btcPrice = btcTask.Result;
+            _fiatUsdPrice = await fiatTask.ConfigureAwait(false);
+            _btcPrice = await btcTask.ConfigureAwait(false);
 
             isUpToDate = _fiatUsdPrice.UpToDate && _btcPrice.UpToDate;
 

@@ -25,6 +25,7 @@ using Valt.Infra.Modules.Budget.FixedExpenses.Queries.DTOs;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
 using Valt.UI.Base;
+using static Valt.UI.Base.TaskExtensions;
 using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
@@ -374,7 +375,7 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         _currencySettings = currencySettings;
         _displaySettings = displaySettings;
 
-        _ = InitializeAsync();
+        InitializeAsync().SafeFireAndForget(callerName: nameof(InitializeAsync));
     }
 
     private async Task InitializeAsync()
@@ -734,7 +735,7 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
             or nameof(ToAccountFiatValue) or nameof(FromAccount) or nameof(FromAccountBtcValue)
             or nameof(FromAccountFiatValue))
         {
-            _ = UpdateTransferRateAsync();
+            UpdateTransferRateAsync().SafeFireAndForget(callerName: nameof(UpdateTransferRateAsync));
         }
     }
 

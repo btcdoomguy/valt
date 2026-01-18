@@ -144,7 +144,7 @@ public partial class LiveRateState : ObservableObject, IRecipient<RatesUpdated>,
                 .Date;
             var previousPrice =
                 _localHistoricalPriceProvider.GetFiatRateAtAsync(DateOnly.FromDateTime(lastDateParsed),
-                    FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency)).Result;
+                    FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency)).GetAwaiter().GetResult();
 
             _lastFiatClosingDate = DateOnly.FromDateTime(lastDateParsed);
             _lastFiatClosingPrice = previousPrice;

@@ -58,7 +58,7 @@ internal sealed class GoalRepository : IGoalRepository
         goal.ClearEvents();
     }
 
-    public Task MarkGoalsStaleForDateAsync(DateOnly date)
+    public async Task MarkGoalsStaleForDateAsync(DateOnly date)
     {
         var goals = _localDatabase.GetGoals()
             .Find(x => x.IsUpToDate);
@@ -71,10 +71,8 @@ internal sealed class GoalRepository : IGoalRepository
             if (date >= range.Start && date <= range.End)
             {
                 goal.MarkAsStale();
-                SaveAsync(goal).GetAwaiter().GetResult();
+                await SaveAsync(goal).ConfigureAwait(false);
             }
         }
-
-        return Task.CompletedTask;
     }
 }

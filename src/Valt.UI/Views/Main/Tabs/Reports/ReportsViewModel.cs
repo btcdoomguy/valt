@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -25,6 +26,7 @@ using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.Infra.Modules.Reports.Statistics;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
+using static Valt.UI.Base.TaskExtensions;
 using Valt.UI.Lang;
 using Valt.UI.State;
 using Valt.UI.UserControls;
@@ -110,7 +112,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _ratesState = ratesState;
         _secureModeState = secureModeState;
 
-        _secureModeState.PropertyChanged += (_, _) => OnPropertyChanged(nameof(IsSecureModeEnabled));
+        _secureModeState.PropertyChanged += OnSecureModeStatePropertyChanged;
 
         FilterMainDate = CategoryFilterMainDate = _clock.GetCurrentDateTimeUtc();
         FilterRange = new DateRange(new DateTime(FilterMainDate.Year, 1, 1), new DateTime(FilterMainDate.Year, 12, 31));
@@ -132,19 +134,12 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     IsMonthlyTotalsLoading = true;
                     IsSpendingByCategoriesLoading = true;
                     // Reload data when currency changes
-                    _ = ReloadDataAndFetchAllReportsAsync();
+                    ReloadDataAndFetchAllReportsAsync().SafeFireAndForget(logger: _logger, callerName: nameof(ReloadDataAndFetchAllReportsAsync));
                     break;
             }
         });
 
-        _accountsTotalState.PropertyChanged += (_, args) =>
-        {
-            if (args.PropertyName == nameof(AccountsTotalState.CurrentWealth))
-            {
-                Dispatcher.UIThread.Post(UpdateWealthData);
-                Dispatcher.UIThread.Post(UpdateBtcStackData);
-            }
-        };
+        _accountsTotalState.PropertyChanged += OnAccountsTotalStatePropertyChanged;
 
         _ready = true;
     }
@@ -165,7 +160,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             _ready = true;
         }
 
-        _ = LoadDataAndFetchAllReportsAsync();
+        LoadDataAndFetchAllReportsAsync().SafeFireAndForget(logger: _logger, callerName: nameof(LoadDataAndFetchAllReportsAsync));
         UpdateWealthData();
         UpdateBtcStackData();
     }
@@ -245,7 +240,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         IsMonthlyTotalsLoading = true;
         var provider = GetOrCreateProvider();
-        _ = FetchMonthlyTotalsAsync(provider);
+        FetchMonthlyTotalsAsync(provider).SafeFireAndForget(logger: _logger, callerName: nameof(FetchMonthlyTotalsAsync));
     }
 
     partial void OnCategoryFilterRangeChanged(DateRange value)
@@ -254,7 +249,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         IsSpendingByCategoriesLoading = true;
         var provider = GetOrCreateProvider();
-        _ = FetchExpensesByCategoryAsync(provider);
+        FetchExpensesByCategoryAsync(provider).SafeFireAndForget(logger: _logger, callerName: nameof(FetchExpensesByCategoryAsync));
     }
 
     private void OnSelectedFiltersChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -266,7 +261,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _filterDebounceTokenSource = new CancellationTokenSource();
 
         IsSpendingByCategoriesLoading = true;
-        _ = DebouncedFetchExpensesByCategoryAsync(_filterDebounceTokenSource.Token);
+        DebouncedFetchExpensesByCategoryAsync(_filterDebounceTokenSource.Token).SafeFireAndForget(logger: _logger, callerName: nameof(DebouncedFetchExpensesByCategoryAsync));
     }
 
     private async Task DebouncedFetchExpensesByCategoryAsync(CancellationToken cancellationToken)
@@ -536,6 +531,24 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
     public record SelectItem(string Id, string Name);
 
+    #region Event Handlers
+
+    private void OnSecureModeStatePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(IsSecureModeEnabled));
+    }
+
+    private void OnAccountsTotalStatePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(AccountsTotalState.CurrentWealth))
+        {
+            Dispatcher.UIThread.Post(UpdateWealthData);
+            Dispatcher.UIThread.Post(UpdateBtcStackData);
+        }
+    }
+
+    #endregion
+
     public void Dispose()
     {
         _filterDebounceTokenSource?.Cancel();
@@ -543,6 +556,10 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         SelectedAccounts.CollectionChanged -= OnSelectedFiltersChanged;
         SelectedCategories.CollectionChanged -= OnSelectedFiltersChanged;
+
+        // Unsubscribe from PropertyChanged events
+        _secureModeState.PropertyChanged -= OnSecureModeStatePropertyChanged;
+        _accountsTotalState.PropertyChanged -= OnAccountsTotalStatePropertyChanged;
 
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
 
