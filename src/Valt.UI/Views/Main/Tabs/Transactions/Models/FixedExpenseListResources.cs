@@ -11,7 +11,8 @@ public static class FixedExpenseListResources
     private static SolidColorBrush? _paidForegroundResource;
     private static SolidColorBrush? _ignoredForegroundResource;
     private static SolidColorBrush? _lateForegroundResource;
-    
+    private static SolidColorBrush? _warningForegroundResource;
+
 
     public static void Initialize()
     {
@@ -19,6 +20,7 @@ public static class FixedExpenseListResources
         _ignoredForegroundResource = GetResource("Text500Brush", Colors.Gray);
         _paidForegroundResource = GetResource("SemanticPositive500Brush", Colors.Gray);
         _lateForegroundResource = GetResource("SemanticNegative200Brush", Colors.Gray);
+        _warningForegroundResource = GetResource("SemanticWarning400Brush", Colors.Yellow);
     }
 
     private static SolidColorBrush GetResource(string key, Color defaultColor)
@@ -76,6 +78,18 @@ public static class FixedExpenseListResources
                 throw new InvalidOperationException("Resources not initialized. Call Initialize() first.");
             }
             return _lateForegroundResource;
+        }
+    }
+
+    public static SolidColorBrush WarningForeground
+    {
+        get
+        {
+            if (_warningForegroundResource is null)
+            {
+                throw new InvalidOperationException("Resources not initialized. Call Initialize() first.");
+            }
+            return _warningForegroundResource;
         }
     }
 }

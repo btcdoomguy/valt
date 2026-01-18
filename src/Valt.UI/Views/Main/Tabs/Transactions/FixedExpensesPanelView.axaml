@@ -46,22 +46,24 @@
                 <DataTemplate>
                     <Border Padding="2, 4" Background="Transparent">
                         <Grid ColumnDefinitions="40, *, 24">
-                            <!-- Calendar icon with day number overlay -->
-                            <Grid Grid.Column="0" Width="36" Height="36" Margin="0, -12, 0, 0">
-                                <TextBlock Text="&#xE935;"
-                                           FontFamily="{DynamicResource MaterialDesign}"
-                                           FontSize="32"
+                            <!-- Day number box -->
+                            <Border Grid.Column="0"
+                                    Width="28"
+                                    Height="28"
+                                    BorderBrush="{Binding TextColor}"
+                                    BorderThickness="1.5"
+                                    CornerRadius="4"
+                                    Padding="1, 0, 0, 0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+                                <TextBlock Text="{Binding DayFormatted}"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"
+                                           FontFamily="{DynamicResource GeistMono}"
                                            Foreground="{Binding TextColor}"
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="{Binding DayFormatted}"
-                                           FontSize="10"
-                                           Width="16"
-                                           Foreground="{Binding TextColor}"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"
-                                           Margin="0, 13, 0, 0" />
-                            </Grid>
+                            </Border>
                             <!-- Name and amount (two lines) -->
                             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" Margin="4, 0, 0, 0">
                                 <TextBlock FontSize="13"

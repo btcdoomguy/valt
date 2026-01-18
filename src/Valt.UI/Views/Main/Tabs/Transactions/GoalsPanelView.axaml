@@ -111,8 +111,8 @@
                                              Value="{Binding AnimatedProgressPercentage}"
                                              Minimum="0"
                                              Maximum="100"
-                                             Height="12"
-                                             CornerRadius="6"
+                                             Height="6"
+                                             CornerRadius="2"
                                              Margin="0, 0, 8, 0"
                                              Classes.complete="{Binding IsZeroToSuccess}"
                                              Classes.danger="{Binding IsDecreasingSuccess}" />
