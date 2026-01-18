@@ -91,7 +91,7 @@
         <value>Bem-vindo ao Valt!</value>
     </data>
     <data name="InputPassword.DatabasePassword" xml:space="preserve">
-        <value>Senha do arquivo</value>
+        <value>Senha do banco de dados</value>
     </data>
     <data name="InputPassword.Password" xml:space="preserve">
         <value>Senha</value>
@@ -1498,5 +1498,20 @@
     </data>
     <data name="GoalTarget_NoSales" xml:space="preserve">
         <value>Sem vendas</value>
+    </data>
+    <data name="Settings.Tab.Advanced" xml:space="preserve">
+        <value>Avançado</value>
+    </data>
+    <data name="Settings.Tab.Currencies" xml:space="preserve">
+        <value>Moedas</value>
+    </data>
+    <data name="Settings.Tab.General" xml:space="preserve">
+        <value>Geral</value>
+    </data>
+    <data name="SaveButton" xml:space="preserve">
+        <value>Salvar</value>
+    </data>
+    <data name="SaveAndAddButton" xml:space="preserve">
+        <value>Salvar e Adicionar Novo</value>
     </data>
 </root>
