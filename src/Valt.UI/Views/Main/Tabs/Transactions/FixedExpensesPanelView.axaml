@@ -1,0 +1,154 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Valt.UI.Lang"
+             xmlns:vm="clr-namespace:Valt.UI.Views.Main.Tabs.Transactions"
+             mc:Ignorable="d" d:DesignWidth="270" d:DesignHeight="300"
+             x:Class="Valt.UI.Views.Main.Tabs.Transactions.FixedExpensesPanelView"
+             x:DataType="vm:FixedExpensesPanelViewModel">
+    <Design.DataContext>
+        <vm:FixedExpensesPanelViewModel />
+    </Design.DataContext>
+
+    <Grid RowDefinitions="30, *, Auto" MinHeight="150">
+        <!-- Fixed Expenses Header -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource Background800Brush}"
+                BorderBrush="{DynamicResource Background500Brush}"
+                Padding="5, 0, 0, 0"
+                BorderThickness="1, 1, 1, 0"
+                CornerRadius="5, 5, 0, 0">
+            <Grid ColumnDefinitions="*, Auto">
+                <TextBlock Grid.Column="0"
+                           FontSize="12"
+                           Text="{x:Static local:language.ManageFixedExpenses_Title}"
+                           VerticalAlignment="Center" />
+                <Button Grid.Column="1"
+                        Classes="panel-header-icon"
+                        Content="&#xE745;"
+                        Command="{Binding ManageFixedExpensesCommand}"
+                        IsEnabled="{Binding !IsSecureModeEnabled}"
+                        Margin="4, 0, 0, 0" />
+            </Grid>
+        </Border>
+        <!-- Fixed Expense List -->
+        <ListBox Grid.Row="1"
+            x:Name="FixedExpenseList"
+            Classes="regularListBox"
+            ItemsSource="{Binding FixedExpenseEntries}"
+            SelectedItem="{Binding SelectedFixedExpense}"
+            SelectionMode="Single"
+            BorderBrush="{DynamicResource Background500Brush}"
+            CornerRadius="0"
+            BorderThickness="1, 0, 1, 0">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="2, 4" Background="Transparent">
+                        <Grid ColumnDefinitions="40, *, 24">
+                            <!-- Calendar icon with day number overlay -->
+                            <Grid Grid.Column="0" Width="36" Height="36" Margin="0, -12, 0, 0">
+                                <TextBlock Text="&#xE935;"
+                                           FontFamily="{DynamicResource MaterialDesign}"
+                                           FontSize="32"
+                                           Foreground="{Binding TextColor}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding DayFormatted}"
+                                           FontSize="10"
+                                           Width="16"
+                                           Foreground="{Binding TextColor}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Margin="0, 13, 0, 0" />
+                            </Grid>
+                            <!-- Name and amount (two lines) -->
+                            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" Margin="4, 0, 0, 0">
+                                <TextBlock FontSize="13"
+                                           Text="{Binding Name}"
+                                           FontFamily="{DynamicResource Geist}"
+                                           Foreground="{Binding TextColor}"
+                                           TextTrimming="CharacterEllipsis" />
+                                <TextBlock FontSize="11"
+                                           FontFamily="{DynamicResource Geist}"
+                                           Text="{Binding AmountDisplay}"
+                                           Foreground="{Binding TextColor}"
+                                           Opacity="0.7" />
+                            </StackPanel>
+                            <!-- Paid checkbox -->
+                            <TextBlock Grid.Column="2"
+                                       IsVisible="{Binding Paid}"
+                                       Text="&#xe834;"
+                                       FontFamily="{DynamicResource MaterialDesign}"
+                                       Foreground="{Binding CheckboxPaidColor}"
+                                       FontSize="20"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Grid>
+                        <Border.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem
+                                    Header="{x:Static local:language.TransactionFixedExpenses_AddOrEditTransaction}"
+                                    Command="{Binding $parent[UserControl].((vm:FixedExpensesPanelViewModel)DataContext).OpenFixedExpenseCommand}"
+                                    CommandParameter="{Binding .}">
+                                </MenuItem>
+                                <MenuItem
+                                    Header="{x:Static local:language.Transactions_Menu_Edit}"
+                                    Command="{Binding $parent[UserControl].((vm:FixedExpensesPanelViewModel)DataContext).EditFixedExpenseCommand}"
+                                    CommandParameter="{Binding .}"
+                                    IsEnabled="{Binding !$parent[UserControl].((vm:FixedExpensesPanelViewModel)DataContext).IsSecureModeEnabled}">
+                                </MenuItem>
+                                <Separator />
+                                <MenuItem
+                                    Header="{x:Static local:language.TransactionFixedExpenses_IgnoreForThisMonth}"
+                                    Command="{Binding $parent[UserControl].((vm:FixedExpensesPanelViewModel)DataContext).IgnoreFixedExpenseCommand}"
+                                    CommandParameter="{Binding .}"
+                                    IsVisible="{Binding Empty}">
+                                </MenuItem>
+                                <MenuItem
+                                    Header="{x:Static local:language.TransactionFixedExpenses_MarkAsPaid}"
+                                    Command="{Binding $parent[UserControl].((vm:FixedExpensesPanelViewModel)DataContext).MarkFixedExpenseAsPaidCommand}"
+                                    CommandParameter="{Binding .}"
+                                    IsVisible="{Binding Empty}">
+                                </MenuItem>
+                                <MenuItem
+                                    Header="{x:Static local:language.TransactionFixedExpenses_UndoIgnoreForThisMonth}"
+                                    Command="{Binding $parent[UserControl].((vm:FixedExpensesPanelViewModel)DataContext).UndoIgnoreFixedExpenseCommand}"
+                                    CommandParameter="{Binding .}"
+                                    IsVisible="{Binding Ignored}">
+                                </MenuItem>
+                                <MenuItem
+                                    Header="{x:Static local:language.TransactionFixedExpenses_UndoMarkAsPaid}"
+                                    Command="{Binding $parent[UserControl].((vm:FixedExpensesPanelViewModel)DataContext).UnmarkFixedExpenseAsPaidCommand}"
+                                    CommandParameter="{Binding .}"
+                                    IsVisible="{Binding MarkedAsPaid}">
+                                </MenuItem>
+                            </ContextMenu>
+                        </Border.ContextMenu>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <!-- Remaining Fixed Expenses Footer -->
+        <Border Grid.Row="2"
+                Background="{DynamicResource Background700Brush}"
+                BorderBrush="{DynamicResource Background500Brush}"
+                Padding="10, 8"
+                BorderThickness="1, 0, 1, 1"
+                CornerRadius="0, 0, 5, 5">
+            <Grid ColumnDefinitions="*, Auto">
+                <TextBlock Grid.Column="0"
+                           FontSize="11"
+                           VerticalAlignment="Center"
+                           Text="{x:Static local:language.RemainingFixedExpenses_Title}" />
+                <TextBlock Grid.Column="1"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource Accent200Brush}"
+                           Text="{Binding DisplayRemainingFixedExpensesAmount}"
+                           ToolTip.Tip="{Binding RemainingFixedExpensesTooltip}" />
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

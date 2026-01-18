@@ -52,6 +52,10 @@ public static class Extensions
         services.AddSingleton<TransactionsViewModel>();
         services.AddSingleton<ReportsViewModel>();
         services.AddSingleton<AvgPriceViewModel>();
+
+        //panel ViewModels
+        services.AddSingleton<FixedExpensesPanelViewModel>();
+        services.AddSingleton<GoalsPanelViewModel>();
         //factory method for pages
         services.AddSingleton<Func<MainViewTabNames, ValtTabViewModel>>(services => pageNames =>
         {

@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
@@ -24,6 +25,8 @@ namespace Valt.UI;
 
 public partial class App : Application
 {
+    public static IServiceProvider? ServiceProvider { get; private set; }
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -51,6 +54,7 @@ public partial class App : Application
 
         //register the current service provider as the universal provider
         serviceProvider.SetAsContextScope();
+        ServiceProvider = serviceProvider;
 
         // Add job logger provider to capture logs into job log pools
         var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();

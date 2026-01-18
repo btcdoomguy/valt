@@ -1,34 +1,22 @@
 using System;
 using System.ComponentModel;
-using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Collections;
-using Avalonia.Controls;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
-using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Accounts.Contracts;
-using Valt.Core.Modules.Budget.Categories;
-using Valt.Core.Modules.Budget.FixedExpenses;
-using Valt.Core.Modules.Budget.FixedExpenses.Contracts;
-using Valt.Core.Modules.Budget.Transactions;
-using Valt.Core.Modules.Goals;
-using Valt.Core.Modules.Goals.Contracts;
 using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Accounts.Queries;
-using Valt.Infra.Modules.Budget.Accounts.Queries.DTOs;
-using Valt.Infra.Modules.Budget.FixedExpenses;
-using Valt.Infra.Modules.Goals.Services;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
@@ -37,10 +25,6 @@ using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
 using Valt.UI.State;
 using Valt.UI.Views.Main.Modals.ManageAccount;
-using Valt.UI.Views.Main.Modals.FixedExpenseEditor;
-using Valt.UI.Views.Main.Modals.ManageFixedExpenses;
-using Valt.UI.Views.Main.Modals.ManageGoal;
-using Valt.UI.Views.Main.Modals.TransactionEditor;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
 namespace Valt.UI.Views.Main.Tabs.Transactions;
@@ -53,20 +37,15 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
     private readonly IModalFactory? _modalFactory;
     private readonly IAccountRepository? _accountRepository;
-    private readonly IFixedExpenseProvider? _fixedExpenseProvider;
     private readonly AccountsTotalState? _accountsTotalState;
     private readonly RatesState _ratesState;
     private readonly CurrencySettings? _currencySettings;
     private readonly DisplaySettings? _displaySettings;
     private readonly AccountDisplayOrderManager? _accountDisplayOrderManager;
     private readonly FilterState? _filterState;
-    private readonly IFixedExpenseRecordService? _fixedExpenseRecordService;
-    private readonly IClock _clock;
     private readonly ILogger<TransactionsViewModel> _logger;
     private readonly IAccountQueries? _accountQueries;
     private readonly SecureModeState _secureModeState;
-    private readonly IGoalRepository? _goalRepository;
-    private readonly GoalProgressState? _goalProgressState;
 
     //instances of the sub contents
     private readonly TransactionListViewModel _transactionListViewModel = null!;
@@ -93,15 +72,8 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     private decimal _startWealthInBtcRatio;
 
     [ObservableProperty] private AvaloniaList<AccountViewModel> _accounts = new();
-    [ObservableProperty] private AvaloniaList<FixedExpensesEntryViewModel> _fixedExpenseEntries = new();
-    [ObservableProperty] private AvaloniaList<GoalEntryViewModel> _goalEntries = new();
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayRemainingFixedExpensesAmount))]
-    private string _remainingFixedExpensesAmount = "~ R$ 12.345,67";
-    [ObservableProperty] private string? _remainingFixedExpensesTooltip;
 
     [ObservableProperty] private AccountViewModel? _selectedAccount;
-    [ObservableProperty] private FixedExpensesEntryViewModel? _selectedFixedExpense;
-    [ObservableProperty] private GoalEntryViewModel? _selectedGoal;
 
     [ObservableProperty] private string _allWealthInSats = "12.34567890";
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayWealthInBtcRatio))]
@@ -120,7 +92,6 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
     public TransactionsViewModel(IAccountQueries accountQueries,
         IModalFactory modalFactory, IAccountRepository accountRepository,
-        IFixedExpenseProvider fixedExpenseProvider,
         AccountsTotalState accountsTotalState,
         RatesState ratesState,
         CurrencySettings currencySettings,
@@ -128,29 +99,20 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         AccountDisplayOrderManager accountDisplayOrderManager,
         FilterState filterState,
         ITransactionTabFactory transactionTabFactory,
-        IFixedExpenseRecordService fixedExpenseRecordService,
-        IClock clock,
         ILogger<TransactionsViewModel> logger,
-        SecureModeState secureModeState,
-        IGoalRepository goalRepository,
-        GoalProgressState goalProgressState)
+        SecureModeState secureModeState)
     {
         _accountQueries = accountQueries;
         _secureModeState = secureModeState;
         _modalFactory = modalFactory;
         _accountRepository = accountRepository;
-        _fixedExpenseProvider = fixedExpenseProvider;
         _accountsTotalState = accountsTotalState;
         _ratesState = ratesState;
         _currencySettings = currencySettings;
         _displaySettings = displaySettings;
         _accountDisplayOrderManager = accountDisplayOrderManager;
         _filterState = filterState;
-        _fixedExpenseRecordService = fixedExpenseRecordService;
-        _clock = clock;
         _logger = logger;
-        _goalRepository = goalRepository;
-        _goalProgressState = goalProgressState;
 
         _transactionListViewModel = (TransactionListViewModel)transactionTabFactory.Create(TransactionsTabNames.List);
 
@@ -163,9 +125,6 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         MainFiatCurrency = FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency);
 
         WeakReferenceMessenger.Default.Register<TransactionListChanged>(this, OnTransactionListChangedReceive);
-        WeakReferenceMessenger.Default.Register<FilterDateRangeChanged>(this, OnCurrentDateRangeChangedReceive);
-        WeakReferenceMessenger.Default.Register<GoalListChanged>(this, OnGoalListChangedReceive);
-        WeakReferenceMessenger.Default.Register<GoalProgressUpdated>(this, OnGoalProgressUpdatedReceive);
 
         WeakReferenceMessenger.Default.Register<SettingsChangedMessage>(this, (recipient, message) =>
         {
@@ -180,72 +139,15 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
             }
         });
     }
-    
-    private void OnCurrentDateRangeChangedReceive(object recipient, FilterDateRangeChanged message)
-    {
-        _ = FetchFixedExpenses();
-        _ = FetchGoals();
-    }
-
-    private void OnGoalListChangedReceive(object recipient, GoalListChanged message)
-    {
-        _ = FetchGoals();
-    }
-
-    private void OnGoalProgressUpdatedReceive(object recipient, GoalProgressUpdated message)
-    {
-        _ = UpdateGoalProgress();
-    }
-
-    /// <summary>
-    /// Updates existing goal entries in place to enable progress animation.
-    /// Only adds/removes entries when the goal list changes.
-    /// </summary>
-    private async Task UpdateGoalProgress()
-    {
-        if (_filterState is null) return;
-        if (_goalRepository is null) return;
-
-        try
-        {
-            var currentDate = DateOnly.FromDateTime(_filterState.MainDate);
-            var allGoals = await _goalRepository.GetAllAsync();
-
-            var goalsForPeriod = allGoals
-                .Where(g =>
-                {
-                    var range = g.GetPeriodRange();
-                    return currentDate >= range.Start && currentDate <= range.End;
-                })
-                .ToDictionary(g => g.Id.ToString());
-
-            // Update existing entries in place (this triggers animation)
-            foreach (var entry in GoalEntries.ToList())
-            {
-                if (goalsForPeriod.TryGetValue(entry.Id, out var updatedGoal))
-                {
-                    entry.UpdateGoal(updatedGoal);
-                    goalsForPeriod.Remove(entry.Id);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating goal progress");
-        }
-    }
 
     private void OnTransactionListChangedReceive(object recipient, TransactionListChanged message)
     {
         _ = FetchAccounts();
-        _ = FetchFixedExpenses();
     }
 
     private void FilterStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         OnPropertyChanged(nameof(CurrentMonthYearDisplay));
-        OnPropertyChanged(nameof(FixedExpenseCurrentMonthDescription));
-        OnPropertyChanged(nameof(GoalsCurrentMonthDescription));
     }
 
     private void SecureModeStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -256,8 +158,6 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
             OnPropertyChanged(nameof(DisplayWealthInFiat));
             OnPropertyChanged(nameof(DisplayAllWealthInFiat));
             OnPropertyChanged(nameof(DisplayWealthInBtcRatio));
-            OnPropertyChanged(nameof(DisplayRemainingFixedExpensesAmount));
-            OnPropertyChanged(nameof(IsSecureModeEnabled));
 
             // Update account display for secure mode
             foreach (var account in Accounts)
@@ -271,8 +171,6 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     public string DisplayWealthInFiat => _secureModeState.IsEnabled ? "---" : CurrencyDisplay.FormatFiat(_animatedWealthInFiat, _currencySettings?.MainFiatCurrency ?? "USD");
     public string DisplayAllWealthInFiat => _secureModeState.IsEnabled ? "---" : CurrencyDisplay.FormatFiat(_animatedAllWealthInFiat, _currencySettings?.MainFiatCurrency ?? "USD");
     public string DisplayWealthInBtcRatio => _secureModeState.IsEnabled ? "---" : _animatedWealthInBtcRatio.ToString("F1", CultureInfo.InvariantCulture) + "%";
-    public string DisplayRemainingFixedExpensesAmount => _secureModeState.IsEnabled ? "---" : RemainingFixedExpensesAmount;
-    public bool IsSecureModeEnabled => _secureModeState.IsEnabled;
 
     private void AccountsTotalStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -377,8 +275,6 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         Dispatcher.UIThread.Post(() =>
         {
             _ = FetchAccounts();
-            _ = FetchFixedExpenses();
-            _ = FetchGoals();
             _transactionListViewModel.FetchTransactionsCommand.Execute(null);
 
             SelectedAccount = Accounts.FirstOrDefault();
@@ -402,114 +298,6 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         if (currentSelectedAccountId is not null)
             SelectedAccount =
                 Accounts.SingleOrDefault(x => x.Id == currentSelectedAccountId);
-    }
-
-    private async Task FetchFixedExpenses()
-    {
-        if (_filterState is null) return;
-        if (_fixedExpenseProvider is null) return;
-
-        try
-        {
-            var value = DateOnly.FromDateTime(_filterState.MainDate);
-            var fixedExpenses = await _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(value);
-
-            fixedExpenses = fixedExpenses.OrderBy(x => x.State).ThenBy(x => x.ReferenceDate).ToList();
-
-            var minTotal = 0m;
-            var maxTotal = 0m;
-
-            var fixedExpenseHelper = new FixedExpenseHelper(_ratesState, _currencySettings);
-
-            FixedExpenseEntries.Clear();
-            foreach (var fixedExpense in fixedExpenses)
-            {
-                FixedExpenseEntries.Add(new FixedExpensesEntryViewModel(fixedExpense, _clock.GetCurrentLocalDate()));
-
-                if (fixedExpense.State != FixedExpenseRecordState.Empty)
-                    continue;
-
-                var (fixedAmountMin, fixedAmountMax) = fixedExpenseHelper.CalculateFixedExpenseRange(
-                    fixedExpense.FixedAmount,
-                    fixedExpense.RangedAmountMin, fixedExpense.RangedAmountMax,
-                    fixedExpense.Currency);
-
-                minTotal += fixedAmountMin;
-                maxTotal += fixedAmountMax;
-            }
-
-            if (minTotal == maxTotal)
-            {
-                RemainingFixedExpensesAmount =
-                    $"{CurrencyDisplay.FormatFiat(minTotal, _currencySettings.MainFiatCurrency)}";
-                RemainingFixedExpensesTooltip = null;
-            }
-            else
-            {
-                var middle = (maxTotal + minTotal) / 2;
-
-                RemainingFixedExpensesAmount =
-                    $"~ {CurrencyDisplay.FormatFiat(middle, _currencySettings.MainFiatCurrency)}";
-                RemainingFixedExpensesTooltip =
-                    $"{CurrencyDisplay.FormatFiat(minTotal, _currencySettings.MainFiatCurrency)} - {CurrencyDisplay.FormatFiat(maxTotal, _currencySettings.MainFiatCurrency)}";
-            }
-                
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error fetching fixed expenses");
-        }
-    }
-
-    private async Task FetchGoals()
-    {
-        if (_filterState is null) return;
-        if (_goalRepository is null) return;
-
-        try
-        {
-            var currentDate = DateOnly.FromDateTime(_filterState.MainDate);
-            var allGoals = await _goalRepository.GetAllAsync();
-
-            var goalsForPeriod = allGoals
-                .Where(g =>
-                {
-                    var range = g.GetPeriodRange();
-                    return currentDate >= range.Start && currentDate <= range.End;
-                })
-                .OrderBy(g => GetGoalSortOrder(g))
-                .ThenBy(g => g.GoalType.TypeName)
-                .ThenBy(g => g.RefDate)
-                .ToList();
-
-            GoalEntries.Clear();
-            foreach (var goal in goalsForPeriod)
-            {
-                GoalEntries.Add(new GoalEntryViewModel(goal, _currencySettings!.MainFiatCurrency));
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error fetching goals");
-        }
-    }
-
-    /// <summary>
-    /// Returns a sort order value for goals:
-    /// 0 = Monthly Open goals
-    /// 1 = Yearly Open goals
-    /// 2 = Completed goals
-    /// 3 = Failed goals
-    /// </summary>
-    private static int GetGoalSortOrder(Goal goal)
-    {
-        return goal.State switch
-        {
-            GoalStates.Open => goal.Period == GoalPeriods.Monthly ? 0 : 1,
-            GoalStates.Completed => 2,
-            GoalStates.Failed => 3,
-            _ => 4
-        };
     }
 
     #region Account operations
@@ -660,246 +448,9 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     public string CurrentMonthYearDisplay =>
         DateOnly.FromDateTime(_filterState!.MainDate).ToString("MMMM yyyy", CultureInfo.CurrentCulture);
 
-    #region Fixed Expense operations
-
-    public string FixedExpenseCurrentMonthDescription =>
-        $"({DateOnly.FromDateTime(_filterState!.MainDate).ToString("MM/yy")})";
-
-    [RelayCommand]
-    private async Task ManageFixedExpenses()
-    {
-        var ownerWindow = GetUserControlOwnerWindow!();
-
-        var window = (ManageFixedExpensesView)await _modalFactory!.CreateAsync(
-            ApplicationModalNames.ManageFixedExpenses,
-            ownerWindow, null)!;
-
-        _ = await window.ShowDialog<ManageFixedExpensesViewModel.Response?>(ownerWindow!);
-
-        await _accountDisplayOrderManager!.NormalizeDisplayOrdersAsync(null);
-        await FetchAccounts();
-        await FetchFixedExpenses();
-    }
-
-    [RelayCommand]
-    private async Task EditFixedExpense(FixedExpensesEntryViewModel? entry)
-    {
-        if (entry is null)
-            return;
-
-        var ownerWindow = GetUserControlOwnerWindow!();
-
-        var window = (FixedExpenseEditorView)await _modalFactory!.CreateAsync(
-            ApplicationModalNames.FixedExpenseEditor,
-            ownerWindow, new FixedExpenseEditorViewModel.Request()
-            {
-                FixedExpenseId = entry.Id
-            })!;
-
-        _ = await window.ShowDialog<FixedExpenseEditorViewModel.Response?>(ownerWindow!);
-
-        await FetchFixedExpenses();
-    }
-
-    [RelayCommand]
-    private async Task OpenFixedExpense()
-    {
-        if (SelectedFixedExpense is null)
-            return;
-
-        TransactionEditorViewModel.Request request;
-        if (SelectedFixedExpense.Paid)
-        {
-            request = new TransactionEditorViewModel.Request()
-            {
-                TransactionId = new TransactionId(SelectedFixedExpense.TransactionId!)
-            };
-        }
-        else
-        {
-            request = new TransactionEditorViewModel.Request()
-            {
-                Date = DateTime.Now,
-                AccountId = SelectedFixedExpense.DefaultAccountId is not null
-                    ? new AccountId(SelectedFixedExpense.DefaultAccountId)
-                    : null,
-                CopyTransaction = false,
-                DefaultFromFiatValue = SelectedFixedExpense.FixedAmount is not null
-                    ? FiatValue.New(SelectedFixedExpense.FixedAmount)
-                    : null,
-                FixedExpenseReference =
-                    new TransactionFixedExpenseReference(SelectedFixedExpense.Id, SelectedFixedExpense.ReferenceDate),
-                Name = SelectedFixedExpense.Name,
-                CategoryId = new CategoryId(SelectedFixedExpense!.CategoryId!)
-            };
-        }
-
-        var ownerWindow = GetUserControlOwnerWindow()!;
-
-        var modal =
-            (TransactionEditorView)await _modalFactory!.CreateAsync(ApplicationModalNames.TransactionEditor,
-                ownerWindow,
-                request)!;
-
-        var result = await modal.ShowDialog<TransactionEditorViewModel.Response?>(ownerWindow);
-
-        if (result is null)
-            return;
-
-        WeakReferenceMessenger.Default.Send(new TransactionListChanged());
-        await FetchFixedExpenses();
-    }
-
-    [RelayCommand(CanExecute = nameof(CanIgnoreFixedExpense))]
-    public async Task IgnoreFixedExpense(FixedExpensesEntryViewModel? entry)
-    {
-        if (entry is null)
-            return;
-
-        await _fixedExpenseRecordService!.IgnoreFixedExpenseAsync(
-            new TransactionFixedExpenseReference(entry.Id, entry.ReferenceDate));
-        await FetchFixedExpenses();
-    }
-
-    public bool CanIgnoreFixedExpense(FixedExpensesEntryViewModel? entry) =>
-        entry?.State == FixedExpenseRecordState.Empty;
-
-    [RelayCommand(CanExecute = nameof(CanMarkFixedExpenseAsPaid))]
-    public async Task MarkFixedExpenseAsPaid(FixedExpensesEntryViewModel? entry)
-    {
-        if (entry is null)
-            return;
-
-        await _fixedExpenseRecordService!.MarkFixedExpenseAsPaidAsync(
-            new TransactionFixedExpenseReference(entry.Id, entry.ReferenceDate));
-        await FetchFixedExpenses();
-    }
-
-    public bool CanMarkFixedExpenseAsPaid(FixedExpensesEntryViewModel? entry) =>
-        entry?.State is FixedExpenseRecordState.Empty or FixedExpenseRecordState.Ignored;
-
-    [RelayCommand(CanExecute = nameof(CanUndoIgnoreFixedExpense))]
-    public async Task UndoIgnoreFixedExpense(FixedExpensesEntryViewModel? entry)
-    {
-        if (entry is null)
-            return;
-
-        await _fixedExpenseRecordService!.UndoIgnoreFixedExpenseAsync(
-            new TransactionFixedExpenseReference(entry.Id, entry.ReferenceDate));
-        await FetchFixedExpenses();
-    }
-
-    public bool CanUndoIgnoreFixedExpense(FixedExpensesEntryViewModel? entry) =>
-        entry?.State is FixedExpenseRecordState.Ignored;
-
-    [RelayCommand(CanExecute = nameof(CanUnmarkFixedExpenseAsPaid))]
-    public async Task UnmarkFixedExpenseAsPaid(FixedExpensesEntryViewModel? entry)
-    {
-        if (entry is null)
-            return;
-
-        await _fixedExpenseRecordService!.UnmarkFixedExpenseAsPaidAsync(
-            new TransactionFixedExpenseReference(entry.Id, entry.ReferenceDate));
-        await FetchFixedExpenses();
-    }
-
-    public bool CanUnmarkFixedExpenseAsPaid(FixedExpensesEntryViewModel? entry) =>
-        entry?.State is FixedExpenseRecordState.ManuallyPaid;
-
-    #endregion
-
-    #region Goal operations
-
-    public string GoalsCurrentMonthDescription =>
-        $"({DateOnly.FromDateTime(_filterState!.MainDate).ToString("MM/yy")})";
-
-    [RelayCommand]
-    private async Task AddGoal()
-    {
-        var ownerWindow = GetUserControlOwnerWindow!();
-
-        var window =
-            (ManageGoalView)await _modalFactory!.CreateAsync(ApplicationModalNames.ManageGoal, ownerWindow)!;
-
-        var result = await window.ShowDialog<ManageGoalViewModel.Response?>(ownerWindow!);
-
-        if (result is null)
-            return;
-
-        await FetchGoals();
-        WeakReferenceMessenger.Default.Send(new GoalListChanged());
-    }
-
-    [RelayCommand]
-    private async Task EditGoal(GoalEntryViewModel? entry)
-    {
-        if (entry is null)
-            return;
-
-        var ownerWindow = GetUserControlOwnerWindow!();
-
-        var window = (ManageGoalView)await _modalFactory!.CreateAsync(
-            ApplicationModalNames.ManageGoal,
-            ownerWindow, entry.Id)!;
-
-        _ = await window.ShowDialog<ManageGoalViewModel.Response?>(ownerWindow!);
-
-        await FetchGoals();
-        WeakReferenceMessenger.Default.Send(new GoalListChanged());
-    }
-
-    [RelayCommand]
-    private async Task RecalculateGoal(GoalEntryViewModel? entry)
-    {
-        if (entry is null)
-            return;
-
-        var goal = await _goalRepository!.GetByIdAsync(new GoalId(entry.Id));
-        if (goal is null)
-            return;
-
-        goal.Recalculate();
-        await _goalRepository.SaveAsync(goal);
-        _goalProgressState?.MarkAsStale();
-
-        await FetchGoals();
-        WeakReferenceMessenger.Default.Send(new GoalListChanged());
-    }
-
-    [RelayCommand]
-    private async Task DeleteGoal(GoalEntryViewModel? entry)
-    {
-        if (entry is null)
-            return;
-
-        var confirmed = await MessageBoxHelper.ShowQuestionAsync(
-            language.Goals_DeleteConfirm_Title,
-            language.Goals_DeleteConfirm_Message,
-            GetUserControlOwnerWindow()!);
-
-        if (!confirmed)
-            return;
-
-        var goal = await _goalRepository!.GetByIdAsync(new GoalId(entry.Id));
-        if (goal is null)
-            return;
-
-        await _goalRepository.DeleteAsync(goal);
-
-        await FetchGoals();
-        WeakReferenceMessenger.Default.Send(new GoalListChanged());
-    }
-
-    #endregion
-
     partial void OnSelectedAccountChanged(AccountViewModel? value)
     {
         WeakReferenceMessenger.Default.Send(new AccountSelectedChanged(value));
-    }
-    
-    partial void OnSelectedFixedExpenseChanged(FixedExpensesEntryViewModel? value)
-    {
-        WeakReferenceMessenger.Default.Send(new FixedExpenseChanged(value));
     }
 
     public void Dispose()
@@ -916,10 +467,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         _secureModeState.PropertyChanged -= SecureModeStateOnPropertyChanged;
 
         WeakReferenceMessenger.Default.Unregister<TransactionListChanged>(this);
-        WeakReferenceMessenger.Default.Unregister<FilterDateRangeChanged>(this);
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
-        WeakReferenceMessenger.Default.Unregister<GoalListChanged>(this);
-        WeakReferenceMessenger.Default.Unregister<GoalProgressUpdated>(this);
     }
 
     public override MainViewTabNames TabName => MainViewTabNames.TransactionsPageContent;
