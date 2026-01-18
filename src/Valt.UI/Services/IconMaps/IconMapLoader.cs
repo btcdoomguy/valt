@@ -9,30 +9,32 @@ namespace Valt.UI.Services.IconMaps;
 
 public static class IconMapLoader
 {
+    private static readonly object _lock = new();
     private static Dictionary<string, HashSet<IconMap>> _codeMap = new();
 
     public static void LoadIcons(string source)
     {
-        //TODO: semaphore
-
-        if (_codeMap.ContainsKey(source))
-            return;
-
-        var iconsMap = AssetLoader.Open(new Uri($"avares://Valt/Assets/Fonts/{source}-map.json"));
-
-        var iconsRaw = JsonSerializer.Deserialize<List<DTO>>(iconsMap)!;
-
-        var iconMapList = iconsRaw.Select(x =>
+        lock (_lock)
         {
-            if (!uint.TryParse(x.unicode, System.Globalization.NumberStyles.HexNumber, null, out var unicodeValue))
+            if (_codeMap.ContainsKey(source))
+                return;
+
+            var iconsMap = AssetLoader.Open(new Uri($"avares://Valt/Assets/Fonts/{source}-map.json"));
+
+            var iconsRaw = JsonSerializer.Deserialize<List<DTO>>(iconsMap)!;
+
+            var iconMapList = iconsRaw.Select(x =>
             {
-                throw new JsonException($"Invalid Unicode value: {x.unicode}");
-            }
+                if (!uint.TryParse(x.unicode, System.Globalization.NumberStyles.HexNumber, null, out var unicodeValue))
+                {
+                    throw new JsonException($"Invalid Unicode value: {x.unicode}");
+                }
 
-            return new IconMap(source, x.name, (char)unicodeValue, x.category);
-        }).ToHashSet();
+                return new IconMap(source, x.name, (char)unicodeValue, x.category);
+            }).ToHashSet();
 
-        _codeMap.Add(source, iconMapList);
+            _codeMap.Add(source, iconMapList);
+        }
     }
 
     public static char GetIcon(string source, string name)

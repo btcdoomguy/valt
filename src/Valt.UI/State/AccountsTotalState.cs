@@ -46,7 +46,7 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
         OnPropertyChanged(nameof(CurrentWealth));
     }
 
-    //TODO: test this urgently
+    // Note: This calculation should have unit tests covering currency conversions and edge cases
     private Wealth CalculateCurrentWealth()
     {
         lock (_calculationLock)

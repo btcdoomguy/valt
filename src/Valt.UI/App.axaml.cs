@@ -80,6 +80,13 @@ public partial class App : Application
             {
                 DataContext = serviceProvider.GetRequiredService<MainViewModel>()
             };
+
+            // Stop background jobs when the application exits
+            desktop.ShutdownRequested += async (_, _) =>
+            {
+                var bgJobManager = serviceProvider.GetRequiredService<BackgroundJobManager>();
+                await bgJobManager.StopAll();
+            };
         }
         
         TransactionGridResources.Initialize();
@@ -102,7 +109,4 @@ public partial class App : Application
         }
     }
 
-    //TODO: stop jobs before finalizing
 }
-
-public class Foo;

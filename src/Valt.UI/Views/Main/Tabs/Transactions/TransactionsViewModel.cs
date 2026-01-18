@@ -32,7 +32,7 @@ namespace Valt.UI.Views.Main.Tabs.Transactions;
 public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 {
     // Animation settings - adjust these to change the wealth counter animation speed
-    private const int WealthAnimationDurationMs = 1500; // 3 seconds
+    private const int WealthAnimationDurationMs = 1500; // 1.5 seconds
     private const int WealthAnimationIntervalMs = 16;   // ~60fps
 
     private readonly IModalFactory? _modalFactory;

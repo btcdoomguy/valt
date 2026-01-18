@@ -36,6 +36,14 @@ namespace Valt.UI.Views.Main.Modals.TransactionEditor;
 
 public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, IValidatableObject
 {
+    // Account mode constants - used for UI binding to show/hide fields based on transfer type
+    private const string AccountModeFiat = "Fiat";
+    private const string AccountModeBitcoin = "Bitcoin";
+    private const string AccountModeFiatToFiat = "FiatToFiat";
+    private const string AccountModeFiatToBitcoin = "FiatToBitcoin";
+    private const string AccountModeBitcoinToBitcoin = "BitcoinToBitcoin";
+    private const string AccountModeBitcoinToFiat = "BitcoinToFiat";
+
     private readonly ITransactionRepository? _transactionRepository;
     private readonly IAccountQueries? _accountQueries;
     private readonly ICategoryQueries? _categoryQueries;
@@ -310,12 +318,12 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         {
             return FromAccountType switch
             {
-                AccountTypes.Fiat when ToAccountType == AccountTypes.Fiat => "FiatToFiat",
-                AccountTypes.Fiat when ToAccountType == AccountTypes.Bitcoin => "FiatToBitcoin",
-                AccountTypes.Fiat => "Fiat",
-                AccountTypes.Bitcoin when ToAccountType == AccountTypes.Bitcoin => "BitcoinToBitcoin",
-                AccountTypes.Bitcoin when ToAccountType == AccountTypes.Fiat => "BitcoinToFiat",
-                AccountTypes.Bitcoin => "Bitcoin",
+                AccountTypes.Fiat when ToAccountType == AccountTypes.Fiat => AccountModeFiatToFiat,
+                AccountTypes.Fiat when ToAccountType == AccountTypes.Bitcoin => AccountModeFiatToBitcoin,
+                AccountTypes.Fiat => AccountModeFiat,
+                AccountTypes.Bitcoin when ToAccountType == AccountTypes.Bitcoin => AccountModeBitcoinToBitcoin,
+                AccountTypes.Bitcoin when ToAccountType == AccountTypes.Fiat => AccountModeBitcoinToFiat,
+                AccountTypes.Bitcoin => AccountModeBitcoin,
                 _ => ""
             };
         }

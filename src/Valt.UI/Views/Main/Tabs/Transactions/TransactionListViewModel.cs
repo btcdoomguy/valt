@@ -381,7 +381,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         if (SelectedTransaction is null || SelectedFixedExpense is null) return;
 
-        //TODO: move to a specific app layer
+        // Note: Consider extracting to an application service (e.g., TransactionFixedExpenseService)
         var transaction = await _transactionRepository.GetTransactionByIdAsync(new TransactionId(SelectedTransaction.Id));
 
         transaction!.SetFixedExpense(new TransactionFixedExpenseReference(SelectedFixedExpense.Id, SelectedFixedExpense.ReferenceDate));
@@ -396,7 +396,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         if (SelectedTransaction is null) return;
 
-        //TODO: move to a specific app layer
+        // Note: Consider extracting to an application service (e.g., TransactionFixedExpenseService)
         var transaction = await _transactionRepository.GetTransactionByIdAsync(new TransactionId(SelectedTransaction.Id));
 
         transaction!.SetFixedExpense(null);

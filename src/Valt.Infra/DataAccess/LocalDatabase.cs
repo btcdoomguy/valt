@@ -108,6 +108,7 @@ internal sealed class LocalDatabase : ILocalDatabase
                 var sourceColl = sourceDb.GetCollection(collName);
                 var targetColl = targetDb.GetCollection(collName);
 
+                // Batch size for bulk insert - balances memory usage vs. performance
                 const int batchSize = 5_000;
                 var batch = new List<BsonDocument>(batchSize);
 
