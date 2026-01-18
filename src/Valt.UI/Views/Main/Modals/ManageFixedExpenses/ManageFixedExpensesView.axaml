@@ -9,10 +9,12 @@
         x:Class="Valt.UI.Views.Main.Modals.ManageFixedExpenses.ManageFixedExpensesView"
         Title="{x:Static lang:language.ManageFixedExpenses_Title}"
         x:DataType="manageFixedExpenses:ManageFixedExpensesViewModel"
-        d:DesignWidth="1200"
+        d:DesignWidth="1100"
         d:DesignHeight="610"
-        MinWidth="1100"
+        MinWidth="700"
         MinHeight="500"
+        MaxWidth="1100"
+        MaxHeight="700"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
         SystemDecorations="None"
@@ -116,7 +118,7 @@
                     VerticalAlignment="Stretch"
                     Margin="10" 
                     Padding="0">
-                <Grid ColumnDefinitions="650, *" RowDefinitions="30, 30">
+                <Grid ColumnDefinitions="*, *" RowDefinitions="30, 30">
                     <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" Foreground="{DynamicResource Accent200Color}" Content="{x:Static lang:language.ManageFixedExpenses_MonthlyExpenses}" />
                     <Label Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Content="{Binding MonthlyExpenses}" />
                     <Label Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" Foreground="{DynamicResource Accent200Color}" Content="{x:Static lang:language.ManageFixedExpenses_YearlyExpenses}" />

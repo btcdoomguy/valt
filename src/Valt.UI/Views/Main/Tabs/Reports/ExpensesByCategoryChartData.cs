@@ -69,7 +69,8 @@ public class ExpensesByCategoryChartData : IDisposable, INotifyPropertyChanged
                 LabelsPaint = new SolidColorPaint(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) },
                 TextSize = 12,
                 SeparatorsPaint = new SolidColorPaint(GridColor.WithAlpha(60)) { StrokeThickness = 1 },
-                MinLimit = 0
+                MinLimit = 0,
+                Padding = new LiveChartsCore.Drawing.Padding(0, 0, 80, 0)  // Right padding for data labels
             }
         };
 

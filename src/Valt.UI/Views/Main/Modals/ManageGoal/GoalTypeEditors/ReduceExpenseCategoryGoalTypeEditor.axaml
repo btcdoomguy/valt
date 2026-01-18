@@ -19,10 +19,22 @@
         <StackPanel Classes="form-field">
             <TextBlock Text="{x:Static local:language.ManageGoal_Category}" />
             <ComboBox ItemsSource="{Binding AvailableCategories}"
-                      SelectedValue="{Binding SelectedCategoryId}"
-                      DisplayMemberBinding="{Binding Text}"
-                      SelectedValueBinding="{Binding Value}"
-                      Width="250" />
+                      SelectedItem="{Binding SelectedCategory}"
+                      IsTextSearchEnabled="True"
+                      Width="250"
+                      Height="36">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock
+                                FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
+                                Text="{Binding Unicode}"
+                                Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
+                            <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
         </StackPanel>
         <StackPanel Classes="form-field">
             <TextBlock Text="{x:Static local:language.ManageGoal_TargetFiatAmount}" />

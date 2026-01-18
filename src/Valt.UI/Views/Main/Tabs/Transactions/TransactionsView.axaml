@@ -246,7 +246,7 @@
                                     Content="&#xE745;"
                                     Command="{Binding ManageFixedExpensesCommand}"
                                     IsEnabled="{Binding !IsSecureModeEnabled}"
-                                    Margin="4, 0, 4, 0" />
+                                    Margin="4, 0, 0, 0" />
                         </Grid>
                     </Border>
                     <!-- Fixed Expense List -->
@@ -372,7 +372,7 @@
                 <!-- GridSplitter between panels -->
                 <GridSplitter Grid.Row="2"
                               Height="4"
-                              Background="{DynamicResource Background600Brush}"
+                              Background="Transparent"
                               ResizeDirection="Rows"
                               ResizeBehavior="PreviousAndNext" />
 
@@ -395,7 +395,7 @@
                                     Content="&#xE145;"
                                     Command="{Binding AddGoalCommand}"
                                     IsEnabled="{Binding !IsSecureModeEnabled}"
-                                    Margin="4, 0, 4, 0" />
+                                    Margin="4, 0, 0, 0" />
                         </Grid>
                     </Border>
                     <!-- Goals List -->
