@@ -96,6 +96,34 @@ public class LocalStorageService : ILocalStorageService
         return Task.CompletedTask;
     }
 
+    public LayoutSettings LoadLayoutSettings()
+    {
+        EnsureLoaded();
+        return _valtSettings!.LayoutSettings;
+    }
+
+    public Task SaveLayoutSettingsAsync(LayoutSettings settings)
+    {
+        EnsureLoaded();
+        _valtSettings!.LayoutSettings = settings;
+        Save();
+        return Task.CompletedTask;
+    }
+
+    public WindowSettings LoadWindowSettings()
+    {
+        EnsureLoaded();
+        return _valtSettings!.WindowSettings;
+    }
+
+    public Task SaveWindowSettingsAsync(WindowSettings settings)
+    {
+        EnsureLoaded();
+        _valtSettings!.WindowSettings = settings;
+        Save();
+        return Task.CompletedTask;
+    }
+
     private void EnsureLoaded()
     {
         if (_valtSettings is not null) return;
@@ -123,6 +151,8 @@ public class LocalStorageService : ILocalStorageService
         public string Theme { get; set; } = "Dark";
         public string FontScale { get; set; } = "Medium";
         public DataGridSettings DataGridSettings { get; set; } = new();
+        public LayoutSettings LayoutSettings { get; set; } = new();
+        public WindowSettings WindowSettings { get; set; } = new();
         public List<string> RecentFiles { get; set; } = new();
 
         private static string GetDefaultCulture()

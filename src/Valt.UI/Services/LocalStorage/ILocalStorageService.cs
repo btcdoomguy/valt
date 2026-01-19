@@ -16,6 +16,10 @@ public interface ILocalStorageService
     Task ChangeFontScaleAsync(string fontScale);
     DataGridSettings LoadDataGridSettings();
     Task SaveDataGridSettingsAsync(DataGridSettings settings);
+    LayoutSettings LoadLayoutSettings();
+    Task SaveLayoutSettingsAsync(LayoutSettings settings);
+    WindowSettings LoadWindowSettings();
+    Task SaveWindowSettingsAsync(WindowSettings settings);
 }
 
 public class DataGridSettings
@@ -24,4 +28,19 @@ public class DataGridSettings
     public List<string> ColumnOrder { get; set; } = new();
     public string? OrderedColumn { get; set; }
     public ListSortDirection? SortDirection { get; set; }
+}
+
+public class LayoutSettings
+{
+    public double? RightPanelWidth { get; set; }
+    public double? FixedExpensesPanelHeight { get; set; }
+}
+
+public class WindowSettings
+{
+    public bool IsMaximized { get; set; }
+    public double? Width { get; set; }
+    public double? Height { get; set; }
+    public double? X { get; set; }
+    public double? Y { get; set; }
 }

@@ -14,7 +14,7 @@
         <vm1:TransactionsViewModel />
     </Design.DataContext>
 
-    <Grid>
+    <Grid x:Name="MainLayoutGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300" MinWidth="100" /> <!-- Left Column -->
             <ColumnDefinition Width="*" MinWidth="300" />   <!-- Center Column -->
@@ -217,7 +217,13 @@
 
         <!-- Right Column -->
         <Panel Grid.Column="3">
-            <Grid RowDefinitions="80, *, 4, *" Margin="0, 0, 10, 10">
+            <Grid x:Name="RightPanelGrid" Margin="0, 0, 10, 10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="80" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="4" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
                 <!-- Current Month/Year Header -->
                 <TextBlock Grid.Row="0"
                            Text="{Binding CurrentMonthYearDisplay}"
