@@ -36,14 +36,14 @@
                 <!-- Message -->
                 <StackPanel Grid.Row="0">
                     <TextBlock Text="{x:Static local:language.InitialSelection_FirstMessage}" 
-                               FontSize="12"
+                               FontSize="{DynamicResource FontSizeSmall}"
                                HorizontalAlignment="Center"
                                TextAlignment="Center"
                                TextWrapping="Wrap"
                                Width="450"
                                Margin="0,10" Foreground="White" />
                     
-                    <TextBlock Text="{x:Static local:language.InitialSelection_CreateOrLoadMessage}" FontSize="14"
+                    <TextBlock Text="{x:Static local:language.InitialSelection_CreateOrLoadMessage}" FontSize="{DynamicResource FontSizeMedium}"
                                HorizontalAlignment="Center"
                                Margin="0,10" Foreground="{DynamicResource Accent100Brush}" />
                 </StackPanel>

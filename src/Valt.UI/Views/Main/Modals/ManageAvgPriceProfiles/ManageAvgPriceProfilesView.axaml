@@ -38,7 +38,7 @@
                             <DataTemplate DataType="models:AveragePriceProfileItem">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,2">
                                     <TextBlock
-                                        FontFamily="{DynamicResource MaterialDesign}" FontSize="16"
+                                        FontFamily="{DynamicResource MaterialDesign}" FontSize="{DynamicResource FontSizeLarge}"
                                         Text="{Binding Unicode}"
                                         VerticalAlignment="Center"
                                         Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
@@ -92,7 +92,7 @@
                                 <StackPanel Orientation="Horizontal" Spacing="10">
                                     <StackPanel>
                                         <TextBlock Text="{x:Static lang:language.AvgPrice_Profiles_AssetName}"
-                                                   FontSize="12" Foreground="{DynamicResource Text400Brush}" />
+                                                   FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource Text400Brush}" />
                                         <TextBox Text="{Binding AssetName}"
                                                  IsEnabled="{Binding EditFields}"
                                                  Width="180"
@@ -100,7 +100,7 @@
                                     </StackPanel>
                                     <StackPanel>
                                         <TextBlock Text="{x:Static lang:language.AvgPrice_Profiles_Decimals}"
-                                                   FontSize="12" Foreground="{DynamicResource Text400Brush}" />
+                                                   FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource Text400Brush}" />
                                         <TextBox Text="{Binding Precision}"
                                                  IsEnabled="{Binding EditFields}"
                                                  Width="100"
@@ -124,10 +124,10 @@
                                     <userControls:ModuleHelperText Margin="0, -3, 0, 0">
                                         <userControls:ModuleHelperText.HelpContent>
                                             <StackPanel Spacing="4">
-                                                <TextBlock FontSize="12"
+                                                <TextBlock FontSize="{DynamicResource FontSizeSmall}"
                                                            Text="{x:Static lang:language.AvgPrice_Help_BrazilianRule}"
                                                            TextWrapping="Wrap" />
-                                                <TextBlock FontSize="12"
+                                                <TextBlock FontSize="{DynamicResource FontSizeSmall}"
                                                            Text="{x:Static lang:language.AvgPrice_Help_FIFO}"
                                                            TextWrapping="Wrap" />
                                             </StackPanel>

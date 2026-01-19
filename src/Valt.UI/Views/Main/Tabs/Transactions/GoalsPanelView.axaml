@@ -72,7 +72,7 @@
                                     <TextBlock Text="{x:Static local:language.Goals_Success}"
                                                FontFamily="{DynamicResource GeistMono}"
                                                Foreground="{DynamicResource SemanticPositive200Brush}"
-                                               FontSize="10" />
+                                               FontSize="{DynamicResource FontSizeXSmall}" />
                                 </Border>
                                 <!-- FAILED label for Failed goals -->
                                 <Border Grid.Column="1"
@@ -85,7 +85,7 @@
                                     <TextBlock Text="{x:Static local:language.Goals_Failed}"
                                                FontFamily="{DynamicResource GeistMono}"
                                                Foreground="{DynamicResource SemanticNegative200Brush}"
-                                               FontSize="10" />
+                                               FontSize="{DynamicResource FontSizeXSmall}" />
                                 </Border>
                             </Grid>
                             <!-- Goal description (e.g., "123,456/1,000,000 sats") - hidden in secure mode -->
@@ -117,7 +117,7 @@
                                              Classes.complete="{Binding IsZeroToSuccess}"
                                              Classes.danger="{Binding IsDecreasingSuccess}" />
                                 <TextBlock Grid.Column="1"
-                                           FontSize="10"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
                                            Text="{Binding ProgressDisplay}"
                                            VerticalAlignment="Center"
                                            Foreground="{DynamicResource Text400Brush}" />

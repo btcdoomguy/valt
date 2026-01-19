@@ -49,11 +49,11 @@
                                          Converter="{x:Static importWizard:StepBackgroundConverter.Instance}"
                                          ConverterParameter="0" />
                             </Border.Background>
-                            <TextBlock Text="1" FontWeight="SemiBold" FontSize="14"
+                            <TextBlock Text="1" FontWeight="SemiBold" FontSize="{DynamicResource FontSizeMedium}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Foreground="White" />
                         </Border>
-                        <TextBlock Text="{x:Static local:language.ImportWizard_Step1}" FontSize="11"
+                        <TextBlock Text="{x:Static local:language.ImportWizard_Step1}" FontSize="{DynamicResource FontSizeXSmall}"
                                    HorizontalAlignment="Center">
                             <TextBlock.Foreground>
                                 <Binding Path="CurrentStep"
@@ -82,11 +82,11 @@
                                          Converter="{x:Static importWizard:StepBackgroundConverter.Instance}"
                                          ConverterParameter="1" />
                             </Border.Background>
-                            <TextBlock Text="2" FontWeight="SemiBold" FontSize="14"
+                            <TextBlock Text="2" FontWeight="SemiBold" FontSize="{DynamicResource FontSizeMedium}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Foreground="White" />
                         </Border>
-                        <TextBlock Text="{x:Static local:language.ImportWizard_Step2}" FontSize="11"
+                        <TextBlock Text="{x:Static local:language.ImportWizard_Step2}" FontSize="{DynamicResource FontSizeXSmall}"
                                    HorizontalAlignment="Center">
                             <TextBlock.Foreground>
                                 <Binding Path="CurrentStep"
@@ -115,11 +115,11 @@
                                          Converter="{x:Static importWizard:StepBackgroundConverter.Instance}"
                                          ConverterParameter="2" />
                             </Border.Background>
-                            <TextBlock Text="3" FontWeight="SemiBold" FontSize="14"
+                            <TextBlock Text="3" FontWeight="SemiBold" FontSize="{DynamicResource FontSizeMedium}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Foreground="White" />
                         </Border>
-                        <TextBlock Text="{x:Static local:language.ImportWizard_Step3}" FontSize="11"
+                        <TextBlock Text="{x:Static local:language.ImportWizard_Step3}" FontSize="{DynamicResource FontSizeXSmall}"
                                    HorizontalAlignment="Center">
                             <TextBlock.Foreground>
                                 <Binding Path="CurrentStep"
@@ -148,11 +148,11 @@
                                          Converter="{x:Static importWizard:StepBackgroundConverter.Instance}"
                                          ConverterParameter="3" />
                             </Border.Background>
-                            <TextBlock Text="4" FontWeight="SemiBold" FontSize="14"
+                            <TextBlock Text="4" FontWeight="SemiBold" FontSize="{DynamicResource FontSizeMedium}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Foreground="White" />
                         </Border>
-                        <TextBlock Text="{x:Static local:language.ImportWizard_Step4}" FontSize="11"
+                        <TextBlock Text="{x:Static local:language.ImportWizard_Step4}" FontSize="{DynamicResource FontSizeXSmall}"
                                    HorizontalAlignment="Center">
                             <TextBlock.Foreground>
                                 <Binding Path="CurrentStep"
@@ -181,11 +181,11 @@
                                          Converter="{x:Static importWizard:StepBackgroundConverter.Instance}"
                                          ConverterParameter="4" />
                             </Border.Background>
-                            <TextBlock Text="5" FontWeight="SemiBold" FontSize="14"
+                            <TextBlock Text="5" FontWeight="SemiBold" FontSize="{DynamicResource FontSizeMedium}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Foreground="White" />
                         </Border>
-                        <TextBlock Text="{x:Static local:language.ImportWizard_Step5}" FontSize="11"
+                        <TextBlock Text="{x:Static local:language.ImportWizard_Step5}" FontSize="{DynamicResource FontSizeXSmall}"
                                    HorizontalAlignment="Center">
                             <TextBlock.Foreground>
                                 <Binding Path="CurrentStep"
@@ -249,7 +249,7 @@
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
                                                         <TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="0,2"
-                                                                   Foreground="Orange" FontSize="12" />
+                                                                   Foreground="Orange" FontSize="{DynamicResource FontSizeSmall}" />
                                                     </DataTemplate>
                                                 </ItemsControl.ItemTemplate>
                                             </ItemsControl>
@@ -332,7 +332,7 @@
                                 IsVisible="{Binding CurrentStep, Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=3}"
                                 Spacing="20">
                         <!-- Summary Title -->
-                        <TextBlock Text="{x:Static local:language.ImportWizard_SummaryTitle}" FontSize="16"
+                        <TextBlock Text="{x:Static local:language.ImportWizard_SummaryTitle}" FontSize="{DynamicResource FontSizeLarge}"
                                    FontWeight="SemiBold" />
 
                         <!-- Summary Cards -->
@@ -388,7 +388,7 @@
                                 IsVisible="{Binding CurrentStep, Converter={x:Static importWizard:StepVisibilityConverter.Instance}, ConverterParameter=4}"
                                 Spacing="20" MinWidth="400">
                         <!-- Status Message -->
-                        <TextBlock Text="{Binding ImportStatusMessage}" FontSize="16" FontWeight="SemiBold"
+                        <TextBlock Text="{Binding ImportStatusMessage}" FontSize="{DynamicResource FontSizeLarge}" FontWeight="SemiBold"
                                    HorizontalAlignment="Center" />
 
                         <!-- Progress Bar -->

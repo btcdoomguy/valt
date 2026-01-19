@@ -67,7 +67,7 @@
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock
-                                                FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
+                                                FontFamily="{DynamicResource MaterialDesign}" FontSize="{DynamicResource FontSizeXXLarge}"
                                                 Text="{Binding Unicode}"
                                                 Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
                                             <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}" />
@@ -112,7 +112,7 @@
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock
-                                                FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
+                                                FontFamily="{DynamicResource MaterialDesign}" FontSize="{DynamicResource FontSizeXXLarge}"
                                                 Text="{Binding Unicode}"
                                                 Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
                                             <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}" />

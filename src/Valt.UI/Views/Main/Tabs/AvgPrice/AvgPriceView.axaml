@@ -36,7 +36,7 @@
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2">
                                         <TextBlock
-                                            FontFamily="{DynamicResource MaterialDesign}" FontSize="16"
+                                            FontFamily="{DynamicResource MaterialDesign}" FontSize="{DynamicResource FontSizeLarge}"
                                             Text="{Binding Unicode}"
                                             VerticalAlignment="Center"
                                             Margin="0,-1,0,0"
@@ -173,14 +173,14 @@
                             </DataGrid.Columns>
                         </DataGrid>
                         <TextBlock Text="{x:Static lang:language.Loading}"
-                                   FontSize="14"
+                                   FontSize="{DynamicResource FontSizeMedium}"
                                    Foreground="{DynamicResource Text400Brush}"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
                                    IsVisible="{Binding IsTotalsLoading}" />
                     </Panel>
                     <TextBlock Text="---"
-                               FontSize="14"
+                               FontSize="{DynamicResource FontSizeMedium}"
                                Foreground="{DynamicResource Text400Brush}"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"
@@ -198,12 +198,12 @@
                         <Grid ColumnDefinitions="*, Auto">
                             <TextBlock Grid.Column="0"
                                        Text="{x:Static lang:language.AvgPrice_CurrentPosition}"
-                                       FontSize="14"
+                                       FontSize="{DynamicResource FontSizeMedium}"
                                        Foreground="{DynamicResource Text400Brush}"
                                        VerticalAlignment="Center" />
                             <TextBlock Grid.Column="1"
                                        Text="{Binding DisplayCurrentPosition}"
-                                       FontSize="20"
+                                       FontSize="{DynamicResource FontSizeXXLarge}"
                                        FontWeight="SemiBold"
                                        FontFamily="Consolas, Menlo, Monaco, monospace"
                                        HorizontalAlignment="Right"
@@ -212,12 +212,12 @@
                         <Grid ColumnDefinitions="*, Auto">
                             <TextBlock Grid.Column="0"
                                        Text="{x:Static lang:language.AvgPrice_AveragePrice}"
-                                       FontSize="14"
+                                       FontSize="{DynamicResource FontSizeMedium}"
                                        Foreground="{DynamicResource Text400Brush}"
                                        VerticalAlignment="Center" />
                             <TextBlock Grid.Column="1"
                                        Text="{Binding DisplayCurrentAvgPrice}"
-                                       FontSize="20"
+                                       FontSize="{DynamicResource FontSizeXXLarge}"
                                        FontWeight="SemiBold"
                                        FontFamily="Consolas, Menlo, Monaco, monospace"
                                        HorizontalAlignment="Right"

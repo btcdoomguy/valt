@@ -12,7 +12,7 @@
              x:DataType="editors:ReduceExpenseCategoryGoalTypeEditorViewModel">
     <StackPanel>
         <TextBlock Text="{Binding Description}"
-                   FontSize="11"
+                   FontSize="{DynamicResource FontSizeXSmall}"
                    Opacity="0.7"
                    TextWrapping="Wrap"
                    Margin="0, 0, 0, 8" />
@@ -27,7 +27,7 @@
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock
-                                FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
+                                FontFamily="{DynamicResource MaterialDesign}" FontSize="{DynamicResource FontSizeXXLarge}"
                                 Text="{Binding Unicode}"
                                 Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
                             <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}" />

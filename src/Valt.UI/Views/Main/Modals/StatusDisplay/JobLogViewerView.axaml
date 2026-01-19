@@ -33,7 +33,7 @@
                          AcceptsReturn="True"
                          TextWrapping="NoWrap"
                          FontFamily="Consolas, Courier New, monospace"
-                         FontSize="12"
+                         FontSize="{DynamicResource FontSizeSmall}"
                          VerticalContentAlignment="Top"
                          ScrollViewer.VerticalScrollBarVisibility="Auto"
                          ScrollViewer.HorizontalScrollBarVisibility="Auto" />

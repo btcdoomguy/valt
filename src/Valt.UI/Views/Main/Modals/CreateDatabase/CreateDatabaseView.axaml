@@ -105,7 +105,7 @@
                                        Text="{x:Static local:language.CreateDatabase_FiatCurrencies}"
                                        TextWrapping="Wrap" />
                             <StackPanel Orientation="Vertical">
-                                <TextBlock FontStyle="Italic" FontSize="11" Margin="0,0,0,5"
+                                <TextBlock FontStyle="Italic" FontSize="{DynamicResource FontSizeXSmall}" Margin="0,0,0,5"
                                            Text="{x:Static local:language.CreateDatabase_FiatCurrencies_Info}" />
                                 <userControls:CheckboxListSelector
                                     Title="{x:Static local:language.CreateDatabase_FiatCurrencies_SelectTitle}"

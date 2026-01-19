@@ -22,7 +22,7 @@
                 <Label HorizontalContentAlignment="Left"
                        Content="{Binding Title}"
                        Foreground="{DynamicResource Accent200Brush}"
-                       FontSize="13"
+                       FontSize="{DynamicResource FontSizeNormal}"
                        FontWeight="SemiBold"
                        Padding="0" />
             </Border>
@@ -38,14 +38,14 @@
 
                                 <DockPanel LastChildFill="True" MinWidth="280">
                                     <TextBlock Text="{Binding LeftText}"
-                                               FontSize="11"
+                                               FontSize="{DynamicResource FontSizeXSmall}"
                                                Foreground="{DynamicResource Text300Brush}"
                                                DockPanel.Dock="Left"
                                                Padding="0, 6, 15, 0"
                                                VerticalAlignment="Center"/>
 
                                     <TextBlock Text="{Binding RightText}"
-                                               FontSize="13"
+                                               FontSize="{DynamicResource FontSizeNormal}"
                                                FontWeight="Medium"
                                                Foreground="{DynamicResource Text100Brush}"
                                                DockPanel.Dock="Right"

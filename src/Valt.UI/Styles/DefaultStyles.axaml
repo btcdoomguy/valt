@@ -141,7 +141,7 @@
     <!-- Material Design icon styling for TextBlocks -->
     <Style Selector="TextBlock.icon">
         <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
-        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeLarge}" />
         <Setter Property="Padding" Value="2, 4, 0, 0" />
     </Style>
 
@@ -347,7 +347,7 @@
     <Style Selector="Button.rounded">
         <Setter Property="Padding" Value="5, 2, 0, 0" />
         <Setter Property="Background" Value="{DynamicResource ButtonOverlayMediumBrush}" />
-        <Setter Property="FontSize" Value="30" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeIconLarge}" />
         <Setter Property="Width" Value="40" />
         <Setter Property="Height" Value="40" />
         <Setter Property="CornerRadius" Value="20" />
@@ -368,7 +368,7 @@
 
     <Style Selector="Button.icon-selector-button">
         <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
-        <Setter Property="FontSize" Value="28" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeIconLarge}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="LightGray" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -548,7 +548,7 @@
 
     <Style Selector="DropDownButton.icon">
         <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
-        <Setter Property="FontSize" Value="22" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeIcon}" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="{DynamicResource TopBarButtonBackgroundBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource TopBarButtonForegroundBrush}" />
@@ -719,7 +719,7 @@
                         x:Name="ButtonBorder">
                     <TextBlock Text="&#xE935;"
                                FontFamily="{StaticResource MaterialDesign}"
-                               FontSize="20"
+                               FontSize="{DynamicResource FontSizeXXLarge}"
                                Foreground="{DynamicResource Text200Brush}"
                                VerticalAlignment="Center"
                                HorizontalAlignment="Center"
@@ -751,7 +751,7 @@
         <Setter Property="DayTitleTemplate">
             <Template x:DataType="x:String">
                 <TextBlock Text="{Binding}"
-                           FontSize="11"
+                           FontSize="{DynamicResource FontSizeXSmall}"
                            Foreground="{DynamicResource Text300Brush}"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
@@ -781,7 +781,7 @@
 
     <!-- Header button (shows month/year) - override template to remove grey background -->
     <Style Selector="CalendarItem /template/ Button#PART_HeaderButton">
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeNormal}" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Height" Value="28" />
         <Setter Property="Background" Value="Transparent" />
@@ -822,7 +822,7 @@
 
     <!-- Day buttons (the actual day numbers) -->
     <Style Selector="CalendarDayButton">
-        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeSmall}" />
         <Setter Property="MinWidth" Value="26" />
         <Setter Property="MinHeight" Value="26" />
         <Setter Property="Margin" Value="1" />
@@ -857,7 +857,7 @@
 
     <!-- Month/Year buttons in year/decade view -->
     <Style Selector="CalendarButton">
-        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeSmall}" />
         <Setter Property="MinWidth" Value="44" />
         <Setter Property="MinHeight" Value="26" />
         <Setter Property="Margin" Value="2" />
@@ -884,21 +884,21 @@
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Margin" Value="0,0,4,0" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeMedium}" />
     </Style>
 
     <Style Selector="DatePicker /template/ TextBlock#PART_MonthTextBlock">
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Margin" Value="0,0,4,0" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeMedium}" />
     </Style>
 
     <Style Selector="DatePicker /template/ TextBlock#PART_YearTextBlock">
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Margin" Value="0" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeMedium}" />
     </Style>
 
     <Style Selector="DatePicker /template/ Rectangle#PART_FirstSpacer">
@@ -1012,7 +1012,7 @@
     </Style>
 
     <Style Selector="Border.hint-box > TextBlock">
-        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeSmall}" />
         <Setter Property="Foreground" Value="{DynamicResource Text200Brush}" />
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
@@ -1054,7 +1054,7 @@
     </Style>
 
     <Style Selector="TextBlock.section-header">
-        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeLarge}" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="{DynamicResource Text200Brush}" />
         <Setter Property="VerticalAlignment" Value="Center" />
@@ -1063,7 +1063,7 @@
 
     <Style Selector="TextBlock.section-header-icon">
         <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
-        <Setter Property="FontSize" Value="20" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeXXLarge}" />
         <Setter Property="Foreground" Value="{DynamicResource Accent300Brush}" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Margin" Value="0, 0, 10, 0" />

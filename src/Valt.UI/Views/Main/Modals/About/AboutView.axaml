@@ -27,9 +27,9 @@
             <Grid Margin="20" RowDefinitions="200, *">
                 <Grid Grid.Row="0" ColumnDefinitions="180, *">
                     <Image Grid.Column="0" Source="/Assets/valt-logo.png" Width="165" Height="176" />
-                    <TextBlock Margin="20, 0, 0, 0" Grid.Column="1" FontSize="12" TextWrapping="Wrap">
-                        <TextBlock Text="VALT" FontSize="48"></TextBlock>
-                        <TextBlock Text="{Binding AppVersion}" FontSize="12" Margin="0, -24, 0, 0" />
+                    <TextBlock Margin="20, 0, 0, 0" Grid.Column="1" FontSize="{DynamicResource FontSizeSmall}" TextWrapping="Wrap">
+                        <TextBlock Text="VALT" FontSize="40"></TextBlock>
+                        <TextBlock Text="{Binding AppVersion}" FontSize="{DynamicResource FontSizeSmall}" Margin="0, -24, 0, 0" />
                         <LineBreak />
                         <LineBreak />
                         <TextBlock Text="Created by BtcDoomGuy"></TextBlock>
@@ -42,11 +42,11 @@
                     </TextBlock>
                 </Grid>
                 <StackPanel Grid.Row="1">
-                    <TextBlock FontSize="12" TextWrapping="Wrap">
+                    <TextBlock FontSize="{DynamicResource FontSizeSmall}" TextWrapping="Wrap">
                         <TextBlock Text="{x:Static local:language.About_Tip}"></TextBlock>
                     </TextBlock>
                     <TextBox Text="{Binding DonationAddresses}" FontFamily="Mono" IsReadOnly="True" Height="100" AcceptsReturn="True"
-                             TextWrapping="NoWrap" FontSize="10">
+                             TextWrapping="NoWrap" FontSize="{DynamicResource FontSizeXSmall}">
                     </TextBox>
                 </StackPanel>
             </Grid>
