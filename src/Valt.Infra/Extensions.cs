@@ -40,6 +40,7 @@ using Valt.Infra.Modules.Budget.Transactions;
 using Valt.Infra.Modules.Budget.Transactions.Queries;
 using Valt.Infra.Modules.Budget.Transactions.Services;
 using Valt.Infra.Modules.Configuration;
+using Valt.Infra.Modules.Currency.Services;
 using Valt.Infra.Modules.Goals;
 using Valt.Infra.Modules.Goals.Handlers;
 using Valt.Infra.Modules.Goals.Queries;
@@ -214,6 +215,7 @@ public static class Extensions
         services.AddSingleton<ITransactionAutoSatAmountCalculator, TransactionAutoSatAmountCalculator>();
         services.AddSingleton<IAvgPriceTotalizer, AvgPriceTotalizer>();
         services.AddSingleton<IUpdateChecker, GitHubUpdateChecker>();
+        services.AddSingleton<ICurrencyConversionService, CurrencyConversionService>();
 
         //csv import
         services.AddSingleton<ICsvImportParser, CsvImportParser>();

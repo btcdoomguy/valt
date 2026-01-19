@@ -3038,5 +3038,17 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("GoalTarget_NoSales", resourceCulture);
             }
         }
+
+        public static string Menu_ConversionCalculator {
+            get {
+                return ResourceManager.GetString("Menu_ConversionCalculator", resourceCulture);
+            }
+        }
+
+        public static string ConversionCalculator_Title {
+            get {
+                return ResourceManager.GetString("ConversionCalculator_Title", resourceCulture);
+            }
+        }
     }
 }

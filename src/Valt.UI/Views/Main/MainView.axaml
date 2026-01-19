@@ -58,6 +58,9 @@
                                 <MenuItem Header="{x:Static local:language.Main_Menu_Settings}"
                                           Command="{Binding ManageSettingsCommand}">
                                 </MenuItem>
+                                <MenuItem Header="{x:Static local:language.Menu_ConversionCalculator}"
+                                          Command="{Binding OpenConversionCalculatorCommand}">
+                                </MenuItem>
                                 <Separator />
                                 <MenuItem Header="{x:Static local:language.Menu_ImportTransactions}"
                                           Command="{Binding OpenImportWizardCommand}">

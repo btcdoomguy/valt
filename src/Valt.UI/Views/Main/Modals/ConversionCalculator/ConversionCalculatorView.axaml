@@ -1,0 +1,201 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        xmlns:conv="clr-namespace:Valt.UI.Views.Main.Modals.ConversionCalculator"
+        mc:Ignorable="d"
+        d:DesignWidth="650" d:DesignHeight="442"
+        MaxWidth="650"
+        MaxHeight="442"
+        x:Class="Valt.UI.Views.Main.Modals.ConversionCalculator.ConversionCalculatorView"
+        x:DataType="conv:ConversionCalculatorViewModel"
+        Title="{x:Static local:language.ConversionCalculator_Title}"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Window.Styles>
+        <!-- Calculator button styles -->
+        <Style Selector="Button.calc-button">
+            <Setter Property="Width" Value="60" />
+            <Setter Property="Height" Value="50" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        </Style>
+        <Style Selector="Button.calc-button:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Background600Brush}" />
+        </Style>
+        <Style Selector="Button.calc-button.operator">
+            <Setter Property="Background" Value="{DynamicResource Accent700Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Accent500Brush}" />
+        </Style>
+        <Style Selector="Button.calc-button.operator:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Accent600Brush}" />
+        </Style>
+        <Style Selector="Button.calc-button.special">
+            <Setter Property="Background" Value="{DynamicResource Background600Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Background400Brush}" />
+        </Style>
+        <Style Selector="Button.calc-button.special:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Background500Brush}" />
+        </Style>
+
+        <!-- Currency list styles -->
+        <Style Selector="ListBox.currency-list">
+            <Setter Property="Background" Value="{DynamicResource Background900Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+        </Style>
+        <Style Selector="ListBox.currency-list ListBoxItem">
+            <Setter Property="Padding" Value="8, 4" />
+        </Style>
+        <Style Selector="ListBox.currency-list ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Accent700Brush}" />
+        </Style>
+    </Window.Styles>
+    <Design.DataContext>
+        <conv:ConversionCalculatorViewModel />
+    </Design.DataContext>
+    <Border Name="MainBorder" Focusable="True">
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="{x:Static local:language.ConversionCalculator_Title}"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+            <Border Classes="form-fields-area" Height="400">
+                <Grid ColumnDefinitions="320, 10, *">
+                    <!-- Left side: Calculator -->
+                    <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="10">
+                        <!-- Expression display -->
+                        <Border Background="{DynamicResource Background900Brush}"
+                                BorderBrush="{DynamicResource Background500Brush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="10">
+                            <StackPanel Orientation="Vertical" Spacing="5">
+                                <TextBlock Text="{Binding Expression}"
+                                           FontSize="20"
+                                           HorizontalAlignment="Right"
+                                           MinHeight="28">
+                                    <TextBlock.Styles>
+                                        <Style Selector="TextBlock">
+                                            <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+                                        </Style>
+                                    </TextBlock.Styles>
+                                </TextBlock>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                                    <TextBlock Text="="
+                                               FontSize="16"
+                                               Foreground="{DynamicResource Text300Brush}"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding DisplayValue}"
+                                               FontSize="20"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource Accent300Brush}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="5">
+                                    <TextBlock Text="{Binding SelectedCurrency.CurrencyCode}"
+                                               FontSize="14"
+                                               Foreground="{DynamicResource Text300Brush}" />
+                                    <TextBlock Text="{Binding SelectedCurrency.CurrencySymbol}"
+                                               FontSize="14"
+                                               Foreground="{DynamicResource Text300Brush}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Calculator buttons -->
+                        <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto" ColumnDefinitions="*, *, *, *"
+                              HorizontalAlignment="Center">
+                            <!-- Row 1: C ( ) Backspace -->
+                            <Button Grid.Row="0" Grid.Column="0" Classes="calc-button special"
+                                    Content="C" Command="{Binding ClearCommand}" />
+                            <Button Grid.Row="0" Grid.Column="1" Classes="calc-button special"
+                                    Content="(" Command="{Binding AppendCharacterCommand}" CommandParameter="(" />
+                            <Button Grid.Row="0" Grid.Column="2" Classes="calc-button special"
+                                    Content=")" Command="{Binding AppendCharacterCommand}" CommandParameter=")" />
+                            <Button Grid.Row="0" Grid.Column="3" Classes="calc-button special"
+                                    FontFamily="{DynamicResource MaterialDesign}"
+                                    Content="&#xE14A;" Command="{Binding BackspaceCommand}" />
+
+                            <!-- Row 2: 7 8 9 / -->
+                            <Button Grid.Row="1" Grid.Column="0" Classes="calc-button"
+                                    Content="7" Command="{Binding AppendCharacterCommand}" CommandParameter="7" />
+                            <Button Grid.Row="1" Grid.Column="1" Classes="calc-button"
+                                    Content="8" Command="{Binding AppendCharacterCommand}" CommandParameter="8" />
+                            <Button Grid.Row="1" Grid.Column="2" Classes="calc-button"
+                                    Content="9" Command="{Binding AppendCharacterCommand}" CommandParameter="9" />
+                            <Button Grid.Row="1" Grid.Column="3" Classes="calc-button operator"
+                                    Content="&#xF7;" Command="{Binding AppendCharacterCommand}" CommandParameter="&#xF7;" />
+
+                            <!-- Row 3: 4 5 6 * -->
+                            <Button Grid.Row="2" Grid.Column="0" Classes="calc-button"
+                                    Content="4" Command="{Binding AppendCharacterCommand}" CommandParameter="4" />
+                            <Button Grid.Row="2" Grid.Column="1" Classes="calc-button"
+                                    Content="5" Command="{Binding AppendCharacterCommand}" CommandParameter="5" />
+                            <Button Grid.Row="2" Grid.Column="2" Classes="calc-button"
+                                    Content="6" Command="{Binding AppendCharacterCommand}" CommandParameter="6" />
+                            <Button Grid.Row="2" Grid.Column="3" Classes="calc-button operator"
+                                    Content="&#xD7;" Command="{Binding AppendCharacterCommand}" CommandParameter="&#xD7;" />
+
+                            <!-- Row 4: 1 2 3 - -->
+                            <Button Grid.Row="3" Grid.Column="0" Classes="calc-button"
+                                    Content="1" Command="{Binding AppendCharacterCommand}" CommandParameter="1" />
+                            <Button Grid.Row="3" Grid.Column="1" Classes="calc-button"
+                                    Content="2" Command="{Binding AppendCharacterCommand}" CommandParameter="2" />
+                            <Button Grid.Row="3" Grid.Column="2" Classes="calc-button"
+                                    Content="3" Command="{Binding AppendCharacterCommand}" CommandParameter="3" />
+                            <Button Grid.Row="3" Grid.Column="3" Classes="calc-button operator"
+                                    Content="-" Command="{Binding AppendCharacterCommand}" CommandParameter="-" />
+
+                            <!-- Row 5: 0 . = + -->
+                            <Button Grid.Row="4" Grid.Column="0" Classes="calc-button"
+                                    Content="0" Command="{Binding AppendCharacterCommand}" CommandParameter="0" />
+                            <Button Grid.Row="4" Grid.Column="1" Classes="calc-button"
+                                    Content="{Binding DecimalSeparator}" Command="{Binding AppendDecimalCommand}" />
+                            <Button Grid.Row="4" Grid.Column="2" Classes="calc-button operator"
+                                    Content="=" Command="{Binding EqualsCommand}" />
+                            <Button Grid.Row="4" Grid.Column="3" Classes="calc-button operator"
+                                    Content="+" Command="{Binding AppendCharacterCommand}" CommandParameter="+" />
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Right side: Currency list -->
+                    <Border Grid.Column="2">
+                        <ListBox Classes="currency-list"
+                                 ItemsSource="{Binding Currencies}"
+                                 SelectedItem="{Binding SelectedCurrency}"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="conv:CurrencyConversionItem">
+                                    <Grid ColumnDefinitions="60, *, Auto">
+                                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="5">
+                                            <TextBlock Text="{Binding CurrencyCode}"
+                                                       FontWeight="SemiBold"
+                                                       VerticalAlignment="Center" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding CurrencySymbol}"
+                                                   Foreground="{DynamicResource Text300Brush}"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Left" />
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding FormattedValue}"
+                                                   FontFamily="{DynamicResource GeistMono}"
+                                                   HorizontalAlignment="Right"
+                                                   VerticalAlignment="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Border>
+                </Grid>
+            </Border>
+        </StackPanel>
+    </Border>
+</Window>

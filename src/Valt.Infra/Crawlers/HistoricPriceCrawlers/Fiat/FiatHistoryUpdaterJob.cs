@@ -225,6 +225,25 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
         }
     }
 
+    private DateTime? GetFiatMaxDateForCurrency(FiatCurrency currency)
+    {
+        try
+        {
+            var currencyData = _priceDatabase.GetFiatData()
+                .Find(x => x.Currency == currency.Code)
+                .ToList();
+
+            if (currencyData.Count == 0)
+                return null;
+
+            return currencyData.Max(x => x.Date);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
     private static DateTime SkipWeekendsForward(DateTime date)
     {
         while (date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
@@ -303,21 +322,57 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
         if (currencies.Count == 0)
             return false;
 
-        var (minFiatDate, maxFiatDate) = GetFiatDateRange();
+        var (minFiatDate, _) = GetFiatDateRange();
 
-        if (minFiatDate.HasValue && maxFiatDate.HasValue)
+        if (minFiatDate.HasValue)
         {
-            _logger.LogInformation("[FiatHistoryUpdater] Current fiat date range: {MinDate} to {MaxDate}",
-                minFiatDate.Value.ToString("yyyy-MM-dd"), maxFiatDate.Value.ToString("yyyy-MM-dd"));
+            _logger.LogInformation("[FiatHistoryUpdater] Current fiat min date: {MinDate}",
+                minFiatDate.Value.ToString("yyyy-MM-dd"));
         }
 
         var updated = false;
 
-        // Fill backward gap using initial seed provider
+        // Fill backward gap using initial seed provider (uses global min date)
         updated |= await FillBackwardGapAsync(currencies, requiredStartDate, minFiatDate);
 
-        // Fill forward using regular provider
-        updated |= await FillForwardDataAsync(currencies, maxFiatDate, requiredStartDate, endDate);
+        // Fill forward using regular provider - check each currency's individual date range
+        // to ensure currencies with stale data get updated even if others are current
+        var staleCurrencies = new List<FiatCurrency>();
+        DateTime? earliestStaleMaxDate = null;
+
+        foreach (var currency in currencies)
+        {
+            var currencyMaxDate = GetFiatMaxDateForCurrency(currency);
+            if (currencyMaxDate is null)
+            {
+                // Currency has no data - should have been handled by ProcessCurrenciesWithoutDataAsync
+                continue;
+            }
+
+            var potentialStartDate = SkipWeekendsForward(currencyMaxDate.Value.AddDays(1).Date);
+            if (potentialStartDate <= endDate)
+            {
+                staleCurrencies.Add(currency);
+                _logger.LogInformation("[FiatHistoryUpdater] Currency {Currency} is stale (max date: {MaxDate})",
+                    currency.Code, currencyMaxDate.Value.ToString("yyyy-MM-dd"));
+
+                if (!earliestStaleMaxDate.HasValue || currencyMaxDate.Value < earliestStaleMaxDate.Value)
+                {
+                    earliestStaleMaxDate = currencyMaxDate.Value;
+                }
+            }
+        }
+
+        if (staleCurrencies.Count > 0)
+        {
+            _logger.LogInformation("[FiatHistoryUpdater] Found {Count} stale currencies: {Currencies}",
+                staleCurrencies.Count, string.Join(", ", staleCurrencies.Select(c => c.Code)));
+            updated |= await FillForwardDataAsync(staleCurrencies, earliestStaleMaxDate, requiredStartDate, endDate);
+        }
+        else
+        {
+            _logger.LogInformation("[FiatHistoryUpdater] All currencies with data are up-to-date");
+        }
 
         return updated;
     }

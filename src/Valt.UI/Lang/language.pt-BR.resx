@@ -1529,4 +1529,10 @@
     <data name="Settings_FontScale_Large" xml:space="preserve">
         <value>Grande</value>
     </data>
+    <data name="Menu_ConversionCalculator" xml:space="preserve">
+        <value>Calculadora de Conversao</value>
+    </data>
+    <data name="ConversionCalculator_Title" xml:space="preserve">
+        <value>Conversor de Moedas</value>
+    </data>
 </root>
