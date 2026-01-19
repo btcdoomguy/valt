@@ -1,6 +1,7 @@
+using System;
 using Avalonia;
-using Avalonia.Controls;
 using Valt.Infra.Settings;
+using Valt.UI.Services.LocalStorage;
 
 namespace Valt.UI.Services.FontScaling;
 
@@ -10,7 +11,8 @@ namespace Valt.UI.Services.FontScaling;
 /// </summary>
 public class FontScaleService : IFontScaleService
 {
-    private readonly DisplaySettings _displaySettings;
+    private readonly ILocalStorageService _localStorageService;
+    private FontScale _currentScale;
 
     // Base font sizes (Medium scale = 1.0x)
     private const double BaseFontSizeXSmall = 11;
@@ -23,16 +25,22 @@ public class FontScaleService : IFontScaleService
     private const double BaseFontSizeIcon = 22;
     private const double BaseFontSizeIconLarge = 28;
 
-    public FontScaleService(DisplaySettings displaySettings)
+    public FontScaleService(ILocalStorageService localStorageService)
     {
-        _displaySettings = displaySettings;
-        ApplyScale(_displaySettings.FontScale);
+        _localStorageService = localStorageService;
+
+        // Load and apply saved font scale
+        var savedScale = _localStorageService.LoadFontScale();
+        _currentScale = Enum.TryParse<FontScale>(savedScale, out var scale) ? scale : FontScale.Medium;
+        ApplyScale(_currentScale);
     }
 
-    public FontScale CurrentScale => _displaySettings.FontScale;
+    public FontScale CurrentScale => _currentScale;
 
     public void ApplyScale(FontScale scale)
     {
+        _currentScale = scale;
+
         var app = Application.Current;
         if (app == null)
             return;
@@ -49,6 +57,11 @@ public class FontScaleService : IFontScaleService
         app.Resources["FontSizeXXLarge"] = BaseFontSizeXXLarge * multiplier;
         app.Resources["FontSizeIcon"] = BaseFontSizeIcon * multiplier;
         app.Resources["FontSizeIconLarge"] = BaseFontSizeIconLarge * multiplier;
+    }
+
+    public void SaveScale(FontScale scale)
+    {
+        _localStorageService.ChangeFontScaleAsync(scale.ToString());
     }
 
     private static double GetScaleMultiplier(FontScale scale) => scale switch

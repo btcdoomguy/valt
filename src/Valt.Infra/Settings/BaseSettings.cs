@@ -50,7 +50,17 @@ public abstract class BaseSettings : ObservableObject
                 try
                 {
                     var currentValue = prop.GetValue(this);
-                    var newValue = Convert.ChangeType(setting.Value, prop.PropertyType);
+                    object newValue;
+
+                    // Handle enum types specially since Convert.ChangeType doesn't work with enums
+                    if (prop.PropertyType.IsEnum)
+                    {
+                        newValue = Enum.Parse(prop.PropertyType, setting.Value);
+                    }
+                    else
+                    {
+                        newValue = Convert.ChangeType(setting.Value, prop.PropertyType);
+                    }
 
                     // Only update and notify if value actually changed
                     if (!Equals(currentValue, newValue))

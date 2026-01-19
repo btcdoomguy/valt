@@ -12,6 +12,8 @@ public interface ILocalStorageService
     Task ChangeCultureAsync(string culture);
     string LoadTheme();
     Task ChangeThemeAsync(string theme);
+    string LoadFontScale();
+    Task ChangeFontScaleAsync(string fontScale);
     DataGridSettings LoadDataGridSettings();
     Task SaveDataGridSettingsAsync(DataGridSettings settings);
 }

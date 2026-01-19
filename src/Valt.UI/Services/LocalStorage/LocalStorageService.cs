@@ -68,6 +68,20 @@ public class LocalStorageService : ILocalStorageService
         return Task.CompletedTask;
     }
 
+    public string LoadFontScale()
+    {
+        EnsureLoaded();
+        return _valtSettings!.FontScale;
+    }
+
+    public Task ChangeFontScaleAsync(string fontScale)
+    {
+        EnsureLoaded();
+        _valtSettings!.FontScale = fontScale;
+        Save();
+        return Task.CompletedTask;
+    }
+
     public DataGridSettings LoadDataGridSettings()
     {
         EnsureLoaded();
@@ -107,6 +121,7 @@ public class LocalStorageService : ILocalStorageService
     {
         public string Culture { get; set; } = GetDefaultCulture();
         public string Theme { get; set; } = "Dark";
+        public string FontScale { get; set; } = "Medium";
         public DataGridSettings DataGridSettings { get; set; } = new();
         public List<string> RecentFiles { get; set; } = new();
 

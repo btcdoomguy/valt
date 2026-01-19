@@ -16,17 +16,8 @@ public partial class DisplaySettings : BaseSettings
         set => SetProperty(ref _showHiddenAccounts, value);
     }
 
-    private FontScale _fontScale;
-    [PersistableSetting]
-    public FontScale FontScale
-    {
-        get => _fontScale;
-        set => SetProperty(ref _fontScale, value);
-    }
-
     protected sealed override void LoadDefaults()
     {
         ShowHiddenAccounts = false;
-        FontScale = FontScale.Medium;
     }
 }

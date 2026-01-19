@@ -137,7 +137,7 @@ public partial class SettingsViewModel : ValtModalViewModel
         CurrentCulture = _localStorageService.LoadCulture();
         SelectedTheme = _themeService.AvailableThemes.FirstOrDefault(t => t.Name == _themeService.CurrentTheme)
                         ?? _themeService.AvailableThemes.First();
-        SelectedFontScale = FontScaleItem.All.FirstOrDefault(x => x.Scale == _displaySettings.FontScale)
+        SelectedFontScale = FontScaleItem.All.FirstOrDefault(x => x.Scale == fontScaleService.CurrentScale)
                             ?? FontScaleItem.All.First(x => x.Scale == FontScale.Medium);
 
         // Initialize currencies
@@ -246,6 +246,7 @@ public partial class SettingsViewModel : ValtModalViewModel
         _currencySettings.Save();
 
         _displaySettings.ShowHiddenAccounts = ShowHiddenAccounts;
+        _displaySettings.Save();
 
         // Apply and save font scale if changed
         if (SelectedFontScale != null && _fontScaleService != null)
@@ -253,11 +254,9 @@ public partial class SettingsViewModel : ValtModalViewModel
             if (_fontScaleService.CurrentScale != SelectedFontScale.Scale)
             {
                 _fontScaleService.ApplyScale(SelectedFontScale.Scale);
-                _displaySettings.FontScale = SelectedFontScale.Scale;
+                _fontScaleService.SaveScale(SelectedFontScale.Scale);
             }
         }
-
-        _displaySettings.Save();
 
         // Apply and save theme if changed
         if (SelectedTheme != null && _themeService != null)

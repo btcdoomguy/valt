@@ -17,4 +17,10 @@ public interface IFontScaleService
     /// </summary>
     /// <param name="scale">The font scale to apply.</param>
     void ApplyScale(FontScale scale);
+
+    /// <summary>
+    /// Saves the specified font scale to local storage.
+    /// </summary>
+    /// <param name="scale">The font scale to save.</param>
+    void SaveScale(FontScale scale);
 }

@@ -18,10 +18,12 @@ public class FontScaleItem
         DisplayName = displayName;
     }
 
-    public static IReadOnlyList<FontScaleItem> All =>
+    private static readonly List<FontScaleItem> _all =
     [
         new FontScaleItem(FontScale.Small, language.Settings_FontScale_Small),
         new FontScaleItem(FontScale.Medium, language.Settings_FontScale_Medium),
         new FontScaleItem(FontScale.Large, language.Settings_FontScale_Large)
     ];
+
+    public static IReadOnlyList<FontScaleItem> All => _all;
 }
