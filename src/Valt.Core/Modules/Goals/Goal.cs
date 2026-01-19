@@ -91,6 +91,15 @@ public sealed class Goal : AggregateRoot<GoalId>
         AddEvent(new GoalUpdatedEvent(this));
     }
 
+    public void Edit(DateOnly refDate, GoalPeriods period, IGoalType goalType)
+    {
+        RefDate = refDate;
+        Period = period;
+        GoalType = goalType;
+        IsUpToDate = false;
+        AddEvent(new GoalUpdatedEvent(this));
+    }
+
     public DateOnlyRange GetPeriodRange() => Period switch
     {
         GoalPeriods.Monthly => new DateOnlyRange(
