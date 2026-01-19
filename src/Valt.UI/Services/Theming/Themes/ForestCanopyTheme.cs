@@ -149,6 +149,14 @@ public static class ForestCanopyTheme
         resources["BlackColor"] = Color.Parse("#060806");
         resources["WhiteColor"] = Color.Parse("#F5F5F0");
 
+        // Transaction Row Colors (for DataGrid highlighting)
+        resources["CreditBaseColor"] = Color.Parse("#78DB55");
+        resources["DebtBaseColor"] = Color.Parse("#FF7D7D");
+        resources["TransferBaseColor"] = Color.Parse("#FFF866");
+
+        // Title Bar
+        resources["TitleBarForegroundColor"] = Color.Parse("#FFFFFF");
+
         // UI Element Colors
         resources["LiveRatesBackgroundColor"] = Color.Parse("#182018");
         resources["LiveRatesBorderGradientStartColor"] = Color.Parse("#059669");

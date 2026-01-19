@@ -148,6 +148,14 @@ public static class CrimsonEmberTheme
         resources["BlackColor"] = Color.Parse("#1C0C0C");
         resources["WhiteColor"] = Color.Parse("#FFF1F2");
 
+        // Transaction Row Colors (for DataGrid highlighting)
+        resources["CreditBaseColor"] = Color.Parse("#78DB55");
+        resources["DebtBaseColor"] = Color.Parse("#FF7D7D");
+        resources["TransferBaseColor"] = Color.Parse("#FFF866");
+
+        // Title Bar
+        resources["TitleBarForegroundColor"] = Color.Parse("#FFFFFF");
+
         // UI Element Colors (high contrast)
         resources["LiveRatesBackgroundColor"] = Color.Parse("#261010");
         resources["LiveRatesBorderGradientStartColor"] = Color.Parse("#E11D48");

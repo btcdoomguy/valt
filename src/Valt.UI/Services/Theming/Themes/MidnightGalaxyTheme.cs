@@ -148,6 +148,14 @@ public static class MidnightGalaxyTheme
         resources["BlackColor"] = Color.Parse("#08060C");
         resources["WhiteColor"] = Color.Parse("#FAF5FF");
 
+        // Transaction Row Colors (for DataGrid highlighting)
+        resources["CreditBaseColor"] = Color.Parse("#78DB55");
+        resources["DebtBaseColor"] = Color.Parse("#FF7D7D");
+        resources["TransferBaseColor"] = Color.Parse("#FFF866");
+
+        // Title Bar
+        resources["TitleBarForegroundColor"] = Color.Parse("#FFFFFF");
+
         // UI Element Colors
         resources["LiveRatesBackgroundColor"] = Color.Parse("#1E1A2E");
         resources["LiveRatesBorderGradientStartColor"] = Color.Parse("#6B46C1");

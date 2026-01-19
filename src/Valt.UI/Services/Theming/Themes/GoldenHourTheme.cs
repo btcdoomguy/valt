@@ -149,6 +149,14 @@ public static class GoldenHourTheme
         resources["BlackColor"] = Color.Parse("#0A0806");
         resources["WhiteColor"] = Color.Parse("#FFFBEB");
 
+        // Transaction Row Colors (for DataGrid highlighting)
+        resources["CreditBaseColor"] = Color.Parse("#78DB55");
+        resources["DebtBaseColor"] = Color.Parse("#FF7D7D");
+        resources["TransferBaseColor"] = Color.Parse("#FFF866");
+
+        // Title Bar
+        resources["TitleBarForegroundColor"] = Color.Parse("#FFFFFF");
+
         // UI Element Colors
         resources["LiveRatesBackgroundColor"] = Color.Parse("#241E18");
         resources["LiveRatesBorderGradientStartColor"] = Color.Parse("#D97706");

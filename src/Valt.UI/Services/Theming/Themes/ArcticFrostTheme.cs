@@ -149,6 +149,14 @@ public static class ArcticFrostTheme
         resources["BlackColor"] = Color.Parse("#04060B");
         resources["WhiteColor"] = Color.Parse("#F8FAFC");
 
+        // Transaction Row Colors (for DataGrid highlighting)
+        resources["CreditBaseColor"] = Color.Parse("#78DB55");
+        resources["DebtBaseColor"] = Color.Parse("#FF7D7D");
+        resources["TransferBaseColor"] = Color.Parse("#FFF866");
+
+        // Title Bar
+        resources["TitleBarForegroundColor"] = Color.Parse("#FFFFFF");
+
         // UI Element Colors
         resources["LiveRatesBackgroundColor"] = Color.Parse("#171E28");
         resources["LiveRatesBorderGradientStartColor"] = Color.Parse("#0284C7");

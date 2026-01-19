@@ -166,4 +166,12 @@
     <SolidColorBrush x:Key="TopBarButtonBackgroundSelectedBrush" Color="{DynamicResource TopBarButtonBackgroundSelectedColor}" />
     <SolidColorBrush x:Key="TopBarButtonForegroundBrush" Color="{DynamicResource TopBarButtonForegroundColor}" />
     <SolidColorBrush x:Key="TopBarButtonForegroundHoverBrush" Color="{DynamicResource TopBarButtonForegroundHoverColor}" />
+
+    <!-- Title Bar Brushes -->
+    <SolidColorBrush x:Key="TitleBarForegroundBrush" Color="{DynamicResource TitleBarForegroundColor}" />
+
+    <!-- Transaction Row Color Brushes -->
+    <SolidColorBrush x:Key="CreditBaseBrush" Color="{DynamicResource CreditBaseColor}" />
+    <SolidColorBrush x:Key="DebtBaseBrush" Color="{DynamicResource DebtBaseColor}" />
+    <SolidColorBrush x:Key="TransferBaseBrush" Color="{DynamicResource TransferBaseColor}" />
 </ResourceDictionary>

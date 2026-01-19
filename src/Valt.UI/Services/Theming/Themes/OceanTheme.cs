@@ -148,6 +148,14 @@ public static class OceanTheme
         resources["BlackColor"] = Color.Parse("#0D1117");
         resources["WhiteColor"] = Color.Parse("#F7FAFC");
 
+        // Transaction Row Colors (for DataGrid highlighting)
+        resources["CreditBaseColor"] = Color.Parse("#78DB55");
+        resources["DebtBaseColor"] = Color.Parse("#FF7D7D");
+        resources["TransferBaseColor"] = Color.Parse("#FFF866");
+
+        // Title Bar
+        resources["TitleBarForegroundColor"] = Color.Parse("#FFFFFF");
+
         // UI Element Colors
         resources["LiveRatesBackgroundColor"] = Color.Parse("#121E1E");
         resources["LiveRatesBorderGradientStartColor"] = Color.Parse("#2C7A7B");  // Teal accent for border
