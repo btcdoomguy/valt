@@ -9,12 +9,13 @@
         x:Class="Valt.UI.Views.Main.Modals.ManageFixedExpenses.ManageFixedExpensesView"
         Title="{x:Static lang:language.ManageFixedExpenses_Title}"
         x:DataType="manageFixedExpenses:ManageFixedExpensesViewModel"
-        d:DesignWidth="1100"
+        d:DesignWidth="950"
         d:DesignHeight="610"
         MinWidth="700"
-        MinHeight="500"
-        MaxWidth="1100"
-        MaxHeight="700"
+        MinHeight="400"
+        MaxWidth="950"
+        MaxHeight="600"
+        SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
         SystemDecorations="None"
@@ -41,10 +42,10 @@
                       SelectedItem="{Binding SelectedFixedExpense}"
                       DoubleTapped="MainGrid_OnDoubleTapped">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Name}" Width="200"
+                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Name}" Width="*"
                                         Binding="{Binding Name}">
                     </DataGridTextColumn>
-                    <DataGridTemplateColumn Header="{x:Static lang:language.FixedExpenses_Columns_Category}" Width="180">
+                    <DataGridTemplateColumn Header="{x:Static lang:language.FixedExpenses_Columns_Category}" Width="140">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate DataType="manageFixedExpenses:ManageFixedExpensesViewModel+FixedExpenseListItemViewModel">
                                 <StackPanel Orientation="Horizontal">
@@ -59,7 +60,7 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="{x:Static lang:language.FixedExpenses_Columns_DefaultAccount}" Width="150">
+                    <DataGridTemplateColumn Header="{x:Static lang:language.FixedExpenses_Columns_DefaultAccount}" Width="120">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate DataType="manageFixedExpenses:ManageFixedExpensesViewModel+FixedExpenseListItemViewModel">
                                 <StackPanel Orientation="Horizontal">
@@ -74,19 +75,19 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Currency}" Width="100"
+                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Currency}" Width="80"
                                         Binding="{Binding Currency}">
                     </DataGridTextColumn>
-                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Amount}" Width="200"
+                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Amount}" Width="150"
                                         Binding="{Binding Amount}">
                     </DataGridTextColumn>
-                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Period}" Width="100"
+                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Period}" Width="80"
                                         Binding="{Binding Period}">
                     </DataGridTextColumn>
-                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Day}" Width="100"
+                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Day}" Width="60"
                                         Binding="{Binding Day}">
                     </DataGridTextColumn>
-                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Enabled}"
+                    <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Enabled}" Width="70"
                                         Binding="{Binding EnabledDescription}">
                     </DataGridTextColumn>
                 </DataGrid.Columns>

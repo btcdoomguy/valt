@@ -12,10 +12,11 @@
     <Design.DataContext>
         <avgPrice:AvgPriceViewModel />
     </Design.DataContext>
-    <Grid>
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <Grid MinHeight="500">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="540" />   <!-- Right Column -->
+            <ColumnDefinition Width="480" />   <!-- Right Column -->
         </Grid.ColumnDefinitions>
         <Border Grid.Column="0" Padding="15">
             <Grid RowDefinitions="50, *">
@@ -227,4 +228,5 @@
             </StackPanel>
         </Border>
     </Grid>
+    </ScrollViewer>
 </UserControl>

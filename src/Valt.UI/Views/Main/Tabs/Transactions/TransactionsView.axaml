@@ -7,7 +7,7 @@
              xmlns:vm1="clr-namespace:Valt.UI.Views.Main.Tabs.Transactions"
              mc:Ignorable="d" d:DesignWidth="1800" d:DesignHeight="900"
              MinWidth="900"
-             MinHeight="700"
+             MinHeight="500"
              x:Class="Valt.UI.Views.Main.Tabs.Transactions.TransactionsView"
              x:DataType="vm1:TransactionsViewModel">
     <Design.DataContext>

@@ -14,7 +14,6 @@
              xmlns:painting="clr-namespace:LiveChartsCore.SkiaSharpView.Painting;assembly=LiveChartsCore.SkiaSharpView"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="1200"
              MinWidth="900"
-             MinHeight="700"
              x:Class="Valt.UI.Views.Main.Tabs.Reports.ReportsView"
              x:DataType="reports1:ReportsViewModel">
     <Design.DataContext>
