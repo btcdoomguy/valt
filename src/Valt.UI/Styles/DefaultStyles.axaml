@@ -232,7 +232,7 @@
 
     <Style Selector="Button">
         <Setter Property="Padding" Value="6, 6, 6, 4" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeMedium}" />
         <Setter Property="Background" Value="{DynamicResource Accent700Brush}" />
         <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Accent400Brush}" />
@@ -286,14 +286,14 @@
          ═══════════════════════════════════════════════════════════════════════════════ -->
 
     <Style Selector="Button.icon-only">
-        <Setter Property="FontSize" Value="28" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeIconLarge}" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
     </Style>
 
     <!-- Panel header icon button - compact with neutral background like tab buttons -->
     <Style Selector="Button.panel-header-icon">
-        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeLarge}" />
         <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
         <Setter Property="Padding" Value="0, 0,0, 0" />
         <Setter Property="Width" Value="30" />
@@ -315,7 +315,7 @@
     </Style>
 
     <Style Selector="Button.calculator">
-        <Setter Property="FontSize" Value="20" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeXXLarge}" />
         <Setter Property="Padding" Value="2, 0, 2, 0" />
         <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
         <Setter Property="Background" Value="Transparent" />
@@ -329,7 +329,7 @@
 
     <Style Selector="Button.text-and-icon">
         <Setter Property="Padding" Value="2" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeMedium}" />
         <Setter Property="Background" Value="{DynamicResource Accent700Brush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Accent400Brush}" />
         <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
@@ -337,7 +337,7 @@
             <Setter Property="Margin" Value="0, 6, 0 ,4" />
         </Style>
         <Style Selector="^ Label.icon">
-            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontSize" Value="{DynamicResource FontSizeXLarge}" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
             <Setter Property="Margin" Value="0, 2, 0 ,0" />
@@ -409,12 +409,12 @@
             <Setter Property="BorderBrush" Value="{DynamicResource Background400Brush}" />
         </Style>
         <Style Selector="^ Label">
-            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontSize" Value="{DynamicResource FontSizeLarge}" />
             <Setter Property="Margin" Value="0, 3 0, 2" />
         </Style>
         <Style Selector="^ Label.icon">
             <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
-            <Setter Property="FontSize" Value="22" />
+            <Setter Property="FontSize" Value="{DynamicResource FontSizeIcon}" />
             <Setter Property="Margin" Value="0" />
         </Style>
         <Style Selector="^ /template/ ContentPresenter">
@@ -439,12 +439,12 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CornerRadius" Value="4" />
         <Style Selector="^ Label">
-            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontSize" Value="{DynamicResource FontSizeMedium}" />
             <Setter Property="Margin" Value="0, 2, 0, 3" />
         </Style>
         <Style Selector="^ Label.icon">
             <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
-            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontSize" Value="{DynamicResource FontSizeXXLarge}" />
             <Setter Property="Margin" Value="0" />
         </Style>
         <Style Selector="^ /template/ ContentPresenter">
@@ -505,7 +505,7 @@
 
     <Style Selector="Button.titlebar">
         <Setter Property="FontFamily" Value="{DynamicResource MaterialDesign}" />
-        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeXLarge}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Height" Value="24" />
         <Setter Property="Width" Value="30" />
@@ -645,7 +645,7 @@
 
     <!-- DataGrid cell text styling (consolidated from views) -->
     <Style Selector="DataGridCell TextBlock">
-        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeSmall}" />
     </Style>
 
     <!-- DataGrid column header styling - override template to remove sort icon reserved space -->

@@ -1394,7 +1394,31 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Settings.Theme", resourceCulture);
             }
         }
-        
+
+        public static string Settings_FontScale {
+            get {
+                return ResourceManager.GetString("Settings_FontScale", resourceCulture);
+            }
+        }
+
+        public static string Settings_FontScale_Small {
+            get {
+                return ResourceManager.GetString("Settings_FontScale_Small", resourceCulture);
+            }
+        }
+
+        public static string Settings_FontScale_Medium {
+            get {
+                return ResourceManager.GetString("Settings_FontScale_Medium", resourceCulture);
+            }
+        }
+
+        public static string Settings_FontScale_Large {
+            get {
+                return ResourceManager.GetString("Settings_FontScale_Large", resourceCulture);
+            }
+        }
+
         public static string Settings_Tab_General {
             get {
                 return ResourceManager.GetString("Settings.Tab.General", resourceCulture);

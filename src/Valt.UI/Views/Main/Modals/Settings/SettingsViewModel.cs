@@ -11,6 +11,7 @@ using Valt.Core.Common;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Settings;
+using FontScale = Valt.Infra.Settings.FontScale;
 using Valt.Infra.TransactionTerms;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
@@ -18,6 +19,7 @@ using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.LocalStorage;
 using Valt.UI.Services.MessageBoxes;
+using Valt.UI.Services.FontScaling;
 using Valt.UI.Services.Theming;
 using Valt.UI.Views.Main.Modals.ChangePassword;
 
@@ -33,11 +35,13 @@ public partial class SettingsViewModel : ValtModalViewModel
     private readonly ILocalStorageService _localStorageService;
     private readonly IConfigurationManager? _configurationManager;
     private readonly IThemeService? _themeService;
+    private readonly IFontScaleService? _fontScaleService;
 
     [ObservableProperty] private string _mainFiatCurrency;
     [ObservableProperty] private bool _showHiddenAccounts;
     [ObservableProperty] private string _currentCulture;
     [ObservableProperty] private ThemeDefinition? _selectedTheme;
+    [ObservableProperty] private FontScaleItem? _selectedFontScale;
 
     private List<string> _initialSelectedCurrencies = new();
     private HashSet<string> _currenciesInUse = new();
@@ -67,6 +71,8 @@ public partial class SettingsViewModel : ValtModalViewModel
     }
 
     public IReadOnlyList<ThemeDefinition> AvailableThemes => _themeService?.AvailableThemes ?? Array.Empty<ThemeDefinition>();
+
+    public static IReadOnlyList<FontScaleItem> AvailableFontScales => FontScaleItem.All;
 
     public static List<ComboBoxValue> Cultures
     {
@@ -101,6 +107,7 @@ public partial class SettingsViewModel : ValtModalViewModel
         MainFiatCurrency = "BRL";
         ShowHiddenAccounts = false;
         CurrentCulture = "en-US";
+        SelectedFontScale = FontScaleItem.All.First(x => x.Scale == FontScale.Medium);
 
         SelectedFiatCurrencies.CollectionChanged += OnSelectedFiatCurrenciesChanged;
     }
@@ -112,7 +119,8 @@ public partial class SettingsViewModel : ValtModalViewModel
         IModalFactory modalFactory,
         ILocalStorageService localStorageService,
         IConfigurationManager configurationManager,
-        IThemeService themeService)
+        IThemeService themeService,
+        IFontScaleService fontScaleService)
     {
         _currencySettings = currencySettings;
         _displaySettings = displaySettings;
@@ -122,12 +130,15 @@ public partial class SettingsViewModel : ValtModalViewModel
         _localStorageService = localStorageService;
         _configurationManager = configurationManager;
         _themeService = themeService;
+        _fontScaleService = fontScaleService;
 
         MainFiatCurrency = _currencySettings.MainFiatCurrency;
         ShowHiddenAccounts = _displaySettings.ShowHiddenAccounts;
         CurrentCulture = _localStorageService.LoadCulture();
         SelectedTheme = _themeService.AvailableThemes.FirstOrDefault(t => t.Name == _themeService.CurrentTheme)
                         ?? _themeService.AvailableThemes.First();
+        SelectedFontScale = FontScaleItem.All.FirstOrDefault(x => x.Scale == _displaySettings.FontScale)
+                            ?? FontScaleItem.All.First(x => x.Scale == FontScale.Medium);
 
         // Initialize currencies
         InitializeFiatCurrencies();
@@ -235,6 +246,17 @@ public partial class SettingsViewModel : ValtModalViewModel
         _currencySettings.Save();
 
         _displaySettings.ShowHiddenAccounts = ShowHiddenAccounts;
+
+        // Apply and save font scale if changed
+        if (SelectedFontScale != null && _fontScaleService != null)
+        {
+            if (_fontScaleService.CurrentScale != SelectedFontScale.Scale)
+            {
+                _fontScaleService.ApplyScale(SelectedFontScale.Scale);
+                _displaySettings.FontScale = SelectedFontScale.Scale;
+            }
+        }
+
         _displaySettings.Save();
 
         // Apply and save theme if changed

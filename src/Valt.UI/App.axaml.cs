@@ -16,6 +16,7 @@ using Valt.Infra.Kernel.BackgroundJobs;
 using Valt.Infra.Modules.Goals.Handlers;
 using Valt.Infra.Settings;
 using Valt.UI.Services.LocalStorage;
+using Valt.UI.Services.FontScaling;
 using Valt.UI.Services.Theming;
 using Valt.UI.Views.Main;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
@@ -70,6 +71,9 @@ public partial class App : Application
 
         // Initialize theme service (it loads and applies the theme from local storage)
         _ = serviceProvider.GetRequiredService<IThemeService>();
+
+        // Initialize font scale service (it loads and applies the font scale from settings)
+        _ = serviceProvider.GetRequiredService<IFontScaleService>();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

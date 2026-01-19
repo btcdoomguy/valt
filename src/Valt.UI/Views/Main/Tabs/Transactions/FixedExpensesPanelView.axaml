@@ -21,7 +21,7 @@
                 CornerRadius="5, 5, 0, 0">
             <Grid ColumnDefinitions="*, Auto">
                 <TextBlock Grid.Column="0"
-                           FontSize="12"
+                           FontSize="{DynamicResource FontSizeSmall}"
                            Text="{x:Static local:language.ManageFixedExpenses_Title}"
                            VerticalAlignment="Center" />
                 <Button Grid.Column="1"
@@ -57,7 +57,7 @@
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center">
                                 <TextBlock Text="{Binding DayFormatted}"
-                                           FontSize="12"
+                                           FontSize="{DynamicResource FontSizeSmall}"
                                            FontWeight="SemiBold"
                                            FontFamily="{DynamicResource GeistMono}"
                                            Foreground="{Binding TextColor}"
@@ -66,12 +66,12 @@
                             </Border>
                             <!-- Name and amount (two lines) -->
                             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" Margin="4, 0, 0, 0">
-                                <TextBlock FontSize="13"
+                                <TextBlock FontSize="{DynamicResource FontSizeNormal}"
                                            Text="{Binding Name}"
                                            FontFamily="{DynamicResource Geist}"
                                            Foreground="{Binding TextColor}"
                                            TextTrimming="CharacterEllipsis" />
-                                <TextBlock FontSize="11"
+                                <TextBlock FontSize="{DynamicResource FontSizeXSmall}"
                                            FontFamily="{DynamicResource Geist}"
                                            Text="{Binding AmountDisplay}"
                                            Foreground="{Binding TextColor}"
@@ -83,7 +83,7 @@
                                        Text="&#xe834;"
                                        FontFamily="{DynamicResource MaterialDesign}"
                                        Foreground="{Binding CheckboxPaidColor}"
-                                       FontSize="20"
+                                       FontSize="{DynamicResource FontSizeXXLarge}"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center" />
                         </Grid>
@@ -140,11 +140,11 @@
                 CornerRadius="0, 0, 5, 5">
             <Grid ColumnDefinitions="*, Auto">
                 <TextBlock Grid.Column="0"
-                           FontSize="11"
+                           FontSize="{DynamicResource FontSizeXSmall}"
                            VerticalAlignment="Center"
                            Text="{x:Static local:language.RemainingFixedExpenses_Title}" />
                 <TextBlock Grid.Column="1"
-                           FontSize="12"
+                           FontSize="{DynamicResource FontSizeSmall}"
                            FontWeight="SemiBold"
                            VerticalAlignment="Center"
                            Foreground="{DynamicResource Accent200Brush}"

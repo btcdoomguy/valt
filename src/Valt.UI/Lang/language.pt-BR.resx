@@ -1514,4 +1514,16 @@
     <data name="SaveAndAddButton" xml:space="preserve">
         <value>Salvar e Adicionar Novo</value>
     </data>
+    <data name="Settings_FontScale" xml:space="preserve">
+        <value>Tamanho da Fonte</value>
+    </data>
+    <data name="Settings_FontScale_Small" xml:space="preserve">
+        <value>Pequeno</value>
+    </data>
+    <data name="Settings_FontScale_Medium" xml:space="preserve">
+        <value>Médio</value>
+    </data>
+    <data name="Settings_FontScale_Large" xml:space="preserve">
+        <value>Grande</value>
+    </data>
 </root>

@@ -69,6 +69,15 @@
                                           DisplayMemberBinding="{Binding DisplayName}"
                                           SelectedItem="{Binding SelectedTheme}" Width="200" />
                             </DockPanel>
+                            <DockPanel>
+                                <TextBlock Width="220" TextAlignment="Right" Margin="0,0,5,0"
+                                           VerticalAlignment="Center"
+                                           Text="{x:Static local:language.Settings_FontScale}"
+                                           TextWrapping="Wrap" />
+                                <ComboBox ItemsSource="{Binding AvailableFontScales}"
+                                          DisplayMemberBinding="{Binding DisplayName}"
+                                          SelectedItem="{Binding SelectedFontScale}" Width="200" />
+                            </DockPanel>
                         </StackPanel>
                     </TabItem>
 

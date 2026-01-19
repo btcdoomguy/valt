@@ -4,6 +4,7 @@ using Valt.Infra.Kernel.Scopes;
 using Valt.Infra.Modules.Budget.Categories;
 using Valt.UI.Base;
 using Valt.UI.Services;
+using Valt.UI.Services.FontScaling;
 using Valt.UI.Services.Theming;
 using Valt.UI.State;
 using Valt.UI.Views;
@@ -207,6 +208,9 @@ public static class Extensions
 
         //theming
         services.AddSingleton<IThemeService, ThemeService>();
+
+        //font scaling
+        services.AddSingleton<IFontScaleService, FontScaleService>();
 
         return services;
     }

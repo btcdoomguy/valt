@@ -21,7 +21,7 @@
                 CornerRadius="5, 5, 0, 0">
             <Grid ColumnDefinitions="*, Auto">
                 <TextBlock Grid.Column="0"
-                           FontSize="12"
+                           FontSize="{DynamicResource FontSizeSmall}"
                            Text="{x:Static local:language.Goals_Title}"
                            VerticalAlignment="Center" />
                 <Button Grid.Column="1"
@@ -49,12 +49,12 @@
                             <!-- Goal name with status label -->
                             <Grid ColumnDefinitions="*, Auto">
                                 <StackPanel Grid.Column="0" Orientation="Horizontal">
-                                    <TextBlock FontSize="13"
+                                    <TextBlock FontSize="{DynamicResource FontSizeNormal}"
                                                Text="{Binding FriendlyName}"
                                                FontFamily="{DynamicResource Geist}"
                                                TextTrimming="CharacterEllipsis" />
                                     <!-- (yearly) indicator for yearly goals -->
-                                    <TextBlock FontSize="13"
+                                    <TextBlock FontSize="{DynamicResource FontSizeNormal}"
                                                Text="{x:Static local:language.Goals_YearlyIndicator}"
                                                FontFamily="{DynamicResource Geist}"
                                                Foreground="{DynamicResource Text400Brush}"
@@ -91,13 +91,13 @@
                             <!-- Goal description (e.g., "123,456/1,000,000 sats") - hidden in secure mode -->
                             <StackPanel Orientation="Horizontal"
                                         IsVisible="{Binding !$parent[UserControl].((vm:GoalsPanelViewModel)DataContext).IsSecureModeEnabled}">
-                                <TextBlock FontSize="11"
+                                <TextBlock FontSize="{DynamicResource FontSizeXSmall}"
                                            Text="{Binding Description}"
                                            FontFamily="{DynamicResource Geist}"
                                            Foreground="{DynamicResource Text400Brush}"
                                            TextTrimming="CharacterEllipsis" />
                                 <!-- Asterisk for goals requiring price data -->
-                                <TextBlock FontSize="11"
+                                <TextBlock FontSize="{DynamicResource FontSizeXSmall}"
                                            Text=" *"
                                            FontFamily="{DynamicResource Geist}"
                                            Foreground="{DynamicResource Text400Brush}"

@@ -1519,4 +1519,16 @@
     <data name="GoalTarget_NoSales" xml:space="preserve">
         <value>No sales</value>
     </data>
+    <data name="Settings_FontScale" xml:space="preserve">
+        <value>Font Size</value>
+    </data>
+    <data name="Settings_FontScale_Small" xml:space="preserve">
+        <value>Small</value>
+    </data>
+    <data name="Settings_FontScale_Medium" xml:space="preserve">
+        <value>Medium</value>
+    </data>
+    <data name="Settings_FontScale_Large" xml:space="preserve">
+        <value>Large</value>
+    </data>
 </root>
