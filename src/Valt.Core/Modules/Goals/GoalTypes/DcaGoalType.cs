@@ -22,4 +22,14 @@ public sealed class DcaGoalType : IGoalType
     {
         return new DcaGoalType(TargetPurchaseCount, calculatedPurchaseCount);
     }
+
+    public bool HasSameTargetAs(IGoalType other)
+    {
+        return other is DcaGoalType d && d.TargetPurchaseCount == TargetPurchaseCount;
+    }
+
+    public IGoalType WithResetProgress()
+    {
+        return new DcaGoalType(TargetPurchaseCount, calculatedPurchaseCount: 0);
+    }
 }

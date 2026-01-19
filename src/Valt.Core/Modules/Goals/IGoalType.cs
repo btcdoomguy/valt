@@ -16,4 +16,17 @@ public interface IGoalType
     /// DecreasingSuccess: Progress starts at 100% (full budget) and decreases, reaching 0% means failure (Failed).
     /// </summary>
     ProgressionMode ProgressionMode { get; }
+
+    /// <summary>
+    /// Determines if this goal type has the same target configuration as another.
+    /// Used for duplicate detection when copying goals between periods.
+    /// Compares only target parameters, not calculated/progress values.
+    /// </summary>
+    bool HasSameTargetAs(IGoalType other);
+
+    /// <summary>
+    /// Creates a copy of this goal type with calculated values reset to zero.
+    /// Used when copying goals to a new period.
+    /// </summary>
+    IGoalType WithResetProgress();
 }

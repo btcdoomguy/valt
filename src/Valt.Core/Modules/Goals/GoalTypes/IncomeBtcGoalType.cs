@@ -32,4 +32,14 @@ public sealed class IncomeBtcGoalType : IGoalType
     {
         return new IncomeBtcGoalType(TargetSats, calculatedSats);
     }
+
+    public bool HasSameTargetAs(IGoalType other)
+    {
+        return other is IncomeBtcGoalType i && i.TargetSats == TargetSats;
+    }
+
+    public IGoalType WithResetProgress()
+    {
+        return new IncomeBtcGoalType(TargetSats, calculatedSats: 0);
+    }
 }

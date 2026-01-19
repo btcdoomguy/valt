@@ -1421,6 +1421,9 @@
     <data name="Goals_DeleteConfirm_Message" xml:space="preserve">
         <value>Tem certeza que deseja excluir esta meta? Esta ação não pode ser desfeita.</value>
     </data>
+    <data name="Goals_CopyFromLastMonth" xml:space="preserve">
+        <value>Copiar metas do mês anterior</value>
+    </data>
     <data name="Goals_PriceDataTooltip" xml:space="preserve">
         <value>Este valor pode estar desatualizado e será atualizado quando as taxas de câmbio diárias estiverem disponíveis.</value>
     </data>

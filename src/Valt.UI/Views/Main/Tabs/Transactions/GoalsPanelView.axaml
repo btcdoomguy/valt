@@ -29,7 +29,16 @@
                         Content="&#xE145;"
                         Command="{Binding AddGoalCommand}"
                         IsEnabled="{Binding !IsSecureModeEnabled}"
-                        Margin="4, 0, 0, 0" />
+                        Margin="4, 0, 0, 0">
+                    <Button.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem
+                                Header="{x:Static local:language.Goals_CopyFromLastMonth}"
+                                Command="{Binding CopyFromLastMonthCommand}"
+                                IsEnabled="{Binding !IsSecureModeEnabled}" />
+                        </ContextMenu>
+                    </Button.ContextMenu>
+                </Button>
             </Grid>
         </Border>
         <!-- Goals List -->

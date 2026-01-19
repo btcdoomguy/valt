@@ -2877,6 +2877,12 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string Goals_CopyFromLastMonth {
+            get {
+                return ResourceManager.GetString("Goals_CopyFromLastMonth", resourceCulture);
+            }
+        }
+
         public static string Goals_PriceDataTooltip {
             get {
                 return ResourceManager.GetString("Goals_PriceDataTooltip", resourceCulture);
