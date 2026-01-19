@@ -12,7 +12,7 @@
              x:DataType="editors:IncomeBtcGoalTypeEditorViewModel">
     <StackPanel>
         <TextBlock Text="{Binding Description}"
-                   FontSize="11"
+                   FontSize="{DynamicResource FontSizeXSmall}"
                    Opacity="0.7"
                    TextWrapping="Wrap"
                    Margin="0, 0, 0, 8" />

@@ -34,10 +34,11 @@ public abstract class BaseSettings : ObservableObject
             LoadDefaults();
             return;
         }
-        
+
         var settings = _localDatabase.GetSettings().FindAll().ToList();
         var type = GetType();
         var className = type.Name;
+        var changedProperties = new List<string>();
 
         foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                      .Where(p => p.GetCustomAttribute<PersistableSettingAttribute>() != null))
@@ -48,9 +49,25 @@ public abstract class BaseSettings : ObservableObject
             {
                 try
                 {
-                    var value = Convert.ChangeType(setting.Value, prop.PropertyType);
-                    prop.SetValue(this, value);
-                    WeakReferenceMessenger.Default.Send(new SettingsChangedMessage(prop.Name));
+                    var currentValue = prop.GetValue(this);
+                    object newValue;
+
+                    // Handle enum types specially since Convert.ChangeType doesn't work with enums
+                    if (prop.PropertyType.IsEnum)
+                    {
+                        newValue = Enum.Parse(prop.PropertyType, setting.Value);
+                    }
+                    else
+                    {
+                        newValue = Convert.ChangeType(setting.Value, prop.PropertyType);
+                    }
+
+                    // Only update and notify if value actually changed
+                    if (!Equals(currentValue, newValue))
+                    {
+                        prop.SetValue(this, newValue);
+                        changedProperties.Add(prop.Name);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -58,15 +75,22 @@ public abstract class BaseSettings : ObservableObject
                 }
             }
         }
+
+        // Send messages only for properties that actually changed
+        foreach (var propName in changedProperties)
+        {
+            WeakReferenceMessenger.Default.Send(new SettingsChangedMessage(propName));
+        }
     }
 
     public virtual void Save()
     {
         if (_localDatabase is null || !_localDatabase.HasDatabaseOpen)
             return;
-        
+
         var type = GetType();
         var className = type.Name;
+        var changedProperties = new List<string>();
 
         foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                      .Where(p => p.GetCustomAttribute<PersistableSettingAttribute>() != null))
@@ -77,20 +101,23 @@ public abstract class BaseSettings : ObservableObject
             var setting = _localDatabase.GetSettings().FindOne(x => x.Property == key);
             if (setting == null)
             {
-                setting = new SettingEntity() { Property = key, Value = value };
+                setting = new SettingEntity { Property = key, Value = value };
+                _localDatabase.GetSettings().Insert(setting);
+                changedProperties.Add(prop.Name);
             }
-            else
+            else if (setting.Value != value)
             {
+                // Only update and notify if value actually changed
                 setting.Value = value;
+                _localDatabase.GetSettings().Update(setting);
+                changedProperties.Add(prop.Name);
             }
-            _localDatabase.GetSettings().Upsert(setting);
         }
 
-        //notify property changes
-        foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                     .Where(p => p.GetCustomAttribute<PersistableSettingAttribute>() != null))
+        // Only notify for properties that actually changed
+        foreach (var propName in changedProperties)
         {
-            WeakReferenceMessenger.Default.Send(new SettingsChangedMessage(prop.Name));
+            WeakReferenceMessenger.Default.Send(new SettingsChangedMessage(propName));
         }
     }
     

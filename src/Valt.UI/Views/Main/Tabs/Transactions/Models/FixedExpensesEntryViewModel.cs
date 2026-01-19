@@ -36,6 +36,8 @@ public class FixedExpensesEntryViewModel(FixedExpenseProviderEntry entry, DateOn
 
     public bool IsLateOrCurrentDay => ReferenceDate <= currentDate;
 
+    public bool IsUpcoming => !IsLateOrCurrentDay && ReferenceDate <= currentDate.AddDays(2);
+
     public string AmountDisplay
     {
         get
@@ -59,8 +61,14 @@ public class FixedExpensesEntryViewModel(FixedExpenseProviderEntry entry, DateOn
         {
             if (Paid || Ignored)
                 return FixedExpenseListResources.IgnoredForeground;
-            
-            return IsLateOrCurrentDay ? FixedExpenseListResources.LateForeground : FixedExpenseListResources.DefaultForeground;
+
+            if (IsLateOrCurrentDay)
+                return FixedExpenseListResources.LateForeground;
+
+            if (IsUpcoming)
+                return FixedExpenseListResources.WarningForeground;
+
+            return FixedExpenseListResources.DefaultForeground;
         }
     }
         

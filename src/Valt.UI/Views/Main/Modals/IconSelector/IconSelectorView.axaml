@@ -64,7 +64,7 @@
                                     HorizontalAlignment="Center"
                                     HorizontalContentAlignment="Center"
                                     FontFamily="{DynamicResource MaterialDesign}"
-                                    FontSize="32"
+                                    FontSize="{DynamicResource FontSizeIconLarge}"
                                     Foreground="{Binding ((iconSelector:IconSelectorViewModel)DataContext).SelectedColorBrush, ElementName=Root}"
                                     ToolTip.Tip="{Binding Name}"
                                     Content="{Binding Unicode}">
@@ -76,7 +76,7 @@
                 <TextBlock Grid.Column="1" Text="{x:Static local:language.IconSelector_Loading}"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
-                           FontSize="16"
+                           FontSize="{DynamicResource FontSizeLarge}"
                            IsVisible="{Binding IsFiltering}" />
             </Grid>
 

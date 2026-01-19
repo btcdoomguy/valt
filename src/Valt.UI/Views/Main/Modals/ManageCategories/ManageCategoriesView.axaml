@@ -41,7 +41,7 @@
                                 <StackPanel Orientation="Horizontal" Height="20">
                                     <TextBlock
                                         Padding="0, 0, 4, 4"
-                                        FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
+                                        FontFamily="{DynamicResource MaterialDesign}" FontSize="{DynamicResource FontSizeXXLarge}"
                                         Text="{Binding Unicode}"
                                         Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}">
                                     </TextBlock>

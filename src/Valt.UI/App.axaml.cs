@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
@@ -15,6 +16,7 @@ using Valt.Infra.Kernel.BackgroundJobs;
 using Valt.Infra.Modules.Goals.Handlers;
 using Valt.Infra.Settings;
 using Valt.UI.Services.LocalStorage;
+using Valt.UI.Services.FontScaling;
 using Valt.UI.Services.Theming;
 using Valt.UI.Views.Main;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
@@ -24,6 +26,8 @@ namespace Valt.UI;
 
 public partial class App : Application
 {
+    public static IServiceProvider? ServiceProvider { get; private set; }
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -51,6 +55,7 @@ public partial class App : Application
 
         //register the current service provider as the universal provider
         serviceProvider.SetAsContextScope();
+        ServiceProvider = serviceProvider;
 
         // Add job logger provider to capture logs into job log pools
         var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
@@ -67,6 +72,9 @@ public partial class App : Application
         // Initialize theme service (it loads and applies the theme from local storage)
         _ = serviceProvider.GetRequiredService<IThemeService>();
 
+        // Initialize font scale service (it loads and applies the font scale from settings)
+        _ = serviceProvider.GetRequiredService<IFontScaleService>();
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             // Line below is needed to remove Avalonia data validation.
@@ -75,6 +83,13 @@ public partial class App : Application
             desktop.MainWindow = new MainView()
             {
                 DataContext = serviceProvider.GetRequiredService<MainViewModel>()
+            };
+
+            // Stop background jobs when the application exits
+            desktop.ShutdownRequested += async (_, _) =>
+            {
+                var bgJobManager = serviceProvider.GetRequiredService<BackgroundJobManager>();
+                await bgJobManager.StopAll();
             };
         }
         
@@ -94,11 +109,8 @@ public partial class App : Application
             //otherwise the jobs will run with the IDE!
             var backgroundJobManager = serviceProvider.GetRequiredService<BackgroundJobManager>();
 
-            backgroundJobManager.StartAllJobs(jobType: BackgroundJobTypes.App);
+            _ = backgroundJobManager.StartAllJobsAsync(jobType: BackgroundJobTypes.App);
         }
     }
 
-    //TODO: stop jobs before finalizing
 }
-
-public class Foo;

@@ -11,7 +11,8 @@ using Valt.Infra.Settings;
 
 namespace Valt.Infra.DataAccess;
 
-//TODO: refactor to hide this from the UI. should use a proxy to access what is needed
+// Architecture note: Consider refactoring to hide raw database access from UI layer.
+// Create a proxy/facade layer that exposes only the query methods needed by ViewModels.
 public interface ILocalDatabase : INotifyPropertyChanged, IDisposable
 {
     bool HasDatabaseOpen { get; }

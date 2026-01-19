@@ -14,6 +14,17 @@
     <FontFamily x:Key="Phosphor-Fill">/Assets/Fonts/Phosphor-Fill.ttf#Phosphor-Fill</FontFamily>
     <FontFamily x:Key="MaterialDesign">/Assets/Fonts/MaterialSymbolsOutlined.ttf#Material Symbols Outlined Thin</FontFamily>
 
+    <!-- Font Sizes (updated dynamically by FontScaleService) -->
+    <x:Double x:Key="FontSizeXSmall">11</x:Double>
+    <x:Double x:Key="FontSizeSmall">12</x:Double>
+    <x:Double x:Key="FontSizeNormal">13</x:Double>
+    <x:Double x:Key="FontSizeMedium">14</x:Double>
+    <x:Double x:Key="FontSizeLarge">16</x:Double>
+    <x:Double x:Key="FontSizeXLarge">18</x:Double>
+    <x:Double x:Key="FontSizeXXLarge">20</x:Double>
+    <x:Double x:Key="FontSizeIcon">22</x:Double>
+    <x:Double x:Key="FontSizeIconLarge">28</x:Double>
+
     <Color x:Key="CreditBaseColor">#78DB55</Color>
     <Color x:Key="DebtBaseColor">#FF7D7D</Color>
     <Color x:Key="TransferBaseColor">#FFF866</Color>

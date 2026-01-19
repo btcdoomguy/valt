@@ -15,7 +15,7 @@ public partial class DisplaySettings : BaseSettings
         get => _showHiddenAccounts;
         set => SetProperty(ref _showHiddenAccounts, value);
     }
-    
+
     protected sealed override void LoadDefaults()
     {
         ShowHiddenAccounts = false;

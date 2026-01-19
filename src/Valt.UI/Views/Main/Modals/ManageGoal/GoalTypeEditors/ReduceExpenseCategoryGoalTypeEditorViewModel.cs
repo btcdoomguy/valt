@@ -1,13 +1,12 @@
-using System.Collections.Generic;
 using System.Linq;
+using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Valt.Core.Common;
-using Valt.Core.Modules.Budget.Categories;
-using Valt.Core.Modules.Budget.Categories.Contracts;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.GoalTypes;
+using Valt.Infra.Modules.Budget.Categories.Queries;
+using Valt.Infra.Modules.Budget.Categories.Queries.DTOs;
 using Valt.Infra.Settings;
-using Valt.UI.Helpers;
 using Valt.UI.Lang;
 
 namespace Valt.UI.Views.Main.Modals.ManageGoal.GoalTypeEditors;
@@ -15,56 +14,66 @@ namespace Valt.UI.Views.Main.Modals.ManageGoal.GoalTypeEditors;
 public partial class ReduceExpenseCategoryGoalTypeEditorViewModel : ObservableObject, IGoalTypeEditorViewModel
 {
     private readonly CurrencySettings? _currencySettings;
-    private readonly ICategoryRepository? _categoryRepository;
-    private List<Category> _categories = [];
+    private readonly ICategoryQueries? _categoryQueries;
+    private string? _pendingCategoryId;
 
     [ObservableProperty]
     private FiatValue _targetFiatAmount = FiatValue.Empty;
 
     [ObservableProperty]
-    private string? _selectedCategoryId;
+    private CategoryDTO? _selectedCategory;
 
     public string Description => language.GoalType_ReduceExpenseCategory_Description;
 
     public string MainFiatCurrency =>
         _currencySettings?.MainFiatCurrency ?? FiatCurrency.Usd.Code;
 
-    public List<ComboBoxValue> AvailableCategories =>
-        _categories.Select(c => new ComboBoxValue(c.Name.Value, c.Id.Value)).ToList();
+    public AvaloniaList<CategoryDTO> AvailableCategories { get; set; } = new();
 
     public ReduceExpenseCategoryGoalTypeEditorViewModel()
     {
     }
 
-    public ReduceExpenseCategoryGoalTypeEditorViewModel(CurrencySettings currencySettings, ICategoryRepository categoryRepository)
+    public ReduceExpenseCategoryGoalTypeEditorViewModel(CurrencySettings currencySettings, ICategoryQueries categoryQueries)
     {
         _currencySettings = currencySettings;
-        _categoryRepository = categoryRepository;
+        _categoryQueries = categoryQueries;
         LoadCategoriesAsync();
     }
 
     private async void LoadCategoriesAsync()
     {
-        if (_categoryRepository is null) return;
-        _categories = (await _categoryRepository.GetCategoriesAsync()).ToList();
-        OnPropertyChanged(nameof(AvailableCategories));
-        if (_categories.Count > 0 && string.IsNullOrEmpty(SelectedCategoryId))
+        if (_categoryQueries is null) return;
+        var categories = (await _categoryQueries.GetCategoriesAsync()).Items.OrderBy(x => x.Name);
+
+        AvailableCategories.Clear();
+        foreach (var category in categories)
+            AvailableCategories.Add(category);
+
+        if (AvailableCategories.Count > 0)
         {
-            SelectedCategoryId = _categories.First().Id.Value;
+            if (_pendingCategoryId is not null)
+            {
+                SelectCategoryById(_pendingCategoryId);
+                _pendingCategoryId = null;
+            }
+            else if (SelectedCategory is null)
+            {
+                SelectedCategory = AvailableCategories.First();
+            }
         }
     }
 
     private string GetSelectedCategoryName()
     {
-        if (string.IsNullOrEmpty(SelectedCategoryId)) return string.Empty;
-        return _categories.FirstOrDefault(c => c.Id.Value == SelectedCategoryId)?.Name.Value ?? string.Empty;
+        return SelectedCategory?.SimpleName ?? string.Empty;
     }
 
     public IGoalType CreateGoalType()
     {
         return new ReduceExpenseCategoryGoalType(
             TargetFiatAmount.Value,
-            SelectedCategoryId ?? string.Empty,
+            SelectedCategory?.Id ?? string.Empty,
             GetSelectedCategoryName());
     }
 
@@ -74,7 +83,7 @@ public partial class ReduceExpenseCategoryGoalTypeEditorViewModel : ObservableOb
         {
             return new ReduceExpenseCategoryGoalType(
                 TargetFiatAmount.Value,
-                SelectedCategoryId ?? string.Empty,
+                SelectedCategory?.Id ?? string.Empty,
                 GetSelectedCategoryName(),
                 reduceExpenseCategory.CalculatedSpending);
         }
@@ -87,7 +96,25 @@ public partial class ReduceExpenseCategoryGoalTypeEditorViewModel : ObservableOb
         if (goalType is ReduceExpenseCategoryGoalType reduceExpenseCategory)
         {
             TargetFiatAmount = FiatValue.New(reduceExpenseCategory.TargetAmount);
-            SelectedCategoryId = reduceExpenseCategory.CategoryId;
+
+            // If categories are already loaded, select immediately; otherwise store for later
+            if (AvailableCategories.Count > 0)
+            {
+                SelectCategoryById(reduceExpenseCategory.CategoryId);
+            }
+            else
+            {
+                _pendingCategoryId = reduceExpenseCategory.CategoryId;
+            }
+        }
+    }
+
+    private void SelectCategoryById(string categoryId)
+    {
+        var category = AvailableCategories.FirstOrDefault(c => c.Id == categoryId);
+        if (category is not null)
+        {
+            SelectedCategory = category;
         }
     }
 }

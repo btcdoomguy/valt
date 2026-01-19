@@ -28,7 +28,7 @@
             <Border Classes="form-fields-area" Height="390">
                 <TabControl>
                     <!-- General Tab -->
-                    <TabItem Header="{x:Static local:language.Settings_Tab_General}" FontSize="16">
+                    <TabItem Header="{x:Static local:language.Settings_Tab_General}" FontSize="{DynamicResource FontSizeLarge}">
                         <StackPanel Orientation="Vertical" Spacing="15" Margin="10">
                             <DockPanel>
                                 <TextBlock Width="220" TextAlignment="Right" Margin="0,0,5,0"
@@ -69,13 +69,22 @@
                                           DisplayMemberBinding="{Binding DisplayName}"
                                           SelectedItem="{Binding SelectedTheme}" Width="200" />
                             </DockPanel>
+                            <DockPanel>
+                                <TextBlock Width="220" TextAlignment="Right" Margin="0,0,5,0"
+                                           VerticalAlignment="Center"
+                                           Text="{x:Static local:language.Settings_FontScale}"
+                                           TextWrapping="Wrap" />
+                                <ComboBox ItemsSource="{Binding AvailableFontScales}"
+                                          DisplayMemberBinding="{Binding DisplayName}"
+                                          SelectedItem="{Binding SelectedFontScale}" Width="200" />
+                            </DockPanel>
                         </StackPanel>
                     </TabItem>
 
                     <!-- Currencies Tab -->
-                    <TabItem Header="{x:Static local:language.Settings_Tab_Currencies}" FontSize="16">
+                    <TabItem Header="{x:Static local:language.Settings_Tab_Currencies}" FontSize="{DynamicResource FontSizeLarge}">
                         <StackPanel Orientation="Vertical" Spacing="10" Margin="10">
-                            <TextBlock FontStyle="Italic" FontSize="11"
+                            <TextBlock FontStyle="Italic" FontSize="{DynamicResource FontSizeXSmall}"
                                        Text="{x:Static local:language.Settings_FiatCurrencies_Info}" />
                             <userControls:CheckboxListSelector
                                 Title="{x:Static local:language.Settings_FiatCurrencies}"
@@ -88,7 +97,7 @@
                     </TabItem>
 
                     <!-- Advanced Tab -->
-                    <TabItem Header="{x:Static local:language.Settings_Tab_Advanced}" FontSize="16">
+                    <TabItem Header="{x:Static local:language.Settings_Tab_Advanced}" FontSize="{DynamicResource FontSizeLarge}">
                         <StackPanel Orientation="Vertical" Spacing="15" Margin="10"
                                     VerticalAlignment="Center">
                             <Button HorizontalAlignment="Center" Classes="transparent link"

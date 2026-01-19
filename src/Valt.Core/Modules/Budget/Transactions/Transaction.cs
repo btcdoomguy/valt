@@ -22,7 +22,10 @@ public class Transaction : AggregateRoot<TransactionId>
         TransactionFixedExpenseReference? fixedExpenseReference,
         int version)
     {
-        //TODO: guard clauses
+        ArgumentNullException.ThrowIfNull(id);
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(categoryId);
+        ArgumentNullException.ThrowIfNull(transactionDetails);
 
         Id = id;
         Date = date;

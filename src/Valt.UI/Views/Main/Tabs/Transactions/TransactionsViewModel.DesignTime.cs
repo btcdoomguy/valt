@@ -74,27 +74,6 @@ public partial class TransactionsViewModel
 
         SelectedAccount = Accounts.FirstOrDefault();
 
-        var currentMockedDay = new DateOnly(2025, 1, 10);
-
-        FixedExpenseEntries =
-        [
-            new FixedExpensesEntryViewModel(new FixedExpenseProviderEntry(new FixedExpenseId().Value, "Test1",
-                new CategoryId(),
-                new DateOnly(2025, 1, 7), null, 100, null, null, FiatCurrency.Usd.Code, FixedExpenseRecordState.Paid,
-                new TransactionId()), currentMockedDay),
-            new FixedExpensesEntryViewModel(new FixedExpenseProviderEntry(new FixedExpenseId().Value, "Test2",
-                new CategoryId(),
-                new DateOnly(2025, 1, 10), null, 120, null, null, FiatCurrency.Usd.Code,
-                FixedExpenseRecordState.ManuallyPaid, null), currentMockedDay),
-            new FixedExpensesEntryViewModel(new FixedExpenseProviderEntry(new FixedExpenseId().Value, "Test3",
-                new CategoryId(),
-                new DateOnly(2025, 1, 15), null, 120, null, null, FiatCurrency.Usd.Code,
-                FixedExpenseRecordState.Ignored, null), currentMockedDay),
-            new FixedExpensesEntryViewModel(new FixedExpenseProviderEntry(new FixedExpenseId().Value, "Test4",
-                new CategoryId(),
-                new DateOnly(2025, 1, 28), null, 120, null, null, FiatCurrency.Usd.Code), currentMockedDay),
-        ];
-
         #endregion
     }
 }

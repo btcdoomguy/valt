@@ -205,6 +205,8 @@ public partial class LiveRatesViewModel : ObservableObject, IDisposable
 
     public void Dispose()
     {
+        _localDatabase.PropertyChanged -= LocalDatabaseOnPropertyChanged;
+
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
         WeakReferenceMessenger.Default.Unregister<LivePriceUpdated>(this);
     }

@@ -479,9 +479,9 @@ public partial class ImportWizardViewModel : ValtModalViewModel
         finally
         {
             // Restart background jobs (all job types)
-            _backgroundJobManager.StartAllJobs(BackgroundJobTypes.App);
-            _backgroundJobManager.StartAllJobs(BackgroundJobTypes.ValtDatabase);
-            _backgroundJobManager.StartAllJobs(BackgroundJobTypes.PriceDatabase);
+            await _backgroundJobManager.StartAllJobsAsync(BackgroundJobTypes.App);
+            await _backgroundJobManager.StartAllJobsAsync(BackgroundJobTypes.ValtDatabase);
+            await _backgroundJobManager.StartAllJobsAsync(BackgroundJobTypes.PriceDatabase);
         }
     }
 

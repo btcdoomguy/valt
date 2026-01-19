@@ -16,10 +16,12 @@ public class TransactionQueries : ITransactionQueries
         _localDatabase = localDatabase;
     }
 
-    public async Task<TransactionsDTO> GetTransactionsAsync(TransactionQueryFilter filter)
+    public Task<TransactionsDTO> GetTransactionsAsync(TransactionQueryFilter filter)
     {
-        var allAccounts = _localDatabase.GetAccounts();
-        var allCategories = await GetCategoriesAsync();
+        // Load accounts and categories once at the start - reuse throughout the method
+        var allAccountsList = _localDatabase.GetAccounts().FindAll().ToList();
+        var allCategoriesList = _localDatabase.GetCategories().FindAll().ToList();
+        var allCategories = ConvertToCategoriesDTO(allCategoriesList);
 
         var query = _localDatabase.GetTransactions().Query();
 
@@ -49,22 +51,18 @@ public class TransactionQueries : ITransactionQueries
         }
 
         // Apply search filter after loading, to support searching by name, category, and account
-        List<LiteDB.ObjectId>? matchingCategoryIds = null;
-        List<LiteDB.ObjectId>? matchingAccountIds = null;
-
         if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
         {
             var searchTerm = filter.SearchTerm;
 
-            // Find categories that match the search term
-            var allCategoriesList = _localDatabase.GetCategories().FindAll().ToList();
-            matchingCategoryIds = allCategoriesList
+            // Find categories that match the search term (reuse already-loaded data)
+            var matchingCategoryIds = allCategoriesList
                 .Where(c => c.Name.Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase))
                 .Select(c => c.Id)
                 .ToList();
 
-            // Find accounts that match the search term
-            matchingAccountIds = allAccounts.FindAll()
+            // Find accounts that match the search term (reuse already-loaded data)
+            var matchingAccountIds = allAccountsList
                 .Where(a => a.Name.Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase))
                 .Select(a => a.Id)
                 .ToList();
@@ -91,9 +89,9 @@ public class TransactionQueries : ITransactionQueries
             fixedExpenseRecords.TryGetValue(transactionEntity.Id, out var fixedExpenseRecord);
 
             var category = allCategories.Items.SingleOrDefault(x => x.Id == transactionEntity.CategoryId.ToString())!;
-            var fromAccount = allAccounts.FindById(transactionEntity.FromAccountId);
+            var fromAccount = allAccountsList.SingleOrDefault(a => a.Id == transactionEntity.FromAccountId);
             var toAccount = transactionEntity.ToAccountId is not null
-                ? allAccounts.FindById(transactionEntity.ToAccountId)
+                ? allAccountsList.SingleOrDefault(a => a.Id == transactionEntity.ToAccountId)
                 : null;
             var transferType = transactionEntity.Type.ToString();
 
@@ -114,15 +112,15 @@ public class TransactionQueries : ITransactionQueries
                 CategoryIcon = category.Icon,
                 CategoryName = category.Name,
                 FromAccountId = transactionEntity.FromAccountId.ToString(),
-                FromAccountIcon = fromAccount.Icon,
-                FromAccountName = fromAccount.Name,
-                FromAccountCurrency = fromAccount.Currency,
+                FromAccountIcon = fromAccount?.Icon,
+                FromAccountName = fromAccount?.Name,
+                FromAccountCurrency = fromAccount?.Currency,
                 ToAccountId = transactionEntity.ToAccountId?.ToString(),
                 ToAccountIcon = toAccount?.Icon,
                 ToAccountName = toAccount?.Name,
                 ToAccountCurrency = toAccount?.Currency,
                 FormattedFromAmount = FormatAmount(transactionEntity.FromSatAmount, transactionEntity.FromFiatAmount,
-                    fromAccount.Currency),
+                    fromAccount?.Currency),
                 FromAmountFiat = transactionEntity.FromFiatAmount,
                 FromAmountSats = transactionEntity.FromSatAmount,
                 FormattedToAmount = FormatAmount(transactionEntity.ToSatAmount, transactionEntity.ToFiatAmount,
@@ -143,7 +141,7 @@ public class TransactionQueries : ITransactionQueries
             };
         });
 
-        return new TransactionsDTO(dtos.ToList());
+        return Task.FromResult(new TransactionsDTO(dtos.ToList()));
     }
 
     public Task<IReadOnlyList<TransactionNameSearchDTO>> GetTransactionNamesAsync(string searchTerm)
@@ -178,11 +176,9 @@ public class TransactionQueries : ITransactionQueries
         return null;
     }
 
-    private Task<CategoriesDTO> GetCategoriesAsync()
+    private static CategoriesDTO ConvertToCategoriesDTO(List<Categories.CategoryEntity> data)
     {
-        var data = _localDatabase.GetCategories().FindAll().ToList();
-
-        return Task.FromResult(new CategoriesDTO(data.Select(category =>
+        return new CategoriesDTO(data.Select(category =>
         {
             var icon = category.Icon != null ? Icon.RestoreFromId(category.Icon) : Icon.Empty;
 
@@ -202,6 +198,6 @@ public class TransactionQueries : ITransactionQueries
                 Unicode = icon.Unicode,
                 Color = icon.Color
             };
-        }).ToList()));
+        }).ToList());
     }
 }

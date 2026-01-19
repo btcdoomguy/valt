@@ -21,11 +21,11 @@ public sealed class BackgroundJobManager : IDisposable
         return _jobInfos.Values;
     }
 
-    public void StartAllJobs(BackgroundJobTypes jobType, bool triggerInitialRun = true)
+    public async Task StartAllJobsAsync(BackgroundJobTypes jobType, bool triggerInitialRun = true)
     {
         foreach (var jobInfo in _jobInfos.Where(jobInfo => jobInfo.Key.JobType == jobType))
         {
-            Task.Delay(100).Wait();
+            await Task.Delay(100).ConfigureAwait(false);
             StartJob(jobInfo.Key, GetCancellationToken(jobType));
             if (triggerInitialRun)
                 jobInfo.Value.TriggerManually();

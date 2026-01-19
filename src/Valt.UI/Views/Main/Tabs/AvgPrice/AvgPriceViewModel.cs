@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Collections;
@@ -6,6 +7,7 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Modules.AvgPrice;
@@ -13,6 +15,7 @@ using Valt.Core.Modules.AvgPrice.Calculations;
 using Valt.Infra.Modules.AvgPrice.Queries;
 using Valt.Infra.Modules.AvgPrice.Queries.DTOs;
 using Valt.UI.Base;
+using static Valt.UI.Base.TaskExtensions;
 using Valt.UI.Services;
 using Valt.UI.Lang;
 using Valt.UI.Services.MessageBoxes;
@@ -24,7 +27,7 @@ using Valt.UI.Views.Main.Tabs.AvgPrice.Models;
 
 namespace Valt.UI.Views.Main.Tabs.AvgPrice;
 
-public partial class AvgPriceViewModel : ValtTabViewModel
+public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
 {
     private readonly IAvgPriceQueries _avgPriceQueries;
     private readonly IAvgPriceRepository _avgPriceRepository;
@@ -32,6 +35,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel
     private readonly IModalFactory _modalFactory;
     private readonly IClock _clock;
     private readonly SecureModeState? _secureModeState;
+    private readonly ILogger<AvgPriceViewModel>? _logger;
 
     [ObservableProperty] private AvaloniaList<AvgPriceProfileDTO> _profiles = new();
     [ObservableProperty] private AvgPriceProfileDTO? _selectedProfile;
@@ -88,7 +92,8 @@ public partial class AvgPriceViewModel : ValtTabViewModel
         IAvgPriceTotalizer avgPriceTotalizer,
         IModalFactory modalFactory,
         IClock clock,
-        SecureModeState secureModeState)
+        SecureModeState secureModeState,
+        ILogger<AvgPriceViewModel> logger)
     {
         _avgPriceQueries = avgPriceQueries;
         _avgPriceRepository = avgPriceRepository;
@@ -96,25 +101,21 @@ public partial class AvgPriceViewModel : ValtTabViewModel
         _modalFactory = modalFactory;
         _clock = clock;
         _secureModeState = secureModeState;
+        _logger = logger;
 
-        _secureModeState.PropertyChanged += (_, _) =>
-        {
-            OnPropertyChanged(nameof(DisplayCurrentPosition));
-            OnPropertyChanged(nameof(DisplayCurrentAvgPrice));
-            OnPropertyChanged(nameof(IsSecureModeEnabled));
-        };
+        _secureModeState.PropertyChanged += OnSecureModeStatePropertyChanged;
 
         TotalsFilterDate = _clock.GetCurrentDateTimeUtc();
     }
 
     public void Initialize()
     {
-        _ = FetchAvgPriceProfiles();
+        FetchAvgPriceProfiles().SafeFireAndForget(logger: _logger, callerName: nameof(FetchAvgPriceProfiles));
     }
 
     partial void OnTotalsFilterRangeChanged(DateRange value)
     {
-        _ = FetchTotals();
+        FetchTotals().SafeFireAndForget(logger: _logger, callerName: nameof(FetchTotals));
     }
 
     private async Task FetchAvgPriceProfiles()
@@ -132,8 +133,8 @@ public partial class AvgPriceViewModel : ValtTabViewModel
     partial void OnSelectedProfileChanged(AvgPriceProfileDTO? oldValue, AvgPriceProfileDTO? newValue)
     {
         AddOperationCommand.NotifyCanExecuteChanged();
-        _ = FetchAvgPriceLines();
-        _ = FetchTotals();
+        FetchAvgPriceLines().SafeFireAndForget(logger: _logger, callerName: nameof(FetchAvgPriceLines));
+        FetchTotals().SafeFireAndForget(logger: _logger, callerName: nameof(FetchTotals));
     }
 
     private async Task FetchAvgPriceLines()
@@ -461,5 +462,22 @@ public partial class AvgPriceViewModel : ValtTabViewModel
                 IsTotalsLoading = false;
             });
         }
+    }
+
+    #region Event Handlers
+
+    private void OnSecureModeStatePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(DisplayCurrentPosition));
+        OnPropertyChanged(nameof(DisplayCurrentAvgPrice));
+        OnPropertyChanged(nameof(IsSecureModeEnabled));
+    }
+
+    #endregion
+
+    public void Dispose()
+    {
+        if (_secureModeState is not null)
+            _secureModeState.PropertyChanged -= OnSecureModeStatePropertyChanged;
     }
 }

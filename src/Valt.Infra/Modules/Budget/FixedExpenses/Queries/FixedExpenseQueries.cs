@@ -59,8 +59,12 @@ public class FixedExpenseQueries(ILocalDatabase localDatabase) : IFixedExpenseQu
         if (fixedExpense is null)
             return Task.FromResult<FixedExpenseHistoryDto?>(null);
 
+        // Load accounts and categories once - reuse throughout the method
+        var allAccounts = localDatabase.GetAccounts().FindAll().ToList();
+        var allCategories = localDatabase.GetCategories().FindAll().ToList();
+
         var account = fixedExpense.DefaultAccountId is not null
-            ? localDatabase.GetAccounts().FindById(fixedExpense.DefaultAccountId)
+            ? allAccounts.SingleOrDefault(a => a.Id == fixedExpense.DefaultAccountId)
             : null;
 
         var displayCurrency = fixedExpense.Currency ?? account?.Currency ?? "USD";
@@ -70,9 +74,6 @@ public class FixedExpenseQueries(ILocalDatabase localDatabase) : IFixedExpenseQu
             .Include(x => x.Transaction)
             .Find(x => x.FixedExpense.Id == fixedExpenseObjectId && x.Transaction != null)
             .ToList();
-
-        var allAccounts = localDatabase.GetAccounts().FindAll().ToList();
-        var allCategories = localDatabase.GetCategories().FindAll().ToList();
 
         var transactionItems = records
             .OrderByDescending(x => x.Transaction!.Date)

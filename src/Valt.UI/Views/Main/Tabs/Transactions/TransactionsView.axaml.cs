@@ -2,62 +2,95 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using Avalonia.VisualTree;
+using Microsoft.Extensions.DependencyInjection;
 using Valt.UI.Base;
+using Valt.UI.Services.LocalStorage;
 
 namespace Valt.UI.Views.Main.Tabs.Transactions;
 
 public partial class TransactionsView : ValtBaseUserControl
 {
+    private ILocalStorageService? _localStorageService;
+
     public TransactionsView()
     {
         InitializeComponent();
 
-        FixedExpenseList.AddHandler(KeyDownEvent, FixedExpenseList_KeyDown, RoutingStrategies.Tunnel, handledEventsToo: true);
-        FixedExpenseList.AddHandler(DoubleTappedEvent, FixedExpenseList_DoubleTapped, RoutingStrategies.Bubble,
-            handledEventsToo: true);
         AccountsList.AddHandler(KeyDownEvent, AccountsList_KeyDown, RoutingStrategies.Tunnel, handledEventsToo: true);
+    }
+
+    protected override void OnLoaded(RoutedEventArgs e)
+    {
+        base.OnLoaded(e);
+
+        if (Design.IsDesignMode)
+            return;
+
+        // Get ViewModels from DI and set DataContext for panels
+        if (App.ServiceProvider != null)
+        {
+            FixedExpensesPanel.DataContext = App.ServiceProvider.GetRequiredService<FixedExpensesPanelViewModel>();
+            GoalsPanel.DataContext = App.ServiceProvider.GetRequiredService<GoalsPanelViewModel>();
+            _localStorageService = App.ServiceProvider.GetRequiredService<ILocalStorageService>();
+        }
+
+        RestoreLayoutSettings();
     }
 
     protected override void OnUnloaded(RoutedEventArgs e)
     {
         base.OnUnloaded(e);
 
-        FixedExpenseList.RemoveHandler(KeyDownEvent, FixedExpenseList_KeyDown);
-        FixedExpenseList.RemoveHandler(DoubleTappedEvent, FixedExpenseList_DoubleTapped);
+        SaveLayoutSettings();
         AccountsList.RemoveHandler(KeyDownEvent, AccountsList_KeyDown);
     }
 
-    private void FixedExpenseList_DoubleTapped(object? sender, TappedEventArgs e)
+    private void RestoreLayoutSettings()
     {
-        var vm = (DataContext as TransactionsViewModel)!;
-        
-        var originalSource = e.Source as Control;
-        var row = originalSource?.FindAncestorOfType<ListBox>();
+        if (_localStorageService is null) return;
 
-        if (row is null || vm.SelectedFixedExpense is null) return;
-        
-        _ = vm.OpenFixedExpenseCommand.ExecuteAsync(null);
-        e.Handled = true;
+        var settings = _localStorageService.LoadLayoutSettings();
+
+        // Right panel column is at index 3
+        if (settings.RightPanelWidth.HasValue && MainLayoutGrid.ColumnDefinitions.Count > 3)
+        {
+            MainLayoutGrid.ColumnDefinitions[3].Width = new GridLength(settings.RightPanelWidth.Value, GridUnitType.Pixel);
+        }
+
+        // Fixed expenses panel row is at index 1 in RightPanelGrid
+        if (settings.FixedExpensesPanelHeight.HasValue && RightPanelGrid.RowDefinitions.Count > 1)
+        {
+            RightPanelGrid.RowDefinitions[1].Height = new GridLength(settings.FixedExpensesPanelHeight.Value, GridUnitType.Pixel);
+        }
     }
 
-    private void FixedExpenseList_KeyDown(object? sender, KeyEventArgs e)
+    private void SaveLayoutSettings()
     {
-        if (e.Key != Key.Enter) return;
+        if (_localStorageService is null) return;
 
-        var vm = (DataContext as TransactionsViewModel)!;
-        if (vm.SelectedFixedExpense is null) return;
+        var rightPanelWidth = MainLayoutGrid.ColumnDefinitions.Count > 3
+            ? MainLayoutGrid.ColumnDefinitions[3].ActualWidth
+            : 270;
 
-        _ = vm.OpenFixedExpenseCommand.ExecuteAsync(null);
-        e.Handled = true;
+        var fixedExpensesPanelHeight = RightPanelGrid.RowDefinitions.Count > 1
+            ? RightPanelGrid.RowDefinitions[1].ActualHeight
+            : 0;
+
+        var settings = new LayoutSettings
+        {
+            RightPanelWidth = rightPanelWidth,
+            FixedExpensesPanelHeight = fixedExpensesPanelHeight
+        };
+
+        _ = _localStorageService.SaveLayoutSettingsAsync(settings);
     }
 
     private async void AccountsList_KeyDown(object? sender, KeyEventArgs e)
     {
         if (e.KeyModifiers != KeyModifiers.Control) return;
 
-        var vm = (DataContext as TransactionsViewModel)!;
-        if (vm.SelectedAccount is null) return;
+        var vm = DataContext as TransactionsViewModel;
+        if (vm?.SelectedAccount is null) return;
 
         if (e.Key == Key.Up)
         {

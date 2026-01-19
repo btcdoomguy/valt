@@ -33,9 +33,9 @@ All types are sealed classes in `GoalTypes/`:
 |------|-----------------|--------|------------|-------------------|-------------|
 | StackBitcoinGoalType | ZeroToSuccess | `TargetSats` | `CalculatedSats` | `false` | Accumulate satoshis |
 | DcaGoalType | ZeroToSuccess | `TargetPurchaseCount` | `CalculatedPurchaseCount` | `false` | DCA purchases |
-| IncomeFiatGoalType | ZeroToSuccess | `TargetAmount` | `CalculatedIncome` | `false` | Earn fiat target |
+| IncomeFiatGoalType | ZeroToSuccess | `TargetAmount` | `CalculatedIncome` | **`true`** | Earn fiat target (multi-currency) |
 | IncomeBtcGoalType | ZeroToSuccess | `TargetSats` | `CalculatedSats` | `false` | Earn bitcoin target |
-| SpendingLimitGoalType | DecreasingSuccess | `TargetAmount` | `CalculatedSpending` | `false` | Cap fiat spending |
+| SpendingLimitGoalType | DecreasingSuccess | `TargetAmount` | `CalculatedSpending` | **`true`** | Cap fiat spending (multi-currency) |
 | ReduceExpenseCategoryGoalType | DecreasingSuccess | `TargetAmount`, `CategoryId` | `CalculatedSpending` | **`true`** | Reduce category spending |
 | BitcoinHodlGoalType | DecreasingSuccess | `MaxSellableSats` | `CalculatedSoldSats` | `false` | Limit bitcoin sales |
 
@@ -43,7 +43,7 @@ All types are sealed classes in `GoalTypes/`:
 ```csharp
 public interface IGoalType {
     GoalTypeNames TypeName { get; }
-    bool RequiresPriceDataForCalculation { get; }  // Only true for ReduceExpenseCategory
+    bool RequiresPriceDataForCalculation { get; }  // True for multi-currency goals
     ProgressionMode ProgressionMode { get; }       // ZeroToSuccess or DecreasingSuccess
 }
 ```
@@ -82,6 +82,7 @@ Goals automatically transition state when progress reaches 100%:
 - Progress starts at 0% and increases as you spend/sell
 - At 100%, goal automatically transitions to `Failed`
 - Red progress bar
+- SpendingLimit can exceed 100% (not capped)
 
 ### Domain Events
 
@@ -121,12 +122,41 @@ Task<GoalProgressResult> CalculateProgressAsync(GoalProgressInput input);
 | StackBitcoinProgressCalculator | ZeroToSuccess | FiatToBitcoin + Bitcoin income - BitcoinToFiat - Bitcoin expenses |
 | DcaProgressCalculator | ZeroToSuccess | Count of FiatToBitcoin transactions |
 | IncomeBtcProgressCalculator | ZeroToSuccess | Bitcoin transactions with positive FromSatAmount |
-| IncomeFiatProgressCalculator | ZeroToSuccess | Positive Fiat + BitcoinToFiat amounts |
-| SpendingLimitProgressCalculator | DecreasingSuccess | `(spent / limit) * 100` - 0% = nothing spent, 100% = at/over limit |
-| ReduceExpenseCategoryProgressCalculator | DecreasingSuccess | Category expenses, 0% = nothing spent, 100% = at/over limit |
-| BitcoinHodlProgressCalculator | DecreasingSuccess | `(soldSats / maxSellable) * 100` - 0% = no sales, 100% = limit reached |
+| IncomeFiatProgressCalculator | ZeroToSuccess | Positive Fiat + BitcoinToFiat amounts, converted to main currency |
+| SpendingLimitProgressCalculator | DecreasingSuccess | `(spent / limit) * 100` - can exceed 100% |
+| ReduceExpenseCategoryProgressCalculator | DecreasingSuccess | Category expenses converted to main currency |
+| BitcoinHodlProgressCalculator | DecreasingSuccess | `(soldSats / maxSellable) * 100` - if max=0, any sale = 100% |
 
 **GoalProgressCalculatorFactory** - Resolves calculator by `GoalTypeNames`
+
+### GoalTransactionReader
+
+**File:** `Services/GoalTransactionReader.cs`
+
+Shared service for calculators that need multi-currency support:
+
+```csharp
+public interface IGoalTransactionReader
+{
+    Task<decimal> CalculateTotalExpenses(DateOnly from, DateOnly to, string? categoryId = null);
+    Task<decimal> CalculateTotalIncome(DateOnly from, DateOnly to);
+}
+```
+
+**Multi-Currency Logic:**
+- Loads all accounts, transactions, price data for date range (with 7-day buffer)
+- For fiat conversion: source currency → USD → target currency
+- For BTC conversion: BTC → USD (using historical BTC price) → target currency
+- Uses binary search to find closest historical rate
+
+**CalculateTotalExpenses:**
+- Handles Fiat debits (FromFiatAmount < 0 on Fiat type)
+- Handles Bitcoin debits (FromSatAmount < 0 on Bitcoin type), converts to fiat
+- Excludes transfers (FiatToBitcoin, BitcoinToFiat)
+
+**CalculateTotalIncome:**
+- Handles Fiat income (FromFiatAmount > 0 on Fiat type)
+- Excludes BitcoinToFiat (transfer, not income)
 
 ### Background Job & State Management
 
@@ -163,11 +193,61 @@ Task<GoalProgressResult> CalculateProgressAsync(GoalProgressInput input);
 **MarkGoalsStaleOnPriceUpdateHandler:**
 - Listens to: `FiatHistoryPriceUpdatedMessage`, `BitcoinHistoryPriceUpdatedMessage`
 - Only marks goals stale where `GoalType.RequiresPriceDataForCalculation == true`
-- Currently only `ReduceExpenseCategoryGoalType` requires price data for multi-currency conversion
+- Affects: `IncomeFiatGoalType`, `SpendingLimitGoalType`, `ReduceExpenseCategoryGoalType`
 
-## UI Layer (Valt.UI/Views/Main/Modals/ManageGoal/)
+## UI Layer (Valt.UI/)
+
+### GoalsPanelViewModel
+
+**File:** `Views/Main/Tabs/Transactions/GoalsPanelViewModel.cs`
+
+Main goals display in Transactions tab.
+
+**Features:**
+- Displays goals for current month/year based on filter
+- Sorts: Open Monthly → Open Yearly → Completed → Failed
+- Subscribes to: `FilterDateRangeChanged`, `GoalListChanged`, `GoalProgressUpdated`
+- Listens to secure mode state changes
+
+**Commands:**
+- `AddGoal` - Opens ManageGoal modal
+- `EditGoal` - Opens ManageGoal modal with goal data
+- `RecalculateGoal` - Reset completed/failed goal to recalculate
+- `DeleteGoal` - Delete goal with confirmation
+
+### GoalEntryViewModel
+
+**File:** `Views/Main/Tabs/Transactions/Models/GoalEntryViewModel.cs`
+
+Individual goal display model with animation support.
+
+**UI Properties:**
+- `FriendlyName` - Localized goal type name (e.g., "Stack Bitcoin")
+- `TargetDisplay` - Formatted target (BTC, sats, count, fiat, etc.)
+- `Description` - "Stacked 50,000 sats of 100,000 target" format
+- `ProgressDisplay` - "45.5%" format
+- `RequiresPriceData` - True if needs exchange rates (shows asterisk)
+
+**State Display:**
+- `ShowSuccessIcon` - Shows "SUCCESS" badge (green background) for Completed goals
+- `ShowFailedIcon` - Shows "FAILED" badge (red background) for Failed goals
+- `ShowProgressBar` - Shows progress bar only for Open state
+
+**Progress Bar Styling:**
+- `IsZeroToSuccess` - Green progress bar (`.complete` class)
+- `IsDecreasingSuccess` - Red progress bar (`.danger` class)
+
+**Progress Animation:**
+- `AnimatedProgressPercentage` - Animates over 3 seconds with cubic easing
+- Updates on `UpdateGoal()` call
+- Uses Timer with 16ms interval (~60fps)
+
+**Context Menu:**
+- `CanRecalculate` - Available for Completed or Failed goals (resets to Open)
 
 ### ManageGoalViewModel
+
+**File:** `Views/Main/Modals/ManageGoal/ManageGoalViewModel.cs`
 
 Main modal for creating/editing goals.
 
@@ -178,6 +258,11 @@ Main modal for creating/editing goals.
 - `CurrentGoalTypeEditor` - Dynamic editor VM
 - `IsEditMode` - Boolean flag
 
+**Edit Mode:**
+- Loads existing goal data
+- Preserves calculated values (doesn't reset progress)
+- Sets IsUpToDate to false (triggers recalculation)
+
 ### Goal Type Editors
 
 Each goal type has a dedicated editor implementing `IGoalTypeEditorViewModel`:
@@ -187,6 +272,7 @@ public interface IGoalTypeEditorViewModel {
     IGoalType CreateGoalType();
     IGoalType CreateGoalTypePreservingCalculated(IGoalType? existing);
     void LoadFrom(IGoalType goalType);
+    bool HasErrors { get; }
 }
 ```
 
@@ -198,20 +284,6 @@ public interface IGoalTypeEditorViewModel {
 - `IncomeBtcGoalTypeEditorViewModel` - BtcValue input
 - `BitcoinHodlGoalTypeEditorViewModel` - BtcValue (0 = full HODL)
 - `ReduceExpenseCategoryGoalTypeEditorViewModel` - FiatValue + Category dropdown
-
-### Goal Display (GoalEntryViewModel)
-
-**State Display:**
-- `ShowSuccessIcon` - Shows "SUCCESS" badge (green background) for Completed goals
-- `ShowFailedIcon` - Shows "FAILED" badge (red background) for Failed goals
-- `ShowProgressBar` - Shows progress bar only for Open state
-
-**Progress Bar Styling:**
-- `IsZeroToSuccess` - Green progress bar (`.complete` class)
-- `IsDecreasingSuccess` - Red progress bar (`.danger` class)
-
-**Context Menu:**
-- `CanRecalculate` - Available for Completed or Failed goals (resets to Open)
 
 ## Key Patterns
 
@@ -276,6 +348,7 @@ GoalBuilder.AGoal().WithGoalType(new SpendingLimitGoalType(1000m)).Build();
    - At 100%: auto-transitions to `Completed`
    - `IsUpToDate = true`
    - UI receives `GoalProgressUpdated` message
+   - Progress bar animates to new value
 
 **Spending Limit Goal (DecreasingSuccess):**
 
@@ -290,6 +363,10 @@ GoalBuilder.AGoal().WithGoalType(new SpendingLimitGoalType(1000m)).Build();
    - Progress: 100%
    - Auto-transitions to `Failed`
    - Shows "FAILED" badge
+
+4. **User exceeds limit ($1500 spent):**
+   - Progress: 150% (not capped for spending limits)
+   - Remains in `Failed` state
 
 ## File Structure
 
@@ -320,6 +397,7 @@ src/Valt.Infra/Modules/Goals/
 ├── Services/
 │   ├── GoalProgressState.cs
 │   ├── GoalProgressUpdaterJob.cs
+│   ├── GoalTransactionReader.cs
 │   ├── IGoalProgressCalculator.cs
 │   ├── GoalProgressCalculatorFactory.cs
 │   └── *ProgressCalculator.cs (7 implementations)
@@ -330,9 +408,14 @@ src/Valt.Infra/Modules/Goals/
 └── Queries/
     └── GoalQueries.cs, DTOs/
 
-src/Valt.UI/Views/Main/Modals/ManageGoal/
-├── ManageGoalViewModel.cs, ManageGoalView.axaml
-├── IGoalTypeEditorViewModel.cs
-└── GoalTypeEditors/
-    └── *GoalTypeEditorViewModel.cs (7 editors + views)
+src/Valt.UI/Views/Main/
+├── Tabs/Transactions/
+│   ├── GoalsPanelView.axaml
+│   ├── GoalsPanelViewModel.cs
+│   └── Models/GoalEntryViewModel.cs
+└── Modals/ManageGoal/
+    ├── ManageGoalViewModel.cs, ManageGoalView.axaml
+    ├── IGoalTypeEditorViewModel.cs
+    └── GoalTypeEditors/
+        └── *GoalTypeEditorViewModel.cs (7 editors + views)
 ```

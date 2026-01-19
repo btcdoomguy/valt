@@ -1,11 +1,12 @@
 using NSubstitute;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Factories;
-using Valt.Core.Modules.Budget.Categories.Contracts;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.Contracts;
 using Valt.Core.Modules.Goals.GoalTypes;
 using Valt.Infra.Kernel;
+using Valt.Infra.Modules.Budget.Categories.Queries;
+using Valt.Infra.Modules.Budget.Categories.Queries.DTOs;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Settings;
 using Valt.Tests.Builders;
@@ -19,7 +20,7 @@ public class ManageGoalViewModelTests : DatabaseTest
 {
     private IGoalRepository _goalRepository = null!;
     private IConfigurationManager _configurationManager = null!;
-    private ICategoryRepository _categoryRepository = null!;
+    private ICategoryQueries _categoryQueries = null!;
     private CurrencySettings _currencySettings = null!;
 
     [OneTimeSetUp]
@@ -33,14 +34,15 @@ public class ManageGoalViewModelTests : DatabaseTest
     {
         _goalRepository = Substitute.For<IGoalRepository>();
         _configurationManager = Substitute.For<IConfigurationManager>();
-        _categoryRepository = Substitute.For<ICategoryRepository>();
+        _categoryQueries = Substitute.For<ICategoryQueries>();
         _currencySettings = new CurrencySettings(_localDatabase);
         _configurationManager.GetAvailableFiatCurrencies().Returns(new List<string> { "USD", "BRL", "EUR" });
+        _categoryQueries.GetCategoriesAsync().Returns(Task.FromResult(new CategoriesDTO(new List<CategoryDTO>())));
     }
 
     private ManageGoalViewModel CreateViewModel()
     {
-        var vm = new ManageGoalViewModel(_goalRepository, _configurationManager, _categoryRepository, _currencySettings);
+        var vm = new ManageGoalViewModel(_goalRepository, _configurationManager, _categoryQueries, _currencySettings);
         vm.GetWindow = () => null!;
         vm.CloseWindow = () => { };
         vm.CloseDialog = _ => { };

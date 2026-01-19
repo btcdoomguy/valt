@@ -14,7 +14,6 @@
              xmlns:painting="clr-namespace:LiveChartsCore.SkiaSharpView.Painting;assembly=LiveChartsCore.SkiaSharpView"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="1200"
              MinWidth="900"
-             MinHeight="700"
              x:Class="Valt.UI.Views.Main.Tabs.Reports.ReportsView"
              x:DataType="reports1:ReportsViewModel">
     <Design.DataContext>
@@ -37,7 +36,7 @@
                         <Panel IsVisible="{Binding !IsWealthLoading}">
                             <reports1:DashboardDataUserControl DataContext="{Binding WealthData}" />
                         </Panel>
-                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="14" Foreground="{DynamicResource Text400Brush}"
+                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    IsVisible="{Binding IsWealthLoading}" />
                     </Grid>
@@ -46,7 +45,7 @@
                         <Panel IsVisible="{Binding !IsAllTimeHighLoading}">
                             <reports1:DashboardDataUserControl DataContext="{Binding AllTimeHighData}" />
                         </Panel>
-                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="14" Foreground="{DynamicResource Text400Brush}"
+                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    IsVisible="{Binding IsAllTimeHighLoading}" />
                     </Grid>
@@ -55,7 +54,7 @@
                         <Panel IsVisible="{Binding !IsBtcStackLoading}">
                             <reports1:DashboardDataUserControl DataContext="{Binding BtcStackData}" />
                         </Panel>
-                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="14" Foreground="{DynamicResource Text400Brush}"
+                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    IsVisible="{Binding IsBtcStackLoading}" />
                     </Grid>
@@ -64,7 +63,7 @@
                         <Panel IsVisible="{Binding !IsStatisticsLoading}">
                             <reports1:DashboardDataUserControl DataContext="{Binding StatisticsData}" />
                         </Panel>
-                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="14" Foreground="{DynamicResource Text400Brush}"
+                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    IsVisible="{Binding IsStatisticsLoading}" />
                     </Grid>
@@ -236,7 +235,7 @@
                                 </DataGrid.Columns>
                             </DataGrid>
                         </StackPanel>
-                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="14" Foreground="{DynamicResource Text400Brush}"
+                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    IsVisible="{Binding IsMonthlyTotalsLoading}" />
                     </Grid>
@@ -296,7 +295,7 @@
                                     </avalonia:CartesianChart>
                                 </ScrollViewer>
                             </Border>
-                            <TextBlock Text="{x:Static lang:language.Loading}" FontSize="14" Foreground="{DynamicResource Text400Brush}"
+                            <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        IsVisible="{Binding IsSpendingByCategoriesLoading}" />
                         </Panel>
@@ -311,7 +310,7 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch">
             <TextBlock Text="{x:Static lang:language.Reports_SecureModeMessage}"
-                       FontSize="18"
+                       FontSize="{DynamicResource FontSizeXLarge}"
                        Foreground="{DynamicResource Text400Brush}"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center" />

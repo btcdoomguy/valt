@@ -83,7 +83,7 @@
                             <!-- Date picker -->
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="0">
                                 <Button FontFamily="{DynamicResource MaterialDesign}" Content="&#xE5DE;"
-                                        FontWeight="Bold" IsTabStop="False" FontSize="28" Padding="0"
+                                        FontWeight="Bold" IsTabStop="False" FontSize="{DynamicResource FontSizeIconLarge}" Padding="0"
                                         Command="{Binding PreviousDayCommand}" />
                                 <CalendarDatePicker Width="140" SelectedDateFormat="Short"
                                                     IsTodayHighlighted="True" TabIndex="10" Height="36"
@@ -96,7 +96,7 @@
                                     </CalendarDatePicker.ContextMenu>
                                 </CalendarDatePicker>
                                 <Button FontFamily="{DynamicResource MaterialDesign}" Content="&#xE5DF;"
-                                        FontWeight="Bold" IsTabStop="False" FontSize="28" Padding="0"
+                                        FontWeight="Bold" IsTabStop="False" FontSize="{DynamicResource FontSizeIconLarge}" Padding="0"
                                         Command="{Binding NextDayCommand}" />
                             </StackPanel>
 
@@ -128,7 +128,7 @@
                                         <ComboBox.ItemTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal">
-                                                    <TextBlock FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
+                                                    <TextBlock FontFamily="{DynamicResource MaterialDesign}" FontSize="{DynamicResource FontSizeXXLarge}"
                                                                Text="{Binding Unicode}"
                                                                Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
                                                     <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}" />
@@ -150,7 +150,7 @@
                                         <ComboBox.ItemTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal">
-                                                    <TextBlock FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
+                                                    <TextBlock FontFamily="{DynamicResource MaterialDesign}" FontSize="{DynamicResource FontSizeXXLarge}"
                                                                Text="{Binding Unicode}"
                                                                Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
                                                     <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}" />
@@ -195,7 +195,7 @@
                                         <ComboBox.ItemTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal">
-                                                    <TextBlock FontFamily="{DynamicResource MaterialDesign}" FontSize="20"
+                                                    <TextBlock FontFamily="{DynamicResource MaterialDesign}" FontSize="{DynamicResource FontSizeXXLarge}"
                                                                Text="{Binding Unicode}"
                                                                Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
                                                     <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}" />
@@ -208,9 +208,9 @@
                                     <StackPanel Orientation="Horizontal" Spacing="4">
                                         <TextBlock Text="{x:Static local:language.ManageTransactions_Amount}" />
                                         <StackPanel Orientation="Horizontal" Margin="8, -10, 0, 0">
-                                            <Label FontFamily="{DynamicResource MaterialDesign}" FontSize="14"
+                                            <Label FontFamily="{DynamicResource MaterialDesign}" FontSize="{DynamicResource FontSizeMedium}"
                                                    Classes="icon" Content="&#xEB70;" Padding="0" />
-                                            <Label FontSize="11" Content="{Binding TransferRate}" Padding="8,0,0,0" />
+                                            <Label FontSize="{DynamicResource FontSizeXSmall}" Content="{Binding TransferRate}" Padding="8,0,0,0" />
                                         </StackPanel>
                                     </StackPanel>
                                     <Panel>
@@ -241,7 +241,7 @@
                         <userControls:ModuleHelperText HorizontalAlignment="Right" VerticalAlignment="Top">
                             <userControls:ModuleHelperText.HelpContent>
                                 <StackPanel Spacing="8">
-                                    <TextBlock FontWeight="Bold" FontSize="14"
+                                    <TextBlock FontWeight="Bold" FontSize="{DynamicResource FontSizeMedium}"
                                                Text="{x:Static local:language.Help_KeyboardShortcuts}" />
                                     <StackPanel Spacing="4">
                                         <StackPanel Orientation="Horizontal" Spacing="8">
@@ -265,7 +265,7 @@
                                             <TextBlock Text="{x:Static local:language.TransactionEditor_Help_NextDay}" />
                                         </StackPanel>
                                     </StackPanel>
-                                    <TextBlock FontWeight="Bold" FontSize="14"
+                                    <TextBlock FontWeight="Bold" FontSize="{DynamicResource FontSizeMedium}"
                                                Text="{x:Static local:language.Help_Tips}" Margin="0, 8, 0, 0" />
                                     <TextBlock TextWrapping="Wrap"
                                                Text="{x:Static local:language.TransactionEditor_Help_Tip1}" />
@@ -298,17 +298,17 @@
                                 IsVisible="{Binding HasMetadata}">
                             <StackPanel Spacing="6">
                                 <TextBlock Text="{x:Static local:language.ManageTransactions_Properties}"
-                                           FontWeight="SemiBold" FontSize="12"
+                                           FontWeight="SemiBold" FontSize="{DynamicResource FontSizeSmall}"
                                            Foreground="{DynamicResource Text300Brush}" />
                                 <StackPanel Spacing="2" IsVisible="{Binding IsBoundToFixedExpense}">
-                                    <TextBlock FontSize="11" Foreground="{DynamicResource Accent200Color}"
+                                    <TextBlock FontSize="{DynamicResource FontSizeXSmall}" Foreground="{DynamicResource Accent200Color}"
                                                Text="{x:Static local:language.ManageTransactions_Properties_BoundToFixedExpense}" />
-                                    <TextBlock FontSize="11" Text="{Binding BoundToFixedExpenseCaption}" />
+                                    <TextBlock FontSize="{DynamicResource FontSizeXSmall}" Text="{Binding BoundToFixedExpenseCaption}" />
                                 </StackPanel>
                                 <StackPanel Spacing="2" IsVisible="{Binding IsAutoSatAmount}">
-                                    <TextBlock FontSize="11" Foreground="{DynamicResource Accent200Color}"
+                                    <TextBlock FontSize="{DynamicResource FontSizeXSmall}" Foreground="{DynamicResource Accent200Color}"
                                                Text="{x:Static local:language.ManageTransactions_Properties_PriceInSats}" />
-                                    <TextBlock FontSize="11" Text="{Binding SatAmountStateDescription}" />
+                                    <TextBlock FontSize="{DynamicResource FontSizeXSmall}" Text="{Binding SatAmountStateDescription}" />
                                 </StackPanel>
                             </StackPanel>
                         </Border>

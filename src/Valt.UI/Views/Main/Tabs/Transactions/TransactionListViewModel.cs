@@ -27,6 +27,7 @@ using Valt.Infra.Modules.Budget.Transactions.Queries.DTOs;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
 using Valt.UI.Base;
+using static Valt.UI.Base.TaskExtensions;
 using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.LocalStorage;
@@ -380,7 +381,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         if (SelectedTransaction is null || SelectedFixedExpense is null) return;
 
-        //TODO: move to a specific app layer
+        // Note: Consider extracting to an application service (e.g., TransactionFixedExpenseService)
         var transaction = await _transactionRepository.GetTransactionByIdAsync(new TransactionId(SelectedTransaction.Id));
 
         transaction!.SetFixedExpense(new TransactionFixedExpenseReference(SelectedFixedExpense.Id, SelectedFixedExpense.ReferenceDate));
@@ -395,7 +396,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         if (SelectedTransaction is null) return;
 
-        //TODO: move to a specific app layer
+        // Note: Consider extracting to an application service (e.g., TransactionFixedExpenseService)
         var transaction = await _transactionRepository.GetTransactionByIdAsync(new TransactionId(SelectedTransaction.Id));
 
         transaction!.SetFixedExpense(null);
@@ -544,7 +545,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         OnPropertyChanged(nameof(FilterMainDate));
         OnPropertyChanged(nameof(FilterRange));
-        _ = FetchTransactions();
+        FetchTransactions().SafeFireAndForget(logger: _logger, callerName: nameof(FetchTransactions));
     }
 
     partial void OnSelectedTransactionChanged(TransactionViewModel? value)

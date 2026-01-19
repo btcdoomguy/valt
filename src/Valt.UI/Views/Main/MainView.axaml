@@ -7,8 +7,8 @@
         xmlns:main1="clr-namespace:Valt.UI.Views.Main"
         xmlns:controls="clr-namespace:Valt.UI.Views.Main.Controls"
         mc:Ignorable="d"
-        d:DesignWidth="1280" d:DesignHeight="838"
-        MinWidth="1280" MinHeight="838"
+        d:DesignWidth="1280" d:DesignHeight="650"
+        MinWidth="1280" MinHeight="650"
         WindowStartupLocation="CenterOwner"
         x:Class="Valt.UI.Views.Main.MainView"
         x:DataType="main1:MainViewModel"
@@ -182,14 +182,14 @@
                                                HorizontalAlignment="Left"
                                                VerticalAlignment="Center"
                                                Margin="10, 0, 0, 0" />
-                <TextBlock Grid.Column="1"
-                           FontSize="12"
-                           HorizontalAlignment="Right"
-                           VerticalAlignment="Center"
-                           Margin="0, 0, 5, 0">
-                    <HyperlinkButton Foreground="{DynamicResource Text300Brush}"
-                                     Command="{Binding OpenStatusDisplayCommand}" Content="{Binding StatusDisplay}" />
-                </TextBlock>
+                <Button Grid.Column="1"
+                        Classes="transparent link"
+                        FontSize="12"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Margin="0, 0, 5, 0"
+                        Command="{Binding OpenStatusDisplayCommand}"
+                        Content="{Binding StatusDisplay}" />
             </Grid>
         </Border>
     </Grid>

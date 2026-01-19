@@ -7,7 +7,7 @@ namespace Valt.Tests.Architecture;
 [TestFixture]
 public class CustomValidatorsTests
 {
-    private static readonly Assembly UIAssembly = typeof(Valt.UI.Foo).Assembly;
+    private static readonly Assembly UIAssembly = typeof(Valt.UI.App).Assembly;
     
     [Test]
     public void ValidationAttributes_Should_Be_Internal()
