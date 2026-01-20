@@ -804,6 +804,15 @@
     <data name="Reports.SpendingByCategories.Categories" xml:space="preserve">
         <value>Categorias</value>
     </data>
+    <data name="Reports.IncomeByCategories.Title" xml:space="preserve">
+        <value>Receitas por categorias</value>
+    </data>
+    <data name="Reports.IncomeByCategories.Accounts" xml:space="preserve">
+        <value>Contas</value>
+    </data>
+    <data name="Reports.IncomeByCategories.Categories" xml:space="preserve">
+        <value>Categorias</value>
+    </data>
     <data name="Total" xml:space="preserve">
         <value>Total</value>
     </data>
