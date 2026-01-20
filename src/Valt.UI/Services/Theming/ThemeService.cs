@@ -26,7 +26,11 @@ public class ThemeService : IThemeService
         new ThemeDefinition("ArcticFrost", "Arctic Frost", "Dark", () => ArcticFrostTheme.Create()),
         new ThemeDefinition("ForestCanopy", "Forest Canopy", "Dark", () => ForestCanopyTheme.Create()),
         new ThemeDefinition("CrimsonEmber", "Crimson Ember", "Dark", () => CrimsonEmberTheme.Create()),
-        new ThemeDefinition("Monochrome", "Monochrome", "Dark", () => MonochromeTheme.Create())
+        new ThemeDefinition("Monochrome", "Monochrome", "Dark", () => MonochromeTheme.Create()),
+        new ThemeDefinition("RoseQuartz", "Rose Quartz", "Dark", () => RoseQuartzTheme.Create()),
+        new ThemeDefinition("SunsetBlaze", "Sunset Blaze", "Dark", () => SunsetBlazeTheme.Create()),
+        new ThemeDefinition("MochaBrew", "Mocha Brew", "Dark", () => MochaBrewTheme.Create()),
+        new ThemeDefinition("CopperForge", "Copper Forge", "Dark", () => CopperForgeTheme.Create())
     ];
 
     private readonly ILocalStorageService _localStorageService;
