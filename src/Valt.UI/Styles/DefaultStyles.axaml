@@ -345,7 +345,7 @@
     </Style>
 
     <Style Selector="Button.rounded">
-        <Setter Property="Padding" Value="5, 2, 0, 0" />
+        <Setter Property="Padding" Value="6, 3, 0, 0" />
         <Setter Property="Background" Value="{DynamicResource ButtonOverlayMediumBrush}" />
         <Setter Property="FontSize" Value="{DynamicResource FontSizeIconLarge}" />
         <Setter Property="Width" Value="40" />

@@ -9,7 +9,6 @@ public enum ApplicationModalNames
     ManageCategories = 4,
     TransactionEditor = 5,
     IconSelector = 6,
-    MathExpression = 7,
     StatusDisplay = 8,
     Settings = 9,
     ChangeCategoryTransactions = 10,

@@ -171,12 +171,6 @@
     <data name="AddNew" xml:space="preserve">
         <value>Adicionar Novo</value>
     </data>
-    <data name="MathExpression.Description" xml:space="preserve">
-        <value>Digite sua expressão abaixo (123+456):</value>
-    </data>
-    <data name="MathExpression.Title" xml:space="preserve">
-        <value>Calcular expressão</value>
-    </data>
     <data name="SaveChanges" xml:space="preserve">
         <value>Salvar Alterações</value>
     </data>

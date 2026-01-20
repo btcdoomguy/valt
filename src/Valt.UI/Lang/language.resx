@@ -203,12 +203,6 @@
     <data name="SaveChanges" xml:space="preserve">
         <value>Save Changes</value>
     </data>
-    <data name="MathExpression.Title" xml:space="preserve">
-        <value>Calculate expression</value>
-    </data>
-    <data name="MathExpression.Description" xml:space="preserve">
-        <value>Enter your expression below (123+456):</value>
-    </data>
     <data name="Settings.Title" xml:space="preserve">
         <value>Settings</value>
     </data>

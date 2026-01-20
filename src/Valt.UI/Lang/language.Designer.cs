@@ -405,18 +405,6 @@ namespace Valt.UI.Lang {
             }
         }
         
-        public static string MathExpression_Title {
-            get {
-                return ResourceManager.GetString("MathExpression.Title", resourceCulture);
-            }
-        }
-        
-        public static string MathExpression_Description {
-            get {
-                return ResourceManager.GetString("MathExpression.Description", resourceCulture);
-            }
-        }
-        
         public static string Settings_Title {
             get {
                 return ResourceManager.GetString("Settings.Title", resourceCulture);

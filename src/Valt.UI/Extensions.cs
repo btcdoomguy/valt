@@ -23,7 +23,6 @@ using Valt.UI.Views.Main.Modals.ManageAccount;
 using Valt.UI.Views.Main.Modals.ManageCategories;
 using Valt.UI.Views.Main.Modals.ManageFixedExpenses;
 using Valt.UI.Views.Main.Modals.TransactionEditor;
-using Valt.UI.Views.Main.Modals.MathExpression;
 using Valt.UI.Views.Main.Modals.Settings;
 using Valt.UI.Views.Main.Modals.StatusDisplay;
 using Valt.UI.Views.Main.Tabs.AvgPrice;
@@ -95,7 +94,6 @@ public static class Extensions
         services.AddTransient<ManageCategoriesViewModel>();
         services.AddTransient<TransactionEditorViewModel>();
         services.AddTransient<IconSelectorViewModel>();
-        services.AddTransient<MathExpressionViewModel>();
         services.AddTransient<StatusDisplayViewModel>();
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<ManageFixedExpensesViewModel>();
@@ -155,10 +153,6 @@ public static class Extensions
                 ApplicationModalNames.IconSelector => new IconSelectorView()
                 {
                     DataContext = services.GetRequiredService<IconSelectorViewModel>(),
-                },
-                ApplicationModalNames.MathExpression => new MathExpressionView()
-                {
-                    DataContext = services.GetRequiredService<MathExpressionViewModel>(),
                 },
                 ApplicationModalNames.StatusDisplay => new StatusDisplayView()
                 {

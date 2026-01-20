@@ -198,12 +198,6 @@
     <data name="SaveChanges" xml:space="preserve">
         <value>Guardar cambios</value>
     </data>
-    <data name="MathExpression.Title" xml:space="preserve">
-        <value>Calcular expresión</value>
-    </data>
-    <data name="MathExpression.Description" xml:space="preserve">
-        <value>Ingresa tu expresión abajo (123+456):</value>
-    </data>
     <data name="Settings.Title" xml:space="preserve">
         <value>Configuración</value>
     </data>

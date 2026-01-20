@@ -29,7 +29,7 @@ using static Valt.UI.Base.TaskExtensions;
 using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
-using Valt.UI.Views.Main.Modals.MathExpression;
+using Valt.UI.Views.Main.Modals.ConversionCalculator;
 using Valt.UI.Views.Main.Modals.TransactionEditor.Exceptions;
 
 namespace Valt.UI.Views.Main.Modals.TransactionEditor;
@@ -710,10 +710,23 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
     [RelayCommand]
     private async Task OpenCalculator(object parameter)
     {
-        var window =
-            (MathExpressionView)await _modalFactory.CreateAsync(ApplicationModalNames.MathExpression, GetWindow!())!;
+        // Determine the default currency based on the field
+        string? defaultCurrencyCode = parameter switch
+        {
+            "FromBtc" or "ToBtc" => "BTC",
+            "FromFiat" => FromAccount?.Currency,
+            "ToFiat" => ToAccount?.Currency,
+            _ => null
+        };
 
-        var result = await window.ShowDialog<MathExpressionViewModel.Response?>(GetWindow!());
+        var request = new ConversionCalculatorViewModel.Request(
+            ResponseMode: true,
+            DefaultCurrencyCode: defaultCurrencyCode);
+
+        var window =
+            (ConversionCalculatorView)await _modalFactory.CreateAsync(ApplicationModalNames.ConversionCalculator, GetWindow!(), request)!;
+
+        var result = await window.ShowDialog<ConversionCalculatorViewModel.Response?>(GetWindow!());
 
         if (result is null)
             return;

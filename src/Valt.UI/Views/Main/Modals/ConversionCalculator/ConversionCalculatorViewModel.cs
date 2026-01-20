@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StringMath;
@@ -23,9 +24,14 @@ public partial class ConversionCalculatorViewModel : ValtModalViewModel
     private readonly IConfigurationManager? _configurationManager;
 
     [ObservableProperty] private string _expression = string.Empty;
-    [ObservableProperty] private decimal? _calculatedValue;
+    [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(OkCommand))]
+    private decimal? _calculatedValue;
     [ObservableProperty] private string _displayValue = string.Empty;
     [ObservableProperty] private CurrencyConversionItem? _selectedCurrency;
+    [ObservableProperty] private bool _isResponseMode;
+
+    public record Request(bool ResponseMode = false, string? DefaultCurrencyCode = null);
+    public record Response(decimal? Result);
 
     public ObservableCollection<CurrencyConversionItem> Currencies { get; } = new();
 
@@ -251,6 +257,47 @@ public partial class ConversionCalculatorViewModel : ValtModalViewModel
 
     [RelayCommand]
     private void Close()
+    {
+        if (IsResponseMode)
+        {
+            Cancel();
+        }
+        else
+        {
+            CloseWindow?.Invoke();
+        }
+    }
+
+    public override Task OnBindParameterAsync()
+    {
+        if (Parameter is Request request)
+        {
+            IsResponseMode = request.ResponseMode;
+
+            if (!string.IsNullOrEmpty(request.DefaultCurrencyCode))
+            {
+                var currency = Currencies.FirstOrDefault(c => c.CurrencyCode == request.DefaultCurrencyCode);
+                if (currency != null)
+                {
+                    SelectedCurrency = currency;
+                }
+            }
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private bool CanOk() => CalculatedValue is not null;
+
+    [RelayCommand(CanExecute = nameof(CanOk))]
+    private void Ok()
+    {
+        var cleanResult = CalculatedValue < 0 ? CalculatedValue * -1 : CalculatedValue;
+        CloseDialog?.Invoke(new Response(cleanResult));
+    }
+
+    [RelayCommand]
+    private void Cancel()
     {
         CloseWindow?.Invoke();
     }

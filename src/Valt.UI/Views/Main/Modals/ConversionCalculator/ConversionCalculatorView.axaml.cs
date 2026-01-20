@@ -101,10 +101,24 @@ public partial class ConversionCalculatorView : ValtBaseWindow
                 vm.ClearCommand.Execute(null);
                 break;
             case Key.Enter:
-                vm.EqualsCommand.Execute(null);
+                if (vm.IsResponseMode && vm.OkCommand.CanExecute(null))
+                {
+                    vm.OkCommand.Execute(null);
+                }
+                else
+                {
+                    vm.EqualsCommand.Execute(null);
+                }
                 break;
             case Key.Escape:
-                vm.CloseCommand.Execute(null);
+                if (vm.IsResponseMode)
+                {
+                    vm.CancelCommand.Execute(null);
+                }
+                else
+                {
+                    vm.CloseCommand.Execute(null);
+                }
                 break;
 
             default:

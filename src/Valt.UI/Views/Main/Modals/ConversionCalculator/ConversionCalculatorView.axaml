@@ -6,9 +6,9 @@
         xmlns:local="clr-namespace:Valt.UI.Lang"
         xmlns:conv="clr-namespace:Valt.UI.Views.Main.Modals.ConversionCalculator"
         mc:Ignorable="d"
-        d:DesignWidth="650" d:DesignHeight="442"
+        d:DesignWidth="650" d:DesignHeight="482"
         MaxWidth="650"
-        MaxHeight="442"
+        MaxHeight="482"
         x:Class="Valt.UI.Views.Main.Modals.ConversionCalculator.ConversionCalculatorView"
         x:DataType="conv:ConversionCalculatorViewModel"
         Title="{x:Static local:language.ConversionCalculator_Title}"
@@ -131,7 +131,8 @@
                             <Button Grid.Row="1" Grid.Column="2" Classes="calc-button"
                                     Content="9" Command="{Binding AppendCharacterCommand}" CommandParameter="9" />
                             <Button Grid.Row="1" Grid.Column="3" Classes="calc-button operator"
-                                    Content="&#xF7;" Command="{Binding AppendCharacterCommand}" CommandParameter="&#xF7;" />
+                                    Content="&#xF7;" Command="{Binding AppendCharacterCommand}"
+                                    CommandParameter="&#xF7;" />
 
                             <!-- Row 3: 4 5 6 * -->
                             <Button Grid.Row="2" Grid.Column="0" Classes="calc-button"
@@ -141,7 +142,8 @@
                             <Button Grid.Row="2" Grid.Column="2" Classes="calc-button"
                                     Content="6" Command="{Binding AppendCharacterCommand}" CommandParameter="6" />
                             <Button Grid.Row="2" Grid.Column="3" Classes="calc-button operator"
-                                    Content="&#xD7;" Command="{Binding AppendCharacterCommand}" CommandParameter="&#xD7;" />
+                                    Content="&#xD7;" Command="{Binding AppendCharacterCommand}"
+                                    CommandParameter="&#xD7;" />
 
                             <!-- Row 4: 1 2 3 - -->
                             <Button Grid.Row="3" Grid.Column="0" Classes="calc-button"
@@ -196,6 +198,20 @@
                     </Border>
                 </Grid>
             </Border>
+            <!-- OK/Cancel buttons for response mode -->
+            <!-- Buttons -->
+            <StackPanel Orientation="Horizontal" IsVisible="{Binding IsResponseMode}" HorizontalAlignment="Center"
+                        Spacing="10"
+                        Margin="0, 0, 0, 10">
+                <Button Width="100" HorizontalContentAlignment="Center"
+                        Content="{x:Static local:language.OkButton}" Command="{Binding OkCommand}"
+                        IsDefault="False">
+                </Button>
+                <Button Width="100" HorizontalContentAlignment="Center"
+                        Content="{x:Static local:language.CancelButton}" Command="{Binding CancelCommand}"
+                        IsCancel="True">
+                </Button>
+            </StackPanel>
         </StackPanel>
     </Border>
 </Window>
