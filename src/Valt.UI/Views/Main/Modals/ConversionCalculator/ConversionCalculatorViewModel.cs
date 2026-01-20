@@ -31,7 +31,7 @@ public partial class ConversionCalculatorViewModel : ValtModalViewModel
     [ObservableProperty] private bool _isResponseMode;
 
     public record Request(bool ResponseMode = false, string? DefaultCurrencyCode = null);
-    public record Response(decimal? Result);
+    public record Response(decimal? Result, string? SelectedCurrencyCode);
 
     public ObservableCollection<CurrencyConversionItem> Currencies { get; } = new();
 
@@ -73,6 +73,17 @@ public partial class ConversionCalculatorViewModel : ValtModalViewModel
             IsBitcoin = true
         };
         Currencies.Add(btcItem);
+
+        // Add SATS after BTC
+        var satsItem = new CurrencyConversionItem
+        {
+            CurrencyCode = "SATS",
+            CurrencySymbol = "sats",
+            Decimals = 0,
+            IsBitcoin = false,
+            IsSats = true
+        };
+        Currencies.Add(satsItem);
 
         // Get available fiat currencies from configuration
         var availableCurrencyCodes = _configurationManager?.GetAvailableFiatCurrencies() ?? new List<string>();
@@ -293,7 +304,7 @@ public partial class ConversionCalculatorViewModel : ValtModalViewModel
     private void Ok()
     {
         var cleanResult = CalculatedValue < 0 ? CalculatedValue * -1 : CalculatedValue;
-        CloseDialog?.Invoke(new Response(cleanResult));
+        CloseDialog?.Invoke(new Response(cleanResult, SelectedCurrency?.CurrencyCode));
     }
 
     [RelayCommand]

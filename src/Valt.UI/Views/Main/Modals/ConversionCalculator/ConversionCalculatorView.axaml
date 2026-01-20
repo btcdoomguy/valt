@@ -172,6 +172,7 @@
                         <ListBox Classes="currency-list"
                                  ItemsSource="{Binding Currencies}"
                                  SelectedItem="{Binding SelectedCurrency}"
+                                 IsHitTestVisible="{Binding !IsResponseMode}"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                             <ListBox.ItemTemplate>
                                 <DataTemplate x:DataType="conv:CurrencyConversionItem">

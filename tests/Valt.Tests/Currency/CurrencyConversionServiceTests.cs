@@ -274,6 +274,88 @@ public class CurrencyConversionServiceTests
 
     #endregion
 
+    #region SATS Conversion Tests
+
+    [Test]
+    public void Convert_SatsToSats_ReturnsSameAmount()
+    {
+        // Arrange
+        var fiatRates = new Dictionary<string, decimal> { { "USD", 1m } };
+
+        // Act
+        var result = _sut.Convert(100000m, "SATS", "SATS", 50000m, fiatRates);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(100000m));
+    }
+
+    [Test]
+    public void Convert_SatsToBtc_ReturnsCorrectAmount()
+    {
+        // Arrange
+        var fiatRates = new Dictionary<string, decimal> { { "USD", 1m } };
+
+        // Act: 100,000 sats = 0.001 BTC
+        var result = _sut.Convert(100000m, "SATS", "BTC", 50000m, fiatRates);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(0.001m));
+    }
+
+    [Test]
+    public void Convert_BtcToSats_ReturnsCorrectAmount()
+    {
+        // Arrange
+        var fiatRates = new Dictionary<string, decimal> { { "USD", 1m } };
+
+        // Act: 0.001 BTC = 100,000 sats
+        var result = _sut.Convert(0.001m, "BTC", "SATS", 50000m, fiatRates);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(100000m));
+    }
+
+    [Test]
+    public void Convert_SatsToUsd_ReturnsCorrectAmount()
+    {
+        // Arrange
+        var fiatRates = new Dictionary<string, decimal> { { "USD", 1m } };
+
+        // Act: 100,000 sats = 0.001 BTC * 50000 USD = 50 USD
+        var result = _sut.Convert(100000m, "SATS", "USD", 50000m, fiatRates);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(50m));
+    }
+
+    [Test]
+    public void Convert_UsdToSats_ReturnsCorrectAmount()
+    {
+        // Arrange
+        var fiatRates = new Dictionary<string, decimal> { { "USD", 1m } };
+
+        // Act: 50 USD / 50000 = 0.001 BTC = 100,000 sats
+        var result = _sut.Convert(50m, "USD", "SATS", 50000m, fiatRates);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(100000m));
+    }
+
+    [Test]
+    public void Convert_SatsCaseInsensitive()
+    {
+        // Arrange
+        var fiatRates = new Dictionary<string, decimal> { { "USD", 1m } };
+
+        // Act
+        var result = _sut.Convert(100000m, "sats", "btc", 50000m, fiatRates);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(0.001m));
+    }
+
+    #endregion
+
     #region ConvertToAll Tests
 
     [Test]
@@ -320,6 +402,36 @@ public class CurrencyConversionServiceTests
         Assert.That(result["BTC"], Is.EqualTo(1m));
         Assert.That(result["USD"], Is.EqualTo(50000m));
         Assert.That(result["BRL"], Is.EqualTo(250000m));
+    }
+
+    [Test]
+    public void ConvertToAll_IncludesSats()
+    {
+        // Arrange
+        var fiatRates = new Dictionary<string, decimal> { { "USD", 1m }, { "BRL", 5m } };
+
+        // Act
+        var result = _sut.ConvertToAll(1m, "BTC", 50000m, fiatRates);
+
+        // Assert
+        Assert.That(result.ContainsKey("SATS"), Is.True);
+        Assert.That(result["SATS"], Is.EqualTo(100000000m)); // 1 BTC = 100M sats
+    }
+
+    [Test]
+    public void ConvertToAll_FromSats_ReturnsAllCurrencies()
+    {
+        // Arrange
+        var fiatRates = new Dictionary<string, decimal> { { "USD", 1m }, { "BRL", 5m } };
+
+        // Act: 100,000 sats = 0.001 BTC
+        var result = _sut.ConvertToAll(100000m, "SATS", 50000m, fiatRates);
+
+        // Assert
+        Assert.That(result["SATS"], Is.EqualTo(100000m));
+        Assert.That(result["BTC"], Is.EqualTo(0.001m));
+        Assert.That(result["USD"], Is.EqualTo(50m)); // 0.001 BTC * 50000
+        Assert.That(result["BRL"], Is.EqualTo(250m)); // 50 USD * 5
     }
 
     #endregion

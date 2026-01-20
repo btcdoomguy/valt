@@ -11,6 +11,8 @@ namespace Valt.Infra.Modules.Currency.Services;
 public class CurrencyConversionService : ICurrencyConversionService
 {
     private const string BtcCode = "BTC";
+    private const string SatsCode = "SATS";
+    private const decimal SatsPerBtc = 100_000_000m;
 
     public decimal Convert(decimal amount, string fromCurrencyCode, string toCurrencyCode,
         decimal? bitcoinPriceUsd, IReadOnlyDictionary<string, decimal>? fiatRates)
@@ -23,6 +25,31 @@ public class CurrencyConversionService : ICurrencyConversionService
 
         var fromIsBtc = string.Equals(fromCurrencyCode, BtcCode, StringComparison.OrdinalIgnoreCase);
         var toIsBtc = string.Equals(toCurrencyCode, BtcCode, StringComparison.OrdinalIgnoreCase);
+        var fromIsSats = string.Equals(fromCurrencyCode, SatsCode, StringComparison.OrdinalIgnoreCase);
+        var toIsSats = string.Equals(toCurrencyCode, SatsCode, StringComparison.OrdinalIgnoreCase);
+
+        // SATS -> SATS (handled by equality check above)
+        // SATS -> BTC
+        if (fromIsSats && toIsBtc)
+            return amount / SatsPerBtc;
+
+        // BTC -> SATS
+        if (fromIsBtc && toIsSats)
+            return amount * SatsPerBtc;
+
+        // SATS -> Fiat: convert to BTC first, then to fiat
+        if (fromIsSats)
+        {
+            var btcAmount = amount / SatsPerBtc;
+            return ConvertBtcToFiat(btcAmount, toCurrencyCode, bitcoinPriceUsd, fiatRates);
+        }
+
+        // Fiat/BTC -> SATS: convert to BTC first, then to SATS
+        if (toIsSats)
+        {
+            var btcAmount = fromIsBtc ? amount : ConvertFiatToBtc(amount, fromCurrencyCode, bitcoinPriceUsd, fiatRates);
+            return btcAmount * SatsPerBtc;
+        }
 
         // BTC -> Fiat
         if (fromIsBtc && !toIsBtc)
@@ -43,6 +70,9 @@ public class CurrencyConversionService : ICurrencyConversionService
 
         // Add BTC conversion
         result[BtcCode] = Convert(amount, fromCurrencyCode, BtcCode, bitcoinPriceUsd, fiatRates);
+
+        // Add SATS conversion
+        result[SatsCode] = Convert(amount, fromCurrencyCode, SatsCode, bitcoinPriceUsd, fiatRates);
 
         // Add all fiat conversions
         foreach (var currency in FiatCurrency.GetAll())
