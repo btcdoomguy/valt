@@ -52,8 +52,8 @@
                             <!-- Transaction type selector -->
                             <Border BorderBrush="LightGray" Background="{DynamicResource Text900Color}"
                                     BorderThickness="1" CornerRadius="4" Padding="5" HorizontalAlignment="Center">
-                                <StackPanel Orientation="Horizontal" Spacing="20">
-                                    <Button Classes="transaction-option debt" Width="100" IsTabStop="False"
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Button Classes="transaction-option debt" Width="120" IsTabStop="False"
                                             Classes.selected="{Binding DebtSelected}"
                                             Command="{Binding SwitchToDebtCommand}">
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -61,7 +61,7 @@
                                             <Label Content="{x:Static local:language.ManageTransactions_Debt}" />
                                         </StackPanel>
                                     </Button>
-                                    <Button Classes="transaction-option credit" Width="100" IsTabStop="False"
+                                    <Button Classes="transaction-option credit" Width="120" IsTabStop="False"
                                             Classes.selected="{Binding CreditSelected}"
                                             Command="{Binding SwitchToCreditCommand}">
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -69,7 +69,7 @@
                                             <Label Content="{x:Static local:language.ManageTransactions_Credit}" />
                                         </StackPanel>
                                     </Button>
-                                    <Button Classes="transaction-option transfer" Width="100" IsTabStop="False"
+                                    <Button Classes="transaction-option transfer" Width="120" IsTabStop="False"
                                             Classes.selected="{Binding TransferSelected}"
                                             Command="{Binding SwitchToTransferCommand}">
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
