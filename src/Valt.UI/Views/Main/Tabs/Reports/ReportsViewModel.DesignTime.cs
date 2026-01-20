@@ -7,6 +7,7 @@ using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Budget.Categories;
 using Valt.Infra.Modules.Reports.ExpensesByCategory;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
+using Valt.UI.State;
 using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Tabs.Reports.Models;
 
@@ -18,6 +19,11 @@ public partial class ReportsViewModel
     {
         if (!Design.IsDesignMode)
             return;
+
+        SecureModeState = new SecureModeState()
+        {
+            IsEnabled = false
+        };
 
         FilterMainDate = CategoryFilterMainDate = DateTime.UtcNow.Date;
         FilterRange = new DateRange(DateTime.UtcNow.Date.AddYears(-1), DateTime.UtcNow.Date);

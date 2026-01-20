@@ -25,6 +25,7 @@
     </Design.DataContext>
     <Window.KeyBindings>
         <KeyBinding Gesture="F2" Command="{Binding SendF2Command}" />
+        <KeyBinding Gesture="F10" Command="{Binding OpenConversionCalculatorCommand}" />
     </Window.KeyBindings>
     <Grid>
         <Grid.RowDefinitions>

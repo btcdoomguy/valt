@@ -816,6 +816,21 @@
     <data name="Reports.MonthlyTotals.AllExpensesInFiat" xml:space="preserve">
         <value>Saídas (Total)</value>
     </data>
+    <data name="Reports.WealthOverview.Title" xml:space="preserve">
+        <value>Visão Geral de Patrimônio</value>
+    </data>
+    <data name="Reports.WealthOverview.Period.Daily" xml:space="preserve">
+        <value>Diário</value>
+    </data>
+    <data name="Reports.WealthOverview.Period.Weekly" xml:space="preserve">
+        <value>Semanal</value>
+    </data>
+    <data name="Reports.WealthOverview.Period.Monthly" xml:space="preserve">
+        <value>Mensal</value>
+    </data>
+    <data name="Reports.WealthOverview.Period.Yearly" xml:space="preserve">
+        <value>Anual</value>
+    </data>
     <data name="AvgPriceLineEditor.AddTitle" xml:space="preserve">
         <value>Adicionar Linha</value>
     </data>

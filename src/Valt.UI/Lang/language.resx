@@ -851,6 +851,21 @@
     <data name="Reports.MonthlyTotals.AllExpensesInFiat" xml:space="preserve">
         <value>Total Expenses</value>
     </data>
+    <data name="Reports.WealthOverview.Title" xml:space="preserve">
+        <value>Wealth Overview</value>
+    </data>
+    <data name="Reports.WealthOverview.Period.Daily" xml:space="preserve">
+        <value>Daily</value>
+    </data>
+    <data name="Reports.WealthOverview.Period.Weekly" xml:space="preserve">
+        <value>Weekly</value>
+    </data>
+    <data name="Reports.WealthOverview.Period.Monthly" xml:space="preserve">
+        <value>Monthly</value>
+    </data>
+    <data name="Reports.WealthOverview.Period.Yearly" xml:space="preserve">
+        <value>Yearly</value>
+    </data>
     <data name="AvgPriceLineEditor.AddTitle" xml:space="preserve">
         <value>Add Line</value>
     </data>

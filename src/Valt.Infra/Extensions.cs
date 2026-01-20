@@ -50,6 +50,7 @@ using Valt.Infra.Modules.Reports.AllTimeHigh;
 using Valt.Infra.Modules.Reports.ExpensesByCategory;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.Infra.Modules.Reports.Statistics;
+using Valt.Infra.Modules.Reports.WealthOverview;
 using Valt.Infra.Services.CsvExport;
 using Valt.Infra.Services.CsvImport;
 using Valt.Infra.Services.Updates;
@@ -123,6 +124,7 @@ public static class Extensions
         services.AddSingleton<IExpensesByCategoryReport, ExpensesByCategoryReport>();
         services.AddSingleton<IMonthlyTotalsReport, MonthlyTotalsReport>();
         services.AddSingleton<IStatisticsReport, StatisticsReport>();
+        services.AddSingleton<IWealthOverviewReport, WealthOverviewReport>();
         services.AddSingleton<IReportDataProviderFactory, ReportDataProviderFactory>();
 
         //background jobs

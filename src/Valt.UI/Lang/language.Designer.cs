@@ -1700,7 +1700,37 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.MonthlyTotals.AllExpensesInFiat", resourceCulture);
             }
         }
-        
+
+        public static string Reports_WealthOverview_Title {
+            get {
+                return ResourceManager.GetString("Reports.WealthOverview.Title", resourceCulture);
+            }
+        }
+
+        public static string Reports_WealthOverview_Period_Daily {
+            get {
+                return ResourceManager.GetString("Reports.WealthOverview.Period.Daily", resourceCulture);
+            }
+        }
+
+        public static string Reports_WealthOverview_Period_Weekly {
+            get {
+                return ResourceManager.GetString("Reports.WealthOverview.Period.Weekly", resourceCulture);
+            }
+        }
+
+        public static string Reports_WealthOverview_Period_Monthly {
+            get {
+                return ResourceManager.GetString("Reports.WealthOverview.Period.Monthly", resourceCulture);
+            }
+        }
+
+        public static string Reports_WealthOverview_Period_Yearly {
+            get {
+                return ResourceManager.GetString("Reports.WealthOverview.Period.Yearly", resourceCulture);
+            }
+        }
+
         public static string AvgPriceLineEditor_AddTitle {
             get {
                 return ResourceManager.GetString("AvgPriceLineEditor.AddTitle", resourceCulture);

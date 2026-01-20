@@ -24,6 +24,7 @@ using Valt.Infra.Modules.Reports.AllTimeHigh;
 using Valt.Infra.Modules.Reports.ExpensesByCategory;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.Infra.Modules.Reports.Statistics;
+using Valt.Infra.Modules.Reports.WealthOverview;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
 using static Valt.UI.Base.TaskExtensions;
@@ -40,6 +41,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly IMonthlyTotalsReport _monthlyTotalsReport;
     private readonly IExpensesByCategoryReport _expensesByCategoryReport;
     private readonly IStatisticsReport _statisticsReport;
+    private readonly IWealthOverviewReport _wealthOverviewReport;
     private readonly IReportDataProviderFactory _reportDataProviderFactory;
     private readonly CurrencySettings _currencySettings;
     private readonly ILocalDatabase _localDatabase;
@@ -47,7 +49,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly ILogger<ReportsViewModel> _logger;
     private readonly AccountsTotalState _accountsTotalState;
     private readonly RatesState _ratesState;
-    private readonly SecureModeState _secureModeState;
+    
+    [ObservableProperty]
+    private SecureModeState _secureModeState;
 
     private const long TotalBtcSupplySats = 21_000_000_00_000_000L; // 21 million BTC in sats
 
@@ -61,6 +65,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private AvaloniaList<MonthlyReportItemViewModel> _monthlyReportItems = new();
     [ObservableProperty] private MonthlyTotalsChartData _monthlyTotalsChartData = new();
     [ObservableProperty] private ExpensesByCategoryChartData _expensesByCategoryChartData = new();
+    [ObservableProperty] private WealthOverviewChartData _wealthOverviewChartData = new();
+    [ObservableProperty] private WealthOverviewPeriod _selectedWealthOverviewPeriod = WealthOverviewPeriod.Monthly;
     [ObservableProperty] private DateTime _filterMainDate;
     [ObservableProperty] private DateRange _filterRange;
     [ObservableProperty] private DateTime _categoryFilterMainDate;
@@ -72,6 +78,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private bool _isStatisticsLoading = true;
     [ObservableProperty] private bool _isMonthlyTotalsLoading = true;
     [ObservableProperty] private bool _isSpendingByCategoriesLoading = true;
+    [ObservableProperty] private bool _isWealthOverviewLoading = true;
 
     public bool IsSecureModeEnabled => _secureModeState.IsEnabled;
 
@@ -90,6 +97,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         IMonthlyTotalsReport monthlyTotalsReport,
         IExpensesByCategoryReport expensesByCategoryReport,
         IStatisticsReport statisticsReport,
+        IWealthOverviewReport wealthOverviewReport,
         IReportDataProviderFactory reportDataProviderFactory,
         CurrencySettings currencySettings,
         ILocalDatabase localDatabase,
@@ -103,6 +111,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _monthlyTotalsReport = monthlyTotalsReport;
         _expensesByCategoryReport = expensesByCategoryReport;
         _statisticsReport = statisticsReport;
+        _wealthOverviewReport = wealthOverviewReport;
         _reportDataProviderFactory = reportDataProviderFactory;
         _currencySettings = currencySettings;
         _localDatabase = localDatabase;
@@ -133,6 +142,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     IsStatisticsLoading = true;
                     IsMonthlyTotalsLoading = true;
                     IsSpendingByCategoriesLoading = true;
+                    IsWealthOverviewLoading = true;
                     // Reload data when currency changes
                     ReloadDataAndFetchAllReportsAsync().SafeFireAndForget(logger: _logger, callerName: nameof(ReloadDataAndFetchAllReportsAsync));
                     break;
@@ -185,7 +195,36 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         // Create and cache the provider
         _cachedProvider = _reportDataProviderFactory.Create();
 
+        // Determine the best default period based on transaction history
+        SelectedWealthOverviewPeriod = DetermineDefaultWealthOverviewPeriod(_cachedProvider);
+
         await FetchAllReportsAsync(_cachedProvider);
+    }
+
+    private WealthOverviewPeriod DetermineDefaultWealthOverviewPeriod(IReportDataProvider provider)
+    {
+        if (provider.AllTransactions.Count == 0)
+            return WealthOverviewPeriod.Monthly;
+
+        var today = _clock.GetCurrentLocalDate();
+        var minDate = provider.MinTransactionDate;
+        var daysDiff = today.DayNumber - minDate.DayNumber;
+
+        // Calculate approximate data points for each period
+        var weeksOfData = daysDiff / 7;
+        var monthsOfData = ((today.Year - minDate.Year) * 12) + (today.Month - minDate.Month);
+
+        // Start with Daily, upgrade when at least 4 data points available
+        // If 4+ months of data, use Monthly
+        if (monthsOfData >= 4)
+            return WealthOverviewPeriod.Monthly;
+
+        // If 4+ weeks of data, use Weekly
+        if (weeksOfData >= 4)
+            return WealthOverviewPeriod.Weekly;
+
+        // Default to Daily for new users
+        return WealthOverviewPeriod.Daily;
     }
 
     private async Task ReloadDataAndFetchAllReportsAsync()
@@ -202,7 +241,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             FetchMonthlyTotalsAsync(provider),
             FetchExpensesByCategoryAsync(provider),
             FetchAllTimeHighDataAsync(provider),
-            FetchStatisticsDataAsync(provider));
+            FetchStatisticsDataAsync(provider),
+            FetchWealthOverviewAsync(provider));
     }
 
     private void PrepareAccountsAndCategoriesList()
@@ -527,6 +567,37 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
     }
 
+    private async Task FetchWealthOverviewAsync(IReportDataProvider provider)
+    {
+        try
+        {
+            var wealthOverviewData = await _wealthOverviewReport.GetAsync(
+                SelectedWealthOverviewPeriod,
+                FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency),
+                provider);
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                WealthOverviewChartData.RefreshChart(wealthOverviewData);
+                IsWealthOverviewLoading = false;
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching wealth overview");
+            await Dispatcher.UIThread.InvokeAsync(() => { IsWealthOverviewLoading = false; });
+        }
+    }
+
+    partial void OnSelectedWealthOverviewPeriodChanged(WealthOverviewPeriod value)
+    {
+        if (!_ready) return;
+
+        IsWealthOverviewLoading = true;
+        var provider = GetOrCreateProvider();
+        FetchWealthOverviewAsync(provider).SafeFireAndForget(logger: _logger, callerName: nameof(FetchWealthOverviewAsync));
+    }
+
     public override MainViewTabNames TabName => MainViewTabNames.ReportsPageContent;
 
     public record SelectItem(string Id, string Name);
@@ -565,6 +636,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         MonthlyTotalsChartData.Dispose();
         ExpensesByCategoryChartData.Dispose();
+        WealthOverviewChartData.Dispose();
 
         // Clear the provider on dispose
         _cachedProvider = null;

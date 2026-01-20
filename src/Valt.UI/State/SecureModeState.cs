@@ -12,7 +12,7 @@ public partial class SecureModeState : ObservableObject
     private string? _passwordHash;
 
     [ObservableProperty]
-    private bool _isEnabled;
+    private bool _isEnabled = false;
 
     partial void OnIsEnabledChanged(bool value)
     {
