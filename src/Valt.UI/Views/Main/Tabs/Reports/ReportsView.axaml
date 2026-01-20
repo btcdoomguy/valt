@@ -99,7 +99,7 @@
                         </ComboBox>
                     </StackPanel>
                     <Grid MinHeight="500">
-                        <Border Background="{DynamicResource Background800Brush}"
+                        <Border Background="{DynamicResource Background900Brush}"
                                 BorderBrush="{DynamicResource Background700Brush}"
                                 BorderThickness="1"
                                 CornerRadius="4"
@@ -107,6 +107,7 @@
                                 IsVisible="{Binding !IsWealthOverviewLoading}">
                             <avalonia:CartesianChart
                                 x:Name="WealthOverviewChart"
+                                Background="{DynamicResource Background900Brush}"
                                 Series="{Binding WealthOverviewChartData.Series}"
                                 XAxes="{Binding WealthOverviewChartData.XAxes}"
                                 YAxes="{Binding WealthOverviewChartData.YAxes}"
@@ -313,7 +314,7 @@
                                 SelectedItems="{Binding SelectedCategories}" />
                         </StackPanel>
                         <Panel Grid.Column="1">
-                            <Border Background="{DynamicResource Background800Brush}"
+                            <Border Background="{DynamicResource Background900Brush}"
                                     BorderBrush="{DynamicResource Background700Brush}"
                                     BorderThickness="1"
                                     CornerRadius="4"
@@ -323,6 +324,7 @@
                                               HorizontalScrollBarVisibility="Disabled"
                                               MaxHeight="600">
                                     <avalonia:CartesianChart x:Name="CategoryBarChart"
+                                                             Background="{DynamicResource Background900Brush}"
                                                              Height="{Binding ExpensesByCategoryChartData.ChartHeight}"
                                                              Series="{Binding ExpensesByCategoryChartData.Series}"
                                                              XAxes="{Binding ExpensesByCategoryChartData.XAxes}"
@@ -374,7 +376,7 @@
                                 SelectedItems="{Binding IncomeSelectedCategories}" />
                         </StackPanel>
                         <Panel Grid.Column="1">
-                            <Border Background="{DynamicResource Background800Brush}"
+                            <Border Background="{DynamicResource Background900Brush}"
                                     BorderBrush="{DynamicResource Background700Brush}"
                                     BorderThickness="1"
                                     CornerRadius="4"
@@ -384,6 +386,7 @@
                                               HorizontalScrollBarVisibility="Disabled"
                                               MaxHeight="600">
                                     <avalonia:CartesianChart x:Name="IncomeCategoryBarChart"
+                                                             Background="{DynamicResource Background900Brush}"
                                                              Height="{Binding IncomeByCategoryChartData.ChartHeight}"
                                                              Series="{Binding IncomeByCategoryChartData.Series}"
                                                              XAxes="{Binding IncomeByCategoryChartData.XAxes}"

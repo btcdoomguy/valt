@@ -16,7 +16,7 @@
             Width="320">
 
         <StackPanel Orientation="Vertical">
-            <Border Background="{DynamicResource Background700Brush}"
+            <Border Background="{DynamicResource Background600Brush}"
                     Padding="12, 8"
                     CornerRadius="4, 4, 0, 0">
                 <Label HorizontalContentAlignment="Left"
