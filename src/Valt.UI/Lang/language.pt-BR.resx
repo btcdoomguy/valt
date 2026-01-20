@@ -1530,7 +1530,7 @@
         <value>Grande</value>
     </data>
     <data name="Menu_ConversionCalculator" xml:space="preserve">
-        <value>Calculadora de Conversao</value>
+        <value>Calculadora de Conversão</value>
     </data>
     <data name="ConversionCalculator_Title" xml:space="preserve">
         <value>Conversor de Moedas</value>

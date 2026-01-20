@@ -55,16 +55,6 @@ public partial class MainView : ValtBaseWindow
         {
             WindowState = WindowState.Maximized;
         }
-        else if (settings.Width.HasValue && settings.Height.HasValue)
-        {
-            Width = settings.Width.Value;
-            Height = settings.Height.Value;
-
-            if (settings.X.HasValue && settings.Y.HasValue)
-            {
-                Position = new Avalonia.PixelPoint((int)settings.X.Value, (int)settings.Y.Value);
-            }
-        }
     }
 
     private void SaveWindowSettings()
@@ -75,15 +65,6 @@ public partial class MainView : ValtBaseWindow
         {
             IsMaximized = WindowState == WindowState.Maximized
         };
-
-        // Only save size/position when not maximized
-        if (WindowState != WindowState.Maximized)
-        {
-            settings.Width = Width;
-            settings.Height = Height;
-            settings.X = Position.X;
-            settings.Y = Position.Y;
-        }
 
         _ = _localStorageService.SaveWindowSettingsAsync(settings);
     }
