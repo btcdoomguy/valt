@@ -385,6 +385,261 @@ public class GoalsPanelViewModelTests : DatabaseTest
 
     #endregion
 
+    #region CopyFromLastMonth Tests
+
+    [Test]
+    public async Task CopyFromLastMonth_Should_Copy_Monthly_Goals_From_Previous_Month()
+    {
+        // Arrange - Previous month goal (December 2024)
+        var previousMonthGoal = GoalBuilder.AGoal()
+            .WithPeriod(GoalPeriods.Monthly)
+            .WithRefDate(new DateOnly(2024, 12, 1))
+            .WithGoalType(new StackBitcoinGoalType(1_000_000L, 500_000L))
+            .Build();
+
+        _goalRepository.GetAllAsync()
+            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal> { previousMonthGoal }));
+
+        _filterState.MainDate = new DateTime(2025, 1, 15);
+
+        var vm = CreateViewModel();
+        await Task.Delay(200);
+
+        // Act
+        await vm.CopyFromLastMonthCommand.ExecuteAsync(null);
+
+        // Assert - Should save a new goal
+        await _goalRepository.Received(1).SaveAsync(Arg.Is<Goal>(g =>
+            g.Period == GoalPeriods.Monthly &&
+            g.RefDate.Year == 2025 &&
+            g.RefDate.Month == 1));
+    }
+
+    [Test]
+    public async Task CopyFromLastMonth_Should_Skip_Yearly_Goals()
+    {
+        // Arrange - Previous month has yearly goal
+        var yearlyGoal = GoalBuilder.AGoal()
+            .WithPeriod(GoalPeriods.Yearly)
+            .WithRefDate(new DateOnly(2024, 12, 1))
+            .WithGoalType(new DcaGoalType(12, 6))
+            .Build();
+
+        _goalRepository.GetAllAsync()
+            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal> { yearlyGoal }));
+
+        _filterState.MainDate = new DateTime(2025, 1, 15);
+
+        var vm = CreateViewModel();
+        await Task.Delay(200);
+
+        // Act
+        await vm.CopyFromLastMonthCommand.ExecuteAsync(null);
+
+        // Assert - Should NOT save any goal (yearly goals are skipped)
+        await _goalRepository.DidNotReceive().SaveAsync(Arg.Any<Goal>());
+    }
+
+    [Test]
+    public async Task CopyFromLastMonth_Should_Skip_Duplicate_Goals()
+    {
+        // Arrange - Same goal exists in both months
+        var previousMonthGoal = GoalBuilder.AGoal()
+            .WithPeriod(GoalPeriods.Monthly)
+            .WithRefDate(new DateOnly(2024, 12, 1))
+            .WithGoalType(new StackBitcoinGoalType(1_000_000L, 500_000L))
+            .Build();
+
+        var currentMonthGoal = GoalBuilder.AGoal()
+            .WithPeriod(GoalPeriods.Monthly)
+            .WithRefDate(new DateOnly(2025, 1, 1))
+            .WithGoalType(new StackBitcoinGoalType(1_000_000L, 0L))
+            .Build();
+
+        _goalRepository.GetAllAsync()
+            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal>
+            {
+                previousMonthGoal,
+                currentMonthGoal
+            }));
+
+        _filterState.MainDate = new DateTime(2025, 1, 15);
+
+        var vm = CreateViewModel();
+        await Task.Delay(200);
+
+        // Act
+        await vm.CopyFromLastMonthCommand.ExecuteAsync(null);
+
+        // Assert - Should NOT save any goal (duplicate detected)
+        await _goalRepository.DidNotReceive().SaveAsync(Arg.Any<Goal>());
+    }
+
+    [Test]
+    public async Task CopyFromLastMonth_Should_Allow_Same_Type_With_Different_Target()
+    {
+        // Arrange - Same type but different target
+        var previousMonthGoal = GoalBuilder.AGoal()
+            .WithPeriod(GoalPeriods.Monthly)
+            .WithRefDate(new DateOnly(2024, 12, 1))
+            .WithGoalType(new StackBitcoinGoalType(1_000_000L, 500_000L))
+            .Build();
+
+        var currentMonthGoal = GoalBuilder.AGoal()
+            .WithPeriod(GoalPeriods.Monthly)
+            .WithRefDate(new DateOnly(2025, 1, 1))
+            .WithGoalType(new StackBitcoinGoalType(2_000_000L, 0L)) // Different target
+            .Build();
+
+        _goalRepository.GetAllAsync()
+            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal>
+            {
+                previousMonthGoal,
+                currentMonthGoal
+            }));
+
+        _filterState.MainDate = new DateTime(2025, 1, 15);
+
+        var vm = CreateViewModel();
+        await Task.Delay(200);
+
+        // Act
+        await vm.CopyFromLastMonthCommand.ExecuteAsync(null);
+
+        // Assert - Should save a new goal (different target means not duplicate)
+        await _goalRepository.Received(1).SaveAsync(Arg.Is<Goal>(g =>
+            g.GoalType.TypeName == GoalTypeNames.StackBitcoin &&
+            ((StackBitcoinGoalType)g.GoalType).TargetSats == 1_000_000L));
+    }
+
+    [Test]
+    public async Task CopyFromLastMonth_Should_Send_GoalListChanged_Message()
+    {
+        // Arrange
+        var previousMonthGoal = GoalBuilder.AGoal()
+            .WithPeriod(GoalPeriods.Monthly)
+            .WithRefDate(new DateOnly(2024, 12, 1))
+            .WithGoalType(new SpendingLimitGoalType(1000m, 500m))
+            .Build();
+
+        _goalRepository.GetAllAsync()
+            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal> { previousMonthGoal }));
+
+        _filterState.MainDate = new DateTime(2025, 1, 15);
+
+        var vm = CreateViewModel();
+        await Task.Delay(200);
+
+        var messageReceived = false;
+        WeakReferenceMessenger.Default.Register<GoalListChanged>(this, (_, _) => messageReceived = true);
+
+        // Act
+        await vm.CopyFromLastMonthCommand.ExecuteAsync(null);
+
+        // Assert
+        Assert.That(messageReceived, Is.True);
+    }
+
+    [Test]
+    public async Task CopyFromLastMonth_Should_Mark_Progress_State_As_Stale()
+    {
+        // Arrange
+        var previousMonthGoal = GoalBuilder.AGoal()
+            .WithPeriod(GoalPeriods.Monthly)
+            .WithRefDate(new DateOnly(2024, 12, 1))
+            .WithGoalType(new DcaGoalType(10, 5))
+            .Build();
+
+        _goalRepository.GetAllAsync()
+            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal> { previousMonthGoal }));
+
+        _filterState.MainDate = new DateTime(2025, 1, 15);
+
+        var vm = CreateViewModel();
+        await Task.Delay(200);
+
+        // Act
+        await vm.CopyFromLastMonthCommand.ExecuteAsync(null);
+
+        // Assert
+        Assert.That(_goalProgressState.HasStaleGoals, Is.True);
+    }
+
+    [Test]
+    public async Task CopyFromLastMonth_Should_Handle_Cross_Year_Boundary()
+    {
+        // Arrange - December 2024 to January 2025
+        var decemberGoal = GoalBuilder.AGoal()
+            .WithPeriod(GoalPeriods.Monthly)
+            .WithRefDate(new DateOnly(2024, 12, 1))
+            .WithGoalType(new IncomeFiatGoalType(5000m, 3000m))
+            .Build();
+
+        _goalRepository.GetAllAsync()
+            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal> { decemberGoal }));
+
+        _filterState.MainDate = new DateTime(2025, 1, 15);
+
+        var vm = CreateViewModel();
+        await Task.Delay(200);
+
+        // Act
+        await vm.CopyFromLastMonthCommand.ExecuteAsync(null);
+
+        // Assert - Should save a new goal for January 2025
+        await _goalRepository.Received(1).SaveAsync(Arg.Is<Goal>(g =>
+            g.RefDate.Year == 2025 &&
+            g.RefDate.Month == 1));
+    }
+
+    [Test]
+    public async Task CopyFromLastMonth_Should_Do_Nothing_When_No_Previous_Month_Goals()
+    {
+        // Arrange - No goals at all
+        _goalRepository.GetAllAsync()
+            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal>()));
+
+        _filterState.MainDate = new DateTime(2025, 1, 15);
+
+        var vm = CreateViewModel();
+        await Task.Delay(200);
+
+        // Act
+        await vm.CopyFromLastMonthCommand.ExecuteAsync(null);
+
+        // Assert
+        await _goalRepository.DidNotReceive().SaveAsync(Arg.Any<Goal>());
+    }
+
+    [Test]
+    public async Task CopyFromLastMonth_Should_Reset_Progress_On_Copied_Goals()
+    {
+        // Arrange - Goal with progress
+        var previousMonthGoal = GoalBuilder.AGoal()
+            .WithPeriod(GoalPeriods.Monthly)
+            .WithRefDate(new DateOnly(2024, 12, 1))
+            .WithGoalType(new StackBitcoinGoalType(1_000_000L, 750_000L)) // 75% progress
+            .Build();
+
+        _goalRepository.GetAllAsync()
+            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal> { previousMonthGoal }));
+
+        _filterState.MainDate = new DateTime(2025, 1, 15);
+
+        var vm = CreateViewModel();
+        await Task.Delay(200);
+
+        // Act
+        await vm.CopyFromLastMonthCommand.ExecuteAsync(null);
+
+        // Assert - Copied goal should have reset progress (0)
+        await _goalRepository.Received(1).SaveAsync(Arg.Is<Goal>(g =>
+            g.GoalType.TypeName == GoalTypeNames.StackBitcoin &&
+            ((StackBitcoinGoalType)g.GoalType).CalculatedSats == 0));
+    }
+
+    #endregion
+
     #region Design-Time Constructor Tests
 
     [Test]

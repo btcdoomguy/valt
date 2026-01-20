@@ -46,26 +46,26 @@ public static class MidnightGalaxyTheme
         resources["Text900Color"] = Color.Parse("#1E1B2A");
 
         // Background (Deep space purple - visible purple tint)
-        resources["Background100Color"] = Color.Parse("#7A6B9A");
-        resources["Background200Color"] = Color.Parse("#685A88");
-        resources["Background300Color"] = Color.Parse("#564A75");
-        resources["Background400Color"] = Color.Parse("#453B62");
-        resources["Background500Color"] = Color.Parse("#382F52");
-        resources["Background600Color"] = Color.Parse("#2C2542");
-        resources["Background700Color"] = Color.Parse("#251F38");
-        resources["Background800Color"] = Color.Parse("#1E1A2E");
-        resources["Background900Color"] = Color.Parse("#0A0810");
+        resources["Background100Color"] = Color.Parse("#8A7BAA");
+        resources["Background200Color"] = Color.Parse("#786898");
+        resources["Background300Color"] = Color.Parse("#665A85");
+        resources["Background400Color"] = Color.Parse("#564B72");
+        resources["Background500Color"] = Color.Parse("#483E62");
+        resources["Background600Color"] = Color.Parse("#3C3155");
+        resources["Background700Color"] = Color.Parse("#332848");
+        resources["Background800Color"] = Color.Parse("#2B2140");
+        resources["Background900Color"] = Color.Parse("#1E1530");
 
         // Disabled (matches Background scale)
-        resources["Disabled100Color"] = Color.Parse("#7A6B9A");
-        resources["Disabled200Color"] = Color.Parse("#685A88");
-        resources["Disabled300Color"] = Color.Parse("#564A75");
-        resources["Disabled400Color"] = Color.Parse("#453B62");
-        resources["Disabled500Color"] = Color.Parse("#382F52");
-        resources["Disabled600Color"] = Color.Parse("#2C2542");
-        resources["Disabled700Color"] = Color.Parse("#251F38");
-        resources["Disabled800Color"] = Color.Parse("#1E1A2E");
-        resources["Disabled900Color"] = Color.Parse("#0A0810");
+        resources["Disabled100Color"] = Color.Parse("#8A7BAA");
+        resources["Disabled200Color"] = Color.Parse("#786898");
+        resources["Disabled300Color"] = Color.Parse("#665A85");
+        resources["Disabled400Color"] = Color.Parse("#564B72");
+        resources["Disabled500Color"] = Color.Parse("#483E62");
+        resources["Disabled600Color"] = Color.Parse("#3C3155");
+        resources["Disabled700Color"] = Color.Parse("#332848");
+        resources["Disabled800Color"] = Color.Parse("#2B2140");
+        resources["Disabled900Color"] = Color.Parse("#1E1530");
 
         // Divider (Violet-tinted gray)
         resources["Divider100Color"] = Color.Parse("#E9E3F0");
@@ -148,28 +148,36 @@ public static class MidnightGalaxyTheme
         resources["BlackColor"] = Color.Parse("#08060C");
         resources["WhiteColor"] = Color.Parse("#FAF5FF");
 
+        // Transaction Row Colors (for DataGrid highlighting)
+        resources["CreditBaseColor"] = Color.Parse("#78DB55");
+        resources["DebtBaseColor"] = Color.Parse("#FF7D7D");
+        resources["TransferBaseColor"] = Color.Parse("#FFF866");
+
+        // Title Bar
+        resources["TitleBarForegroundColor"] = Color.Parse("#FFFFFF");
+
         // UI Element Colors
-        resources["LiveRatesBackgroundColor"] = Color.Parse("#1E1A2E");
+        resources["LiveRatesBackgroundColor"] = Color.Parse("#2B2140");
         resources["LiveRatesBorderGradientStartColor"] = Color.Parse("#6B46C1");
-        resources["LiveRatesBorderGradientEndColor"] = Color.Parse("#382F52");
-        resources["LiveRatesVariationBackgroundColor"] = Color.Parse("#251F38");
+        resources["LiveRatesBorderGradientEndColor"] = Color.Parse("#483E62");
+        resources["LiveRatesVariationBackgroundColor"] = Color.Parse("#332848");
         resources["ButtonOverlayLightColor"] = Color.Parse("#40FFFFFF");
         resources["ButtonOverlayMediumColor"] = Color.Parse("#26FFFFFF");
         resources["StepIndicatorActiveColor"] = Color.Parse("#805AD5");
-        resources["StepIndicatorInactiveColor"] = Color.Parse("#564A75");
-        resources["StepIndicatorInactiveLightColor"] = Color.Parse("#7A6B9A");
+        resources["StepIndicatorInactiveColor"] = Color.Parse("#665A85");
+        resources["StepIndicatorInactiveLightColor"] = Color.Parse("#8A7BAA");
         resources["MessageBoxInfoColor"] = Color.Parse("#667EEA");
         resources["MessageBoxWarningColor"] = Color.Parse("#D69E2E");
         resources["MessageBoxErrorColor"] = Color.Parse("#ED64A6");
         resources["MessageBoxQuestionColor"] = Color.Parse("#38B2AC");
         resources["ColorPickerSelectedBorderColor"] = Color.Parse("#9F7AEA");
-        resources["ModalTopBarBackgroundColor"] = Color.Parse("#2C2542");
+        resources["ModalTopBarBackgroundColor"] = Color.Parse("#3C3155");
         resources["TopBarButtonBackgroundColor"] = Color.Parse("#322659");
         resources["TopBarButtonBackgroundHoverColor"] = Color.Parse("#44337A");
         resources["TopBarButtonBackgroundSelectedColor"] = Color.Parse("#9F7AEA");
         resources["TopBarButtonForegroundColor"] = Color.Parse("#B794F4");
         resources["TopBarButtonForegroundHoverColor"] = Color.Parse("#FAF5FF");
-        resources["FooterGradientStartColor"] = Color.Parse("#0A0810");
+        resources["FooterGradientStartColor"] = Color.Parse("#1E1530");
         resources["IconSelectorDefaultColor"] = Color.Parse("#FAF5FF");
 
         return resources;

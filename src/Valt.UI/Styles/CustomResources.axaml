@@ -25,12 +25,7 @@
     <x:Double x:Key="FontSizeIcon">22</x:Double>
     <x:Double x:Key="FontSizeIconLarge">28</x:Double>
 
-    <Color x:Key="CreditBaseColor">#78DB55</Color>
-    <Color x:Key="DebtBaseColor">#FF7D7D</Color>
-    <Color x:Key="TransferBaseColor">#FFF866</Color>
-    <SolidColorBrush x:Key="CreditBaseBrush" Color="{DynamicResource CreditBaseColor}" />
-    <SolidColorBrush x:Key="DebtBaseBrush" Color="{DynamicResource DebtBaseColor}" />
-    <SolidColorBrush x:Key="TransferBaseBrush" Color="{DynamicResource TransferBaseColor}" />
+    <!-- Transaction row colors are now theme-provided - see ColorResources.axaml -->
     <!--Transaction grid colors-->
     <SolidColorBrush x:Key="TransactionAmountCredit" Color="{DynamicResource CreditBaseColor}" />
     <SolidColorBrush x:Key="TransactionAmountDebt" Color="{DynamicResource DebtBaseColor}" />

@@ -40,6 +40,7 @@ using Valt.Infra.Modules.Budget.Transactions;
 using Valt.Infra.Modules.Budget.Transactions.Queries;
 using Valt.Infra.Modules.Budget.Transactions.Services;
 using Valt.Infra.Modules.Configuration;
+using Valt.Infra.Modules.Currency.Services;
 using Valt.Infra.Modules.Goals;
 using Valt.Infra.Modules.Goals.Handlers;
 using Valt.Infra.Modules.Goals.Queries;
@@ -47,8 +48,10 @@ using Valt.Infra.Modules.Goals.Services;
 using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
 using Valt.Infra.Modules.Reports.ExpensesByCategory;
+using Valt.Infra.Modules.Reports.IncomeByCategory;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.Infra.Modules.Reports.Statistics;
+using Valt.Infra.Modules.Reports.WealthOverview;
 using Valt.Infra.Services.CsvExport;
 using Valt.Infra.Services.CsvImport;
 using Valt.Infra.Services.Updates;
@@ -120,8 +123,10 @@ public static class Extensions
         //reports
         services.AddSingleton<IAllTimeHighReport, AllTimeHighReport>();
         services.AddSingleton<IExpensesByCategoryReport, ExpensesByCategoryReport>();
+        services.AddSingleton<IIncomeByCategoryReport, IncomeByCategoryReport>();
         services.AddSingleton<IMonthlyTotalsReport, MonthlyTotalsReport>();
         services.AddSingleton<IStatisticsReport, StatisticsReport>();
+        services.AddSingleton<IWealthOverviewReport, WealthOverviewReport>();
         services.AddSingleton<IReportDataProviderFactory, ReportDataProviderFactory>();
 
         //background jobs
@@ -214,6 +219,7 @@ public static class Extensions
         services.AddSingleton<ITransactionAutoSatAmountCalculator, TransactionAutoSatAmountCalculator>();
         services.AddSingleton<IAvgPriceTotalizer, AvgPriceTotalizer>();
         services.AddSingleton<IUpdateChecker, GitHubUpdateChecker>();
+        services.AddSingleton<ICurrencyConversionService, CurrencyConversionService>();
 
         //csv import
         services.AddSingleton<ICsvImportParser, CsvImportParser>();

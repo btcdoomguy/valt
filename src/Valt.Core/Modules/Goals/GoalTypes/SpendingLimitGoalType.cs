@@ -22,4 +22,14 @@ public sealed class SpendingLimitGoalType : IGoalType
     {
         return new SpendingLimitGoalType(TargetAmount, calculatedSpending);
     }
+
+    public bool HasSameTargetAs(IGoalType other)
+    {
+        return other is SpendingLimitGoalType s && s.TargetAmount == TargetAmount;
+    }
+
+    public IGoalType WithResetProgress()
+    {
+        return new SpendingLimitGoalType(TargetAmount, calculatedSpending: 0);
+    }
 }

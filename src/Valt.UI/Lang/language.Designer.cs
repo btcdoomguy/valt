@@ -405,18 +405,6 @@ namespace Valt.UI.Lang {
             }
         }
         
-        public static string MathExpression_Title {
-            get {
-                return ResourceManager.GetString("MathExpression.Title", resourceCulture);
-            }
-        }
-        
-        public static string MathExpression_Description {
-            get {
-                return ResourceManager.GetString("MathExpression.Description", resourceCulture);
-            }
-        }
-        
         public static string Settings_Title {
             get {
                 return ResourceManager.GetString("Settings.Title", resourceCulture);
@@ -1394,31 +1382,7 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Settings.Theme", resourceCulture);
             }
         }
-
-        public static string Settings_FontScale {
-            get {
-                return ResourceManager.GetString("Settings_FontScale", resourceCulture);
-            }
-        }
-
-        public static string Settings_FontScale_Small {
-            get {
-                return ResourceManager.GetString("Settings_FontScale_Small", resourceCulture);
-            }
-        }
-
-        public static string Settings_FontScale_Medium {
-            get {
-                return ResourceManager.GetString("Settings_FontScale_Medium", resourceCulture);
-            }
-        }
-
-        public static string Settings_FontScale_Large {
-            get {
-                return ResourceManager.GetString("Settings_FontScale_Large", resourceCulture);
-            }
-        }
-
+        
         public static string Settings_Tab_General {
             get {
                 return ResourceManager.GetString("Settings.Tab.General", resourceCulture);
@@ -1700,7 +1664,25 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.SpendingByCategories.Categories", resourceCulture);
             }
         }
-        
+
+        public static string Reports_IncomeByCategories_Title {
+            get {
+                return ResourceManager.GetString("Reports.IncomeByCategories.Title", resourceCulture);
+            }
+        }
+
+        public static string Reports_IncomeByCategories_Accounts {
+            get {
+                return ResourceManager.GetString("Reports.IncomeByCategories.Accounts", resourceCulture);
+            }
+        }
+
+        public static string Reports_IncomeByCategories_Categories {
+            get {
+                return ResourceManager.GetString("Reports.IncomeByCategories.Categories", resourceCulture);
+            }
+        }
+
         public static string Total {
             get {
                 return ResourceManager.GetString("Total", resourceCulture);
@@ -1724,7 +1706,37 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.MonthlyTotals.AllExpensesInFiat", resourceCulture);
             }
         }
-        
+
+        public static string Reports_WealthOverview_Title {
+            get {
+                return ResourceManager.GetString("Reports.WealthOverview.Title", resourceCulture);
+            }
+        }
+
+        public static string Reports_WealthOverview_Period_Daily {
+            get {
+                return ResourceManager.GetString("Reports.WealthOverview.Period.Daily", resourceCulture);
+            }
+        }
+
+        public static string Reports_WealthOverview_Period_Weekly {
+            get {
+                return ResourceManager.GetString("Reports.WealthOverview.Period.Weekly", resourceCulture);
+            }
+        }
+
+        public static string Reports_WealthOverview_Period_Monthly {
+            get {
+                return ResourceManager.GetString("Reports.WealthOverview.Period.Monthly", resourceCulture);
+            }
+        }
+
+        public static string Reports_WealthOverview_Period_Yearly {
+            get {
+                return ResourceManager.GetString("Reports.WealthOverview.Period.Yearly", resourceCulture);
+            }
+        }
+
         public static string AvgPriceLineEditor_AddTitle {
             get {
                 return ResourceManager.GetString("AvgPriceLineEditor.AddTitle", resourceCulture);
@@ -2876,19 +2888,25 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Goals_DeleteConfirm_Message", resourceCulture);
             }
         }
-
+        
+        public static string Goals_CopyFromLastMonth {
+            get {
+                return ResourceManager.GetString("Goals_CopyFromLastMonth", resourceCulture);
+            }
+        }
+        
         public static string Goals_PriceDataTooltip {
             get {
                 return ResourceManager.GetString("Goals_PriceDataTooltip", resourceCulture);
             }
         }
-
+        
         public static string Goals_YearlyIndicator {
             get {
                 return ResourceManager.GetString("Goals_YearlyIndicator", resourceCulture);
             }
         }
-
+        
         public static string GoalDescription_StackBitcoin {
             get {
                 return ResourceManager.GetString("GoalDescription_StackBitcoin", resourceCulture);
@@ -3030,6 +3048,42 @@ namespace Valt.UI.Lang {
         public static string GoalTarget_NoSales {
             get {
                 return ResourceManager.GetString("GoalTarget_NoSales", resourceCulture);
+            }
+        }
+        
+        public static string Settings_FontScale {
+            get {
+                return ResourceManager.GetString("Settings_FontScale", resourceCulture);
+            }
+        }
+        
+        public static string Settings_FontScale_Small {
+            get {
+                return ResourceManager.GetString("Settings_FontScale_Small", resourceCulture);
+            }
+        }
+        
+        public static string Settings_FontScale_Medium {
+            get {
+                return ResourceManager.GetString("Settings_FontScale_Medium", resourceCulture);
+            }
+        }
+        
+        public static string Settings_FontScale_Large {
+            get {
+                return ResourceManager.GetString("Settings_FontScale_Large", resourceCulture);
+            }
+        }
+        
+        public static string Menu_ConversionCalculator {
+            get {
+                return ResourceManager.GetString("Menu_ConversionCalculator", resourceCulture);
+            }
+        }
+        
+        public static string ConversionCalculator_Title {
+            get {
+                return ResourceManager.GetString("ConversionCalculator_Title", resourceCulture);
             }
         }
     }

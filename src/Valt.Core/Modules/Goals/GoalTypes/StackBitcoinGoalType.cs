@@ -32,4 +32,14 @@ public sealed class StackBitcoinGoalType : IGoalType
     {
         return new StackBitcoinGoalType(TargetSats, calculatedSats);
     }
+
+    public bool HasSameTargetAs(IGoalType other)
+    {
+        return other is StackBitcoinGoalType s && s.TargetSats == TargetSats;
+    }
+
+    public IGoalType WithResetProgress()
+    {
+        return new StackBitcoinGoalType(TargetSats, calculatedSats: 0);
+    }
 }

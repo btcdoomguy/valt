@@ -396,6 +396,100 @@ public class FiatHistoryUpdaterJobTests
         Assert.That(provider.InitialDownloadSource, Is.False);
     }
 
+    [Test]
+    public async Task Should_Update_Stale_Currency_Even_When_Other_Currency_Is_UpToDate()
+    {
+        // Arrange: BRL has up-to-date data, EUR has stale data
+        // This tests the scenario where a user adds a new currency to their database
+        // but the price database already has some (outdated) data for it
+        var configManager = CreateConfigurationManager(new List<string>
+        {
+            FiatCurrency.Brl.Code,
+            FiatCurrency.Eur.Code
+        });
+
+        // Set up "today" as a known date for predictable test results
+        // Assume today is 2024-01-20 (Saturday), so endDate would be 2024-01-19 (Friday)
+        var minDate = new DateOnly(2020, 1, 1);          // Both start from default start date (no backward gap)
+        var upToDateMaxDate = new DateOnly(2024, 1, 19); // BRL is current
+        var staleMaxDate = new DateOnly(2024, 1, 10);    // EUR is stale (9 days behind)
+
+        var existingData = new List<FiatDataEntity>
+        {
+            // BRL data from 2020-01-01 to 2024-01-19 (up-to-date)
+            new() { Currency = FiatCurrency.Brl.Code, Date = minDate.ToValtDateTime(), Price = 4.0m },
+            new() { Currency = FiatCurrency.Brl.Code, Date = upToDateMaxDate.ToValtDateTime(), Price = 5.0m },
+            // EUR data from 2020-01-01 to 2024-01-10 (stale)
+            new() { Currency = FiatCurrency.Eur.Code, Date = minDate.ToValtDateTime(), Price = 0.8m },
+            new() { Currency = FiatCurrency.Eur.Code, Date = staleMaxDate.ToValtDateTime(), Price = 0.9m }
+        };
+
+        var fiatDataCollection = Substitute.For<ILiteCollection<FiatDataEntity>>();
+
+        // Both currencies have data
+        fiatDataCollection.Exists(Arg.Is<System.Linq.Expressions.Expression<Func<FiatDataEntity, bool>>>(
+            expr => expr.Compile().Invoke(new FiatDataEntity { Currency = FiatCurrency.Brl.Code }))).Returns(true);
+        fiatDataCollection.Exists(Arg.Is<System.Linq.Expressions.Expression<Func<FiatDataEntity, bool>>>(
+            expr => expr.Compile().Invoke(new FiatDataEntity { Currency = FiatCurrency.Eur.Code }))).Returns(true);
+
+        var queryable = Substitute.For<ILiteQueryable<FiatDataEntity>>();
+        queryable.Count().Returns(existingData.Count);
+        fiatDataCollection.Query().Returns(queryable);
+        fiatDataCollection.FindAll().Returns(existingData);
+
+        // Setup Find to return filtered data based on currency
+        fiatDataCollection.Find(Arg.Any<System.Linq.Expressions.Expression<Func<FiatDataEntity, bool>>>())
+            .Returns(callInfo =>
+            {
+                var expr = callInfo.Arg<System.Linq.Expressions.Expression<Func<FiatDataEntity, bool>>>();
+                var compiled = expr.Compile();
+                return existingData.Where(compiled).ToList();
+            });
+
+        _priceDatabase.GetFiatData().Returns(fiatDataCollection);
+
+        var transactionsCollection = Substitute.For<ILiteCollection<Infra.Modules.Budget.Transactions.TransactionEntity>>();
+        transactionsCollection.FindAll().Returns(new List<Infra.Modules.Budget.Transactions.TransactionEntity>());
+        _localDatabase.GetTransactions().Returns(transactionsCollection);
+
+        // Regular provider should be called for EUR (stale data) but NOT for BRL (up-to-date)
+        _regularProvider.GetPricesAsync(
+                Arg.Any<DateOnly>(),
+                Arg.Any<DateOnly>(),
+                Arg.Any<IEnumerable<FiatCurrency>>())
+            .Returns(new List<IFiatHistoricalDataProvider.FiatPriceData>
+            {
+                new(new DateOnly(2024, 1, 11), new HashSet<IFiatHistoricalDataProvider.CurrencyAndPrice>
+                {
+                    new(FiatCurrency.Eur, 0.91m)
+                })
+            });
+
+        var providers = new List<IFiatHistoricalDataProvider> { _initialSeedProvider, _regularProvider };
+
+        var job = new FiatHistoryUpdaterJob(
+            _priceDatabase,
+            _localDatabase,
+            providers,
+            configManager,
+            new NullLogger<FiatHistoryUpdaterJob>());
+
+        // Act
+        await job.RunAsync(CancellationToken.None);
+
+        // Assert: Regular provider should be called for EUR (the stale currency)
+        await _regularProvider.Received().GetPricesAsync(
+            Arg.Any<DateOnly>(),
+            Arg.Any<DateOnly>(),
+            Arg.Is<IEnumerable<FiatCurrency>>(c => c.Contains(FiatCurrency.Eur)));
+
+        // Initial seed provider should NOT be called (both currencies have data from 2020-01-01, no backward gap needed)
+        await _initialSeedProvider.DidNotReceive().GetPricesAsync(
+            Arg.Any<DateOnly>(),
+            Arg.Any<DateOnly>(),
+            Arg.Any<IEnumerable<FiatCurrency>>());
+    }
+
     #endregion
 
     #region Provider Selection Edge Cases

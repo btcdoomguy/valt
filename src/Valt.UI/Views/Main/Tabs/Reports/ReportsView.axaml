@@ -12,6 +12,7 @@
              xmlns:models="clr-namespace:Valt.UI.Views.Main.Tabs.Reports.Models"
              xmlns:lang="clr-namespace:Valt.UI.Lang"
              xmlns:painting="clr-namespace:LiveChartsCore.SkiaSharpView.Painting;assembly=LiveChartsCore.SkiaSharpView"
+             xmlns:wealthOverview="clr-namespace:Valt.Infra.Modules.Reports.WealthOverview;assembly=Valt.Infra"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="1200"
              MinWidth="900"
              x:Class="Valt.UI.Views.Main.Tabs.Reports.ReportsView"
@@ -69,6 +70,61 @@
                     </Grid>
                 </StackPanel>
             </Expander>
+            <!--Wealth Overview-->
+            <Expander Classes="section" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsExpanded="True">
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Classes="section-header-icon" Text="&#xE6DF;" />
+                        <TextBlock Classes="section-header" Text="{x:Static lang:language.Reports_WealthOverview_Title}" />
+                    </StackPanel>
+                </Expander.Header>
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10" HorizontalAlignment="Center">
+                        <ComboBox SelectedItem="{Binding SelectedWealthOverviewPeriod}" MinWidth="150">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0}">
+                                                <Binding />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                            <wealthOverview:WealthOverviewPeriod>Daily</wealthOverview:WealthOverviewPeriod>
+                            <wealthOverview:WealthOverviewPeriod>Weekly</wealthOverview:WealthOverviewPeriod>
+                            <wealthOverview:WealthOverviewPeriod>Monthly</wealthOverview:WealthOverviewPeriod>
+                            <wealthOverview:WealthOverviewPeriod>Yearly</wealthOverview:WealthOverviewPeriod>
+                        </ComboBox>
+                    </StackPanel>
+                    <Grid MinHeight="500">
+                        <Border Background="{DynamicResource Background900Brush}"
+                                BorderBrush="{DynamicResource Background700Brush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="10"
+                                IsVisible="{Binding !IsWealthOverviewLoading}">
+                            <avalonia:CartesianChart
+                                x:Name="WealthOverviewChart"
+                                Background="{DynamicResource Background900Brush}"
+                                Series="{Binding WealthOverviewChartData.Series}"
+                                XAxes="{Binding WealthOverviewChartData.XAxes}"
+                                YAxes="{Binding WealthOverviewChartData.YAxes}"
+                                LegendPosition="Top"
+                                LegendTextSize="13"
+                                TooltipTextSize="12"
+                                ZoomMode="X"
+                                Height="480"
+                                Margin="20, 10, 20, 10">
+                            </avalonia:CartesianChart>
+                        </Border>
+                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   IsVisible="{Binding IsWealthOverviewLoading}" />
+                    </Grid>
+                </StackPanel>
+            </Expander>
             <!--Monthly totals-->
             <Expander Classes="section" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsExpanded="True">
                 <Expander.Header>
@@ -87,26 +143,8 @@
                             <userControls:DateCalendarSelectorMode>All</userControls:DateCalendarSelectorMode>
                         </userControls:DateCalendarSelector.AllowedSelectorModes>
                     </userControls:DateCalendarSelector>
-                    <Grid MinHeight="600">
-                        <StackPanel Orientation="Vertical" IsVisible="{Binding !IsMonthlyTotalsLoading}">
-                            <Border Background="{DynamicResource Background800Brush}"
-                                    BorderBrush="{DynamicResource Background700Brush}"
-                                    BorderThickness="1"
-                                    CornerRadius="4"
-                                    Padding="10">
-                                <avalonia:CartesianChart
-                                    x:Name="MonthlyChart"
-                                    Series="{Binding MonthlyTotalsChartData.Series}"
-                                    XAxes="{Binding MonthlyTotalsChartData.XAxes}"
-                                    YAxes="{Binding MonthlyTotalsChartData.YAxes}"
-                                    LegendPosition="Top"
-                                    LegendTextSize="13"
-                                    TooltipTextSize="12"
-                                    ZoomMode="X"
-                                    Height="480"
-                                    Margin="20, 10, 20, 10">
-                                </avalonia:CartesianChart>
-                            </Border>
+                    <Grid MinHeight="400">
+                        <Panel IsVisible="{Binding !IsMonthlyTotalsLoading}">
                             <DataGrid
                                 x:Name="MonthlyTotalsGrid"
                                 Margin="0, 10, 0, 0"
@@ -234,7 +272,7 @@
                                     </DataGridTemplateColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
-                        </StackPanel>
+                        </Panel>
                         <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    IsVisible="{Binding IsMonthlyTotalsLoading}" />
@@ -276,7 +314,7 @@
                                 SelectedItems="{Binding SelectedCategories}" />
                         </StackPanel>
                         <Panel Grid.Column="1">
-                            <Border Background="{DynamicResource Background800Brush}"
+                            <Border Background="{DynamicResource Background900Brush}"
                                     BorderBrush="{DynamicResource Background700Brush}"
                                     BorderThickness="1"
                                     CornerRadius="4"
@@ -286,6 +324,7 @@
                                               HorizontalScrollBarVisibility="Disabled"
                                               MaxHeight="600">
                                     <avalonia:CartesianChart x:Name="CategoryBarChart"
+                                                             Background="{DynamicResource Background900Brush}"
                                                              Height="{Binding ExpensesByCategoryChartData.ChartHeight}"
                                                              Series="{Binding ExpensesByCategoryChartData.Series}"
                                                              XAxes="{Binding ExpensesByCategoryChartData.XAxes}"
@@ -298,6 +337,68 @@
                             <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        IsVisible="{Binding IsSpendingByCategoriesLoading}" />
+                        </Panel>
+                    </Grid>
+                </StackPanel>
+            </Expander>
+            <!--Income by Categories-->
+            <Expander Classes="section" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsExpanded="True">
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Classes="section-header-icon" Text="&#xE24B;" />
+                        <TextBlock Classes="section-header" Text="{x:Static lang:language.Reports_IncomeByCategories_Title}" />
+                    </StackPanel>
+                </Expander.Header>
+                <StackPanel Orientation="Vertical">
+                    <userControls:DateCalendarSelector HorizontalContentAlignment="Center"
+                                                       Height="60"
+                                                       Date="{Binding IncomeCategoryFilterMainDate}"
+                                                       Range="{Binding IncomeCategoryFilterRange}">
+                        <userControls:DateCalendarSelector.AllowedSelectorModes>
+                            <userControls:DateCalendarSelectorMode>Month</userControls:DateCalendarSelectorMode>
+                            <userControls:DateCalendarSelectorMode>Year</userControls:DateCalendarSelectorMode>
+                            <userControls:DateCalendarSelectorMode>All</userControls:DateCalendarSelectorMode>
+                        </userControls:DateCalendarSelector.AllowedSelectorModes>
+                    </userControls:DateCalendarSelector>
+                    <Grid ColumnDefinitions="300, *" MinHeight="600">
+                        <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="10" Margin="0, 10, 10, 0">
+                            <userControls:CheckboxListSelector
+                                Title="{x:Static lang:language.Reports_IncomeByCategories_Accounts}"
+                                DisplayMemberPath="Name"
+                                MaxListHeight="200"
+                                ItemsSource="{Binding AvailableAccounts}"
+                                SelectedItems="{Binding IncomeSelectedAccounts}" />
+                            <userControls:CheckboxListSelector
+                                Title="{x:Static lang:language.Reports_IncomeByCategories_Categories}"
+                                DisplayMemberPath="Name"
+                                MaxListHeight="300"
+                                ItemsSource="{Binding AvailableCategories}"
+                                SelectedItems="{Binding IncomeSelectedCategories}" />
+                        </StackPanel>
+                        <Panel Grid.Column="1">
+                            <Border Background="{DynamicResource Background900Brush}"
+                                    BorderBrush="{DynamicResource Background700Brush}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Padding="10"
+                                    IsVisible="{Binding !IsIncomeByCategoriesLoading}">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                              HorizontalScrollBarVisibility="Disabled"
+                                              MaxHeight="600">
+                                    <avalonia:CartesianChart x:Name="IncomeCategoryBarChart"
+                                                             Background="{DynamicResource Background900Brush}"
+                                                             Height="{Binding IncomeByCategoryChartData.ChartHeight}"
+                                                             Series="{Binding IncomeByCategoryChartData.Series}"
+                                                             XAxes="{Binding IncomeByCategoryChartData.XAxes}"
+                                                             YAxes="{Binding IncomeByCategoryChartData.YAxes}"
+                                                             TooltipTextSize="12"
+                                                             Margin="20, 10, 20, 10">
+                                    </avalonia:CartesianChart>
+                                </ScrollViewer>
+                            </Border>
+                            <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       IsVisible="{Binding IsIncomeByCategoriesLoading}" />
                         </Panel>
                     </Grid>
                 </StackPanel>

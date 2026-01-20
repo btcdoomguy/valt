@@ -198,12 +198,6 @@
     <data name="SaveChanges" xml:space="preserve">
         <value>Guardar cambios</value>
     </data>
-    <data name="MathExpression.Title" xml:space="preserve">
-        <value>Calcular expresión</value>
-    </data>
-    <data name="MathExpression.Description" xml:space="preserve">
-        <value>Ingresa tu expresión abajo (123+456):</value>
-    </data>
     <data name="Settings.Title" xml:space="preserve">
         <value>Configuración</value>
     </data>
@@ -834,6 +828,15 @@
     <data name="Reports.SpendingByCategories.Categories" xml:space="preserve">
         <value>Categorías</value>
     </data>
+    <data name="Reports.IncomeByCategories.Title" xml:space="preserve">
+        <value>Ingresos por categorías</value>
+    </data>
+    <data name="Reports.IncomeByCategories.Accounts" xml:space="preserve">
+        <value>Cuentas</value>
+    </data>
+    <data name="Reports.IncomeByCategories.Categories" xml:space="preserve">
+        <value>Categorías</value>
+    </data>
     <data name="Total" xml:space="preserve">
         <value>Total</value>
     </data>
@@ -845,6 +848,21 @@
     </data>
     <data name="Reports.MonthlyTotals.AllExpensesInFiat" xml:space="preserve">
         <value>Gastos totales</value>
+    </data>
+    <data name="Reports.WealthOverview.Title" xml:space="preserve">
+        <value>Visión General de Patrimonio</value>
+    </data>
+    <data name="Reports.WealthOverview.Period.Daily" xml:space="preserve">
+        <value>Diario</value>
+    </data>
+    <data name="Reports.WealthOverview.Period.Weekly" xml:space="preserve">
+        <value>Semanal</value>
+    </data>
+    <data name="Reports.WealthOverview.Period.Monthly" xml:space="preserve">
+        <value>Mensual</value>
+    </data>
+    <data name="Reports.WealthOverview.Period.Yearly" xml:space="preserve">
+        <value>Anual</value>
     </data>
     <data name="AvgPriceLineEditor.AddTitle" xml:space="preserve">
         <value>Agregar línea</value>
@@ -1436,6 +1454,9 @@
     <data name="Goals_DeleteConfirm_Message" xml:space="preserve">
         <value>¿Estás seguro de que deseas eliminar esta meta? Esta acción no se puede deshacer.</value>
     </data>
+    <data name="Goals_CopyFromLastMonth" xml:space="preserve">
+        <value>Copiar metas del mes anterior</value>
+    </data>
     <data name="Goals_PriceDataTooltip" xml:space="preserve">
         <value>Este valor puede estar desactualizado y se actualizará cuando las tasas de cambio diarias estén disponibles.</value>
     </data>
@@ -1525,5 +1546,11 @@
     </data>
     <data name="Settings_FontScale_Large" xml:space="preserve">
         <value>Grande</value>
+    </data>
+    <data name="Menu_ConversionCalculator" xml:space="preserve">
+        <value>Calculadora de Conversion</value>
+    </data>
+    <data name="ConversionCalculator_Title" xml:space="preserve">
+        <value>Conversor de Divisas</value>
     </data>
 </root>

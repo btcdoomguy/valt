@@ -259,6 +259,58 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
         WeakReferenceMessenger.Default.Send(new GoalListChanged());
     }
 
+    [RelayCommand]
+    private async Task CopyFromLastMonth()
+    {
+        try
+        {
+            var currentDate = DateOnly.FromDateTime(_filterState.MainDate);
+            var currentMonthStart = new DateOnly(currentDate.Year, currentDate.Month, 1);
+            var previousMonthStart = currentMonthStart.AddMonths(-1);
+
+            var allGoals = await _goalRepository.GetAllAsync();
+
+            var previousMonthGoals = allGoals
+                .Where(g => g.Period == GoalPeriods.Monthly &&
+                           g.RefDate.Year == previousMonthStart.Year &&
+                           g.RefDate.Month == previousMonthStart.Month)
+                .ToList();
+
+            var currentMonthGoals = allGoals
+                .Where(g => g.Period == GoalPeriods.Monthly &&
+                           g.RefDate.Year == currentMonthStart.Year &&
+                           g.RefDate.Month == currentMonthStart.Month)
+                .ToList();
+
+            var copiedCount = 0;
+
+            foreach (var previousGoal in previousMonthGoals)
+            {
+                var isDuplicate = currentMonthGoals.Any(g =>
+                    g.GoalType.HasSameTargetAs(previousGoal.GoalType));
+
+                if (isDuplicate)
+                    continue;
+
+                var newGoalType = previousGoal.GoalType.WithResetProgress();
+                var newGoal = Goal.New(currentMonthStart, GoalPeriods.Monthly, newGoalType);
+                await _goalRepository.SaveAsync(newGoal);
+                copiedCount++;
+            }
+
+            if (copiedCount > 0)
+            {
+                await FetchGoals();
+                WeakReferenceMessenger.Default.Send(new GoalListChanged());
+                _goalProgressState.MarkAsStale();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error copying goals from last month");
+        }
+    }
+
     #endregion
 
     public void Dispose()

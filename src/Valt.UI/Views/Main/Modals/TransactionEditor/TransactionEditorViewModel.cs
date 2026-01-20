@@ -29,7 +29,7 @@ using static Valt.UI.Base.TaskExtensions;
 using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
-using Valt.UI.Views.Main.Modals.MathExpression;
+using Valt.UI.Views.Main.Modals.ConversionCalculator;
 using Valt.UI.Views.Main.Modals.TransactionEditor.Exceptions;
 
 namespace Valt.UI.Views.Main.Modals.TransactionEditor;
@@ -102,6 +102,9 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
     [ObservableProperty] private bool _isFromFiatInputFocused;
     [ObservableProperty] private bool _isToBtcInputFocused;
     [ObservableProperty] private bool _isToFiatInputFocused;
+
+    [ObservableProperty] private bool _fromBtcIsBitcoinMode = true;
+    [ObservableProperty] private bool _toBtcIsBitcoinMode = true;
 
     [NotifyPropertyChangedFor(nameof(IsBoundToFixedExpense), nameof(BoundToFixedExpenseCaption), nameof(HasMetadata))]
     [ObservableProperty]
@@ -710,10 +713,24 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
     [RelayCommand]
     private async Task OpenCalculator(object parameter)
     {
-        var window =
-            (MathExpressionView)await _modalFactory.CreateAsync(ApplicationModalNames.MathExpression, GetWindow!())!;
+        // Determine the default currency based on the field and current BTC/Sats mode
+        string? defaultCurrencyCode = parameter switch
+        {
+            "FromBtc" => FromBtcIsBitcoinMode ? "BTC" : "SATS",
+            "ToBtc" => ToBtcIsBitcoinMode ? "BTC" : "SATS",
+            "FromFiat" => FromAccount?.Currency,
+            "ToFiat" => ToAccount?.Currency,
+            _ => null
+        };
 
-        var result = await window.ShowDialog<MathExpressionViewModel.Response?>(GetWindow!());
+        var request = new ConversionCalculatorViewModel.Request(
+            ResponseMode: true,
+            DefaultCurrencyCode: defaultCurrencyCode);
+
+        var window =
+            (ConversionCalculatorView)await _modalFactory.CreateAsync(ApplicationModalNames.ConversionCalculator, GetWindow!(), request)!;
+
+        var result = await window.ShowDialog<ConversionCalculatorViewModel.Response?>(GetWindow!());
 
         if (result is null)
             return;
@@ -727,10 +744,16 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
                 ToAccountFiatValue = FiatValue.New(result.Result.GetValueOrDefault());
                 break;
             case "FromBtc":
-                FromAccountBtcValue = BtcValue.ParseBitcoin(result.Result.GetValueOrDefault());
+                if (result.SelectedCurrencyCode == "SATS")
+                    FromAccountBtcValue = BtcValue.New((long)result.Result.GetValueOrDefault());
+                else
+                    FromAccountBtcValue = BtcValue.ParseBitcoin(result.Result.GetValueOrDefault());
                 break;
             case "ToBtc":
-                ToAccountBtcValue = BtcValue.ParseBitcoin(result.Result.GetValueOrDefault());
+                if (result.SelectedCurrencyCode == "SATS")
+                    ToAccountBtcValue = BtcValue.New((long)result.Result.GetValueOrDefault());
+                else
+                    ToAccountBtcValue = BtcValue.ParseBitcoin(result.Result.GetValueOrDefault());
                 break;
         }
     }

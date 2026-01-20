@@ -12,20 +12,25 @@ namespace Valt.UI.Services.Theming;
 /// <summary>
 /// Service for managing application themes.
 /// Dynamically loads theme resource dictionaries.
-/// Always uses ThemeVariant.Dark to ensure Fluent theme uses dark mode styling.
+/// Sets ThemeVariant based on each theme's BaseTheme property (Dark or Light).
 /// </summary>
 public class ThemeService : IThemeService
 {
     private static readonly List<ThemeDefinition> Themes =
     [
-        new ThemeDefinition("Default", "Default", () => DefaultTheme.Create()),
-        new ThemeDefinition("Ocean", "Ocean", () => OceanTheme.Create()),
-        new ThemeDefinition("MidnightGalaxy", "Midnight Galaxy", () => MidnightGalaxyTheme.Create()),
-        new ThemeDefinition("GoldenHour", "Golden Hour", () => GoldenHourTheme.Create()),
-        new ThemeDefinition("ArcticFrost", "Arctic Frost", () => ArcticFrostTheme.Create()),
-        new ThemeDefinition("ForestCanopy", "Forest Canopy", () => ForestCanopyTheme.Create()),
-        new ThemeDefinition("CrimsonEmber", "Crimson Ember", () => CrimsonEmberTheme.Create()),
-        new ThemeDefinition("Monochrome", "Monochrome", () => MonochromeTheme.Create())
+        // Dark themes
+        new ThemeDefinition("Default", "Default", "Dark", () => DefaultTheme.Create()),
+        new ThemeDefinition("Ocean", "Ocean", "Dark", () => OceanTheme.Create()),
+        new ThemeDefinition("MidnightGalaxy", "Midnight Galaxy", "Dark", () => MidnightGalaxyTheme.Create()),
+        new ThemeDefinition("GoldenHour", "Golden Hour", "Dark", () => GoldenHourTheme.Create()),
+        new ThemeDefinition("ArcticFrost", "Arctic Frost", "Dark", () => ArcticFrostTheme.Create()),
+        new ThemeDefinition("ForestCanopy", "Forest Canopy", "Dark", () => ForestCanopyTheme.Create()),
+        new ThemeDefinition("CrimsonEmber", "Crimson Ember", "Dark", () => CrimsonEmberTheme.Create()),
+        new ThemeDefinition("Monochrome", "Monochrome", "Dark", () => MonochromeTheme.Create()),
+        new ThemeDefinition("RoseQuartz", "Rose Quartz", "Dark", () => RoseQuartzTheme.Create()),
+        new ThemeDefinition("SunsetBlaze", "Sunset Blaze", "Dark", () => SunsetBlazeTheme.Create()),
+        new ThemeDefinition("MochaBrew", "Mocha Brew", "Dark", () => MochaBrewTheme.Create()),
+        new ThemeDefinition("CopperForge", "Copper Forge", "Dark", () => CopperForgeTheme.Create())
     ];
 
     private readonly ILocalStorageService _localStorageService;
@@ -60,8 +65,10 @@ public class ThemeService : IThemeService
             return;
         }
 
-        // Always use Dark theme variant to ensure Fluent theme uses dark mode styling
-        app.RequestedThemeVariant = ThemeVariant.Dark;
+        // Set theme variant based on the theme's base theme
+        app.RequestedThemeVariant = theme.BaseTheme == "Light"
+            ? ThemeVariant.Light
+            : ThemeVariant.Dark;
 
         // Remove previous theme resources if loaded
         if (_currentThemeResources != null)

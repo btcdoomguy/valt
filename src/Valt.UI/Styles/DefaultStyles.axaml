@@ -345,7 +345,7 @@
     </Style>
 
     <Style Selector="Button.rounded">
-        <Setter Property="Padding" Value="5, 2, 0, 0" />
+        <Setter Property="Padding" Value="6, 3, 0, 0" />
         <Setter Property="Background" Value="{DynamicResource ButtonOverlayMediumBrush}" />
         <Setter Property="FontSize" Value="{DynamicResource FontSizeIconLarge}" />
         <Setter Property="Width" Value="40" />
@@ -556,27 +556,21 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CornerRadius" Value="4" />
         <Setter Property="Padding" Value="8, 6" />
-        <!-- Style the main border background -->
-        <Style Selector="^ /template/ Border#PART_Border">
+        <!-- Style the outer Border (RootBorder) which contains the entire button -->
+        <Style Selector="^ /template/ Border#RootBorder">
             <Setter Property="Background" Value="{DynamicResource TopBarButtonBackgroundBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource Accent700Brush}" />
-            <Setter Property="Transitions">
-                <Transitions>
-                    <BrushTransition Property="Background" Duration="0:0:0.1" />
-                    <BrushTransition Property="BorderBrush" Duration="0:0:0.1" />
-                </Transitions>
-            </Setter>
         </Style>
-        <!-- Hover state - entire button -->
-        <Style Selector="^:pointerover /template/ Border#PART_Border">
+        <!-- Hover state - target the outer Border -->
+        <Style Selector="^:pointerover /template/ Border#RootBorder">
             <Setter Property="Background" Value="{DynamicResource TopBarButtonBackgroundHoverBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource Accent500Brush}" />
         </Style>
         <Style Selector="^:pointerover">
             <Setter Property="Foreground" Value="{DynamicResource TopBarButtonForegroundHoverBrush}" />
         </Style>
-        <!-- Pressed state -->
-        <Style Selector="^:pressed /template/ Border#PART_Border">
+        <!-- Pressed state - target the outer Border -->
+        <Style Selector="^:pressed /template/ Border#RootBorder">
             <Setter Property="Background" Value="{DynamicResource TopBarButtonBackgroundSelectedBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource Accent300Brush}" />
         </Style>

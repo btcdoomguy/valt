@@ -22,4 +22,14 @@ public sealed class IncomeFiatGoalType : IGoalType
     {
         return new IncomeFiatGoalType(TargetAmount, calculatedIncome);
     }
+
+    public bool HasSameTargetAs(IGoalType other)
+    {
+        return other is IncomeFiatGoalType i && i.TargetAmount == TargetAmount;
+    }
+
+    public IGoalType WithResetProgress()
+    {
+        return new IncomeFiatGoalType(TargetAmount, calculatedIncome: 0);
+    }
 }

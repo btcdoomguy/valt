@@ -185,16 +185,8 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
 
                 var goalType = CurrentGoalTypeEditor.CreateGoalTypePreservingCalculated(existingGoal.GoalType);
 
-                goal = Goal.Create(
-                    existingGoal.Id,
-                    refDate,
-                    period,
-                    goalType,
-                    existingGoal.Progress,
-                    false,
-                    existingGoal.LastUpdatedAt,
-                    existingGoal.State,
-                    existingGoal.Version);
+                existingGoal.Edit(refDate, period, goalType);
+                goal = existingGoal;
             }
 
             await _goalRepository!.SaveAsync(goal);

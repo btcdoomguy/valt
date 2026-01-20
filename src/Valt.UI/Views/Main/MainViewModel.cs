@@ -42,6 +42,7 @@ using Valt.UI.Views.Main.Modals.Settings;
 using Valt.UI.Views.Main.Modals.StatusDisplay;
 using Valt.UI.Views.Main.Modals.ImportWizard;
 using Valt.UI.Views.Main.Modals.InputPassword;
+using Valt.UI.Views.Main.Modals.ConversionCalculator;
 
 namespace Valt.UI.Views.Main;
 
@@ -292,6 +293,15 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     {
         var modal =
             (AboutView)await _modalFactory.CreateAsync(ApplicationModalNames.About, Window)!;
+
+        await modal.ShowDialog(Window!);
+    }
+
+    [RelayCommand]
+    private async Task OpenConversionCalculator()
+    {
+        var modal =
+            (ConversionCalculatorView)await _modalFactory.CreateAsync(ApplicationModalNames.ConversionCalculator, Window)!;
 
         await modal.ShowDialog(Window!);
     }

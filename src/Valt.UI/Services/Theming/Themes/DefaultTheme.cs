@@ -148,6 +148,14 @@ public static class DefaultTheme
         resources["BlackColor"] = Color.Parse("#1f1a14");
         resources["WhiteColor"] = Color.Parse("#ffffff");
 
+        // Transaction Row Colors (for DataGrid highlighting)
+        resources["CreditBaseColor"] = Color.Parse("#78DB55");
+        resources["DebtBaseColor"] = Color.Parse("#FF7D7D");
+        resources["TransferBaseColor"] = Color.Parse("#FFF866");
+
+        // Title Bar
+        resources["TitleBarForegroundColor"] = Color.Parse("#FFFFFF");
+
         // UI Element Colors
         resources["LiveRatesBackgroundColor"] = Color.Parse("#0D0D0D");
         resources["LiveRatesBorderGradientStartColor"] = Color.Parse("#2A2A2A");

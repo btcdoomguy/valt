@@ -22,8 +22,10 @@ using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
 using Valt.Infra.Modules.Reports.ExpensesByCategory;
+using Valt.Infra.Modules.Reports.IncomeByCategory;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.Infra.Modules.Reports.Statistics;
+using Valt.Infra.Modules.Reports.WealthOverview;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
 using static Valt.UI.Base.TaskExtensions;
@@ -39,7 +41,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly IAllTimeHighReport _allTimeHighReport;
     private readonly IMonthlyTotalsReport _monthlyTotalsReport;
     private readonly IExpensesByCategoryReport _expensesByCategoryReport;
+    private readonly IIncomeByCategoryReport _incomeByCategoryReport;
     private readonly IStatisticsReport _statisticsReport;
+    private readonly IWealthOverviewReport _wealthOverviewReport;
     private readonly IReportDataProviderFactory _reportDataProviderFactory;
     private readonly CurrencySettings _currencySettings;
     private readonly ILocalDatabase _localDatabase;
@@ -47,7 +51,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly ILogger<ReportsViewModel> _logger;
     private readonly AccountsTotalState _accountsTotalState;
     private readonly RatesState _ratesState;
-    private readonly SecureModeState _secureModeState;
+    
+    [ObservableProperty]
+    private SecureModeState _secureModeState;
 
     private const long TotalBtcSupplySats = 21_000_000_00_000_000L; // 21 million BTC in sats
 
@@ -61,6 +67,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private AvaloniaList<MonthlyReportItemViewModel> _monthlyReportItems = new();
     [ObservableProperty] private MonthlyTotalsChartData _monthlyTotalsChartData = new();
     [ObservableProperty] private ExpensesByCategoryChartData _expensesByCategoryChartData = new();
+    [ObservableProperty] private WealthOverviewChartData _wealthOverviewChartData = new();
+    [ObservableProperty] private WealthOverviewPeriod _selectedWealthOverviewPeriod = WealthOverviewPeriod.Monthly;
     [ObservableProperty] private DateTime _filterMainDate;
     [ObservableProperty] private DateRange _filterRange;
     [ObservableProperty] private DateTime _categoryFilterMainDate;
@@ -72,16 +80,26 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private bool _isStatisticsLoading = true;
     [ObservableProperty] private bool _isMonthlyTotalsLoading = true;
     [ObservableProperty] private bool _isSpendingByCategoriesLoading = true;
+    [ObservableProperty] private bool _isIncomeByCategoriesLoading = true;
+    [ObservableProperty] private bool _isWealthOverviewLoading = true;
 
     public bool IsSecureModeEnabled => _secureModeState.IsEnabled;
 
-    // Pie chart filter collections
+    // Pie chart filter collections (expenses)
     [ObservableProperty] private AvaloniaList<SelectItem> _availableAccounts = new();
     [ObservableProperty] private AvaloniaList<SelectItem> _selectedAccounts = new();
     [ObservableProperty] private AvaloniaList<SelectItem> _availableCategories = new();
     [ObservableProperty] private AvaloniaList<SelectItem> _selectedCategories = new();
 
+    // Income by category
+    [ObservableProperty] private IncomeByCategoryChartData _incomeByCategoryChartData = new();
+    [ObservableProperty] private DateTime _incomeCategoryFilterMainDate;
+    [ObservableProperty] private DateRange _incomeCategoryFilterRange;
+    [ObservableProperty] private AvaloniaList<SelectItem> _incomeSelectedAccounts = new();
+    [ObservableProperty] private AvaloniaList<SelectItem> _incomeSelectedCategories = new();
+
     private CancellationTokenSource? _filterDebounceTokenSource;
+    private CancellationTokenSource? _incomeFilterDebounceTokenSource;
     private const int FilterDebounceDelayMs = 300;
 
     private bool _ready;
@@ -89,7 +107,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     public ReportsViewModel(IAllTimeHighReport allTimeHighReport,
         IMonthlyTotalsReport monthlyTotalsReport,
         IExpensesByCategoryReport expensesByCategoryReport,
+        IIncomeByCategoryReport incomeByCategoryReport,
         IStatisticsReport statisticsReport,
+        IWealthOverviewReport wealthOverviewReport,
         IReportDataProviderFactory reportDataProviderFactory,
         CurrencySettings currencySettings,
         ILocalDatabase localDatabase,
@@ -102,7 +122,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _allTimeHighReport = allTimeHighReport;
         _monthlyTotalsReport = monthlyTotalsReport;
         _expensesByCategoryReport = expensesByCategoryReport;
+        _incomeByCategoryReport = incomeByCategoryReport;
         _statisticsReport = statisticsReport;
+        _wealthOverviewReport = wealthOverviewReport;
         _reportDataProviderFactory = reportDataProviderFactory;
         _currencySettings = currencySettings;
         _localDatabase = localDatabase;
@@ -114,15 +136,18 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         _secureModeState.PropertyChanged += OnSecureModeStatePropertyChanged;
 
-        FilterMainDate = CategoryFilterMainDate = _clock.GetCurrentDateTimeUtc();
+        FilterMainDate = CategoryFilterMainDate = IncomeCategoryFilterMainDate = _clock.GetCurrentDateTimeUtc();
         FilterRange = new DateRange(new DateTime(FilterMainDate.Year, 1, 1), new DateTime(FilterMainDate.Year, 12, 31));
         var currentMonth = new DateTime(CategoryFilterMainDate.Year, CategoryFilterMainDate.Month, 1);
         CategoryFilterRange = new DateRange(currentMonth, currentMonth.AddMonths(1).AddDays(-1));
+        IncomeCategoryFilterRange = new DateRange(currentMonth, currentMonth.AddMonths(1).AddDays(-1));
 
         PrepareAccountsAndCategoriesList();
 
         SelectedAccounts.CollectionChanged += OnSelectedFiltersChanged;
         SelectedCategories.CollectionChanged += OnSelectedFiltersChanged;
+        IncomeSelectedAccounts.CollectionChanged += OnIncomeSelectedFiltersChanged;
+        IncomeSelectedCategories.CollectionChanged += OnIncomeSelectedFiltersChanged;
 
         WeakReferenceMessenger.Default.Register<SettingsChangedMessage>(this, (recipient, message) =>
         {
@@ -133,6 +158,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     IsStatisticsLoading = true;
                     IsMonthlyTotalsLoading = true;
                     IsSpendingByCategoriesLoading = true;
+                    IsIncomeByCategoriesLoading = true;
+                    IsWealthOverviewLoading = true;
                     // Reload data when currency changes
                     ReloadDataAndFetchAllReportsAsync().SafeFireAndForget(logger: _logger, callerName: nameof(ReloadDataAndFetchAllReportsAsync));
                     break;
@@ -185,7 +212,36 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         // Create and cache the provider
         _cachedProvider = _reportDataProviderFactory.Create();
 
+        // Determine the best default period based on transaction history
+        SelectedWealthOverviewPeriod = DetermineDefaultWealthOverviewPeriod(_cachedProvider);
+
         await FetchAllReportsAsync(_cachedProvider);
+    }
+
+    private WealthOverviewPeriod DetermineDefaultWealthOverviewPeriod(IReportDataProvider provider)
+    {
+        if (provider.AllTransactions.Count == 0)
+            return WealthOverviewPeriod.Monthly;
+
+        var today = _clock.GetCurrentLocalDate();
+        var minDate = provider.MinTransactionDate;
+        var daysDiff = today.DayNumber - minDate.DayNumber;
+
+        // Calculate approximate data points for each period
+        var weeksOfData = daysDiff / 7;
+        var monthsOfData = ((today.Year - minDate.Year) * 12) + (today.Month - minDate.Month);
+
+        // Start with Daily, upgrade when at least 4 data points available
+        // If 4+ months of data, use Monthly
+        if (monthsOfData >= 4)
+            return WealthOverviewPeriod.Monthly;
+
+        // If 4+ weeks of data, use Weekly
+        if (weeksOfData >= 4)
+            return WealthOverviewPeriod.Weekly;
+
+        // Default to Daily for new users
+        return WealthOverviewPeriod.Daily;
     }
 
     private async Task ReloadDataAndFetchAllReportsAsync()
@@ -201,8 +257,10 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         await Task.WhenAll(
             FetchMonthlyTotalsAsync(provider),
             FetchExpensesByCategoryAsync(provider),
+            FetchIncomeByCategoryAsync(provider),
             FetchAllTimeHighDataAsync(provider),
-            FetchStatisticsDataAsync(provider));
+            FetchStatisticsDataAsync(provider),
+            FetchWealthOverviewAsync(provider));
     }
 
     private void PrepareAccountsAndCategoriesList()
@@ -211,12 +269,15 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         SelectedAccounts.Clear();
         AvailableCategories.Clear();
         SelectedCategories.Clear();
+        IncomeSelectedAccounts.Clear();
+        IncomeSelectedCategories.Clear();
 
         var accounts = _localDatabase.GetAccounts().FindAll().OrderByDescending(x => x.Visible).ThenBy(x => x.DisplayOrder)
             .Select(x => new SelectItem(x.Id.ToString(), x.Name));
 
         AvailableAccounts.AddRange(accounts);
         SelectedAccounts.AddRange(AvailableAccounts);
+        IncomeSelectedAccounts.AddRange(AvailableAccounts);
 
         var categories = _localDatabase.GetCategories().FindAll().ToDictionary(x => x.Id.ToString());
 
@@ -232,6 +293,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         AvailableCategories.AddRange(parsedCategories.OrderBy(x => x.Name));
         SelectedCategories.AddRange(AvailableCategories);
+        IncomeSelectedCategories.AddRange(AvailableCategories);
     }
 
     partial void OnFilterRangeChanged(DateRange value)
@@ -250,6 +312,15 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         IsSpendingByCategoriesLoading = true;
         var provider = GetOrCreateProvider();
         FetchExpensesByCategoryAsync(provider).SafeFireAndForget(logger: _logger, callerName: nameof(FetchExpensesByCategoryAsync));
+    }
+
+    partial void OnIncomeCategoryFilterRangeChanged(DateRange value)
+    {
+        if (!_ready) return;
+
+        IsIncomeByCategoriesLoading = true;
+        var provider = GetOrCreateProvider();
+        FetchIncomeByCategoryAsync(provider).SafeFireAndForget(logger: _logger, callerName: nameof(FetchIncomeByCategoryAsync));
     }
 
     private void OnSelectedFiltersChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -271,6 +342,32 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             await Task.Delay(FilterDebounceDelayMs, cancellationToken);
             var provider = GetOrCreateProvider();
             await FetchExpensesByCategoryAsync(provider);
+        }
+        catch (TaskCanceledException)
+        {
+            // Debounce cancelled, ignore
+        }
+    }
+
+    private void OnIncomeSelectedFiltersChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (!_ready) return;
+
+        // Cancel any pending debounced fetch
+        _incomeFilterDebounceTokenSource?.Cancel();
+        _incomeFilterDebounceTokenSource = new CancellationTokenSource();
+
+        IsIncomeByCategoriesLoading = true;
+        DebouncedFetchIncomeByCategoryAsync(_incomeFilterDebounceTokenSource.Token).SafeFireAndForget(logger: _logger, callerName: nameof(DebouncedFetchIncomeByCategoryAsync));
+    }
+
+    private async Task DebouncedFetchIncomeByCategoryAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(FilterDebounceDelayMs, cancellationToken);
+            var provider = GetOrCreateProvider();
+            await FetchIncomeByCategoryAsync(provider);
         }
         catch (TaskCanceledException)
         {
@@ -495,6 +592,35 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
     }
 
+    private async Task FetchIncomeByCategoryAsync(IReportDataProvider provider)
+    {
+        try
+        {
+            var filter = new IIncomeByCategoryReport.Filter(
+                IncomeSelectedAccounts.Select(x => new AccountId(x.Id.ToString())).ToList(),
+                IncomeSelectedCategories.Select(x => new CategoryId(x.Id.ToString())).ToList());
+
+            var incomeByCategoryData = await _incomeByCategoryReport.GetAsync(
+                DateOnly.FromDateTime(IncomeCategoryFilterMainDate),
+                new DateOnlyRange(DateOnly.FromDateTime(IncomeCategoryFilterRange.Start),
+                    DateOnly.FromDateTime(IncomeCategoryFilterRange.End)),
+                FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency),
+                filter,
+                provider);
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                IncomeByCategoryChartData.RefreshChart(incomeByCategoryData);
+                IsIncomeByCategoriesLoading = false;
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching income by category");
+            await Dispatcher.UIThread.InvokeAsync(() => { IsIncomeByCategoriesLoading = false; });
+        }
+    }
+
     private async Task FetchMonthlyTotalsAsync(IReportDataProvider provider)
     {
         try
@@ -527,6 +653,37 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
     }
 
+    private async Task FetchWealthOverviewAsync(IReportDataProvider provider)
+    {
+        try
+        {
+            var wealthOverviewData = await _wealthOverviewReport.GetAsync(
+                SelectedWealthOverviewPeriod,
+                FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency),
+                provider);
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                WealthOverviewChartData.RefreshChart(wealthOverviewData);
+                IsWealthOverviewLoading = false;
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching wealth overview");
+            await Dispatcher.UIThread.InvokeAsync(() => { IsWealthOverviewLoading = false; });
+        }
+    }
+
+    partial void OnSelectedWealthOverviewPeriodChanged(WealthOverviewPeriod value)
+    {
+        if (!_ready) return;
+
+        IsWealthOverviewLoading = true;
+        var provider = GetOrCreateProvider();
+        FetchWealthOverviewAsync(provider).SafeFireAndForget(logger: _logger, callerName: nameof(FetchWealthOverviewAsync));
+    }
+
     public override MainViewTabNames TabName => MainViewTabNames.ReportsPageContent;
 
     public record SelectItem(string Id, string Name);
@@ -553,9 +710,13 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     {
         _filterDebounceTokenSource?.Cancel();
         _filterDebounceTokenSource?.Dispose();
+        _incomeFilterDebounceTokenSource?.Cancel();
+        _incomeFilterDebounceTokenSource?.Dispose();
 
         SelectedAccounts.CollectionChanged -= OnSelectedFiltersChanged;
         SelectedCategories.CollectionChanged -= OnSelectedFiltersChanged;
+        IncomeSelectedAccounts.CollectionChanged -= OnIncomeSelectedFiltersChanged;
+        IncomeSelectedCategories.CollectionChanged -= OnIncomeSelectedFiltersChanged;
 
         // Unsubscribe from PropertyChanged events
         _secureModeState.PropertyChanged -= OnSecureModeStatePropertyChanged;
@@ -565,6 +726,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         MonthlyTotalsChartData.Dispose();
         ExpensesByCategoryChartData.Dispose();
+        IncomeByCategoryChartData.Dispose();
+        WealthOverviewChartData.Dispose();
 
         // Clear the provider on dispose
         _cachedProvider = null;

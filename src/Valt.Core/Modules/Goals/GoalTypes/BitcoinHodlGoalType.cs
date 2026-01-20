@@ -28,4 +28,14 @@ public sealed class BitcoinHodlGoalType : IGoalType
     {
         return new BitcoinHodlGoalType(MaxSellableSats, calculatedSoldSats);
     }
+
+    public bool HasSameTargetAs(IGoalType other)
+    {
+        return other is BitcoinHodlGoalType h && h.MaxSellableSats == MaxSellableSats;
+    }
+
+    public IGoalType WithResetProgress()
+    {
+        return new BitcoinHodlGoalType(MaxSellableSats, calculatedSoldSats: 0);
+    }
 }

@@ -28,4 +28,16 @@ public sealed class ReduceExpenseCategoryGoalType : IGoalType
     {
         return new ReduceExpenseCategoryGoalType(TargetAmount, CategoryId, CategoryName, calculatedSpending);
     }
+
+    public bool HasSameTargetAs(IGoalType other)
+    {
+        return other is ReduceExpenseCategoryGoalType r
+            && r.TargetAmount == TargetAmount
+            && r.CategoryId == CategoryId;
+    }
+
+    public IGoalType WithResetProgress()
+    {
+        return new ReduceExpenseCategoryGoalType(TargetAmount, CategoryId, CategoryName, calculatedSpending: 0);
+    }
 }

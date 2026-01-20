@@ -46,26 +46,26 @@ public static class CrimsonEmberTheme
         resources["Text900Color"] = Color.Parse("#1F1718");
 
         // Background (Rich burgundy/crimson tinted - visible color)
-        resources["Background100Color"] = Color.Parse("#9E5A5A");
-        resources["Background200Color"] = Color.Parse("#8A4848");
-        resources["Background300Color"] = Color.Parse("#723838");
-        resources["Background400Color"] = Color.Parse("#5C2A2A");
-        resources["Background500Color"] = Color.Parse("#4A2020");
-        resources["Background600Color"] = Color.Parse("#3C1818");
-        resources["Background700Color"] = Color.Parse("#301414");
-        resources["Background800Color"] = Color.Parse("#261010");
-        resources["Background900Color"] = Color.Parse("#1C0C0C");
+        resources["Background100Color"] = Color.Parse("#A86A6A");
+        resources["Background200Color"] = Color.Parse("#985858");
+        resources["Background300Color"] = Color.Parse("#884848");
+        resources["Background400Color"] = Color.Parse("#763A3A");
+        resources["Background500Color"] = Color.Parse("#643030");
+        resources["Background600Color"] = Color.Parse("#542828");
+        resources["Background700Color"] = Color.Parse("#442020");
+        resources["Background800Color"] = Color.Parse("#361A1A");
+        resources["Background900Color"] = Color.Parse("#261212");
 
         // Disabled (matches Background scale)
-        resources["Disabled100Color"] = Color.Parse("#9E5A5A");
-        resources["Disabled200Color"] = Color.Parse("#8A4848");
-        resources["Disabled300Color"] = Color.Parse("#723838");
-        resources["Disabled400Color"] = Color.Parse("#5C2A2A");
-        resources["Disabled500Color"] = Color.Parse("#4A2020");
-        resources["Disabled600Color"] = Color.Parse("#3C1818");
-        resources["Disabled700Color"] = Color.Parse("#301414");
-        resources["Disabled800Color"] = Color.Parse("#261010");
-        resources["Disabled900Color"] = Color.Parse("#1C0C0C");
+        resources["Disabled100Color"] = Color.Parse("#A86A6A");
+        resources["Disabled200Color"] = Color.Parse("#985858");
+        resources["Disabled300Color"] = Color.Parse("#884848");
+        resources["Disabled400Color"] = Color.Parse("#763A3A");
+        resources["Disabled500Color"] = Color.Parse("#643030");
+        resources["Disabled600Color"] = Color.Parse("#542828");
+        resources["Disabled700Color"] = Color.Parse("#442020");
+        resources["Disabled800Color"] = Color.Parse("#361A1A");
+        resources["Disabled900Color"] = Color.Parse("#261212");
 
         // Divider (Brighter rose-tinted for high contrast borders)
         resources["Divider100Color"] = Color.Parse("#FFF1F2");
@@ -148,28 +148,36 @@ public static class CrimsonEmberTheme
         resources["BlackColor"] = Color.Parse("#1C0C0C");
         resources["WhiteColor"] = Color.Parse("#FFF1F2");
 
+        // Transaction Row Colors (for DataGrid highlighting)
+        resources["CreditBaseColor"] = Color.Parse("#78DB55");
+        resources["DebtBaseColor"] = Color.Parse("#FF7D7D");
+        resources["TransferBaseColor"] = Color.Parse("#FFF866");
+
+        // Title Bar
+        resources["TitleBarForegroundColor"] = Color.Parse("#FFFFFF");
+
         // UI Element Colors (high contrast)
-        resources["LiveRatesBackgroundColor"] = Color.Parse("#261010");
+        resources["LiveRatesBackgroundColor"] = Color.Parse("#361A1A");
         resources["LiveRatesBorderGradientStartColor"] = Color.Parse("#E11D48");
-        resources["LiveRatesBorderGradientEndColor"] = Color.Parse("#5C2A2A");
-        resources["LiveRatesVariationBackgroundColor"] = Color.Parse("#301414");
+        resources["LiveRatesBorderGradientEndColor"] = Color.Parse("#643030");
+        resources["LiveRatesVariationBackgroundColor"] = Color.Parse("#442020");
         resources["ButtonOverlayLightColor"] = Color.Parse("#50FFFFFF");
         resources["ButtonOverlayMediumColor"] = Color.Parse("#30FFFFFF");
         resources["StepIndicatorActiveColor"] = Color.Parse("#F43F5E");
-        resources["StepIndicatorInactiveColor"] = Color.Parse("#8A4848");
-        resources["StepIndicatorInactiveLightColor"] = Color.Parse("#B8808A");
+        resources["StepIndicatorInactiveColor"] = Color.Parse("#884848");
+        resources["StepIndicatorInactiveLightColor"] = Color.Parse("#A86A6A");
         resources["MessageBoxInfoColor"] = Color.Parse("#38BDF8");
         resources["MessageBoxWarningColor"] = Color.Parse("#FBBF24");
         resources["MessageBoxErrorColor"] = Color.Parse("#F87171");
         resources["MessageBoxQuestionColor"] = Color.Parse("#A78BFA");
         resources["ColorPickerSelectedBorderColor"] = Color.Parse("#FB7185");
-        resources["ModalTopBarBackgroundColor"] = Color.Parse("#3C1818");
+        resources["ModalTopBarBackgroundColor"] = Color.Parse("#542828");
         resources["TopBarButtonBackgroundColor"] = Color.Parse("#4C0519");
         resources["TopBarButtonBackgroundHoverColor"] = Color.Parse("#9F1239");
         resources["TopBarButtonBackgroundSelectedColor"] = Color.Parse("#FB7185");
         resources["TopBarButtonForegroundColor"] = Color.Parse("#FDA4AF");
         resources["TopBarButtonForegroundHoverColor"] = Color.Parse("#FFF1F2");
-        resources["FooterGradientStartColor"] = Color.Parse("#1C0C0C");
+        resources["FooterGradientStartColor"] = Color.Parse("#261212");
         resources["IconSelectorDefaultColor"] = Color.Parse("#FFF1F2");
 
         return resources;

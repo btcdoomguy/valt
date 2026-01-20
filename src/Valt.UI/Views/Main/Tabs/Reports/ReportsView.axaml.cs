@@ -12,7 +12,7 @@ namespace Valt.UI.Views.Main.Tabs.Reports;
 
 public partial class ReportsView : ValtBaseUserControl
 {
-    CartesianChart? _monthlyTotalsChart;
+    CartesianChart? _wealthOverviewChart;
     CartesianChart? _categoryBarChart;
     private ReportsViewModel? _viewModel;
 
@@ -26,7 +26,7 @@ public partial class ReportsView : ValtBaseUserControl
         base.OnApplyTemplate(e);
 
         _categoryBarChart = CategoryBarChart;
-        _monthlyTotalsChart = MonthlyChart;
+        _wealthOverviewChart = WealthOverviewChart;
 
         if (DataContext is ReportsViewModel vm)
         {
@@ -34,7 +34,7 @@ public partial class ReportsView : ValtBaseUserControl
             _viewModel.PropertyChanged += ViewModelOnPropertyChanged;
             _viewModel.Initialize();
 
-            Dispatcher.UIThread.Post(() => ForceMonthlyTotalsRedraw(), DispatcherPriority.Background);
+            Dispatcher.UIThread.Post(() => ForceWealthOverviewRedraw(), DispatcherPriority.Background);
         }
     }
 
@@ -48,25 +48,25 @@ public partial class ReportsView : ValtBaseUserControl
             _viewModel = null;
         }
 
-        _monthlyTotalsChart = null;
+        _wealthOverviewChart = null;
         _categoryBarChart = null;
     }
 
     private void ViewModelOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(ReportsViewModel.IsMonthlyTotalsLoading))
+        if (e.PropertyName == nameof(ReportsViewModel.IsWealthOverviewLoading))
         {
-            ForceMonthlyTotalsRedraw();
+            ForceWealthOverviewRedraw();
         }
     }
 
-    private void ForceMonthlyTotalsRedraw()
+    private void ForceWealthOverviewRedraw()
     {
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            _monthlyTotalsChart?.InvalidateMeasure();
-            _monthlyTotalsChart?.InvalidateVisual();
-            _monthlyTotalsChart?.CoreChart.Update(new ChartUpdateParams()
+            _wealthOverviewChart?.InvalidateMeasure();
+            _wealthOverviewChart?.InvalidateVisual();
+            _wealthOverviewChart?.CoreChart.Update(new ChartUpdateParams()
             {
                 IsAutomaticUpdate = true,
                 Throttling = false

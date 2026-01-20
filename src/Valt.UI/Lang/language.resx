@@ -203,12 +203,6 @@
     <data name="SaveChanges" xml:space="preserve">
         <value>Save Changes</value>
     </data>
-    <data name="MathExpression.Title" xml:space="preserve">
-        <value>Calculate expression</value>
-    </data>
-    <data name="MathExpression.Description" xml:space="preserve">
-        <value>Enter your expression below (123+456):</value>
-    </data>
     <data name="Settings.Title" xml:space="preserve">
         <value>Settings</value>
     </data>
@@ -839,6 +833,15 @@
     <data name="Reports.SpendingByCategories.Categories" xml:space="preserve">
         <value>Categories</value>
     </data>
+    <data name="Reports.IncomeByCategories.Title" xml:space="preserve">
+        <value>Income by categories</value>
+    </data>
+    <data name="Reports.IncomeByCategories.Accounts" xml:space="preserve">
+        <value>Accounts</value>
+    </data>
+    <data name="Reports.IncomeByCategories.Categories" xml:space="preserve">
+        <value>Categories</value>
+    </data>
     <data name="Total" xml:space="preserve">
         <value>Total</value>
     </data>
@@ -850,6 +853,21 @@
     </data>
     <data name="Reports.MonthlyTotals.AllExpensesInFiat" xml:space="preserve">
         <value>Total Expenses</value>
+    </data>
+    <data name="Reports.WealthOverview.Title" xml:space="preserve">
+        <value>Wealth Overview</value>
+    </data>
+    <data name="Reports.WealthOverview.Period.Daily" xml:space="preserve">
+        <value>Daily</value>
+    </data>
+    <data name="Reports.WealthOverview.Period.Weekly" xml:space="preserve">
+        <value>Weekly</value>
+    </data>
+    <data name="Reports.WealthOverview.Period.Monthly" xml:space="preserve">
+        <value>Monthly</value>
+    </data>
+    <data name="Reports.WealthOverview.Period.Yearly" xml:space="preserve">
+        <value>Yearly</value>
     </data>
     <data name="AvgPriceLineEditor.AddTitle" xml:space="preserve">
         <value>Add Line</value>
@@ -1441,6 +1459,9 @@
     <data name="Goals_DeleteConfirm_Message" xml:space="preserve">
         <value>Are you sure you want to delete this goal? This action cannot be undone.</value>
     </data>
+    <data name="Goals_CopyFromLastMonth" xml:space="preserve">
+        <value>Copy goals from last month</value>
+    </data>
     <data name="Goals_PriceDataTooltip" xml:space="preserve">
         <value>This value may be outdated and will be updated when daily exchange rates are available.</value>
     </data>
@@ -1530,5 +1551,11 @@
     </data>
     <data name="Settings_FontScale_Large" xml:space="preserve">
         <value>Large</value>
+    </data>
+    <data name="Menu_ConversionCalculator" xml:space="preserve">
+        <value>Conversion Calculator</value>
+    </data>
+    <data name="ConversionCalculator_Title" xml:space="preserve">
+        <value>Conversion Calculator</value>
     </data>
 </root>

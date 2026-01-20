@@ -27,7 +27,7 @@
         <Grid ColumnDefinitions="*, Auto">
             <TextBlock Grid.Column="0" Classes="titlebar-text" VerticalAlignment="Center"
                        HorizontalAlignment="Center"
-                       Foreground="White"
+                       Foreground="{DynamicResource TitleBarForegroundBrush}"
                        Text="{Binding Title, RelativeSource={RelativeSource AncestorType=userControls:CustomTitleBar}}" />
             <StackPanel Orientation="Horizontal" Grid.Column="1">
                 <Button Classes="titlebar minimize"

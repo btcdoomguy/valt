@@ -15,7 +15,8 @@
         WindowStartupLocation="CenterOwner"
         SystemDecorations="None"
         ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaTitleBarHeightHint="0">
+        ExtendClientAreaTitleBarHeightHint="0"
+        Background="{DynamicResource Background700Brush}">
     <Design.DataContext>
         <initialSelection1:InitialSelectionViewModel />
     </Design.DataContext>
