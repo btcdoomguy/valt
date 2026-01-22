@@ -17,7 +17,7 @@ public partial class MainView : ValtBaseWindow
     {
         InitializeComponent();
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
             ExtendClientAreaToDecorationsHint = false;
             ExtendClientAreaTitleBarHeightHint = -1;
