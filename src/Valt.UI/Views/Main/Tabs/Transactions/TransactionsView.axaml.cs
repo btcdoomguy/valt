@@ -5,6 +5,7 @@ using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Valt.UI.Base;
 using Valt.UI.Services.LocalStorage;
+using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
 namespace Valt.UI.Views.Main.Tabs.Transactions;
 
@@ -90,23 +91,40 @@ public partial class TransactionsView : ValtBaseUserControl
         if (e.KeyModifiers != KeyModifiers.Control) return;
 
         var vm = DataContext as TransactionsViewModel;
-        if (vm?.SelectedAccount is null) return;
+        if (vm is null) return;
+
+        var selectedItem = AccountsList.SelectedItem;
+        if (selectedItem is null) return;
 
         if (e.Key == Key.Up)
         {
-            await vm.MoveUpAccountCommand.ExecuteAsync(vm.SelectedAccount);
+            if (selectedItem is AccountViewModel account)
+            {
+                await vm.MoveUpAccountCommand.ExecuteAsync(account);
+            }
+            else if (selectedItem is AccountGroupHeaderViewModel group)
+            {
+                await vm.MoveUpAccountGroupCommand.ExecuteAsync(group);
+            }
             e.Handled = true;
-            FocusSelectedAccountItem();
+            FocusSelectedItem();
         }
         else if (e.Key == Key.Down)
         {
-            await vm.MoveDownAccountCommand.ExecuteAsync(vm.SelectedAccount);
+            if (selectedItem is AccountViewModel account)
+            {
+                await vm.MoveDownAccountCommand.ExecuteAsync(account);
+            }
+            else if (selectedItem is AccountGroupHeaderViewModel group)
+            {
+                await vm.MoveDownAccountGroupCommand.ExecuteAsync(group);
+            }
             e.Handled = true;
-            FocusSelectedAccountItem();
+            FocusSelectedItem();
         }
     }
 
-    private void FocusSelectedAccountItem()
+    private void FocusSelectedItem()
     {
         Dispatcher.UIThread.Post(() =>
         {
@@ -118,5 +136,14 @@ public partial class TransactionsView : ValtBaseUserControl
                 AccountsList.ContainerFromIndex(index)?.Focus();
             }
         }, DispatcherPriority.Background);
+    }
+
+    private void MoveToGroupMenu_OnSubmenuOpened(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuItem menuItem) return;
+        if (menuItem.DataContext is not AccountViewModel account) return;
+        if (DataContext is not TransactionsViewModel vm) return;
+
+        vm.SetContextMenuAccountCommand.Execute(account);
     }
 }

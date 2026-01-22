@@ -17,4 +17,6 @@ public record AccountSummaryDTO(
     long? SatsTotal,
     bool HasFutureTotal,
     decimal? FutureFiatTotal,
-    long? FutureSatsTotal);
+    long? FutureSatsTotal,
+    string? GroupId,
+    string? GroupName);

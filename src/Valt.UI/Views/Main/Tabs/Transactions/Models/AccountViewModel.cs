@@ -5,9 +5,8 @@ using Valt.Infra.Modules.Budget.Accounts.Queries.DTOs;
 
 namespace Valt.UI.Views.Main.Tabs.Transactions.Models;
 
-public partial class AccountViewModel : ObservableObject
+public partial class AccountViewModel : ObservableObject, IAccountListItem
 {
-    
     public string Id { get; set; }
     public string Type { get; set; }
     public string Name { get; set; }
@@ -21,6 +20,7 @@ public partial class AccountViewModel : ObservableObject
     public bool HasFutureTotal { get; set; }
     public decimal? FutureFiatTotal { get; set; }
     public long? FutureSatsTotal { get; set; }
+    public string? GroupId { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(FormattedTotal))]
@@ -65,6 +65,7 @@ public partial class AccountViewModel : ObservableObject
         HasFutureTotal = dto.HasFutureTotal;
         FutureFiatTotal = dto.FutureFiatTotal;
         FutureSatsTotal = dto.FutureSatsTotal;
+        GroupId = dto.GroupId;
     }
 
     public string FormattedTotal

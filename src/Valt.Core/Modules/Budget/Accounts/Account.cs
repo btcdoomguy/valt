@@ -11,10 +11,11 @@ public abstract class Account : AggregateRoot<AccountId>
     public bool Visible { get; protected set; }
     public Icon Icon { get; protected set; }
     public int DisplayOrder { get; protected set; }
+    public AccountGroupId? GroupId { get; protected set; }
 
     public abstract AccountTypes AccountType { get; }
 
-    protected Account(AccountId id, AccountName name, bool visible, Icon icon, AccountCurrencyNickname currencyNickname, int displayOrder, int version)
+    protected Account(AccountId id, AccountName name, bool visible, Icon icon, AccountCurrencyNickname currencyNickname, int displayOrder, AccountGroupId? groupId, int version)
     {
         Id = id;
         Name = name;
@@ -22,6 +23,7 @@ public abstract class Account : AggregateRoot<AccountId>
         Icon = icon;
         CurrencyNickname = currencyNickname;
         DisplayOrder = displayOrder;
+        GroupId = groupId;
         Version = version;
 
         if (Version == 0)
@@ -72,8 +74,18 @@ public abstract class Account : AggregateRoot<AccountId>
     {
         if (DisplayOrder == displayOrder)
             return;
-        
+
         DisplayOrder = displayOrder;
+
+        AddEvent(new AccountUpdatedEvent(this));
+    }
+
+    public void AssignToGroup(AccountGroupId? groupId)
+    {
+        if (GroupId == groupId)
+            return;
+
+        GroupId = groupId;
 
         AddEvent(new AccountUpdatedEvent(this));
     }

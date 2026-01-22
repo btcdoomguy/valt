@@ -9,19 +9,20 @@ public sealed class BtcAccount : Account
     public override AccountTypes AccountType => AccountTypes.Bitcoin;
 
     private BtcAccount(AccountId id, AccountName name, AccountCurrencyNickname currencyNickname, bool visible, Icon icon, BtcValue initialAmount,
-        int displayOrder, int version) :
-        base(id, name, visible, icon, currencyNickname, displayOrder, version)
+        int displayOrder, AccountGroupId? groupId, int version) :
+        base(id, name, visible, icon, currencyNickname, displayOrder, groupId, version)
     {
         InitialAmount = initialAmount;
     }
 
-    public static BtcAccount New(AccountName name, AccountCurrencyNickname currencyNickname, bool visible, Icon icon, BtcValue initialAmount)
-        => new(new AccountId(), name, currencyNickname, visible, icon, initialAmount, int.MaxValue, 0);
+    public static BtcAccount New(AccountName name, AccountCurrencyNickname currencyNickname, bool visible, Icon icon, BtcValue initialAmount, AccountGroupId? groupId = null)
+        => new(new AccountId(), name, currencyNickname, visible, icon, initialAmount, int.MaxValue, groupId, 0);
 
     public static BtcAccount Create(AccountId id, AccountName name, AccountCurrencyNickname currencyNickname, bool visible, Icon icon, BtcValue initialAmount,
         int displayOrder,
+        AccountGroupId? groupId,
         int version)
-        => new(id, name, currencyNickname, visible, icon, initialAmount, displayOrder, version);
+        => new(id, name, currencyNickname, visible, icon, initialAmount, displayOrder, groupId, version);
 
     public void ChangeInitialAmount(BtcValue initialAmount)
     {

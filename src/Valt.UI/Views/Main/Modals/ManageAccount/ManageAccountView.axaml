@@ -7,9 +7,9 @@
         xmlns:manageAccount1="clr-namespace:Valt.UI.Views.Main.Modals.ManageAccount"
         mc:Ignorable="d"
         d:DesignWidth="500"
-        d:DesignHeight="590"
+        d:DesignHeight="660"
         MaxWidth="500"
-        MaxHeight="590"
+        MaxHeight="660"
         x:Class="Valt.UI.Views.Main.Modals.ManageAccount.ManageAccountView"
         x:DataType="manageAccount1:ManageAccountViewModel"
         Title="{x:Static local:language.ManageAccount_Title}"
@@ -28,7 +28,7 @@
             <userControls:CustomTitleBar Title="{x:Static local:language.ManageAccount_Title}" 
                                          TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
-            <Border Classes="form-fields-area" Height="510">
+            <Border Classes="form-fields-area" Height="580">
                 <StackPanel>
                     <!-- Name Field -->
                     <StackPanel Classes="form-field">
@@ -90,6 +90,15 @@
                     <StackPanel Classes="form-field" IsVisible="{Binding ShowBtcFields}">
                         <TextBlock Text="{x:Static local:language.ManageAccount_InitialAmount}" />
                         <userControls:BtcInput BtcValue="{Binding InitialBtcAmount, Mode=TwoWay}" />
+                    </StackPanel>
+
+                    <!-- Group Field -->
+                    <StackPanel Classes="form-field">
+                        <TextBlock Text="{x:Static local:language.ManageAccount_Group}" />
+                        <ComboBox ItemsSource="{Binding AvailableGroups}"
+                                  SelectedItem="{Binding SelectedGroup}"
+                                  DisplayMemberBinding="{Binding Name}"
+                                  Width="200" />
                     </StackPanel>
                 </StackPanel>
             </Border>

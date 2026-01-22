@@ -44,7 +44,9 @@ public partial class TransactionsViewModel
                     SatsTotal: 100000,
                     HasFutureTotal: true,
                     FutureFiatTotal: null,
-                    FutureSatsTotal: 120000)),
+                    FutureSatsTotal: 120000,
+                    GroupId: null,
+                    GroupName: null)),
             new AccountViewModel(new AccountSummaryDTO(Id: IdGenerator.Generate(),
                 Type: "FiatAccount",
                 Name: "Nubank",
@@ -55,7 +57,8 @@ public partial class TransactionsViewModel
                     .ToString(),
                 Currency: "BRL", CurrencyDisplayName: "BRL", IsBtcAccount: false, FiatTotal: 1000, SatsTotal: null,
                 HasFutureTotal: false,
-                FutureFiatTotal: 1000, FutureSatsTotal: null)),
+                FutureFiatTotal: 1000, FutureSatsTotal: null,
+                GroupId: null, GroupName: null)),
             new AccountViewModel(new AccountSummaryDTO(Id: IdGenerator.Generate(),
                 Type: "FiatAccount",
                 Name: "Itaú",
@@ -69,7 +72,8 @@ public partial class TransactionsViewModel
                 IsBtcAccount: false,
                 FiatTotal: 1000, SatsTotal: null,
                 HasFutureTotal: false,
-                FutureFiatTotal: 1000, FutureSatsTotal: null))
+                FutureFiatTotal: 1000, FutureSatsTotal: null,
+                GroupId: null, GroupName: null))
         ];
 
         SelectedAccount = Accounts.FirstOrDefault();

@@ -21,5 +21,6 @@ public enum ApplicationModalNames
     FixedExpenseHistory = 17,
     ImportWizard = 18,
     ManageGoal = 19,
-    ConversionCalculator = 20
+    ConversionCalculator = 20,
+    ManageAccountGroup = 21
 }

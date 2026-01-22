@@ -13,6 +13,7 @@ public class AccountEntity
     [BsonField("curr")] public string? Currency { get; set; }
     [BsonField("val")] public decimal InitialAmount { get; set; }
     [BsonField("ord")] public int DisplayOrder { get; set; }
+    [BsonField("grp")] public ObjectId? GroupId { get; set; }
     [BsonField("v")] public int Version { get; set; }
 
     [BsonIgnore]

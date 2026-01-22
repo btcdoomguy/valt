@@ -25,6 +25,7 @@ using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
 using Valt.UI.State;
 using Valt.UI.Views.Main.Modals.ManageAccount;
+using Valt.UI.Views.Main.Modals.ManageAccountGroup;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
 namespace Valt.UI.Views.Main.Tabs.Transactions;
@@ -37,6 +38,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
     private readonly IModalFactory? _modalFactory;
     private readonly IAccountRepository? _accountRepository;
+    private readonly IAccountGroupRepository? _accountGroupRepository;
     private readonly AccountsTotalState? _accountsTotalState;
     private readonly RatesState _ratesState;
     private readonly CurrencySettings? _currencySettings;
@@ -73,6 +75,16 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
     [ObservableProperty] private AvaloniaList<AccountViewModel> _accounts = new();
 
+    /// <summary>
+    /// Flat list of items for the accounts ListBox, containing both group headers and accounts.
+    /// </summary>
+    [ObservableProperty] private AvaloniaList<IAccountListItem> _accountListItems = new();
+
+    /// <summary>
+    /// Available groups for the "Move to Group" context menu.
+    /// </summary>
+    [ObservableProperty] private AvaloniaList<AccountGroupMenuItem> _availableGroups = new();
+
     [ObservableProperty] private AccountViewModel? _selectedAccount;
 
     [ObservableProperty] private string _allWealthInSats = "12.34567890";
@@ -92,6 +104,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
     public TransactionsViewModel(IAccountQueries accountQueries,
         IModalFactory modalFactory, IAccountRepository accountRepository,
+        IAccountGroupRepository accountGroupRepository,
         AccountsTotalState accountsTotalState,
         RatesState ratesState,
         CurrencySettings currencySettings,
@@ -106,6 +119,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         _secureModeState = secureModeState;
         _modalFactory = modalFactory;
         _accountRepository = accountRepository;
+        _accountGroupRepository = accountGroupRepository;
         _accountsTotalState = accountsTotalState;
         _ratesState = ratesState;
         _currencySettings = currencySettings;
@@ -163,6 +177,15 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
             foreach (var account in Accounts)
             {
                 account.SecureModeEnabled = _secureModeState.IsEnabled;
+            }
+
+            // Update accounts in the flat list
+            foreach (var item in AccountListItems)
+            {
+                if (item is AccountViewModel account)
+                {
+                    account.SecureModeEnabled = _secureModeState.IsEnabled;
+                }
             }
         });
     }
@@ -289,15 +312,56 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         var currentSelectedAccountId = SelectedAccount?.Id;
 
         var accounts = await _accountQueries.GetAccountSummariesAsync(_displaySettings.ShowHiddenAccounts);
+        var groups = await _accountQueries.GetAccountGroupsAsync();
 
         WeakReferenceMessenger.Default.Send(accounts);
 
+        // Build all accounts list (for compatibility with existing code)
         Accounts.Clear();
         Accounts.AddRange(accounts.Items.Select(x => new AccountViewModel(x) { SecureModeEnabled = _secureModeState.IsEnabled }));
 
+        // Build flat list with group headers interspersed
+        AccountListItems.Clear();
+
+        // First, add grouped accounts with their headers
+        foreach (var group in groups.OrderBy(g => g.DisplayOrder))
+        {
+            var groupAccounts = accounts.Items
+                .Where(a => a.GroupId == group.Id)
+                .Select(x => new AccountViewModel(x) { SecureModeEnabled = _secureModeState.IsEnabled })
+                .ToList();
+
+            // Only add group header if it has accounts
+            if (groupAccounts.Count > 0)
+            {
+                var header = new AccountGroupHeaderViewModel(group.Id, group.Name);
+                AccountListItems.Add(header);
+
+                foreach (var account in groupAccounts)
+                {
+                    AccountListItems.Add(account);
+                }
+            }
+        }
+
+        // Then add ungrouped accounts
+        var ungrouped = accounts.Items
+            .Where(a => a.GroupId is null)
+            .Select(x => new AccountViewModel(x) { SecureModeEnabled = _secureModeState.IsEnabled });
+
+        foreach (var account in ungrouped)
+        {
+            AccountListItems.Add(account);
+        }
+
+        // Populate available groups for the "Move to Group" context menu
+        AvailableGroups.Clear();
+        AvailableGroups.AddRange(groups.OrderBy(g => g.Name).Select(g => new AccountGroupMenuItem(g.Id, g.Name)));
+
         if (currentSelectedAccountId is not null)
-            SelectedAccount =
-                Accounts.SingleOrDefault(x => x.Id == currentSelectedAccountId);
+            SelectedAccount = AccountListItems
+                .OfType<AccountViewModel>()
+                .SingleOrDefault(x => x.Id == currentSelectedAccountId);
     }
 
     #region Account operations
@@ -316,6 +380,93 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
             return;
 
         await _accountDisplayOrderManager!.NormalizeDisplayOrdersAsync(null);
+        await FetchAccounts();
+    }
+
+    [RelayCommand]
+    private async Task AddAccountGroup()
+    {
+        var ownerWindow = GetUserControlOwnerWindow!();
+
+        var window =
+            (ManageAccountGroupView)await _modalFactory!.CreateAsync(ApplicationModalNames.ManageAccountGroup, ownerWindow)!;
+
+        var result = await window.ShowDialog<ManageAccountGroupViewModel.Response?>(ownerWindow!);
+
+        if (result is null)
+            return;
+
+        await FetchAccounts();
+    }
+
+    [RelayCommand]
+    private async Task EditAccountGroup(AccountGroupHeaderViewModel group)
+    {
+        var ownerWindow = GetUserControlOwnerWindow!();
+
+        var window =
+            (ManageAccountGroupView)await _modalFactory!.CreateAsync(ApplicationModalNames.ManageAccountGroup, ownerWindow, group.Id)!;
+
+        var result = await window.ShowDialog<ManageAccountGroupViewModel.Response?>(ownerWindow!);
+
+        if (result is null)
+            return;
+
+        await FetchAccounts();
+    }
+
+    [RelayCommand]
+    private async Task DeleteAccountGroup(AccountGroupHeaderViewModel group)
+    {
+        var ownerWindow = GetUserControlOwnerWindow!();
+
+        var confirmed = await MessageBoxHelper.ShowQuestionAsync(
+            language.Transactions_DeleteGroup,
+            language.Transactions_DeleteGroupConfirmation,
+            ownerWindow!);
+
+        if (!confirmed)
+            return;
+
+        await _accountGroupRepository!.DeleteAsync(new AccountGroupId(group.Id));
+        await FetchAccounts();
+    }
+
+    [RelayCommand]
+    private async Task MoveUpAccountGroup(AccountGroupHeaderViewModel group)
+    {
+        await MoveAccountGroup(group.Id, moveUp: true);
+    }
+
+    [RelayCommand]
+    private async Task MoveDownAccountGroup(AccountGroupHeaderViewModel group)
+    {
+        await MoveAccountGroup(group.Id, moveUp: false);
+    }
+
+    private async Task MoveAccountGroup(string groupId, bool moveUp)
+    {
+        // Get all groups ordered by display order
+        var allGroups = (await _accountGroupRepository!.GetAllAsync()).OrderBy(g => g.DisplayOrder).ToList();
+        var currentIndex = allGroups.FindIndex(g => g.Id.Value == groupId);
+
+        if (currentIndex < 0) return;
+
+        // Check if move is valid
+        if (moveUp && currentIndex == 0) return;
+        if (!moveUp && currentIndex == allGroups.Count - 1) return;
+
+        // Swap positions in the list
+        var targetIndex = moveUp ? currentIndex - 1 : currentIndex + 1;
+        (allGroups[currentIndex], allGroups[targetIndex]) = (allGroups[targetIndex], allGroups[currentIndex]);
+
+        // Re-assign sequential display orders and save all groups
+        for (var i = 0; i < allGroups.Count; i++)
+        {
+            allGroups[i].ChangeDisplayOrder(i);
+            await _accountGroupRepository.SaveAsync(allGroups[i]);
+        }
+
         await FetchAccounts();
     }
 
@@ -440,6 +591,64 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Stores the account for which the context menu was opened.
+    /// Set by SetContextMenuAccount command when "Move to Group" submenu is opened.
+    /// </summary>
+    private AccountViewModel? _contextMenuAccount;
+
+    [RelayCommand]
+    private void SetContextMenuAccount(AccountViewModel? account)
+    {
+        _contextMenuAccount = account;
+    }
+
+    [RelayCommand]
+    private async Task MoveAccountToGroup(AccountGroupMenuItem? group)
+    {
+        if (group is null || _contextMenuAccount is null) return;
+
+        var account = await _accountRepository!.GetAccountByIdAsync(_contextMenuAccount.Id);
+
+        if (account is null)
+        {
+            await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_AccountNotFound, GetUserControlOwnerWindow()!);
+            return;
+        }
+
+        var newGroupId = new AccountGroupId(group.Id);
+        var newDisplayOrder = _accountDisplayOrderManager!.GetNextDisplayOrderForGroup(
+            new LiteDB.ObjectId(group.Id));
+
+        account.ChangeDisplayOrder(newDisplayOrder);
+        account.AssignToGroup(newGroupId);
+
+        await _accountRepository.SaveAccountAsync(account);
+        await FetchAccounts();
+    }
+
+    [RelayCommand]
+    private async Task RemoveAccountFromGroup(AccountViewModel? selectedAccount)
+    {
+        if (selectedAccount is null) return;
+
+        var account = await _accountRepository!.GetAccountByIdAsync(selectedAccount.Id);
+
+        if (account is null)
+        {
+            await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_AccountNotFound, GetUserControlOwnerWindow()!);
+            return;
+        }
+
+        var newDisplayOrder = _accountDisplayOrderManager!.GetNextDisplayOrderForGroup(null);
+
+        account.ChangeDisplayOrder(newDisplayOrder);
+        account.AssignToGroup(null);
+
+        await _accountRepository.SaveAccountAsync(account);
+        await FetchAccounts();
+    }
+
     #endregion
 
     /// <summary>
@@ -471,4 +680,12 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     }
 
     public override MainViewTabNames TabName => MainViewTabNames.TransactionsPageContent;
+}
+
+/// <summary>
+/// Represents a group option in the "Move to Group" context menu.
+/// </summary>
+public record AccountGroupMenuItem(string Id, string Name)
+{
+    public override string ToString() => Name;
 }

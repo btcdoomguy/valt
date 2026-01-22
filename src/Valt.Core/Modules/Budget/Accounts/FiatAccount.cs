@@ -10,22 +10,23 @@ public sealed class FiatAccount : Account
     public override AccountTypes AccountType => AccountTypes.Fiat;
 
     private FiatAccount(AccountId id, AccountName name, AccountCurrencyNickname currencyNickname, bool visible, Icon icon, FiatCurrency fiatCurrency,
-        FiatValue initialAmount, int displayOrder, int version)
-        : base(id, name, visible, icon, currencyNickname, displayOrder, version)
+        FiatValue initialAmount, int displayOrder, AccountGroupId? groupId, int version)
+        : base(id, name, visible, icon, currencyNickname, displayOrder, groupId, version)
     {
         FiatCurrency = fiatCurrency;
         InitialAmount = initialAmount;
     }
 
     public static FiatAccount New(AccountName name, AccountCurrencyNickname currencyNickname, bool visible, Icon icon, FiatCurrency fiatCurrency,
-        FiatValue initialAmount)
-        => new(new AccountId(), name, currencyNickname, visible, icon, fiatCurrency, initialAmount, int.MaxValue, 0);
+        FiatValue initialAmount, AccountGroupId? groupId = null)
+        => new(new AccountId(), name, currencyNickname, visible, icon, fiatCurrency, initialAmount, int.MaxValue, groupId, 0);
 
     public static FiatAccount Create(AccountId id, AccountName name, AccountCurrencyNickname currencyNickname, bool visible, Icon icon, FiatCurrency fiatCurrency,
         FiatValue initialAmount,
         int displayOrder,
+        AccountGroupId? groupId,
         int version)
-        => new(id, name, currencyNickname, visible, icon, fiatCurrency, initialAmount, displayOrder, version);
+        => new(id, name, currencyNickname, visible, icon, fiatCurrency, initialAmount, displayOrder, groupId, version);
 
     public void ChangeCurrency(FiatCurrency fiatCurrency)
     {

@@ -188,6 +188,11 @@ internal sealed class LocalDatabase : ILocalDatabase
         return GetOpenDatabase().GetCollection<AccountEntity>("budget_accounts");
     }
 
+    public ILiteCollection<AccountGroupEntity> GetAccountGroups()
+    {
+        return GetOpenDatabase().GetCollection<AccountGroupEntity>("budget_accountgroups");
+    }
+
     public ILiteCollection<AccountCacheEntity> GetAccountCaches()
     {
         return GetOpenDatabase().GetCollection<AccountCacheEntity>("budget_accounts_cache");

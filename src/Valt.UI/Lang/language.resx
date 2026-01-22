@@ -158,6 +158,15 @@
     <data name="ManageAccount.InitialAmount" xml:space="preserve">
         <value>Initial Amount</value>
     </data>
+    <data name="ManageAccount.Group" xml:space="preserve">
+        <value>Group</value>
+    </data>
+    <data name="ManageAccountGroup.Title" xml:space="preserve">
+        <value>Account Group</value>
+    </data>
+    <data name="ManageAccountGroup.Name" xml:space="preserve">
+        <value>Name</value>
+    </data>
     <data name="ManageCategories.Title" xml:space="preserve">
         <value>Categories</value>
     </data>
@@ -245,11 +254,32 @@
     <data name="Transactions.Delete" xml:space="preserve">
         <value>Delete</value>
     </data>
+    <data name="Transactions.AddAccount" xml:space="preserve">
+        <value>Add Account</value>
+    </data>
+    <data name="Transactions.AddAccountGroup" xml:space="preserve">
+        <value>Add Account Group</value>
+    </data>
+    <data name="Transactions.EditGroup" xml:space="preserve">
+        <value>Edit Group</value>
+    </data>
+    <data name="Transactions.DeleteGroup" xml:space="preserve">
+        <value>Delete Group</value>
+    </data>
+    <data name="Transactions.DeleteGroupConfirmation" xml:space="preserve">
+        <value>Delete this group? Accounts will become ungrouped.</value>
+    </data>
     <data name="Transactions.MoveUp" xml:space="preserve">
         <value>Move Up</value>
     </data>
     <data name="Transactions.MoveDown" xml:space="preserve">
         <value>Move Down</value>
+    </data>
+    <data name="Transactions.MoveToGroup" xml:space="preserve">
+        <value>Move to Group</value>
+    </data>
+    <data name="Transactions.RemoveFromGroup" xml:space="preserve">
+        <value>Remove from Group</value>
     </data>
     <data name="Transactions.EnterSearchTerm" xml:space="preserve">
         <value>Enter search term...</value>
@@ -1160,6 +1190,9 @@
     </data>
     <data name="Error.AccountNotFound" xml:space="preserve">
         <value>Account not found</value>
+    </data>
+    <data name="Error.AccountGroupNotFound" xml:space="preserve">
+        <value>Account group not found</value>
     </data>
     <data name="Error.FixedExpenseNotFound" xml:space="preserve">
         <value>Fixed expense not found</value>

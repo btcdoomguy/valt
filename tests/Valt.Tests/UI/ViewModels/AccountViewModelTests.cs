@@ -76,7 +76,9 @@ public class AccountViewModelTests
             SatsTotal: null,
             HasFutureTotal: false,
             FutureFiatTotal: null,
-            FutureSatsTotal: null);
+            FutureSatsTotal: null,
+            GroupId: null,
+            GroupName: null);
 
         var viewModel = new AccountViewModel(dto);
 
@@ -104,7 +106,9 @@ public class AccountViewModelTests
             SatsTotal: null,
             HasFutureTotal: false,
             FutureFiatTotal: null,
-            FutureSatsTotal: null);
+            FutureSatsTotal: null,
+            GroupId: null,
+            GroupName: null);
 
         var viewModel = new AccountViewModel(dto);
 

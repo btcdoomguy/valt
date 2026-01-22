@@ -1,3 +1,4 @@
+using LiteDB;
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Accounts;
 using Valt.Infra;
@@ -19,6 +20,7 @@ public class FiatAccountBuilder
     private FiatValue _value = FiatValue.Empty;
     private bool _visible = true;
     private int _version = 1;
+    private AccountGroupId? _groupId = null;
 
     // Public properties for backward compatibility with property initializer syntax
     public AccountId Id { get => _id; set => _id = value; }
@@ -29,6 +31,7 @@ public class FiatAccountBuilder
     public FiatValue Value { get => _value; set => _value = value; }
     public bool Visible { get => _visible; set => _visible = value; }
     public int Version { get => _version; set => _version = value; }
+    public AccountGroupId? GroupId { get => _groupId; set => _groupId = value; }
 
     public static FiatAccountBuilder AnAccount() => new();
 
@@ -92,6 +95,12 @@ public class FiatAccountBuilder
         return this;
     }
 
+    public FiatAccountBuilder WithGroupId(AccountGroupId? groupId)
+    {
+        _groupId = groupId;
+        return this;
+    }
+
     public AccountEntity Build()
     {
         return new AccountEntity()
@@ -104,7 +113,8 @@ public class FiatAccountBuilder
             Name = _name,
             AccountEntityType = AccountEntityType.Fiat,
             Version = _version,
-            Visible = _visible
+            Visible = _visible,
+            GroupId = _groupId != null ? new ObjectId(_groupId) : null
         };
     }
 }

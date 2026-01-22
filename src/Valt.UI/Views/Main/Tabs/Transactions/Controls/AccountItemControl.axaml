@@ -1,0 +1,54 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Valt.UI.Lang"
+             xmlns:models="clr-namespace:Valt.UI.Views.Main.Tabs.Transactions.Models"
+             mc:Ignorable="d" d:DesignWidth="280" d:DesignHeight="60"
+             x:Class="Valt.UI.Views.Main.Tabs.Transactions.Controls.AccountItemControl"
+             x:DataType="models:AccountViewModel">
+    <Border Padding="3,3" Background="Transparent"
+            BorderBrush="{DynamicResource Background700Brush}"
+            BorderThickness="0,0,0,1">
+        <Grid ColumnDefinitions="44, *" Opacity="{Binding Visible, Converter={StaticResource BoolToOpacityConverter}}">
+            <Border Grid.Column="0"
+                    Background="{DynamicResource Background900Brush}"
+                    CornerRadius="4"
+                    Width="36"
+                    Height="36"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+                <Label
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontFamily="{DynamicResource MaterialDesign}"
+                    FontSize="{DynamicResource FontSizeIconLarge}"
+                    Content="{Binding RenderIcon.Unicode}"
+                    Foreground="{Binding RenderIcon.Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}"
+                    Padding="0" />
+            </Border>
+            <StackPanel Grid.Column="1" Spacing="-1">
+                <Label FontSize="{DynamicResource FontSizeMedium}" Padding="0" Content="{Binding Name}" />
+                <Label FontSize="{DynamicResource FontSizeXSmall}" Padding="0"
+                       Foreground="{DynamicResource Text400Brush}"
+                       IsVisible="{Binding !IsBtcAccount}"
+                       Content="{Binding CurrencyDisplayName}" />
+                <Label FontSize="{DynamicResource FontSizeXSmall}" Padding="0"
+                       Foreground="{DynamicResource Accent200Brush}"
+                       IsVisible="{Binding IsBtcAccount}"
+                       Content="{Binding CurrencyDisplayName}" />
+                <Grid>
+                    <Label FontSize="{DynamicResource FontSizeMedium}" Padding="0"
+                           HorizontalContentAlignment="Right"
+                           Content="{Binding FormattedTotal}" />
+                    <Label FontSize="{DynamicResource FontSizeXSmall}" Padding="0"
+                           Margin="0, -14, 0, 0"
+                           HorizontalContentAlignment="Right"
+                           Foreground="{DynamicResource Text400Brush}"
+                           IsVisible="{Binding HasFutureTotal}"
+                           Content="{Binding FormattedFutureTotal}" />
+                </Grid>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>
