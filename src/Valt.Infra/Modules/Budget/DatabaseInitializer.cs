@@ -13,18 +13,21 @@ namespace Valt.Infra.Modules.Budget;
 internal class DatabaseInitializer : IDatabaseInitializer
 {
     private readonly IAccountRepository _accountRepository;
+    private readonly IAccountGroupRepository _accountGroupRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly MigrationManager _migrationManager;
     private readonly IInitialCategoryNameLanguageProvider _initialCategoryNameLanguageProvider;
     private readonly IConfigurationManager _configurationManager;
 
     public DatabaseInitializer(IAccountRepository accountRepository,
+        IAccountGroupRepository accountGroupRepository,
         ICategoryRepository categoryRepository,
         MigrationManager migrationManager,
         IInitialCategoryNameLanguageProvider initialCategoryNameLanguageProvider,
         IConfigurationManager configurationManager)
     {
         _accountRepository = accountRepository;
+        _accountGroupRepository = accountGroupRepository;
         _categoryRepository = categoryRepository;
         _migrationManager = migrationManager;
         _initialCategoryNameLanguageProvider = initialCategoryNameLanguageProvider;
@@ -33,14 +36,22 @@ internal class DatabaseInitializer : IDatabaseInitializer
 
     public async Task InitializeAsync(string? initialDataLanguage = null, IEnumerable<string>? selectedCurrencies = null)
     {
+        // Create account groups
+        var regularAccountsGroup = AccountGroup.New(_initialCategoryNameLanguageProvider.Get(InitialCategoryNames.RegularAccountsGroup, initialDataLanguage));
+        await _accountGroupRepository.SaveAsync(regularAccountsGroup);
+
+        var bitcoinGroup = AccountGroup.New(_initialCategoryNameLanguageProvider.Get(InitialCategoryNames.BitcoinGroup, initialDataLanguage));
+        await _accountGroupRepository.SaveAsync(bitcoinGroup);
+
+        // Create accounts with their respective groups
         var fiatAccount = FiatAccount.New(_initialCategoryNameLanguageProvider.Get(InitialCategoryNames.FiatAccount, initialDataLanguage),
             AccountCurrencyNickname.Empty, true, new Icon("MaterialSymbolsOutlined", "account_balanced", '\ue84f', Color.FromArgb(-16731500)),
-            FiatCurrency.Usd, FiatValue.Empty);
+            FiatCurrency.Usd, FiatValue.Empty, regularAccountsGroup.Id);
         await _accountRepository.SaveAccountAsync(fiatAccount);
 
         var btcAccount = BtcAccount.New(_initialCategoryNameLanguageProvider.Get(InitialCategoryNames.BtcAccount, initialDataLanguage),
             AccountCurrencyNickname.Empty, true,
-            new Icon("MaterialSymbolsOutlined", "currency_bitcoin", '\uebc5', Color.FromArgb(-33532)), BtcValue.Empty);
+            new Icon("MaterialSymbolsOutlined", "currency_bitcoin", '\uebc5', Color.FromArgb(-33532)), BtcValue.Empty, bitcoinGroup.Id);
         await _accountRepository.SaveAccountAsync(btcAccount);
 
         var categories = new List<Category>()

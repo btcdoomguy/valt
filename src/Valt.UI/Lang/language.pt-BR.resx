@@ -1233,6 +1233,12 @@
     <data name="BootDatabase.Category.Housing" xml:space="preserve">
         <value>Moradia</value>
     </data>
+    <data name="BootDatabase.AccountGroup.RegularAccounts" xml:space="preserve">
+        <value>Contas Regulares</value>
+    </data>
+    <data name="BootDatabase.AccountGroup.Bitcoin" xml:space="preserve">
+        <value>Bitcoin</value>
+    </data>
     <data name="Error.IncompatibleVersion" xml:space="preserve">
         <value>Este banco de dados requer a versão {0} ou superior do aplicativo. Você está executando a versão {1}. Por favor, atualize o aplicativo.</value>
     </data>

@@ -14,5 +14,7 @@ public enum InitialCategoryNames
     Entertainment,
     Groceries,
     Paycheck,
-    Housing
+    Housing,
+    RegularAccountsGroup,
+    BitcoinGroup
 }

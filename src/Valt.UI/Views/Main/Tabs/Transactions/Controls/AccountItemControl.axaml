@@ -12,14 +12,19 @@
             BorderThickness="0,0,0,1">
         <Grid ColumnDefinitions="44, *" Opacity="{Binding Visible, Converter={StaticResource BoolToOpacityConverter}}">
             <Border Grid.Column="0"
-                    Background="{DynamicResource Background900Brush}"
+                    Background="{DynamicResource Background800Brush}"
                     CornerRadius="4"
+                    BorderBrush="{DynamicResource Background600Brush}"
+                    BorderThickness="1"
+                    Margin="-8, 0, 0, 0"
                     Width="36"
                     Height="36"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center">
                 <Label
                     HorizontalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
                     VerticalAlignment="Center"
                     FontFamily="{DynamicResource MaterialDesign}"
                     FontSize="{DynamicResource FontSizeIconLarge}"

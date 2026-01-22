@@ -1248,6 +1248,12 @@
     <data name="BootDatabase.Category.Housing" xml:space="preserve">
         <value>Vivienda</value>
     </data>
+    <data name="BootDatabase.AccountGroup.RegularAccounts" xml:space="preserve">
+        <value>Cuentas Regulares</value>
+    </data>
+    <data name="BootDatabase.AccountGroup.Bitcoin" xml:space="preserve">
+        <value>Bitcoin</value>
+    </data>
     <data name="Error.IncompatibleVersion" xml:space="preserve">
         <value>Esta base de datos requiere la versión {0} o superior de la aplicación. Estás ejecutando la versión {1}. Por favor actualiza la aplicación.</value>
     </data>

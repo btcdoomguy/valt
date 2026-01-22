@@ -24,6 +24,8 @@ public class InitialCategoryNameLanguageProvider : IInitialCategoryNameLanguageP
             InitialCategoryNames.Groceries => "BootDatabase.Category.Groceries",
             InitialCategoryNames.Paycheck => "BootDatabase.Category.Paycheck",
             InitialCategoryNames.Housing => "BootDatabase.Category.Housing",
+            InitialCategoryNames.RegularAccountsGroup => "BootDatabase.AccountGroup.RegularAccounts",
+            InitialCategoryNames.BitcoinGroup => "BootDatabase.AccountGroup.Bitcoin",
             _ => throw new ArgumentOutOfRangeException(nameof(categoryName), categoryName, null)
         };
 

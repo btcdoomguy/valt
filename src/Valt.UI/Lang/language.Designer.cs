@@ -2486,7 +2486,19 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("BootDatabase.Category.Housing", resourceCulture);
             }
         }
-        
+
+        public static string BootDatabase_AccountGroup_RegularAccounts {
+            get {
+                return ResourceManager.GetString("BootDatabase.AccountGroup.RegularAccounts", resourceCulture);
+            }
+        }
+
+        public static string BootDatabase_AccountGroup_Bitcoin {
+            get {
+                return ResourceManager.GetString("BootDatabase.AccountGroup.Bitcoin", resourceCulture);
+            }
+        }
+
         public static string Error_IncompatibleVersion {
             get {
                 return ResourceManager.GetString("Error.IncompatibleVersion", resourceCulture);
