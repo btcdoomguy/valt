@@ -314,7 +314,25 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("ManageAccount.InitialAmount", resourceCulture);
             }
         }
-        
+
+        public static string ManageAccount_Group {
+            get {
+                return ResourceManager.GetString("ManageAccount.Group", resourceCulture);
+            }
+        }
+
+        public static string ManageAccountGroup_Title {
+            get {
+                return ResourceManager.GetString("ManageAccountGroup.Title", resourceCulture);
+            }
+        }
+
+        public static string ManageAccountGroup_Name {
+            get {
+                return ResourceManager.GetString("ManageAccountGroup.Name", resourceCulture);
+            }
+        }
+
         public static string ManageCategories_Title {
             get {
                 return ResourceManager.GetString("ManageCategories.Title", resourceCulture);
@@ -488,7 +506,37 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Transactions.Delete", resourceCulture);
             }
         }
-        
+
+        public static string Transactions_AddAccount {
+            get {
+                return ResourceManager.GetString("Transactions.AddAccount", resourceCulture);
+            }
+        }
+
+        public static string Transactions_AddAccountGroup {
+            get {
+                return ResourceManager.GetString("Transactions.AddAccountGroup", resourceCulture);
+            }
+        }
+
+        public static string Transactions_EditGroup {
+            get {
+                return ResourceManager.GetString("Transactions.EditGroup", resourceCulture);
+            }
+        }
+
+        public static string Transactions_DeleteGroup {
+            get {
+                return ResourceManager.GetString("Transactions.DeleteGroup", resourceCulture);
+            }
+        }
+
+        public static string Transactions_DeleteGroupConfirmation {
+            get {
+                return ResourceManager.GetString("Transactions.DeleteGroupConfirmation", resourceCulture);
+            }
+        }
+
         public static string Transactions_MoveUp {
             get {
                 return ResourceManager.GetString("Transactions.MoveUp", resourceCulture);
@@ -500,7 +548,19 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Transactions.MoveDown", resourceCulture);
             }
         }
-        
+
+        public static string Transactions_MoveToGroup {
+            get {
+                return ResourceManager.GetString("Transactions.MoveToGroup", resourceCulture);
+            }
+        }
+
+        public static string Transactions_RemoveFromGroup {
+            get {
+                return ResourceManager.GetString("Transactions.RemoveFromGroup", resourceCulture);
+            }
+        }
+
         public static string Transactions_EnterSearchTerm {
             get {
                 return ResourceManager.GetString("Transactions.EnterSearchTerm", resourceCulture);
@@ -2306,7 +2366,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Error.AccountNotFound", resourceCulture);
             }
         }
-        
+
+        public static string Error_AccountGroupNotFound {
+            get {
+                return ResourceManager.GetString("Error.AccountGroupNotFound", resourceCulture);
+            }
+        }
+
         public static string Error_FixedExpenseNotFound {
             get {
                 return ResourceManager.GetString("Error.FixedExpenseNotFound", resourceCulture);
@@ -2420,7 +2486,19 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("BootDatabase.Category.Housing", resourceCulture);
             }
         }
-        
+
+        public static string BootDatabase_AccountGroup_RegularAccounts {
+            get {
+                return ResourceManager.GetString("BootDatabase.AccountGroup.RegularAccounts", resourceCulture);
+            }
+        }
+
+        public static string BootDatabase_AccountGroup_Bitcoin {
+            get {
+                return ResourceManager.GetString("BootDatabase.AccountGroup.Bitcoin", resourceCulture);
+            }
+        }
+
         public static string Error_IncompatibleVersion {
             get {
                 return ResourceManager.GetString("Error.IncompatibleVersion", resourceCulture);

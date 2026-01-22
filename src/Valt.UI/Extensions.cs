@@ -33,6 +33,7 @@ using Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles;
 using Valt.UI.Views.Main.Modals.ImportWizard;
 using Valt.UI.Views.Main.Modals.ManageGoal;
 using Valt.UI.Views.Main.Modals.ConversionCalculator;
+using Valt.UI.Views.Main.Modals.ManageAccountGroup;
 using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Tabs.Transactions;
 
@@ -104,6 +105,7 @@ public static class Extensions
         services.AddTransient<ImportWizardViewModel>();
         services.AddTransient<ManageGoalViewModel>();
         services.AddTransient<ConversionCalculatorViewModel>();
+        services.AddTransient<ManageAccountGroupViewModel>();
 
         //other
         services.AddSingleton<IInitialCategoryNameLanguageProvider, InitialCategoryNameLanguageProvider>();
@@ -193,6 +195,10 @@ public static class Extensions
                 ApplicationModalNames.ConversionCalculator => new ConversionCalculatorView()
                 {
                     DataContext = services.GetRequiredService<ConversionCalculatorViewModel>(),
+                },
+                ApplicationModalNames.ManageAccountGroup => new ManageAccountGroupView()
+                {
+                    DataContext = services.GetRequiredService<ManageAccountGroupViewModel>(),
                 },
                 _ => throw new ArgumentOutOfRangeException(nameof(modalNames), modalNames, null)
             };

@@ -34,6 +34,7 @@ public interface ILocalDatabase : INotifyPropertyChanged, IDisposable
     #region Budget module
 
     ILiteCollection<AccountEntity> GetAccounts();
+    ILiteCollection<AccountGroupEntity> GetAccountGroups();
     ILiteCollection<CategoryEntity> GetCategories();
     ILiteCollection<FixedExpenseEntity> GetFixedExpenses();
     ILiteCollection<FixedExpenseRecordEntity> GetFixedExpenseRecords();

@@ -129,6 +129,15 @@
     <data name="ManageAccount.Visible" xml:space="preserve">
         <value>Visível</value>
     </data>
+    <data name="ManageAccount.Group" xml:space="preserve">
+        <value>Grupo</value>
+    </data>
+    <data name="ManageAccountGroup.Title" xml:space="preserve">
+        <value>Grupo de Contas</value>
+    </data>
+    <data name="ManageAccountGroup.Name" xml:space="preserve">
+        <value>Nome</value>
+    </data>
     <data name="ManageCategories.Delete" xml:space="preserve">
         <value>Excluir</value>
     </data>
@@ -216,6 +225,21 @@
     <data name="Transactions.Delete" xml:space="preserve">
         <value>Excluir</value>
     </data>
+    <data name="Transactions.AddAccount" xml:space="preserve">
+        <value>Adicionar Conta</value>
+    </data>
+    <data name="Transactions.AddAccountGroup" xml:space="preserve">
+        <value>Adicionar Grupo</value>
+    </data>
+    <data name="Transactions.EditGroup" xml:space="preserve">
+        <value>Editar Grupo</value>
+    </data>
+    <data name="Transactions.DeleteGroup" xml:space="preserve">
+        <value>Excluir Grupo</value>
+    </data>
+    <data name="Transactions.DeleteGroupConfirmation" xml:space="preserve">
+        <value>Excluir este grupo? As contas ficarão sem grupo.</value>
+    </data>
     <data name="Transactions.Edit" xml:space="preserve">
         <value>Editar</value>
     </data>
@@ -245,6 +269,12 @@
     </data>
     <data name="Transactions.MoveUp" xml:space="preserve">
         <value>Mover para cima</value>
+    </data>
+    <data name="Transactions.MoveToGroup" xml:space="preserve">
+        <value>Mover para Grupo</value>
+    </data>
+    <data name="Transactions.RemoveFromGroup" xml:space="preserve">
+        <value>Remover do Grupo</value>
     </data>
     <data name="Transactions.Total" xml:space="preserve">
         <value>Total em BTC</value>
@@ -1141,6 +1171,9 @@
     <data name="Error.AccountNotFound" xml:space="preserve">
         <value>Conta não encontrada</value>
     </data>
+    <data name="Error.AccountGroupNotFound" xml:space="preserve">
+        <value>Grupo de contas não encontrado</value>
+    </data>
     <data name="Error.FixedExpenseNotFound" xml:space="preserve">
         <value>Despesa fixa não encontrada</value>
     </data>
@@ -1199,6 +1232,12 @@
     </data>
     <data name="BootDatabase.Category.Housing" xml:space="preserve">
         <value>Moradia</value>
+    </data>
+    <data name="BootDatabase.AccountGroup.RegularAccounts" xml:space="preserve">
+        <value>Contas Regulares</value>
+    </data>
+    <data name="BootDatabase.AccountGroup.Bitcoin" xml:space="preserve">
+        <value>Bitcoin</value>
     </data>
     <data name="Error.IncompatibleVersion" xml:space="preserve">
         <value>Este banco de dados requer a versão {0} ou superior do aplicativo. Você está executando a versão {1}. Por favor, atualize o aplicativo.</value>

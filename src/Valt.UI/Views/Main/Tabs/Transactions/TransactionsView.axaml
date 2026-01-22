@@ -5,6 +5,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="clr-namespace:Valt.UI.Lang"
              xmlns:vm1="clr-namespace:Valt.UI.Views.Main.Tabs.Transactions"
+             xmlns:models="clr-namespace:Valt.UI.Views.Main.Tabs.Transactions.Models"
+             xmlns:controls="clr-namespace:Valt.UI.Views.Main.Tabs.Transactions.Controls"
              mc:Ignorable="d" d:DesignWidth="1800" d:DesignHeight="900"
              MinWidth="900"
              MinHeight="500"
@@ -13,6 +15,14 @@
     <Design.DataContext>
         <vm1:TransactionsViewModel />
     </Design.DataContext>
+
+    <UserControl.Styles>
+        <!-- Style for Move to Group submenu items -->
+        <Style Selector="MenuItem#MoveToGroupMenu > MenuItem">
+            <Setter Property="Command" Value="{Binding #Root.((vm1:TransactionsViewModel)DataContext).MoveAccountToGroupCommand}" />
+            <Setter Property="CommandParameter" Value="{Binding}" />
+        </Style>
+    </UserControl.Styles>
 
     <Grid x:Name="MainLayoutGrid">
         <Grid.ColumnDefinitions>
@@ -110,82 +120,89 @@
                     <ListBox Grid.Row="1"
                              x:Name="AccountsList"
                              Classes="accounts"
-                             ItemsSource="{Binding Accounts}"
+                             ItemsSource="{Binding AccountListItems}"
                              SelectedItem="{Binding SelectedAccount}"
                              SelectionMode="Single">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <!-- Had to create a clickable area using the background transparent to proper render the contextmenu on right click otherwise clickable area doesn't work! -->
-                                <Border Padding="3,3" Background="Transparent"
-                                        BorderBrush="{DynamicResource Background700Brush}"
-                                        BorderThickness="0,0,0,1">
-                                    <Grid ColumnDefinitions="44, *" Opacity="{Binding Visible, Converter={StaticResource BoolToOpacityConverter}}">
-                                        <Label
-                                            Grid.Column="0"
-                                            Width="40"
-                                            VerticalAlignment="Center"
-                                            FontFamily="{DynamicResource MaterialDesign}"
-                                            FontSize="{DynamicResource FontSizeIconLarge}"
-                                            Content="{Binding RenderIcon.Unicode}"
-                                            Foreground="{Binding RenderIcon.Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
-                                        <StackPanel Grid.Column="1" Spacing="-1">
-                                            <Label FontSize="{DynamicResource FontSizeMedium}" Padding="0" Content="{Binding Name}" />
-                                            <Label FontSize="{DynamicResource FontSizeXSmall}" Padding="0"
-                                                   Foreground="{DynamicResource Text400Brush}"
-                                                   IsVisible="{Binding !IsBtcAccount}"
-                                                   Content="{Binding CurrencyDisplayName}" />
-                                            <Label FontSize="{DynamicResource FontSizeXSmall}" Padding="0"
-                                                   Foreground="{DynamicResource Accent200Brush}"
-                                                   IsVisible="{Binding IsBtcAccount}"
-                                                   Content="{Binding CurrencyDisplayName}" />
-                                            <Grid>
-                                                <Label FontSize="{DynamicResource FontSizeMedium}" Padding="0"
-                                                       HorizontalContentAlignment="Right"
-                                                       Content="{Binding FormattedTotal}" />
-                                                <Label FontSize="{DynamicResource FontSizeXSmall}" Padding="0"
-                                                       Margin="0, -14, 0, 0"
-                                                       HorizontalContentAlignment="Right"
-                                                       Foreground="{DynamicResource Text400Brush}"
-                                                       IsVisible="{Binding HasFutureTotal}"
-                                                       Content="{Binding FormattedFutureTotal}" />
-                                            </Grid>
-                                        </StackPanel>
-                                    </Grid>
+                        <ListBox.Styles>
+                            <!-- Override padding for account items -->
+                            <Style Selector="ListBoxItem">
+                                <Setter Property="Padding" Value="5,5,5,0" />
+                            </Style>
+                        </ListBox.Styles>
+                        <ListBox.DataTemplates>
+                            <!-- Group Header Template -->
+                            <DataTemplate DataType="{x:Type models:AccountGroupHeaderViewModel}">
+                                <Border Background="{DynamicResource Background800Brush}"
+                                        BorderBrush="{DynamicResource Background600Brush}"
+                                        BorderThickness="0,0,0,1"
+                                        Padding="8,4"
+                                        Margin="-5,-5,-5,0">
                                     <Border.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem Header="{x:Static local:language.Transactions_Edit}"
-                                                      Command="{Binding ((vm1:TransactionsViewModel)DataContext).EditAccountCommand, ElementName=Root}"
-                                                      CommandParameter="{Binding .}">
-                                            </MenuItem>
-
-                                            <MenuItem Header="{x:Static local:language.Transactions_Hide}"
-                                                      Command="{Binding ((vm1:TransactionsViewModel)DataContext).HideAccountCommand, ElementName=Root}"
-                                                      CommandParameter="{Binding .}"
-                                                      IsVisible="{Binding Visible}">
-                                            </MenuItem>
-                                            <MenuItem Header="{x:Static local:language.Transactions_Show}"
-                                                      Command="{Binding ((vm1:TransactionsViewModel)DataContext).ShowAccountCommand, ElementName=Root}"
-                                                      CommandParameter="{Binding .}"
-                                                      IsVisible="{Binding IsHidden}">
-                                            </MenuItem>
-                                            <MenuItem Header="{x:Static local:language.Transactions_Delete}"
-                                                      Command="{Binding ((vm1:TransactionsViewModel)DataContext).DeleteAccountCommand, ElementName=Root}"
-                                                      CommandParameter="{Binding .}">
-                                            </MenuItem>
-                                            <Separator></Separator>
+                                        <ContextMenu x:DataType="models:AccountGroupHeaderViewModel">
+                                            <MenuItem Header="{x:Static local:language.Transactions_EditGroup}"
+                                                      Command="{Binding #Root.((vm1:TransactionsViewModel)DataContext).EditAccountGroupCommand}"
+                                                      CommandParameter="{Binding .}" />
+                                            <MenuItem Header="{x:Static local:language.Transactions_DeleteGroup}"
+                                                      Command="{Binding #Root.((vm1:TransactionsViewModel)DataContext).DeleteAccountGroupCommand}"
+                                                      CommandParameter="{Binding .}" />
+                                            <Separator />
                                             <MenuItem Header="{x:Static local:language.Transactions_MoveUp}"
-                                                      Command="{Binding ((vm1:TransactionsViewModel)DataContext).MoveUpAccountCommand, ElementName=Root}"
-                                                      CommandParameter="{Binding .}">
-                                            </MenuItem>
+                                                      Command="{Binding #Root.((vm1:TransactionsViewModel)DataContext).MoveUpAccountGroupCommand}"
+                                                      CommandParameter="{Binding .}" />
                                             <MenuItem Header="{x:Static local:language.Transactions_MoveDown}"
-                                                      Command="{Binding ((vm1:TransactionsViewModel)DataContext).MoveDownAccountCommand, ElementName=Root}"
-                                                      CommandParameter="{Binding .}">
-                                            </MenuItem>
+                                                      Command="{Binding #Root.((vm1:TransactionsViewModel)DataContext).MoveDownAccountGroupCommand}"
+                                                      CommandParameter="{Binding .}" />
                                         </ContextMenu>
                                     </Border.ContextMenu>
+                                    <TextBlock Text="{Binding Name}"
+                                               FontSize="{DynamicResource FontSizeSmall}"
+                                               Foreground="{DynamicResource Text400Brush}"
+                                               VerticalAlignment="Center" />
                                 </Border>
                             </DataTemplate>
-                        </ListBox.ItemTemplate>
+                            <!-- Account Item Template -->
+                            <DataTemplate DataType="{x:Type models:AccountViewModel}">
+                                <controls:AccountItemControl DataContext="{Binding}">
+                                    <controls:AccountItemControl.ContextMenu>
+                                        <ContextMenu x:DataType="models:AccountViewModel">
+                                            <MenuItem Header="{x:Static local:language.Transactions_Edit}"
+                                                      Command="{Binding #Root.((vm1:TransactionsViewModel)DataContext).EditAccountCommand}"
+                                                      CommandParameter="{Binding .}" />
+                                            <MenuItem Header="{x:Static local:language.Transactions_Hide}"
+                                                      Command="{Binding #Root.((vm1:TransactionsViewModel)DataContext).HideAccountCommand}"
+                                                      CommandParameter="{Binding .}"
+                                                      IsVisible="{Binding Visible}" />
+                                            <MenuItem Header="{x:Static local:language.Transactions_Show}"
+                                                      Command="{Binding #Root.((vm1:TransactionsViewModel)DataContext).ShowAccountCommand}"
+                                                      CommandParameter="{Binding .}"
+                                                      IsVisible="{Binding IsHidden}" />
+                                            <MenuItem Header="{x:Static local:language.Transactions_Delete}"
+                                                      Command="{Binding #Root.((vm1:TransactionsViewModel)DataContext).DeleteAccountCommand}"
+                                                      CommandParameter="{Binding .}" />
+                                            <Separator />
+                                            <MenuItem Header="{x:Static local:language.Transactions_MoveUp}"
+                                                      Command="{Binding #Root.((vm1:TransactionsViewModel)DataContext).MoveUpAccountCommand}"
+                                                      CommandParameter="{Binding .}" />
+                                            <MenuItem Header="{x:Static local:language.Transactions_MoveDown}"
+                                                      Command="{Binding #Root.((vm1:TransactionsViewModel)DataContext).MoveDownAccountCommand}"
+                                                      CommandParameter="{Binding .}" />
+                                            <Separator IsVisible="{Binding !GroupId, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                            <!-- Move to Group submenu - visible only when account is not in a group -->
+                                            <MenuItem x:Name="MoveToGroupMenu"
+                                                      Header="{x:Static local:language.Transactions_MoveToGroup}"
+                                                      IsVisible="{Binding GroupId, Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                                                      SubmenuOpened="MoveToGroupMenu_OnSubmenuOpened"
+                                                      ItemsSource="{Binding #Root.((vm1:TransactionsViewModel)DataContext).AvailableGroups}" />
+                                            <!-- Remove from Group - visible only when account is in a group -->
+                                            <MenuItem Header="{x:Static local:language.Transactions_RemoveFromGroup}"
+                                                      Command="{Binding #Root.((vm1:TransactionsViewModel)DataContext).RemoveAccountFromGroupCommand}"
+                                                      CommandParameter="{Binding .}"
+                                                      IsVisible="{Binding GroupId, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                        </ContextMenu>
+                                    </controls:AccountItemControl.ContextMenu>
+                                </controls:AccountItemControl>
+                            </DataTemplate>
+                        </ListBox.DataTemplates>
                     </ListBox>
                 </Grid>
 
@@ -194,7 +211,15 @@
                         VerticalAlignment="Bottom"
                         Padding="10"
                         Margin="0,0,10,18">
-                    <Button Classes="rounded" Content="&#xE145;" Command="{Binding AddAccountCommand}">
+                    <Button Classes="rounded" Content="&#xE145;">
+                        <Button.Flyout>
+                            <MenuFlyout>
+                                <MenuItem Header="{x:Static local:language.Transactions_AddAccount}"
+                                          Command="{Binding AddAccountCommand}" />
+                                <MenuItem Header="{x:Static local:language.Transactions_AddAccountGroup}"
+                                          Command="{Binding AddAccountGroupCommand}" />
+                            </MenuFlyout>
+                        </Button.Flyout>
                     </Button>
                 </Border>
             </Grid>

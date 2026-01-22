@@ -700,6 +700,7 @@ public class CsvImportExecutorTests
             FiatCurrency.Usd,
             FiatValue.Empty,
             displayOrder: 0,
+            groupId: null,
             version: 0);
 
         _accountRepository.GetAccountByIdAsync(Arg.Any<AccountId>()).Returns(fiatAccount);
@@ -735,6 +736,7 @@ public class CsvImportExecutorTests
             Icon.Empty,
             BtcValue.Empty,
             displayOrder: 0,
+            groupId: null,
             version: 0);
 
         _accountRepository.GetAccountByIdAsync(Arg.Any<AccountId>()).Returns(btcAccount);
@@ -771,6 +773,7 @@ public class CsvImportExecutorTests
             FiatCurrency.Usd,
             FiatValue.Empty,
             displayOrder: 0,
+            groupId: null,
             version: 0);
 
         _accountRepository.GetAccountByIdAsync(Arg.Any<AccountId>()).Returns(fiatAccount);
@@ -814,6 +817,7 @@ public class CsvImportExecutorTests
             FiatCurrency.Usd,
             FiatValue.Empty,
             displayOrder: 0,
+            groupId: null,
             version: 0);
 
         _accountRepository.GetAccountByIdAsync(Arg.Any<AccountId>()).Returns(fiatAccount);

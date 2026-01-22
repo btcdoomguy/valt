@@ -9,4 +9,5 @@ public interface IAccountQueries
 {
     Task<AccountSummariesDTO> GetAccountSummariesAsync(bool showHiddenAccounts);
     Task<IEnumerable<AccountDTO>> GetAccountsAsync(bool showHiddenAccounts);
+    Task<IEnumerable<AccountGroupDTO>> GetAccountGroupsAsync();
 }

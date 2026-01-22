@@ -35,7 +35,7 @@ public class AccountRepositoryUpdateFiatAccountTests : DatabaseTest
     {
         var repository = new AccountRepository(_localDatabase, _domainEventPublisher);
 
-        var account = FiatAccount.Create(_fiatAccountId, "Fiat Account", AccountCurrencyNickname.Empty, true, Icon.Empty, FiatCurrency.Brl, 1, 0, 1);
+        var account = FiatAccount.Create(_fiatAccountId, "Fiat Account", AccountCurrencyNickname.Empty, true, Icon.Empty, FiatCurrency.Brl, 1, 0, null, 1);
 
         account.ChangeInitialAmount(2);
 

@@ -23,11 +23,8 @@ public class ModalFactory : IModalFactory
         if (window.DataContext is IValtModal modal)
         {
             modal.OwnerWindow = owner;
-            if (parameter != null)
-            {
-                modal.Parameter = parameter;
-                await modal.OnBindParameterAsync();
-            }
+            modal.Parameter = parameter;
+            await modal.OnBindParameterAsync();
         }
 
         return window;

@@ -7,6 +7,7 @@
     <converters:EnumEqualityConverter x:Key="EnumEqualityConverter" />
     <converters:AvgPriceLineTypeConverter x:Key="AvgPriceLineTypeConverter" />
     <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
+    <converters:BoolToExpanderIconConverter x:Key="BoolToExpanderIconConverter" />
 
     <FontFamily x:Key="GeistMono">/Assets/Fonts/GeistMono-Regular.ttf#Geist Mono</FontFamily>
     <FontFamily x:Key="Geist">/Assets/Fonts/Geist-Regular.ttf#Geist</FontFamily>

@@ -114,7 +114,7 @@
                                 LegendPosition="Top"
                                 LegendTextSize="13"
                                 TooltipTextSize="12"
-                                ZoomMode="X"
+                                ZoomMode="None"
                                 Height="480"
                                 Margin="20, 10, 20, 10">
                             </avalonia:CartesianChart>
@@ -330,6 +330,7 @@
                                                              XAxes="{Binding ExpensesByCategoryChartData.XAxes}"
                                                              YAxes="{Binding ExpensesByCategoryChartData.YAxes}"
                                                              TooltipTextSize="12"
+                                                             ZoomMode="None"
                                                              Margin="20, 10, 20, 10">
                                     </avalonia:CartesianChart>
                                 </ScrollViewer>
@@ -392,6 +393,7 @@
                                                              XAxes="{Binding IncomeByCategoryChartData.XAxes}"
                                                              YAxes="{Binding IncomeByCategoryChartData.YAxes}"
                                                              TooltipTextSize="12"
+                                                             ZoomMode="None"
                                                              Margin="20, 10, 20, 10">
                                     </avalonia:CartesianChart>
                                 </ScrollViewer>

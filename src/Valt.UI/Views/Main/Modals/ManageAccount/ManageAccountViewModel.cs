@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using LiteDB;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Exceptions;
 using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Accounts.Contracts;
 using Valt.Core.Modules.Budget.Accounts.Exceptions;
 using Valt.Core.Modules.Budget.Transactions.Contracts;
+using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Configuration;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
@@ -23,13 +25,16 @@ namespace Valt.UI.Views.Main.Modals.ManageAccount;
 public partial class ManageAccountViewModel : ValtModalValidatorViewModel
 {
     private readonly IAccountRepository? _accountRepository;
+    private readonly IAccountGroupRepository? _accountGroupRepository;
     private readonly ITransactionRepository? _transactionRepository;
     private readonly IModalFactory? _modalFactory;
     private readonly IConfigurationManager? _configurationManager;
+    private readonly AccountDisplayOrderManager? _accountDisplayOrderManager;
 
     #region Form Data
 
     private AccountId? _accountId;
+    private AccountGroupId? _existingGroupId;
 
     [ObservableProperty] [NotifyDataErrorInfo] [Required(ErrorMessage = "Inform a valid account name.")]
     private string _name = string.Empty;
@@ -76,7 +81,13 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
 
     [ObservableProperty] private bool _canEditAccountStructure = true;
 
+    [ObservableProperty] private List<GroupOption> _availableGroups = [];
+
+    [ObservableProperty] private GroupOption? _selectedGroup;
+
     #endregion
+
+    public record GroupOption(string? Id, string Name);
 
     /// <summary>
     /// Design-time constructor
@@ -92,14 +103,18 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
     }
 
     public ManageAccountViewModel(IAccountRepository accountRepository,
+        IAccountGroupRepository accountGroupRepository,
         ITransactionRepository transactionRepository,
         IModalFactory modalFactory,
-        IConfigurationManager configurationManager)
+        IConfigurationManager configurationManager,
+        AccountDisplayOrderManager accountDisplayOrderManager)
     {
         _accountRepository = accountRepository;
+        _accountGroupRepository = accountGroupRepository;
         _transactionRepository = transactionRepository;
         _modalFactory = modalFactory;
         _configurationManager = configurationManager;
+        _accountDisplayOrderManager = accountDisplayOrderManager;
 
         AccountType = AvailableAccountTypes[0];
         Currency = AvailableCurrencies.FirstOrDefault() ?? FiatCurrency.Usd.Code;
@@ -108,6 +123,9 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
 
     public override async Task OnBindParameterAsync()
     {
+        // Load available groups
+        await LoadAvailableGroupsAsync();
+
         if (Parameter is not null && Parameter is string accountId)
         {
             var account = await _accountRepository!.GetAccountByIdAsync(new AccountId(accountId));
@@ -119,10 +137,21 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
             }
 
             _accountId = account.Id;
+            _existingGroupId = account.GroupId;
             Name = account.Name;
             CurrencyNickname = account.CurrencyNickname.Value;
             Visible = account.Visible;
             Icon = account.Icon;
+
+            // Set selected group
+            if (account.GroupId is not null)
+            {
+                SelectedGroup = AvailableGroups.FirstOrDefault(g => g.Id == account.GroupId.Value);
+            }
+            else
+            {
+                SelectedGroup = AvailableGroups.FirstOrDefault();
+            }
 
             switch (account)
             {
@@ -140,6 +169,18 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
             if (await _transactionRepository!.HasAnyTransactionAsync(account.Id))
                 CanEditAccountStructure = false;
         }
+        else
+        {
+            SelectedGroup = AvailableGroups.FirstOrDefault();
+        }
+    }
+
+    private async Task LoadAvailableGroupsAsync()
+    {
+        var groups = await _accountGroupRepository!.GetAllAsync();
+        var groupOptions = new List<GroupOption> { new(null, "(None)") };
+        groupOptions.AddRange(groups.Select(g => new GroupOption(g.Id.Value, g.Name.Value)));
+        AvailableGroups = groupOptions;
     }
 
     [RelayCommand]
@@ -221,6 +262,21 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
                     btcAccount.ChangeInitialAmount(InitialBtcAmount);
                 }
             }
+
+            // Apply group selection and reset display order if group changed
+            var selectedGroupId = SelectedGroup?.Id is not null ? new AccountGroupId(SelectedGroup.Id) : null;
+            var groupChanged = _existingGroupId != selectedGroupId;
+            var isNewAccount = _accountId is null;
+
+            if (groupChanged || isNewAccount)
+            {
+                // Get the next display order for the target group
+                var newDisplayOrder = _accountDisplayOrderManager!.GetNextDisplayOrderForGroup(
+                    selectedGroupId is not null ? new ObjectId(selectedGroupId.Value) : null);
+                account.ChangeDisplayOrder(newDisplayOrder);
+            }
+
+            account.AssignToGroup(selectedGroupId);
 
             await _accountRepository!.SaveAccountAsync(account);
 

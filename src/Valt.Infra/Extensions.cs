@@ -189,6 +189,7 @@ public static class Extensions
     private static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddSingleton<IAccountRepository, AccountRepository>();
+        services.AddSingleton<IAccountGroupRepository, AccountGroupRepository>();
         services.AddSingleton<IAvgPriceRepository, AvgPriceRepository>();
         services.AddSingleton<ICategoryRepository, CategoryRepository>();
         services.AddSingleton<IFixedExpenseRepository, FixedExpenseRepository>();

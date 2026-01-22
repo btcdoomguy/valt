@@ -28,6 +28,14 @@
             </Border>
 
             <ItemsControl ItemsSource="{Binding Rows}">
+                <ItemsControl.Styles>
+                    <Style Selector="ItemsControl > ContentPresenter:nth-child(odd)">
+                        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+                    </Style>
+                    <Style Selector="ItemsControl > ContentPresenter:nth-child(even)">
+                        <Setter Property="Background" Value="{DynamicResource Background900Brush}" />
+                    </Style>
+                </ItemsControl.Styles>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="vm:RowItem">
                         <Border Padding="12, 6"

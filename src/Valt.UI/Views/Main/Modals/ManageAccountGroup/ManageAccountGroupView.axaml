@@ -1,0 +1,48 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        xmlns:manageAccountGroup="clr-namespace:Valt.UI.Views.Main.Modals.ManageAccountGroup"
+        mc:Ignorable="d"
+        d:DesignWidth="400"
+        d:DesignHeight="200"
+        MaxWidth="400"
+        MaxHeight="200"
+        x:Class="Valt.UI.Views.Main.Modals.ManageAccountGroup.ManageAccountGroupView"
+        x:DataType="manageAccountGroup:ManageAccountGroupViewModel"
+        Title="{x:Static local:language.ManageAccountGroup_Title}"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <manageAccountGroup:ManageAccountGroupViewModel />
+    </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" />
+    </Window.KeyBindings>
+    <Border>
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="{x:Static local:language.ManageAccountGroup_Title}"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+            <Border Classes="form-fields-area" Height="120">
+                <StackPanel>
+                    <!-- Name Field -->
+                    <StackPanel Classes="form-field">
+                        <TextBlock Text="{x:Static local:language.ManageAccountGroup_Name}"
+                                   Margin="0, 8, 0, 0" />
+                        <TextBox Text="{Binding Name}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10"
+                        Margin="0, 0, 0, 0">
+                <Button Width="100" Content="{x:Static local:language.OkButton}" HorizontalContentAlignment="Center" Command="{Binding OkCommand}"></Button>
+                <Button Width="100" Content="{x:Static local:language.CancelButton}" HorizontalContentAlignment="Center" Command="{Binding CancelCommand}"></Button>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

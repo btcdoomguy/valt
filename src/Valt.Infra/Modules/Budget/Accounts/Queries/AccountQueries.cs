@@ -1,3 +1,4 @@
+using LiteDB;
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Accounts.Contracts;
 using Valt.Infra.DataAccess;
@@ -20,7 +21,9 @@ public class AccountQueries : IAccountQueries
     public async Task<AccountSummariesDTO> GetAccountSummariesAsync(bool showHiddenAccounts)
     {
         var accounts = _localDatabase.GetAccounts().FindAll().OrderBy(x => x.DisplayOrder);
-        var summaryTasks = (from account in accounts where account.Visible || showHiddenAccounts select CreateAccountSummaryAsync(account))
+        var groups = _localDatabase.GetAccountGroups().FindAll().ToDictionary(g => g.Id, g => g.Name);
+
+        var summaryTasks = (from account in accounts where account.Visible || showHiddenAccounts select CreateAccountSummaryAsync(account, groups))
             .ToList();
 
         var dtos = await Task.WhenAll(summaryTasks);
@@ -45,7 +48,17 @@ public class AccountQueries : IAccountQueries
         }));
     }
 
-    private async Task<AccountSummaryDTO> CreateAccountSummaryAsync(AccountEntity account)
+    public Task<IEnumerable<AccountGroupDTO>> GetAccountGroupsAsync()
+    {
+        var groups = _localDatabase.GetAccountGroups()
+            .FindAll()
+            .OrderBy(g => g.DisplayOrder)
+            .Select(g => new AccountGroupDTO(g.Id.ToString(), g.Name, g.DisplayOrder));
+
+        return Task.FromResult(groups);
+    }
+
+    private async Task<AccountSummaryDTO> CreateAccountSummaryAsync(AccountEntity account, Dictionary<LiteDB.ObjectId, string> groups)
     {
         decimal? fiatTotal = null;
         decimal? futureFiatTotal = null;
@@ -73,6 +86,9 @@ public class AccountQueries : IAccountQueries
             ? account.CurrencyNickname
             : account.AccountEntityType == AccountEntityType.Bitcoin ? "BTC" : account.Currency;
 
+        string? groupId = account.GroupId?.ToString();
+        string? groupName = account.GroupId != null && groups.TryGetValue(account.GroupId, out var name) ? name : null;
+
         return new AccountSummaryDTO(
             account.Id.ToString(),
             account.AccountEntityType.ToString(),
@@ -88,6 +104,8 @@ public class AccountQueries : IAccountQueries
             satsTotal,
             hasFuture,
             futureFiatTotal,
-            futureSatsTotal);
+            futureSatsTotal,
+            groupId,
+            groupName);
     }
 }
