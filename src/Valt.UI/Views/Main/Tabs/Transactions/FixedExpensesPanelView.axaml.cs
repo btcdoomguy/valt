@@ -3,6 +3,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using Valt.UI.Base;
+using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
 namespace Valt.UI.Views.Main.Tabs.Transactions;
 
@@ -48,5 +49,13 @@ public partial class FixedExpensesPanelView : ValtBaseUserControl
 
         _ = vm.OpenFixedExpenseCommand.ExecuteAsync(null);
         e.Handled = true;
+    }
+
+    private void FixedExpenseList_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (DataContext is FixedExpensesPanelViewModel vm && sender is ListBox listBox)
+        {
+            vm.SelectedFixedExpense = listBox.SelectedItem as FixedExpensesEntryViewModel;
+        }
     }
 }

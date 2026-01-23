@@ -32,10 +32,11 @@
                 <Border Grid.Column="0"
                         Padding="5">
                     <TreeView x:Name="Tree" ItemsSource="{Binding NewCategories}"
-                              SelectedItem="{Binding SelectedCategory}"
+                              SelectedItem="{Binding SelectedCategory, Mode=OneWay}"
                               SelectionMode="Single"
                               IsEnabled="{Binding !IsEditing}"
-                              DragDrop.AllowDrop="True">
+                              DragDrop.AllowDrop="True"
+                              SelectionChanged="Tree_OnSelectionChanged">
                         <TreeView.ItemTemplate>
                             <TreeDataTemplate ItemsSource="{Binding SubNodes}">
                                 <StackPanel Orientation="Horizontal" Height="20">

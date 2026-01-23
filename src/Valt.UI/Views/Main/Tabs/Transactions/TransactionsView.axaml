@@ -121,8 +121,9 @@
                              x:Name="AccountsList"
                              Classes="accounts"
                              ItemsSource="{Binding AccountListItems}"
-                             SelectedItem="{Binding SelectedAccount}"
-                             SelectionMode="Single">
+                             SelectedItem="{Binding SelectedAccount, Mode=OneWay}"
+                             SelectionMode="Single"
+                             SelectionChanged="AccountsList_OnSelectionChanged">
                         <ListBox.Styles>
                             <!-- Override padding for account items -->
                             <Style Selector="ListBoxItem">

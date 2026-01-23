@@ -12,7 +12,6 @@
     <Design.DataContext>
         <avgPrice:AvgPriceViewModel />
     </Design.DataContext>
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
     <Grid MinHeight="500">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -125,6 +124,7 @@
             </Grid>
         </Border>
         <Border Grid.Column="1" Padding="15">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <StackPanel Orientation="Vertical" Spacing="10">
                 <!-- Year Filter -->
                 <userControls:DateCalendarSelector HorizontalContentAlignment="Center"
@@ -227,7 +227,7 @@
                     </StackPanel>
                 </Border>
             </StackPanel>
+            </ScrollViewer>
         </Border>
     </Grid>
-    </ScrollViewer>
 </UserControl>

@@ -146,4 +146,12 @@ public partial class TransactionsView : ValtBaseUserControl
 
         vm.SetContextMenuAccountCommand.Execute(account);
     }
+
+    private void AccountsList_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (DataContext is TransactionsViewModel vm && sender is ListBox listBox)
+        {
+            vm.SelectedAccount = listBox.SelectedItem as AccountViewModel;
+        }
+    }
 }
