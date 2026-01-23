@@ -554,14 +554,19 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
                 throw new ArgumentOutOfRangeException();
         }
 
-        if (transaction.HasAutoSatAmount)
+        if (!request.CopyTransaction && transaction.HasAutoSatAmount)
         {
             var autoSatAmountDetails = transaction.AutoSatAmountDetails!;
             IsAutoSatAmount = autoSatAmountDetails.IsAutoSatAmount;
 
-            SatAmountStateDescription = autoSatAmountDetails.SatAmountState == SatAmountState.Processed
-                ? $"{autoSatAmountDetails.SatAmount!.Sats} sats"
-                : autoSatAmountDetails.SatAmountState.ToString();
+            SatAmountStateDescription = autoSatAmountDetails.SatAmountState switch
+            {
+                SatAmountState.Processed => $"{autoSatAmountDetails.SatAmount!.Sats} sats",
+                SatAmountState.Manual => language.SatAmountState_Manual,
+                SatAmountState.Pending => language.SatAmountState_Pending,
+                SatAmountState.Missing => language.SatAmountState_Missing,
+                _ => autoSatAmountDetails.SatAmountState.ToString()
+            };
         }
     }
 

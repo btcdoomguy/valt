@@ -608,6 +608,18 @@
     <data name="ManageTransactions.Properties.PriceInSats" xml:space="preserve">
         <value>Price in sats:</value>
     </data>
+    <data name="SatAmountState.Manual" xml:space="preserve">
+        <value>Manual</value>
+    </data>
+    <data name="SatAmountState.Pending" xml:space="preserve">
+        <value>Pending</value>
+    </data>
+    <data name="SatAmountState.Missing" xml:space="preserve">
+        <value>Missing price data</value>
+    </data>
+    <data name="ManageTransactions.Properties.None" xml:space="preserve">
+        <value>No additional properties</value>
+    </data>
     <data name="ChangePasswordTitle" xml:space="preserve">
         <value>Change password</value>
     </data>
@@ -1593,6 +1605,9 @@
     </data>
     <data name="Settings_FontScale_Large" xml:space="preserve">
         <value>Large</value>
+    </data>
+    <data name="Menu_Tools" xml:space="preserve">
+        <value>Tools</value>
     </data>
     <data name="Menu_ConversionCalculator" xml:space="preserve">
         <value>Conversion Calculator</value>

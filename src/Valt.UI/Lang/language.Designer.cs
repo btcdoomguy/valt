@@ -1214,7 +1214,31 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("ManageTransactions.Properties.PriceInSats", resourceCulture);
             }
         }
-        
+
+        public static string SatAmountState_Manual {
+            get {
+                return ResourceManager.GetString("SatAmountState.Manual", resourceCulture);
+            }
+        }
+
+        public static string SatAmountState_Pending {
+            get {
+                return ResourceManager.GetString("SatAmountState.Pending", resourceCulture);
+            }
+        }
+
+        public static string SatAmountState_Missing {
+            get {
+                return ResourceManager.GetString("SatAmountState.Missing", resourceCulture);
+            }
+        }
+
+        public static string ManageTransactions_Properties_None {
+            get {
+                return ResourceManager.GetString("ManageTransactions.Properties.None", resourceCulture);
+            }
+        }
+
         public static string ChangePasswordTitle {
             get {
                 return ResourceManager.GetString("ChangePasswordTitle", resourceCulture);
@@ -3159,12 +3183,18 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string Menu_Tools {
+            get {
+                return ResourceManager.GetString("Menu_Tools", resourceCulture);
+            }
+        }
+
         public static string Menu_ConversionCalculator {
             get {
                 return ResourceManager.GetString("Menu_ConversionCalculator", resourceCulture);
             }
         }
-        
+
         public static string ConversionCalculator_Title {
             get {
                 return ResourceManager.GetString("ConversionCalculator_Title", resourceCulture);

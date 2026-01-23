@@ -301,9 +301,37 @@
 
                 <!-- Right pane - Notes and metadata -->
                 <Border Classes="form-fields-area" Padding="10" Background="{DynamicResource Background800Brush}">
-                    <StackPanel Spacing="10" Width="276">
-                        <!-- Notes field -->
-                        <StackPanel Classes="form-field">
+                    <DockPanel Width="276">
+                        <!-- Properties section (fixed at bottom) -->
+                        <Border DockPanel.Dock="Bottom" Background="{DynamicResource Background900Brush}"
+                                CornerRadius="4" Padding="10" MinHeight="90">
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="{x:Static local:language.ManageTransactions_Properties}"
+                                           FontWeight="SemiBold" FontSize="{DynamicResource FontSizeSmall}"
+                                           Foreground="{DynamicResource Text300Brush}" />
+                                <!-- Empty state -->
+                                <TextBlock IsVisible="{Binding !HasMetadata}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource Text500Brush}"
+                                           FontStyle="Italic"
+                                           Text="{x:Static local:language.ManageTransactions_Properties_None}" />
+                                <!-- Fixed expense binding -->
+                                <StackPanel Spacing="2" IsVisible="{Binding IsBoundToFixedExpense}">
+                                    <TextBlock FontSize="{DynamicResource FontSizeXSmall}" Foreground="{DynamicResource Accent200Color}"
+                                               Text="{x:Static local:language.ManageTransactions_Properties_BoundToFixedExpense}" />
+                                    <TextBlock FontSize="{DynamicResource FontSizeXSmall}" Text="{Binding BoundToFixedExpenseCaption}" />
+                                </StackPanel>
+                                <!-- Auto sat amount -->
+                                <StackPanel Spacing="2" IsVisible="{Binding IsAutoSatAmount}">
+                                    <TextBlock FontSize="{DynamicResource FontSizeXSmall}" Foreground="{DynamicResource Accent200Color}"
+                                               Text="{x:Static local:language.ManageTransactions_Properties_PriceInSats}" />
+                                    <TextBlock FontSize="{DynamicResource FontSizeXSmall}" Text="{Binding SatAmountStateDescription}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Notes field (fills remaining space) -->
+                        <StackPanel Classes="form-field" Margin="0,0,0,10">
                             <TextBlock Text="{x:Static local:language.ManageTransactions_Notes}" />
                             <TextBox Text="{Binding Notes}"
                                      AcceptsReturn="True"
@@ -313,28 +341,7 @@
                                      TabIndex="10"
                                      Watermark="{x:Static local:language.ManageTransactions_Notes_Placeholder}" />
                         </StackPanel>
-
-                        <!-- Metadata section -->
-                        <Border Background="{DynamicResource Background900Brush}"
-                                CornerRadius="4" Padding="10"
-                                IsVisible="{Binding HasMetadata}">
-                            <StackPanel Spacing="6">
-                                <TextBlock Text="{x:Static local:language.ManageTransactions_Properties}"
-                                           FontWeight="SemiBold" FontSize="{DynamicResource FontSizeSmall}"
-                                           Foreground="{DynamicResource Text300Brush}" />
-                                <StackPanel Spacing="2" IsVisible="{Binding IsBoundToFixedExpense}">
-                                    <TextBlock FontSize="{DynamicResource FontSizeXSmall}" Foreground="{DynamicResource Accent200Color}"
-                                               Text="{x:Static local:language.ManageTransactions_Properties_BoundToFixedExpense}" />
-                                    <TextBlock FontSize="{DynamicResource FontSizeXSmall}" Text="{Binding BoundToFixedExpenseCaption}" />
-                                </StackPanel>
-                                <StackPanel Spacing="2" IsVisible="{Binding IsAutoSatAmount}">
-                                    <TextBlock FontSize="{DynamicResource FontSizeXSmall}" Foreground="{DynamicResource Accent200Color}"
-                                               Text="{x:Static local:language.ManageTransactions_Properties_PriceInSats}" />
-                                    <TextBlock FontSize="{DynamicResource FontSizeXSmall}" Text="{Binding SatAmountStateDescription}" />
-                                </StackPanel>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
+                    </DockPanel>
                 </Border>
             </StackPanel>
         </DockPanel>
