@@ -1595,4 +1595,19 @@
     <data name="ConversionCalculator_Title" xml:space="preserve">
         <value>Conversor de Divisas</value>
     </data>
+    <data name="ManageTransactions_UseInstallments" xml:space="preserve">
+        <value>Usar cuotas</value>
+    </data>
+    <data name="DeleteInstallment_Title" xml:space="preserve">
+        <value>Eliminar Cuota</value>
+    </data>
+    <data name="DeleteInstallment_Message" xml:space="preserve">
+        <value>Esta transacción es parte de cuotas. ¿Desea eliminar todas las cuotas?</value>
+    </data>
+    <data name="DeleteInstallment_OnlyThis" xml:space="preserve">
+        <value>Solo esta</value>
+    </data>
+    <data name="DeleteInstallment_All" xml:space="preserve">
+        <value>Todas las cuotas</value>
+    </data>
 </root>

@@ -3170,5 +3170,35 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("ConversionCalculator_Title", resourceCulture);
             }
         }
+
+        public static string ManageTransactions_UseInstallments {
+            get {
+                return ResourceManager.GetString("ManageTransactions_UseInstallments", resourceCulture);
+            }
+        }
+
+        public static string DeleteInstallment_Title {
+            get {
+                return ResourceManager.GetString("DeleteInstallment_Title", resourceCulture);
+            }
+        }
+
+        public static string DeleteInstallment_Message {
+            get {
+                return ResourceManager.GetString("DeleteInstallment_Message", resourceCulture);
+            }
+        }
+
+        public static string DeleteInstallment_OnlyThis {
+            get {
+                return ResourceManager.GetString("DeleteInstallment_OnlyThis", resourceCulture);
+            }
+        }
+
+        public static string DeleteInstallment_All {
+            get {
+                return ResourceManager.GetString("DeleteInstallment_All", resourceCulture);
+            }
+        }
     }
 }

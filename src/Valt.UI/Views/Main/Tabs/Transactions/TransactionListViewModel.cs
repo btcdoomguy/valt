@@ -38,6 +38,7 @@ using Valt.Infra.Modules.AvgPrice.Queries;
 using Valt.Infra.Modules.AvgPrice.Queries.DTOs;
 using Valt.UI.Views.Main.Modals.AvgPriceLineEditor;
 using Valt.UI.Views.Main.Modals.ChangeCategoryTransactions;
+using Valt.UI.Services.MessageBoxes;
 using Valt.UI.Views.Main.Modals.TransactionEditor;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
@@ -309,8 +310,42 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         if (selectedTransaction is null)
             return;
-        
-        await _transactionRepository.DeleteTransactionAsync(selectedTransaction.Id);
+
+        var ownerWindow = GetUserControlOwnerWindow();
+        if (ownerWindow is null)
+            return;
+
+        // First, ask for default confirmation
+        var confirmed = await MessageBoxHelper.ShowQuestionAsync(
+            language.Transactions_Menu_Delete,
+            $"{language.Transactions_Menu_Delete} '{selectedTransaction.Name}'?",
+            ownerWindow);
+
+        if (!confirmed)
+            return;
+
+        // Check if transaction is part of an installment group
+        var transaction = await _transactionRepository.GetTransactionByIdAsync(selectedTransaction.Id);
+        if (transaction is not null && transaction.IsPartOfGroup)
+        {
+            var deleteAll = await MessageBoxHelper.ShowQuestionAsync(
+                language.DeleteInstallment_Title,
+                language.DeleteInstallment_Message,
+                ownerWindow);
+
+            if (deleteAll)
+            {
+                await _transactionRepository.DeleteTransactionsByGroupIdAsync(transaction.GroupId!);
+            }
+            else
+            {
+                await _transactionRepository.DeleteTransactionAsync(selectedTransaction.Id);
+            }
+        }
+        else
+        {
+            await _transactionRepository.DeleteTransactionAsync(selectedTransaction.Id);
+        }
 
         WeakReferenceMessenger.Default.Send(new TransactionListChanged());
         await FetchTransactions();

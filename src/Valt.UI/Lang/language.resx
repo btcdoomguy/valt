@@ -1600,4 +1600,19 @@
     <data name="ConversionCalculator_Title" xml:space="preserve">
         <value>Conversion Calculator</value>
     </data>
+    <data name="ManageTransactions_UseInstallments" xml:space="preserve">
+        <value>Use installments</value>
+    </data>
+    <data name="DeleteInstallment_Title" xml:space="preserve">
+        <value>Delete Installment</value>
+    </data>
+    <data name="DeleteInstallment_Message" xml:space="preserve">
+        <value>This transaction is part of an installment group. Delete all installments?</value>
+    </data>
+    <data name="DeleteInstallment_OnlyThis" xml:space="preserve">
+        <value>Only this one</value>
+    </data>
+    <data name="DeleteInstallment_All" xml:space="preserve">
+        <value>All installments</value>
+    </data>
 </root>

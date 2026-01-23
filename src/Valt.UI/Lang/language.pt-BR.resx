@@ -1595,4 +1595,19 @@
     <data name="ConversionCalculator_Title" xml:space="preserve">
         <value>Conversor de Moedas</value>
     </data>
+    <data name="ManageTransactions_UseInstallments" xml:space="preserve">
+        <value>Parcelar</value>
+    </data>
+    <data name="DeleteInstallment_Title" xml:space="preserve">
+        <value>Excluir Parcela</value>
+    </data>
+    <data name="DeleteInstallment_Message" xml:space="preserve">
+        <value>Esta transação faz parte de um parcelamento. Deseja excluir todas as parcelas?</value>
+    </data>
+    <data name="DeleteInstallment_OnlyThis" xml:space="preserve">
+        <value>Apenas esta</value>
+    </data>
+    <data name="DeleteInstallment_All" xml:space="preserve">
+        <value>Todas as parcelas</value>
+    </data>
 </root>

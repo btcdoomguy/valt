@@ -99,4 +99,26 @@ internal class TransactionRepository : ITransactionRepository
 
         return Task.FromResult(anyTransaction is not null);
     }
+
+    public Task<IEnumerable<Transaction>> GetTransactionsByGroupIdAsync(GroupId groupId)
+    {
+        var groupIdBson = new ObjectId(groupId.Value);
+        var entities = _localDatabase.GetTransactions()
+            .Find(x => x.GroupId == groupIdBson)
+            .ToList();
+
+        var transactions = entities.Select(e => e.AsDomainObject());
+        return Task.FromResult(transactions);
+    }
+
+    public async Task DeleteTransactionsByGroupIdAsync(GroupId groupId)
+    {
+        var transactions = await GetTransactionsByGroupIdAsync(groupId);
+
+        foreach (var transaction in transactions)
+        {
+            _localDatabase.GetTransactions().Delete(new ObjectId(transaction.Id));
+            await _domainEventPublisher.PublishAsync(new TransactionDeletedEvent(transaction));
+        }
+    }
 }
