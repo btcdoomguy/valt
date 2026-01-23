@@ -12,6 +12,7 @@ namespace Valt.UI.Views.Main;
 public partial class MainView : ValtBaseWindow
 {
     private ILocalStorageService? _localStorageService;
+    private bool _isClosing;
 
     public MainView()
     {
@@ -79,15 +80,22 @@ public partial class MainView : ValtBaseWindow
 
     private async void Window_OnClosing(object? sender, WindowClosingEventArgs e)
     {
+        // If we're already in the closing process, allow the close to proceed
+        if (_isClosing)
+            return;
+
+        // Cancel this close attempt - we'll close again after async cleanup
         e.Cancel = true;
+        _isClosing = true;
 
         SaveWindowSettings();
 
-        if (DataContext is not MainViewModel viewModel)
-            return;
+        if (DataContext is MainViewModel viewModel)
+        {
+            await viewModel.OnClosingAsync();
+        }
 
-        await viewModel.OnClosingAsync();
-
-        e.Cancel = false;
+        // Now close the window for real
+        Close();
     }
 }

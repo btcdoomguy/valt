@@ -27,5 +27,7 @@ public class TransactionEntity
     [BsonField("sState")] public int? SatAmountStateId { get; set; }
     [BsonField("note")] public string? Notes { get; set; }
 
+    [BsonField("gId")] public ObjectId? GroupId { get; set; }
+
     [BsonField("v")] public int Version { get; set; }
 }

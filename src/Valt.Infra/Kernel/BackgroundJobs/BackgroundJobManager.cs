@@ -1,9 +1,21 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Channels;
 
 namespace Valt.Infra.Kernel.BackgroundJobs;
 
-public sealed class BackgroundJobManager : IDisposable
+public readonly struct JobExecutionRequest
+{
+    public TaskCompletionSource<JobExecutionResult>? CompletionSource { get; init; }
+}
+
+public readonly struct JobExecutionResult
+{
+    public bool Success { get; init; }
+    public Exception? Exception { get; init; }
+}
+
+public sealed class BackgroundJobManager : IAsyncDisposable
 {
     private readonly Dictionary<IBackgroundJob, JobInfo> _jobInfos = new();
     private readonly Dictionary<BackgroundJobTypes, CancellationTokenSource> _ctsMap = new();
@@ -28,7 +40,7 @@ public sealed class BackgroundJobManager : IDisposable
             await Task.Delay(100).ConfigureAwait(false);
             StartJob(jobInfo.Key, GetCancellationToken(jobType));
             if (triggerInitialRun)
-                jobInfo.Value.TriggerManually();
+                jobInfo.Value.RequestRun();
         }
     }
 
@@ -42,19 +54,18 @@ public sealed class BackgroundJobManager : IDisposable
     
     public void TriggerJobManually(BackgroundJobSystemNames systemName)
     {
-        var job = _jobInfos.Keys.SingleOrDefault(x => x.SystemName == systemName);
-        if (job is not null && _jobInfos.TryGetValue(job, out var jobInfo))
-        {
-            jobInfo.TriggerManually();
-        }
+        var jobInfo = _jobInfos.Values.SingleOrDefault(x => x.Job.SystemName == systemName);
+        jobInfo?.RequestRun();  // Fire-and-forget, non-blocking
     }
 
-    public async Task TriggerJobManuallyOnCurrentThreadAsync(BackgroundJobSystemNames systemName)
+    public async Task TriggerJobAndWaitAsync(BackgroundJobSystemNames systemName)
     {
-        var job = _jobInfos.Keys.SingleOrDefault(x => x.SystemName == systemName);
-        if (job is not null && _jobInfos.TryGetValue(job, out var jobInfo))
+        var jobInfo = _jobInfos.Values.SingleOrDefault(x => x.Job.SystemName == systemName);
+        if (jobInfo != null)
         {
-            await jobInfo.RunOnCurrentThreadAsync(CancellationToken.None);
+            var result = await jobInfo.RequestRunAndWaitAsync(CancellationToken.None);
+            if (!result.Success && result.Exception != null)
+                throw result.Exception;
         }
     }
 
@@ -78,17 +89,17 @@ public sealed class BackgroundJobManager : IDisposable
         return newCts.Token;
     }
     
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         foreach (var token in _ctsMap.Values)
         {
-            token.Cancel();
+            await token.CancelAsync();
             token.Dispose();
         }
 
         foreach (var jobInfo in _jobInfos.Values)
         {
-            jobInfo.Dispose();
+            await jobInfo.DisposeAsync();
         }
     }
 
@@ -103,26 +114,34 @@ public sealed class BackgroundJobManager : IDisposable
     }
 }
 
-public sealed class JobInfo : INotifyPropertyChanged, IDisposable
+public sealed class JobInfo : INotifyPropertyChanged, IAsyncDisposable
 {
     private const int MaxRetryAttempts = 3;
     private static readonly TimeSpan RetryDelay = TimeSpan.FromMilliseconds(100);
 
     private readonly IBackgroundJob _job;
-    private readonly SemaphoreSlim _semaphore = new(1, 1);
+    private readonly Channel<JobExecutionRequest> _channel;
     private readonly JobLogPool _logPool = new();
-    private Timer? _timer;
-    private CancellationToken _token;
+    private Task? _consumerTask;
+    private Timer? _periodicTimer;
+    private CancellationTokenSource? _cts;
     private BackgroundJobState _state = BackgroundJobState.Stopped;
 
     public JobInfo(IBackgroundJob job)
     {
         _job = job;
+        _channel = Channel.CreateBounded<JobExecutionRequest>(
+            new BoundedChannelOptions(1)
+            {
+                FullMode = BoundedChannelFullMode.DropWrite,
+                SingleReader = true,
+                SingleWriter = false
+            });
     }
 
     public IBackgroundJob Job => _job;
     public JobLogPool LogPool => _logPool;
-        
+
     public BackgroundJobState State
     {
         get => _state;
@@ -135,9 +154,9 @@ public sealed class JobInfo : INotifyPropertyChanged, IDisposable
             }
         }
     }
-    
+
     public string? ErrorMessage { get; private set; }
-        
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
@@ -147,71 +166,79 @@ public sealed class JobInfo : INotifyPropertyChanged, IDisposable
 
     public void Start(CancellationToken token)
     {
-        if (_timer != null) return;
-        _token = token;
-        _timer = new Timer(async _ => await RunJobAsync(), null, _job.Interval, _job.Interval);
+        if (_consumerTask != null) return;
+
+        _cts = CancellationTokenSource.CreateLinkedTokenSource(token);
+
+        // Start consumer loop
+        _consumerTask = Task.Run(() => ConsumeLoopAsync(_cts.Token), _cts.Token);
+
+        // Timer writes to channel instead of executing directly
+        _periodicTimer = new Timer(_ => RequestRun(), null, _job.Interval, _job.Interval);
     }
 
-    public void TriggerManually()
+    public void RequestRun()
     {
-        //reset timer to run now
-        _timer?.Change(TimeSpan.Zero, _job.Interval);
+        _channel.Writer.TryWrite(new JobExecutionRequest());
     }
 
-    public async Task RunOnCurrentThreadAsync(CancellationToken token)
+    public async Task<JobExecutionResult> RequestRunAndWaitAsync(CancellationToken ct)
     {
-        await _semaphore.WaitAsync(token);
+        var tcs = new TaskCompletionSource<JobExecutionResult>(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+
+        // WriteAsync blocks if channel full (waits for current pending to be consumed)
+        await _channel.Writer.WriteAsync(
+            new JobExecutionRequest { CompletionSource = tcs }, ct);
+
+        return await tcs.Task;
+    }
+
+    private async Task ConsumeLoopAsync(CancellationToken ct)
+    {
+        try
+        {
+            await foreach (var request in _channel.Reader.ReadAllAsync(ct))
+            {
+                await ExecuteJobAsync(request, ct);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Expected when cancellation is requested
+        }
+        // Note: State is set by StopAsync after awaiting this task to avoid
+        // deadlock when PropertyChanged tries to marshal to UI thread
+    }
+
+    private async Task ExecuteJobAsync(JobExecutionRequest request, CancellationToken ct)
+    {
+        var result = new JobExecutionResult();
         try
         {
             if (State == BackgroundJobState.Stopped)
-                await _job.StartAsync(token);
+                await _job.StartAsync(ct);
 
             State = BackgroundJobState.Running;
             ErrorMessage = null;
-
-            await RunWithRetryAsync(token);
+            await RunWithRetryAsync(ct);
             State = BackgroundJobState.Ok;
+            result = new JobExecutionResult { Success = true };
+        }
+        catch (OperationCanceledException)
+        {
+            State = BackgroundJobState.Stopped;
+            result = new JobExecutionResult { Success = false };
         }
         catch (Exception ex)
         {
-            State = ex is OperationCanceledException ? BackgroundJobState.Stopped : BackgroundJobState.Error;
-
-            if (State == BackgroundJobState.Error)
-                ErrorMessage = ex.Message;
+            State = BackgroundJobState.Error;
+            ErrorMessage = ex.Message;
+            result = new JobExecutionResult { Success = false, Exception = ex };
         }
         finally
         {
-            _semaphore.Release();
-        }
-    }
-
-    private async Task RunJobAsync(CancellationToken token = default)
-    {
-        if (!await _semaphore.WaitAsync(0, token))
-            return;
-
-        if (State == BackgroundJobState.Stopped)
-            await _job.StartAsync(_token);
-
-        State = BackgroundJobState.Running;
-        ErrorMessage = null;
-
-        try
-        {
-            await RunWithRetryAsync(_token);
-            State = BackgroundJobState.Ok;
-        }
-        catch (Exception ex)
-        {
-            State = ex is OperationCanceledException ? BackgroundJobState.Stopped : // Cancelled via token
-                BackgroundJobState.Error; // Other errors
-
-            if (State == BackgroundJobState.Error)
-                ErrorMessage = ex.Message;
-        }
-        finally
-        {
-            _semaphore.Release();
+            request.CompletionSource?.TrySetResult(result);
         }
     }
 
@@ -247,18 +274,45 @@ public sealed class JobInfo : INotifyPropertyChanged, IDisposable
 
     public async Task StopAsync()
     {
-        if (_timer == null) return;
-        _timer.Change(Timeout.Infinite, Timeout.Infinite);
-        await _semaphore.WaitAsync(); // Wait for any running job to finish
-        _semaphore.Release();
-        await _timer.DisposeAsync();
-        _timer = null;
+        if (_consumerTask == null) return;
+
+        _channel.Writer.TryComplete();
+        if (_cts != null) await _cts.CancelAsync();
+
+        try
+        {
+            // Use timeout to prevent indefinite blocking if job doesn't respect cancellation
+            await _consumerTask.WaitAsync(TimeSpan.FromSeconds(5));
+        }
+        catch (OperationCanceledException)
+        {
+            // Expected
+        }
+        catch (TimeoutException)
+        {
+            // Job didn't stop in time, proceed anyway
+        }
+
+        _periodicTimer?.Dispose();
+        _periodicTimer = null;
+        _consumerTask = null;
         State = BackgroundJobState.Stopped;
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        _timer?.Dispose();
-        _semaphore.Dispose();
+        _channel.Writer.TryComplete();
+        if (_cts != null) await _cts.CancelAsync();
+        if (_consumerTask != null)
+        {
+            try
+            {
+                await _consumerTask.WaitAsync(TimeSpan.FromSeconds(5));
+            }
+            catch (OperationCanceledException) { }
+            catch (TimeoutException) { }
+        }
+        _periodicTimer?.Dispose();
+        _cts?.Dispose();
     }
 }

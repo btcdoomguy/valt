@@ -51,6 +51,7 @@ public static class Extensions
                     new FixedExpenseId(fixedExpenseRecord.FixedExpense.Id.ToString()),
                     DateOnly.FromDateTime(fixedExpenseRecord.ReferenceDate))
                 : null,
+            entity.GroupId != null ? new GroupId(entity.GroupId.ToString()!) : null,
             entity.Version);
     }
 
@@ -72,6 +73,7 @@ public static class Extensions
                     new FixedExpenseId(fixedExpenseRecord.FixedExpense.Id.ToString()),
                     DateOnly.FromDateTime(fixedExpenseRecord.ReferenceDate))
                 : null,
+            entity.GroupId != null ? new GroupId(entity.GroupId.ToString()!) : null,
             entity.Version);
     }
 
@@ -92,6 +94,7 @@ public static class Extensions
                     new FixedExpenseId(fixedExpenseRecord.FixedExpense.Id.ToString()),
                     DateOnly.FromDateTime(fixedExpenseRecord.ReferenceDate))
                 : null,
+            entity.GroupId != null ? new GroupId(entity.GroupId.ToString()!) : null,
             entity.Version);
     }
 
@@ -116,6 +119,7 @@ public static class Extensions
                     new FixedExpenseId(fixedExpenseRecord.FixedExpense.Id.ToString()),
                     DateOnly.FromDateTime(fixedExpenseRecord.ReferenceDate))
                 : null,
+            entity.GroupId != null ? new GroupId(entity.GroupId.ToString()!) : null,
             entity.Version);
     }
 
@@ -138,6 +142,7 @@ public static class Extensions
                     new FixedExpenseId(fixedExpenseRecord.FixedExpense.Id.ToString()),
                     DateOnly.FromDateTime(fixedExpenseRecord.ReferenceDate))
                 : null,
+            entity.GroupId != null ? new GroupId(entity.GroupId.ToString()!) : null,
             entity.Version);
     }
 
@@ -160,6 +165,7 @@ public static class Extensions
                     new FixedExpenseId(fixedExpenseRecord.FixedExpense.Id.ToString()),
                     DateOnly.FromDateTime(fixedExpenseRecord.ReferenceDate))
                 : null,
+            entity.GroupId != null ? new GroupId(entity.GroupId.ToString()!) : null,
             entity.Version);
     }
 
@@ -206,6 +212,7 @@ public static class Extensions
             ToFiatAmount = null,
             FromSatAmount = null,
             ToSatAmount = null,
+            GroupId = transaction.GroupId is not null ? new ObjectId(transaction.GroupId.Value) : null,
             Version = transaction.Version
         };
     }
@@ -232,6 +239,7 @@ public static class Extensions
             ToFiatAmount = null,
             ToSatAmount = null,
             SatAmountStateId = null,
+            GroupId = transaction.GroupId is not null ? new ObjectId(transaction.GroupId.Value) : null,
             Version = transaction.Version
         };
     }
@@ -258,6 +266,7 @@ public static class Extensions
             ToSatAmount = ConvertBtcValueToStorageFormat(bitcoinToBitcoinDetails.Amount, false),
             ToFiatAmount = null,
             SatAmountStateId = null,
+            GroupId = transaction.GroupId is not null ? new ObjectId(transaction.GroupId.Value) : null,
             Version = transaction.Version
         };
     }
@@ -284,6 +293,7 @@ public static class Extensions
             FromSatAmount = null,
             ToFiatAmount = ConvertFiatValueToStorageFormat(fiatToFiatDetails.ToAmount, false),
             ToSatAmount = null,
+            GroupId = transaction.GroupId is not null ? new ObjectId(transaction.GroupId.Value) : null,
             Version = transaction.Version
         };
     }
@@ -310,6 +320,7 @@ public static class Extensions
             FromSatAmount = null,
             ToFiatAmount = null,
             ToSatAmount = ConvertBtcValueToStorageFormat(fiatToBitcoinDetails.ToAmount, false),
+            GroupId = transaction.GroupId is not null ? new ObjectId(transaction.GroupId.Value) : null,
             Version = transaction.Version
         };
     }
@@ -336,6 +347,7 @@ public static class Extensions
             FromSatAmount = ConvertBtcValueToStorageFormat(bitcoinToFiatDetails.FromAmount.Sats, true),
             ToFiatAmount = ConvertFiatValueToStorageFormat(bitcoinToFiatDetails.ToAmount, false),
             ToSatAmount = null,
+            GroupId = transaction.GroupId is not null ? new ObjectId(transaction.GroupId.Value) : null,
             Version = transaction.Version
         };
     }

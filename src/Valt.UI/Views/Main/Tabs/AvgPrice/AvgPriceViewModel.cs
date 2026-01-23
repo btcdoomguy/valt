@@ -137,13 +137,14 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
         FetchTotals().SafeFireAndForget(logger: _logger, callerName: nameof(FetchTotals));
     }
 
-    private async Task FetchAvgPriceLines()
+    private async Task FetchAvgPriceLines(string? selectLineId = null)
     {
         if (SelectedProfile is null)
         {
             Lines.Clear();
             CurrentPosition = "-";
             CurrentAvgPrice = "-";
+            SelectedLine = null;
             return;
         }
 
@@ -153,6 +154,16 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
 
         Lines.Clear();
         Lines.AddRange(viewModels);
+
+        // Restore selection if ID provided
+        if (!string.IsNullOrEmpty(selectLineId))
+        {
+            SelectedLine = Lines.FirstOrDefault(l => l.Id == selectLineId);
+        }
+        else
+        {
+            SelectedLine = null;
+        }
 
         // Update current position summary from the last line
         UpdateCurrentPositionSummary();
@@ -310,6 +321,19 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
         if (!confirmed)
             return;
 
+        // Find next item to select after deletion
+        var currentIndex = Lines.IndexOf(SelectedLine);
+        string? nextLineId = null;
+
+        if (currentIndex >= 0 && Lines.Count > 1)
+        {
+            // Try to select next item, or previous if deleting last
+            if (currentIndex < Lines.Count - 1)
+                nextLineId = Lines[currentIndex + 1].Id;
+            else if (currentIndex > 0)
+                nextLineId = Lines[currentIndex - 1].Id;
+        }
+
         try
         {
             var profileId = new AvgPriceProfileId(SelectedProfile.Id);
@@ -326,7 +350,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
                 await _avgPriceRepository.SaveAvgPriceProfileAsync(profile);
             }
 
-            await FetchAvgPriceLines();
+            await FetchAvgPriceLines(nextLineId);
             await FetchTotals();
         }
         catch (Exception e)
@@ -352,6 +376,9 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
         if (SelectedProfile is null || SelectedLine is null)
             return;
 
+        // Save ID before refresh
+        var lineIdToSelect = SelectedLine.Id;
+
         try
         {
             var profileId = new AvgPriceProfileId(SelectedProfile.Id);
@@ -360,7 +387,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
             if (profile is null)
                 return;
 
-            var lineToMove = FindLineById(profile, SelectedLine.Id);
+            var lineToMove = FindLineById(profile, lineIdToSelect);
 
             if (lineToMove is not null)
             {
@@ -368,11 +395,8 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
                 await _avgPriceRepository.SaveAvgPriceProfileAsync(profile);
             }
 
-            await FetchAvgPriceLines();
+            await FetchAvgPriceLines(lineIdToSelect);
             await FetchTotals();
-
-            // Re-select the moved line
-            SelectedLine = Lines.FirstOrDefault(x => x.Id == SelectedLine?.Id);
         }
         catch (Exception e)
         {
@@ -387,6 +411,9 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
         if (SelectedProfile is null || SelectedLine is null)
             return;
 
+        // Save ID before refresh
+        var lineIdToSelect = SelectedLine.Id;
+
         try
         {
             var profileId = new AvgPriceProfileId(SelectedProfile.Id);
@@ -395,7 +422,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
             if (profile is null)
                 return;
 
-            var lineToMove = FindLineById(profile, SelectedLine.Id);
+            var lineToMove = FindLineById(profile, lineIdToSelect);
 
             if (lineToMove is not null)
             {
@@ -403,11 +430,8 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
                 await _avgPriceRepository.SaveAvgPriceProfileAsync(profile);
             }
 
-            await FetchAvgPriceLines();
+            await FetchAvgPriceLines(lineIdToSelect);
             await FetchTotals();
-
-            // Re-select the moved line
-            SelectedLine = Lines.FirstOrDefault(x => x.Id == SelectedLine?.Id);
         }
         catch (Exception e)
         {

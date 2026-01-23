@@ -7,12 +7,17 @@
              xmlns:transactionTerms="clr-namespace:Valt.Infra.TransactionTerms;assembly=Valt.Infra"
              xmlns:transactions1="clr-namespace:Valt.UI.Views.Main.Tabs.Transactions"
              xmlns:models1="clr-namespace:Valt.UI.Views.Main.Tabs.Transactions.Models"
+             xmlns:avgPriceDtos="clr-namespace:Valt.Infra.Modules.AvgPrice.Queries.DTOs;assembly=Valt.Infra"
+             xmlns:helpers="clr-namespace:Valt.UI.Helpers"
              mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="700"
              x:Class="Valt.UI.Views.Main.Tabs.Transactions.TransactionListView"
              x:DataType="transactions1:TransactionListViewModel">
     <Design.DataContext>
         <transactions1:TransactionListViewModel />
     </Design.DataContext>
+    <UserControl.Resources>
+        <helpers:BindingProxy x:Key="ViewModelProxy" Data="{Binding}" />
+    </UserControl.Resources>
     <Grid RowDefinitions="100, *">
         <Grid Grid.Row="0" Margin="10" ColumnDefinitions="*, 260, *">
             <StackPanel Grid.Column="0" Margin="10" Orientation="Horizontal">
@@ -48,7 +53,7 @@
                   SelectionMode="Extended"
                   CanUserResizeColumns="True"
                   IsReadOnly="True"
-                  SelectedItem="{Binding SelectedTransaction}"
+                  SelectedItem="{Binding SelectedTransaction, Mode=OneWay}"
                   SelectionChanged="MainGrid_OnSelectionChanged">
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="{x:Static local:language.Transactions_Columns_Date}"
@@ -189,6 +194,18 @@
                     <MenuItem Header="{Binding UnbindToFixedExpenseCaption}"
                               IsVisible="{Binding CanUnbindFromFixedExpense}"
                               Command="{Binding UnbindFromFixedExpenseCommand}">
+                    </MenuItem>
+                    <MenuItem Header="{x:Static local:language.Transactions_Menu_SendToAvgPrice}"
+                              IsVisible="{Binding CanSendToAvgPrice}"
+                              ItemsSource="{Binding MatchingAvgPriceProfiles}">
+                        <MenuItem.Styles>
+                            <Style Selector="MenuItem > MenuItem" x:DataType="avgPriceDtos:AvgPriceProfileDTO">
+                                <Setter Property="Header" Value="{Binding Name}"/>
+                                <Setter Property="Command"
+                                        Value="{Binding ((transactions1:TransactionListViewModel)Data).SendToAvgPriceProfileCommand, Source={StaticResource ViewModelProxy}}"/>
+                                <Setter Property="CommandParameter" Value="{Binding}"/>
+                            </Style>
+                        </MenuItem.Styles>
                     </MenuItem>
 
                 </ContextMenu>

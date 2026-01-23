@@ -33,11 +33,11 @@
 
             <!-- Buttons at bottom -->
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10" Margin="0, 0, 0, 5">
-                <Button Width="100" TabIndex="11" Content="{x:Static local:language.OkButton}"
+                <Button Width="100" TabIndex="13" Content="{x:Static local:language.OkButton}"
                         HorizontalContentAlignment="Center"
                         Command="{Binding OkCommand}"
                         IsDefault="True" />
-                <Button Width="100" TabIndex="12" Content="{x:Static local:language.CancelButton}"
+                <Button Width="100" TabIndex="14" Content="{x:Static local:language.CancelButton}"
                         HorizontalContentAlignment="Center"
                         Command="{Binding CancelCommand}"
                         IsCancel="True" />
@@ -86,7 +86,7 @@
                                         FontWeight="Bold" IsTabStop="False" FontSize="{DynamicResource FontSizeIconLarge}" Padding="0"
                                         Command="{Binding PreviousDayCommand}" />
                                 <CalendarDatePicker Width="140" SelectedDateFormat="Short"
-                                                    IsTodayHighlighted="True" TabIndex="10" Height="36"
+                                                    IsTodayHighlighted="True" TabIndex="12" Height="36"
                                                     SelectedDate="{Binding Date}">
                                     <CalendarDatePicker.ContextMenu>
                                         <ContextMenu>
@@ -185,6 +185,26 @@
                                 </StackPanel>
                             </StackPanel>
 
+                            <!-- Installments section (Debt mode only, Add mode only) -->
+                            <StackPanel Orientation="Horizontal" Spacing="10"
+                                        IsVisible="{Binding ShowInstallmentsOption}">
+                                <CheckBox Content="{x:Static local:language.ManageTransactions_UseInstallments}"
+                                          IsChecked="{Binding UseInstallments}"
+                                          VerticalAlignment="Center"
+                                          TabIndex="5" />
+                                <NumericUpDown IsVisible="{Binding ShowInstallmentCount}"
+                                               Value="{Binding InstallmentCount}"
+                                               Minimum="2" Maximum="72" Width="120"
+                                               FormatString="0"
+                                               Increment="1"
+                                               VerticalAlignment="Center"
+                                               TabIndex="6" />
+                                <TextBlock IsVisible="{Binding ShowInstallmentCount}"
+                                           Text="{Binding InstallmentValueText}"
+                                           VerticalAlignment="Center"
+                                           Opacity="0.7" />
+                            </StackPanel>
+
                             <!-- To Account and Amount row (Transfer only) -->
                             <StackPanel Orientation="Horizontal" Spacing="10">
                                 <StackPanel Classes="form-field" Width="190" IsVisible="{Binding TransferSelected}">
@@ -192,7 +212,7 @@
                                     <ComboBox ItemsSource="{Binding AvailableAccounts}"
                                               SelectedItem="{Binding ToAccount}"
                                               HorizontalAlignment="Stretch"
-                                              IsTextSearchEnabled="True" Height="36" TabIndex="5">
+                                              IsTextSearchEnabled="True" Height="36" TabIndex="7">
                                         <ComboBox.ItemTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal">
@@ -220,13 +240,13 @@
                                             IsInputFocused="{Binding IsToBtcInputFocused, Mode=TwoWay}"
                                             IsBitcoin="{Binding ToBtcIsBitcoinMode, Mode=TwoWay}"
                                             BtcValue="{Binding ToAccountBtcValue, Mode=TwoWay}"
-                                            TabIndex="6"
+                                            TabIndex="8"
                                             CalculatorCommand="{Binding OpenCalculatorCommand}"
                                             CalculatorCommandParameter="ToBtc"
                                             Width="270"
                                             Height="38" />
                                         <userControls:FiatInput x:Name="ToFiat"
-                                            TabIndex="7"
+                                            TabIndex="9"
                                             IsVisible="{Binding !ToAccountIsBtc}"
                                             IsInputFocused="{Binding IsToFiatInputFocused, Mode=TwoWay}"
                                             FiatValue="{Binding ToAccountFiatValue, Mode=TwoWay}"
@@ -281,32 +301,27 @@
 
                 <!-- Right pane - Notes and metadata -->
                 <Border Classes="form-fields-area" Padding="10" Background="{DynamicResource Background800Brush}">
-                    <StackPanel Spacing="10" Width="276">
-                        <!-- Notes field -->
-                        <StackPanel Classes="form-field">
-                            <TextBlock Text="{x:Static local:language.ManageTransactions_Notes}" />
-                            <TextBox Text="{Binding Notes}"
-                                     AcceptsReturn="True"
-                                     TextWrapping="Wrap"
-                                     MaxLength="1000"
-                                     Height="160"
-                                     TabIndex="8"
-                                     Watermark="{x:Static local:language.ManageTransactions_Notes_Placeholder}" />
-                        </StackPanel>
-
-                        <!-- Metadata section -->
-                        <Border Background="{DynamicResource Background900Brush}"
-                                CornerRadius="4" Padding="10"
-                                IsVisible="{Binding HasMetadata}">
+                    <DockPanel Width="276">
+                        <!-- Properties section (fixed at bottom) -->
+                        <Border DockPanel.Dock="Bottom" Background="{DynamicResource Background900Brush}"
+                                CornerRadius="4" Padding="10" MinHeight="90">
                             <StackPanel Spacing="6">
                                 <TextBlock Text="{x:Static local:language.ManageTransactions_Properties}"
                                            FontWeight="SemiBold" FontSize="{DynamicResource FontSizeSmall}"
                                            Foreground="{DynamicResource Text300Brush}" />
+                                <!-- Empty state -->
+                                <TextBlock IsVisible="{Binding !HasMetadata}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource Text500Brush}"
+                                           FontStyle="Italic"
+                                           Text="{x:Static local:language.ManageTransactions_Properties_None}" />
+                                <!-- Fixed expense binding -->
                                 <StackPanel Spacing="2" IsVisible="{Binding IsBoundToFixedExpense}">
                                     <TextBlock FontSize="{DynamicResource FontSizeXSmall}" Foreground="{DynamicResource Accent200Color}"
                                                Text="{x:Static local:language.ManageTransactions_Properties_BoundToFixedExpense}" />
                                     <TextBlock FontSize="{DynamicResource FontSizeXSmall}" Text="{Binding BoundToFixedExpenseCaption}" />
                                 </StackPanel>
+                                <!-- Auto sat amount -->
                                 <StackPanel Spacing="2" IsVisible="{Binding IsAutoSatAmount}">
                                     <TextBlock FontSize="{DynamicResource FontSizeXSmall}" Foreground="{DynamicResource Accent200Color}"
                                                Text="{x:Static local:language.ManageTransactions_Properties_PriceInSats}" />
@@ -314,7 +329,19 @@
                                 </StackPanel>
                             </StackPanel>
                         </Border>
-                    </StackPanel>
+
+                        <!-- Notes field (fills remaining space) -->
+                        <StackPanel Classes="form-field" Margin="0,0,0,10">
+                            <TextBlock Text="{x:Static local:language.ManageTransactions_Notes}" />
+                            <TextBox Text="{Binding Notes}"
+                                     AcceptsReturn="True"
+                                     TextWrapping="Wrap"
+                                     MaxLength="1000"
+                                     Height="160"
+                                     TabIndex="10"
+                                     Watermark="{x:Static local:language.ManageTransactions_Notes_Placeholder}" />
+                        </StackPanel>
+                    </DockPanel>
                 </Border>
             </StackPanel>
         </DockPanel>

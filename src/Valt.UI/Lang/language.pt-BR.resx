@@ -258,6 +258,9 @@
     <data name="Transactions.Menu.Delete" xml:space="preserve">
         <value>Excluir</value>
     </data>
+    <data name="Transactions.Menu.SendToAvgPrice" xml:space="preserve">
+        <value>Nova entrada de preço-médio</value>
+    </data>
     <data name="Transactions.Menu.Edit" xml:space="preserve">
         <value>Editar</value>
     </data>
@@ -578,6 +581,18 @@
     </data>
     <data name="ManageTransactions.Properties.PriceInSats" xml:space="preserve">
         <value>Preço em sats:</value>
+    </data>
+    <data name="SatAmountState.Manual" xml:space="preserve">
+        <value>Manual</value>
+    </data>
+    <data name="SatAmountState.Pending" xml:space="preserve">
+        <value>Pendente</value>
+    </data>
+    <data name="SatAmountState.Missing" xml:space="preserve">
+        <value>Preço não disponível</value>
+    </data>
+    <data name="ManageTransactions.Properties.None" xml:space="preserve">
+        <value>Sem propriedades adicionais</value>
     </data>
     <data name="ChangePasswordTitle" xml:space="preserve">
         <value>Alterar senha</value>
@@ -1586,10 +1601,28 @@
     <data name="Settings_FontScale_Large" xml:space="preserve">
         <value>Grande</value>
     </data>
+    <data name="Menu_Tools" xml:space="preserve">
+        <value>Ferramentas</value>
+    </data>
     <data name="Menu_ConversionCalculator" xml:space="preserve">
         <value>Calculadora de Conversão</value>
     </data>
     <data name="ConversionCalculator_Title" xml:space="preserve">
         <value>Conversor de Moedas</value>
+    </data>
+    <data name="ManageTransactions_UseInstallments" xml:space="preserve">
+        <value>Parcelar</value>
+    </data>
+    <data name="DeleteInstallment_Title" xml:space="preserve">
+        <value>Excluir Parcela</value>
+    </data>
+    <data name="DeleteInstallment_Message" xml:space="preserve">
+        <value>Esta transação faz parte de um parcelamento. Deseja excluir todas as parcelas?</value>
+    </data>
+    <data name="DeleteInstallment_OnlyThis" xml:space="preserve">
+        <value>Apenas esta</value>
+    </data>
+    <data name="DeleteInstallment_All" xml:space="preserve">
+        <value>Todas as parcelas</value>
     </data>
 </root>

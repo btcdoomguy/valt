@@ -320,6 +320,9 @@
     <data name="Transactions.Menu.Delete" xml:space="preserve">
         <value>Delete</value>
     </data>
+    <data name="Transactions.Menu.SendToAvgPrice" xml:space="preserve">
+        <value>New Avg Price entry</value>
+    </data>
     <data name="Main.Transactions" xml:space="preserve">
         <value>Transactions</value>
     </data>
@@ -604,6 +607,18 @@
     </data>
     <data name="ManageTransactions.Properties.PriceInSats" xml:space="preserve">
         <value>Price in sats:</value>
+    </data>
+    <data name="SatAmountState.Manual" xml:space="preserve">
+        <value>Manual</value>
+    </data>
+    <data name="SatAmountState.Pending" xml:space="preserve">
+        <value>Pending</value>
+    </data>
+    <data name="SatAmountState.Missing" xml:space="preserve">
+        <value>Missing price data</value>
+    </data>
+    <data name="ManageTransactions.Properties.None" xml:space="preserve">
+        <value>No additional properties</value>
     </data>
     <data name="ChangePasswordTitle" xml:space="preserve">
         <value>Change password</value>
@@ -1591,10 +1606,28 @@
     <data name="Settings_FontScale_Large" xml:space="preserve">
         <value>Large</value>
     </data>
+    <data name="Menu_Tools" xml:space="preserve">
+        <value>Tools</value>
+    </data>
     <data name="Menu_ConversionCalculator" xml:space="preserve">
         <value>Conversion Calculator</value>
     </data>
     <data name="ConversionCalculator_Title" xml:space="preserve">
         <value>Conversion Calculator</value>
+    </data>
+    <data name="ManageTransactions_UseInstallments" xml:space="preserve">
+        <value>Use installments</value>
+    </data>
+    <data name="DeleteInstallment_Title" xml:space="preserve">
+        <value>Delete Installment</value>
+    </data>
+    <data name="DeleteInstallment_Message" xml:space="preserve">
+        <value>This transaction is part of an installment group. Delete all installments?</value>
+    </data>
+    <data name="DeleteInstallment_OnlyThis" xml:space="preserve">
+        <value>Only this one</value>
+    </data>
+    <data name="DeleteInstallment_All" xml:space="preserve">
+        <value>All installments</value>
     </data>
 </root>

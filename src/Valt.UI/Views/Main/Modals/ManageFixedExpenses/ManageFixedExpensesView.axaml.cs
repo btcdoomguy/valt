@@ -1,3 +1,4 @@
+using Avalonia.Controls;
 using Avalonia.Input;
 using Valt.UI.Base;
 
@@ -9,9 +10,17 @@ public partial class ManageFixedExpensesView : ValtBaseWindow
     {
         InitializeComponent();
     }
-    
+
     private void MainGrid_OnDoubleTapped(object? sender, TappedEventArgs e)
     {
-        (DataContext as ManageFixedExpensesViewModel).EditFixedExpenseCommand.Execute(null);
+        (DataContext as ManageFixedExpensesViewModel)?.EditFixedExpenseCommand.Execute(null);
+    }
+
+    private void MainGrid_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (DataContext is ManageFixedExpensesViewModel vm && sender is DataGrid dataGrid)
+        {
+            vm.SelectedFixedExpense = dataGrid.SelectedItem as ManageFixedExpensesViewModel.FixedExpenseListItemViewModel;
+        }
     }
 }

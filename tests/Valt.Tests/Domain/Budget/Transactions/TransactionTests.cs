@@ -177,4 +177,44 @@ public class TransactionTests : DatabaseTest
     }
 
     #endregion
+
+    #region GroupId Tests
+
+    [Test]
+    public void Should_Create_Transaction_With_GroupId_And_IsPartOfGroup_Returns_True()
+    {
+        // Arrange
+        var groupId = new GroupId();
+
+        // Act
+        var transaction = new TransactionBuilder()
+            .WithCategoryId(_categoryId)
+            .WithDate(new DateOnly(2023, 1, 1))
+            .WithName("My Transaction")
+            .WithTransactionDetails(new FiatDetails(_fiatAccountId, 100m, true))
+            .WithGroupId(groupId)
+            .BuildDomainObject();
+
+        // Assert
+        Assert.That(transaction.GroupId, Is.EqualTo(groupId));
+        Assert.That(transaction.IsPartOfGroup, Is.True);
+    }
+
+    [Test]
+    public void Should_Create_Transaction_Without_GroupId_And_IsPartOfGroup_Returns_False()
+    {
+        // Arrange & Act
+        var transaction = new TransactionBuilder()
+            .WithCategoryId(_categoryId)
+            .WithDate(new DateOnly(2023, 1, 1))
+            .WithName("My Transaction")
+            .WithTransactionDetails(new FiatDetails(_fiatAccountId, 100m, true))
+            .BuildDomainObject();
+
+        // Assert
+        Assert.That(transaction.GroupId, Is.Null);
+        Assert.That(transaction.IsPartOfGroup, Is.False);
+    }
+
+    #endregion
 }

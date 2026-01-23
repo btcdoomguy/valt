@@ -17,9 +17,12 @@ public class Transaction : AggregateRoot<TransactionId>
     public TransactionFixedExpenseReference? FixedExpenseReference { get; private set; }
     public string? Notes { get; private set; }
 
+    public GroupId? GroupId { get; private set; }
+    public bool IsPartOfGroup => GroupId is not null;
+
     private Transaction(TransactionId id, DateOnly date, TransactionName name, CategoryId categoryId,
         TransactionDetails transactionDetails, AutoSatAmountDetails? autoSatAmountDetails, string? notes,
-        TransactionFixedExpenseReference? fixedExpenseReference,
+        TransactionFixedExpenseReference? fixedExpenseReference, GroupId? groupId,
         int version)
     {
         ArgumentNullException.ThrowIfNull(id);
@@ -35,28 +38,30 @@ public class Transaction : AggregateRoot<TransactionId>
         AutoSatAmountDetails = autoSatAmountDetails;
         Notes = notes;
         FixedExpenseReference = fixedExpenseReference;
+        GroupId = groupId;
         Version = version;
 
         if (Version != 0) return;
-        
+
         AddEvent(new TransactionCreatedEvent(this));
         if (FixedExpenseReference is not null)
             AddEvent(new TransactionBoundToFixedExpenseEvent(this.Id, FixedExpenseReference));
     }
 
     public static Transaction New(DateOnly date, TransactionName name, CategoryId categoryId,
-        TransactionDetails transactionDetails, string? notes, TransactionFixedExpenseReference? fixedExpense)
+        TransactionDetails transactionDetails, string? notes, TransactionFixedExpenseReference? fixedExpense,
+        GroupId? groupId = null)
     {
         return new Transaction(new TransactionId(), date, name, categoryId, transactionDetails,
-            transactionDetails.EligibleToAutoSatAmount ? AutoSatAmountDetails.Pending : null, notes, fixedExpense, 0);
+            transactionDetails.EligibleToAutoSatAmount ? AutoSatAmountDetails.Pending : null, notes, fixedExpense, groupId, 0);
     }
 
     public static Transaction Create(TransactionId id, DateOnly date, TransactionName name, CategoryId categoryId,
         TransactionDetails transactionDetails, AutoSatAmountDetails? autoSatAmountDetails, string? notes,
-        TransactionFixedExpenseReference? fixedExpense, 
+        TransactionFixedExpenseReference? fixedExpense, GroupId? groupId,
         int version)
     {
-        return new Transaction(id, date, name, categoryId, transactionDetails, autoSatAmountDetails, notes, fixedExpense, version);
+        return new Transaction(id, date, name, categoryId, transactionDetails, autoSatAmountDetails, notes, fixedExpense, groupId, version);
     }
     
     public void ChangeDate(DateOnly date)

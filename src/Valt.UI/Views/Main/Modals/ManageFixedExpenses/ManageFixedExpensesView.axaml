@@ -35,12 +35,13 @@
                       x:Name="MainGrid"
                       Margin="10, 10, 10, 0"
                       GridLinesVisibility="All"
-                      ItemsSource="{Binding FixedExpenses}"
+                      ItemsSource="{Binding FixedExpenses, Mode=OneWay}"
                       SelectionMode="Extended"
                       CanUserResizeColumns="True"
                       IsReadOnly="True"
-                      SelectedItem="{Binding SelectedFixedExpense}"
-                      DoubleTapped="MainGrid_OnDoubleTapped">
+                      SelectedItem="{Binding SelectedFixedExpense, Mode=OneWay}"
+                      DoubleTapped="MainGrid_OnDoubleTapped"
+                      SelectionChanged="MainGrid_OnSelectionChanged">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="{x:Static lang:language.FixedExpenses_Columns_Name}" Width="*"
                                         Binding="{Binding Name}">

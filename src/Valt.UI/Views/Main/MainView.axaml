@@ -56,7 +56,7 @@
                                 <MenuItem Header="{x:Static local:language.Main_Menu_Categories}"
                                           Command="{Binding ManageCategoriesCommand}">
                                 </MenuItem>
-                                <MenuItem Header="Tools">
+                                <MenuItem Header="{x:Static local:language.Menu_Tools}">
                                     <MenuItem Header="{x:Static local:language.Menu_ConversionCalculator}"
                                               Command="{Binding OpenConversionCalculatorCommand}">
                                     </MenuItem>

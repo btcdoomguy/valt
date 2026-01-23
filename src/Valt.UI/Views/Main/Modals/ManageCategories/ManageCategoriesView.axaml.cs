@@ -192,7 +192,15 @@ public partial class ManageCategoriesView : ValtBaseWindow
             if (result != null)
                 return result;
         }
-        
+
         return null;
+    }
+
+    private void Tree_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (DataContext is ManageCategoriesViewModel vm && sender is TreeView treeView)
+        {
+            vm.SelectedCategory = treeView.SelectedItem as CategoryTreeElement;
+        }
     }
 }

@@ -37,11 +37,12 @@
             x:Name="FixedExpenseList"
             Classes="regularListBox"
             ItemsSource="{Binding FixedExpenseEntries}"
-            SelectedItem="{Binding SelectedFixedExpense}"
+            SelectedItem="{Binding SelectedFixedExpense, Mode=OneWay}"
             SelectionMode="Single"
             BorderBrush="{DynamicResource Background500Brush}"
             CornerRadius="0"
-            BorderThickness="1, 0, 1, 0">
+            BorderThickness="1, 0, 1, 0"
+            SelectionChanged="FixedExpenseList_OnSelectionChanged">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Border Padding="2, 4" Background="Transparent">
