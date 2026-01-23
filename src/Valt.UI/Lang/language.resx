@@ -320,6 +320,9 @@
     <data name="Transactions.Menu.Delete" xml:space="preserve">
         <value>Delete</value>
     </data>
+    <data name="Transactions.Menu.SendToAvgPrice" xml:space="preserve">
+        <value>New Avg Price entry</value>
+    </data>
     <data name="Main.Transactions" xml:space="preserve">
         <value>Transactions</value>
     </data>

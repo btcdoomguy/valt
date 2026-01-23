@@ -35,7 +35,7 @@
                       x:Name="MainGrid"
                       Margin="10, 10, 10, 0"
                       GridLinesVisibility="All"
-                      ItemsSource="{Binding FixedExpenses}"
+                      ItemsSource="{Binding FixedExpenses, Mode=OneWay}"
                       SelectionMode="Extended"
                       CanUserResizeColumns="True"
                       IsReadOnly="True"

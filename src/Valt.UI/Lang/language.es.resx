@@ -315,6 +315,9 @@
     <data name="Transactions.Menu.Delete" xml:space="preserve">
         <value>Eliminar</value>
     </data>
+    <data name="Transactions.Menu.SendToAvgPrice" xml:space="preserve">
+        <value>Enviar a perfil Precio Promedio</value>
+    </data>
     <data name="Main.Transactions" xml:space="preserve">
         <value>Transacciones</value>
     </data>

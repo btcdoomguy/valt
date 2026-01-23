@@ -35,6 +35,13 @@ public partial class TransactionViewModel : ObservableObject
     public TransactionTransferTypes TransferType { get; }
     public TransactionTypes TransactionType { get; }
 
+    public string? FiatCurrencyCode => TransferType switch
+    {
+        TransactionTransferTypes.FiatToBitcoin => FromCurrency,  // From is fiat
+        TransactionTransferTypes.BitcoinToFiat => ToCurrency,    // To is fiat
+        _ => null
+    };
+
     private decimal _currentUsdFiatRate;
 
     private decimal _currentBtcRate;

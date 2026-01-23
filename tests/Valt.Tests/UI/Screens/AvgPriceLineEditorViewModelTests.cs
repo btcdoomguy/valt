@@ -297,6 +297,216 @@ public class AvgPriceLineEditorViewModelTests
 
     #endregion
 
+    #region Bind Parameter Tests - Preset Values
+
+    [Test]
+    public async Task Should_Apply_Preset_Date_When_Provided()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        var presetDate = new DateOnly(2024, 3, 20);
+
+        var request = new AvgPriceLineEditorViewModel.Request
+        {
+            ProfileId = new AvgPriceProfileId().Value,
+            AssetName = "BTC",
+            AssetPrecision = 8,
+            CurrencySymbol = "$",
+            CurrencySymbolOnRight = false,
+            PresetDate = presetDate
+        };
+
+        viewModel.Parameter = request;
+
+        // Act
+        await viewModel.OnBindParameterAsync();
+
+        // Assert
+        Assert.That(viewModel.Date!.Value.Date, Is.EqualTo(new DateTime(2024, 3, 20)));
+        Assert.That(viewModel.IsInsertMode, Is.True);
+    }
+
+    [Test]
+    public async Task Should_Apply_Preset_LineType_Buy_When_Provided()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+
+        var request = new AvgPriceLineEditorViewModel.Request
+        {
+            ProfileId = new AvgPriceProfileId().Value,
+            AssetName = "BTC",
+            AssetPrecision = 8,
+            CurrencySymbol = "$",
+            CurrencySymbolOnRight = false,
+            PresetLineType = AvgPriceLineTypes.Buy
+        };
+
+        viewModel.Parameter = request;
+
+        // Act
+        await viewModel.OnBindParameterAsync();
+
+        // Assert
+        Assert.That(viewModel.LineType, Is.EqualTo(AvgPriceLineTypes.Buy));
+        Assert.That(viewModel.IsBuy, Is.True);
+    }
+
+    [Test]
+    public async Task Should_Apply_Preset_LineType_Sell_When_Provided()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+
+        var request = new AvgPriceLineEditorViewModel.Request
+        {
+            ProfileId = new AvgPriceProfileId().Value,
+            AssetName = "BTC",
+            AssetPrecision = 8,
+            CurrencySymbol = "$",
+            CurrencySymbolOnRight = false,
+            PresetLineType = AvgPriceLineTypes.Sell
+        };
+
+        viewModel.Parameter = request;
+
+        // Act
+        await viewModel.OnBindParameterAsync();
+
+        // Assert
+        Assert.That(viewModel.LineType, Is.EqualTo(AvgPriceLineTypes.Sell));
+        Assert.That(viewModel.IsSell, Is.True);
+    }
+
+    [Test]
+    public async Task Should_Apply_Preset_Quantity_When_Provided()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+
+        var request = new AvgPriceLineEditorViewModel.Request
+        {
+            ProfileId = new AvgPriceProfileId().Value,
+            AssetName = "BTC",
+            AssetPrecision = 8,
+            CurrencySymbol = "$",
+            CurrencySymbolOnRight = false,
+            PresetQuantity = 0.5m
+        };
+
+        viewModel.Parameter = request;
+
+        // Act
+        await viewModel.OnBindParameterAsync();
+
+        // Assert
+        Assert.That(viewModel.Quantity, Is.EqualTo(0.5m));
+    }
+
+    [Test]
+    public async Task Should_Apply_Preset_Amount_When_Provided()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+
+        var request = new AvgPriceLineEditorViewModel.Request
+        {
+            ProfileId = new AvgPriceProfileId().Value,
+            AssetName = "BTC",
+            AssetPrecision = 8,
+            CurrencySymbol = "$",
+            CurrencySymbolOnRight = false,
+            PresetAmount = 25000m
+        };
+
+        viewModel.Parameter = request;
+
+        // Act
+        await viewModel.OnBindParameterAsync();
+
+        // Assert
+        Assert.That(viewModel.Amount!.Value, Is.EqualTo(25000m));
+    }
+
+    [Test]
+    public async Task Should_Apply_All_Preset_Values_Together()
+    {
+        // Arrange - Simulating a FiatToBitcoin transaction preset
+        var viewModel = CreateViewModel();
+
+        var request = new AvgPriceLineEditorViewModel.Request
+        {
+            ProfileId = new AvgPriceProfileId().Value,
+            AssetName = "BTC",
+            AssetPrecision = 8,
+            CurrencySymbol = "$",
+            CurrencySymbolOnRight = false,
+            PresetDate = new DateOnly(2024, 6, 15),
+            PresetLineType = AvgPriceLineTypes.Buy,
+            PresetQuantity = 0.05m,  // 5,000,000 sats = 0.05 BTC
+            PresetAmount = 3000m     // $3,000
+        };
+
+        viewModel.Parameter = request;
+
+        // Act
+        await viewModel.OnBindParameterAsync();
+
+        // Assert
+        Assert.That(viewModel.Date!.Value.Date, Is.EqualTo(new DateTime(2024, 6, 15)));
+        Assert.That(viewModel.LineType, Is.EqualTo(AvgPriceLineTypes.Buy));
+        Assert.That(viewModel.Quantity, Is.EqualTo(0.05m));
+        Assert.That(viewModel.Amount!.Value, Is.EqualTo(3000m));
+        Assert.That(viewModel.IsInsertMode, Is.True);
+    }
+
+    [Test]
+    public async Task Should_Ignore_Presets_When_ExistingLine_Provided()
+    {
+        // Arrange - Edit mode should use ExistingLine values, not presets
+        var viewModel = CreateViewModel();
+        var existingLine = new AvgPriceLineDTO(
+            new AvgPriceLineId().Value,
+            new DateOnly(2024, 1, 1),
+            1,
+            (int)AvgPriceLineTypes.Sell,
+            1.0m,
+            50000m,
+            "Existing",
+            50000m,
+            50000m,
+            1.0m);
+
+        var request = new AvgPriceLineEditorViewModel.Request
+        {
+            ProfileId = new AvgPriceProfileId().Value,
+            AssetName = "BTC",
+            AssetPrecision = 8,
+            CurrencySymbol = "$",
+            CurrencySymbolOnRight = false,
+            ExistingLine = existingLine,
+            // These should be ignored
+            PresetDate = new DateOnly(2024, 12, 31),
+            PresetLineType = AvgPriceLineTypes.Buy,
+            PresetQuantity = 999m,
+            PresetAmount = 999999m
+        };
+
+        viewModel.Parameter = request;
+
+        // Act
+        await viewModel.OnBindParameterAsync();
+
+        // Assert - Should use ExistingLine values, not presets
+        Assert.That(viewModel.Date!.Value.Date, Is.EqualTo(new DateTime(2024, 1, 1)));
+        Assert.That(viewModel.LineType, Is.EqualTo(AvgPriceLineTypes.Sell));
+        Assert.That(viewModel.Quantity, Is.EqualTo(1.0m));
+        Assert.That(viewModel.Amount!.Value, Is.EqualTo(50000m));
+        Assert.That(viewModel.IsEditMode, Is.True);
+    }
+
+    #endregion
+
     #region Save Tests - Insert Mode
 
     [Test]

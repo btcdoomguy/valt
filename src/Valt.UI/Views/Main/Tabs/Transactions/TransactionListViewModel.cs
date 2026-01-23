@@ -33,6 +33,10 @@ using Valt.UI.Services;
 using Valt.UI.Services.LocalStorage;
 using Valt.UI.State;
 using Valt.UI.UserControls;
+using Valt.Core.Modules.AvgPrice;
+using Valt.Infra.Modules.AvgPrice.Queries;
+using Valt.Infra.Modules.AvgPrice.Queries.DTOs;
+using Valt.UI.Views.Main.Modals.AvgPriceLineEditor;
 using Valt.UI.Views.Main.Modals.ChangeCategoryTransactions;
 using Valt.UI.Views.Main.Modals.TransactionEditor;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
@@ -52,6 +56,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     private readonly IClock _clock;
     private readonly ILocalStorageService _localStorageService;
     private readonly ILogger<TransactionListViewModel> _logger;
+    private readonly IAvgPriceQueries _avgPriceQueries;
 
     private DateTime _dateForTransaction = DateTime.Now;
 
@@ -64,6 +69,8 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     [ObservableProperty] private string _amountHeader = language.Transactions_Columns_Amount;
 
     [ObservableProperty] private bool _isSingleItemSelected;
+
+    [ObservableProperty] private List<AvgPriceProfileDTO> _matchingAvgPriceProfiles = new();
 
     #region DataGrid State
 
@@ -90,7 +97,8 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
         FilterState filterState,
         IClock clock,
         ILocalStorageService localStorageService,
-        ILogger<TransactionListViewModel> logger)
+        ILogger<TransactionListViewModel> logger,
+        IAvgPriceQueries avgPriceQueries)
     {
         _modalFactory = modalFactory;
         _transactionRepository = transactionRepository;
@@ -103,6 +111,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
         _clock = clock;
         _localStorageService = localStorageService;
         _logger = logger;
+        _avgPriceQueries = avgPriceQueries;
 
         _liveRateState.PropertyChanged += LiveRateStateOnPropertyChanged;
         _localDatabase.PropertyChanged += LocalDatabaseOnPropertyChanged;
@@ -408,6 +417,102 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
 
     #endregion
 
+    #region AvgPrice - Send to Profile
+
+    public bool CanSendToAvgPrice =>
+        SelectedTransaction is not null &&
+        IsSingleItemSelected &&
+        SelectedTransaction.TransferType is TransactionTransferTypes.FiatToBitcoin
+            or TransactionTransferTypes.BitcoinToFiat &&
+        MatchingAvgPriceProfiles.Count > 0;
+
+    private async Task RefreshMatchingAvgPriceProfilesAsync()
+    {
+        if (SelectedTransaction is null ||
+            SelectedTransaction.TransferType is not (TransactionTransferTypes.FiatToBitcoin
+                or TransactionTransferTypes.BitcoinToFiat))
+        {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                MatchingAvgPriceProfiles = new List<AvgPriceProfileDTO>();
+                OnPropertyChanged(nameof(CanSendToAvgPrice));
+            });
+            return;
+        }
+
+        var fiatCurrencyCode = SelectedTransaction.FiatCurrencyCode;
+        if (string.IsNullOrEmpty(fiatCurrencyCode))
+        {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                MatchingAvgPriceProfiles = new List<AvgPriceProfileDTO>();
+                OnPropertyChanged(nameof(CanSendToAvgPrice));
+            });
+            return;
+        }
+
+        var allProfiles = await _avgPriceQueries.GetProfilesAsync(showHidden: false);
+
+        var filteredProfiles = allProfiles
+            .Where(p => p.AssetName == "BTC" &&
+                        p.CurrencyCode.Equals(fiatCurrencyCode, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(p => p.Name)
+            .ToList();
+
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            MatchingAvgPriceProfiles = filteredProfiles;
+            OnPropertyChanged(nameof(CanSendToAvgPrice));
+        });
+    }
+
+    [RelayCommand]
+    private async Task SendToAvgPriceProfile(AvgPriceProfileDTO? profile)
+    {
+        if (profile is null || SelectedTransaction is null)
+            return;
+
+        var ownerWindow = GetUserControlOwnerWindow()!;
+
+        // Determine line type: FiatToBitcoin = Buy, BitcoinToFiat = Sell
+        var lineType = SelectedTransaction.TransferType == TransactionTransferTypes.FiatToBitcoin
+            ? AvgPriceLineTypes.Buy
+            : AvgPriceLineTypes.Sell;
+
+        // Get BTC amount in BTC (not sats) - always positive
+        var btcSats = SelectedTransaction.TransferType == TransactionTransferTypes.FiatToBitcoin
+            ? SelectedTransaction.ToAmountSats.GetValueOrDefault()
+            : Math.Abs(SelectedTransaction.FromAmountSats.GetValueOrDefault());
+        var btcQuantity = btcSats / 100_000_000m;
+
+        // Get fiat amount (total cost) - always positive
+        var fiatAmount = SelectedTransaction.TransferType == TransactionTransferTypes.FiatToBitcoin
+            ? Math.Abs(SelectedTransaction.FromAmountFiat.GetValueOrDefault())
+            : SelectedTransaction.ToAmountFiat.GetValueOrDefault();
+
+        var currency = FiatCurrency.GetFromCode(profile.CurrencyCode);
+
+        var modal = (AvgPriceLineEditorView)await _modalFactory.CreateAsync(
+            ApplicationModalNames.AvgPriceLineEditor,
+            ownerWindow,
+            new AvgPriceLineEditorViewModel.Request
+            {
+                ProfileId = profile.Id,
+                AssetName = profile.AssetName,
+                AssetPrecision = profile.Precision,
+                CurrencySymbol = currency.Symbol,
+                CurrencySymbolOnRight = currency.SymbolOnRight,
+                PresetDate = SelectedTransaction.Date,
+                PresetLineType = lineType,
+                PresetQuantity = btcQuantity,
+                PresetAmount = fiatAmount
+            })!;
+
+        await modal.ShowDialog<AvgPriceLineEditorViewModel.Response?>(ownerWindow);
+    }
+
+    #endregion
+
     [RelayCommand]
     private async Task FetchTransactions()
     {
@@ -447,15 +552,28 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
 
     public void UpdateSelectedItems(IList selectedItems)
     {
-        SelectedTransaction = selectedItems.OfType<TransactionViewModel>().FirstOrDefault();
         SelectedTransactions = selectedItems.OfType<TransactionViewModel>().ToList();
-        if (SelectedAccount == null)
+
+        if (selectedItems.Count == 0)
         {
+            // No selection - clear state
+            IsSingleItemSelected = false;
+            SelectedTransaction = null;
             AmountHeader = language.Transactions_Columns_Amount;
             return;
         }
 
-        if (selectedItems.Count <= 1)
+        // Keep SelectedTransaction as anchor for context menu (first item in selection)
+        SelectedTransaction = SelectedTransactions.FirstOrDefault();
+
+        if (SelectedAccount == null)
+        {
+            IsSingleItemSelected = selectedItems.Count == 1;
+            AmountHeader = language.Transactions_Columns_Amount;
+            return;
+        }
+
+        if (selectedItems.Count == 1)
         {
             IsSingleItemSelected = true;
             AmountHeader = language.Transactions_Columns_Amount;
@@ -551,6 +669,12 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     partial void OnSelectedTransactionChanged(TransactionViewModel? value)
     {
         RefreshFixedExpensesContextProperties();
+        RefreshMatchingAvgPriceProfilesAsync().SafeFireAndForget(logger: _logger);
+    }
+
+    partial void OnIsSingleItemSelectedChanged(bool value)
+    {
+        OnPropertyChanged(nameof(CanSendToAvgPrice));
     }
     
 

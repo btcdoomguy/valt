@@ -9,6 +9,8 @@ namespace Valt.UI.Views.Main.Tabs.AvgPrice;
 
 public partial class AvgPriceView : ValtBaseUserControl
 {
+    private bool _isUpdatingSelection;
+
     public AvgPriceView()
     {
         InitializeComponent();
@@ -89,10 +91,21 @@ public partial class AvgPriceView : ValtBaseUserControl
 
     private void MainGrid_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        // Explicitly update SelectedLine to ensure binding stays in sync
-        if (DataContext is AvgPriceViewModel vm && sender is DataGrid dataGrid)
+        if (_isUpdatingSelection) return;
+
+        try
         {
-            vm.SelectedLine = dataGrid.SelectedItem as Models.AvgPriceLineViewModel;
+            _isUpdatingSelection = true;
+
+            // Explicitly update SelectedLine to ensure binding stays in sync
+            if (DataContext is AvgPriceViewModel vm && sender is DataGrid dataGrid)
+            {
+                vm.SelectedLine = dataGrid.SelectedItem as Models.AvgPriceLineViewModel;
+            }
+        }
+        finally
+        {
+            _isUpdatingSelection = false;
         }
     }
 }

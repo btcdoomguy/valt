@@ -61,7 +61,7 @@
                 <DataGrid Grid.Row="1"
                           x:Name="MainGrid"
                           ItemsSource="{Binding Lines}"
-                          SelectedItem="{Binding SelectedLine}"
+                          SelectedItem="{Binding SelectedLine, Mode=OneWay}"
                           AutoGenerateColumns="False"
                           IsReadOnly="True"
                           CanUserReorderColumns="True"

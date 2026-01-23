@@ -260,7 +260,7 @@
                            Margin="0, 0, 0, 8" />
 
                 <!-- Fixed Expenses Panel -->
-                <vm1:FixedExpensesPanelView Grid.Row="1" x:Name="FixedExpensesPanel" />
+                <vm1:FixedExpensesPanelView Grid.Row="1" x:Name="FixedExpensesPanel" DataContext="{x:Null}" />
 
                 <!-- GridSplitter between panels -->
                 <GridSplitter Grid.Row="2"
@@ -270,7 +270,7 @@
                               ResizeBehavior="PreviousAndNext" />
 
                 <!-- Goals Panel -->
-                <vm1:GoalsPanelView Grid.Row="3" x:Name="GoalsPanel" />
+                <vm1:GoalsPanelView Grid.Row="3" x:Name="GoalsPanel" DataContext="{x:Null}" />
             </Grid>
         </Panel>
     </Grid>

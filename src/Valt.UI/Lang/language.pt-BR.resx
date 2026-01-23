@@ -258,6 +258,9 @@
     <data name="Transactions.Menu.Delete" xml:space="preserve">
         <value>Excluir</value>
     </data>
+    <data name="Transactions.Menu.SendToAvgPrice" xml:space="preserve">
+        <value>Nova entrada de preço-médio</value>
+    </data>
     <data name="Transactions.Menu.Edit" xml:space="preserve">
         <value>Editar</value>
     </data>
