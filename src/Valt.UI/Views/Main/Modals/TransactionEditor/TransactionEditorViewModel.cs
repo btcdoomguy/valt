@@ -103,8 +103,8 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
     [ObservableProperty] private bool _isToBtcInputFocused;
     [ObservableProperty] private bool _isToFiatInputFocused;
 
-    [ObservableProperty] private bool _fromBtcIsBitcoinMode = true;
-    [ObservableProperty] private bool _toBtcIsBitcoinMode = true;
+    [ObservableProperty] private bool _fromBtcIsBitcoinMode;
+    [ObservableProperty] private bool _toBtcIsBitcoinMode;
 
     [NotifyPropertyChangedFor(nameof(IsBoundToFixedExpense), nameof(BoundToFixedExpenseCaption), nameof(HasMetadata))]
     [ObservableProperty]
