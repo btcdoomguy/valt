@@ -69,7 +69,8 @@
                           CanUserSortColumns="False"
                           SelectionMode="Single"
                           HorizontalScrollBarVisibility="Visible"
-                          Margin="0,10,0,0">
+                          Margin="0,10,0,0"
+                          SelectionChanged="MainGrid_OnSelectionChanged">
                     <DataGrid.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="{x:Static lang:language.AvgPrice_Menu_Edit}"
