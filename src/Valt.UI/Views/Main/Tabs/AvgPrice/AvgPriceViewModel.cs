@@ -29,11 +29,11 @@ namespace Valt.UI.Views.Main.Tabs.AvgPrice;
 
 public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
 {
-    private readonly IAvgPriceQueries _avgPriceQueries;
-    private readonly IAvgPriceRepository _avgPriceRepository;
-    private readonly IAvgPriceTotalizer _avgPriceTotalizer;
-    private readonly IModalFactory _modalFactory;
-    private readonly IClock _clock;
+    private readonly IAvgPriceQueries _avgPriceQueries = null!;
+    private readonly IAvgPriceRepository _avgPriceRepository = null!;
+    private readonly IAvgPriceTotalizer _avgPriceTotalizer = null!;
+    private readonly IModalFactory _modalFactory = null!;
+    private readonly IClock _clock = null!;
     private readonly SecureModeState? _secureModeState;
     private readonly ILogger<AvgPriceViewModel>? _logger;
 

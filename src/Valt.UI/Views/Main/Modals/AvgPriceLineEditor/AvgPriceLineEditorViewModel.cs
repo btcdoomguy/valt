@@ -16,7 +16,7 @@ namespace Valt.UI.Views.Main.Modals.AvgPriceLineEditor;
 
 public partial class AvgPriceLineEditorViewModel : ValtModalValidatorViewModel
 {
-    private readonly IAvgPriceRepository _avgPriceRepository;
+    private readonly IAvgPriceRepository _avgPriceRepository = null!;
 
     [ObservableProperty] private string _windowTitle = language.AvgPriceLineEditor_AddTitle;
 

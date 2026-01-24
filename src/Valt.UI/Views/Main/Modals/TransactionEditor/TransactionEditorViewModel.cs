@@ -48,11 +48,11 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
     private readonly ITransactionRepository? _transactionRepository;
     private readonly IAccountQueries? _accountQueries;
     private readonly ICategoryQueries? _categoryQueries;
-    private readonly IFixedExpenseQueries _fixedExpenseQueries;
+    private readonly IFixedExpenseQueries _fixedExpenseQueries = null!;
     private readonly ITransactionTermService? _transactionTermService;
-    private readonly IModalFactory _modalFactory;
-    private readonly CurrencySettings _currencySettings;
-    private readonly DisplaySettings _displaySettings;
+    private readonly IModalFactory _modalFactory = null!;
+    private readonly CurrencySettings _currencySettings = null!;
+    private readonly DisplaySettings _displaySettings = null!;
 
     public AvaloniaList<CategoryDTO> AvailableCategories { get; set; } = new();
     public AvaloniaList<AccountDTO> AvailableAccounts { get; set; } = new();
@@ -101,7 +101,7 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
     [CustomValidation(typeof(TransactionEditorViewModel), nameof(ValidateToAccountFiatValue))] [ObservableProperty]
     private FiatValue? _toAccountFiatValue = FiatValue.Empty;
 
-    [ObservableProperty] private string _transferRate;
+    [ObservableProperty] private string _transferRate = string.Empty;
 
     [ObservableProperty] private bool _isFromBtcInputFocused;
     [ObservableProperty] private bool _isFromFiatInputFocused;
@@ -482,7 +482,7 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
     private async Task OnBindParameterForEditingAsync(Request request)
     {
         var transaction =
-            await _transactionRepository!.GetTransactionByIdAsync(request.TransactionId);
+            await _transactionRepository!.GetTransactionByIdAsync(request.TransactionId!);
 
         if (transaction is null)
         {

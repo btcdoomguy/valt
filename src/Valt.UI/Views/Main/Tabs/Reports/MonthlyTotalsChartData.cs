@@ -35,7 +35,7 @@ public class MonthlyTotalsChartData : IDisposable
     private static readonly SKColor LegendTextColor = SKColor.Parse("#eeebe8");  // Text200
     private static readonly SKColor ChartBackground = SKColor.Parse("#333333");  // Background800
 
-    public FiatCurrency FiatCurrency { get; set; }
+    public FiatCurrency FiatCurrency { get; set; } = null!;
 
     // Chart styling
     public SolidColorPaint LegendTextPaint { get; } = new(LegendTextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) };

@@ -50,7 +50,7 @@ public partial class TransactionViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(AutoSatAmountCurrentPrice))] [ObservableProperty]
     private long? _autoSatAmount;
 
-    [ObservableProperty] private string _autoSatAmountCurrentPrice;
+    [ObservableProperty] private string _autoSatAmountCurrentPrice = string.Empty;
 
     public string? FixedExpenseRecordId { get; set; }
     public string? FixedExpenseId { get; set; }
@@ -58,7 +58,7 @@ public partial class TransactionViewModel : ObservableObject
     public DateOnly? FixedExpenseReferenceDate { get; set; }
     public string? Notes { get; set; }
 
-    public SolidColorBrush AutoSatLineColor { get; private set; }
+    public SolidColorBrush AutoSatLineColor { get; private set; } = TransactionGridResources.RegularLine;
 
     public TransactionViewModel(string id, DateOnly date, string name, string categoryId, string categoryName,
         Icon categoryIcon, string fromAccountId, string fromAccountName, Icon fromAccountIcon, string? toAccountId,
@@ -82,7 +82,7 @@ public partial class TransactionViewModel : ObservableObject
         FromAccountIcon = fromAccountIcon;
         ToAccountId = toAccountId;
         ToAccountName = toAccountName;
-        ToAccountIcon = toAccountIcon;
+        ToAccountIcon = toAccountIcon ?? Icon.Empty;
         FormattedFromAmount = formattedFromAmount;
         FromAmountSats = fromAmountSats;
         FromAmountFiat = fromAmountFiat;
@@ -193,7 +193,7 @@ public partial class TransactionViewModel : ObservableObject
             dto.CategoryIcon is not null ? Icon.RestoreFromId(dto.CategoryIcon) : Icon.Empty,
             dto.FromAccountId,
             dto.FromAccountName,
-            Icon.RestoreFromId(dto.FromAccountIcon),
+            dto.FromAccountIcon is not null ? Icon.RestoreFromId(dto.FromAccountIcon) : Icon.Empty,
             dto.ToAccountId,
             dto.ToAccountName,
             dto.ToAccountIcon is not null ? Icon.RestoreFromId(dto.ToAccountIcon) : Icon.Empty,

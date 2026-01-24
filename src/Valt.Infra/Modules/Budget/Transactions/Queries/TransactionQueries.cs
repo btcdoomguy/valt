@@ -113,7 +113,7 @@ public class TransactionQueries : ITransactionQueries
                 CategoryName = category.Name,
                 FromAccountId = transactionEntity.FromAccountId.ToString(),
                 FromAccountIcon = fromAccount?.Icon,
-                FromAccountName = fromAccount?.Name,
+                FromAccountName = fromAccount?.Name ?? string.Empty,
                 FromAccountCurrency = fromAccount?.Currency,
                 ToAccountId = transactionEntity.ToAccountId?.ToString(),
                 ToAccountIcon = toAccount?.Icon,

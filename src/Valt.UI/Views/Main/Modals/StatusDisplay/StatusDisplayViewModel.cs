@@ -11,8 +11,8 @@ namespace Valt.UI.Views.Main.Modals.StatusDisplay;
 
 public partial class StatusDisplayViewModel : ValtModalViewModel
 {
-    private readonly BackgroundJobManager _jobManager;
-    public AvaloniaList<JobInfo> Jobs { get; set; }
+    private readonly BackgroundJobManager _jobManager = null!;
+    public AvaloniaList<JobInfo> Jobs { get; set; } = new();
 
     [ObservableProperty]
     private JobInfo? _selectedJob;
@@ -44,7 +44,9 @@ public partial class StatusDisplayViewModel : ValtModalViewModel
             DataContext = new JobLogViewerViewModel(jobInfo)
         };
 
-        logViewer.ShowDialog(GetWindow());
+#pragma warning disable CS8602 // Dereference of a possibly null reference
+        logViewer.ShowDialog(GetWindow()!);
+#pragma warning restore CS8602
     }
 
     public class FooBackgroundJob : IBackgroundJob

@@ -46,18 +46,18 @@ namespace Valt.UI.Views.Main.Tabs.Transactions;
 
 public partial class TransactionListViewModel : ValtViewModel, IDisposable
 {
-    private readonly IModalFactory _modalFactory;
-    private readonly ITransactionRepository _transactionRepository;
-    private readonly ITransactionQueries _transactionQueries;
-    private readonly ITransactionTermService _transactionTermService;
-    private readonly LiveRateState _liveRateState;
-    private readonly ILocalDatabase _localDatabase;
-    private readonly CurrencySettings _currencySettings;
-    private readonly FilterState _filterState;
-    private readonly IClock _clock;
-    private readonly ILocalStorageService _localStorageService;
-    private readonly ILogger<TransactionListViewModel> _logger;
-    private readonly IAvgPriceQueries _avgPriceQueries;
+    private readonly IModalFactory _modalFactory = null!;
+    private readonly ITransactionRepository _transactionRepository = null!;
+    private readonly ITransactionQueries _transactionQueries = null!;
+    private readonly ITransactionTermService _transactionTermService = null!;
+    private readonly LiveRateState _liveRateState = null!;
+    private readonly ILocalDatabase _localDatabase = null!;
+    private readonly CurrencySettings _currencySettings = null!;
+    private readonly FilterState _filterState = null!;
+    private readonly IClock _clock = null!;
+    private readonly ILocalStorageService _localStorageService = null!;
+    private readonly ILogger<TransactionListViewModel> _logger = null!;
+    private readonly IAvgPriceQueries _avgPriceQueries = null!;
 
     private DateTime _dateForTransaction = DateTime.Now;
 

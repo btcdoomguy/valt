@@ -16,7 +16,7 @@ public static class EnumExtensions
 
         return Enum.GetValues(enumType)
             .Cast<object>()
-            .Select(e => new EnumItem(Convert.ToInt32(e), e.ToString()))
+            .Select(e => new EnumItem(Convert.ToInt32(e), e.ToString() ?? string.Empty))
             .ToList();
     }
 }

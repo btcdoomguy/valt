@@ -32,7 +32,7 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
         _animatedProgressPercentage = Math.Min(goal.Progress, 100);
     }
 
-    public string Id => _goal.Id.ToString();
+    public string Id => _goal.Id.ToString() ?? string.Empty;
 
     public string FriendlyName
     {

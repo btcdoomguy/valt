@@ -26,7 +26,7 @@ namespace Valt.UI.Views.Main.Modals.ManageCategories;
 public partial class ManageCategoriesViewModel : ValtModalValidatorViewModel
 {
     private readonly ICategoryRepository? _categoryRepository;
-    private readonly ITransactionQueries _transactionQueries;
+    private readonly ITransactionQueries _transactionQueries = null!;
     private readonly IModalFactory? _modalFactory;
 
     #region Form data

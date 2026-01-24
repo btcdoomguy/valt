@@ -38,22 +38,21 @@ namespace Valt.UI.Views.Main.Tabs.Reports;
 
 public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 {
-    private readonly IAllTimeHighReport _allTimeHighReport;
-    private readonly IMonthlyTotalsReport _monthlyTotalsReport;
-    private readonly IExpensesByCategoryReport _expensesByCategoryReport;
-    private readonly IIncomeByCategoryReport _incomeByCategoryReport;
-    private readonly IStatisticsReport _statisticsReport;
-    private readonly IWealthOverviewReport _wealthOverviewReport;
-    private readonly IReportDataProviderFactory _reportDataProviderFactory;
-    private readonly CurrencySettings _currencySettings;
-    private readonly ILocalDatabase _localDatabase;
-    private readonly IClock _clock;
-    private readonly ILogger<ReportsViewModel> _logger;
-    private readonly AccountsTotalState _accountsTotalState;
-    private readonly RatesState _ratesState;
+    private readonly IAllTimeHighReport _allTimeHighReport = null!;
+    private readonly IMonthlyTotalsReport _monthlyTotalsReport = null!;
+    private readonly IExpensesByCategoryReport _expensesByCategoryReport = null!;
+    private readonly IIncomeByCategoryReport _incomeByCategoryReport = null!;
+    private readonly IStatisticsReport _statisticsReport = null!;
+    private readonly IWealthOverviewReport _wealthOverviewReport = null!;
+    private readonly IReportDataProviderFactory _reportDataProviderFactory = null!;
+    private readonly CurrencySettings _currencySettings = null!;
+    private readonly ILocalDatabase _localDatabase = null!;
+    private readonly IClock _clock = null!;
+    private readonly ILogger<ReportsViewModel> _logger = null!;
+    private readonly AccountsTotalState _accountsTotalState = null!;
+    private readonly RatesState _ratesState = null!;
     
-    [ObservableProperty]
-    private SecureModeState _secureModeState;
+    private readonly SecureModeState _secureModeState = null!;
 
     private const long TotalBtcSupplySats = 21_000_000_00_000_000L; // 21 million BTC in sats
 
@@ -70,9 +69,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private WealthOverviewChartData _wealthOverviewChartData = new();
     [ObservableProperty] private WealthOverviewPeriod _selectedWealthOverviewPeriod = WealthOverviewPeriod.Monthly;
     [ObservableProperty] private DateTime _filterMainDate;
-    [ObservableProperty] private DateRange _filterRange;
+    [ObservableProperty] private DateRange _filterRange = new(DateTime.MinValue, DateTime.MinValue);
     [ObservableProperty] private DateTime _categoryFilterMainDate;
-    [ObservableProperty] private DateRange _categoryFilterRange;
+    [ObservableProperty] private DateRange _categoryFilterRange = new(DateTime.MinValue, DateTime.MinValue);
 
     [ObservableProperty] private bool _isWealthLoading = true;
     [ObservableProperty] private bool _isAllTimeHighLoading = true;
@@ -94,7 +93,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     // Income by category
     [ObservableProperty] private IncomeByCategoryChartData _incomeByCategoryChartData = new();
     [ObservableProperty] private DateTime _incomeCategoryFilterMainDate;
-    [ObservableProperty] private DateRange _incomeCategoryFilterRange;
+    [ObservableProperty] private DateRange _incomeCategoryFilterRange = new(DateTime.MinValue, DateTime.MinValue);
     [ObservableProperty] private AvaloniaList<SelectItem> _incomeSelectedAccounts = new();
     [ObservableProperty] private AvaloniaList<SelectItem> _incomeSelectedCategories = new();
 

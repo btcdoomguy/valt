@@ -7,6 +7,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+#pragma warning disable CS8981 // The type name only contains lower-cased ascii characters
+
 namespace Valt.UI.Lang {
     using System;
     

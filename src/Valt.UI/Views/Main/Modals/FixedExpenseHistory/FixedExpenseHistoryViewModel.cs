@@ -17,8 +17,8 @@ namespace Valt.UI.Views.Main.Modals.FixedExpenseHistory;
 
 public partial class FixedExpenseHistoryViewModel : ValtModalViewModel
 {
-    private readonly IFixedExpenseQueries _fixedExpenseQueries;
-    private readonly IModalFactory _modalFactory;
+    private readonly IFixedExpenseQueries _fixedExpenseQueries = null!;
+    private readonly IModalFactory _modalFactory = null!;
 
     [ObservableProperty] private string _fixedExpenseName = string.Empty;
     [ObservableProperty] private TransactionHistoryItemViewModel? _selectedTransaction;

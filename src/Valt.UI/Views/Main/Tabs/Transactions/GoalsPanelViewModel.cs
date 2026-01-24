@@ -25,13 +25,13 @@ namespace Valt.UI.Views.Main.Tabs.Transactions;
 
 public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
 {
-    private readonly IModalFactory _modalFactory;
-    private readonly IGoalRepository _goalRepository;
-    private readonly GoalProgressState _goalProgressState;
-    private readonly CurrencySettings _currencySettings;
-    private readonly FilterState _filterState;
-    private readonly ILogger<GoalsPanelViewModel> _logger;
-    private readonly SecureModeState _secureModeState;
+    private readonly IModalFactory _modalFactory = null!;
+    private readonly IGoalRepository _goalRepository = null!;
+    private readonly GoalProgressState _goalProgressState = null!;
+    private readonly CurrencySettings _currencySettings = null!;
+    private readonly FilterState _filterState = null!;
+    private readonly ILogger<GoalsPanelViewModel> _logger = null!;
+    private readonly SecureModeState _secureModeState = null!;
 
     [ObservableProperty] private AvaloniaList<GoalEntryViewModel> _goalEntries = new();
 
@@ -144,7 +144,7 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
                     var range = g.GetPeriodRange();
                     return currentDate >= range.Start && currentDate <= range.End;
                 })
-                .ToDictionary(g => g.Id.ToString());
+                .ToDictionary(g => g.Id.ToString() ?? string.Empty, g => g);
 
             // Update existing entries in place (this triggers animation)
             foreach (var entry in GoalEntries.ToList())

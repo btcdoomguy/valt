@@ -20,7 +20,7 @@ public partial class ReportsViewModel
         if (!Design.IsDesignMode)
             return;
 
-        SecureModeState = new SecureModeState()
+        _secureModeState = new SecureModeState()
         {
             IsEnabled = false
         };

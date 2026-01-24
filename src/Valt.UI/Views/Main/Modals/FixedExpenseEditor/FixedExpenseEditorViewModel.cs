@@ -30,11 +30,11 @@ namespace Valt.UI.Views.Main.Modals.FixedExpenseEditor;
 
 public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
 {
-    private readonly IFixedExpenseRepository _fixedExpenseRepository;
-    private readonly IAccountQueries _accountQueries;
-    private readonly ICategoryQueries _categoryQueries;
-    private readonly DisplaySettings _displaySettings;
-    private readonly ITransactionTermService _transactionTermService;
+    private readonly IFixedExpenseRepository _fixedExpenseRepository = null!;
+    private readonly IAccountQueries _accountQueries = null!;
+    private readonly ICategoryQueries _categoryQueries = null!;
+    private readonly DisplaySettings _displaySettings = null!;
+    private readonly ITransactionTermService _transactionTermService = null!;
     private readonly IConfigurationManager? _configurationManager;
 
     public AvaloniaList<CategoryDTO> AvailableCategories { get; set; } = new();
@@ -75,7 +75,7 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
     private string _name = string.Empty;
 
     [Required(ErrorMessage = "Category is required")] [ObservableProperty]
-    private CategoryDTO _category;
+    private CategoryDTO _category = null!;
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsDefaultAccountSelectorVisible))]
     private bool _isAttachedToDefaultAccount = true;
@@ -274,7 +274,7 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
             WindowTitle = language.FixedExpensesEditor_EditTitle;
 
             Name = fixedExpense.Name;
-            Category = AvailableCategories.FirstOrDefault(c => c.Id == fixedExpense.CategoryId.Value);
+            Category = AvailableCategories.FirstOrDefault(c => c.Id == fixedExpense.CategoryId.Value)!;
 
             IsAttachedToDefaultAccount = fixedExpense.DefaultAccountId is not null;
             IsAttachedToCurrency = fixedExpense.Currency is not null;
@@ -283,7 +283,7 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
                 : null;
             Currency = fixedExpense.Currency?.Code;
 
-            var latestRange = fixedExpense.Ranges.LastOrDefault();
+            var latestRange = fixedExpense.Ranges.Last();
 
             Period = latestRange.Period.ToString();
             Day = latestRange.Day;
@@ -385,15 +385,15 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
         FixedExpenseRange initialRange;
         if (IsFixedSelectorVisible)
             initialRange =
-                FixedExpenseRange.CreateFixedAmount(FixedAmount, Enum.Parse<FixedExpensePeriods>(Period), date, Day);
+                FixedExpenseRange.CreateFixedAmount(FixedAmount!, Enum.Parse<FixedExpensePeriods>(Period), date, Day);
         else
-            initialRange = FixedExpenseRange.CreateRangedAmount(new RangedFiatValue(RangedAmountMin, RangedAmountMax),
+            initialRange = FixedExpenseRange.CreateRangedAmount(new RangedFiatValue(RangedAmountMin!, RangedAmountMax!),
                 Enum.Parse<FixedExpensePeriods>(Period),
                 date,
                 Day);
 
         return FixedExpense.New(name,
-            IsDefaultAccountSelectorVisible ? new AccountId(DefaultAccount.Id) : null,
+            IsDefaultAccountSelectorVisible ? new AccountId(DefaultAccount!.Id) : null,
             new CategoryId(Category.Id),
             Currency is not null ? FiatCurrency.GetFromCode(Currency) : null,
             new List<FixedExpenseRange> { initialRange },
@@ -421,9 +421,9 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
         FixedExpenseRange newRange;
         if (IsFixedSelectorVisible)
             newRange =
-                FixedExpenseRange.CreateFixedAmount(FixedAmount, Enum.Parse<FixedExpensePeriods>(Period), date, Day);
+                FixedExpenseRange.CreateFixedAmount(FixedAmount!, Enum.Parse<FixedExpensePeriods>(Period), date, Day);
         else
-            newRange = FixedExpenseRange.CreateRangedAmount(new RangedFiatValue(RangedAmountMin, RangedAmountMax),
+            newRange = FixedExpenseRange.CreateRangedAmount(new RangedFiatValue(RangedAmountMin!, RangedAmountMax!),
                 Enum.Parse<FixedExpensePeriods>(Period),
                 date,
                 Day);

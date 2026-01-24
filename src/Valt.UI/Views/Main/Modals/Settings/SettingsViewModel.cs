@@ -27,19 +27,19 @@ namespace Valt.UI.Views.Main.Modals.Settings;
 
 public partial class SettingsViewModel : ValtModalViewModel
 {
-    private readonly CurrencySettings _currencySettings;
-    private readonly DisplaySettings _displaySettings;
-    private readonly ILocalDatabase _localDatabase;
-    private readonly ITransactionTermService _transactionTermService;
-    private readonly IModalFactory _modalFactory;
-    private readonly ILocalStorageService _localStorageService;
+    private readonly CurrencySettings _currencySettings = null!;
+    private readonly DisplaySettings _displaySettings = null!;
+    private readonly ILocalDatabase _localDatabase = null!;
+    private readonly ITransactionTermService _transactionTermService = null!;
+    private readonly IModalFactory _modalFactory = null!;
+    private readonly ILocalStorageService _localStorageService = null!;
     private readonly IConfigurationManager? _configurationManager;
     private readonly IThemeService? _themeService;
     private readonly IFontScaleService? _fontScaleService;
 
-    [ObservableProperty] private string _mainFiatCurrency;
+    [ObservableProperty] private string _mainFiatCurrency = string.Empty;
     [ObservableProperty] private bool _showHiddenAccounts;
-    [ObservableProperty] private string _currentCulture;
+    [ObservableProperty] private string _currentCulture = string.Empty;
     [ObservableProperty] private ThemeDefinition? _selectedTheme;
     [ObservableProperty] private FontScaleItem? _selectedFontScale;
 

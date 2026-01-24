@@ -26,13 +26,13 @@ namespace Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles;
 
 public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewModel
 {
-    private readonly IModalFactory _modalFactory;
-    private readonly IAvgPriceQueries _avgPriceQueries;
-    private readonly IAvgPriceRepository _avgPriceRepository;
+    private readonly IModalFactory _modalFactory = null!;
+    private readonly IAvgPriceQueries _avgPriceQueries = null!;
+    private readonly IAvgPriceRepository _avgPriceRepository = null!;
     private readonly IConfigurationManager? _configurationManager;
 
     [ObservableProperty] private string? _id;
-    [ObservableProperty] private string _name;
+    [ObservableProperty] private string _name = string.Empty;
 
     public bool IsBitcoin => AssetName == "BTC" && Precision == 8;
 
@@ -41,7 +41,7 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsBitcoin))]
     [NotifyPropertyChangedFor(nameof(IsCustomAsset))]
-    private string _assetName;
+    private string _assetName = string.Empty;
 
     [ObservableProperty] [Range(0, 15, ErrorMessage = "Precision must be between 0 and 15")]
     [NotifyPropertyChangedFor(nameof(IsBitcoin))]
@@ -51,7 +51,7 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
     [ObservableProperty] private bool _visible = true;
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(SymbolOnRight))] [NotifyPropertyChangedFor(nameof(Symbol))]
-    private string _currency;
+    private string _currency = string.Empty;
 
     public List<string> AvailableCurrencies => _configurationManager?.GetAvailableFiatCurrencies()
         ?? FiatCurrency.GetAll().Select(x => x.Code).ToList();
@@ -71,9 +71,9 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
     [NotifyPropertyChangedFor(nameof(EditFields))]
     private AveragePriceProfileItem? _selectedAveragePriceProfile;
 
-    public AvaloniaList<EnumItem> AvailableStrategies { get; set; }
+    public AvaloniaList<EnumItem> AvailableStrategies { get; set; } = new();
 
-    [ObservableProperty] private EnumItem _selectedStrategy;
+    [ObservableProperty] private EnumItem _selectedStrategy = null!;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsAdding))]
@@ -291,7 +291,7 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
             AssetName = profile.AssetName;
             Precision = profile.Precision;
             Currency = profile.CurrencyCode;
-            Icon = Icon.RestoreFromId(profile.Icon);
+            Icon = profile.Icon is not null ? Icon.RestoreFromId(profile.Icon) : Icon.Empty;
             SelectedStrategy = AvailableStrategies.First(x => x.Value == profile.AvgPriceCalculationMethodId);
             Name = profile.Name;
             Visible = profile.Visible;

@@ -16,7 +16,6 @@
         <PackageReference Include="CommunityToolkit.Mvvm" />
         <PackageReference Include="CsvHelper" />
         <PackageReference Include="LiteDB" />
-        <PackageReference Include="Microsoft.Extensions.Logging" />
         <PackageReference Include="Scrutor" />
         <PackageReference Include="StringMath" />
     </ItemGroup>

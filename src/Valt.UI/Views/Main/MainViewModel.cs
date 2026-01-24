@@ -52,18 +52,18 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     private readonly IModalFactory _modalFactory;
 
     private readonly ILocalDatabase? _localDatabase;
-    private readonly IPriceDatabase _priceDatabase;
+    private readonly IPriceDatabase _priceDatabase = null!;
     private readonly CurrencySettings _currencySettings;
     private readonly BackgroundJobManager? _backgroundJobManager;
     private readonly IDatabaseInitializer? _databaseInitializer;
     private readonly IDatabaseVersionChecker? _databaseVersionChecker;
-    private readonly LiveRatesViewModel _liveRatesViewModel;
+    private readonly LiveRatesViewModel _liveRatesViewModel = null!;
     private readonly UpdateIndicatorViewModel _updateIndicatorViewModel;
-    private readonly IAllTimeHighReport _allTimeHighReport;
-    private readonly ICsvExportService _csvExportService;
-    private readonly IClock _clock;
-    private readonly ILogger<MainViewModel> _logger;
-    private readonly SecureModeState _secureModeState;
+    private readonly IAllTimeHighReport _allTimeHighReport = null!;
+    private readonly ICsvExportService _csvExportService = null!;
+    private readonly IClock _clock = null!;
+    private readonly ILogger<MainViewModel> _logger = null!;
+    private readonly SecureModeState _secureModeState = null!;
 
     public MainView? Window { get; set; }
 
@@ -90,10 +90,10 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     public bool IsAvgPriceButtonSelected =>
         SelectedTabComponent?.TabName == MainViewTabNames.AvgPricePageContent;
 
-    [ObservableProperty] private string _statusDisplay;
+    [ObservableProperty] private string _statusDisplay = string.Empty;
 
     [ObservableProperty] private bool _isLoading;
-    [ObservableProperty] private string _loadingMessage;
+    [ObservableProperty] private string _loadingMessage = string.Empty;
 
     [ObservableProperty] private bool _showPepe;
     [ObservableProperty] private bool _crashing;
@@ -107,7 +107,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
 
     public LiveRatesViewModel LiveRatesViewModel => _liveRatesViewModel;
     public UpdateIndicatorViewModel UpdateIndicator => _updateIndicatorViewModel;
-    public AvaloniaList<JobInfo> Jobs { get; set; }
+    public AvaloniaList<JobInfo> Jobs { get; set; } = new();
 
     public string SecureModeIcon => _secureModeState?.IsEnabled == true ? "\xE897" : "\xE898";
 
@@ -127,7 +127,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     {
         _pageFactory = new DesignTimePageFactory();
         _modalFactory = new DesignTimeModalFactory();
-        _currencySettings = new CurrencySettings(_localDatabase);
+        _currencySettings = new CurrencySettings(_localDatabase!);
         _updateIndicatorViewModel = new UpdateIndicatorViewModel();
 
         HasDatabaseOpen = true;

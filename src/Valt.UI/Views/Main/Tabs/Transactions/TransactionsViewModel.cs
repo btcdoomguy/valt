@@ -40,14 +40,14 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     private readonly IAccountRepository? _accountRepository;
     private readonly IAccountGroupRepository? _accountGroupRepository;
     private readonly AccountsTotalState? _accountsTotalState;
-    private readonly RatesState _ratesState;
+    private readonly RatesState _ratesState = null!;
     private readonly CurrencySettings? _currencySettings;
     private readonly DisplaySettings? _displaySettings;
     private readonly AccountDisplayOrderManager? _accountDisplayOrderManager;
     private readonly FilterState? _filterState;
-    private readonly ILogger<TransactionsViewModel> _logger;
+    private readonly ILogger<TransactionsViewModel> _logger = null!;
     private readonly IAccountQueries? _accountQueries;
-    private readonly SecureModeState _secureModeState;
+    private readonly SecureModeState _secureModeState = null!;
 
     //instances of the sub contents
     private readonly TransactionListViewModel _transactionListViewModel = null!;

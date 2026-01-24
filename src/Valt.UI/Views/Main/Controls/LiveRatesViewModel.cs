@@ -18,9 +18,9 @@ namespace Valt.UI.Views.Main.Controls;
 public partial class LiveRatesViewModel : ObservableObject, IDisposable
 {
     private readonly CurrencySettings _currencySettings;
-    private readonly LiveRateState _liveRateState;
-    private readonly ILocalDatabase _localDatabase;
-    private readonly BackgroundJobManager _backgroundJobManager;
+    private readonly LiveRateState _liveRateState = null!;
+    private readonly ILocalDatabase _localDatabase = null!;
+    private readonly BackgroundJobManager _backgroundJobManager = null!;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(BtcUsdText))]
