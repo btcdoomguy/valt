@@ -24,6 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\src\Valt.App\Valt.App.csproj"/>
         <ProjectReference Include="..\..\src\Valt.Core\Valt.Core.csproj"/>
         <ProjectReference Include="..\..\src\Valt.Infra\Valt.Infra.csproj"/>
         <ProjectReference Include="..\..\src\Valt.UI\Valt.UI.csproj"/>

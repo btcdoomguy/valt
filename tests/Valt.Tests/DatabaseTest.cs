@@ -3,13 +3,19 @@ using Valt.Core.Kernel.Abstractions.EventSystem;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Budget.Accounts.Contracts;
 using Valt.Core.Modules.Budget.Categories.Contracts;
+using Valt.Core.Modules.Budget.FixedExpenses.Contracts;
 using Valt.Core.Modules.Budget.Transactions.Contracts;
+using Valt.Core.Modules.AvgPrice.Calculations;
+using Valt.Core.Modules.Goals.Contracts;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
 using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Kernel.Time;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Categories;
+using Valt.Infra.Modules.Budget.FixedExpenses;
+using Valt.Infra.Modules.AvgPrice;
+using Valt.Infra.Modules.Goals;
 using Valt.Infra.Modules.Budget.Transactions;
 
 namespace Valt.Tests;
@@ -26,10 +32,14 @@ public abstract class DatabaseTest
     protected IPriceDatabase _priceDatabase;
 
     protected IDomainEventPublisher _domainEventPublisher;
-    
+
     protected ITransactionRepository _transactionRepository;
     protected IAccountRepository _accountRepository;
+    protected IAccountGroupRepository _accountGroupRepository;
     protected ICategoryRepository _categoryRepository;
+    protected IFixedExpenseRepository _fixedExpenseRepository;
+    protected IGoalRepository _goalRepository;
+    protected IAvgPriceRepository _avgPriceRepository;
 
     protected DatabaseTest()
     {
@@ -43,6 +53,10 @@ public abstract class DatabaseTest
         _transactionRepository = new TransactionRepository(_localDatabase, _priceDatabase, _domainEventPublisher);
         _categoryRepository = new CategoryRepository(_localDatabase);
         _accountRepository = new AccountRepository(_localDatabase, _domainEventPublisher);
+        _accountGroupRepository = new AccountGroupRepository(_localDatabase);
+        _fixedExpenseRepository = new FixedExpenseRepository(_localDatabase, _domainEventPublisher);
+        _goalRepository = new GoalRepository(_localDatabase, _domainEventPublisher);
+        _avgPriceRepository = new AvgPriceRepository(_localDatabase, _domainEventPublisher);
     }
 
     [OneTimeSetUp]

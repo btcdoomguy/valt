@@ -10,6 +10,7 @@ using LiveChartsCore.SkiaSharpView;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SkiaSharp;
+using Valt.App;
 using Valt.Core;
 using Valt.Infra;
 using Valt.Infra.Kernel.BackgroundJobs;
@@ -49,6 +50,7 @@ public partial class App : Application
         collection
             .AddValtCore()
             .AddValtInfrastructure()
+            .AddValtApp()
             .AddValtUI(localStorageService);
 
         var serviceProvider = collection.BuildServiceProvider();
