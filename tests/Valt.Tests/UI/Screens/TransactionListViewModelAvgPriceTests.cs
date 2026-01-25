@@ -22,6 +22,12 @@ namespace Valt.Tests.UI.Screens;
 [TestFixture]
 public class TransactionListViewModelAvgPriceTests : DatabaseTest
 {
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
+    {
+        TransactionGridResources.InitializeForTesting();
+    }
+
     private IAvgPriceQueries _avgPriceQueries = null!;
     private ILocalStorageService _localStorageService = null!;
     private IModalFactory _modalFactory = null!;

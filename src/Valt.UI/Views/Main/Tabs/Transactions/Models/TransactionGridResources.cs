@@ -22,6 +22,19 @@ public static class TransactionGridResources
         _regularLineResource = GetResource("RegularColor", Colors.Gray);
     }
 
+    /// <summary>
+    /// Initializes resources with default values for unit testing scenarios
+    /// where Avalonia Application is not available.
+    /// </summary>
+    public static void InitializeForTesting()
+    {
+        _creditResource = new SolidColorBrush(Colors.Green);
+        _debtResource = new SolidColorBrush(Colors.Red);
+        _transferResource = new SolidColorBrush(Colors.Blue);
+        _futureLineResource = new SolidColorBrush(Colors.Gray);
+        _regularLineResource = new SolidColorBrush(Colors.Black);
+    }
+
     private static SolidColorBrush GetResource(string key, Color defaultColor)
     {
         if (!Application.Current!.TryGetResource(key, ThemeVariant.Default, out var resource))
