@@ -14,7 +14,7 @@ namespace Valt.Infra.Modules.Reports;
 
 public interface IReportDataProviderFactory
 {
-    IReportDataProvider Create();
+    Task<IReportDataProvider> CreateAsync(bool forceRefresh = false, CancellationToken ct = default);
 }
 
 internal class ReportDataProviderFactory : IReportDataProviderFactory
@@ -22,6 +22,9 @@ internal class ReportDataProviderFactory : IReportDataProviderFactory
     private readonly IPriceDatabase _priceDatabase;
     private readonly ILocalDatabase _localDatabase;
     private readonly IClock _clock;
+    private IReportDataProvider? _cachedProvider;
+    private int _lastTransactionCount;
+    private readonly Lock _lock = new();
 
     public ReportDataProviderFactory(IPriceDatabase priceDatabase, ILocalDatabase localDatabase, IClock clock)
     {
@@ -30,9 +33,36 @@ internal class ReportDataProviderFactory : IReportDataProviderFactory
         _clock = clock;
     }
 
-    public IReportDataProvider Create()
+    public async Task<IReportDataProvider> CreateAsync(bool forceRefresh = false, CancellationToken ct = default)
     {
-        return new ReportDataProvider(_priceDatabase, _localDatabase, _clock);
+        // Quick cache check (lightweight query)
+        if (!forceRefresh && _cachedProvider != null)
+        {
+            var currentCount = _localDatabase.GetTransactions().Count();
+            if (currentCount == _lastTransactionCount)
+                return _cachedProvider;
+        }
+
+        // Load all database collections in parallel
+        var accountsTask = Task.Run(() => _localDatabase.GetAccounts().FindAll().ToImmutableList(), ct);
+        var categoriesTask = Task.Run(() => _localDatabase.GetCategories().FindAll().ToImmutableList(), ct);
+        var transactionsTask = Task.Run(() => _localDatabase.GetTransactions().FindAll().ToImmutableList(), ct);
+        var btcRatesTask = Task.Run(() => _priceDatabase.GetBitcoinData().FindAll().ToImmutableList(), ct);
+        var fiatRatesTask = Task.Run(() => _priceDatabase.GetFiatData().FindAll().ToImmutableList(), ct);
+
+        await Task.WhenAll(accountsTask, categoriesTask, transactionsTask, btcRatesTask, fiatRatesTask);
+
+        var provider = new ReportDataProvider(
+            await accountsTask, await categoriesTask, await transactionsTask,
+            await btcRatesTask, await fiatRatesTask, _clock);
+
+        lock (_lock)
+        {
+            _cachedProvider = provider;
+            _lastTransactionCount = provider.AllTransactions.Count;
+        }
+
+        return provider;
     }
 }
 
@@ -53,20 +83,19 @@ internal class ReportDataProvider : IReportDataProvider
     private readonly ImmutableArray<DateOnly> _sortedBtcDates;
     private readonly FrozenDictionary<string, ImmutableArray<DateOnly>> _sortedFiatDatesByCurrency;
 
-    public ReportDataProvider(IPriceDatabase priceDatabase, ILocalDatabase localDatabase, IClock clock)
+    public ReportDataProvider(
+        ImmutableList<AccountEntity> accounts,
+        ImmutableList<CategoryEntity> categories,
+        ImmutableList<TransactionEntity> transactions,
+        ImmutableList<BitcoinDataEntity> btcRates,
+        ImmutableList<FiatDataEntity> fiatRates,
+        IClock clock)
     {
-        // Load all accounts
-        var accounts = localDatabase.GetAccounts().FindAll().ToImmutableList();
         Accounts = accounts.ToFrozenDictionary(x => x.Id);
-
-        // Load all categories
-        var categories = localDatabase.GetCategories().FindAll().ToImmutableList();
         Categories = categories.ToFrozenDictionary(x => x.Id);
+        AllTransactions = transactions;
 
-        // Load all transactions
-        AllTransactions = localDatabase.GetTransactions().FindAll().ToImmutableList();
-
-        if (AllTransactions.Count == 0)
+        if (transactions.Count == 0)
         {
             // No transactions - set empty collections
             MinTransactionDate = clock.GetCurrentLocalDate();
@@ -80,33 +109,38 @@ internal class ReportDataProvider : IReportDataProvider
             return;
         }
 
-        // Determine date range - extract DateOnly from UTC to ensure consistency
-        MinTransactionDate = AllTransactions.Min(x => DateOnly.FromDateTime(x.Date.ToUniversalTime()));
+        // Single-pass index building for transactions
+        var transactionsByDate = new Dictionary<DateOnly, List<TransactionEntity>>();
+        var accountsByDate = new Dictionary<DateOnly, HashSet<ObjectId>>();
+        var minDate = DateOnly.MaxValue;
+
+        foreach (var tx in transactions)
+        {
+            var date = DateOnly.FromDateTime(tx.Date.ToUniversalTime());
+            if (date < minDate) minDate = date;
+
+            if (!transactionsByDate.TryGetValue(date, out var txList))
+            {
+                txList = new List<TransactionEntity>();
+                transactionsByDate[date] = txList;
+                accountsByDate[date] = new HashSet<ObjectId>();
+            }
+            txList.Add(tx);
+            accountsByDate[date].Add(tx.FromAccountId);
+            if (tx.ToAccountId is { } toAccountId)
+                accountsByDate[date].Add(toAccountId);
+        }
+
+        MinTransactionDate = minDate;
         MaxTransactionDate = clock.GetCurrentLocalDate();
+        TransactionsByDate = transactionsByDate.ToFrozenDictionary(k => k.Key, k => k.Value.ToImmutableList());
+        AccountsByDate = accountsByDate.ToFrozenDictionary(k => k.Key,
+            k => k.Value.Where(id => id != ObjectId.Empty).ToImmutableList());
 
-        // Build transaction indexes - group by DateOnly extracted from UTC
-        TransactionsByDate = AllTransactions
-            .GroupBy(x => DateOnly.FromDateTime(x.Date.ToUniversalTime()))
-            .ToFrozenDictionary(x => x.Key, x => x.ToImmutableList());
-
-        AccountsByDate = TransactionsByDate.ToFrozenDictionary(
-            x => x.Key,
-            x => x.Value
-                .SelectMany(y => new[] { y.FromAccountId, y.ToAccountId ?? ObjectId.Empty })
-                .Where(y => y != ObjectId.Empty)
-                .Distinct()
-                .ToImmutableList());
-
-        // Load all rates for flexible lookups
-        var btcRates = priceDatabase.GetBitcoinData()
-            .FindAll()
-            .ToImmutableList();
+        // BTC and fiat rates indexing
         BtcRates = btcRates.ToFrozenDictionary(x => DateOnly.FromDateTime(x.Date.ToUniversalTime()));
         _sortedBtcDates = BtcRates.Keys.Order().ToImmutableArray();
 
-        var fiatRates = priceDatabase.GetFiatData()
-            .FindAll()
-            .ToImmutableList();
         FiatRates = fiatRates
             .GroupBy(x => DateOnly.FromDateTime(x.Date.ToUniversalTime()))
             .ToFrozenDictionary(x => x.Key, x => x.ToImmutableList());
@@ -120,6 +154,21 @@ internal class ReportDataProvider : IReportDataProvider
                     .Distinct()
                     .Order()
                     .ToImmutableArray());
+    }
+
+    /// <summary>
+    /// Convenience constructor that loads data synchronously from databases.
+    /// Primarily used for testing. Production code should use the factory with pre-loaded data.
+    /// </summary>
+    public ReportDataProvider(IPriceDatabase priceDatabase, ILocalDatabase localDatabase, IClock clock)
+        : this(
+            localDatabase.GetAccounts().FindAll().ToImmutableList(),
+            localDatabase.GetCategories().FindAll().ToImmutableList(),
+            localDatabase.GetTransactions().FindAll().ToImmutableList(),
+            priceDatabase.GetBitcoinData().FindAll().ToImmutableList(),
+            priceDatabase.GetFiatData().FindAll().ToImmutableList(),
+            clock)
+    {
     }
 
     public decimal GetFiatRateAt(DateOnly date, FiatCurrency currency)

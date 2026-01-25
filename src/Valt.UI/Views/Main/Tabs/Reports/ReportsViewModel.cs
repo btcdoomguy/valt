@@ -200,16 +200,16 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _logger.LogDebug("Report data provider unloaded");
     }
 
-    private IReportDataProvider GetOrCreateProvider()
+    private async Task<IReportDataProvider> GetOrCreateProviderAsync()
     {
-        _cachedProvider ??= _reportDataProviderFactory.Create();
+        _cachedProvider ??= await _reportDataProviderFactory.CreateAsync();
         return _cachedProvider;
     }
 
     private async Task LoadDataAndFetchAllReportsAsync()
     {
-        // Create and cache the provider
-        _cachedProvider = _reportDataProviderFactory.Create();
+        // Create and cache the provider with parallel data loading
+        _cachedProvider = await _reportDataProviderFactory.CreateAsync();
 
         // Determine the best default period based on transaction history
         SelectedWealthOverviewPeriod = DetermineDefaultWealthOverviewPeriod(_cachedProvider);
@@ -245,8 +245,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
     private async Task ReloadDataAndFetchAllReportsAsync()
     {
-        // Recreate the provider (data might have changed)
-        _cachedProvider = _reportDataProviderFactory.Create();
+        // Force refresh the provider (data might have changed)
+        _cachedProvider = await _reportDataProviderFactory.CreateAsync(forceRefresh: true);
 
         await FetchAllReportsAsync(_cachedProvider);
     }
@@ -300,8 +300,13 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         if (!_ready) return;
 
         IsMonthlyTotalsLoading = true;
-        var provider = GetOrCreateProvider();
-        FetchMonthlyTotalsAsync(provider).SafeFireAndForget(logger: _logger, callerName: nameof(FetchMonthlyTotalsAsync));
+        FetchMonthlyTotalsWithProviderAsync().SafeFireAndForget(logger: _logger, callerName: nameof(FetchMonthlyTotalsWithProviderAsync));
+    }
+
+    private async Task FetchMonthlyTotalsWithProviderAsync()
+    {
+        var provider = await GetOrCreateProviderAsync();
+        await FetchMonthlyTotalsAsync(provider);
     }
 
     partial void OnCategoryFilterRangeChanged(DateRange value)
@@ -309,8 +314,13 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         if (!_ready) return;
 
         IsSpendingByCategoriesLoading = true;
-        var provider = GetOrCreateProvider();
-        FetchExpensesByCategoryAsync(provider).SafeFireAndForget(logger: _logger, callerName: nameof(FetchExpensesByCategoryAsync));
+        FetchExpensesByCategoryWithProviderAsync().SafeFireAndForget(logger: _logger, callerName: nameof(FetchExpensesByCategoryWithProviderAsync));
+    }
+
+    private async Task FetchExpensesByCategoryWithProviderAsync()
+    {
+        var provider = await GetOrCreateProviderAsync();
+        await FetchExpensesByCategoryAsync(provider);
     }
 
     partial void OnIncomeCategoryFilterRangeChanged(DateRange value)
@@ -318,8 +328,13 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         if (!_ready) return;
 
         IsIncomeByCategoriesLoading = true;
-        var provider = GetOrCreateProvider();
-        FetchIncomeByCategoryAsync(provider).SafeFireAndForget(logger: _logger, callerName: nameof(FetchIncomeByCategoryAsync));
+        FetchIncomeByCategoryWithProviderAsync().SafeFireAndForget(logger: _logger, callerName: nameof(FetchIncomeByCategoryWithProviderAsync));
+    }
+
+    private async Task FetchIncomeByCategoryWithProviderAsync()
+    {
+        var provider = await GetOrCreateProviderAsync();
+        await FetchIncomeByCategoryAsync(provider);
     }
 
     private void OnSelectedFiltersChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -339,7 +354,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         try
         {
             await Task.Delay(FilterDebounceDelayMs, cancellationToken);
-            var provider = GetOrCreateProvider();
+            var provider = await GetOrCreateProviderAsync();
             await FetchExpensesByCategoryAsync(provider);
         }
         catch (TaskCanceledException)
@@ -365,7 +380,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         try
         {
             await Task.Delay(FilterDebounceDelayMs, cancellationToken);
-            var provider = GetOrCreateProvider();
+            var provider = await GetOrCreateProviderAsync();
             await FetchIncomeByCategoryAsync(provider);
         }
         catch (TaskCanceledException)
@@ -679,8 +694,13 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         if (!_ready) return;
 
         IsWealthOverviewLoading = true;
-        var provider = GetOrCreateProvider();
-        FetchWealthOverviewAsync(provider).SafeFireAndForget(logger: _logger, callerName: nameof(FetchWealthOverviewAsync));
+        FetchWealthOverviewWithProviderAsync().SafeFireAndForget(logger: _logger, callerName: nameof(FetchWealthOverviewWithProviderAsync));
+    }
+
+    private async Task FetchWealthOverviewWithProviderAsync()
+    {
+        var provider = await GetOrCreateProviderAsync();
+        await FetchWealthOverviewAsync(provider);
     }
 
     public override MainViewTabNames TabName => MainViewTabNames.ReportsPageContent;
