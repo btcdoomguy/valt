@@ -6,7 +6,7 @@ using Valt.Infra.Modules.Budget.Accounts.Queries;
 using Valt.Infra.Modules.Budget.Accounts.Services;
 using Valt.Tests.Builders;
 
-namespace Valt.Tests.UseCases.Budget.Accounts.Queries;
+namespace Valt.Tests.Application.Budget.Accounts.Queries;
 
 [TestFixture]
 public class GetAccountsQueryHandlerTests : DatabaseTest

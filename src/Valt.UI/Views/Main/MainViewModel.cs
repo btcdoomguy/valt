@@ -127,7 +127,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     {
         _pageFactory = new DesignTimePageFactory();
         _modalFactory = new DesignTimeModalFactory();
-        _currencySettings = new CurrencySettings(_localDatabase!);
+        _currencySettings = new CurrencySettings(_localDatabase!, null!);
         _updateIndicatorViewModel = new UpdateIndicatorViewModel();
 
         HasDatabaseOpen = true;

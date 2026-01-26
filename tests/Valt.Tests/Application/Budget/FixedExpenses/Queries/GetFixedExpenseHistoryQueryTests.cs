@@ -10,7 +10,7 @@ using Valt.Infra.Modules.Budget.FixedExpenses.Queries;
 using Valt.Infra.Modules.Budget.Transactions;
 using Valt.Tests.Builders;
 
-namespace Valt.Tests.UseCases.Budget.FixedExpenses.Queries;
+namespace Valt.Tests.Application.Budget.FixedExpenses.Queries;
 
 [TestFixture]
 public class GetFixedExpenseHistoryQueryTests : DatabaseTest

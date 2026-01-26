@@ -150,7 +150,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         WeakReferenceMessenger.Default.Register<SettingsChangedMessage>(this, (recipient, message) =>
         {
-            switch (message.Value)
+            switch (message.PropertyName)
             {
                 case nameof(CurrencySettings.MainFiatCurrency):
                     IsAllTimeHighLoading = true;

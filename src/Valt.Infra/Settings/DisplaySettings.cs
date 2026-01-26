@@ -1,10 +1,12 @@
 using Valt.Infra.DataAccess;
+using Valt.Infra.Kernel.Notifications;
 
 namespace Valt.Infra.Settings;
 
 public partial class DisplaySettings : BaseSettings
 {
-    public DisplaySettings(ILocalDatabase localDatabase) : base(localDatabase)
+    public DisplaySettings(ILocalDatabase localDatabase, INotificationPublisher notificationPublisher)
+        : base(localDatabase, notificationPublisher)
     {
     }
     

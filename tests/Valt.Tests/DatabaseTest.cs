@@ -57,8 +57,9 @@ public abstract class DatabaseTest
     private void RefreshLocalInstances()
     {
         _domainEventPublisher = Substitute.For<IDomainEventPublisher>();
+        var notificationPublisher = Substitute.For<INotificationPublisher>();
 
-        _transactionRepository = new TransactionRepository(_localDatabase, _priceDatabase, _domainEventPublisher);
+        _transactionRepository = new TransactionRepository(_localDatabase, _priceDatabase, _domainEventPublisher, notificationPublisher);
         _categoryRepository = new CategoryRepository(_localDatabase);
         _accountRepository = new AccountRepository(_localDatabase, _domainEventPublisher);
         _accountGroupRepository = new AccountGroupRepository(_localDatabase);

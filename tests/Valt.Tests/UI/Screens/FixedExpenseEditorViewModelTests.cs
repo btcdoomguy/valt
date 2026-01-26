@@ -85,7 +85,7 @@ public class FixedExpenseEditorViewModelTests
         _commandDispatcher = Substitute.For<ICommandDispatcher>();
         _queryDispatcher = Substitute.For<IQueryDispatcher>();
         var localDatabase = Substitute.For<ILocalDatabase>();
-        _displaySettings = new DisplaySettings(localDatabase);
+        _displaySettings = new DisplaySettings(localDatabase, null!);
         _transactionTermService = Substitute.For<ITransactionTermService>();
         _configurationManager = Substitute.For<IConfigurationManager>();
 

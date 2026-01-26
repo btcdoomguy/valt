@@ -56,7 +56,7 @@ public class TransactionListViewModelAvgPriceTests : DatabaseTest
 
     private TransactionListViewModel CreateViewModel()
     {
-        var currencySettings = new CurrencySettings(_localDatabase);
+        var currencySettings = new CurrencySettings(_localDatabase, null!);
         var ratesState = new RatesState();
         var liveRateState = new LiveRateState(
             currencySettings,

@@ -1,8 +1,8 @@
-using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Messages;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel.BackgroundJobs;
+using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Modules.DataSources.Bitcoin;
 
 namespace Valt.Infra.Crawlers.HistoricPriceCrawlers.Bitcoin;
@@ -12,6 +12,7 @@ internal class BitcoinHistoryUpdaterJob : IBackgroundJob
     private readonly IBitcoinHistoricalDataProvider _provider;
     private readonly IBitcoinInitialSeedPriceProvider _seedProvider;
     private readonly IPriceDatabase _priceDatabase;
+    private readonly INotificationPublisher _notificationPublisher;
     private readonly ILogger<BitcoinHistoryUpdaterJob> _logger;
 
     public string Name => "Bitcoin history updater job";
@@ -23,11 +24,13 @@ internal class BitcoinHistoryUpdaterJob : IBackgroundJob
     public BitcoinHistoryUpdaterJob(IBitcoinHistoricalDataProvider provider,
         IBitcoinInitialSeedPriceProvider seedProvider,
         IPriceDatabase priceDatabase,
+        INotificationPublisher notificationPublisher,
         ILogger<BitcoinHistoryUpdaterJob> logger)
     {
         _provider = provider;
         _seedProvider = seedProvider;
         _priceDatabase = priceDatabase;
+        _notificationPublisher = notificationPublisher;
         _logger = logger;
     }
 
@@ -114,7 +117,7 @@ internal class BitcoinHistoryUpdaterJob : IBackgroundJob
                 _priceDatabase.GetBitcoinData().Insert(entries);
                 _priceDatabase.Checkpoint();
                 _logger.LogInformation("[BitcoinHistoryUpdater] Inserted {Count} new BTC price records", entries.Count);
-                WeakReferenceMessenger.Default.Send<BitcoinHistoryPriceUpdatedMessage>();
+                await _notificationPublisher.PublishAsync(new BitcoinHistoryPriceUpdatedMessage());
             }
             else
             {

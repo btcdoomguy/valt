@@ -1,18 +1,20 @@
 using System.ComponentModel;
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Messaging;
-using CommunityToolkit.Mvvm.Messaging.Messages;
 using Valt.Infra.DataAccess;
+using Valt.Infra.Kernel.Notifications;
 
 namespace Valt.Infra.Settings;
 
 public abstract class BaseSettings : ObservableObject
 {
     private readonly ILocalDatabase? _localDatabase;
+    private readonly INotificationPublisher? _notificationPublisher;
 
-    public BaseSettings(ILocalDatabase? localDatabase)
+    public BaseSettings(ILocalDatabase? localDatabase, INotificationPublisher? notificationPublisher)
     {
+        _notificationPublisher = notificationPublisher;
+
         if (localDatabase is not null)
         {
             _localDatabase = localDatabase;
@@ -79,7 +81,7 @@ public abstract class BaseSettings : ObservableObject
         // Send messages only for properties that actually changed
         foreach (var propName in changedProperties)
         {
-            WeakReferenceMessenger.Default.Send(new SettingsChangedMessage(propName));
+            _ = _notificationPublisher?.PublishAsync(new SettingsChangedMessage(propName));
         }
     }
 
@@ -117,16 +119,11 @@ public abstract class BaseSettings : ObservableObject
         // Only notify for properties that actually changed
         foreach (var propName in changedProperties)
         {
-            WeakReferenceMessenger.Default.Send(new SettingsChangedMessage(propName));
+            _ = _notificationPublisher?.PublishAsync(new SettingsChangedMessage(propName));
         }
     }
-    
+
     protected abstract void LoadDefaults();
 }
 
-public class SettingsChangedMessage : ValueChangedMessage<string>
-{
-    public SettingsChangedMessage(string propertyName) : base(propertyName)
-    {
-    }
-}
+public record SettingsChangedMessage(string PropertyName) : INotification;

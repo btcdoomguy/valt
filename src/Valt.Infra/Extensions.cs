@@ -48,7 +48,6 @@ using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Modules.Currency.Services;
 using Valt.App.Modules.Goals.Contracts;
 using Valt.Infra.Modules.Goals;
-using Valt.Infra.Modules.Goals.Handlers;
 using Valt.Infra.Modules.Goals.Queries;
 using Valt.Infra.Modules.Goals.Services;
 using Valt.Infra.Modules.Reports;
@@ -137,7 +136,6 @@ public static class Extensions
 
         //background jobs
         services.AddSingleton<BackgroundJobManager>();
-        services.AddSingleton<BackgroundJobCoordinator>();
 
         services.AddSingleton<IDatabaseInitializer, DatabaseInitializer>();
         services.AddSingleton<IConfigurationManager, ConfigurationManager>();
@@ -247,9 +245,6 @@ public static class Extensions
         services.AddSingleton<IGoalProgressCalculator, BitcoinHodlProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculatorFactory, GoalProgressCalculatorFactory>();
         services.AddSingleton<GoalProgressState>();
-
-        //goal price update handler (subscribes to price update messages)
-        services.AddSingleton<MarkGoalsStaleOnPriceUpdateHandler>();
 
         return services;
     }

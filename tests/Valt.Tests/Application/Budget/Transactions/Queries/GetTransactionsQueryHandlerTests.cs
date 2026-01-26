@@ -8,7 +8,7 @@ using Valt.Infra.Modules.Budget.Transactions;
 using Valt.Infra.Modules.Budget.Transactions.Queries;
 using Valt.Tests.Builders;
 
-namespace Valt.Tests.UseCases.Budget.Transactions.Queries;
+namespace Valt.Tests.Application.Budget.Transactions.Queries;
 
 [TestFixture]
 public class GetTransactionsQueryHandlerTests : DatabaseTest

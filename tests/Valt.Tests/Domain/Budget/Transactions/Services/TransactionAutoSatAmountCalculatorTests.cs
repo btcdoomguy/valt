@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging.Abstractions;
+using NSubstitute;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Budget.Accounts;
@@ -7,6 +8,7 @@ using Valt.Core.Modules.Budget.Transactions;
 using Valt.Core.Modules.Budget.Transactions.Details;
 using Valt.Infra;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers;
+using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Modules.Budget.Transactions.Services;
 using Valt.Infra.Modules.DataSources.Bitcoin;
 using Valt.Infra.Modules.DataSources.Fiat;
@@ -125,7 +127,7 @@ public class TransactionAutoSatAmountCalculatorTests : DatabaseTest
         var localHistoryProvider = new LocalHistoricalPriceProvider(_priceDatabase);
 
         var service = new TransactionAutoSatAmountCalculator(_transactionRepository, _localDatabase, localHistoryProvider,
-            NullLogger<TransactionAutoSatAmountCalculator>.Instance);
+            Substitute.For<INotificationPublisher>(), NullLogger<TransactionAutoSatAmountCalculator>.Instance);
         await service.UpdateAutoSatAmountAsync(transaction.Id);
 
         //reads the db and checks if the autosatamount was properly set
@@ -163,7 +165,7 @@ public class TransactionAutoSatAmountCalculatorTests : DatabaseTest
         var localHistoryProvider = new LocalHistoricalPriceProvider(_priceDatabase);
 
         var service = new TransactionAutoSatAmountCalculator(_transactionRepository, _localDatabase, localHistoryProvider,
-            NullLogger<TransactionAutoSatAmountCalculator>.Instance);
+            Substitute.For<INotificationPublisher>(), NullLogger<TransactionAutoSatAmountCalculator>.Instance);
         await service.UpdateAutoSatAmountAsync(transaction.Id);
 
         //reads the db and checks if the autosatamount was properly set
@@ -210,7 +212,7 @@ public class TransactionAutoSatAmountCalculatorTests : DatabaseTest
         var localHistoryProvider = new LocalHistoricalPriceProvider(_priceDatabase);
 
         var service = new TransactionAutoSatAmountCalculator(_transactionRepository, _localDatabase, localHistoryProvider,
-            NullLogger<TransactionAutoSatAmountCalculator>.Instance);
+            Substitute.For<INotificationPublisher>(), NullLogger<TransactionAutoSatAmountCalculator>.Instance);
         await service.UpdateAutoSatAmountAsync(transaction.Id);
 
         //reads the db and checks if the autosatamount was properly set

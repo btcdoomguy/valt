@@ -42,8 +42,8 @@ public class TransactionEditorViewModelTests : DatabaseTest
 
     private TransactionEditorViewModel CreateInstance()
     {
-        var currencySettings = new CurrencySettings(_localDatabase);
-        var displaySettings = new DisplaySettings(_localDatabase);
+        var currencySettings = new CurrencySettings(_localDatabase, null!);
+        var displaySettings = new DisplaySettings(_localDatabase, null!);
 
         return new TransactionEditorViewModel(
             _commandDispatcher,

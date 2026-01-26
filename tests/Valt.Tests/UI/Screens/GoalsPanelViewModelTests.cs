@@ -51,7 +51,7 @@ public class GoalsPanelViewModelTests : DatabaseTest
         _queryDispatcher = Substitute.For<IQueryDispatcher>();
         _modalFactory = Substitute.For<IModalFactory>();
         _goalProgressState = new GoalProgressState();
-        _currencySettings = new CurrencySettings(_localDatabase);
+        _currencySettings = new CurrencySettings(_localDatabase, null!);
         _filterState = new FilterState { MainDate = new DateTime(2025, 1, 15) };
         _logger = Substitute.For<ILogger<GoalsPanelViewModel>>();
         _secureModeState = new SecureModeState();

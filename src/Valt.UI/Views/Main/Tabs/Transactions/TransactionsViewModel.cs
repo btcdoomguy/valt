@@ -148,7 +148,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
         WeakReferenceMessenger.Default.Register<SettingsChangedMessage>(this, (recipient, message) =>
         {
-            switch (message.Value)
+            switch (message.PropertyName)
             {
                 case nameof(CurrencySettings.MainFiatCurrency):
                     MainFiatCurrency = FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency);

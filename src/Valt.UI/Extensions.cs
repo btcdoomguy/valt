@@ -1,8 +1,11 @@
 using System;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Kernel.Scopes;
 using Valt.Infra.Modules.Budget.Categories;
 using Valt.UI.Base;
+using Valt.UI.Handlers;
 using Valt.UI.Services;
 using Valt.UI.Services.FontScaling;
 using Valt.UI.Services.Theming;
@@ -217,6 +220,16 @@ public static class Extensions
 
         //font scaling
         services.AddSingleton<IFontScaleService, FontScaleService>();
+
+        //notification handlers (bridge handlers to forward to WeakReferenceMessenger)
+        services.Scan(scan => scan
+            .FromAssemblyOf<LivePriceUpdateUIHandler>()
+            .AddClasses(classes => classes.Where(type =>
+                type.GetInterfaces().Any(i =>
+                    i.IsGenericType &&
+                    i.GetGenericTypeDefinition() == typeof(INotificationHandler<>))), publicOnly: false)
+            .AsImplementedInterfaces()
+            .WithScopedLifetime());
 
         return services;
     }

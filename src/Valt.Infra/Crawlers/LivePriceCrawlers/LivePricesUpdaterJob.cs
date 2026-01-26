@@ -1,4 +1,3 @@
-using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers;
@@ -7,6 +6,7 @@ using Valt.Infra.Crawlers.LivePriceCrawlers.Fiat.Providers;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Messages;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel.BackgroundJobs;
+using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Modules.Configuration;
 
 namespace Valt.Infra.Crawlers.LivePriceCrawlers;
@@ -18,6 +18,7 @@ internal class LivePricesUpdaterJob : IBackgroundJob
     private readonly IPriceDatabase _priceDatabase;
     private readonly ILocalHistoricalPriceProvider _localHistoricalPriceProvider;
     private readonly IConfigurationManager _configurationManager;
+    private readonly INotificationPublisher _notificationPublisher;
     private readonly ILogger<LivePricesUpdaterJob> _logger;
 
     private decimal? _lastClosingPrice;
@@ -36,6 +37,7 @@ internal class LivePricesUpdaterJob : IBackgroundJob
         IPriceDatabase priceDatabase,
         ILocalHistoricalPriceProvider localHistoricalPriceProvider,
         IConfigurationManager configurationManager,
+        INotificationPublisher notificationPublisher,
         ILogger<LivePricesUpdaterJob> logger)
     {
         _fiatPriceProviderSelector = fiatPriceProviderSelector;
@@ -43,6 +45,7 @@ internal class LivePricesUpdaterJob : IBackgroundJob
         _priceDatabase = priceDatabase;
         _localHistoricalPriceProvider = localHistoricalPriceProvider;
         _configurationManager = configurationManager;
+        _notificationPublisher = notificationPublisher;
         _logger = logger;
     }
 
@@ -154,7 +157,7 @@ internal class LivePricesUpdaterJob : IBackgroundJob
                     _lastClosingPrice.GetValueOrDefault());
             }
 
-            WeakReferenceMessenger.Default.Send(new LivePriceUpdateMessage(_btcPrice, _fiatUsdPrice, isUpToDate));
+            await _notificationPublisher.PublishAsync(new LivePriceUpdateMessage(_btcPrice, _fiatUsdPrice, isUpToDate));
             _logger.LogInformation("[LivePricesUpdaterJob] Price update completed successfully (up-to-date: {IsUpToDate})", isUpToDate);
         }
         catch (Exception ex)
@@ -194,7 +197,7 @@ internal class LivePricesUpdaterJob : IBackgroundJob
         _logger.LogInformation("[LivePricesUpdaterJob] Using stored fiat rates from {Date} ({Count} currencies)",
             fiatLastDateStored, fiatLastPricesStored.Count());
 
-        WeakReferenceMessenger.Default.Send(new LivePriceUpdateMessage(
+        await _notificationPublisher.PublishAsync(new LivePriceUpdateMessage(
             new BtcPrice(btcLastDateStored.ToDateTime(TimeOnly.MinValue, DateTimeKind.Local), false,
                 new[] { new BtcPrice.Item(FiatCurrency.Usd.Code, btcLastPriceStored.Value, btcLastPriceStored.Value) }),
             new FiatUsdPrice(fiatLastDateStored.ToDateTime(TimeOnly.MinValue, DateTimeKind.Local), false,

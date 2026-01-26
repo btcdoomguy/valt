@@ -7,7 +7,7 @@ using Valt.Infra.Modules.Goals.Queries.DTOs;
 using Valt.Infra.Modules.Goals.Services;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
-namespace Valt.Tests.UseCases.Goals;
+namespace Valt.Tests.Services.Goals;
 
 [TestFixture]
 public class DcaProgressCalculatorTests : DatabaseTest

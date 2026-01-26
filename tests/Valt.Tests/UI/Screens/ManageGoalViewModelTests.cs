@@ -37,7 +37,7 @@ public class ManageGoalViewModelTests : DatabaseTest
     {
         _commandDispatcher = Substitute.For<ICommandDispatcher>();
         _queryDispatcher = Substitute.For<IQueryDispatcher>();
-        _currencySettings = new CurrencySettings(_localDatabase);
+        _currencySettings = new CurrencySettings(_localDatabase, null!);
         _queryDispatcher.DispatchAsync(Arg.Any<GetCategoriesQuery>(), Arg.Any<CancellationToken>())
             .Returns(new CategoriesDTO(new List<CategoryDTO>()));
 
