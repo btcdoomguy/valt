@@ -2,8 +2,8 @@ using System;
 using System.Globalization;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Valt.App.Modules.AvgPrice.DTOs;
 using Valt.Core.Modules.AvgPrice;
-using Valt.Infra.Modules.AvgPrice.Queries.DTOs;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
 namespace Valt.UI.Views.Main.Tabs.AvgPrice.Models;

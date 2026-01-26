@@ -1,6 +1,6 @@
-using Valt.Infra.Modules.Budget.Transactions.Queries.DTOs;
+using Valt.App.Modules.Budget.Transactions.DTOs;
 
-namespace Valt.Infra.Modules.Budget.Transactions.Queries;
+namespace Valt.App.Modules.Budget.Transactions.Contracts;
 
 public interface ITransactionQueries
 {

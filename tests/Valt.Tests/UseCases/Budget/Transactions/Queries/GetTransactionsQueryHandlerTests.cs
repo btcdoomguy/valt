@@ -1,3 +1,4 @@
+using Valt.App.Modules.Budget.Transactions.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Budget.Accounts;
@@ -5,7 +6,6 @@ using Valt.Core.Modules.Budget.Categories;
 using Valt.Core.Modules.Budget.Transactions.Details;
 using Valt.Infra.Modules.Budget.Transactions;
 using Valt.Infra.Modules.Budget.Transactions.Queries;
-using Valt.Infra.Modules.Budget.Transactions.Queries.DTOs;
 using Valt.Tests.Builders;
 
 namespace Valt.Tests.UseCases.Budget.Transactions.Queries;
@@ -80,7 +80,7 @@ public class GetTransactionsQueryHandlerTests : DatabaseTest
         {
             From = new DateOnly(2023, 1, 1),
             To = new DateOnly(2023, 1, 31),
-            Accounts = new AccountId[] { _fiatAccountId }
+            AccountIds = new[] { _fiatAccountId.Value }
         };
 
         var query = new TransactionQueries(_localDatabase);
@@ -97,7 +97,7 @@ public class GetTransactionsQueryHandlerTests : DatabaseTest
         {
             From = new DateOnly(2022, 1, 1),
             To = new DateOnly(2022, 1, 31),
-            Accounts = new AccountId[] { _fiatAccountId }
+            AccountIds = new[] { _fiatAccountId.Value }
         };
 
         var query = new TransactionQueries(_localDatabase);
@@ -114,7 +114,7 @@ public class GetTransactionsQueryHandlerTests : DatabaseTest
         {
             From = new DateOnly(2023, 1, 1),
             To = new DateOnly(2023, 1, 31),
-            Accounts = new AccountId[] { _btcAccountId }
+            AccountIds = new[] { _btcAccountId.Value }
         };
 
         var query = new TransactionQueries(_localDatabase);

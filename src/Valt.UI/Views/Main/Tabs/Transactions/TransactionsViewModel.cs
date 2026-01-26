@@ -10,13 +10,19 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Budget.Accounts.Commands.ChangeAccountVisibility;
+using Valt.App.Modules.Budget.Accounts.Commands.DeleteAccount;
+using Valt.App.Modules.Budget.Accounts.Commands.DeleteAccountGroup;
+using Valt.App.Modules.Budget.Accounts.Commands.MoveAccountGroup;
+using Valt.App.Modules.Budget.Accounts.Commands.MoveAccountToGroup;
+using Valt.App.Modules.Budget.Accounts.Queries;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Budget.Accounts;
-using Valt.Core.Modules.Budget.Accounts.Contracts;
 using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Budget.Accounts;
-using Valt.Infra.Modules.Budget.Accounts.Queries;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
@@ -37,8 +43,8 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     private const int WealthAnimationIntervalMs = 16;   // ~60fps
 
     private readonly IModalFactory? _modalFactory;
-    private readonly IAccountRepository? _accountRepository;
-    private readonly IAccountGroupRepository? _accountGroupRepository;
+    private readonly ICommandDispatcher _commandDispatcher = null!;
+    private readonly IQueryDispatcher _queryDispatcher = null!;
     private readonly AccountsTotalState? _accountsTotalState;
     private readonly RatesState _ratesState = null!;
     private readonly CurrencySettings? _currencySettings;
@@ -46,7 +52,6 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     private readonly AccountDisplayOrderManager? _accountDisplayOrderManager;
     private readonly FilterState? _filterState;
     private readonly ILogger<TransactionsViewModel> _logger = null!;
-    private readonly IAccountQueries? _accountQueries;
     private readonly SecureModeState _secureModeState = null!;
 
     //instances of the sub contents
@@ -102,9 +107,10 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
     [ObservableProperty] private ValtViewModel? _subContent;
 
-    public TransactionsViewModel(IAccountQueries accountQueries,
-        IModalFactory modalFactory, IAccountRepository accountRepository,
-        IAccountGroupRepository accountGroupRepository,
+    public TransactionsViewModel(
+        ICommandDispatcher commandDispatcher,
+        IQueryDispatcher queryDispatcher,
+        IModalFactory modalFactory,
         AccountsTotalState accountsTotalState,
         RatesState ratesState,
         CurrencySettings currencySettings,
@@ -115,11 +121,10 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         ILogger<TransactionsViewModel> logger,
         SecureModeState secureModeState)
     {
-        _accountQueries = accountQueries;
+        _commandDispatcher = commandDispatcher;
+        _queryDispatcher = queryDispatcher;
         _secureModeState = secureModeState;
         _modalFactory = modalFactory;
-        _accountRepository = accountRepository;
-        _accountGroupRepository = accountGroupRepository;
         _accountsTotalState = accountsTotalState;
         _ratesState = ratesState;
         _currencySettings = currencySettings;
@@ -306,13 +311,12 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
     private async Task FetchAccounts()
     {
-        if (_accountQueries is null) return;
         if (_displaySettings is null) return;
 
         var currentSelectedAccountId = SelectedAccount?.Id;
 
-        var accounts = await _accountQueries.GetAccountSummariesAsync(_displaySettings.ShowHiddenAccounts);
-        var groups = await _accountQueries.GetAccountGroupsAsync();
+        var accounts = await _queryDispatcher.DispatchAsync(new GetAccountSummariesQuery(_displaySettings.ShowHiddenAccounts));
+        var groups = await _queryDispatcher.DispatchAsync(new GetAccountGroupsQuery());
 
         WeakReferenceMessenger.Default.Send(accounts);
 
@@ -428,7 +432,14 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         if (!confirmed)
             return;
 
-        await _accountGroupRepository!.DeleteAsync(new AccountGroupId(group.Id));
+        var result = await _commandDispatcher.DispatchAsync(new DeleteAccountGroupCommand { GroupId = group.Id });
+
+        if (result.IsFailure)
+        {
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, ownerWindow!);
+            return;
+        }
+
         await FetchAccounts();
     }
 
@@ -447,8 +458,9 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     private async Task MoveAccountGroup(string groupId, bool moveUp)
     {
         // Get all groups ordered by display order
-        var allGroups = (await _accountGroupRepository!.GetAllAsync()).OrderBy(g => g.DisplayOrder).ToList();
-        var currentIndex = allGroups.FindIndex(g => g.Id.Value == groupId);
+        var allGroups = (await _queryDispatcher.DispatchAsync(new GetAccountGroupsQuery()))
+            .OrderBy(g => g.DisplayOrder).ToList();
+        var currentIndex = allGroups.FindIndex(g => g.Id == groupId);
 
         if (currentIndex < 0) return;
 
@@ -456,15 +468,20 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         if (moveUp && currentIndex == 0) return;
         if (!moveUp && currentIndex == allGroups.Count - 1) return;
 
-        // Swap positions in the list
+        // Calculate target index
         var targetIndex = moveUp ? currentIndex - 1 : currentIndex + 1;
-        (allGroups[currentIndex], allGroups[targetIndex]) = (allGroups[targetIndex], allGroups[currentIndex]);
 
-        // Re-assign sequential display orders and save all groups
-        for (var i = 0; i < allGroups.Count; i++)
+        // Use the MoveAccountGroup command with the target position
+        var result = await _commandDispatcher.DispatchAsync(new MoveAccountGroupCommand
         {
-            allGroups[i].ChangeDisplayOrder(i);
-            await _accountGroupRepository.SaveAsync(allGroups[i]);
+            GroupId = groupId,
+            NewDisplayOrder = targetIndex
+        });
+
+        if (result.IsFailure)
+        {
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetUserControlOwnerWindow()!);
+            return;
         }
 
         await FetchAccounts();
@@ -490,17 +507,17 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     [RelayCommand]
     private async Task HideAccount(AccountViewModel selectedAccount)
     {
-        var account = await _accountRepository!.GetAccountByIdAsync(selectedAccount.Id);
-
-        if (account is null)
+        var result = await _commandDispatcher.DispatchAsync(new ChangeAccountVisibilityCommand
         {
-            await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_AccountNotFound, GetUserControlOwnerWindow()!);
+            AccountId = selectedAccount.Id,
+            Visible = false
+        });
+
+        if (result.IsFailure)
+        {
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetUserControlOwnerWindow()!);
             return;
         }
-
-        account.ChangeVisibility(false);
-
-        await _accountRepository.SaveAccountAsync(account);
 
         await _accountDisplayOrderManager!.NormalizeDisplayOrdersAsync(null);
         await FetchAccounts();
@@ -509,17 +526,17 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     [RelayCommand]
     private async Task ShowAccount(AccountViewModel selectedAccount)
     {
-        var account = await _accountRepository!.GetAccountByIdAsync(selectedAccount.Id);
-
-        if (account is null)
+        var result = await _commandDispatcher.DispatchAsync(new ChangeAccountVisibilityCommand
         {
-            await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_AccountNotFound, GetUserControlOwnerWindow()!);
+            AccountId = selectedAccount.Id,
+            Visible = true
+        });
+
+        if (result.IsFailure)
+        {
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetUserControlOwnerWindow()!);
             return;
         }
-
-        account.ChangeVisibility(true);
-
-        await _accountRepository.SaveAccountAsync(account);
 
         await _accountDisplayOrderManager!.NormalizeDisplayOrdersAsync(null);
         await FetchAccounts();
@@ -528,21 +545,15 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     [RelayCommand]
     private async Task DeleteAccount(AccountViewModel selectedAccount)
     {
-        var account = await _accountRepository!.GetAccountByIdAsync(selectedAccount.Id);
-
-        if (account is null)
+        var result = await _commandDispatcher.DispatchAsync(new DeleteAccountCommand
         {
-            await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_AccountNotFound, GetUserControlOwnerWindow()!);
+            AccountId = selectedAccount.Id
+        });
+
+        if (result.IsFailure)
+        {
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetUserControlOwnerWindow()!);
             return;
-        }
-
-        try
-        {
-            await _accountRepository.DeleteAccountAsync(account);
-        }
-        catch (Exception e)
-        {
-            await MessageBoxHelper.ShowErrorAsync(language.Error, e.Message, GetUserControlOwnerWindow()!);
         }
 
         await _accountDisplayOrderManager!.NormalizeDisplayOrdersAsync(null);
@@ -553,14 +564,6 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     [RelayCommand]
     private async Task MoveUpAccount(AccountViewModel selectedAccount)
     {
-        var account = await _accountRepository!.GetAccountByIdAsync(selectedAccount.Id);
-
-        if (account is null)
-        {
-            await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_AccountNotFound, GetUserControlOwnerWindow()!);
-            return;
-        }
-
         await _accountDisplayOrderManager!.NormalizeDisplayOrdersAsync(
             new AccountOrderAction(new AccountId(selectedAccount.Id), true));
 
@@ -570,14 +573,6 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     [RelayCommand]
     private async Task MoveDownAccount(AccountViewModel selectedAccount)
     {
-        var account = await _accountRepository!.GetAccountByIdAsync(selectedAccount.Id);
-
-        if (account is null)
-        {
-            await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_AccountNotFound, GetUserControlOwnerWindow()!);
-            return;
-        }
-
         await _accountDisplayOrderManager!.NormalizeDisplayOrdersAsync(
             new AccountOrderAction(new AccountId(selectedAccount.Id), false));
 
@@ -608,22 +603,19 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     {
         if (group is null || _contextMenuAccount is null) return;
 
-        var account = await _accountRepository!.GetAccountByIdAsync(_contextMenuAccount.Id);
+        var result = await _commandDispatcher.DispatchAsync(
+            new MoveAccountToGroupCommand
+            {
+                AccountId = _contextMenuAccount.Id,
+                TargetGroupId = group.Id
+            });
 
-        if (account is null)
+        if (result.IsFailure)
         {
-            await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_AccountNotFound, GetUserControlOwnerWindow()!);
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetUserControlOwnerWindow()!);
             return;
         }
 
-        var newGroupId = new AccountGroupId(group.Id);
-        var newDisplayOrder = _accountDisplayOrderManager!.GetNextDisplayOrderForGroup(
-            new LiteDB.ObjectId(group.Id));
-
-        account.ChangeDisplayOrder(newDisplayOrder);
-        account.AssignToGroup(newGroupId);
-
-        await _accountRepository.SaveAccountAsync(account);
         await FetchAccounts();
     }
 
@@ -632,20 +624,19 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     {
         if (selectedAccount is null) return;
 
-        var account = await _accountRepository!.GetAccountByIdAsync(selectedAccount.Id);
+        var result = await _commandDispatcher.DispatchAsync(
+            new MoveAccountToGroupCommand
+            {
+                AccountId = selectedAccount.Id,
+                TargetGroupId = null
+            });
 
-        if (account is null)
+        if (result.IsFailure)
         {
-            await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_AccountNotFound, GetUserControlOwnerWindow()!);
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetUserControlOwnerWindow()!);
             return;
         }
 
-        var newDisplayOrder = _accountDisplayOrderManager!.GetNextDisplayOrderForGroup(null);
-
-        account.ChangeDisplayOrder(newDisplayOrder);
-        account.AssignToGroup(null);
-
-        await _accountRepository.SaveAccountAsync(account);
         await FetchAccounts();
     }
 

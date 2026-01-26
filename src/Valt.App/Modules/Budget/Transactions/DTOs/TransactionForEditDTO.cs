@@ -21,6 +21,18 @@ public record TransactionForEditDTO
     /// Transaction details (polymorphic based on transaction type).
     /// </summary>
     public required TransactionDetailsDto Details { get; init; }
+
+    /// <summary>
+    /// Auto sat amount details, if applicable.
+    /// </summary>
+    public AutoSatAmountDTO? AutoSatAmountDetails { get; init; }
+}
+
+public record AutoSatAmountDTO
+{
+    public required bool IsAutoSatAmount { get; init; }
+    public required string SatAmountState { get; init; }
+    public long? SatAmountSats { get; init; }
 }
 
 public record FixedExpenseReferenceDTO

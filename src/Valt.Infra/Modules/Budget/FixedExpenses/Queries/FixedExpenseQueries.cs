@@ -1,21 +1,22 @@
 using LiteDB;
+using Valt.App.Modules.Budget.FixedExpenses.Contracts;
+using Valt.App.Modules.Budget.FixedExpenses.DTOs;
 using Valt.Core.Modules.Budget.FixedExpenses;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Categories;
-using Valt.Infra.Modules.Budget.FixedExpenses.Queries.DTOs;
 
 namespace Valt.Infra.Modules.Budget.FixedExpenses.Queries;
 
 public class FixedExpenseQueries(ILocalDatabase localDatabase) : IFixedExpenseQueries
 {
-    public Task<FixedExpenseDto?> GetFixedExpenseAsync(FixedExpenseId id)
+    public Task<FixedExpenseDTO?> GetFixedExpenseAsync(FixedExpenseId id)
     {
         var fixedExpense = localDatabase.GetFixedExpenses().FindById(new ObjectId(id));
 
         if (fixedExpense is null)
-            return Task.FromResult<FixedExpenseDto?>(null);
+            return Task.FromResult<FixedExpenseDTO?>(null);
         
         var account = fixedExpense!.DefaultAccountId is not null ? localDatabase.GetAccounts().FindById(fixedExpense?.DefaultAccountId) : null;
         var category = localDatabase.GetCategories().FindById(fixedExpense?.CategoryId);
@@ -25,7 +26,7 @@ public class FixedExpenseQueries(ILocalDatabase localDatabase) : IFixedExpenseQu
         return Task.FromResult(dto)!;
     }
 
-    public Task<IEnumerable<FixedExpenseDto>> GetFixedExpensesAsync()
+    public Task<IEnumerable<FixedExpenseDTO>> GetFixedExpensesAsync()
     {
         var data = localDatabase.GetFixedExpenses().FindAll().ToList();
 
@@ -51,13 +52,13 @@ public class FixedExpenseQueries(ILocalDatabase localDatabase) : IFixedExpenseQu
         return Task.FromResult(dto);
     }
 
-    public Task<FixedExpenseHistoryDto?> GetFixedExpenseHistoryAsync(FixedExpenseId id)
+    public Task<FixedExpenseHistoryDTO?> GetFixedExpenseHistoryAsync(FixedExpenseId id)
     {
         var fixedExpenseObjectId = new ObjectId(id);
         var fixedExpense = localDatabase.GetFixedExpenses().FindById(fixedExpenseObjectId);
 
         if (fixedExpense is null)
-            return Task.FromResult<FixedExpenseHistoryDto?>(null);
+            return Task.FromResult<FixedExpenseHistoryDTO?>(null);
 
         // Load accounts and categories once - reuse throughout the method
         var allAccounts = localDatabase.GetAccounts().FindAll().ToList();
@@ -89,7 +90,7 @@ public class FixedExpenseQueries(ILocalDatabase localDatabase) : IFixedExpenseQu
                         ? CurrencyDisplay.FormatSatsAsBitcoin(transaction.FromSatAmount.Value)
                         : string.Empty;
 
-                return new TransactionHistoryItemDto
+                return new TransactionHistoryItemDTO
                 {
                     TransactionId = transaction.Id.ToString(),
                     Date = DateOnly.FromDateTime(transaction.Date),
@@ -112,7 +113,7 @@ public class FixedExpenseQueries(ILocalDatabase localDatabase) : IFixedExpenseQu
                     ? CurrencyDisplay.FormatFiat(range.FixedAmount.Value, displayCurrency)
                     : $"{CurrencyDisplay.FormatFiat(range.RangedAmountMin!.Value, displayCurrency)} - {CurrencyDisplay.FormatFiat(range.RangedAmountMax!.Value, displayCurrency)}";
 
-                return new PriceHistoryItemDto
+                return new PriceHistoryItemDTO
                 {
                     PeriodStart = DateOnly.FromDateTime(range.PeriodStart),
                     Amount = amount,
@@ -122,7 +123,7 @@ public class FixedExpenseQueries(ILocalDatabase localDatabase) : IFixedExpenseQu
             })
             .ToList();
 
-        var dto = new FixedExpenseHistoryDto
+        var dto = new FixedExpenseHistoryDTO
         {
             FixedExpenseId = fixedExpense.Id.ToString(),
             FixedExpenseName = fixedExpense.Name,
@@ -130,16 +131,16 @@ public class FixedExpenseQueries(ILocalDatabase localDatabase) : IFixedExpenseQu
             PriceHistory = priceHistoryItems
         };
 
-        return Task.FromResult<FixedExpenseHistoryDto?>(dto);
+        return Task.FromResult<FixedExpenseHistoryDTO?>(dto);
     }
 
-    private static FixedExpenseDto ConvertToDto(FixedExpenseEntity fixedExpense, AccountEntity? account,
+    private static FixedExpenseDTO ConvertToDto(FixedExpenseEntity fixedExpense, AccountEntity? account,
         CategoryEntity? category)
     {
         var displayCurrency = fixedExpense.Currency ??
                               account?.Currency;
 
-        return new FixedExpenseDto
+        return new FixedExpenseDTO
         {
             Id = fixedExpense.Id.ToString(),
             Name = fixedExpense.Name,
@@ -148,7 +149,7 @@ public class FixedExpenseQueries(ILocalDatabase localDatabase) : IFixedExpenseQu
             CategoryId = fixedExpense.CategoryId?.ToString(),
             DefaultAccountId = fixedExpense.DefaultAccountId?.ToString(),
             Enabled = fixedExpense.Enabled,
-            Ranges = fixedExpense.Ranges.Select(range => new FixedExpenseDto.RangeDto()
+            Ranges = fixedExpense.Ranges.Select(range => new FixedExpenseRangeDTO()
             {
                 Day = range.Day,
                 PeriodId = range.PeriodId,
@@ -166,7 +167,7 @@ public class FixedExpenseQueries(ILocalDatabase localDatabase) : IFixedExpenseQu
                     : string.Empty,
                 PeriodDescription = range.Period.ToString(),
                 PeriodStart = DateOnly.FromDateTime(range.PeriodStart)
-            }).OrderBy(x => x.PeriodStart).ToHashSet(),
+            }).OrderBy(x => x.PeriodStart).ToList(),
             CategoryName = category?.Name,
             CategoryIcon = category?.Icon,
             DefaultAccountName = account?.Name,

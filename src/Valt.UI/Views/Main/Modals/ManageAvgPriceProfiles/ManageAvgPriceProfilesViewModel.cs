@@ -7,12 +7,17 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.AvgPrice.Commands.CreateProfile;
+using Valt.App.Modules.AvgPrice.Commands.DeleteProfile;
+using Valt.App.Modules.AvgPrice.Commands.EditProfile;
+using Valt.App.Modules.AvgPrice.Queries.GetLinesOfProfile;
+using Valt.App.Modules.AvgPrice.Queries.GetProfile;
+using Valt.App.Modules.AvgPrice.Queries.GetProfiles;
 using Valt.Core.Common;
-using Valt.Core.Kernel.Exceptions;
 using Valt.Core.Modules.AvgPrice;
-using Valt.Core.Modules.AvgPrice.Calculations;
 using Valt.Infra.Kernel.Extensions;
-using Valt.Infra.Modules.AvgPrice.Queries;
 using Valt.Infra.Modules.Configuration;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
@@ -27,8 +32,8 @@ namespace Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles;
 public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewModel
 {
     private readonly IModalFactory _modalFactory = null!;
-    private readonly IAvgPriceQueries _avgPriceQueries = null!;
-    private readonly IAvgPriceRepository _avgPriceRepository = null!;
+    private readonly ICommandDispatcher _commandDispatcher = null!;
+    private readonly IQueryDispatcher _queryDispatcher = null!;
     private readonly IConfigurationManager? _configurationManager;
 
     [ObservableProperty] private string? _id;
@@ -105,14 +110,15 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
         AvailableStrategies = new AvaloniaList<EnumItem>(EnumExtensions.ToList<AvgPriceCalculationMethod>());
     }
 
-    public ManageAvgPriceProfilesViewModel(IModalFactory modalFactory,
-        IAvgPriceQueries avgPriceQueries,
-        IAvgPriceRepository avgPriceRepository,
+    public ManageAvgPriceProfilesViewModel(
+        IModalFactory modalFactory,
+        ICommandDispatcher commandDispatcher,
+        IQueryDispatcher queryDispatcher,
         IConfigurationManager configurationManager)
     {
         _modalFactory = modalFactory;
-        _avgPriceQueries = avgPriceQueries;
-        _avgPriceRepository = avgPriceRepository;
+        _commandDispatcher = commandDispatcher;
+        _queryDispatcher = queryDispatcher;
         _configurationManager = configurationManager;
 
         AvailableStrategies = new AvaloniaList<EnumItem>(EnumExtensions.ToList<AvgPriceCalculationMethod>());
@@ -125,17 +131,17 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
 
     private async Task FetchAvgPriceProfiles()
     {
-        var profiles = await _avgPriceQueries.GetProfilesAsync(false);
+        var profiles = await _queryDispatcher.DispatchAsync(new GetProfilesQuery { ShowHidden = false });
 
         AveragePriceProfiles.Clear();
         AveragePriceProfiles.AddRange(profiles.Select(x => new AveragePriceProfileItem(
-            x.Id,
+            new AvgPriceProfileId(x.Id),
             x.Name,
             x.AssetName,
             x.Unicode,
             x.Color)));
     }
-    
+
     [RelayCommand]
     private void SetBitcoin()
     {
@@ -177,40 +183,57 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
     private async Task SaveChanges()
     {
         ValidateAllProperties();
-        
+
         if (!HasErrors)
         {
             if (Id == null)
             {
-                var profile = AvgPriceProfile.New(Name, new AvgPriceAsset(AssetName, Precision), Visible, Icon, FiatCurrency.GetFromCode(Currency), (AvgPriceCalculationMethod) SelectedStrategy.Value);
+                var result = await _commandDispatcher.DispatchAsync(new CreateProfileCommand
+                {
+                    Name = Name,
+                    AssetName = AssetName,
+                    Precision = Precision,
+                    Visible = Visible,
+                    IconName = Icon != Icon.Empty ? Icon.Name : null,
+                    IconUnicode = Icon.Unicode,
+                    IconColor = Icon.Color.ToArgb(),
+                    CurrencyCode = Currency,
+                    CalculationMethodId = (int)SelectedStrategy.Value
+                });
 
-                await _avgPriceRepository!.SaveAvgPriceProfileAsync(profile);
+                if (result.IsFailure)
+                {
+                    await MessageBoxHelper.ShowErrorAsync(Lang.language.Error, result.Error!.Message, GetWindow!());
+                    return;
+                }
             }
             else
             {
-                var id = new AvgPriceProfileId(Id);
-                var name = AvgPriceProfileName.New(Name);
-                var strategy = (AvgPriceCalculationMethod)SelectedStrategy.Value;
+                var result = await _commandDispatcher.DispatchAsync(new EditProfileCommand
+                {
+                    ProfileId = Id,
+                    Name = Name,
+                    AssetName = AssetName,
+                    Precision = Precision,
+                    Visible = Visible,
+                    IconName = Icon != Icon.Empty ? Icon.Name : null,
+                    IconUnicode = Icon.Unicode,
+                    IconColor = Icon.Color.ToArgb(),
+                    CalculationMethodId = (int)SelectedStrategy.Value
+                });
 
-                var profile = await _avgPriceRepository!.GetAvgPriceProfileByIdAsync(id);
-
-                if (profile is null)
-                    throw new EntityNotFoundException(nameof(AvgPriceProfile), id);
-
-                profile.Rename(name);
-                profile.ChangeAsset(AssetName, Precision);
-                profile.ChangeIcon(Icon);
-                profile.ChangeCalculationMethod(strategy);
-                profile.ChangeVisibility(Visible);
-
-                await _avgPriceRepository.SaveAvgPriceProfileAsync(profile);
+                if (result.IsFailure)
+                {
+                    await MessageBoxHelper.ShowErrorAsync(Lang.language.Error, result.Error!.Message, GetWindow!());
+                    return;
+                }
             }
 
             ClearSelection();
             await FetchAvgPriceProfiles();
         }
     }
-    
+
     [RelayCommand]
     private Task AddNew()
     {
@@ -240,9 +263,9 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
         if (SelectedAveragePriceProfile is null)
             return;
 
-        var profileId = new AvgPriceProfileId(SelectedAveragePriceProfile.Id);
-        var lines = await _avgPriceQueries.GetLinesOfProfileAsync(profileId);
-        var lineCount = lines.Count();
+        var profileId = SelectedAveragePriceProfile.Id;
+        var lines = await _queryDispatcher.DispatchAsync(new GetLinesOfProfileQuery { ProfileId = profileId });
+        var lineCount = lines.Count;
 
         if (lineCount > 0)
         {
@@ -255,14 +278,19 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
                 return;
         }
 
-        var profile = await _avgPriceRepository.GetAvgPriceProfileByIdAsync(profileId);
-
-        if (profile is not null)
+        var result = await _commandDispatcher.DispatchAsync(new DeleteProfileCommand
         {
-            await _avgPriceRepository.DeleteAvgPriceProfileAsync(profile);
-            ClearSelection();
-            await FetchAvgPriceProfiles();
+            ProfileId = profileId
+        });
+
+        if (result.IsFailure)
+        {
+            await MessageBoxHelper.ShowErrorAsync(Lang.language.Error, result.Error!.Message, GetWindow!());
+            return;
         }
+
+        ClearSelection();
+        await FetchAvgPriceProfiles();
     }
 
     [RelayCommand]
@@ -285,7 +313,13 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
         }
         else
         {
-            var profile = await _avgPriceQueries.GetProfileAsync(id);
+            var profile = await _queryDispatcher.DispatchAsync(new GetProfileQuery { ProfileId = id });
+
+            if (profile is null)
+            {
+                ClearSelection();
+                return;
+            }
 
             Id = profile.Id;
             AssetName = profile.AssetName;
@@ -297,7 +331,7 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
             Visible = profile.Visible;
         }
     }
-    
+
     private void ClearSelection()
     {
         SelectedAveragePriceProfile = null;

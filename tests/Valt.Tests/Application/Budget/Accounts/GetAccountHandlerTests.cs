@@ -18,7 +18,7 @@ public class GetAccountHandlerTests : DatabaseTest
         foreach (var account in existingAccounts)
             await _accountRepository.DeleteAccountAsync(account);
 
-        _handler = new GetAccountHandler(_localDatabase);
+        _handler = new GetAccountHandler(_accountQueries);
     }
 
     [Test]

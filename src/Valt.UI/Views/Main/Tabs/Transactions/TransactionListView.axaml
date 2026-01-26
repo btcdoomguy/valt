@@ -7,7 +7,7 @@
              xmlns:transactionTerms="clr-namespace:Valt.Infra.TransactionTerms;assembly=Valt.Infra"
              xmlns:transactions1="clr-namespace:Valt.UI.Views.Main.Tabs.Transactions"
              xmlns:models1="clr-namespace:Valt.UI.Views.Main.Tabs.Transactions.Models"
-             xmlns:avgPriceDtos="clr-namespace:Valt.Infra.Modules.AvgPrice.Queries.DTOs;assembly=Valt.Infra"
+             xmlns:avgPriceDtos="clr-namespace:Valt.App.Modules.AvgPrice.DTOs;assembly=Valt.App"
              xmlns:helpers="clr-namespace:Valt.UI.Helpers"
              mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="700"
              x:Class="Valt.UI.Views.Main.Tabs.Transactions.TransactionListView"

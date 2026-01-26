@@ -1,6 +1,7 @@
+using Valt.App.Modules.Goals.Contracts;
+using Valt.App.Modules.Goals.DTOs;
 using Valt.Core.Modules.Goals;
 using Valt.Infra.DataAccess;
-using Valt.Infra.Modules.Goals.Queries.DTOs;
 
 namespace Valt.Infra.Modules.Goals.Queries;
 
@@ -25,7 +26,7 @@ internal class GoalQueries : IGoalQueries
 
                 return new StaleGoalDTO(
                     entity.Id.ToString(),
-                    (GoalTypeNames)entity.GoalTypeNameId,
+                    entity.GoalTypeNameId,
                     entity.GoalTypeJson,
                     from,
                     to);

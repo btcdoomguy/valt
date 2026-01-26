@@ -1,4 +1,6 @@
 using NSubstitute;
+using Valt.App.Modules.Budget.Accounts.Contracts;
+using Valt.App.Modules.Budget.Categories.Contracts;
 using Valt.Core.Kernel.Abstractions.EventSystem;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Budget.Accounts.Contracts;
@@ -12,7 +14,9 @@ using Valt.Infra.Kernel;
 using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Kernel.Time;
 using Valt.Infra.Modules.Budget.Accounts;
+using Valt.Infra.Modules.Budget.Accounts.Queries;
 using Valt.Infra.Modules.Budget.Categories;
+using Valt.Infra.Modules.Budget.Categories.Queries;
 using Valt.Infra.Modules.Budget.FixedExpenses;
 using Valt.Infra.Modules.AvgPrice;
 using Valt.Infra.Modules.Goals;
@@ -41,6 +45,10 @@ public abstract class DatabaseTest
     protected IGoalRepository _goalRepository;
     protected IAvgPriceRepository _avgPriceRepository;
 
+    // Query implementations
+    protected IAccountQueries _accountQueries;
+    protected ICategoryQueries _categoryQueries;
+
     protected DatabaseTest()
     {
         IdGenerator.Configure(new LiteDbIdProvider());
@@ -57,6 +65,10 @@ public abstract class DatabaseTest
         _fixedExpenseRepository = new FixedExpenseRepository(_localDatabase, _domainEventPublisher);
         _goalRepository = new GoalRepository(_localDatabase, _domainEventPublisher);
         _avgPriceRepository = new AvgPriceRepository(_localDatabase, _domainEventPublisher);
+
+        // Query implementations
+        _categoryQueries = new CategoryQueries(_localDatabase);
+        _accountQueries = new AccountQueries(_localDatabase, Substitute.For<IAccountTotalsCalculator>());
     }
 
     [OneTimeSetUp]

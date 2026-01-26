@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Valt.App.Modules.Goals.DTOs;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.GoalTypes;
 using Valt.UI.Lang;
@@ -39,6 +40,19 @@ public partial class DcaGoalTypeEditorViewModel : ObservableObject, IGoalTypeEdi
     public void LoadFrom(IGoalType goalType)
     {
         if (goalType is DcaGoalType dca)
+        {
+            TargetPurchaseCount = dca.TargetPurchaseCount;
+        }
+    }
+
+    public GoalTypeInputDTO CreateGoalTypeDTO()
+    {
+        return new DcaGoalTypeDTO { TargetPurchaseCount = TargetPurchaseCount };
+    }
+
+    public void LoadFromDTO(GoalTypeOutputDTO goalType)
+    {
+        if (goalType is DcaGoalTypeOutputDTO dca)
         {
             TargetPurchaseCount = dca.TargetPurchaseCount;
         }

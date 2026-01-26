@@ -1,19 +1,19 @@
 using Valt.App.Kernel;
 using Valt.App.Kernel.Commands;
+using Valt.App.Modules.Goals.Contracts;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.Contracts;
-using Valt.Infra.Modules.Goals.Services;
 
 namespace Valt.App.Modules.Goals.Commands.CopyGoalsFromLastMonth;
 
 internal sealed class CopyGoalsFromLastMonthHandler : ICommandHandler<CopyGoalsFromLastMonthCommand, CopyGoalsFromLastMonthResult>
 {
     private readonly IGoalRepository _goalRepository;
-    private readonly GoalProgressState _goalProgressState;
+    private readonly IGoalProgressState _goalProgressState;
 
     public CopyGoalsFromLastMonthHandler(
         IGoalRepository goalRepository,
-        GoalProgressState goalProgressState)
+        IGoalProgressState goalProgressState)
     {
         _goalRepository = goalRepository;
         _goalProgressState = goalProgressState;

@@ -1,9 +1,11 @@
+using LiteDB;
+using Valt.App.Modules.Budget.Categories.DTOs;
+using Valt.App.Modules.Budget.Transactions.Contracts;
+using Valt.App.Modules.Budget.Transactions.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Transactions;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
-using Valt.Infra.Modules.Budget.Categories.Queries.DTOs;
-using Valt.Infra.Modules.Budget.Transactions.Queries.DTOs;
 
 namespace Valt.Infra.Modules.Budget.Transactions.Queries;
 
@@ -37,16 +39,16 @@ public class TransactionQueries : ITransactionQueries
             query = query.Where(x => x.Date <= parsedDate);
         }
 
-        if (filter.Accounts is not null)
+        if (filter.AccountIds is not null)
         {
-            var accountIds = filter.Accounts.Select(x => x.ToObjectId()).ToList();
+            var accountIds = filter.AccountIds.Select(x => new ObjectId(x)).ToList();
             query = query.Where(x =>
                 accountIds.Contains(x.FromAccountId) || (x.ToAccountId != null && accountIds.Contains(x.ToAccountId)));
         }
 
-        if (filter.Categories is not null)
+        if (filter.CategoryIds is not null)
         {
-            var categoryIds = filter.Categories.Select(x => x.ToObjectId()).ToList();
+            var categoryIds = filter.CategoryIds.Select(x => new ObjectId(x)).ToList();
             query = query.Where(x => categoryIds.Contains(x.CategoryId));
         }
 
@@ -109,7 +111,7 @@ public class TransactionQueries : ITransactionQueries
                 Date = DateOnly.FromDateTime(transactionEntity.Date),
                 Name = transactionEntity.Name,
                 CategoryId = transactionEntity.CategoryId.ToString(),
-                CategoryIcon = category.Icon,
+                CategoryIcon = category.IconId,
                 CategoryName = category.Name,
                 FromAccountId = transactionEntity.FromAccountId.ToString(),
                 FromAccountIcon = fromAccount?.Icon,
@@ -194,7 +196,8 @@ public class TransactionQueries : ITransactionQueries
             {
                 Id = category.Id.ToString(),
                 Name = name,
-                Icon = category.Icon,
+                SimpleName = category.Name,
+                IconId = category.Icon,
                 Unicode = icon.Unicode,
                 Color = icon.Color
             };

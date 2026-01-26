@@ -8,16 +8,20 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Valt.App.Kernel;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Budget.Accounts.DTOs;
+using Valt.App.Modules.Budget.Accounts.Queries;
+using Valt.App.Modules.Budget.Categories.DTOs;
+using Valt.App.Modules.Budget.Categories.Queries;
+using Valt.App.Modules.Budget.FixedExpenses.Commands.CreateFixedExpense;
+using Valt.App.Modules.Budget.FixedExpenses.Commands.EditFixedExpense;
+using Valt.App.Modules.Budget.FixedExpenses.DTOs;
+using Valt.App.Modules.Budget.FixedExpenses.Queries.GetFixedExpense;
 using Valt.Core.Common;
-using Valt.Core.Modules.Budget.Accounts;
-using Valt.Core.Modules.Budget.Categories;
 using Valt.Core.Modules.Budget.FixedExpenses;
-using Valt.Core.Modules.Budget.FixedExpenses.Contracts;
 using Valt.Infra;
-using Valt.Infra.Modules.Budget.Accounts.Queries;
-using Valt.Infra.Modules.Budget.Accounts.Queries.DTOs;
-using Valt.Infra.Modules.Budget.Categories.Queries;
-using Valt.Infra.Modules.Budget.Categories.Queries.DTOs;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
@@ -30,9 +34,8 @@ namespace Valt.UI.Views.Main.Modals.FixedExpenseEditor;
 
 public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
 {
-    private readonly IFixedExpenseRepository _fixedExpenseRepository = null!;
-    private readonly IAccountQueries _accountQueries = null!;
-    private readonly ICategoryQueries _categoryQueries = null!;
+    private readonly ICommandDispatcher _commandDispatcher = null!;
+    private readonly IQueryDispatcher _queryDispatcher = null!;
     private readonly DisplaySettings _displaySettings = null!;
     private readonly ITransactionTermService _transactionTermService = null!;
     private readonly IConfigurationManager? _configurationManager;
@@ -193,16 +196,15 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
         if (!Design.IsDesignMode) return;
     }
 
-    public FixedExpenseEditorViewModel(IFixedExpenseRepository fixedExpenseRepository,
-        IAccountQueries accountQueries,
-        ICategoryQueries categoryQueries,
+    public FixedExpenseEditorViewModel(
+        ICommandDispatcher commandDispatcher,
+        IQueryDispatcher queryDispatcher,
         DisplaySettings displaySettings,
         ITransactionTermService transactionTermService,
         IConfigurationManager configurationManager)
     {
-        _fixedExpenseRepository = fixedExpenseRepository;
-        _accountQueries = accountQueries;
-        _categoryQueries = categoryQueries;
+        _commandDispatcher = commandDispatcher;
+        _queryDispatcher = queryDispatcher;
         _displaySettings = displaySettings;
         _transactionTermService = transactionTermService;
         _configurationManager = configurationManager;
@@ -218,7 +220,8 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
 
     private async Task FetchCategoriesAsync()
     {
-        var categories = (await _categoryQueries!.GetCategoriesAsync()).Items.OrderBy(x => x.Name);
+        var result = await _queryDispatcher.DispatchAsync(new GetCategoriesQuery());
+        var categories = result.Items.OrderBy(x => x.Name);
 
         AvailableCategories.Clear();
         foreach (var category in categories)
@@ -227,7 +230,8 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
 
     private async Task FetchAccountsAsync()
     {
-        var accounts = await _accountQueries!.GetAccountsAsync(_displaySettings.ShowHiddenAccounts);
+        var accounts = await _queryDispatcher.DispatchAsync(
+            new GetAccountsQuery(_displaySettings.ShowHiddenAccounts));
 
         AvailableAccounts.Clear();
         foreach (var account in accounts)
@@ -257,8 +261,8 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
 
         if (request.FixedExpenseId is not null)
         {
-            var fixedExpense =
-                await _fixedExpenseRepository!.GetFixedExpenseByIdAsync(request.FixedExpenseId.Value);
+            var fixedExpense = await _queryDispatcher.DispatchAsync(
+                new GetFixedExpenseQuery { FixedExpenseId = request.FixedExpenseId.Value });
 
             if (fixedExpense is null)
             {
@@ -268,38 +272,36 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
             }
 
             FixedExpenseId = request.FixedExpenseId;
-            LastFixedExpenseRecordReferenceDate = fixedExpense.LastFixedExpenseRecordDate;
-            CurrentFixedExpenseRange = fixedExpense.CurrentRange;
 
             WindowTitle = language.FixedExpensesEditor_EditTitle;
 
             Name = fixedExpense.Name;
-            Category = AvailableCategories.FirstOrDefault(c => c.Id == fixedExpense.CategoryId.Value)!;
+            Category = AvailableCategories.FirstOrDefault(c => c.Id == fixedExpense.CategoryId)!;
 
             IsAttachedToDefaultAccount = fixedExpense.DefaultAccountId is not null;
             IsAttachedToCurrency = fixedExpense.Currency is not null;
             DefaultAccount = fixedExpense.DefaultAccountId is not null
                 ? AvailableAccounts.FirstOrDefault(a => a.Id == fixedExpense.DefaultAccountId)
                 : null;
-            Currency = fixedExpense.Currency?.Code;
+            Currency = fixedExpense.Currency;
 
-            var latestRange = fixedExpense.Ranges.Last();
+            var latestRange = fixedExpense.LatestRange;
 
-            Period = latestRange.Period.ToString();
+            Period = ((FixedExpensePeriods)latestRange.PeriodId).ToString();
             Day = latestRange.Day;
-            PeriodStart = latestRange.PeriodStart.ToValtDateTime();
+            PeriodStart = latestRange.PeriodStart.ToDateTime(TimeOnly.MinValue);
             Enabled = fixedExpense.Enabled;
 
             IsFixedAmount = latestRange.FixedAmount is not null;
-            IsVariableAmount = latestRange.RangedAmount is not null;
-            if (latestRange.RangedAmount is not null)
+            IsVariableAmount = latestRange.RangedAmountMin is not null;
+            if (latestRange.RangedAmountMin is not null)
             {
-                RangedAmountMin = latestRange.RangedAmount.Min;
-                RangedAmountMax = latestRange.RangedAmount.Max;
+                RangedAmountMin = FiatValue.New(latestRange.RangedAmountMin.Value);
+                RangedAmountMax = FiatValue.New(latestRange.RangedAmountMax!.Value);
             }
             else
             {
-                FixedAmount = latestRange.FixedAmount;
+                FixedAmount = latestRange.FixedAmount.HasValue ? FiatValue.New(latestRange.FixedAmount.Value) : null;
             }
         }
     }
@@ -312,27 +314,66 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
         if (HasErrors)
             return;
 
-        FixedExpense? fixedExpense;
-        try
-        {
-            if (FixedExpenseId != null)
-            {
-                fixedExpense = await _fixedExpenseRepository!.GetFixedExpenseByIdAsync(FixedExpenseId);
+        var periodId = (int)Enum.Parse<FixedExpensePeriods>(Period);
+        var periodStart = DateOnly.FromDateTime(PeriodStart!.Value);
 
-                await EditAsync(fixedExpense!);
-            }
-            else
+        if (FixedExpenseId != null)
+        {
+            var command = new EditFixedExpenseCommand
             {
-                fixedExpense = await CreateAsync();
+                FixedExpenseId = FixedExpenseId.Value,
+                Name = Name,
+                CategoryId = Category.Id,
+                DefaultAccountId = IsDefaultAccountSelectorVisible ? DefaultAccount?.Id : null,
+                Currency = IsAttachedToCurrency ? Currency : null,
+                Enabled = Enabled,
+                NewRange = new FixedExpenseRangeInputDTO
+                {
+                    PeriodStart = periodStart,
+                    PeriodId = periodId,
+                    Day = Day,
+                    FixedAmount = IsFixedSelectorVisible ? FixedAmount?.Value : null,
+                    RangedAmountMin = IsVariableAmount ? RangedAmountMin?.Value : null,
+                    RangedAmountMax = IsVariableAmount ? RangedAmountMax?.Value : null
+                }
+            };
+            var result = await _commandDispatcher.DispatchAsync(command);
+            if (result.IsFailure)
+            {
+                await ResultExtensions.ShowErrorAsync(result.Error!, GetWindow!());
+                return;
             }
         }
-        catch (Exception e)
+        else
         {
-            await MessageBoxHelper.ShowErrorAsync(language.Error, e.Message, GetWindow!());
-            return;
+            var command = new CreateFixedExpenseCommand
+            {
+                Name = Name,
+                CategoryId = Category.Id,
+                DefaultAccountId = IsDefaultAccountSelectorVisible ? DefaultAccount?.Id : null,
+                Currency = IsAttachedToCurrency ? Currency : null,
+                Enabled = Enabled,
+                Ranges = new List<FixedExpenseRangeInputDTO>
+                {
+                    new()
+                    {
+                        PeriodStart = periodStart,
+                        PeriodId = periodId,
+                        Day = Day,
+                        FixedAmount = IsFixedSelectorVisible ? FixedAmount?.Value : null,
+                        RangedAmountMin = IsVariableAmount ? RangedAmountMin?.Value : null,
+                        RangedAmountMax = IsVariableAmount ? RangedAmountMax?.Value : null
+                    }
+                }
+            };
+            var result = await _commandDispatcher.DispatchAsync(command);
+            if (result.IsFailure)
+            {
+                await ResultExtensions.ShowErrorAsync(result.Error!, GetWindow!());
+                return;
+            }
         }
 
-        await _fixedExpenseRepository!.SaveFixedExpenseAsync(fixedExpense!);
         CloseDialog?.Invoke(new Response(true));
     }
 
@@ -375,63 +416,6 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
         PeriodStart = _originalPeriodStart;
 
         IsInChangeRecurrenceMode = false;
-    }
-
-    private async Task<FixedExpense> CreateAsync()
-    {
-        var name = FixedExpenseName.New(Name);
-        var date = DateOnly.FromDateTime(PeriodStart!.Value);
-
-        FixedExpenseRange initialRange;
-        if (IsFixedSelectorVisible)
-            initialRange =
-                FixedExpenseRange.CreateFixedAmount(FixedAmount!, Enum.Parse<FixedExpensePeriods>(Period), date, Day);
-        else
-            initialRange = FixedExpenseRange.CreateRangedAmount(new RangedFiatValue(RangedAmountMin!, RangedAmountMax!),
-                Enum.Parse<FixedExpensePeriods>(Period),
-                date,
-                Day);
-
-        return FixedExpense.New(name,
-            IsDefaultAccountSelectorVisible ? new AccountId(DefaultAccount!.Id) : null,
-            new CategoryId(Category.Id),
-            Currency is not null ? FiatCurrency.GetFromCode(Currency) : null,
-            new List<FixedExpenseRange> { initialRange },
-            Enabled);
-    }
-
-    private Task EditAsync(FixedExpense fixedExpense)
-    {
-        var name = FixedExpenseName.New(Name);
-        var date = DateOnly.FromDateTime(PeriodStart!.Value);
-
-        fixedExpense.Rename(name);
-        fixedExpense.SetCategory(fixedExpense.CategoryId.Value);
-        fixedExpense.SetEnabled(Enabled);
-
-        if (IsDefaultAccountSelectorVisible)
-        {
-            fixedExpense.SetDefaultAccountId(DefaultAccount!.Id);
-        }
-        else
-        {
-            fixedExpense.SetCurrency(FiatCurrency.GetFromCode(Currency!));
-        }
-
-        FixedExpenseRange newRange;
-        if (IsFixedSelectorVisible)
-            newRange =
-                FixedExpenseRange.CreateFixedAmount(FixedAmount!, Enum.Parse<FixedExpensePeriods>(Period), date, Day);
-        else
-            newRange = FixedExpenseRange.CreateRangedAmount(new RangedFiatValue(RangedAmountMin!, RangedAmountMax!),
-                Enum.Parse<FixedExpensePeriods>(Period),
-                date,
-                Day);
-
-        if (!fixedExpense.ContainsRange(newRange))
-            fixedExpense.AddRange(newRange);
-
-        return Task.CompletedTask;
     }
 
     public Task<IEnumerable<object>> GetTransactionTermsAsync(string? term, CancellationToken cancellationToken)

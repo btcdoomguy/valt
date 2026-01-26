@@ -9,20 +9,25 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Budget.Accounts.DTOs;
+using Valt.App.Modules.Budget.Accounts.Queries;
+using Valt.App.Modules.Budget.Categories.DTOs;
+using Valt.App.Modules.Budget.Categories.Queries;
+using Valt.App.Modules.Budget.FixedExpenses.DTOs;
+using Valt.App.Modules.Budget.FixedExpenses.Queries.GetFixedExpense;
+using Valt.App.Modules.Budget.Transactions.Commands.AddTransaction;
+using Valt.App.Modules.Budget.Transactions.Commands.EditTransaction;
+using Valt.App.Modules.Budget.Transactions.DTOs;
+using Valt.App.Modules.Budget.Transactions.Queries.GetTransactionById;
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Categories;
+using Valt.Core.Modules.Budget.FixedExpenses;
 using Valt.Core.Modules.Budget.Transactions;
-using Valt.Core.Modules.Budget.Transactions.Contracts;
 using Valt.Core.Modules.Budget.Transactions.Details;
 using Valt.Core.Modules.Budget.Transactions.Services;
-using Valt.Infra;
-using Valt.Infra.Modules.Budget.Accounts.Queries;
-using Valt.Infra.Modules.Budget.Accounts.Queries.DTOs;
-using Valt.Infra.Modules.Budget.Categories.Queries;
-using Valt.Infra.Modules.Budget.Categories.Queries.DTOs;
-using Valt.Infra.Modules.Budget.FixedExpenses.Queries;
-using Valt.Infra.Modules.Budget.FixedExpenses.Queries.DTOs;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
 using Valt.UI.Base;
@@ -45,17 +50,15 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
     private const string AccountModeBitcoinToBitcoin = "BitcoinToBitcoin";
     private const string AccountModeBitcoinToFiat = "BitcoinToFiat";
 
-    private readonly ITransactionRepository? _transactionRepository;
-    private readonly IAccountQueries? _accountQueries;
-    private readonly ICategoryQueries? _categoryQueries;
-    private readonly IFixedExpenseQueries _fixedExpenseQueries = null!;
+    private readonly ICommandDispatcher? _commandDispatcher;
+    private readonly IQueryDispatcher? _queryDispatcher;
     private readonly ITransactionTermService? _transactionTermService;
     private readonly IModalFactory _modalFactory = null!;
     private readonly CurrencySettings _currencySettings = null!;
     private readonly DisplaySettings _displaySettings = null!;
 
-    public AvaloniaList<CategoryDTO> AvailableCategories { get; set; } = new();
-    public AvaloniaList<AccountDTO> AvailableAccounts { get; set; } = new();
+    public AvaloniaList<CategoryDTO> AvailableCategories { get; set; } = [];
+    public AvaloniaList<AccountDTO> AvailableAccounts { get; set; } = [];
 
     #region Form Data
 
@@ -117,7 +120,7 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
 
     [NotifyPropertyChangedFor(nameof(IsBoundToFixedExpense), nameof(BoundToFixedExpenseCaption), nameof(HasMetadata))]
     [ObservableProperty]
-    private FixedExpenseDto? _fixedExpense;
+    private FixedExpenseDTO? _fixedExpense;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowInstallmentCount), nameof(InstallmentValueText))]
@@ -399,19 +402,15 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
     }
 
     public TransactionEditorViewModel(
-        ITransactionRepository transactionRepository,
-        IAccountQueries accountQueries,
-        ICategoryQueries categoryQueries,
-        IFixedExpenseQueries fixedExpenseQueries,
+        ICommandDispatcher commandDispatcher,
+        IQueryDispatcher queryDispatcher,
         ITransactionTermService transactionTermService,
         IModalFactory modalFactory,
         CurrencySettings currencySettings,
         DisplaySettings displaySettings)
     {
-        _transactionRepository = transactionRepository;
-        _accountQueries = accountQueries;
-        _categoryQueries = categoryQueries;
-        _fixedExpenseQueries = fixedExpenseQueries;
+        _commandDispatcher = commandDispatcher;
+        _queryDispatcher = queryDispatcher;
         _transactionTermService = transactionTermService;
         _modalFactory = modalFactory;
         _currencySettings = currencySettings;
@@ -473,16 +472,19 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         if (request.FixedExpenseReference is not null)
         {
             TransactionFixedExpenseReference = request.FixedExpenseReference;
-            FixedExpense =
-                await _fixedExpenseQueries.GetFixedExpenseAsync(TransactionFixedExpenseReference
-                    .FixedExpenseId);
+            FixedExpense = await _queryDispatcher!.DispatchAsync(new GetFixedExpenseQuery
+            {
+                FixedExpenseId = TransactionFixedExpenseReference.FixedExpenseId.Value
+            });
         }
     }
 
     private async Task OnBindParameterForEditingAsync(Request request)
     {
-        var transaction =
-            await _transactionRepository!.GetTransactionByIdAsync(request.TransactionId!);
+        var transaction = await _queryDispatcher!.DispatchAsync(new GetTransactionByIdQuery
+        {
+            TransactionId = request.TransactionId!.Value
+        });
 
         if (transaction is null)
         {
@@ -491,18 +493,21 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
             return;
         }
 
-        Date = transaction.Date.ToValtDateTime();
+        Date = transaction.Date.ToDateTime(TimeOnly.MinValue);
         if (!request.CopyTransaction)
         {
-            _transactionId = transaction.Id;
+            _transactionId = new TransactionId(transaction.Id);
 
             WindowTitle = language.ManageTransactions_EditTitle;
             if (transaction.FixedExpenseReference is not null)
             {
-                TransactionFixedExpenseReference = transaction.FixedExpenseReference;
-                FixedExpense =
-                    await _fixedExpenseQueries.GetFixedExpenseAsync(TransactionFixedExpenseReference
-                        .FixedExpenseId);
+                TransactionFixedExpenseReference = new TransactionFixedExpenseReference(
+                    new FixedExpenseId(transaction.FixedExpenseReference.FixedExpenseId),
+                    transaction.FixedExpenseReference.ReferenceDate);
+                FixedExpense = await _queryDispatcher!.DispatchAsync(new GetFixedExpenseQuery
+                {
+                    FixedExpenseId = TransactionFixedExpenseReference.FixedExpenseId.Value
+                });
             }
         }
         else
@@ -512,61 +517,66 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
 
         Name = transaction.Name;
         Notes = transaction.Notes ?? string.Empty;
-        Category = AvailableCategories.FirstOrDefault(c => c.Id == transaction.CategoryId.Value);
-        FromAccount =
-            AvailableAccounts.FirstOrDefault(a => a.Id == transaction.TransactionDetails.FromAccountId);
-        if (transaction.TransactionDetails.TransactionType == TransactionTypes.Transfer &&
-            transaction.TransactionDetails.ToAccountId is not null)
+        Category = AvailableCategories.FirstOrDefault(c => c.Id == transaction.CategoryId);
+        FromAccount = AvailableAccounts.FirstOrDefault(a => a.Id == transaction.Details.FromAccountId);
+
+        LoadTransactionDetailsFromDto(transaction.Details);
+
+        if (!request.CopyTransaction && transaction.AutoSatAmountDetails is not null)
         {
-            ToAccount =
-                AvailableAccounts.FirstOrDefault(a => a.Id == transaction.TransactionDetails.ToAccountId);
+            IsAutoSatAmount = transaction.AutoSatAmountDetails.IsAutoSatAmount;
+
+            SatAmountStateDescription = transaction.AutoSatAmountDetails.SatAmountState switch
+            {
+                nameof(SatAmountState.Processed) => $"{transaction.AutoSatAmountDetails.SatAmountSats} sats",
+                nameof(SatAmountState.Manual) => language.SatAmountState_Manual,
+                nameof(SatAmountState.Pending) => language.SatAmountState_Pending,
+                nameof(SatAmountState.Missing) => language.SatAmountState_Missing,
+                _ => transaction.AutoSatAmountDetails.SatAmountState
+            };
         }
+    }
 
-        SelectedMode = transaction.TransactionDetails.TransactionType;
-
-        switch (transaction.TransactionDetails.TransferType)
+    private void LoadTransactionDetailsFromDto(TransactionDetailsDto details)
+    {
+        switch (details)
         {
-            case TransactionTransferTypes.Fiat:
-                FromAccountFiatValue = ((FiatDetails)transaction.TransactionDetails).Amount;
+            case FiatTransactionDto fiat:
+                SelectedMode = fiat.IsCredit ? TransactionTypes.Credit : TransactionTypes.Debt;
+                FromAccountFiatValue = FiatValue.New(fiat.Amount);
                 break;
-            case TransactionTransferTypes.Bitcoin:
-                FromAccountBtcValue = ((BitcoinDetails)transaction.TransactionDetails).Amount;
+            case BitcoinTransactionDto btc:
+                SelectedMode = btc.IsCredit ? TransactionTypes.Credit : TransactionTypes.Debt;
+                FromAccountBtcValue = BtcValue.New(btc.AmountSats);
                 break;
-            case TransactionTransferTypes.FiatToFiat:
-                FromAccountFiatValue = ((FiatToFiatDetails)transaction.TransactionDetails).FromAmount;
+            case FiatToFiatTransferDto fiatToFiat:
+                SelectedMode = TransactionTypes.Transfer;
+                ToAccount = AvailableAccounts.FirstOrDefault(a => a.Id == fiatToFiat.ToAccountId);
+                FromAccountFiatValue = FiatValue.New(fiatToFiat.FromAmount);
                 ToAccountFiatValue = AccountsAreSameTypeAndCurrency
                     ? FromAccountFiatValue
-                    : ((FiatToFiatDetails)transaction.TransactionDetails).ToAmount;
+                    : FiatValue.New(fiatToFiat.ToAmount);
                 break;
-            case TransactionTransferTypes.BitcoinToBitcoin:
-                FromAccountBtcValue = ((BitcoinToBitcoinDetails)transaction.TransactionDetails).Amount;
-                ToAccountBtcValue = ((BitcoinToBitcoinDetails)transaction.TransactionDetails).Amount;
+            case BitcoinToBitcoinTransferDto btcToBtc:
+                SelectedMode = TransactionTypes.Transfer;
+                ToAccount = AvailableAccounts.FirstOrDefault(a => a.Id == btcToBtc.ToAccountId);
+                FromAccountBtcValue = BtcValue.New(btcToBtc.AmountSats);
+                ToAccountBtcValue = BtcValue.New(btcToBtc.AmountSats);
                 break;
-            case TransactionTransferTypes.FiatToBitcoin:
-                FromAccountFiatValue = ((FiatToBitcoinDetails)transaction.TransactionDetails).FromAmount;
-                ToAccountBtcValue = ((FiatToBitcoinDetails)transaction.TransactionDetails).ToAmount;
+            case FiatToBitcoinTransferDto fiatToBtc:
+                SelectedMode = TransactionTypes.Transfer;
+                ToAccount = AvailableAccounts.FirstOrDefault(a => a.Id == fiatToBtc.ToAccountId);
+                FromAccountFiatValue = FiatValue.New(fiatToBtc.FromFiatAmount);
+                ToAccountBtcValue = BtcValue.New(fiatToBtc.ToSatsAmount);
                 break;
-            case TransactionTransferTypes.BitcoinToFiat:
-                FromAccountBtcValue = ((BitcoinToFiatDetails)transaction.TransactionDetails).FromAmount;
-                ToAccountFiatValue = ((BitcoinToFiatDetails)transaction.TransactionDetails).ToAmount;
+            case BitcoinToFiatTransferDto btcToFiat:
+                SelectedMode = TransactionTypes.Transfer;
+                ToAccount = AvailableAccounts.FirstOrDefault(a => a.Id == btcToFiat.ToAccountId);
+                FromAccountBtcValue = BtcValue.New(btcToFiat.FromSatsAmount);
+                ToAccountFiatValue = FiatValue.New(btcToFiat.ToFiatAmount);
                 break;
             default:
-                throw new ArgumentOutOfRangeException();
-        }
-
-        if (!request.CopyTransaction && transaction.HasAutoSatAmount)
-        {
-            var autoSatAmountDetails = transaction.AutoSatAmountDetails!;
-            IsAutoSatAmount = autoSatAmountDetails.IsAutoSatAmount;
-
-            SatAmountStateDescription = autoSatAmountDetails.SatAmountState switch
-            {
-                SatAmountState.Processed => $"{autoSatAmountDetails.SatAmount!.Sats} sats",
-                SatAmountState.Manual => language.SatAmountState_Manual,
-                SatAmountState.Pending => language.SatAmountState_Pending,
-                SatAmountState.Missing => language.SatAmountState_Missing,
-                _ => autoSatAmountDetails.SatAmountState.ToString()
-            };
+                throw new ArgumentOutOfRangeException(nameof(details), details.GetType().Name, "Unknown transaction details type");
         }
     }
 
@@ -609,7 +619,8 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
 
     private async Task FetchCategoriesAsync()
     {
-        var categories = (await _categoryQueries!.GetCategoriesAsync()).Items.OrderBy(x => x.Name);
+        var result = await _queryDispatcher!.DispatchAsync(new GetCategoriesQuery());
+        var categories = result.Items.OrderBy(x => x.Name);
 
         AvailableCategories.Clear();
         foreach (var category in categories)
@@ -618,7 +629,7 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
 
     private async Task FetchAccountsAsync()
     {
-        var accounts = await _accountQueries!.GetAccountsAsync(_displaySettings.ShowHiddenAccounts);
+        var accounts = await _queryDispatcher!.DispatchAsync(new GetAccountsQuery(_displaySettings.ShowHiddenAccounts));
 
         AvailableAccounts.Clear();
         foreach (var account in accounts)
@@ -695,32 +706,87 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
 
         if (!HasErrors)
         {
-            Transaction? transaction;
             DateTime? newTransactionDate = null;
+
             if (_transactionId != null)
             {
-                transaction = await _transactionRepository!.GetTransactionByIdAsync(_transactionId);
+                // Edit existing transaction
+                var detailsDto = BuildTransactionDetailsDtoFromForm();
+                var result = await _commandDispatcher!.DispatchAsync(new EditTransactionCommand
+                {
+                    TransactionId = _transactionId.Value,
+                    Date = DateOnly.FromDateTime(Date!.Value),
+                    Name = Name,
+                    CategoryId = Category!.Id,
+                    Details = detailsDto,
+                    Notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes,
+                    FixedExpenseId = TransactionFixedExpenseReference?.FixedExpenseId.Value,
+                    FixedExpenseReferenceDate = TransactionFixedExpenseReference?.ReferenceDate
+                });
 
-                await EditAsync(transaction!);
-                await _transactionRepository!.SaveTransactionAsync(transaction!);
+                if (result.IsFailure)
+                {
+                    await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
+                    return;
+                }
             }
             else
             {
+                // Create new transaction(s)
                 if (UseInstallments && InstallmentCount >= 2 && DebtSelected)
                 {
-                    var transactions = await CreateInstallmentsAsync();
-                    foreach (var t in transactions)
-                    {
-                        await _transactionRepository!.SaveTransactionAsync(t);
-                    }
+                    var dates = InstallmentDateCalculator.CalculateInstallmentDates(
+                        DateOnly.FromDateTime(Date!.Value), InstallmentCount).ToList();
 
-                    newTransactionDate = transactions.First().Date.ToValtDateTime();
+                    for (var i = 0; i < dates.Count; i++)
+                    {
+                        var installmentName = $"{Name} ({i + 1}/{InstallmentCount})";
+                        var detailsDto = BuildTransactionDetailsDtoFromForm();
+
+                        var result = await _commandDispatcher!.DispatchAsync(new AddTransactionCommand
+                        {
+                            Date = dates[i],
+                            Name = installmentName,
+                            CategoryId = Category!.Id,
+                            Details = detailsDto,
+                            Notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes,
+                            FixedExpenseId = TransactionFixedExpenseReference?.FixedExpenseId.Value,
+                            FixedExpenseReferenceDate = TransactionFixedExpenseReference?.ReferenceDate
+                        });
+
+                        if (result.IsFailure)
+                        {
+                            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
+                            return;
+                        }
+
+                        if (i == 0)
+                        {
+                            newTransactionDate = dates[i].ToDateTime(TimeOnly.MinValue);
+                        }
+                    }
                 }
                 else
                 {
-                    transaction = await CreateAsync();
-                    newTransactionDate = transaction.Date.ToValtDateTime();
-                    await _transactionRepository!.SaveTransactionAsync(transaction!);
+                    var detailsDto = BuildTransactionDetailsDtoFromForm();
+                    var result = await _commandDispatcher!.DispatchAsync(new AddTransactionCommand
+                    {
+                        Date = DateOnly.FromDateTime(Date!.Value),
+                        Name = Name,
+                        CategoryId = Category!.Id,
+                        Details = detailsDto,
+                        Notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes,
+                        FixedExpenseId = TransactionFixedExpenseReference?.FixedExpenseId.Value,
+                        FixedExpenseReferenceDate = TransactionFixedExpenseReference?.ReferenceDate
+                    });
+
+                    if (result.IsFailure)
+                    {
+                        await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
+                        return;
+                    }
+
+                    newTransactionDate = result.Value!.Date.ToDateTime(TimeOnly.MinValue);
                 }
             }
 
@@ -734,55 +800,6 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         CloseWindow?.Invoke();
     }
 
-    private Task<Transaction> CreateAsync()
-    {
-        var name = TransactionName.New(Name);
-        var date = DateOnly.FromDateTime(Date!.Value);
-
-        var transactionDetails = BuildTransactionDetailsFromForm();
-        var notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes;
-
-        return Task.FromResult(Transaction.New(date, name, Category!.Id, transactionDetails, notes,
-            TransactionFixedExpenseReference));
-    }
-
-    private Task<List<Transaction>> CreateInstallmentsAsync()
-    {
-        var name = TransactionName.New(Name);
-        var startDate = DateOnly.FromDateTime(Date!.Value);
-        var transactionDetails = BuildTransactionDetailsFromForm();
-        var notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes;
-
-        var groupId = new GroupId();
-        var dates = InstallmentDateCalculator.CalculateInstallmentDates(startDate, InstallmentCount).ToList();
-
-        var transactions = new List<Transaction>();
-        for (var i = 0; i < dates.Count; i++)
-        {
-            var installmentName = TransactionName.New($"{Name} ({i + 1}/{InstallmentCount})");
-            var transaction = Transaction.New(dates[i], installmentName, Category!.Id, transactionDetails, notes,
-                TransactionFixedExpenseReference, groupId);
-            transactions.Add(transaction);
-        }
-
-        return Task.FromResult(transactions);
-    }
-
-    private Task EditAsync(Transaction transaction)
-    {
-        var name = TransactionName.New(Name);
-        var date = DateOnly.FromDateTime(Date!.Value);
-        var transactionDetails = BuildTransactionDetailsFromForm();
-        var notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes;
-
-        transaction.ChangeDate(date);
-        transaction.ChangeNameAndCategory(name, Category!.Id);
-        transaction.SetFixedExpense(TransactionFixedExpenseReference);
-        transaction.ChangeTransactionDetails(transactionDetails);
-        transaction.ChangeNotes(notes);
-
-        return Task.CompletedTask;
-    }
 
     [RelayCommand]
     private async Task OpenCalculator(object parameter)
@@ -904,31 +921,57 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         return string.Empty;
     }
 
-    private TransactionDetails BuildTransactionDetailsFromForm()
+    private TransactionDetailsDto BuildTransactionDetailsDtoFromForm()
     {
         if (SelectedMode == TransactionTypes.Transfer)
         {
-            switch (CurrentAccountMode)
+            return CurrentAccountMode switch
             {
-                case "BitcoinToBitcoin":
-                    return new BitcoinToBitcoinDetails(FromAccount!.Id, ToAccount!.Id, FromAccountBtcValue!);
-                case "BitcoinToFiat":
-                    return new BitcoinToFiatDetails(FromAccount!.Id, ToAccount!.Id, FromAccountBtcValue!,
-                        ToAccountFiatValue!);
-                case "FiatToBitcoin":
-                    return new FiatToBitcoinDetails(FromAccount!.Id, ToAccount!.Id, FromAccountFiatValue!,
-                        ToAccountBtcValue!);
-                case "FiatToFiat":
-                    return new FiatToFiatDetails(FromAccount!.Id, ToAccount!.Id, FromAccountFiatValue!,
-                        AccountsAreSameTypeAndCurrency ? FromAccountFiatValue! : ToAccountFiatValue!);
-            }
+                "BitcoinToBitcoin" => new BitcoinToBitcoinTransferDto
+                {
+                    FromAccountId = FromAccount!.Id,
+                    ToAccountId = ToAccount!.Id,
+                    AmountSats = FromAccountBtcValue!.Sats
+                },
+                "BitcoinToFiat" => new BitcoinToFiatTransferDto
+                {
+                    FromAccountId = FromAccount!.Id,
+                    ToAccountId = ToAccount!.Id,
+                    FromSatsAmount = FromAccountBtcValue!.Sats,
+                    ToFiatAmount = ToAccountFiatValue!.Value
+                },
+                "FiatToBitcoin" => new FiatToBitcoinTransferDto
+                {
+                    FromAccountId = FromAccount!.Id,
+                    ToAccountId = ToAccount!.Id,
+                    FromFiatAmount = FromAccountFiatValue!.Value,
+                    ToSatsAmount = ToAccountBtcValue!.Sats
+                },
+                "FiatToFiat" => new FiatToFiatTransferDto
+                {
+                    FromAccountId = FromAccount!.Id,
+                    ToAccountId = ToAccount!.Id,
+                    FromAmount = FromAccountFiatValue!.Value,
+                    ToAmount = AccountsAreSameTypeAndCurrency ? FromAccountFiatValue!.Value : ToAccountFiatValue!.Value
+                },
+                _ => throw new TransactionDetailsBuildException()
+            };
         }
 
         return CurrentAccountMode switch
         {
-            "Bitcoin" => new BitcoinDetails(FromAccount!.Id, FromAccountBtcValue!,
-                SelectedMode == TransactionTypes.Credit),
-            "Fiat" => new FiatDetails(FromAccount!.Id, FromAccountFiatValue!, SelectedMode == TransactionTypes.Credit),
+            "Bitcoin" => new BitcoinTransactionDto
+            {
+                FromAccountId = FromAccount!.Id,
+                AmountSats = FromAccountBtcValue!.Sats,
+                IsCredit = SelectedMode == TransactionTypes.Credit
+            },
+            "Fiat" => new FiatTransactionDto
+            {
+                FromAccountId = FromAccount!.Id,
+                Amount = FromAccountFiatValue!.Value,
+                IsCredit = SelectedMode == TransactionTypes.Credit
+            },
             _ => throw new TransactionDetailsBuildException()
         };
     }

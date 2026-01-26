@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Budget.Categories.DTOs;
 using Valt.App.Modules.Budget.Categories.Queries;
+using Valt.App.Modules.Goals.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.GoalTypes;
@@ -117,6 +118,33 @@ public partial class ReduceExpenseCategoryGoalTypeEditorViewModel : ObservableOb
         if (category is not null)
         {
             SelectedCategory = category;
+        }
+    }
+
+    public GoalTypeInputDTO CreateGoalTypeDTO()
+    {
+        return new ReduceExpenseCategoryGoalTypeDTO
+        {
+            TargetAmount = TargetFiatAmount.Value,
+            CategoryId = SelectedCategory?.Id ?? string.Empty
+        };
+    }
+
+    public void LoadFromDTO(GoalTypeOutputDTO goalType)
+    {
+        if (goalType is ReduceExpenseCategoryGoalTypeOutputDTO reduceExpense)
+        {
+            TargetFiatAmount = FiatValue.New(reduceExpense.TargetAmount);
+
+            // If categories are already loaded, select immediately; otherwise store for later
+            if (AvailableCategories.Count > 0)
+            {
+                SelectCategoryById(reduceExpense.CategoryId);
+            }
+            else
+            {
+                _pendingCategoryId = reduceExpense.CategoryId;
+            }
         }
     }
 }

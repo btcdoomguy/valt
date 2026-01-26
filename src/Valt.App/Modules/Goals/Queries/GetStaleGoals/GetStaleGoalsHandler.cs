@@ -1,6 +1,6 @@
 using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Goals.Contracts;
 using Valt.App.Modules.Goals.DTOs;
-using Valt.Infra.Modules.Goals.Queries;
 
 namespace Valt.App.Modules.Goals.Queries.GetStaleGoals;
 
@@ -13,16 +13,8 @@ internal sealed class GetStaleGoalsHandler : IQueryHandler<GetStaleGoalsQuery, I
         _goalQueries = goalQueries;
     }
 
-    public async Task<IReadOnlyList<StaleGoalDTO>> HandleAsync(GetStaleGoalsQuery query, CancellationToken ct = default)
+    public Task<IReadOnlyList<StaleGoalDTO>> HandleAsync(GetStaleGoalsQuery query, CancellationToken ct = default)
     {
-        var infraResult = await _goalQueries.GetStaleGoalsAsync();
-
-        return infraResult.Select(g => new StaleGoalDTO(
-            g.Id,
-            (int)g.TypeName,
-            g.GoalTypeJson,
-            g.From,
-            g.To
-        )).ToList();
+        return _goalQueries.GetStaleGoalsAsync();
     }
 }

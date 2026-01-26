@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Collections;
@@ -9,8 +8,14 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Goals.Commands.CopyGoalsFromLastMonth;
+using Valt.App.Modules.Goals.Commands.DeleteGoal;
+using Valt.App.Modules.Goals.Commands.RecalculateGoal;
+using Valt.App.Modules.Goals.DTOs;
+using Valt.App.Modules.Goals.Queries.GetGoals;
 using Valt.Core.Modules.Goals;
-using Valt.Core.Modules.Goals.Contracts;
 using Valt.Infra.Modules.Goals.Services;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
@@ -25,8 +30,9 @@ namespace Valt.UI.Views.Main.Tabs.Transactions;
 
 public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
 {
+    private readonly ICommandDispatcher _commandDispatcher = null!;
+    private readonly IQueryDispatcher _queryDispatcher = null!;
     private readonly IModalFactory _modalFactory = null!;
-    private readonly IGoalRepository _goalRepository = null!;
     private readonly GoalProgressState _goalProgressState = null!;
     private readonly CurrencySettings _currencySettings = null!;
     private readonly FilterState _filterState = null!;
@@ -38,16 +44,18 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
     [ObservableProperty] private GoalEntryViewModel? _selectedGoal;
 
     public GoalsPanelViewModel(
+        ICommandDispatcher commandDispatcher,
+        IQueryDispatcher queryDispatcher,
         IModalFactory modalFactory,
-        IGoalRepository goalRepository,
         GoalProgressState goalProgressState,
         CurrencySettings currencySettings,
         FilterState filterState,
         ILogger<GoalsPanelViewModel> logger,
         SecureModeState secureModeState)
     {
+        _commandDispatcher = commandDispatcher;
+        _queryDispatcher = queryDispatcher;
         _modalFactory = modalFactory;
-        _goalRepository = goalRepository;
         _goalProgressState = goalProgressState;
         _currencySettings = currencySettings;
         _filterState = filterState;
@@ -102,21 +110,16 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
         try
         {
             var currentDate = DateOnly.FromDateTime(_filterState.MainDate);
-            var allGoals = await _goalRepository.GetAllAsync();
+            var goals = await _queryDispatcher.DispatchAsync(new GetGoalsQuery { FilterDate = currentDate });
 
-            var goalsForPeriod = allGoals
-                .Where(g =>
-                {
-                    var range = g.GetPeriodRange();
-                    return currentDate >= range.Start && currentDate <= range.End;
-                })
+            var sortedGoals = goals
                 .OrderBy(g => GetGoalSortOrder(g))
-                .ThenBy(g => g.GoalType.TypeName)
+                .ThenBy(g => g.GoalType.TypeId)
                 .ThenBy(g => g.RefDate)
                 .ToList();
 
             GoalEntries.Clear();
-            foreach (var goal in goalsForPeriod)
+            foreach (var goal in sortedGoals)
             {
                 GoalEntries.Add(new GoalEntryViewModel(goal, _currencySettings.MainFiatCurrency));
             }
@@ -136,23 +139,17 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
         try
         {
             var currentDate = DateOnly.FromDateTime(_filterState.MainDate);
-            var allGoals = await _goalRepository.GetAllAsync();
+            var goals = await _queryDispatcher.DispatchAsync(new GetGoalsQuery { FilterDate = currentDate });
 
-            var goalsForPeriod = allGoals
-                .Where(g =>
-                {
-                    var range = g.GetPeriodRange();
-                    return currentDate >= range.Start && currentDate <= range.End;
-                })
-                .ToDictionary(g => g.Id.ToString() ?? string.Empty, g => g);
+            var goalsDict = goals.ToDictionary(g => g.Id, g => g);
 
             // Update existing entries in place (this triggers animation)
             foreach (var entry in GoalEntries.ToList())
             {
-                if (goalsForPeriod.TryGetValue(entry.Id, out var updatedGoal))
+                if (goalsDict.TryGetValue(entry.Id, out var updatedGoal))
                 {
                     entry.UpdateGoal(updatedGoal);
-                    goalsForPeriod.Remove(entry.Id);
+                    goalsDict.Remove(entry.Id);
                 }
             }
         }
@@ -169,13 +166,13 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
     /// 2 = Completed goals
     /// 3 = Failed goals
     /// </summary>
-    private static int GetGoalSortOrder(Goal goal)
+    private static int GetGoalSortOrder(GoalDTO goal)
     {
         return goal.State switch
         {
-            GoalStates.Open => goal.Period == GoalPeriods.Monthly ? 0 : 1,
-            GoalStates.Completed => 2,
-            GoalStates.Failed => 3,
+            (int)GoalStates.Open => goal.Period == (int)GoalPeriods.Monthly ? 0 : 1,
+            (int)GoalStates.Completed => 2,
+            (int)GoalStates.Failed => 3,
             _ => 4
         };
     }
@@ -223,14 +220,18 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
         if (entry is null)
             return;
 
-        var goal = await _goalRepository.GetByIdAsync(new GoalId(entry.Id));
-        if (goal is null)
+        var result = await _commandDispatcher.DispatchAsync(new RecalculateGoalCommand
+        {
+            GoalId = entry.Id
+        });
+
+        if (result.IsFailure)
+        {
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetUserControlOwnerWindow()!);
             return;
+        }
 
-        goal.Recalculate();
-        await _goalRepository.SaveAsync(goal);
         _goalProgressState.MarkAsStale();
-
         await FetchGoals();
         WeakReferenceMessenger.Default.Send(new GoalListChanged());
     }
@@ -249,11 +250,16 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
         if (!confirmed)
             return;
 
-        var goal = await _goalRepository.GetByIdAsync(new GoalId(entry.Id));
-        if (goal is null)
-            return;
+        var result = await _commandDispatcher.DispatchAsync(new DeleteGoalCommand
+        {
+            GoalId = entry.Id
+        });
 
-        await _goalRepository.DeleteAsync(goal);
+        if (result.IsFailure)
+        {
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetUserControlOwnerWindow()!);
+            return;
+        }
 
         await FetchGoals();
         WeakReferenceMessenger.Default.Send(new GoalListChanged());
@@ -265,40 +271,19 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
         try
         {
             var currentDate = DateOnly.FromDateTime(_filterState.MainDate);
-            var currentMonthStart = new DateOnly(currentDate.Year, currentDate.Month, 1);
-            var previousMonthStart = currentMonthStart.AddMonths(-1);
 
-            var allGoals = await _goalRepository.GetAllAsync();
-
-            var previousMonthGoals = allGoals
-                .Where(g => g.Period == GoalPeriods.Monthly &&
-                           g.RefDate.Year == previousMonthStart.Year &&
-                           g.RefDate.Month == previousMonthStart.Month)
-                .ToList();
-
-            var currentMonthGoals = allGoals
-                .Where(g => g.Period == GoalPeriods.Monthly &&
-                           g.RefDate.Year == currentMonthStart.Year &&
-                           g.RefDate.Month == currentMonthStart.Month)
-                .ToList();
-
-            var copiedCount = 0;
-
-            foreach (var previousGoal in previousMonthGoals)
+            var result = await _commandDispatcher.DispatchAsync(new CopyGoalsFromLastMonthCommand
             {
-                var isDuplicate = currentMonthGoals.Any(g =>
-                    g.GoalType.HasSameTargetAs(previousGoal.GoalType));
+                CurrentDate = currentDate
+            });
 
-                if (isDuplicate)
-                    continue;
-
-                var newGoalType = previousGoal.GoalType.WithResetProgress();
-                var newGoal = Goal.New(currentMonthStart, GoalPeriods.Monthly, newGoalType);
-                await _goalRepository.SaveAsync(newGoal);
-                copiedCount++;
+            if (result.IsFailure)
+            {
+                await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetUserControlOwnerWindow()!);
+                return;
             }
 
-            if (copiedCount > 0)
+            if (result.Value!.CopiedCount > 0)
             {
                 await FetchGoals();
                 WeakReferenceMessenger.Default.Send(new GoalListChanged());

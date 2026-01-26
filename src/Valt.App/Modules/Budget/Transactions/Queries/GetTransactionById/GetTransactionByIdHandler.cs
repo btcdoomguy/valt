@@ -42,7 +42,15 @@ internal sealed class GetTransactionByIdHandler : IQueryHandler<GetTransactionBy
                     ReferenceDate = transaction.FixedExpenseReference.ReferenceDate
                 }
                 : null,
-            Details = MapDetailsToDto(transaction.TransactionDetails)
+            Details = MapDetailsToDto(transaction.TransactionDetails),
+            AutoSatAmountDetails = transaction.HasAutoSatAmount
+                ? new AutoSatAmountDTO
+                {
+                    IsAutoSatAmount = transaction.AutoSatAmountDetails!.IsAutoSatAmount,
+                    SatAmountState = transaction.AutoSatAmountDetails.SatAmountState.ToString(),
+                    SatAmountSats = transaction.AutoSatAmountDetails.SatAmount?.Sats
+                }
+                : null
         };
     }
 

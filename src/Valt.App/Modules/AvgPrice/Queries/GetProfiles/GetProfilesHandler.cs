@@ -1,6 +1,6 @@
 using Valt.App.Kernel.Queries;
+using Valt.App.Modules.AvgPrice.Contracts;
 using Valt.App.Modules.AvgPrice.DTOs;
-using Valt.Infra.Modules.AvgPrice.Queries;
 
 namespace Valt.App.Modules.AvgPrice.Queries.GetProfiles;
 
@@ -15,19 +15,7 @@ internal sealed class GetProfilesHandler : IQueryHandler<GetProfilesQuery, IRead
 
     public async Task<IReadOnlyList<AvgPriceProfileDTO>> HandleAsync(GetProfilesQuery query, CancellationToken ct = default)
     {
-        var infraResult = await _avgPriceQueries.GetProfilesAsync(query.ShowHidden);
-
-        return infraResult.Select(p => new AvgPriceProfileDTO(
-            p.Id,
-            p.Name,
-            p.AssetName,
-            p.Precision,
-            p.Visible,
-            p.Icon,
-            p.Unicode,
-            p.Color.ToArgb(),
-            p.CurrencyCode,
-            p.AvgPriceCalculationMethodId
-        )).ToList();
+        var result = await _avgPriceQueries.GetProfilesAsync(query.ShowHidden);
+        return result.ToList();
     }
 }

@@ -1,8 +1,9 @@
 using LiteDB;
+using Valt.App.Modules.AvgPrice.Contracts;
+using Valt.App.Modules.AvgPrice.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Modules.AvgPrice;
 using Valt.Infra.DataAccess;
-using Valt.Infra.Modules.AvgPrice.Queries.DTOs;
 
 namespace Valt.Infra.Modules.AvgPrice.Queries;
 
@@ -25,11 +26,14 @@ internal sealed class AvgPriceQueries : IAvgPriceQueries
         return Task.FromResult(query.Select(AsDto));
     }
 
-    public Task<AvgPriceProfileDTO> GetProfileAsync(AvgPriceProfileId id)
+    public Task<AvgPriceProfileDTO?> GetProfileAsync(AvgPriceProfileId id)
     {
         var entity = _localDatabase.GetAvgPriceProfiles().FindById(new ObjectId(id.ToString()));
 
-        return Task.FromResult(AsDto(entity));
+        if (entity is null)
+            return Task.FromResult<AvgPriceProfileDTO?>(null);
+
+        return Task.FromResult<AvgPriceProfileDTO?>(AsDto(entity));
     }
 
     private AvgPriceProfileDTO AsDto(AvgPriceProfileEntity entity)

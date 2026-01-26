@@ -1,11 +1,12 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
+using Valt.App.Modules.Goals.Contracts;
+using Valt.App.Modules.Goals.DTOs;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.Contracts;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel.BackgroundJobs;
-using Valt.Infra.Modules.Goals.Queries;
 using Valt.Infra.Modules.Goals.Queries.DTOs;
 
 namespace Valt.Infra.Modules.Goals.Services;
@@ -95,13 +96,14 @@ internal class GoalProgressUpdaterJob : IBackgroundJob
 
             foreach (var staleGoal in staleGoals)
             {
+                var typeName = (GoalTypeNames)staleGoal.TypeId;
                 var input = new GoalProgressInput(
-                    staleGoal.TypeName,
+                    typeName,
                     staleGoal.GoalTypeJson,
                     staleGoal.From,
                     staleGoal.To);
 
-                var calculator = _calculatorFactory.GetCalculator(staleGoal.TypeName);
+                var calculator = _calculatorFactory.GetCalculator(typeName);
                 var result = await calculator.CalculateProgressAsync(input);
 
                 var goal = await _goalRepository.GetByIdAsync(new GoalId(staleGoal.Id));

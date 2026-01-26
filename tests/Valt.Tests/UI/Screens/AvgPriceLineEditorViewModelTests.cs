@@ -1,11 +1,13 @@
 using NSubstitute;
+using Valt.App.Kernel;
+using Valt.App.Kernel.Commands;
+using Valt.App.Modules.AvgPrice.Commands.AddLine;
+using Valt.App.Modules.AvgPrice.Commands.EditLine;
+using Valt.App.Modules.AvgPrice.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.AvgPrice;
-using Valt.Core.Modules.AvgPrice.Calculations;
 using Valt.Infra.Kernel;
-using Valt.Infra.Modules.AvgPrice.Queries.DTOs;
-using Valt.Tests.Builders;
 using Valt.UI.Views.Main.Modals.AvgPriceLineEditor;
 
 namespace Valt.Tests.UI.Screens;
@@ -13,7 +15,7 @@ namespace Valt.Tests.UI.Screens;
 [TestFixture]
 public class AvgPriceLineEditorViewModelTests
 {
-    private IAvgPriceRepository _avgPriceRepository;
+    private ICommandDispatcher _commandDispatcher;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -24,12 +26,12 @@ public class AvgPriceLineEditorViewModelTests
     [SetUp]
     public void SetUp()
     {
-        _avgPriceRepository = Substitute.For<IAvgPriceRepository>();
+        _commandDispatcher = Substitute.For<ICommandDispatcher>();
     }
 
     private AvgPriceLineEditorViewModel CreateViewModel()
     {
-        return new AvgPriceLineEditorViewModel(_avgPriceRepository);
+        return new AvgPriceLineEditorViewModel(_commandDispatcher);
     }
 
     #region Initial State Tests
@@ -510,19 +512,14 @@ public class AvgPriceLineEditorViewModelTests
     #region Save Tests - Insert Mode
 
     [Test]
-    public async Task Should_Add_New_Line_When_In_Insert_Mode()
+    public async Task Should_Dispatch_AddLineCommand_When_In_Insert_Mode()
     {
         // Arrange
         var viewModel = CreateViewModel();
         var profileId = new AvgPriceProfileId();
 
-        var profile = AvgPriceProfileBuilder.AProfile()
-            .WithId(profileId)
-            .WithCurrency(FiatCurrency.Usd)
-            .Build();
-
-        _avgPriceRepository.GetAvgPriceProfileByIdAsync(Arg.Any<AvgPriceProfileId>())
-            .Returns(Task.FromResult<AvgPriceProfile?>(profile));
+        _commandDispatcher.DispatchAsync(Arg.Any<AddLineCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result<AddLineResult>.Success(new AddLineResult(new AvgPriceLineId().Value)));
 
         var request = new AvgPriceLineEditorViewModel.Request
         {
@@ -547,7 +544,15 @@ public class AvgPriceLineEditorViewModelTests
         await viewModel.OkCommand.ExecuteAsync(null);
 
         // Assert
-        await _avgPriceRepository.Received(1).SaveAvgPriceProfileAsync(Arg.Any<AvgPriceProfile>());
+        await _commandDispatcher.Received(1).DispatchAsync(
+            Arg.Is<AddLineCommand>(c =>
+                c.ProfileId == profileId.Value &&
+                c.Date == new DateOnly(2024, 6, 15) &&
+                c.LineTypeId == (int)AvgPriceLineTypes.Buy &&
+                c.Quantity == 1m &&
+                c.Amount == 50000m &&
+                c.Comment == "New buy"),
+            Arg.Any<CancellationToken>());
     }
 
     #endregion
@@ -555,26 +560,18 @@ public class AvgPriceLineEditorViewModelTests
     #region Save Tests - Edit Mode
 
     [Test]
-    public async Task Should_Remove_Old_Line_And_Add_New_When_Editing()
+    public async Task Should_Dispatch_EditLineCommand_When_In_Edit_Mode()
     {
         // Arrange
         var viewModel = CreateViewModel();
         var profileId = new AvgPriceProfileId();
+        var lineId = new AvgPriceLineId();
 
-        var profile = AvgPriceProfileBuilder.AProfile()
-            .WithId(profileId)
-            .WithCurrency(FiatCurrency.Usd)
-            .Build();
-
-        // Add an existing line to the profile
-        profile.AddLine(new DateOnly(2024, 6, 10), 1, AvgPriceLineTypes.Buy, 1m, FiatValue.New(45000m), "Original");
-        var existingLineId = profile.AvgPriceLines.First().Id;
-
-        _avgPriceRepository.GetAvgPriceProfileByIdAsync(Arg.Any<AvgPriceProfileId>())
-            .Returns(Task.FromResult<AvgPriceProfile?>(profile));
+        _commandDispatcher.DispatchAsync(Arg.Any<EditLineCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result<EditLineResult>.Success(new EditLineResult()));
 
         var existingLineDto = new AvgPriceLineDTO(
-            existingLineId.Value,
+            lineId.Value,
             new DateOnly(2024, 6, 10),
             1,
             (int)AvgPriceLineTypes.Buy,
@@ -608,7 +605,15 @@ public class AvgPriceLineEditorViewModelTests
         await viewModel.OkCommand.ExecuteAsync(null);
 
         // Assert
-        await _avgPriceRepository.Received(1).SaveAvgPriceProfileAsync(Arg.Any<AvgPriceProfile>());
+        await _commandDispatcher.Received(1).DispatchAsync(
+            Arg.Is<EditLineCommand>(c =>
+                c.ProfileId == profileId.Value &&
+                c.LineId == lineId.Value &&
+                c.Date == new DateOnly(2024, 6, 15) &&
+                c.Quantity == 2m &&
+                c.Amount == 90000m &&
+                c.Comment == "Updated buy"),
+            Arg.Any<CancellationToken>());
     }
 
     #endregion
@@ -616,19 +621,11 @@ public class AvgPriceLineEditorViewModelTests
     #region Validation Tests
 
     [Test]
-    public async Task Should_Not_Save_When_Quantity_Is_Zero()
+    public async Task Should_Not_Dispatch_Command_When_Quantity_Is_Zero()
     {
         // Arrange
         var viewModel = CreateViewModel();
         var profileId = new AvgPriceProfileId();
-
-        var profile = AvgPriceProfileBuilder.AProfile()
-            .WithId(profileId)
-            .WithCurrency(FiatCurrency.Usd)
-            .Build();
-
-        _avgPriceRepository.GetAvgPriceProfileByIdAsync(Arg.Any<AvgPriceProfileId>())
-            .Returns(Task.FromResult<AvgPriceProfile?>(profile));
 
         var request = new AvgPriceLineEditorViewModel.Request
         {
@@ -649,8 +646,8 @@ public class AvgPriceLineEditorViewModelTests
         // Act
         await viewModel.OkCommand.ExecuteAsync(null);
 
-        // Assert - Should not save due to validation errors
-        await _avgPriceRepository.DidNotReceive().SaveAvgPriceProfileAsync(Arg.Any<AvgPriceProfile>());
+        // Assert - Should not dispatch due to validation errors
+        await _commandDispatcher.DidNotReceive().DispatchAsync(Arg.Any<AddLineCommand>(), Arg.Any<CancellationToken>());
         Assert.That(viewModel.HasErrors, Is.True);
     }
 

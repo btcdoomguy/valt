@@ -1,8 +1,9 @@
 using LiteDB;
+using Valt.App.Modules.Budget.Accounts.Contracts;
+using Valt.App.Modules.Budget.Accounts.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Accounts.Contracts;
 using Valt.Infra.DataAccess;
-using Valt.Infra.Modules.Budget.Accounts.Queries.DTOs;
 
 namespace Valt.Infra.Modules.Budget.Accounts.Queries;
 
@@ -16,6 +17,34 @@ public class AccountQueries : IAccountQueries
     {
         _localDatabase = localDatabase;
         _accountTotalsCalculator = accountTotalsCalculator;
+    }
+
+    public Task<AccountDTO?> GetAccountAsync(string accountId)
+    {
+        var account = _localDatabase.GetAccounts().FindById(new ObjectId(accountId));
+
+        if (account is null)
+            return Task.FromResult<AccountDTO?>(null);
+
+        var icon = account.Icon != null ? Icon.RestoreFromId(account.Icon) : Icon.Empty;
+        var isBtc = account.AccountEntityType == AccountEntityType.Bitcoin;
+
+        var dto = new AccountDTO(
+            account.Id.ToString(),
+            account.AccountEntityType.ToString(),
+            account.Name,
+            account.CurrencyNickname ?? string.Empty,
+            account.Visible,
+            account.Icon,
+            icon.Unicode,
+            icon.Color,
+            account.Currency,
+            isBtc,
+            InitialAmountFiat: isBtc ? null : account.InitialAmount,
+            InitialAmountSats: isBtc ? Convert.ToInt64(account.InitialAmount) : null,
+            GroupId: account.GroupId?.ToString());
+
+        return Task.FromResult<AccountDTO?>(dto);
     }
 
     public async Task<AccountSummariesDTO> GetAccountSummariesAsync(bool showHiddenAccounts)
@@ -39,12 +68,20 @@ public class AccountQueries : IAccountQueries
             var icon = account.Icon != null ? Icon.RestoreFromId(account.Icon) : Icon.Empty;
             var isBtc = account.AccountEntityType == AccountEntityType.Bitcoin;
 
-            return new AccountDTO(account.Id.ToString(),
+            return new AccountDTO(
+                account.Id.ToString(),
                 account.AccountEntityType.ToString(),
-                account.Name, account.Visible, account.Icon, icon.Unicode, icon.Color, account.Currency,
+                account.Name,
+                account.CurrencyNickname ?? string.Empty,
+                account.Visible,
+                account.Icon,
+                icon.Unicode,
+                icon.Color,
+                account.Currency,
                 isBtc,
                 InitialAmountFiat: isBtc ? null : account.InitialAmount,
-                InitialAmountSats: isBtc ? Convert.ToInt64(account.InitialAmount) : null);
+                InitialAmountSats: isBtc ? Convert.ToInt64(account.InitialAmount) : null,
+                GroupId: account.GroupId?.ToString());
         }));
     }
 

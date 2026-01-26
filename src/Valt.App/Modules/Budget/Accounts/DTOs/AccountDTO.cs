@@ -6,6 +6,7 @@ public record AccountDTO(
     string Id,
     string Type,
     string Name,
+    string CurrencyNickname,
     bool Visible,
     string? IconId,
     char Unicode,
@@ -13,7 +14,8 @@ public record AccountDTO(
     string? Currency,
     bool IsBtcAccount,
     decimal? InitialAmountFiat,
-    long? InitialAmountSats)
+    long? InitialAmountSats,
+    string? GroupId)
 {
     public override string ToString() => Name;
 }

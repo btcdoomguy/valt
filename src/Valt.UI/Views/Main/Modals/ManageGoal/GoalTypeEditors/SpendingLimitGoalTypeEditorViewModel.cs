@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Valt.App.Modules.Goals.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.GoalTypes;
@@ -46,6 +47,19 @@ public partial class SpendingLimitGoalTypeEditorViewModel : ObservableObject, IG
     public void LoadFrom(IGoalType goalType)
     {
         if (goalType is SpendingLimitGoalType spendingLimit)
+        {
+            TargetFiatAmount = FiatValue.New(spendingLimit.TargetAmount);
+        }
+    }
+
+    public GoalTypeInputDTO CreateGoalTypeDTO()
+    {
+        return new SpendingLimitGoalTypeDTO { TargetAmount = TargetFiatAmount.Value };
+    }
+
+    public void LoadFromDTO(GoalTypeOutputDTO goalType)
+    {
+        if (goalType is SpendingLimitGoalTypeOutputDTO spendingLimit)
         {
             TargetFiatAmount = FiatValue.New(spendingLimit.TargetAmount);
         }

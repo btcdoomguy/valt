@@ -2,9 +2,8 @@ using System;
 using System.Threading;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Valt.Core.Common;
+using Valt.App.Modules.Goals.DTOs;
 using Valt.Core.Modules.Goals;
-using Valt.Core.Modules.Goals.GoalTypes;
 using Valt.Infra.Kernel;
 using Valt.UI.Lang;
 
@@ -12,7 +11,7 @@ namespace Valt.UI.Views.Main.Tabs.Transactions.Models;
 
 public partial class GoalEntryViewModel : ObservableObject, IDisposable
 {
-    private Goal _goal;
+    private GoalDTO _goal;
     private readonly string _mainFiatCurrency;
     private Timer? _animationTimer;
     private decimal _animationStartValue;
@@ -25,39 +24,35 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
     [NotifyPropertyChangedFor(nameof(ProgressDisplay))]
     private decimal _animatedProgressPercentage;
 
-    public GoalEntryViewModel(Goal goal, string mainFiatCurrency)
+    public GoalEntryViewModel(GoalDTO goal, string mainFiatCurrency)
     {
         _goal = goal;
         _mainFiatCurrency = mainFiatCurrency;
         _animatedProgressPercentage = Math.Min(goal.Progress, 100);
     }
 
-    public string Id => _goal.Id.ToString() ?? string.Empty;
+    public string Id => _goal.Id;
 
     public string FriendlyName
     {
         get
         {
-            var typeName = _goal.GoalType switch
+            return _goal.GoalType switch
             {
-                ReduceExpenseCategoryGoalType reduceExpense => $"{language.GoalType_ReduceExpenseCategory}: {reduceExpense.CategoryName}",
-                _ => _goal.GoalType.TypeName switch
-                {
-                    GoalTypeNames.StackBitcoin => language.GoalType_StackBitcoin,
-                    GoalTypeNames.SpendingLimit => language.GoalType_SpendingLimit,
-                    GoalTypeNames.Dca => language.GoalType_Dca,
-                    GoalTypeNames.IncomeFiat => language.GoalType_IncomeFiat,
-                    GoalTypeNames.IncomeBtc => language.GoalType_IncomeBtc,
-                    GoalTypeNames.BitcoinHodl => language.GoalType_BitcoinHodl,
-                    _ => _goal.GoalType.TypeName.ToString()
-                }
+                ReduceExpenseCategoryGoalTypeOutputDTO reduceExpense =>
+                    $"{language.GoalType_ReduceExpenseCategory}: {reduceExpense.CategoryName}",
+                StackBitcoinGoalTypeOutputDTO => language.GoalType_StackBitcoin,
+                SpendingLimitGoalTypeOutputDTO => language.GoalType_SpendingLimit,
+                DcaGoalTypeOutputDTO => language.GoalType_Dca,
+                IncomeFiatGoalTypeOutputDTO => language.GoalType_IncomeFiat,
+                IncomeBtcGoalTypeOutputDTO => language.GoalType_IncomeBtc,
+                BitcoinHodlGoalTypeOutputDTO => language.GoalType_BitcoinHodl,
+                _ => "Unknown"
             };
-
-            return typeName;
         }
     }
 
-    public bool IsYearly => _goal.Period == GoalPeriods.Yearly;
+    public bool IsYearly => _goal.Period == (int)GoalPeriods.Yearly;
 
     public decimal Progress => _goal.Progress;
 
@@ -81,13 +76,19 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
         {
             return _goal.GoalType switch
             {
-                StackBitcoinGoalType stackBitcoin => CurrencyDisplay.FormatSatsAsBitcoin(stackBitcoin.TargetAmount.Sats),
-                SpendingLimitGoalType spendingLimit => CurrencyDisplay.FormatFiat(spendingLimit.TargetAmount, _mainFiatCurrency),
-                DcaGoalType dca => dca.TargetPurchaseCount.ToString(),
-                IncomeFiatGoalType incomeFiat => CurrencyDisplay.FormatFiat(incomeFiat.TargetAmount, _mainFiatCurrency),
-                IncomeBtcGoalType incomeBtc => CurrencyDisplay.FormatSatsAsBitcoin(incomeBtc.TargetAmount.Sats),
-                ReduceExpenseCategoryGoalType reduceExpense => CurrencyDisplay.FormatFiat(reduceExpense.TargetAmount, _mainFiatCurrency),
-                BitcoinHodlGoalType bitcoinHodl => bitcoinHodl.MaxSellableSats == 0
+                StackBitcoinGoalTypeOutputDTO stackBitcoin =>
+                    CurrencyDisplay.FormatSatsAsBitcoin(stackBitcoin.TargetSats),
+                SpendingLimitGoalTypeOutputDTO spendingLimit =>
+                    CurrencyDisplay.FormatFiat(spendingLimit.TargetAmount, _mainFiatCurrency),
+                DcaGoalTypeOutputDTO dca =>
+                    dca.TargetPurchaseCount.ToString(),
+                IncomeFiatGoalTypeOutputDTO incomeFiat =>
+                    CurrencyDisplay.FormatFiat(incomeFiat.TargetAmount, _mainFiatCurrency),
+                IncomeBtcGoalTypeOutputDTO incomeBtc =>
+                    CurrencyDisplay.FormatSatsAsBitcoin(incomeBtc.TargetSats),
+                ReduceExpenseCategoryGoalTypeOutputDTO reduceExpense =>
+                    CurrencyDisplay.FormatFiat(reduceExpense.TargetAmount, _mainFiatCurrency),
+                BitcoinHodlGoalTypeOutputDTO bitcoinHodl => bitcoinHodl.MaxSellableSats == 0
                     ? language.GoalTarget_NoSales
                     : CurrencyDisplay.FormatSatsAsBitcoin(bitcoinHodl.MaxSellableSats),
                 _ => string.Empty
@@ -101,37 +102,37 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
         {
             return _goal.GoalType switch
             {
-                StackBitcoinGoalType stackBitcoin => string.Format(
+                StackBitcoinGoalTypeOutputDTO stackBitcoin => string.Format(
                     language.GoalDescription_StackBitcoin,
-                    CurrencyDisplay.FormatSatsAsNumber(Math.Min(stackBitcoin.CalculatedSats, stackBitcoin.TargetAmount.Sats)),
-                    CurrencyDisplay.FormatSatsAsNumber(stackBitcoin.TargetAmount.Sats)),
-                SpendingLimitGoalType spendingLimit => string.Format(
+                    CurrencyDisplay.FormatSatsAsNumber(Math.Min(stackBitcoin.CalculatedSats, stackBitcoin.TargetSats)),
+                    CurrencyDisplay.FormatSatsAsNumber(stackBitcoin.TargetSats)),
+                SpendingLimitGoalTypeOutputDTO spendingLimit => string.Format(
                     language.GoalDescription_SpendingLimit,
                     CurrencyDisplay.FormatFiat(Math.Min(spendingLimit.CalculatedSpending, spendingLimit.TargetAmount), _mainFiatCurrency),
                     CurrencyDisplay.FormatFiat(spendingLimit.TargetAmount, _mainFiatCurrency)),
-                DcaGoalType dca => string.Format(
+                DcaGoalTypeOutputDTO dca => string.Format(
                     language.GoalDescription_Dca,
                     Math.Min(dca.CalculatedPurchaseCount, dca.TargetPurchaseCount),
                     dca.TargetPurchaseCount),
-                IncomeFiatGoalType incomeFiat => string.Format(
+                IncomeFiatGoalTypeOutputDTO incomeFiat => string.Format(
                     language.GoalDescription_IncomeFiat,
                     CurrencyDisplay.FormatFiat(Math.Min(incomeFiat.CalculatedIncome, incomeFiat.TargetAmount), _mainFiatCurrency),
                     CurrencyDisplay.FormatFiat(incomeFiat.TargetAmount, _mainFiatCurrency)),
-                IncomeBtcGoalType incomeBtc => string.Format(
+                IncomeBtcGoalTypeOutputDTO incomeBtc => string.Format(
                     language.GoalDescription_IncomeBtc,
-                    CurrencyDisplay.FormatSatsAsNumber(Math.Min(incomeBtc.CalculatedSats, incomeBtc.TargetAmount.Sats)),
-                    CurrencyDisplay.FormatSatsAsNumber(incomeBtc.TargetAmount.Sats)),
-                ReduceExpenseCategoryGoalType reduceExpense => string.Format(
+                    CurrencyDisplay.FormatSatsAsNumber(Math.Min(incomeBtc.CalculatedSats, incomeBtc.TargetSats)),
+                    CurrencyDisplay.FormatSatsAsNumber(incomeBtc.TargetSats)),
+                ReduceExpenseCategoryGoalTypeOutputDTO reduceExpense => string.Format(
                     language.GoalDescription_ReduceExpenseCategory,
                     CurrencyDisplay.FormatFiat(Math.Min(reduceExpense.CalculatedSpending, reduceExpense.TargetAmount), _mainFiatCurrency),
                     CurrencyDisplay.FormatFiat(reduceExpense.TargetAmount, _mainFiatCurrency)),
-                BitcoinHodlGoalType bitcoinHodl => GetBitcoinHodlDescription(bitcoinHodl),
+                BitcoinHodlGoalTypeOutputDTO bitcoinHodl => GetBitcoinHodlDescription(bitcoinHodl),
                 _ => string.Empty
             };
         }
     }
 
-    private static string GetBitcoinHodlDescription(BitcoinHodlGoalType bitcoinHodl)
+    private static string GetBitcoinHodlDescription(BitcoinHodlGoalTypeOutputDTO bitcoinHodl)
     {
         if (bitcoinHodl.MaxSellableSats == 0)
         {
@@ -146,42 +147,42 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
             CurrencyDisplay.FormatSatsAsNumber(bitcoinHodl.MaxSellableSats));
     }
 
-    public bool IsCompleted => _goal.State == GoalStates.Completed;
+    public bool IsCompleted => _goal.State == (int)GoalStates.Completed;
 
-    public GoalStates State => _goal.State;
+    public GoalStates State => (GoalStates)_goal.State;
 
-    public GoalPeriods Period => _goal.Period;
+    public GoalPeriods Period => (GoalPeriods)_goal.Period;
 
     public DateOnly RefDate => _goal.RefDate;
 
-    public ProgressionMode ProgressionMode => _goal.GoalType.ProgressionMode;
+    public ProgressionMode ProgressionMode => (ProgressionMode)_goal.GoalType.ProgressionMode;
 
     // State-based UI properties
-    public bool IsFailed => _goal.State == GoalStates.Failed;
-    public bool IsOpen => _goal.State == GoalStates.Open;
-    public bool IsProgressComplete => _goal.State == GoalStates.Completed || _goal.Progress >= 100m;
+    public bool IsFailed => _goal.State == (int)GoalStates.Failed;
+    public bool IsOpen => _goal.State == (int)GoalStates.Open;
+    public bool IsProgressComplete => _goal.State == (int)GoalStates.Completed || _goal.Progress >= 100m;
 
     // Progress bar color properties
-    public bool IsZeroToSuccess => _goal.GoalType.ProgressionMode == ProgressionMode.ZeroToSuccess;
-    public bool IsDecreasingSuccess => _goal.GoalType.ProgressionMode == ProgressionMode.DecreasingSuccess;
+    public bool IsZeroToSuccess => _goal.GoalType.ProgressionMode == (int)ProgressionMode.ZeroToSuccess;
+    public bool IsDecreasingSuccess => _goal.GoalType.ProgressionMode == (int)ProgressionMode.DecreasingSuccess;
 
     // Icon display properties
-    public bool ShowSuccessIcon => _goal.State == GoalStates.Completed;
-    public bool ShowFailedIcon => _goal.State == GoalStates.Failed;
+    public bool ShowSuccessIcon => _goal.State == (int)GoalStates.Completed;
+    public bool ShowFailedIcon => _goal.State == (int)GoalStates.Failed;
 
     // Context menu visibility
-    public bool CanRecalculate => _goal.State == GoalStates.Completed || _goal.State == GoalStates.Failed;
+    public bool CanRecalculate => _goal.State == (int)GoalStates.Completed || _goal.State == (int)GoalStates.Failed;
 
     // Show progress bar only for Open state (not for Completed or Failed)
-    public bool ShowProgressBar => _goal.State == GoalStates.Open;
+    public bool ShowProgressBar => _goal.State == (int)GoalStates.Open;
 
     // Price data indicator - shows asterisk for goals that depend on exchange rates
-    public bool RequiresPriceData => _goal.GoalType.RequiresPriceDataForCalculation;
+    public bool RequiresPriceData => _goal.GoalType.RequiresPriceData;
 
     /// <summary>
     /// Updates the goal data and animates the progress bar to the new value over 3 seconds
     /// </summary>
-    public void UpdateGoal(Goal newGoal)
+    public void UpdateGoal(GoalDTO newGoal)
     {
         var oldProgress = AnimatedProgressPercentage;
         var newProgress = Math.Min(newGoal.Progress, 100);

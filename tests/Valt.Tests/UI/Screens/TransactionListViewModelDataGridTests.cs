@@ -1,12 +1,11 @@
 using System.ComponentModel;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
 using Valt.Core.Kernel.Abstractions.Time;
-using Valt.Core.Modules.Budget.Transactions.Contracts;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers;
 using Valt.Infra.DataAccess;
-using Valt.Infra.Modules.AvgPrice.Queries;
-using Valt.Infra.Modules.Budget.Transactions.Queries;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
 using Valt.UI.Services;
@@ -22,12 +21,12 @@ public class TransactionListViewModelDataGridTests : DatabaseTest
 {
     private ILocalStorageService _localStorageService = null!;
     private IModalFactory _modalFactory = null!;
-    private ITransactionQueries _transactionQueries = null!;
+    private ICommandDispatcher _commandDispatcher = null!;
+    private IQueryDispatcher _queryDispatcher = null!;
     private ITransactionTermService _transactionTermService = null!;
     private FilterState _filterState = null!;
     private IClock _clock = null!;
     private ILogger<TransactionListViewModel> _vmLogger = null!;
-    private IAvgPriceQueries _avgPriceQueries = null!;
 
     [SetUp]
     public new void SetUp()
@@ -38,12 +37,12 @@ public class TransactionListViewModelDataGridTests : DatabaseTest
         _localStorageService.LoadDataGridSettings().Returns(new DataGridSettings());
 
         _modalFactory = Substitute.For<IModalFactory>();
-        _transactionQueries = Substitute.For<ITransactionQueries>();
+        _commandDispatcher = Substitute.For<ICommandDispatcher>();
+        _queryDispatcher = Substitute.For<IQueryDispatcher>();
         _transactionTermService = Substitute.For<ITransactionTermService>();
         _filterState = new FilterState();
         _clock = Substitute.For<IClock>();
         _vmLogger = Substitute.For<ILogger<TransactionListViewModel>>();
-        _avgPriceQueries = Substitute.For<IAvgPriceQueries>();
     }
 
     private TransactionListViewModel CreateViewModel()
@@ -60,8 +59,8 @@ public class TransactionListViewModelDataGridTests : DatabaseTest
 
         return new TransactionListViewModel(
             _modalFactory,
-            _transactionRepository,
-            _transactionQueries,
+            _commandDispatcher,
+            _queryDispatcher,
             _transactionTermService,
             liveRateState,
             _localDatabase,
@@ -69,8 +68,7 @@ public class TransactionListViewModelDataGridTests : DatabaseTest
             _filterState,
             _clock,
             _localStorageService,
-            _vmLogger,
-            _avgPriceQueries);
+            _vmLogger);
     }
 
     #region UpdateSortState Tests

@@ -1,3 +1,5 @@
+using System.Drawing;
+
 namespace Valt.App.Modules.AvgPrice.DTOs;
 
 public record AvgPriceProfileDTO(
@@ -8,7 +10,7 @@ public record AvgPriceProfileDTO(
     bool Visible,
     string? Icon,
     char Unicode,
-    int Color,
+    Color Color,
     string CurrencyCode,
     int AvgPriceCalculationMethodId)
 {

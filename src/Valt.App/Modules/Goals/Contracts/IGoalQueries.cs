@@ -1,6 +1,6 @@
-using Valt.Infra.Modules.Goals.Queries.DTOs;
+using Valt.App.Modules.Goals.DTOs;
 
-namespace Valt.Infra.Modules.Goals.Queries;
+namespace Valt.App.Modules.Goals.Contracts;
 
 public interface IGoalQueries
 {

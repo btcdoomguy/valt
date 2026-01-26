@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Valt.App.Modules.Budget.Transactions.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Transactions;
 using Valt.Infra.Kernel;
-using Valt.Infra.Modules.Budget.Transactions.Queries.DTOs;
 
 namespace Valt.UI.Views.Main.Tabs.Transactions.Models;
 

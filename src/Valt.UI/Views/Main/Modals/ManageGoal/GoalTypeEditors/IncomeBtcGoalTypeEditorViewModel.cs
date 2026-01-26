@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Valt.App.Modules.Goals.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.GoalTypes;
@@ -42,6 +43,19 @@ public partial class IncomeBtcGoalTypeEditorViewModel : ObservableObject, IGoalT
         if (goalType is IncomeBtcGoalType incomeBtc)
         {
             TargetBtcAmount = incomeBtc.TargetAmount;
+        }
+    }
+
+    public GoalTypeInputDTO CreateGoalTypeDTO()
+    {
+        return new IncomeBtcGoalTypeDTO { TargetSats = TargetBtcAmount.Sats };
+    }
+
+    public void LoadFromDTO(GoalTypeOutputDTO goalType)
+    {
+        if (goalType is IncomeBtcGoalTypeOutputDTO incomeBtc)
+        {
+            TargetBtcAmount = incomeBtc.TargetSats;
         }
     }
 }

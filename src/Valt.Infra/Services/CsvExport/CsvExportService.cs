@@ -1,11 +1,12 @@
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Valt.Infra.Modules.Budget.Accounts.Queries;
-using Valt.Infra.Modules.Budget.Accounts.Queries.DTOs;
-using Valt.Infra.Modules.Budget.Categories.Queries;
-using Valt.Infra.Modules.Budget.Transactions.Queries;
-using Valt.Infra.Modules.Budget.Transactions.Queries.DTOs;
+using Valt.App.Modules.Budget.Accounts.Contracts;
+using Valt.App.Modules.Budget.Accounts.DTOs;
+using Valt.App.Modules.Budget.Categories.Contracts;
+using Valt.App.Modules.Budget.Categories.DTOs;
+using Valt.App.Modules.Budget.Transactions.Contracts;
+using Valt.App.Modules.Budget.Transactions.DTOs;
 
 namespace Valt.Infra.Services.CsvExport;
 
@@ -160,7 +161,7 @@ internal class CsvExportService : ICsvExportService
     private static CsvExportRow MapTransactionToRow(
         TransactionDTO transaction,
         Dictionary<string, AccountDTO> accountDict,
-        Dictionary<string, Modules.Budget.Categories.Queries.DTOs.CategoryDTO> categoryDict)
+        Dictionary<string, CategoryDTO> categoryDict)
     {
         var fromAccount = accountDict.GetValueOrDefault(transaction.FromAccountId);
         var toAccount = transaction.ToAccountId != null

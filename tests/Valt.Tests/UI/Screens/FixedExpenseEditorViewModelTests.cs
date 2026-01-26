@@ -1,75 +1,159 @@
+using System.Drawing;
 using NSubstitute;
+using Valt.App.Kernel;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Budget.Accounts.DTOs;
+using Valt.App.Modules.Budget.Accounts.Queries;
+using Valt.App.Modules.Budget.Categories.DTOs;
+using Valt.App.Modules.Budget.Categories.Queries;
+using Valt.App.Modules.Budget.FixedExpenses.Commands.CreateFixedExpense;
+using Valt.App.Modules.Budget.FixedExpenses.Commands.EditFixedExpense;
+using Valt.App.Modules.Budget.FixedExpenses.DTOs;
+using Valt.App.Modules.Budget.FixedExpenses.Queries.GetFixedExpense;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Categories;
 using Valt.Core.Modules.Budget.FixedExpenses;
-using Valt.Core.Modules.Budget.FixedExpenses.Contracts;
 using Valt.Infra;
+using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
-using Valt.Infra.Kernel.Time;
-using Valt.Infra.Modules.Budget.Accounts.Queries;
-using Valt.Infra.Modules.Budget.Accounts.Queries.DTOs;
-using Valt.Infra.Modules.Budget.Accounts.Services;
-using Valt.Infra.Modules.Budget.Categories.Queries;
-using Valt.Infra.Modules.Budget.Categories.Queries.DTOs;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
-using Valt.Tests.Builders;
 using Valt.UI.Views.Main.Modals.FixedExpenseEditor;
 
 namespace Valt.Tests.UI.Screens;
 
 [TestFixture]
-public class FixedExpenseEditorViewModelTests : DatabaseTest
+public class FixedExpenseEditorViewModelTests
 {
-    private IFixedExpenseRepository _fixedExpenseRepository;
-    private AccountQueries _accountQueries;
-    private CategoryQueries _categoryQueries;
-    private DisplaySettings _displaySettings;
-    private ITransactionTermService _transactionTermService;
-    private ConfigurationManager _configurationManager;
+    private ICommandDispatcher _commandDispatcher = null!;
+    private IQueryDispatcher _queryDispatcher = null!;
+    private DisplaySettings _displaySettings = null!;
+    private ITransactionTermService _transactionTermService = null!;
+    private IConfigurationManager _configurationManager = null!;
 
-    private AccountId _testAccountId;
-    private CategoryId _testCategoryId;
+    private string _testAccountId = null!;
+    private string _testCategoryId = null!;
+    private List<AccountDTO> _testAccounts = null!;
+    private List<CategoryDTO> _testCategories = null!;
 
-    protected override Task SeedDatabase()
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
     {
-        // Create test account
-        _testAccountId = new AccountId();
-        var account = new FiatAccountBuilder()
-            .WithId(_testAccountId)
-            .WithName("Test Account")
-            .WithFiatCurrency(FiatCurrency.Usd)
-            .Build();
-        _localDatabase.GetAccounts().Insert(account);
+        IdGenerator.Configure(new LiteDbIdProvider());
+    }
 
-        // Create test category
-        _testCategoryId = new CategoryId();
-        var category = CategoryBuilder.ACategory()
-            .WithId(_testCategoryId)
-            .WithName("Test Category")
-            .Build();
-        _localDatabase.GetCategories().Insert(category);
+    [SetUp]
+    public void SetUp()
+    {
+        _testAccountId = new AccountId().Value;
+        _testCategoryId = new CategoryId().Value;
 
-        return Task.CompletedTask;
+        _testAccounts = new List<AccountDTO>
+        {
+            new AccountDTO(
+                Id: _testAccountId,
+                Type: "fiat",
+                Name: "Test Account",
+                CurrencyNickname: "",
+                Visible: true,
+                IconId: null,
+                Unicode: '\0',
+                Color: Color.Black,
+                Currency: FiatCurrency.Usd.Code,
+                IsBtcAccount: false,
+                InitialAmountFiat: null,
+                InitialAmountSats: null,
+                GroupId: null)
+        };
+
+        _testCategories = new List<CategoryDTO>
+        {
+            new()
+            {
+                Id = _testCategoryId,
+                Name = "Test Category",
+                SimpleName = "Test Category",
+                Unicode = '\0',
+                Color = Color.Black
+            }
+        };
+
+        _commandDispatcher = Substitute.For<ICommandDispatcher>();
+        _queryDispatcher = Substitute.For<IQueryDispatcher>();
+        var localDatabase = Substitute.For<ILocalDatabase>();
+        _displaySettings = new DisplaySettings(localDatabase);
+        _transactionTermService = Substitute.For<ITransactionTermService>();
+        _configurationManager = Substitute.For<IConfigurationManager>();
+
+        // Setup default query returns
+        _queryDispatcher.DispatchAsync(Arg.Any<GetAccountsQuery>(), Arg.Any<CancellationToken>())
+            .Returns(_testAccounts);
+
+        _queryDispatcher.DispatchAsync(Arg.Any<GetCategoriesQuery>(), Arg.Any<CancellationToken>())
+            .Returns(new CategoriesDTO(_testCategories));
+
+        // Setup default command returns
+        _commandDispatcher.DispatchAsync(Arg.Any<CreateFixedExpenseCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result<CreateFixedExpenseResult>.Success(new CreateFixedExpenseResult("new-id")));
+
+        _commandDispatcher.DispatchAsync(Arg.Any<EditFixedExpenseCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result<EditFixedExpenseResult>.Success(new EditFixedExpenseResult()));
+
+        // Setup configuration manager
+        _configurationManager.GetAvailableFiatCurrencies()
+            .Returns(FiatCurrency.GetAll().Select(x => x.Code).ToList());
+    }
+
+    private static FixedExpenseDTO CreateFixedExpenseDto(
+        string id,
+        string name,
+        string categoryId,
+        string? defaultAccountId,
+        string? currency,
+        bool enabled,
+        int periodId,
+        int day,
+        DateOnly periodStart,
+        decimal? fixedAmount,
+        decimal? rangedAmountMin = null,
+        decimal? rangedAmountMax = null)
+    {
+        var ranges = new List<FixedExpenseRangeDTO>
+        {
+            new()
+            {
+                PeriodStart = periodStart,
+                PeriodId = periodId,
+                PeriodDescription = ((FixedExpensePeriods)periodId).ToString(),
+                Day = day,
+                FixedAmount = fixedAmount,
+                RangedAmountMin = rangedAmountMin,
+                RangedAmountMax = rangedAmountMax
+            }
+        };
+
+        return new FixedExpenseDTO
+        {
+            Id = id,
+            Name = name,
+            CategoryId = categoryId,
+            DefaultAccountId = defaultAccountId,
+            Currency = currency,
+            DisplayCurrency = currency ?? "USD",
+            Enabled = enabled,
+            Ranges = ranges
+        };
     }
 
     private FixedExpenseEditorViewModel CreateViewModel()
     {
-        _fixedExpenseRepository = Substitute.For<IFixedExpenseRepository>();
-        _accountQueries = new AccountQueries(_localDatabase,
-            new AccountTotalsCalculator(_localDatabase, new AccountCacheService(_localDatabase, new Clock())));
-        _categoryQueries = new CategoryQueries(_localDatabase);
-        _displaySettings = new DisplaySettings(_localDatabase);
-        _transactionTermService = Substitute.For<ITransactionTermService>();
-        _configurationManager = new ConfigurationManager(_localDatabase);
-
         return new FixedExpenseEditorViewModel(
-            _fixedExpenseRepository,
-            _accountQueries,
-            _categoryQueries,
+            _commandDispatcher,
+            _queryDispatcher,
             _displaySettings,
             _transactionTermService,
             _configurationManager);
@@ -119,7 +203,7 @@ public class FixedExpenseEditorViewModelTests : DatabaseTest
 
         // Assert
         Assert.That(vm.AvailableCategories.Count, Is.GreaterThan(0));
-        Assert.That(vm.AvailableCategories.Any(c => c.Id == _testCategoryId.Value), Is.True);
+        Assert.That(vm.AvailableCategories.Any(c => c.Id == _testCategoryId), Is.True);
     }
 
     [Test]
@@ -130,27 +214,34 @@ public class FixedExpenseEditorViewModelTests : DatabaseTest
 
         // Assert
         Assert.That(vm.AvailableAccounts.Count, Is.GreaterThan(0));
-        Assert.That(vm.AvailableAccounts.Any(a => a.Id == _testAccountId.Value), Is.True);
+        Assert.That(vm.AvailableAccounts.Any(a => a.Id == _testAccountId), Is.True);
     }
 
     [Test]
     public async Task Should_Not_Include_Bitcoin_Accounts_In_Available_Accounts()
     {
-        // Arrange
-        var btcAccountId = new AccountId();
-        var btcAccount = new BtcAccountBuilder()
-        {
-            Id = btcAccountId,
-            Name = "BTC Account",
-            Value = 0
-        }.Build();
-        _localDatabase.GetAccounts().Insert(btcAccount);
+        // Arrange - Add a BTC account to the test data
+        var btcAccountId = new AccountId().Value;
+        _testAccounts.Add(new AccountDTO(
+            Id: btcAccountId,
+            Type: "btc",
+            Name: "BTC Account",
+            CurrencyNickname: "",
+            Visible: true,
+            IconId: null,
+            Unicode: '\0',
+            Color: Color.Black,
+            Currency: null,
+            IsBtcAccount: true,
+            InitialAmountFiat: null,
+            InitialAmountSats: null,
+            GroupId: null));
 
         // Act
         var vm = await CreateViewModelWithLoadedDataAsync();
 
         // Assert
-        Assert.That(vm.AvailableAccounts.Any(a => a.Id == btcAccountId.Value), Is.False);
+        Assert.That(vm.AvailableAccounts.Any(a => a.Id == btcAccountId), Is.False);
     }
 
     #endregion
@@ -418,17 +509,22 @@ public class FixedExpenseEditorViewModelTests : DatabaseTest
     {
         // Arrange
         var fixedExpenseId = new FixedExpenseId();
-        var fixedExpense = FixedExpenseBuilder.AFixedExpenseWithAccount(_testAccountId)
-            .WithId(fixedExpenseId)
-            .WithName("Rent Payment")
-            .WithCategoryId(_testCategoryId)
-            .WithFixedAmountRange(1500m, FixedExpensePeriods.Monthly, new DateOnly(2024, 1, 1), 5)
-            .WithEnabled(true)
-            .BuildDomainObject();
+        var fixedExpenseDto = CreateFixedExpenseDto(
+            id: fixedExpenseId.Value,
+            name: "Rent Payment",
+            categoryId: _testCategoryId,
+            defaultAccountId: _testAccountId,
+            currency: null,
+            enabled: true,
+            periodId: (int)FixedExpensePeriods.Monthly,
+            day: 5,
+            periodStart: new DateOnly(2024, 1, 1),
+            fixedAmount: 1500m);
+
+        _queryDispatcher.DispatchAsync(Arg.Any<GetFixedExpenseQuery>(), Arg.Any<CancellationToken>())
+            .Returns(fixedExpenseDto);
 
         var vm = await CreateViewModelWithLoadedDataAsync();
-        // Set up mock AFTER creating the ViewModel (which creates the substitute)
-        _fixedExpenseRepository.GetFixedExpenseByIdAsync(Arg.Any<FixedExpenseId>()).Returns(Task.FromResult<FixedExpense?>(fixedExpense));
         vm.Parameter = new FixedExpenseEditorViewModel.Request { FixedExpenseId = fixedExpenseId };
 
         // Act
@@ -453,17 +549,24 @@ public class FixedExpenseEditorViewModelTests : DatabaseTest
     {
         // Arrange
         var fixedExpenseId = new FixedExpenseId();
-        var fixedExpense = FixedExpenseBuilder.AFixedExpenseWithCurrency(FiatCurrency.Usd)
-            .WithId(fixedExpenseId)
-            .WithName("Groceries")
-            .WithCategoryId(_testCategoryId)
-            .WithRangedAmountRange(200m, 400m, FixedExpensePeriods.Weekly, new DateOnly(2024, 1, 1), 1)
-            .WithEnabled(true)
-            .BuildDomainObject();
+        var fixedExpenseDto = CreateFixedExpenseDto(
+            id: fixedExpenseId.Value,
+            name: "Groceries",
+            categoryId: _testCategoryId,
+            defaultAccountId: null,
+            currency: FiatCurrency.Usd.Code,
+            enabled: true,
+            periodId: (int)FixedExpensePeriods.Weekly,
+            day: 1,
+            periodStart: new DateOnly(2024, 1, 1),
+            fixedAmount: null,
+            rangedAmountMin: 200m,
+            rangedAmountMax: 400m);
+
+        _queryDispatcher.DispatchAsync(Arg.Any<GetFixedExpenseQuery>(), Arg.Any<CancellationToken>())
+            .Returns(fixedExpenseDto);
 
         var vm = await CreateViewModelWithLoadedDataAsync();
-        // Set up mock AFTER creating the ViewModel (which creates the substitute)
-        _fixedExpenseRepository.GetFixedExpenseByIdAsync(Arg.Any<FixedExpenseId>()).Returns(Task.FromResult<FixedExpense?>(fixedExpense));
         vm.Parameter = new FixedExpenseEditorViewModel.Request { FixedExpenseId = fixedExpenseId };
 
         // Act
@@ -482,10 +585,6 @@ public class FixedExpenseEditorViewModelTests : DatabaseTest
             Assert.That(vm.Period, Is.EqualTo(FixedExpensePeriods.Weekly.ToString()));
         });
     }
-
-    // Note: OnBindParameterAsync_Should_Close_Window_When_FixedExpense_Not_Found cannot be easily tested
-    // because it requires MessageBoxHelper which needs Avalonia platform to be initialized.
-    // The scenario is: when FixedExpense is not found, it shows an error message and closes the window.
 
     #endregion
 
@@ -526,7 +625,7 @@ public class FixedExpenseEditorViewModelTests : DatabaseTest
     #region Ok Command Tests
 
     [Test]
-    public async Task OkCommand_Should_Not_Save_When_Validation_Fails()
+    public async Task OkCommand_Should_Not_Dispatch_When_Validation_Fails()
     {
         // Arrange
         var vm = await CreateViewModelWithLoadedDataAsync();
@@ -536,11 +635,13 @@ public class FixedExpenseEditorViewModelTests : DatabaseTest
         await vm.OkCommand.ExecuteAsync(null);
 
         // Assert
-        await _fixedExpenseRepository.DidNotReceive().SaveFixedExpenseAsync(Arg.Any<FixedExpense>());
+        await _commandDispatcher.DidNotReceive().DispatchAsync(
+            Arg.Any<CreateFixedExpenseCommand>(),
+            Arg.Any<CancellationToken>());
     }
 
     [Test]
-    public async Task OkCommand_Should_Create_New_FixedExpense_With_Fixed_Amount()
+    public async Task OkCommand_Should_Dispatch_CreateFixedExpenseCommand_With_Fixed_Amount()
     {
         // Arrange
         var vm = await CreateViewModelWithLoadedDataAsync();
@@ -555,9 +656,9 @@ public class FixedExpenseEditorViewModelTests : DatabaseTest
         vm.PeriodStart = DateTime.Today;
         vm.Enabled = true;
 
-        FixedExpense? savedExpense = null;
-        _fixedExpenseRepository.SaveFixedExpenseAsync(Arg.Do<FixedExpense>(fe => savedExpense = fe))
-            .Returns(Task.CompletedTask);
+        CreateFixedExpenseCommand? capturedCommand = null;
+        _commandDispatcher.DispatchAsync(Arg.Do<CreateFixedExpenseCommand>(c => capturedCommand = c), Arg.Any<CancellationToken>())
+            .Returns(Result<CreateFixedExpenseResult>.Success(new CreateFixedExpenseResult("new-id")));
 
         object? dialogResult = null;
         vm.CloseDialog = result => dialogResult = result;
@@ -566,18 +667,21 @@ public class FixedExpenseEditorViewModelTests : DatabaseTest
         await vm.OkCommand.ExecuteAsync(null);
 
         // Assert
-        Assert.That(savedExpense, Is.Not.Null);
-        Assert.That((string)savedExpense!.Name, Is.EqualTo("New Expense"));
-        Assert.That(savedExpense.DefaultAccountId, Is.Not.Null);
-        Assert.That(savedExpense.CurrentRange.FixedAmount?.Value, Is.EqualTo(500m));
-        Assert.That(savedExpense.CurrentRange.Period, Is.EqualTo(FixedExpensePeriods.Monthly));
-        Assert.That(savedExpense.CurrentRange.Day, Is.EqualTo(15));
+        Assert.That(capturedCommand, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedCommand!.Name, Is.EqualTo("New Expense"));
+            Assert.That(capturedCommand.DefaultAccountId, Is.Not.Null);
+            Assert.That(capturedCommand.Ranges[0].FixedAmount, Is.EqualTo(500m));
+            Assert.That(capturedCommand.Ranges[0].PeriodId, Is.EqualTo((int)FixedExpensePeriods.Monthly));
+            Assert.That(capturedCommand.Ranges[0].Day, Is.EqualTo(15));
+        });
         Assert.That(dialogResult, Is.InstanceOf<FixedExpenseEditorViewModel.Response>());
         Assert.That(((FixedExpenseEditorViewModel.Response)dialogResult!).Ok, Is.True);
     }
 
     [Test]
-    public async Task OkCommand_Should_Create_New_FixedExpense_With_Ranged_Amount()
+    public async Task OkCommand_Should_Dispatch_CreateFixedExpenseCommand_With_Ranged_Amount()
     {
         // Arrange
         var vm = await CreateViewModelWithLoadedDataAsync();
@@ -595,9 +699,9 @@ public class FixedExpenseEditorViewModelTests : DatabaseTest
         vm.PeriodStart = DateTime.Today;
         vm.Enabled = true;
 
-        FixedExpense? savedExpense = null;
-        _fixedExpenseRepository.SaveFixedExpenseAsync(Arg.Do<FixedExpense>(fe => savedExpense = fe))
-            .Returns(Task.CompletedTask);
+        CreateFixedExpenseCommand? capturedCommand = null;
+        _commandDispatcher.DispatchAsync(Arg.Do<CreateFixedExpenseCommand>(c => capturedCommand = c), Arg.Any<CancellationToken>())
+            .Returns(Result<CreateFixedExpenseResult>.Success(new CreateFixedExpenseResult("new-id")));
 
         vm.CloseDialog = _ => { };
 
@@ -605,31 +709,38 @@ public class FixedExpenseEditorViewModelTests : DatabaseTest
         await vm.OkCommand.ExecuteAsync(null);
 
         // Assert
-        Assert.That(savedExpense, Is.Not.Null);
-        Assert.That(savedExpense!.Currency, Is.EqualTo(FiatCurrency.Usd));
-        Assert.That(savedExpense.DefaultAccountId, Is.Null);
-        Assert.That(savedExpense.CurrentRange.RangedAmount, Is.Not.Null);
-        Assert.That(savedExpense.CurrentRange.RangedAmount!.Min.Value, Is.EqualTo(100m));
-        Assert.That(savedExpense.CurrentRange.RangedAmount.Max.Value, Is.EqualTo(300m));
-        Assert.That(savedExpense.CurrentRange.Period, Is.EqualTo(FixedExpensePeriods.Biweekly));
+        Assert.That(capturedCommand, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedCommand!.Currency, Is.EqualTo(FiatCurrency.Usd.Code));
+            Assert.That(capturedCommand.DefaultAccountId, Is.Null);
+            Assert.That(capturedCommand.Ranges[0].RangedAmountMin, Is.EqualTo(100m));
+            Assert.That(capturedCommand.Ranges[0].RangedAmountMax, Is.EqualTo(300m));
+            Assert.That(capturedCommand.Ranges[0].PeriodId, Is.EqualTo((int)FixedExpensePeriods.Biweekly));
+        });
     }
 
     [Test]
-    public async Task OkCommand_Should_Edit_Existing_FixedExpense()
+    public async Task OkCommand_Should_Dispatch_EditFixedExpenseCommand_When_Editing()
     {
         // Arrange
         var fixedExpenseId = new FixedExpenseId();
-        var existingExpense = FixedExpenseBuilder.AFixedExpenseWithAccount(_testAccountId)
-            .WithId(fixedExpenseId)
-            .WithName("Original Name")
-            .WithCategoryId(_testCategoryId)
-            .WithFixedAmountRange(100m, FixedExpensePeriods.Monthly, new DateOnly(2024, 1, 1), 5)
-            .WithEnabled(true)
-            .BuildDomainObject();
+        var fixedExpenseDto = CreateFixedExpenseDto(
+            id: fixedExpenseId.Value,
+            name: "Original Name",
+            categoryId: _testCategoryId,
+            defaultAccountId: _testAccountId,
+            currency: null,
+            enabled: true,
+            periodId: (int)FixedExpensePeriods.Monthly,
+            day: 5,
+            periodStart: new DateOnly(2024, 1, 1),
+            fixedAmount: 100m);
+
+        _queryDispatcher.DispatchAsync(Arg.Any<GetFixedExpenseQuery>(), Arg.Any<CancellationToken>())
+            .Returns(fixedExpenseDto);
 
         var vm = await CreateViewModelWithLoadedDataAsync();
-        // Set up mock AFTER creating the ViewModel (which creates the substitute)
-        _fixedExpenseRepository.GetFixedExpenseByIdAsync(Arg.Any<FixedExpenseId>()).Returns(Task.FromResult<FixedExpense?>(existingExpense));
         vm.Parameter = new FixedExpenseEditorViewModel.Request { FixedExpenseId = fixedExpenseId };
         await vm.OnBindParameterAsync();
 
@@ -637,9 +748,9 @@ public class FixedExpenseEditorViewModelTests : DatabaseTest
         vm.Name = "Updated Name";
         vm.Enabled = false;
 
-        FixedExpense? savedExpense = null;
-        _fixedExpenseRepository.SaveFixedExpenseAsync(Arg.Do<FixedExpense>(fe => savedExpense = fe))
-            .Returns(Task.CompletedTask);
+        EditFixedExpenseCommand? capturedCommand = null;
+        _commandDispatcher.DispatchAsync(Arg.Do<EditFixedExpenseCommand>(c => capturedCommand = c), Arg.Any<CancellationToken>())
+            .Returns(Result<EditFixedExpenseResult>.Success(new EditFixedExpenseResult()));
 
         vm.CloseDialog = _ => { };
 
@@ -647,9 +758,13 @@ public class FixedExpenseEditorViewModelTests : DatabaseTest
         await vm.OkCommand.ExecuteAsync(null);
 
         // Assert
-        Assert.That(savedExpense, Is.Not.Null);
-        Assert.That((string)savedExpense!.Name, Is.EqualTo("Updated Name"));
-        Assert.That(savedExpense.Enabled, Is.False);
+        Assert.That(capturedCommand, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedCommand!.FixedExpenseId, Is.EqualTo(fixedExpenseId.Value));
+            Assert.That(capturedCommand.Name, Is.EqualTo("Updated Name"));
+            Assert.That(capturedCommand.Enabled, Is.False);
+        });
     }
 
     #endregion
@@ -665,7 +780,7 @@ public class FixedExpenseEditorViewModelTests : DatabaseTest
 
         var termResult = new TransactionTermResult(
             "Test Term",
-            _testCategoryId.Value,
+            _testCategoryId,
             "Test Category",
             null,
             100m);
@@ -674,7 +789,7 @@ public class FixedExpenseEditorViewModelTests : DatabaseTest
         vm.TransactionTermResult = termResult;
 
         // Assert
-        Assert.That(vm.Category?.Id, Is.EqualTo(_testCategoryId.Value));
+        Assert.That(vm.Category?.Id, Is.EqualTo(_testCategoryId));
     }
 
     [Test]
@@ -687,7 +802,7 @@ public class FixedExpenseEditorViewModelTests : DatabaseTest
 
         var termResult = new TransactionTermResult(
             "Test Term",
-            _testCategoryId.Value,
+            _testCategoryId,
             "Test Category",
             null,
             100m);
@@ -892,16 +1007,22 @@ public class FixedExpenseEditorViewModelTests : DatabaseTest
     {
         // Arrange
         var fixedExpenseId = new FixedExpenseId();
-        var fixedExpense = FixedExpenseBuilder.AFixedExpenseWithAccount(_testAccountId)
-            .WithId(fixedExpenseId)
-            .WithName("Test")
-            .WithCategoryId(_testCategoryId)
-            .WithFixedAmountRange(100m, FixedExpensePeriods.Monthly, new DateOnly(2024, 1, 1), 5)
-            .BuildDomainObject();
+        var fixedExpenseDto = CreateFixedExpenseDto(
+            id: fixedExpenseId.Value,
+            name: "Test",
+            categoryId: _testCategoryId,
+            defaultAccountId: _testAccountId,
+            currency: null,
+            enabled: true,
+            periodId: (int)FixedExpensePeriods.Monthly,
+            day: 5,
+            periodStart: new DateOnly(2024, 1, 1),
+            fixedAmount: 100m);
+
+        _queryDispatcher.DispatchAsync(Arg.Any<GetFixedExpenseQuery>(), Arg.Any<CancellationToken>())
+            .Returns(fixedExpenseDto);
 
         var vm = await CreateViewModelWithLoadedDataAsync();
-        // Set up mock AFTER creating the ViewModel (which creates the substitute)
-        _fixedExpenseRepository.GetFixedExpenseByIdAsync(Arg.Any<FixedExpenseId>()).Returns(Task.FromResult<FixedExpense?>(fixedExpense));
         var originalTitle = vm.WindowTitle;
         vm.Parameter = new FixedExpenseEditorViewModel.Request { FixedExpenseId = fixedExpenseId };
 

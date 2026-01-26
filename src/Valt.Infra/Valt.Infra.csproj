@@ -10,6 +10,7 @@
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
         <ProjectReference Include="..\Valt.Core\Valt.Core.csproj" />
+        <ProjectReference Include="..\Valt.App\Valt.App.csproj" />
     </ItemGroup>
 
     <ItemGroup>

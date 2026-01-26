@@ -1,5 +1,5 @@
 using System.Drawing;
-using Valt.Infra.Modules.Budget.Accounts.Queries.DTOs;
+using Valt.App.Modules.Budget.Accounts.DTOs;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
 namespace Valt.Tests.UI.ViewModels;
@@ -66,7 +66,7 @@ public class AccountViewModelTests
             Type: "Fiat",
             Name: "Test Account",
             Visible: false,
-            Icon: null,
+            IconId: null,
             Unicode: '\0',
             Color: Color.White,
             Currency: "USD",
@@ -96,7 +96,7 @@ public class AccountViewModelTests
             Type: "Fiat",
             Name: "Test Account",
             Visible: true,
-            Icon: null,
+            IconId: null,
             Unicode: '\0',
             Color: Color.White,
             Currency: "USD",

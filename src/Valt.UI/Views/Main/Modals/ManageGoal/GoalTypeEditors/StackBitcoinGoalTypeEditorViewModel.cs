@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Valt.App.Modules.Goals.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.GoalTypes;
@@ -42,6 +43,19 @@ public partial class StackBitcoinGoalTypeEditorViewModel : ObservableObject, IGo
         if (goalType is StackBitcoinGoalType stackBitcoin)
         {
             TargetBtcAmount = stackBitcoin.TargetAmount;
+        }
+    }
+
+    public GoalTypeInputDTO CreateGoalTypeDTO()
+    {
+        return new StackBitcoinGoalTypeDTO { TargetSats = TargetBtcAmount.Sats };
+    }
+
+    public void LoadFromDTO(GoalTypeOutputDTO goalType)
+    {
+        if (goalType is StackBitcoinGoalTypeOutputDTO stackBitcoin)
+        {
+            TargetBtcAmount = stackBitcoin.TargetSats;
         }
     }
 }

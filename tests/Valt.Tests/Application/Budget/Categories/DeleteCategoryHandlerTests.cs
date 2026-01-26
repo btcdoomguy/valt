@@ -1,9 +1,9 @@
 using NSubstitute;
 using Valt.App.Modules.Budget.Categories.Commands.DeleteCategory;
+using Valt.App.Modules.Budget.Transactions.Contracts;
+using Valt.App.Modules.Budget.Transactions.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Categories;
-using Valt.Infra.Modules.Budget.Transactions.Queries;
-using Valt.Infra.Modules.Budget.Transactions.Queries.DTOs;
 
 namespace Valt.Tests.Application.Budget.Categories;
 

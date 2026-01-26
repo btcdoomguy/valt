@@ -2,9 +2,9 @@ using System.Drawing;
 using System.Linq;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Valt.App.Modules.Budget.Accounts.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Factories;
-using Valt.Infra.Modules.Budget.Accounts.Queries.DTOs;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
 namespace Valt.UI.Views.Main.Tabs.Transactions;
@@ -32,7 +32,7 @@ public partial class TransactionsViewModel
                 Type: "BtcAccount",
                 Name: "Cold Storage",
                 Visible: true,
-                Icon: new Icon("MaterialDesign", "wallet-outline", '\uF19F', Color.FromArgb(255, 247, 147, 26))
+                IconId: new Icon("MaterialDesign", "wallet-outline", '\uF19F', Color.FromArgb(255, 247, 147, 26))
                     .ToString(),
                 Unicode: '\uF19F',
                 Color: Color.FromArgb(255, 247, 147, 26),
@@ -53,7 +53,7 @@ public partial class TransactionsViewModel
                 Type: "BtcAccount",
                 Name: "Lightning Wallet",
                 Visible: true,
-                Icon: new Icon("MaterialDesign", "flash", '\uEA0B', Color.FromArgb(255, 255, 215, 0))
+                IconId: new Icon("MaterialDesign", "flash", '\uEA0B', Color.FromArgb(255, 255, 215, 0))
                     .ToString(),
                 Unicode: '\uEA0B',
                 Color: Color.FromArgb(255, 255, 215, 0),
@@ -74,7 +74,7 @@ public partial class TransactionsViewModel
                 Type: "FiatAccount",
                 Name: "Nubank",
                 Visible: true,
-                Icon: new Icon("MaterialDesign", "bank", '\uE905', Color.FromArgb(255, 130, 10, 209))
+                IconId: new Icon("MaterialDesign", "bank", '\uE905', Color.FromArgb(255, 130, 10, 209))
                     .ToString(),
                 Unicode: '\uE905',
                 Color: Color.FromArgb(255, 130, 10, 209),
@@ -95,7 +95,7 @@ public partial class TransactionsViewModel
                 Type: "FiatAccount",
                 Name: "Itaú",
                 Visible: true,
-                Icon: new Icon("MaterialDesign", "bank", '\uE905', Color.FromArgb(255, 0, 51, 160))
+                IconId: new Icon("MaterialDesign", "bank", '\uE905', Color.FromArgb(255, 0, 51, 160))
                     .ToString(),
                 Unicode: '\uE905',
                 Color: Color.FromArgb(255, 0, 51, 160),
@@ -116,7 +116,7 @@ public partial class TransactionsViewModel
                 Type: "FiatAccount",
                 Name: "Cash",
                 Visible: true,
-                Icon: new Icon("MaterialDesign", "cash", '\uEA0C', Color.FromArgb(255, 76, 175, 80))
+                IconId: new Icon("MaterialDesign", "cash", '\uEA0C', Color.FromArgb(255, 76, 175, 80))
                     .ToString(),
                 Unicode: '\uEA0C',
                 Color: Color.FromArgb(255, 76, 175, 80),

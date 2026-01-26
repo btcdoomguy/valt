@@ -1,14 +1,14 @@
+using System.Drawing;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.AvgPrice.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Modules.Budget.Transactions;
-using Valt.Core.Modules.Budget.Transactions.Contracts;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers;
 using Valt.Infra.DataAccess;
-using Valt.Infra.Modules.AvgPrice.Queries;
-using Valt.Infra.Modules.AvgPrice.Queries.DTOs;
-using Valt.Infra.Modules.Budget.Transactions.Queries;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
 using Valt.UI.Services;
@@ -28,10 +28,10 @@ public class TransactionListViewModelAvgPriceTests : DatabaseTest
         TransactionGridResources.InitializeForTesting();
     }
 
-    private IAvgPriceQueries _avgPriceQueries = null!;
     private ILocalStorageService _localStorageService = null!;
     private IModalFactory _modalFactory = null!;
-    private ITransactionQueries _transactionQueries = null!;
+    private ICommandDispatcher _commandDispatcher = null!;
+    private IQueryDispatcher _queryDispatcher = null!;
     private ITransactionTermService _transactionTermService = null!;
     private FilterState _filterState = null!;
     private IClock _clock = null!;
@@ -42,12 +42,12 @@ public class TransactionListViewModelAvgPriceTests : DatabaseTest
     {
         base.SetUp();
 
-        _avgPriceQueries = Substitute.For<IAvgPriceQueries>();
         _localStorageService = Substitute.For<ILocalStorageService>();
         _localStorageService.LoadDataGridSettings().Returns(new DataGridSettings());
 
         _modalFactory = Substitute.For<IModalFactory>();
-        _transactionQueries = Substitute.For<ITransactionQueries>();
+        _commandDispatcher = Substitute.For<ICommandDispatcher>();
+        _queryDispatcher = Substitute.For<IQueryDispatcher>();
         _transactionTermService = Substitute.For<ITransactionTermService>();
         _filterState = new FilterState();
         _clock = Substitute.For<IClock>();
@@ -68,8 +68,8 @@ public class TransactionListViewModelAvgPriceTests : DatabaseTest
 
         return new TransactionListViewModel(
             _modalFactory,
-            _transactionRepository,
-            _transactionQueries,
+            _commandDispatcher,
+            _queryDispatcher,
             _transactionTermService,
             liveRateState,
             _localDatabase,
@@ -77,8 +77,7 @@ public class TransactionListViewModelAvgPriceTests : DatabaseTest
             _filterState,
             _clock,
             _localStorageService,
-            _vmLogger,
-            _avgPriceQueries);
+            _vmLogger);
     }
 
     #region CanSendToAvgPrice Tests
@@ -240,7 +239,7 @@ public class TransactionListViewModelAvgPriceTests : DatabaseTest
             Visible: true,
             Icon: null,
             Unicode: '\uf15a',
-            Color: System.Drawing.Color.Orange,
+            Color: Color.FromArgb(0xFFA500), // Orange
             CurrencyCode: currencyCode,
             AvgPriceCalculationMethodId: 0);
     }

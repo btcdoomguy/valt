@@ -1,15 +1,20 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Valt.App.Kernel;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Goals.Commands.CopyGoalsFromLastMonth;
+using Valt.App.Modules.Goals.Commands.DeleteGoal;
+using Valt.App.Modules.Goals.Commands.RecalculateGoal;
+using Valt.App.Modules.Goals.DTOs;
+using Valt.App.Modules.Goals.Queries.GetGoals;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Goals;
-using Valt.Core.Modules.Goals.Contracts;
-using Valt.Core.Modules.Goals.GoalTypes;
 using Valt.Infra.Kernel;
-using Valt.Infra.Modules.Goals.Services;
 using Valt.Infra.Settings;
-using Valt.Tests.Builders;
+using Valt.Infra.Modules.Goals.Services;
 using Valt.UI.Services;
 using Valt.UI.State;
 using Valt.UI.Views.Main.Tabs.Transactions;
@@ -20,13 +25,15 @@ namespace Valt.Tests.UI.Screens;
 [TestFixture]
 public class GoalsPanelViewModelTests : DatabaseTest
 {
+    private ICommandDispatcher _commandDispatcher = null!;
+    private IQueryDispatcher _queryDispatcher = null!;
     private IModalFactory _modalFactory = null!;
-    private IGoalRepository _goalRepository = null!;
     private GoalProgressState _goalProgressState = null!;
     private CurrencySettings _currencySettings = null!;
     private FilterState _filterState = null!;
     private ILogger<GoalsPanelViewModel> _logger = null!;
     private SecureModeState _secureModeState = null!;
+    private List<GoalDTO> _goals = null!;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -40,17 +47,19 @@ public class GoalsPanelViewModelTests : DatabaseTest
         // Reset messenger to avoid interference between tests
         WeakReferenceMessenger.Default.Reset();
 
+        _commandDispatcher = Substitute.For<ICommandDispatcher>();
+        _queryDispatcher = Substitute.For<IQueryDispatcher>();
         _modalFactory = Substitute.For<IModalFactory>();
-        _goalRepository = Substitute.For<IGoalRepository>();
         _goalProgressState = new GoalProgressState();
         _currencySettings = new CurrencySettings(_localDatabase);
         _filterState = new FilterState { MainDate = new DateTime(2025, 1, 15) };
         _logger = Substitute.For<ILogger<GoalsPanelViewModel>>();
         _secureModeState = new SecureModeState();
+        _goals = new List<GoalDTO>();
 
-        // Default mock for goal repository
-        _goalRepository.GetAllAsync()
-            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal>()));
+        // Default mock for query dispatcher
+        _queryDispatcher.DispatchAsync(Arg.Any<GetGoalsQuery>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Task.FromResult<IReadOnlyList<GoalDTO>>(_goals.ToList()));
     }
 
     [TearDown]
@@ -62,8 +71,9 @@ public class GoalsPanelViewModelTests : DatabaseTest
     private GoalsPanelViewModel CreateViewModel()
     {
         var vm = new GoalsPanelViewModel(
+            _commandDispatcher,
+            _queryDispatcher,
             _modalFactory,
-            _goalRepository,
             _goalProgressState,
             _currencySettings,
             _filterState,
@@ -71,6 +81,63 @@ public class GoalsPanelViewModelTests : DatabaseTest
             _secureModeState);
         vm.GetUserControlOwnerWindow = () => null!;
         return vm;
+    }
+
+    private GoalDTO CreateStackBitcoinGoalDTO(string id, GoalPeriods period, DateOnly refDate, GoalStates state = GoalStates.Open, decimal progress = 0m)
+    {
+        return new GoalDTO
+        {
+            Id = id,
+            RefDate = refDate,
+            Period = (int)period,
+            Progress = progress,
+            State = (int)state,
+            IsUpToDate = true,
+            LastUpdatedAt = DateTime.Now,
+            GoalType = new StackBitcoinGoalTypeOutputDTO
+            {
+                TargetSats = 1_000_000,
+                CalculatedSats = (long)(progress * 10000)
+            }
+        };
+    }
+
+    private GoalDTO CreateSpendingLimitGoalDTO(string id, GoalPeriods period, DateOnly refDate, GoalStates state = GoalStates.Open, decimal progress = 0m)
+    {
+        return new GoalDTO
+        {
+            Id = id,
+            RefDate = refDate,
+            Period = (int)period,
+            Progress = progress,
+            State = (int)state,
+            IsUpToDate = true,
+            LastUpdatedAt = DateTime.Now,
+            GoalType = new SpendingLimitGoalTypeOutputDTO
+            {
+                TargetAmount = 5000m,
+                CalculatedSpending = progress * 50
+            }
+        };
+    }
+
+    private GoalDTO CreateDcaGoalDTO(string id, GoalPeriods period, DateOnly refDate, GoalStates state = GoalStates.Open, decimal progress = 0m)
+    {
+        return new GoalDTO
+        {
+            Id = id,
+            RefDate = refDate,
+            Period = (int)period,
+            Progress = progress,
+            State = (int)state,
+            IsUpToDate = true,
+            LastUpdatedAt = DateTime.Now,
+            GoalType = new DcaGoalTypeOutputDTO
+            {
+                TargetPurchaseCount = 12,
+                CalculatedPurchaseCount = (int)(progress / 10)
+            }
+        };
     }
 
     #region Initialization Tests
@@ -90,68 +157,14 @@ public class GoalsPanelViewModelTests : DatabaseTest
     public async Task Should_Fetch_Goals_On_Initialization()
     {
         // Arrange
-        var currentDate = new DateOnly(2025, 1, 15);
-        var goals = new List<Goal>
-        {
-            GoalBuilder.AGoal()
-                .WithPeriod(GoalPeriods.Monthly)
-                .WithRefDate(new DateOnly(2025, 1, 1))
-                .WithGoalType(new StackBitcoinGoalType(1_000_000L))
-                .Build(),
-            GoalBuilder.AGoal()
-                .WithPeriod(GoalPeriods.Monthly)
-                .WithRefDate(new DateOnly(2025, 1, 1))
-                .WithGoalType(new SpendingLimitGoalType(5000m))
-                .Build()
-        };
-
-        _goalRepository.GetAllAsync()
-            .Returns(Task.FromResult<IEnumerable<Goal>>(goals));
+        _goals.Add(CreateStackBitcoinGoalDTO("1", GoalPeriods.Monthly, new DateOnly(2025, 1, 1)));
+        _goals.Add(CreateSpendingLimitGoalDTO("2", GoalPeriods.Monthly, new DateOnly(2025, 1, 1)));
 
         // Act
         var vm = CreateViewModel();
         await Task.Delay(200); // Wait for async initialization
 
         // Assert
-        Assert.That(vm.GoalEntries, Has.Count.EqualTo(2));
-    }
-
-    [Test]
-    public async Task Should_Filter_Goals_By_Current_Period()
-    {
-        // Arrange
-        var goals = new List<Goal>
-        {
-            // Goal for January 2025 (should be included)
-            GoalBuilder.AGoal()
-                .WithPeriod(GoalPeriods.Monthly)
-                .WithRefDate(new DateOnly(2025, 1, 1))
-                .WithGoalType(new StackBitcoinGoalType(1_000_000L))
-                .Build(),
-            // Goal for February 2025 (should NOT be included when filter is January)
-            GoalBuilder.AGoal()
-                .WithPeriod(GoalPeriods.Monthly)
-                .WithRefDate(new DateOnly(2025, 2, 1))
-                .WithGoalType(new SpendingLimitGoalType(5000m))
-                .Build(),
-            // Yearly goal for 2025 (should be included)
-            GoalBuilder.AGoal()
-                .WithPeriod(GoalPeriods.Yearly)
-                .WithRefDate(new DateOnly(2025, 1, 1))
-                .WithGoalType(new DcaGoalType(12))
-                .Build()
-        };
-
-        _goalRepository.GetAllAsync()
-            .Returns(Task.FromResult<IEnumerable<Goal>>(goals));
-
-        _filterState.MainDate = new DateTime(2025, 1, 15);
-
-        // Act
-        var vm = CreateViewModel();
-        await Task.Delay(200);
-
-        // Assert - should only include January 2025 monthly goal and 2025 yearly goal
         Assert.That(vm.GoalEntries, Has.Count.EqualTo(2));
     }
 
@@ -176,33 +189,9 @@ public class GoalsPanelViewModelTests : DatabaseTest
     public async Task Should_Sort_Goals_By_State_And_Period()
     {
         // Arrange
-        var goals = new List<Goal>
-        {
-            // Completed goal
-            GoalBuilder.AGoal()
-                .WithPeriod(GoalPeriods.Monthly)
-                .WithRefDate(new DateOnly(2025, 1, 1))
-                .WithGoalType(new StackBitcoinGoalType(1_000_000L))
-                .WithState(GoalStates.Completed)
-                .Build(),
-            // Open monthly goal
-            GoalBuilder.AGoal()
-                .WithPeriod(GoalPeriods.Monthly)
-                .WithRefDate(new DateOnly(2025, 1, 1))
-                .WithGoalType(new SpendingLimitGoalType(5000m))
-                .WithState(GoalStates.Open)
-                .Build(),
-            // Open yearly goal
-            GoalBuilder.AGoal()
-                .WithPeriod(GoalPeriods.Yearly)
-                .WithRefDate(new DateOnly(2025, 1, 1))
-                .WithGoalType(new DcaGoalType(12))
-                .WithState(GoalStates.Open)
-                .Build()
-        };
-
-        _goalRepository.GetAllAsync()
-            .Returns(Task.FromResult<IEnumerable<Goal>>(goals));
+        _goals.Add(CreateStackBitcoinGoalDTO("1", GoalPeriods.Monthly, new DateOnly(2025, 1, 1), GoalStates.Completed));
+        _goals.Add(CreateSpendingLimitGoalDTO("2", GoalPeriods.Monthly, new DateOnly(2025, 1, 1), GoalStates.Open));
+        _goals.Add(CreateDcaGoalDTO("3", GoalPeriods.Yearly, new DateOnly(2025, 1, 1), GoalStates.Open));
 
         // Act
         var vm = CreateViewModel();
@@ -243,11 +232,11 @@ public class GoalsPanelViewModelTests : DatabaseTest
     {
         // Arrange
         var callCount = 0;
-        _goalRepository.GetAllAsync()
+        _queryDispatcher.DispatchAsync(Arg.Any<GetGoalsQuery>(), Arg.Any<CancellationToken>())
             .Returns(callInfo =>
             {
                 callCount++;
-                return Task.FromResult<IEnumerable<Goal>>(new List<Goal>());
+                return Task.FromResult<IReadOnlyList<GoalDTO>>(new List<GoalDTO>());
             });
 
         var vm = CreateViewModel();
@@ -267,11 +256,11 @@ public class GoalsPanelViewModelTests : DatabaseTest
     {
         // Arrange
         var callCount = 0;
-        _goalRepository.GetAllAsync()
+        _queryDispatcher.DispatchAsync(Arg.Any<GetGoalsQuery>(), Arg.Any<CancellationToken>())
             .Returns(callInfo =>
             {
                 callCount++;
-                return Task.FromResult<IEnumerable<Goal>>(new List<Goal>());
+                return Task.FromResult<IReadOnlyList<GoalDTO>>(new List<GoalDTO>());
             });
 
         var vm = CreateViewModel();
@@ -290,15 +279,8 @@ public class GoalsPanelViewModelTests : DatabaseTest
     public async Task Should_Update_Progress_When_GoalProgressUpdated_Message_Received()
     {
         // Arrange
-        var goal = GoalBuilder.AGoal()
-            .WithPeriod(GoalPeriods.Monthly)
-            .WithRefDate(new DateOnly(2025, 1, 1))
-            .WithGoalType(new StackBitcoinGoalType(1_000_000L))
-            .WithProgress(25m)
-            .Build();
-
-        _goalRepository.GetAllAsync()
-            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal> { goal }));
+        var goalDto = CreateStackBitcoinGoalDTO("1", GoalPeriods.Monthly, new DateOnly(2025, 1, 1), GoalStates.Open, 25m);
+        _goals.Add(goalDto);
 
         var vm = CreateViewModel();
         await Task.Delay(200);
@@ -306,14 +288,14 @@ public class GoalsPanelViewModelTests : DatabaseTest
         Assert.That(vm.GoalEntries, Has.Count.EqualTo(1));
         Assert.That(vm.GoalEntries[0].Progress, Is.EqualTo(25m));
 
-        // Update the goal progress
-        goal.UpdateProgress(50m, goal.GoalType, DateTime.Now);
+        // Update the goal progress in the mock
+        _goals[0] = CreateStackBitcoinGoalDTO("1", GoalPeriods.Monthly, new DateOnly(2025, 1, 1), GoalStates.Open, 50m);
 
         // Act
         WeakReferenceMessenger.Default.Send(new GoalProgressUpdated());
         await Task.Delay(100);
 
-        // Assert - progress should be updated (note: the UpdateGoal method updates AnimatedProgressPercentage)
+        // Assert - progress should be updated
         Assert.That(vm.GoalEntries[0].Progress, Is.EqualTo(50m));
     }
 
@@ -322,36 +304,32 @@ public class GoalsPanelViewModelTests : DatabaseTest
     #region Command Tests
 
     [Test]
-    public async Task RecalculateGoalCommand_Should_Recalculate_And_Mark_Stale()
+    public async Task RecalculateGoalCommand_Should_Dispatch_Command_And_Mark_Stale()
     {
         // Arrange
-        var goal = GoalBuilder.AGoal()
-            .WithPeriod(GoalPeriods.Monthly)
-            .WithRefDate(new DateOnly(2025, 1, 1))
-            .WithGoalType(new StackBitcoinGoalType(1_000_000L))
-            .WithState(GoalStates.Completed)
-            .Build();
+        var goalDto = CreateStackBitcoinGoalDTO("goal-1", GoalPeriods.Monthly, new DateOnly(2025, 1, 1), GoalStates.Completed, 100m);
+        _goals.Add(goalDto);
 
-        _goalRepository.GetByIdAsync(Arg.Any<GoalId>())
-            .Returns(Task.FromResult<Goal?>(goal));
-        _goalRepository.GetAllAsync()
-            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal> { goal }));
+        _commandDispatcher.DispatchAsync(Arg.Any<RecalculateGoalCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result<RecalculateGoalResult>.Success(new RecalculateGoalResult()));
 
         var vm = CreateViewModel();
         await Task.Delay(200);
 
-        var entry = new GoalEntryViewModel(goal, _currencySettings.MainFiatCurrency);
+        var entry = new GoalEntryViewModel(goalDto, _currencySettings.MainFiatCurrency);
 
         // Act
         await vm.RecalculateGoalCommand.ExecuteAsync(entry);
 
         // Assert
-        await _goalRepository.Received(1).SaveAsync(Arg.Any<Goal>());
+        await _commandDispatcher.Received(1).DispatchAsync(
+            Arg.Is<RecalculateGoalCommand>(c => c.GoalId == "goal-1"),
+            Arg.Any<CancellationToken>());
         Assert.That(_goalProgressState.HasStaleGoals, Is.True);
     }
 
     [Test]
-    public async Task DeleteGoalCommand_Should_Not_Delete_Without_Entry()
+    public async Task DeleteGoalCommand_Should_Not_Dispatch_Without_Entry()
     {
         // Arrange
         var vm = CreateViewModel();
@@ -360,7 +338,7 @@ public class GoalsPanelViewModelTests : DatabaseTest
         await vm.DeleteGoalCommand.ExecuteAsync(null);
 
         // Assert
-        await _goalRepository.DidNotReceive().DeleteAsync(Arg.Any<Goal>());
+        await _commandDispatcher.DidNotReceive().DispatchAsync(Arg.Any<DeleteGoalCommand>(), Arg.Any<CancellationToken>());
     }
 
     #endregion
@@ -388,170 +366,32 @@ public class GoalsPanelViewModelTests : DatabaseTest
     #region CopyFromLastMonth Tests
 
     [Test]
-    public async Task CopyFromLastMonth_Should_Copy_Monthly_Goals_From_Previous_Month()
-    {
-        // Arrange - Previous month goal (December 2024)
-        var previousMonthGoal = GoalBuilder.AGoal()
-            .WithPeriod(GoalPeriods.Monthly)
-            .WithRefDate(new DateOnly(2024, 12, 1))
-            .WithGoalType(new StackBitcoinGoalType(1_000_000L, 500_000L))
-            .Build();
-
-        _goalRepository.GetAllAsync()
-            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal> { previousMonthGoal }));
-
-        _filterState.MainDate = new DateTime(2025, 1, 15);
-
-        var vm = CreateViewModel();
-        await Task.Delay(200);
-
-        // Act
-        await vm.CopyFromLastMonthCommand.ExecuteAsync(null);
-
-        // Assert - Should save a new goal
-        await _goalRepository.Received(1).SaveAsync(Arg.Is<Goal>(g =>
-            g.Period == GoalPeriods.Monthly &&
-            g.RefDate.Year == 2025 &&
-            g.RefDate.Month == 1));
-    }
-
-    [Test]
-    public async Task CopyFromLastMonth_Should_Skip_Yearly_Goals()
-    {
-        // Arrange - Previous month has yearly goal
-        var yearlyGoal = GoalBuilder.AGoal()
-            .WithPeriod(GoalPeriods.Yearly)
-            .WithRefDate(new DateOnly(2024, 12, 1))
-            .WithGoalType(new DcaGoalType(12, 6))
-            .Build();
-
-        _goalRepository.GetAllAsync()
-            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal> { yearlyGoal }));
-
-        _filterState.MainDate = new DateTime(2025, 1, 15);
-
-        var vm = CreateViewModel();
-        await Task.Delay(200);
-
-        // Act
-        await vm.CopyFromLastMonthCommand.ExecuteAsync(null);
-
-        // Assert - Should NOT save any goal (yearly goals are skipped)
-        await _goalRepository.DidNotReceive().SaveAsync(Arg.Any<Goal>());
-    }
-
-    [Test]
-    public async Task CopyFromLastMonth_Should_Skip_Duplicate_Goals()
-    {
-        // Arrange - Same goal exists in both months
-        var previousMonthGoal = GoalBuilder.AGoal()
-            .WithPeriod(GoalPeriods.Monthly)
-            .WithRefDate(new DateOnly(2024, 12, 1))
-            .WithGoalType(new StackBitcoinGoalType(1_000_000L, 500_000L))
-            .Build();
-
-        var currentMonthGoal = GoalBuilder.AGoal()
-            .WithPeriod(GoalPeriods.Monthly)
-            .WithRefDate(new DateOnly(2025, 1, 1))
-            .WithGoalType(new StackBitcoinGoalType(1_000_000L, 0L))
-            .Build();
-
-        _goalRepository.GetAllAsync()
-            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal>
-            {
-                previousMonthGoal,
-                currentMonthGoal
-            }));
-
-        _filterState.MainDate = new DateTime(2025, 1, 15);
-
-        var vm = CreateViewModel();
-        await Task.Delay(200);
-
-        // Act
-        await vm.CopyFromLastMonthCommand.ExecuteAsync(null);
-
-        // Assert - Should NOT save any goal (duplicate detected)
-        await _goalRepository.DidNotReceive().SaveAsync(Arg.Any<Goal>());
-    }
-
-    [Test]
-    public async Task CopyFromLastMonth_Should_Allow_Same_Type_With_Different_Target()
-    {
-        // Arrange - Same type but different target
-        var previousMonthGoal = GoalBuilder.AGoal()
-            .WithPeriod(GoalPeriods.Monthly)
-            .WithRefDate(new DateOnly(2024, 12, 1))
-            .WithGoalType(new StackBitcoinGoalType(1_000_000L, 500_000L))
-            .Build();
-
-        var currentMonthGoal = GoalBuilder.AGoal()
-            .WithPeriod(GoalPeriods.Monthly)
-            .WithRefDate(new DateOnly(2025, 1, 1))
-            .WithGoalType(new StackBitcoinGoalType(2_000_000L, 0L)) // Different target
-            .Build();
-
-        _goalRepository.GetAllAsync()
-            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal>
-            {
-                previousMonthGoal,
-                currentMonthGoal
-            }));
-
-        _filterState.MainDate = new DateTime(2025, 1, 15);
-
-        var vm = CreateViewModel();
-        await Task.Delay(200);
-
-        // Act
-        await vm.CopyFromLastMonthCommand.ExecuteAsync(null);
-
-        // Assert - Should save a new goal (different target means not duplicate)
-        await _goalRepository.Received(1).SaveAsync(Arg.Is<Goal>(g =>
-            g.GoalType.TypeName == GoalTypeNames.StackBitcoin &&
-            ((StackBitcoinGoalType)g.GoalType).TargetSats == 1_000_000L));
-    }
-
-    [Test]
-    public async Task CopyFromLastMonth_Should_Send_GoalListChanged_Message()
+    public async Task CopyFromLastMonth_Should_Dispatch_Command()
     {
         // Arrange
-        var previousMonthGoal = GoalBuilder.AGoal()
-            .WithPeriod(GoalPeriods.Monthly)
-            .WithRefDate(new DateOnly(2024, 12, 1))
-            .WithGoalType(new SpendingLimitGoalType(1000m, 500m))
-            .Build();
-
-        _goalRepository.GetAllAsync()
-            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal> { previousMonthGoal }));
+        _commandDispatcher.DispatchAsync(Arg.Any<CopyGoalsFromLastMonthCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result<CopyGoalsFromLastMonthResult>.Success(new CopyGoalsFromLastMonthResult { CopiedCount = 1 }));
 
         _filterState.MainDate = new DateTime(2025, 1, 15);
 
         var vm = CreateViewModel();
         await Task.Delay(200);
 
-        var messageReceived = false;
-        WeakReferenceMessenger.Default.Register<GoalListChanged>(this, (_, _) => messageReceived = true);
-
         // Act
         await vm.CopyFromLastMonthCommand.ExecuteAsync(null);
 
-        // Assert
-        Assert.That(messageReceived, Is.True);
+        // Assert - the ViewModel passes the current date from _filterState.MainDate
+        await _commandDispatcher.Received(1).DispatchAsync(
+            Arg.Is<CopyGoalsFromLastMonthCommand>(c => c.CurrentDate == new DateOnly(2025, 1, 15)),
+            Arg.Any<CancellationToken>());
     }
 
     [Test]
-    public async Task CopyFromLastMonth_Should_Mark_Progress_State_As_Stale()
+    public async Task CopyFromLastMonth_Should_Mark_Progress_State_As_Stale_When_Goals_Copied()
     {
         // Arrange
-        var previousMonthGoal = GoalBuilder.AGoal()
-            .WithPeriod(GoalPeriods.Monthly)
-            .WithRefDate(new DateOnly(2024, 12, 1))
-            .WithGoalType(new DcaGoalType(10, 5))
-            .Build();
-
-        _goalRepository.GetAllAsync()
-            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal> { previousMonthGoal }));
+        _commandDispatcher.DispatchAsync(Arg.Any<CopyGoalsFromLastMonthCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result<CopyGoalsFromLastMonthResult>.Success(new CopyGoalsFromLastMonthResult { CopiedCount = 2 }));
 
         _filterState.MainDate = new DateTime(2025, 1, 15);
 
@@ -566,38 +406,11 @@ public class GoalsPanelViewModelTests : DatabaseTest
     }
 
     [Test]
-    public async Task CopyFromLastMonth_Should_Handle_Cross_Year_Boundary()
+    public async Task CopyFromLastMonth_Should_Not_Mark_Stale_When_No_Goals_Copied()
     {
-        // Arrange - December 2024 to January 2025
-        var decemberGoal = GoalBuilder.AGoal()
-            .WithPeriod(GoalPeriods.Monthly)
-            .WithRefDate(new DateOnly(2024, 12, 1))
-            .WithGoalType(new IncomeFiatGoalType(5000m, 3000m))
-            .Build();
-
-        _goalRepository.GetAllAsync()
-            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal> { decemberGoal }));
-
-        _filterState.MainDate = new DateTime(2025, 1, 15);
-
-        var vm = CreateViewModel();
-        await Task.Delay(200);
-
-        // Act
-        await vm.CopyFromLastMonthCommand.ExecuteAsync(null);
-
-        // Assert - Should save a new goal for January 2025
-        await _goalRepository.Received(1).SaveAsync(Arg.Is<Goal>(g =>
-            g.RefDate.Year == 2025 &&
-            g.RefDate.Month == 1));
-    }
-
-    [Test]
-    public async Task CopyFromLastMonth_Should_Do_Nothing_When_No_Previous_Month_Goals()
-    {
-        // Arrange - No goals at all
-        _goalRepository.GetAllAsync()
-            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal>()));
+        // Arrange
+        _commandDispatcher.DispatchAsync(Arg.Any<CopyGoalsFromLastMonthCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result<CopyGoalsFromLastMonthResult>.Success(new CopyGoalsFromLastMonthResult { CopiedCount = 0 }));
 
         _filterState.MainDate = new DateTime(2025, 1, 15);
 
@@ -608,34 +421,7 @@ public class GoalsPanelViewModelTests : DatabaseTest
         await vm.CopyFromLastMonthCommand.ExecuteAsync(null);
 
         // Assert
-        await _goalRepository.DidNotReceive().SaveAsync(Arg.Any<Goal>());
-    }
-
-    [Test]
-    public async Task CopyFromLastMonth_Should_Reset_Progress_On_Copied_Goals()
-    {
-        // Arrange - Goal with progress
-        var previousMonthGoal = GoalBuilder.AGoal()
-            .WithPeriod(GoalPeriods.Monthly)
-            .WithRefDate(new DateOnly(2024, 12, 1))
-            .WithGoalType(new StackBitcoinGoalType(1_000_000L, 750_000L)) // 75% progress
-            .Build();
-
-        _goalRepository.GetAllAsync()
-            .Returns(Task.FromResult<IEnumerable<Goal>>(new List<Goal> { previousMonthGoal }));
-
-        _filterState.MainDate = new DateTime(2025, 1, 15);
-
-        var vm = CreateViewModel();
-        await Task.Delay(200);
-
-        // Act
-        await vm.CopyFromLastMonthCommand.ExecuteAsync(null);
-
-        // Assert - Copied goal should have reset progress (0)
-        await _goalRepository.Received(1).SaveAsync(Arg.Is<Goal>(g =>
-            g.GoalType.TypeName == GoalTypeNames.StackBitcoin &&
-            ((StackBitcoinGoalType)g.GoalType).CalculatedSats == 0));
+        Assert.That(_goalProgressState.HasStaleGoals, Is.False);
     }
 
     #endregion

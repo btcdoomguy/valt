@@ -9,7 +9,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Valt.Core\Valt.Core.csproj" />
-        <ProjectReference Include="..\Valt.Infra\Valt.Infra.csproj" />
     </ItemGroup>
 
     <ItemGroup>

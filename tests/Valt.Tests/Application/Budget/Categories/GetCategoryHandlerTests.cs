@@ -17,7 +17,7 @@ public class GetCategoryHandlerTests : DatabaseTest
         foreach (var category in existingCategories)
             await _categoryRepository.DeleteCategoryAsync(category.Id);
 
-        _handler = new GetCategoryHandler(_localDatabase);
+        _handler = new GetCategoryHandler(_categoryQueries);
     }
 
     [Test]

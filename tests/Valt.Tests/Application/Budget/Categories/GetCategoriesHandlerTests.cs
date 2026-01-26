@@ -23,7 +23,7 @@ public class GetCategoriesHandlerTests : DatabaseTest
     [SetUp]
     public void SetUpHandler()
     {
-        _handler = new GetCategoriesHandler(_localDatabase);
+        _handler = new GetCategoriesHandler(_categoryQueries);
     }
 
     [Test]

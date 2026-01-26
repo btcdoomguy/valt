@@ -1,9 +1,9 @@
 using Valt.App.Kernel;
 using Valt.App.Kernel.Commands;
+using Valt.App.Modules.Budget.Transactions.Contracts;
+using Valt.App.Modules.Budget.Transactions.DTOs;
 using Valt.Core.Modules.Budget.Categories;
 using Valt.Core.Modules.Budget.Categories.Contracts;
-using Valt.Infra.Modules.Budget.Transactions.Queries;
-using Valt.Infra.Modules.Budget.Transactions.Queries.DTOs;
 
 namespace Valt.App.Modules.Budget.Categories.Commands.DeleteCategory;
 
@@ -39,7 +39,7 @@ internal sealed class DeleteCategoryHandler : ICommandHandler<DeleteCategoryComm
         // Check if category is used by any transaction
         var transactionsWithCategory = await _transactionQueries.GetTransactionsAsync(new TransactionQueryFilter
         {
-            Categories = [command.CategoryId]
+            CategoryIds = [command.CategoryId]
         });
 
         if (transactionsWithCategory.Items.Count > 0)

@@ -5,11 +5,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Queries;
-using Valt.Core.Kernel.Exceptions;
+using Valt.App.Modules.Goals.Commands.CreateGoal;
+using Valt.App.Modules.Goals.Commands.EditGoal;
+using Valt.App.Modules.Goals.Queries.GetGoal;
 using Valt.Core.Modules.Goals;
-using Valt.Core.Modules.Goals.Contracts;
-using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
@@ -21,15 +22,13 @@ namespace Valt.UI.Views.Main.Modals.ManageGoal;
 
 public partial class ManageGoalViewModel : ValtModalValidatorViewModel
 {
-    private readonly IGoalRepository? _goalRepository;
-    private readonly IConfigurationManager? _configurationManager;
+    private readonly ICommandDispatcher? _commandDispatcher;
     private readonly IQueryDispatcher? _queryDispatcher;
     private readonly CurrencySettings? _currencySettings;
 
     #region Form Data
 
-    private GoalId? _goalId;
-    private IGoalType? _existingGoalType;
+    private string? _goalId;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowMonthSelector))]
@@ -91,13 +90,11 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     }
 
     public ManageGoalViewModel(
-        IGoalRepository goalRepository,
-        IConfigurationManager configurationManager,
+        ICommandDispatcher commandDispatcher,
         IQueryDispatcher queryDispatcher,
         CurrencySettings currencySettings)
     {
-        _goalRepository = goalRepository;
-        _configurationManager = configurationManager;
+        _commandDispatcher = commandDispatcher;
         _queryDispatcher = queryDispatcher;
         _currencySettings = currencySettings;
 
@@ -139,7 +136,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     {
         if (Parameter is not null && Parameter is string goalIdString)
         {
-            var goal = await _goalRepository!.GetByIdAsync(new GoalId(goalIdString));
+            var goal = await _queryDispatcher!.DispatchAsync(new GetGoalQuery { GoalId = goalIdString });
 
             if (goal is null)
             {
@@ -148,14 +145,13 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
             }
 
             _goalId = goal.Id;
-            _existingGoalType = goal.GoalType;
             IsEditMode = true;
-            SelectedPeriod = goal.Period.ToString();
+            SelectedPeriod = ((GoalPeriods)goal.Period).ToString();
             SelectedYear = goal.RefDate.Year;
             SelectedMonth = goal.RefDate.Month.ToString();
-            SelectedGoalType = goal.GoalType.TypeName.ToString();
+            SelectedGoalType = ((GoalTypeNames)goal.GoalType.TypeId).ToString();
 
-            CurrentGoalTypeEditor?.LoadFrom(goal.GoalType);
+            CurrentGoalTypeEditor?.LoadFromDTO(goal.GoalType);
         }
     }
 
@@ -169,28 +165,45 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
             var period = Enum.Parse<GoalPeriods>(SelectedPeriod);
             var month = period == GoalPeriods.Yearly ? 1 : int.Parse(SelectedMonth);
             var refDate = new DateOnly(SelectedYear, month, 1);
+            var goalTypeDto = CurrentGoalTypeEditor.CreateGoalTypeDTO();
 
-            Goal goal;
             if (_goalId is null)
             {
-                var goalType = CurrentGoalTypeEditor.CreateGoalType();
-                goal = Goal.New(refDate, period, goalType);
+                var result = await _commandDispatcher!.DispatchAsync(new CreateGoalCommand
+                {
+                    RefDate = refDate,
+                    Period = (int)period,
+                    GoalType = goalTypeDto
+                });
+
+                if (result.IsSuccess)
+                {
+                    CloseDialog?.Invoke(new Response(true, result.Value!.GoalId));
+                }
+                else
+                {
+                    await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
+                }
             }
             else
             {
-                var existingGoal = await _goalRepository!.GetByIdAsync(_goalId);
+                var result = await _commandDispatcher!.DispatchAsync(new EditGoalCommand
+                {
+                    GoalId = _goalId,
+                    RefDate = refDate,
+                    Period = (int)period,
+                    GoalType = goalTypeDto
+                });
 
-                if (existingGoal is null)
-                    throw new EntityNotFoundException(nameof(Goal), _goalId);
-
-                var goalType = CurrentGoalTypeEditor.CreateGoalTypePreservingCalculated(existingGoal.GoalType);
-
-                existingGoal.Edit(refDate, period, goalType);
-                goal = existingGoal;
+                if (result.IsSuccess)
+                {
+                    CloseDialog?.Invoke(new Response(true, _goalId));
+                }
+                else
+                {
+                    await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
+                }
             }
-
-            await _goalRepository!.SaveAsync(goal);
-            CloseDialog?.Invoke(new Response(true, goal.Id));
         }
     }
 
@@ -207,5 +220,5 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
         return Task.CompletedTask;
     }
 
-    public record Response(bool Ok, GoalId? GoalId = null);
+    public record Response(bool Ok, string? GoalId = null);
 }
