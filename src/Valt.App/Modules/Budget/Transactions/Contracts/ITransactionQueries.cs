@@ -6,4 +6,6 @@ public interface ITransactionQueries
 {
     Task<TransactionsDTO> GetTransactionsAsync(TransactionQueryFilter filter);
     Task<IReadOnlyList<TransactionNameSearchDTO>> GetTransactionNamesAsync(string searchTerm);
+    Task<TransactionForEditDTO?> GetTransactionByIdAsync(string transactionId);
+    Task<bool> HasAnyTransactionAsync(string accountId);
 }

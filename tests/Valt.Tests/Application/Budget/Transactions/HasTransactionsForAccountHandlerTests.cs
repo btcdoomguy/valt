@@ -44,7 +44,7 @@ public class HasTransactionsForAccountHandlerTests : DatabaseTest
     [SetUp]
     public void SetUpHandler()
     {
-        _handler = new HasTransactionsForAccountHandler(_transactionRepository);
+        _handler = new HasTransactionsForAccountHandler(_transactionQueries);
     }
 
     [Test]

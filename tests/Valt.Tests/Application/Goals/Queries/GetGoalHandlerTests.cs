@@ -18,7 +18,7 @@ public class GetGoalHandlerTests : DatabaseTest
         foreach (var goal in existingGoals)
             await _goalRepository.DeleteAsync(goal);
 
-        _handler = new GetGoalHandler(_goalRepository);
+        _handler = new GetGoalHandler(_goalQueries);
     }
 
     [Test]

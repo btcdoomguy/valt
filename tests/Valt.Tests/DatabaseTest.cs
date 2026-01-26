@@ -1,6 +1,8 @@
 using NSubstitute;
 using Valt.App.Modules.Budget.Accounts.Contracts;
 using Valt.App.Modules.Budget.Categories.Contracts;
+using Valt.App.Modules.Budget.Transactions.Contracts;
+using Valt.App.Modules.Goals.Contracts;
 using Valt.Core.Kernel.Abstractions.EventSystem;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Budget.Accounts.Contracts;
@@ -21,6 +23,8 @@ using Valt.Infra.Modules.Budget.FixedExpenses;
 using Valt.Infra.Modules.AvgPrice;
 using Valt.Infra.Modules.Goals;
 using Valt.Infra.Modules.Budget.Transactions;
+using Valt.Infra.Modules.Budget.Transactions.Queries;
+using Valt.Infra.Modules.Goals.Queries;
 
 namespace Valt.Tests;
 
@@ -48,6 +52,8 @@ public abstract class DatabaseTest
     // Query implementations
     protected IAccountQueries _accountQueries;
     protected ICategoryQueries _categoryQueries;
+    protected ITransactionQueries _transactionQueries;
+    protected IGoalQueries _goalQueries;
 
     protected DatabaseTest()
     {
@@ -70,6 +76,8 @@ public abstract class DatabaseTest
         // Query implementations
         _categoryQueries = new CategoryQueries(_localDatabase);
         _accountQueries = new AccountQueries(_localDatabase, Substitute.For<IAccountTotalsCalculator>());
+        _transactionQueries = new TransactionQueries(_localDatabase);
+        _goalQueries = new GoalQueries(_localDatabase);
     }
 
     [OneTimeSetUp]

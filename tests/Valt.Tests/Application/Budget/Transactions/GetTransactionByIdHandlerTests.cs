@@ -36,7 +36,7 @@ public class GetTransactionByIdHandlerTests : DatabaseTest
     [SetUp]
     public void SetUpHandler()
     {
-        _handler = new GetTransactionByIdHandler(_transactionRepository);
+        _handler = new GetTransactionByIdHandler(_transactionQueries);
     }
 
     [Test]
