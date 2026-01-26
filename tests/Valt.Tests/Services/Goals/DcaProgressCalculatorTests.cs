@@ -1,10 +1,8 @@
-using LiteDB;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.GoalTypes;
-using Valt.Infra;
-using Valt.Infra.Modules.Budget.Transactions;
 using Valt.Infra.Modules.Goals.Queries.DTOs;
 using Valt.Infra.Modules.Goals.Services;
+using Valt.Tests.Builders;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Valt.Tests.Services.Goals;
@@ -322,68 +320,42 @@ public class DcaProgressCalculatorTests : DatabaseTest
 
     private void AddBitcoinPurchase(DateOnly date)
     {
-        _localDatabase.GetTransactions().Insert(new TransactionEntity
-        {
-            Id = ObjectId.NewObjectId(),
-            Date = date.ToValtDateTime(),
-            Name = "Bitcoin Purchase",
-            Type = TransactionEntityType.FiatToBitcoin,
-            FromFiatAmount = -100m, // Fiat spent
-            ToSatAmount = 100000,   // Sats received
-            CategoryId = ObjectId.NewObjectId(),
-            FromAccountId = ObjectId.NewObjectId(),
-            ToAccountId = ObjectId.NewObjectId(),
-            Version = 1
-        });
+        var entity = TransactionBuilder.ATransaction()
+            .WithDate(date)
+            .WithName("Bitcoin Purchase")
+            .AsBitcoinPurchase(satAmount: 100_000, fiatAmount: 100m)
+            .Build();
+        _localDatabase.GetTransactions().Insert(entity);
     }
 
     private void AddBitcoinSale(DateOnly date)
     {
-        _localDatabase.GetTransactions().Insert(new TransactionEntity
-        {
-            Id = ObjectId.NewObjectId(),
-            Date = date.ToValtDateTime(),
-            Name = "Bitcoin Sale",
-            Type = TransactionEntityType.BitcoinToFiat,
-            FromSatAmount = -100000, // Sats sold
-            ToFiatAmount = 100m,     // Fiat received
-            CategoryId = ObjectId.NewObjectId(),
-            FromAccountId = ObjectId.NewObjectId(),
-            ToAccountId = ObjectId.NewObjectId(),
-            Version = 1
-        });
+        var entity = TransactionBuilder.ATransaction()
+            .WithDate(date)
+            .WithName("Bitcoin Sale")
+            .AsBitcoinSale(satAmount: 100_000, fiatAmount: 100m)
+            .Build();
+        _localDatabase.GetTransactions().Insert(entity);
     }
 
     private void AddFiatTransaction(DateOnly date)
     {
-        _localDatabase.GetTransactions().Insert(new TransactionEntity
-        {
-            Id = ObjectId.NewObjectId(),
-            Date = date.ToValtDateTime(),
-            Name = "Fiat Transaction",
-            Type = TransactionEntityType.Fiat,
-            FromFiatAmount = -50m, // Fiat expense
-            CategoryId = ObjectId.NewObjectId(),
-            FromAccountId = ObjectId.NewObjectId(),
-            Version = 1
-        });
+        var entity = TransactionBuilder.ATransaction()
+            .WithDate(date)
+            .WithName("Fiat Transaction")
+            .AsFiatExpense(amount: 50m)
+            .Build();
+        _localDatabase.GetTransactions().Insert(entity);
     }
 
     private void AddBitcoinTransfer(DateOnly date)
     {
-        _localDatabase.GetTransactions().Insert(new TransactionEntity
-        {
-            Id = ObjectId.NewObjectId(),
-            Date = date.ToValtDateTime(),
-            Name = "Bitcoin Transfer",
-            Type = TransactionEntityType.BitcoinToBitcoin,
-            FromSatAmount = -50000, // Sats from source
-            ToSatAmount = 50000,    // Sats to destination
-            CategoryId = ObjectId.NewObjectId(),
-            FromAccountId = ObjectId.NewObjectId(),
-            ToAccountId = ObjectId.NewObjectId(),
-            Version = 1
-        });
+        var entity = TransactionBuilder.ATransaction()
+            .WithDate(date)
+            .WithName("Bitcoin Transfer")
+            .AsBitcoinToBitcoinTransfer(satAmount: 50_000)
+            .Build();
+        _localDatabase.GetTransactions().Insert(entity);
     }
 
     #endregion
