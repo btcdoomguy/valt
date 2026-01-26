@@ -4,7 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Queries;
+using Valt.Infra.Crawlers.HistoricPriceCrawlers;
+using Valt.Infra.Crawlers.LivePriceCrawlers.Bitcoin.Providers;
+using Valt.Infra.Crawlers.LivePriceCrawlers.Fiat.Providers;
 using Valt.Infra.DataAccess;
+using Valt.Infra.Modules.Configuration;
+using Valt.Infra.Modules.Currency.Services;
 using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
 using Valt.Infra.Modules.Reports.ExpensesByCategory;
@@ -231,5 +236,13 @@ public class McpServerService
         services.AddSingleton(_appServices.GetRequiredService<IMonthlyTotalsReport>());
         services.AddSingleton(_appServices.GetRequiredService<IStatisticsReport>());
         services.AddSingleton(_appServices.GetRequiredService<IWealthOverviewReport>());
+
+        // Currency services (needed by CurrencyTools)
+        services.AddSingleton(_appServices.GetRequiredService<IConfigurationManager>());
+        services.AddSingleton(_appServices.GetRequiredService<CurrencySettings>());
+        services.AddSingleton(_appServices.GetRequiredService<ICurrencyConversionService>());
+        services.AddSingleton(_appServices.GetRequiredService<ILocalHistoricalPriceProvider>());
+        services.AddSingleton(_appServices.GetRequiredService<IBitcoinPriceProvider>());
+        services.AddSingleton(_appServices.GetRequiredService<IFiatPriceProviderSelector>());
     }
 }
