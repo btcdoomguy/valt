@@ -8,9 +8,10 @@ using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Budget.Accounts.Queries;
+using Valt.App.Modules.Budget.Categories.Queries;
 using Valt.Infra.Kernel.BackgroundJobs;
-using Valt.Infra.Modules.Budget.Accounts.Queries;
-using Valt.Infra.Modules.Budget.Categories.Queries;
 using Valt.Infra.Services.CsvImport;
 using Valt.UI.Base;
 using Valt.UI.Lang;
@@ -38,8 +39,7 @@ public partial class ImportWizardViewModel : ValtModalViewModel
 {
     private readonly ICsvImportParser? _csvImportParser;
     private readonly ICsvTemplateGenerator? _csvTemplateGenerator;
-    private readonly IAccountQueries? _accountQueries;
-    private readonly ICategoryQueries? _categoryQueries;
+    private readonly IQueryDispatcher? _queryDispatcher;
     private readonly ICsvImportExecutor? _csvImportExecutor;
     private readonly BackgroundJobManager? _backgroundJobManager;
 
@@ -195,15 +195,13 @@ public partial class ImportWizardViewModel : ValtModalViewModel
     public ImportWizardViewModel(
         ICsvImportParser csvImportParser,
         ICsvTemplateGenerator csvTemplateGenerator,
-        IAccountQueries accountQueries,
-        ICategoryQueries categoryQueries,
+        IQueryDispatcher queryDispatcher,
         ICsvImportExecutor csvImportExecutor,
         BackgroundJobManager backgroundJobManager)
     {
         _csvImportParser = csvImportParser;
         _csvTemplateGenerator = csvTemplateGenerator;
-        _accountQueries = accountQueries;
-        _categoryQueries = categoryQueries;
+        _queryDispatcher = queryDispatcher;
         _csvImportExecutor = csvImportExecutor;
         _backgroundJobManager = backgroundJobManager;
     }
@@ -321,12 +319,12 @@ public partial class ImportWizardViewModel : ValtModalViewModel
     /// </summary>
     private async Task ProcessMappingsAsync()
     {
-        if (ParseResult is null || _accountQueries is null || _categoryQueries is null)
+        if (ParseResult is null || _queryDispatcher is null)
             return;
 
         // Get existing accounts and categories
-        var existingAccounts = (await _accountQueries.GetAccountsAsync(showHiddenAccounts: true)).ToList();
-        var existingCategories = (await _categoryQueries.GetCategoriesAsync()).Items;
+        var existingAccounts = (await _queryDispatcher.DispatchAsync(new GetAccountsQuery(ShowHiddenAccounts: true))).ToList();
+        var existingCategories = (await _queryDispatcher.DispatchAsync(new GetCategoriesQuery())).Items;
 
         // Extract unique account names from CSV (both from and to accounts)
         var csvAccountNames = ParseResult.Rows

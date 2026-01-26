@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Valt.Infra.Modules.Budget.Categories.Queries;
-using Valt.Infra.Modules.Budget.Categories.Queries.DTOs;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Budget.Categories.DTOs;
+using Valt.App.Modules.Budget.Categories.Queries;
 using Valt.Infra.TransactionTerms;
 using Valt.UI.Base;
 
@@ -16,7 +17,7 @@ namespace Valt.UI.Views.Main.Modals.ChangeCategoryTransactions;
 public partial class ChangeCategoryTransactionsViewModel : ValtModalValidatorViewModel
 {
     private readonly ITransactionTermService _transactionTermService;
-    private readonly ICategoryQueries _categoryQueries;
+    private readonly IQueryDispatcher _queryDispatcher;
 
     #region Form Data
 
@@ -65,10 +66,10 @@ public partial class ChangeCategoryTransactionsViewModel : ValtModalValidatorVie
 
     public ChangeCategoryTransactionsViewModel(
         ITransactionTermService transactionTermService,
-        ICategoryQueries categoryQueries)
+        IQueryDispatcher queryDispatcher)
     {
         _transactionTermService = transactionTermService;
-        _categoryQueries = categoryQueries;
+        _queryDispatcher = queryDispatcher;
 
         _ = InitializeAsync();
     }
@@ -80,7 +81,8 @@ public partial class ChangeCategoryTransactionsViewModel : ValtModalValidatorVie
 
     private async Task FetchCategoriesAsync()
     {
-        var categories = (await _categoryQueries.GetCategoriesAsync()).Items.OrderBy(x => x.Name);
+        var result = await _queryDispatcher.DispatchAsync(new GetCategoriesQuery());
+        var categories = result.Items.OrderBy(x => x.Name);
 
         AvailableCategories.Clear();
         foreach (var category in categories)

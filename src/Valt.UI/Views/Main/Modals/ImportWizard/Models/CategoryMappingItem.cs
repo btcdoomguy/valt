@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Valt.Infra.Modules.Budget.Categories.Queries.DTOs;
+using Valt.App.Modules.Budget.Categories.DTOs;
 
 namespace Valt.UI.Views.Main.Modals.ImportWizard.Models;
 

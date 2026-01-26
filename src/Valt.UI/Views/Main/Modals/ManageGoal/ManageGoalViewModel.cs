@@ -5,10 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Valt.App.Kernel.Queries;
 using Valt.Core.Kernel.Exceptions;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.Contracts;
-using Valt.Infra.Modules.Budget.Categories.Queries;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
@@ -23,7 +23,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
 {
     private readonly IGoalRepository? _goalRepository;
     private readonly IConfigurationManager? _configurationManager;
-    private readonly ICategoryQueries? _categoryQueries;
+    private readonly IQueryDispatcher? _queryDispatcher;
     private readonly CurrencySettings? _currencySettings;
 
     #region Form Data
@@ -93,12 +93,12 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     public ManageGoalViewModel(
         IGoalRepository goalRepository,
         IConfigurationManager configurationManager,
-        ICategoryQueries categoryQueries,
+        IQueryDispatcher queryDispatcher,
         CurrencySettings currencySettings)
     {
         _goalRepository = goalRepository;
         _configurationManager = configurationManager;
-        _categoryQueries = categoryQueries;
+        _queryDispatcher = queryDispatcher;
         _currencySettings = currencySettings;
 
         SelectedPeriod = GoalPeriods.Monthly.ToString();
@@ -127,8 +127,8 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
                 ? new IncomeFiatGoalTypeEditorViewModel(_currencySettings)
                 : new IncomeFiatGoalTypeEditorViewModel(),
             GoalTypeNames.IncomeBtc => new IncomeBtcGoalTypeEditorViewModel(),
-            GoalTypeNames.ReduceExpenseCategory => _currencySettings != null && _categoryQueries != null
-                ? new ReduceExpenseCategoryGoalTypeEditorViewModel(_currencySettings, _categoryQueries)
+            GoalTypeNames.ReduceExpenseCategory => _currencySettings != null && _queryDispatcher != null
+                ? new ReduceExpenseCategoryGoalTypeEditorViewModel(_currencySettings, _queryDispatcher)
                 : new ReduceExpenseCategoryGoalTypeEditorViewModel(),
             GoalTypeNames.BitcoinHodl => new BitcoinHodlGoalTypeEditorViewModel(),
             _ => throw new ArgumentOutOfRangeException(nameof(goalTypeName))

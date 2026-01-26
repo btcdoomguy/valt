@@ -1,6 +1,6 @@
 using System;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Valt.Infra.Modules.Budget.Accounts.Queries.DTOs;
+using Valt.App.Modules.Budget.Accounts.DTOs;
 
 namespace Valt.UI.Views.Main.Modals.ImportWizard.Models;
 
