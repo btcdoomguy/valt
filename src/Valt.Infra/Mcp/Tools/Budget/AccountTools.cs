@@ -10,6 +10,8 @@ using Valt.App.Modules.Budget.Accounts.DTOs;
 using Valt.App.Modules.Budget.Accounts.Queries.GetAccount;
 using Valt.App.Modules.Budget.Accounts.Queries.GetAccountGroups;
 using Valt.App.Modules.Budget.Accounts.Queries.GetAccounts;
+using Valt.Infra.Kernel.Notifications;
+using Valt.Infra.Mcp.Notifications;
 
 namespace Valt.Infra.Mcp.Tools.Budget;
 
@@ -57,6 +59,7 @@ public class AccountTools
     [McpServerTool, Description("Create a new fiat currency account (e.g., bank account, credit card)")]
     public static async Task<string> CreateFiatAccount(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("Account name")] string name,
         [Description("Currency code (e.g., USD, EUR, BRL)")] string currency,
         [Description("Icon ID for the account")] string iconId,
@@ -81,6 +84,7 @@ public class AccountTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Account created with ID: {result.Value.AccountId}";
     }
 
@@ -90,6 +94,7 @@ public class AccountTools
     [McpServerTool, Description("Create a new Bitcoin account (e.g., cold storage, exchange wallet)")]
     public static async Task<string> CreateBtcAccount(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("Account name")] string name,
         [Description("Icon ID for the account")] string iconId,
         [Description("Initial balance in satoshis")] long initialAmountSats = 0,
@@ -112,6 +117,7 @@ public class AccountTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Bitcoin account created with ID: {result.Value.AccountId}";
     }
 
@@ -121,6 +127,7 @@ public class AccountTools
     [McpServerTool, Description("Edit an existing account's properties (all fields are required)")]
     public static async Task<string> EditAccount(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("The account ID to edit")] string accountId,
         [Description("Account name")] string name,
         [Description("Icon ID")] string iconId,
@@ -149,6 +156,7 @@ public class AccountTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Account {accountId} updated successfully";
     }
 
@@ -158,6 +166,7 @@ public class AccountTools
     [McpServerTool, Description("Delete an account (will fail if it has transactions)")]
     public static async Task<string> DeleteAccount(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("The account ID to delete")] string accountId)
     {
         var result = await dispatcher.DispatchAsync(new DeleteAccountCommand
@@ -170,6 +179,7 @@ public class AccountTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Account {accountId} deleted successfully";
     }
 }

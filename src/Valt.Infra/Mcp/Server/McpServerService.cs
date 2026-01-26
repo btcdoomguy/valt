@@ -17,6 +17,7 @@ using Valt.Infra.Modules.Reports.IncomeByCategory;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.Infra.Modules.Reports.Statistics;
 using Valt.Infra.Modules.Reports.WealthOverview;
+using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Settings;
 
 namespace Valt.Infra.Mcp.Server;
@@ -236,6 +237,9 @@ public class McpServerService
         services.AddSingleton(_appServices.GetRequiredService<IMonthlyTotalsReport>());
         services.AddSingleton(_appServices.GetRequiredService<IStatisticsReport>());
         services.AddSingleton(_appServices.GetRequiredService<IWealthOverviewReport>());
+
+        // Notification publisher (needed for MCP tools to notify UI of changes)
+        services.AddSingleton(_appServices.GetRequiredService<INotificationPublisher>());
 
         // Currency services (needed by CurrencyTools)
         services.AddSingleton(_appServices.GetRequiredService<IConfigurationManager>());

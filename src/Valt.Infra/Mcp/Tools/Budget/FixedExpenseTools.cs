@@ -8,6 +8,8 @@ using Valt.App.Modules.Budget.FixedExpenses.Commands.EditFixedExpense;
 using Valt.App.Modules.Budget.FixedExpenses.DTOs;
 using Valt.App.Modules.Budget.FixedExpenses.Queries.GetFixedExpense;
 using Valt.App.Modules.Budget.FixedExpenses.Queries.GetFixedExpenses;
+using Valt.Infra.Kernel.Notifications;
+using Valt.Infra.Mcp.Notifications;
 
 namespace Valt.Infra.Mcp.Tools.Budget;
 
@@ -44,6 +46,7 @@ public class FixedExpenseTools
     [McpServerTool, Description("Create a new monthly fixed expense with a constant amount")]
     public static async Task<string> CreateMonthlyFixedExpense(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("Expense name")] string name,
         [Description("Category ID")] string categoryId,
         [Description("Fixed amount value")] decimal amount,
@@ -77,6 +80,7 @@ public class FixedExpenseTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Fixed expense created with ID: {result.Value.FixedExpenseId}";
     }
 
@@ -86,6 +90,7 @@ public class FixedExpenseTools
     [McpServerTool, Description("Create a new monthly fixed expense with a variable amount range")]
     public static async Task<string> CreateMonthlyVariableExpense(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("Expense name")] string name,
         [Description("Category ID")] string categoryId,
         [Description("Minimum expected amount")] decimal minAmount,
@@ -121,6 +126,7 @@ public class FixedExpenseTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Fixed expense created with ID: {result.Value.FixedExpenseId}";
     }
 
@@ -130,6 +136,7 @@ public class FixedExpenseTools
     [McpServerTool, Description("Edit an existing fixed expense's name, category, and enabled status")]
     public static async Task<string> EditFixedExpense(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("The fixed expense ID to edit")] string fixedExpenseId,
         [Description("New expense name")] string name,
         [Description("New category ID")] string categoryId,
@@ -148,6 +155,7 @@ public class FixedExpenseTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Fixed expense {fixedExpenseId} updated successfully";
     }
 
@@ -157,6 +165,7 @@ public class FixedExpenseTools
     [McpServerTool, Description("Delete a fixed expense (transactions will lose their association)")]
     public static async Task<string> DeleteFixedExpense(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("The fixed expense ID to delete")] string fixedExpenseId)
     {
         var result = await dispatcher.DispatchAsync(new DeleteFixedExpenseCommand
@@ -169,6 +178,7 @@ public class FixedExpenseTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Fixed expense {fixedExpenseId} deleted successfully";
     }
 }

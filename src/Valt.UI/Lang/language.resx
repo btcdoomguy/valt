@@ -1643,4 +1643,10 @@
     <data name="Settings_McpServerPort_Hint" xml:space="preserve">
         <value>(for AI assistants)</value>
     </data>
+    <data name="McpNotification_Title" xml:space="preserve">
+        <value>Data changed via AI assistant</value>
+    </data>
+    <data name="McpNotification_ClickToRefresh" xml:space="preserve">
+        <value>Click to refresh the current view</value>
+    </data>
 </root>

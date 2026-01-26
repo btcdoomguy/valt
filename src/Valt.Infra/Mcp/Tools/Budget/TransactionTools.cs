@@ -6,6 +6,8 @@ using Valt.App.Modules.Budget.Transactions.Commands.AddTransaction;
 using Valt.App.Modules.Budget.Transactions.Commands.DeleteTransaction;
 using Valt.App.Modules.Budget.Transactions.DTOs;
 using Valt.App.Modules.Budget.Transactions.Queries.GetTransactions;
+using Valt.Infra.Kernel.Notifications;
+using Valt.Infra.Mcp.Notifications;
 
 namespace Valt.Infra.Mcp.Tools.Budget;
 
@@ -45,6 +47,7 @@ public class TransactionTools
     [McpServerTool, Description("Add a fiat expense transaction (money leaving a fiat account)")]
     public static async Task<string> AddFiatExpense(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("Transaction date (format: yyyy-MM-dd)")] string date,
         [Description("Transaction name/description")] string name,
         [Description("Category ID")] string categoryId,
@@ -73,6 +76,7 @@ public class TransactionTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Expense transaction created with ID: {result.Value.TransactionId}";
     }
 
@@ -82,6 +86,7 @@ public class TransactionTools
     [McpServerTool, Description("Add a fiat income transaction (money entering a fiat account)")]
     public static async Task<string> AddFiatIncome(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("Transaction date (format: yyyy-MM-dd)")] string date,
         [Description("Transaction name/description")] string name,
         [Description("Category ID")] string categoryId,
@@ -110,6 +115,7 @@ public class TransactionTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Income transaction created with ID: {result.Value.TransactionId}";
     }
 
@@ -119,6 +125,7 @@ public class TransactionTools
     [McpServerTool, Description("Add a transfer between two fiat accounts")]
     public static async Task<string> AddFiatToFiatTransfer(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("Transaction date (format: yyyy-MM-dd)")] string date,
         [Description("Transaction name/description")] string name,
         [Description("Category ID")] string categoryId,
@@ -150,6 +157,7 @@ public class TransactionTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Transfer transaction created with ID: {result.Value.TransactionId}";
     }
 
@@ -159,6 +167,7 @@ public class TransactionTools
     [McpServerTool, Description("Add a Bitcoin expense transaction (sats leaving a BTC account)")]
     public static async Task<string> AddBitcoinExpense(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("Transaction date (format: yyyy-MM-dd)")] string date,
         [Description("Transaction name/description")] string name,
         [Description("Category ID")] string categoryId,
@@ -187,6 +196,7 @@ public class TransactionTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Bitcoin expense transaction created with ID: {result.Value.TransactionId}";
     }
 
@@ -196,6 +206,7 @@ public class TransactionTools
     [McpServerTool, Description("Add a Bitcoin income transaction (sats entering a BTC account)")]
     public static async Task<string> AddBitcoinIncome(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("Transaction date (format: yyyy-MM-dd)")] string date,
         [Description("Transaction name/description")] string name,
         [Description("Category ID")] string categoryId,
@@ -224,6 +235,7 @@ public class TransactionTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Bitcoin income transaction created with ID: {result.Value.TransactionId}";
     }
 
@@ -233,6 +245,7 @@ public class TransactionTools
     [McpServerTool, Description("Add a Bitcoin purchase (fiat leaves, BTC enters)")]
     public static async Task<string> AddBitcoinPurchase(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("Transaction date (format: yyyy-MM-dd)")] string date,
         [Description("Transaction name/description")] string name,
         [Description("Category ID")] string categoryId,
@@ -264,6 +277,7 @@ public class TransactionTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Bitcoin purchase transaction created with ID: {result.Value.TransactionId}";
     }
 
@@ -273,6 +287,7 @@ public class TransactionTools
     [McpServerTool, Description("Delete a transaction")]
     public static async Task<string> DeleteTransaction(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("The transaction ID to delete")] string transactionId)
     {
         var result = await dispatcher.DispatchAsync(new DeleteTransactionCommand
@@ -285,6 +300,7 @@ public class TransactionTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Transaction {transactionId} deleted successfully";
     }
 

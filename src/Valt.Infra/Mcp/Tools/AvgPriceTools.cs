@@ -12,6 +12,8 @@ using Valt.App.Modules.AvgPrice.DTOs;
 using Valt.App.Modules.AvgPrice.Queries.GetLinesOfProfile;
 using Valt.App.Modules.AvgPrice.Queries.GetProfile;
 using Valt.App.Modules.AvgPrice.Queries.GetProfiles;
+using Valt.Infra.Kernel.Notifications;
+using Valt.Infra.Mcp.Notifications;
 
 namespace Valt.Infra.Mcp.Tools;
 
@@ -60,6 +62,7 @@ public class AvgPriceTools
     [McpServerTool, Description("Create a new average price profile using Brazilian Rule calculation (weighted average)")]
     public static async Task<string> CreateBrazilianRuleProfile(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("Profile name")] string name,
         [Description("Asset name (e.g., 'Bitcoin', 'BTC')")] string assetName,
         [Description("Decimal precision for amounts (e.g., 8 for satoshis)")] int precision,
@@ -87,6 +90,7 @@ public class AvgPriceTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Profile created with ID: {result.Value.ProfileId}";
     }
 
@@ -96,6 +100,7 @@ public class AvgPriceTools
     [McpServerTool, Description("Create a new average price profile using FIFO calculation (First-In-First-Out)")]
     public static async Task<string> CreateFifoProfile(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("Profile name")] string name,
         [Description("Asset name (e.g., 'Bitcoin', 'BTC')")] string assetName,
         [Description("Decimal precision for amounts (e.g., 8 for satoshis)")] int precision,
@@ -123,6 +128,7 @@ public class AvgPriceTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Profile created with ID: {result.Value.ProfileId}";
     }
 
@@ -132,6 +138,7 @@ public class AvgPriceTools
     [McpServerTool, Description("Edit an average price profile")]
     public static async Task<string> EditProfile(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("The profile ID to edit")] string profileId,
         [Description("Profile name")] string name,
         [Description("Asset name")] string assetName,
@@ -160,6 +167,7 @@ public class AvgPriceTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Profile {profileId} updated successfully";
     }
 
@@ -169,6 +177,7 @@ public class AvgPriceTools
     [McpServerTool, Description("Delete an average price profile and all its lines")]
     public static async Task<string> DeleteProfile(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("The profile ID to delete")] string profileId)
     {
         var result = await dispatcher.DispatchAsync(new DeleteProfileCommand
@@ -181,6 +190,7 @@ public class AvgPriceTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Profile {profileId} deleted successfully";
     }
 
@@ -190,6 +200,7 @@ public class AvgPriceTools
     [McpServerTool, Description("Add a buy (acquisition) line to an average price profile")]
     public static async Task<string> AddBuyLine(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("The profile ID")] string profileId,
         [Description("Date of acquisition (format: yyyy-MM-dd)")] string date,
         [Description("Quantity acquired")] decimal quantity,
@@ -211,6 +222,7 @@ public class AvgPriceTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Buy line added with ID: {result.Value.LineId}";
     }
 
@@ -220,6 +232,7 @@ public class AvgPriceTools
     [McpServerTool, Description("Add a sell (disposal) line to an average price profile")]
     public static async Task<string> AddSellLine(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("The profile ID")] string profileId,
         [Description("Date of sale (format: yyyy-MM-dd)")] string date,
         [Description("Quantity sold")] decimal quantity,
@@ -241,6 +254,7 @@ public class AvgPriceTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Sell line added with ID: {result.Value.LineId}";
     }
 
@@ -250,6 +264,7 @@ public class AvgPriceTools
     [McpServerTool, Description("Add a setup line (initial position) to an average price profile")]
     public static async Task<string> AddSetupLine(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("The profile ID")] string profileId,
         [Description("Date of setup (format: yyyy-MM-dd)")] string date,
         [Description("Initial quantity")] decimal quantity,
@@ -271,6 +286,7 @@ public class AvgPriceTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Setup line added with ID: {result.Value.LineId}";
     }
 
@@ -280,6 +296,7 @@ public class AvgPriceTools
     [McpServerTool, Description("Edit an existing line in an average price profile")]
     public static async Task<string> EditLine(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("The profile ID")] string profileId,
         [Description("The line ID to edit")] string lineId,
         [Description("Date (format: yyyy-MM-dd)")] string date,
@@ -304,6 +321,7 @@ public class AvgPriceTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Line {lineId} updated successfully";
     }
 
@@ -313,6 +331,7 @@ public class AvgPriceTools
     [McpServerTool, Description("Delete a line from an average price profile")]
     public static async Task<string> DeleteLine(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("The profile ID")] string profileId,
         [Description("The line ID to delete")] string lineId)
     {
@@ -327,6 +346,7 @@ public class AvgPriceTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Line {lineId} deleted successfully";
     }
 }

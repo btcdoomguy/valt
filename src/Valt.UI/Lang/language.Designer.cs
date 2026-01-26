@@ -3256,5 +3256,17 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Settings_McpServerPort_Hint", resourceCulture);
             }
         }
+
+        public static string McpNotification_Title {
+            get {
+                return ResourceManager.GetString("McpNotification_Title", resourceCulture);
+            }
+        }
+
+        public static string McpNotification_ClickToRefresh {
+            get {
+                return ResourceManager.GetString("McpNotification_ClickToRefresh", resourceCulture);
+            }
+        }
     }
 }

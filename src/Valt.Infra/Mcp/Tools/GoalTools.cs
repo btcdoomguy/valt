@@ -8,6 +8,8 @@ using Valt.App.Modules.Goals.Commands.EditGoal;
 using Valt.App.Modules.Goals.DTOs;
 using Valt.App.Modules.Goals.Queries.GetGoal;
 using Valt.App.Modules.Goals.Queries.GetGoals;
+using Valt.Infra.Kernel.Notifications;
+using Valt.Infra.Mcp.Notifications;
 
 namespace Valt.Infra.Mcp.Tools;
 
@@ -49,6 +51,7 @@ public class GoalTools
     [McpServerTool, Description("Create a goal to stack a target amount of Bitcoin (sats)")]
     public static async Task<string> CreateStackBitcoinGoal(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("Reference date (format: yyyy-MM-dd)")] string refDate,
         [Description("Period type: 0=Monthly, 1=Yearly")] int period,
         [Description("Target amount in satoshis")] long targetSats)
@@ -65,6 +68,7 @@ public class GoalTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Stack Bitcoin goal created with ID: {result.Value.GoalId}";
     }
 
@@ -74,6 +78,7 @@ public class GoalTools
     [McpServerTool, Description("Create a goal to limit fiat spending to a maximum amount")]
     public static async Task<string> CreateSpendingLimitGoal(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("Reference date (format: yyyy-MM-dd)")] string refDate,
         [Description("Period type: 0=Monthly, 1=Yearly")] int period,
         [Description("Maximum spending amount")] decimal targetAmount)
@@ -90,6 +95,7 @@ public class GoalTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Spending Limit goal created with ID: {result.Value.GoalId}";
     }
 
@@ -99,6 +105,7 @@ public class GoalTools
     [McpServerTool, Description("Create a DCA goal to make a target number of Bitcoin purchases")]
     public static async Task<string> CreateDcaGoal(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("Reference date (format: yyyy-MM-dd)")] string refDate,
         [Description("Period type: 0=Monthly, 1=Yearly")] int period,
         [Description("Target number of purchases")] int targetPurchaseCount)
@@ -115,6 +122,7 @@ public class GoalTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"DCA goal created with ID: {result.Value.GoalId}";
     }
 
@@ -124,6 +132,7 @@ public class GoalTools
     [McpServerTool, Description("Create a goal to earn a target amount of fiat income")]
     public static async Task<string> CreateIncomeFiatGoal(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("Reference date (format: yyyy-MM-dd)")] string refDate,
         [Description("Period type: 0=Monthly, 1=Yearly")] int period,
         [Description("Target income amount")] decimal targetAmount)
@@ -140,6 +149,7 @@ public class GoalTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Fiat Income goal created with ID: {result.Value.GoalId}";
     }
 
@@ -149,6 +159,7 @@ public class GoalTools
     [McpServerTool, Description("Create a goal to earn a target amount of Bitcoin income (sats)")]
     public static async Task<string> CreateIncomeBtcGoal(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("Reference date (format: yyyy-MM-dd)")] string refDate,
         [Description("Period type: 0=Monthly, 1=Yearly")] int period,
         [Description("Target income in satoshis")] long targetSats)
@@ -165,6 +176,7 @@ public class GoalTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Bitcoin Income goal created with ID: {result.Value.GoalId}";
     }
 
@@ -174,6 +186,7 @@ public class GoalTools
     [McpServerTool, Description("Create a goal to limit spending in a specific category")]
     public static async Task<string> CreateReduceExpenseCategoryGoal(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("Reference date (format: yyyy-MM-dd)")] string refDate,
         [Description("Period type: 0=Monthly, 1=Yearly")] int period,
         [Description("Category ID to track")] string categoryId,
@@ -195,6 +208,7 @@ public class GoalTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Reduce Expense Category goal created with ID: {result.Value.GoalId}";
     }
 
@@ -204,6 +218,7 @@ public class GoalTools
     [McpServerTool, Description("Create a goal to limit Bitcoin selling (HODL goal)")]
     public static async Task<string> CreateBitcoinHodlGoal(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("Reference date (format: yyyy-MM-dd)")] string refDate,
         [Description("Period type: 0=Monthly, 1=Yearly")] int period,
         [Description("Maximum sats that can be sold (0 = no selling allowed)")] long maxSellableSats)
@@ -220,6 +235,7 @@ public class GoalTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Bitcoin HODL goal created with ID: {result.Value.GoalId}";
     }
 
@@ -229,6 +245,7 @@ public class GoalTools
     [McpServerTool, Description("Delete a financial goal")]
     public static async Task<string> DeleteGoal(
         ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
         [Description("The goal ID to delete")] string goalId)
     {
         var result = await dispatcher.DispatchAsync(new DeleteGoalCommand
@@ -241,6 +258,7 @@ public class GoalTools
             return $"Error: {result.Error?.Message ?? "Unknown error"}";
         }
 
+        await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Goal {goalId} deleted successfully";
     }
 }

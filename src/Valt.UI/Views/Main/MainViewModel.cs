@@ -43,6 +43,7 @@ using Valt.UI.Views.Main.Modals.StatusDisplay;
 using Valt.UI.Views.Main.Modals.ImportWizard;
 using Valt.UI.Views.Main.Modals.InputPassword;
 using Valt.UI.Views.Main.Modals.ConversionCalculator;
+using Valt.Infra.Mcp.Notifications;
 using Valt.Infra.Mcp.Server;
 
 namespace Valt.UI.Views.Main;
@@ -108,6 +109,12 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     private Bitmap? _pepeMoodImage;
 
     [ObservableProperty] private bool _isOffline;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasPendingMcpChanges))]
+    private int _pendingMcpChanges;
+
+    public bool HasPendingMcpChanges => PendingMcpChanges > 0;
 
     public LiveRatesViewModel LiveRatesViewModel => _liveRatesViewModel;
     public UpdateIndicatorViewModel UpdateIndicator => _updateIndicatorViewModel;
@@ -203,34 +210,59 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         {
             var percentage = liveRateState.PreviousBitcoinPrice.HasValue
                 ? liveRateState.BitcoinPrice / liveRateState.PreviousBitcoinPrice.Value : 0m;
-            
+
             Crashing = percentage <= 0.95m;
             Down = percentage <= 0.97m && !Crashing;
             Pumping = percentage >= 1.05m;
             Up = percentage >= 1.03m && !Pumping;
-            
+
             UpdatePepeImage();
 
             IsOffline = liveRateState.IsOffline;
+        });
+
+        WeakReferenceMessenger.Default.Register<McpDataChangedNotification>(this, (recipient, message) =>
+        {
+            Dispatcher.UIThread.Post(() => PendingMcpChanges++);
         });
     }
 
     [RelayCommand]
     private void SetTransactionsTab()
     {
+        PendingMcpChanges = 0;
         SelectedTabComponent = _pageFactory.Create(MainViewTabNames.TransactionsPageContent);
     }
 
     [RelayCommand]
     private void SetReportsTab()
     {
+        PendingMcpChanges = 0;
         SelectedTabComponent = _pageFactory.Create(MainViewTabNames.ReportsPageContent);
     }
-    
+
     [RelayCommand]
     private void SetAvgPriceTab()
     {
+        PendingMcpChanges = 0;
         SelectedTabComponent = _pageFactory.Create(MainViewTabNames.AvgPricePageContent);
+    }
+
+    [RelayCommand]
+    private void RefreshCurrentTab()
+    {
+        PendingMcpChanges = 0;
+
+        // Re-trigger current tab initialization
+        var currentTab = SelectedTabComponent;
+        SelectedTabComponent = null;
+        SelectedTabComponent = currentTab?.TabName switch
+        {
+            MainViewTabNames.TransactionsPageContent => _pageFactory.Create(MainViewTabNames.TransactionsPageContent),
+            MainViewTabNames.ReportsPageContent => _pageFactory.Create(MainViewTabNames.ReportsPageContent),
+            MainViewTabNames.AvgPricePageContent => _pageFactory.Create(MainViewTabNames.AvgPricePageContent),
+            _ => currentTab
+        };
     }
 
     [RelayCommand]

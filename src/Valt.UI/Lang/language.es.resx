@@ -1638,4 +1638,10 @@
     <data name="Settings_McpServerPort_Hint" xml:space="preserve">
         <value>(para asistentes de IA)</value>
     </data>
+    <data name="McpNotification_Title" xml:space="preserve">
+        <value>Datos cambiados por asistente de IA</value>
+    </data>
+    <data name="McpNotification_ClickToRefresh" xml:space="preserve">
+        <value>Haga clic para actualizar la vista actual</value>
+    </data>
 </root>
