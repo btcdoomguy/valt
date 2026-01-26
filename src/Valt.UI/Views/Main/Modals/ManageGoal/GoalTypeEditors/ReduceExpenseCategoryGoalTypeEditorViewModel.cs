@@ -3,7 +3,7 @@ using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Budget.Categories.DTOs;
-using Valt.App.Modules.Budget.Categories.Queries;
+using Valt.App.Modules.Budget.Categories.Queries.GetCategories;
 using Valt.App.Modules.Goals.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Modules.Goals;

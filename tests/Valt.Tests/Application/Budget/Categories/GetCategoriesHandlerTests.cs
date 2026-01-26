@@ -1,4 +1,4 @@
-using Valt.App.Modules.Budget.Categories.Queries;
+using Valt.App.Modules.Budget.Categories.Queries.GetCategories;
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Categories;
 

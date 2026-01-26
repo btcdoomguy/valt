@@ -2,7 +2,7 @@ using System.Drawing;
 using NSubstitute;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Budget.Categories.DTOs;
-using Valt.App.Modules.Budget.Categories.Queries;
+using Valt.App.Modules.Budget.Categories.Queries.GetCategories;
 using Valt.Core.Kernel.Factories;
 using Valt.Infra.Kernel;
 using Valt.Infra.TransactionTerms;

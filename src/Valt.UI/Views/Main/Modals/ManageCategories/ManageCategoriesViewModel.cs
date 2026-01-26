@@ -13,7 +13,7 @@ using Valt.App.Modules.Budget.Categories.Commands.ChangeCategoryParent;
 using Valt.App.Modules.Budget.Categories.Commands.CreateCategory;
 using Valt.App.Modules.Budget.Categories.Commands.DeleteCategory;
 using Valt.App.Modules.Budget.Categories.Commands.EditCategory;
-using Valt.App.Modules.Budget.Categories.Queries;
+using Valt.App.Modules.Budget.Categories.Queries.GetCategories;
 using Valt.App.Modules.Budget.Categories.Queries.GetCategory;
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Categories;

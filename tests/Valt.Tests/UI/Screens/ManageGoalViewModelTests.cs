@@ -3,7 +3,7 @@ using Valt.App.Kernel;
 using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Budget.Categories.DTOs;
-using Valt.App.Modules.Budget.Categories.Queries;
+using Valt.App.Modules.Budget.Categories.Queries.GetCategories;
 using Valt.App.Modules.Goals.Commands.CreateGoal;
 using Valt.App.Modules.Goals.Commands.EditGoal;
 using Valt.App.Modules.Goals.DTOs;
