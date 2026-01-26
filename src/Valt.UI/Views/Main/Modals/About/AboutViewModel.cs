@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -35,21 +34,15 @@ public partial class AboutViewModel : ValtModalViewModel
     private async Task LoadDonationAddressesAsync()
     {
         using var client = new HttpClient() { Timeout = TimeSpan.FromSeconds(10) };
-        
+
         try
         {
-            var response = await client.GetAsync(DONATION_URL);
-            response.EnsureSuccessStatusCode();
-            
-            var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            
-            using var reader = new StreamReader(stream);
-
-            DonationAddresses = await reader.ReadToEndAsync();
+            // Use GetStringAsync to ensure full content is downloaded within timeout
+            DonationAddresses = await client.GetStringAsync(DONATION_URL).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during execution of Bitcoin Initial Seed Price provider");
+            _logger.LogError(ex, "Error loading donation addresses");
         }
     }
 }
