@@ -85,17 +85,14 @@ public class StaticCsvFiatHistoricalDataProvider : IFiatHistoricalDataProvider
         var url = $"{BASE_URL}{currency.Code}.csv";
         _logger.LogInformation("Downloading CSV data from {Url}", url);
 
-        var response = await client.GetAsync(url);
-        response.EnsureSuccessStatusCode();
-
-        var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-        using var reader = new StreamReader(stream);
+        // Use GetStringAsync to ensure full content is downloaded within timeout
+        var content = await client.GetStringAsync(url).ConfigureAwait(false);
 
         var result = new List<(DateOnly Date, decimal Price)>();
         decimal lastValidPrice = 0;
 
-        var line = await reader.ReadLineAsync();
-        while (line is not null)
+        var lines = content.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        foreach (var line in lines)
         {
             var split = line.Split(',');
             if (split.Length >= 2)
@@ -116,8 +113,6 @@ public class StaticCsvFiatHistoricalDataProvider : IFiatHistoricalDataProvider
                     }
                 }
             }
-
-            line = await reader.ReadLineAsync();
         }
 
         _logger.LogInformation("Downloaded {Count} records for currency {Currency}", result.Count, currency.Code);

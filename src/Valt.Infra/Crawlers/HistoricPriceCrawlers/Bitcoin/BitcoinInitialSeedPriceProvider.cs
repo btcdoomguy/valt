@@ -16,32 +16,28 @@ internal class BitcoinInitialSeedPriceProvider : IBitcoinInitialSeedPriceProvide
     
     public async Task<IEnumerable<BitcoinPriceData>> GetPricesAsync()
     {
-        using var client = new HttpClient() { Timeout = TimeSpan.FromSeconds(10) };
+        using var client = new HttpClient() { Timeout = TimeSpan.FromSeconds(30) };
 
         var result = new List<BitcoinPriceData>();
         try
         {
             var url = SEED_URL;
 
-            var response = await client.GetAsync(url);
-            response.EnsureSuccessStatusCode();
-            
-            var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            
-            using var reader = new StreamReader(stream);
+            // Use ReadAsStringAsync to ensure full content is downloaded within timeout
+            var content = await client.GetStringAsync(url).ConfigureAwait(false);
 
-            var nextLine = reader.ReadLine();
+            var lines = content.Split('\n', StringSplitOptions.RemoveEmptyEntries);
             decimal lastValidPrice = 0;
-            while (nextLine is not null)
+
+            foreach (var line in lines)
             {
-                var split = nextLine.Split(',');
+                var split = line.Split(',');
+                if (split.Length < 2) continue;
 
                 if (split[1] != "nan")
                     lastValidPrice = decimal.Parse(split[1], CultureInfo.InvariantCulture);
 
                 result.Add(new BitcoinPriceData(DateOnly.Parse(split[0]), lastValidPrice));
-
-                nextLine = reader.ReadLine();
             }
 
             return result;
