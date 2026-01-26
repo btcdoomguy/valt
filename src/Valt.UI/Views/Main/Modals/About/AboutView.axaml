@@ -6,6 +6,8 @@
         xmlns:userControls="clr-namespace:Valt.UI.UserControls"
         xmlns:local="clr-namespace:Valt.UI.Lang"
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
+        MinWidth="600"
+        MinHeight="400"
         MaxWidth="600"
         MaxHeight="400"
         x:Class="Valt.UI.Views.Main.Modals.About.AboutView"

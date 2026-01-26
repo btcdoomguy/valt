@@ -13,6 +13,8 @@
         WindowStartupLocation="CenterOwner"
         d:DesignWidth="750"
         d:DesignHeight="600"
+        MinWidth="750"
+        MinHeight="600"
         MaxWidth="750"
         MaxHeight="600"
         ExtendClientAreaToDecorationsHint="True"

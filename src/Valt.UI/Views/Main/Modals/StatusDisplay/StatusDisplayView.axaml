@@ -11,6 +11,8 @@
         Title="{x:Static local:language.StatusDisplay_Title}"
         d:DesignWidth="450"
         d:DesignHeight="255"
+        MinWidth="450"
+        MinHeight="255"
         MaxWidth="450"
         MaxHeight="255"
         x:DataType="statusDisplay:StatusDisplayViewModel"

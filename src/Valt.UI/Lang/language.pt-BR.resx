@@ -1625,4 +1625,17 @@
     <data name="DeleteInstallment_All" xml:space="preserve">
         <value>Todas as parcelas</value>
     </data>
+    <!-- MCP Server -->
+    <data name="McpServer_RunningTooltip" xml:space="preserve">
+        <value>Servidor MCP rodando em {0}. Clique para parar.</value>
+    </data>
+    <data name="McpServer_StoppedTooltip" xml:space="preserve">
+        <value>Servidor MCP parado. Clique para iniciar.</value>
+    </data>
+    <data name="Settings_McpServerPort" xml:space="preserve">
+        <value>Porta do Servidor MCP</value>
+    </data>
+    <data name="Settings_McpServerPort_Hint" xml:space="preserve">
+        <value>(para assistentes de IA)</value>
+    </data>
 </root>

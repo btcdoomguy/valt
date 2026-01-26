@@ -43,6 +43,7 @@ using Valt.UI.Views.Main.Modals.StatusDisplay;
 using Valt.UI.Views.Main.Modals.ImportWizard;
 using Valt.UI.Views.Main.Modals.InputPassword;
 using Valt.UI.Views.Main.Modals.ConversionCalculator;
+using Valt.Infra.Mcp.Server;
 
 namespace Valt.UI.Views.Main;
 
@@ -64,6 +65,9 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     private readonly IClock _clock = null!;
     private readonly ILogger<MainViewModel> _logger = null!;
     private readonly SecureModeState _secureModeState = null!;
+    private readonly McpServerService _mcpServerService = null!;
+    private readonly McpServerState _mcpServerState = null!;
+    private readonly DisplaySettings _displaySettings = null!;
 
     public MainView? Window { get; set; }
 
@@ -111,11 +115,24 @@ public partial class MainViewModel : ValtViewModel, IDisposable
 
     public string SecureModeIcon => _secureModeState?.IsEnabled == true ? "\xE897" : "\xE898";
 
+    // MCP Server icon: E157 (terminal/lan) when running, E5CD (lan-disconnect) when stopped
+    public string McpServerIcon => _mcpServerState?.IsRunning == true ? "\xE157" : "\xE5CD";
+
+    public string McpServerTooltip => _mcpServerState?.IsRunning == true
+        ? string.Format(language.McpServer_RunningTooltip, _mcpServerState.ServerUrl)
+        : language.McpServer_StoppedTooltip;
+
     #region Event subscribers
 
     private void LocalDatabaseOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         HasDatabaseOpen = _localDatabase!.HasDatabaseOpen;
+    }
+
+    private void McpServerStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(McpServerIcon));
+        OnPropertyChanged(nameof(McpServerTooltip));
     }
 
     #endregion
@@ -151,7 +168,10 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         ICsvExportService csvExportService,
         IClock clock,
         ILogger<MainViewModel> logger,
-        SecureModeState secureModeState)
+        SecureModeState secureModeState,
+        McpServerService mcpServerService,
+        McpServerState mcpServerState,
+        DisplaySettings displaySettings)
     {
         _pageFactory = pageFactory;
         _modalFactory = modalFactory;
@@ -168,8 +188,12 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         _clock = clock;
         _logger = logger;
         _secureModeState = secureModeState;
+        _mcpServerService = mcpServerService;
+        _mcpServerState = mcpServerState;
+        _displaySettings = displaySettings;
 
         _localDatabase.PropertyChanged += LocalDatabaseOnPropertyChanged;
+        _mcpServerState.PropertyChanged += McpServerStateOnPropertyChanged;
 
         Jobs = new AvaloniaList<JobInfo>(_backgroundJobManager.GetJobInfos());
         foreach (var job in Jobs)
@@ -237,6 +261,12 @@ public partial class MainViewModel : ValtViewModel, IDisposable
 
         _secureModeState.IsEnabled = !_secureModeState.IsEnabled;
         OnPropertyChanged(nameof(SecureModeIcon));
+    }
+
+    [RelayCommand]
+    private async Task ToggleMcpServer()
+    {
+        await _mcpServerService.ToggleAsync(_displaySettings.McpServerPort);
     }
 
     [RelayCommand]
@@ -570,6 +600,12 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         if (_backgroundJobManager is null)
             return;
 
+        // Stop MCP server first
+        if (_mcpServerService is not null)
+        {
+            await _mcpServerService.StopAsync();
+        }
+
         await _backgroundJobManager.StopAll();
 
         // Close databases to trigger checkpoint (merges -log.db into main .db file)
@@ -608,6 +644,10 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         // Unsubscribe from local database PropertyChanged
         if (_localDatabase is not null)
             _localDatabase.PropertyChanged -= LocalDatabaseOnPropertyChanged;
+
+        // Unsubscribe from MCP server state PropertyChanged
+        if (_mcpServerState is not null)
+            _mcpServerState.PropertyChanged -= McpServerStateOnPropertyChanged;
 
         // Unsubscribe from job PropertyChanged events
         foreach (var job in Jobs)

@@ -11,6 +11,8 @@
         x:DataType="avgPriceLineEditor:AvgPriceLineEditorViewModel"
         d:DesignWidth="450"
         d:DesignHeight="400"
+        MinWidth="450"
+        MinHeight="400"
         MaxWidth="450"
         MaxHeight="400"
         WindowStartupLocation="CenterOwner"

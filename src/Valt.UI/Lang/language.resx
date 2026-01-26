@@ -1630,4 +1630,17 @@
     <data name="DeleteInstallment_All" xml:space="preserve">
         <value>All installments</value>
     </data>
+    <!-- MCP Server -->
+    <data name="McpServer_RunningTooltip" xml:space="preserve">
+        <value>MCP Server running at {0}. Click to stop.</value>
+    </data>
+    <data name="McpServer_StoppedTooltip" xml:space="preserve">
+        <value>MCP Server stopped. Click to start.</value>
+    </data>
+    <data name="Settings_McpServerPort" xml:space="preserve">
+        <value>MCP Server Port</value>
+    </data>
+    <data name="Settings_McpServerPort_Hint" xml:space="preserve">
+        <value>(for AI assistants)</value>
+    </data>
 </root>

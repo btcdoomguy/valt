@@ -66,4 +66,24 @@ public interface ILocalDatabase : INotifyPropertyChanged, IDisposable
     ILiteCollection<GoalEntity> GetGoals();
 
     #endregion
+
+    #region Thread-safe database access for MCP
+
+    /// <summary>
+    /// Executes a database operation with thread-safe locking.
+    /// Use this method for MCP tool operations that may run on a background thread.
+    /// </summary>
+    Task<T> ExecuteWithLockAsync<T>(Func<LiteDatabase, T> operation, CancellationToken ct = default);
+
+    /// <summary>
+    /// Executes a database operation with thread-safe locking (async version).
+    /// </summary>
+    Task<T> ExecuteWithLockAsync<T>(Func<LiteDatabase, Task<T>> operation, CancellationToken ct = default);
+
+    /// <summary>
+    /// Executes a void database operation with thread-safe locking.
+    /// </summary>
+    Task ExecuteWithLockAsync(Action<LiteDatabase> operation, CancellationToken ct = default);
+
+    #endregion
 }

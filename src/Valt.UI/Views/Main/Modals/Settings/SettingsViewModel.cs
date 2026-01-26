@@ -42,6 +42,7 @@ public partial class SettingsViewModel : ValtModalViewModel
     [ObservableProperty] private string _currentCulture = string.Empty;
     [ObservableProperty] private ThemeDefinition? _selectedTheme;
     [ObservableProperty] private FontScaleItem? _selectedFontScale;
+    [ObservableProperty] private int _mcpServerPort = 5200;
 
     private List<string> _initialSelectedCurrencies = new();
     private HashSet<string> _currenciesInUse = new();
@@ -108,6 +109,7 @@ public partial class SettingsViewModel : ValtModalViewModel
         ShowHiddenAccounts = false;
         CurrentCulture = "en-US";
         SelectedFontScale = FontScaleItem.All.First(x => x.Scale == FontScale.Medium);
+        McpServerPort = 5200;
 
         SelectedFiatCurrencies.CollectionChanged += OnSelectedFiatCurrenciesChanged;
     }
@@ -139,6 +141,7 @@ public partial class SettingsViewModel : ValtModalViewModel
                         ?? _themeService.AvailableThemes.First();
         SelectedFontScale = FontScaleItem.All.FirstOrDefault(x => x.Scale == fontScaleService.CurrentScale)
                             ?? FontScaleItem.All.First(x => x.Scale == FontScale.Medium);
+        McpServerPort = _displaySettings.McpServerPort;
 
         // Initialize currencies
         InitializeFiatCurrencies();
@@ -246,6 +249,7 @@ public partial class SettingsViewModel : ValtModalViewModel
         _currencySettings.Save();
 
         _displaySettings.ShowHiddenAccounts = ShowHiddenAccounts;
+        _displaySettings.McpServerPort = McpServerPort;
         _displaySettings.Save();
 
         // Apply and save font scale if changed

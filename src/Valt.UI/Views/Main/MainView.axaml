@@ -113,6 +113,15 @@
                             Padding="8"
                             Margin="0, 24, 10, 0"
                             VerticalAlignment="Top"
+                            Content="{Binding McpServerIcon}"
+                            Command="{Binding ToggleMcpServerCommand}"
+                            ToolTip.Tip="{Binding McpServerTooltip}" />
+                    <Button Classes="icon-only transparent link"
+                            FontFamily="{DynamicResource MaterialDesign}"
+                            FontSize="28"
+                            Padding="8"
+                            Margin="0, 24, 10, 0"
+                            VerticalAlignment="Top"
                             Content="{Binding SecureModeIcon}"
                             Command="{Binding ToggleSecureModeCommand}"
                             ToolTip.Tip="{x:Static local:language.SecureMode_ToggleTooltip}" />

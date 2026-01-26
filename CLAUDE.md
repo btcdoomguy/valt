@@ -127,6 +127,25 @@ public void OneTimeSetUp() => IdGenerator.Configure(new LiteDbIdProvider());
 - LiveChartsCore.SkiaSharpView for charts
 - Custom fonts: Geist, GeistMono, Phosphor, MaterialDesign
 
+### Modal Windows
+
+**Always set MinWidth and MinHeight for modal windows** to prevent content from being cut off on small screen resolutions:
+
+```xml
+<Window ...
+        d:DesignWidth="600"
+        d:DesignHeight="400"
+        MinWidth="600"
+        MinHeight="400"
+        MaxWidth="600"
+        MaxHeight="400"
+        ... >
+```
+
+- Use `d:DesignWidth` and `d:DesignHeight` values as the minimum dimensions
+- Modal views are located in `Views/Main/Modals/`
+- All modals use `SystemDecorations="None"` with custom title bar (`CustomTitleBar`)
+
 ### Localization
 
 **Update ALL THREE language files when adding strings:**

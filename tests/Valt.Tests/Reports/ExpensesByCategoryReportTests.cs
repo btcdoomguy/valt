@@ -410,4 +410,57 @@ public class ExpensesByCategoryReportTests : DatabaseTest
         Assert.That(result.Items[1].CategoryName, Is.EqualTo("Transport"));
         Assert.That(result.Items[2].CategoryName, Is.EqualTo("Utilities"));
     }
+
+    [Test]
+    public async Task Should_Include_All_Accounts_And_Categories_When_Filters_Are_Empty()
+    {
+        var baseDate = new DateOnly(2025, 01, 31);
+        var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var report = new ExpensesByCategoryReport(new NullLogger<ExpensesByCategoryReport>());
+
+        // Empty filter - should include all accounts and categories
+        var emptyFilter = new IExpensesByCategoryReport.Filter(
+            Array.Empty<AccountId>(),
+            Array.Empty<CategoryId>()
+        );
+
+        var resultWithEmptyFilter = await report.GetAsync(
+            baseDate,
+            new DateOnlyRange(new DateOnly(2025, 01, 01), new DateOnly(2025, 01, 31)),
+            FiatCurrency.Usd,
+            emptyFilter,
+            provider);
+
+        // Full filter - should include all accounts and categories explicitly
+        var fullFilter = new IExpensesByCategoryReport.Filter(
+            new[] { new AccountId(_usdAccount.Id.ToString()), new AccountId(_brlAccount.Id.ToString()), new AccountId(_btcAccount.Id.ToString()) },
+            new[] { _foodCategoryId, _transportCategoryId, _utilitiesCategoryId }
+        );
+
+        var resultWithFullFilter = await report.GetAsync(
+            baseDate,
+            new DateOnlyRange(new DateOnly(2025, 01, 01), new DateOnly(2025, 01, 31)),
+            FiatCurrency.Usd,
+            fullFilter,
+            provider);
+
+        // Both should return the same results
+        Assert.That(resultWithEmptyFilter.Items.Count, Is.EqualTo(resultWithFullFilter.Items.Count));
+        Assert.That(resultWithEmptyFilter.Items.Count, Is.EqualTo(3));
+
+        // Verify the totals match
+        var emptyFoodItem = resultWithEmptyFilter.Items.Single(x => x.CategoryId == _foodCategoryId);
+        var fullFoodItem = resultWithFullFilter.Items.Single(x => x.CategoryId == _foodCategoryId);
+        Assert.That(emptyFoodItem.FiatTotal, Is.EqualTo(fullFoodItem.FiatTotal));
+        Assert.That(emptyFoodItem.FiatTotal, Is.EqualTo(150m));
+
+        var emptyTransportItem = resultWithEmptyFilter.Items.Single(x => x.CategoryId == _transportCategoryId);
+        var fullTransportItem = resultWithFullFilter.Items.Single(x => x.CategoryId == _transportCategoryId);
+        Assert.That(emptyTransportItem.FiatTotal, Is.EqualTo(fullTransportItem.FiatTotal));
+
+        var emptyUtilitiesItem = resultWithEmptyFilter.Items.Single(x => x.CategoryId == _utilitiesCategoryId);
+        var fullUtilitiesItem = resultWithFullFilter.Items.Single(x => x.CategoryId == _utilitiesCategoryId);
+        Assert.That(emptyUtilitiesItem.FiatTotal, Is.EqualTo(fullUtilitiesItem.FiatTotal));
+    }
 }

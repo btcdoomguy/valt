@@ -12,6 +12,8 @@
         WindowStartupLocation="CenterOwner"
         d:DesignWidth="660"
         d:DesignHeight="470"
+        MinWidth="660"
+        MinHeight="470"
         MaxWidth="660"
         MaxHeight="470"
         ExtendClientAreaToDecorationsHint="True"
@@ -100,6 +102,21 @@
                     <TabItem Header="{x:Static local:language.Settings_Tab_Advanced}" FontSize="{DynamicResource FontSizeLarge}">
                         <StackPanel Orientation="Vertical" Spacing="15" Margin="10"
                                     VerticalAlignment="Center">
+                            <DockPanel>
+                                <TextBlock Width="220" TextAlignment="Right" Margin="0,0,5,0"
+                                           VerticalAlignment="Center"
+                                           Text="{x:Static local:language.Settings_McpServerPort}"
+                                           TextWrapping="Wrap" />
+                                <StackPanel Orientation="Horizontal" Spacing="5">
+                                    <NumericUpDown Value="{Binding McpServerPort}"
+                                                   Minimum="1024" Maximum="65535"
+                                                   Width="120" />
+                                    <TextBlock VerticalAlignment="Center" FontStyle="Italic"
+                                               FontSize="{DynamicResource FontSizeXSmall}"
+                                               Text="{x:Static local:language.Settings_McpServerPort_Hint}" />
+                                </StackPanel>
+                            </DockPanel>
+                            <Separator Margin="0,5" />
                             <Button HorizontalAlignment="Center" Classes="transparent link"
                                     Command="{Binding ClearAccountCacheCommand}"
                                     Content="{x:Static local:language.Settings_ClearAccountTotalsCache}" />

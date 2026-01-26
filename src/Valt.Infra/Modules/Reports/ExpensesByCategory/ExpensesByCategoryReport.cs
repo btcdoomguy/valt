@@ -87,7 +87,8 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
 
                 foreach (var accountId in accountsForDate)
                 {
-                    if (!_filter.AccountIds.Contains(new AccountId(accountId.ToString())))
+                    // If filter has account IDs, only include matching accounts; otherwise include all
+                    if (_filter.AccountIds.Any() && !_filter.AccountIds.Contains(new AccountId(accountId.ToString())))
                         continue;
 
                     var account = _provider.Accounts[accountId];
@@ -96,7 +97,8 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
 
                     foreach (var transaction in transactions)
                     {
-                        if (!_filter.CategoryIds.Contains(new CategoryId(transaction.CategoryId.ToString())))
+                        // If filter has category IDs, only include matching categories; otherwise include all
+                        if (_filter.CategoryIds.Any() && !_filter.CategoryIds.Contains(new CategoryId(transaction.CategoryId.ToString())))
                             continue;
 
                         if (account.AccountEntityType == AccountEntityType.Bitcoin)

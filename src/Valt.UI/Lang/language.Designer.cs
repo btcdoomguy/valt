@@ -3232,5 +3232,29 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("DeleteInstallment_All", resourceCulture);
             }
         }
+
+        public static string McpServer_RunningTooltip {
+            get {
+                return ResourceManager.GetString("McpServer_RunningTooltip", resourceCulture);
+            }
+        }
+
+        public static string McpServer_StoppedTooltip {
+            get {
+                return ResourceManager.GetString("McpServer_StoppedTooltip", resourceCulture);
+            }
+        }
+
+        public static string Settings_McpServerPort {
+            get {
+                return ResourceManager.GetString("Settings_McpServerPort", resourceCulture);
+            }
+        }
+
+        public static string Settings_McpServerPort_Hint {
+            get {
+                return ResourceManager.GetString("Settings_McpServerPort_Hint", resourceCulture);
+            }
+        }
     }
 }

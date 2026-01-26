@@ -18,8 +18,17 @@ public partial class DisplaySettings : BaseSettings
         set => SetProperty(ref _showHiddenAccounts, value);
     }
 
+    private int _mcpServerPort = 5200;
+    [PersistableSetting]
+    public int McpServerPort
+    {
+        get => _mcpServerPort;
+        set => SetProperty(ref _mcpServerPort, Math.Clamp(value, 1024, 65535));
+    }
+
     protected sealed override void LoadDefaults()
     {
         ShowHiddenAccounts = false;
+        McpServerPort = 5200;
     }
 }

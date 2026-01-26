@@ -8,6 +8,8 @@
         mc:Ignorable="d"
         d:DesignWidth="500"
         d:DesignHeight="660"
+        MinWidth="500"
+        MinHeight="660"
         MaxWidth="500"
         MaxHeight="660"
         x:Class="Valt.UI.Views.Main.Modals.ManageAccount.ManageAccountView"

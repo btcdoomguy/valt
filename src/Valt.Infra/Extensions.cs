@@ -57,6 +57,7 @@ using Valt.Infra.Modules.Reports.IncomeByCategory;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.Infra.Modules.Reports.Statistics;
 using Valt.Infra.Modules.Reports.WealthOverview;
+using Valt.Infra.Mcp.Server;
 using Valt.Infra.Services.CsvExport;
 using Valt.Infra.Services.CsvImport;
 using Valt.Infra.Services.Updates;
@@ -93,6 +94,10 @@ public static class Extensions
         services.AddSingleton<CurrencySettings>();
         services.AddSingleton<DisplaySettings>();
         services.AddSingleton<UISettings>();
+
+        //mcp server
+        services.AddSingleton<McpServerState>();
+        services.AddSingleton<McpServerService>();
 
         //price crawlers bitcoin
         services.AddSingleton<IBitcoinPriceProvider, CoinbaseProvider>();

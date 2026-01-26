@@ -8,6 +8,8 @@
         mc:Ignorable="d"
         d:DesignWidth="400"
         d:DesignHeight="200"
+        MinWidth="400"
+        MinHeight="200"
         MaxWidth="400"
         MaxHeight="200"
         x:Class="Valt.UI.Views.Main.Modals.ManageAccountGroup.ManageAccountGroupView"
