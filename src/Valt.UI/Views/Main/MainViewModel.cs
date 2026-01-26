@@ -493,13 +493,16 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         await MessageBoxHelper.ShowAlertAsync(language.InstallPriceDatabase_Title,
             language.InstallPriceDatabase_Info,
             Window!);
-        
+
         _priceDatabase!.OpenDatabase();
 
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
             IsLoading = true;
         });
+
+        // Start jobs first so the channel consumer is running (required for TriggerJobAndWaitAsync)
+        await _backgroundJobManager!.StartAllJobsAsync(jobType: BackgroundJobTypes.PriceDatabase, triggerInitialRun: false);
 
         //execute the main jobs manually
         try
@@ -508,7 +511,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             {
                 LoadingMessage = language.InstallingBitcoinPriceMessage;
             });
-            await _backgroundJobManager!.TriggerJobAndWaitAsync(BackgroundJobSystemNames
+            await _backgroundJobManager.TriggerJobAndWaitAsync(BackgroundJobSystemNames
                 .BitcoinHistoryUpdater);
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
