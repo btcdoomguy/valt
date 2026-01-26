@@ -48,7 +48,7 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
     [NotifyPropertyChangedFor(nameof(IsCustomAsset))]
     private int _precision;
 
-    [ObservableProperty] private bool _visible;
+    [ObservableProperty] private bool _visible = true;
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(SymbolOnRight))] [NotifyPropertyChangedFor(nameof(Symbol))]
     private string _currency;

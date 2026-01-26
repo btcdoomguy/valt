@@ -20,6 +20,7 @@ public partial class TransactionListView : ValtBaseUserControl
         MainGrid.AddHandler(KeyDownEvent, MainGrid_KeyDownHandler, RoutingStrategies.Tunnel, handledEventsToo: true);
         MainGrid.AddHandler(DoubleTappedEvent, MainGrid_OnDoubleTapped, RoutingStrategies.Bubble,
             handledEventsToo: true);
+        MainGrid.AddHandler(PointerPressedEvent, MainGrid_OnPointerPressed, RoutingStrategies.Tunnel, handledEventsToo: true);
     }
 
     protected override void OnLoaded(RoutedEventArgs e)
@@ -41,6 +42,7 @@ public partial class TransactionListView : ValtBaseUserControl
 
         MainGrid.RemoveHandler(KeyDownEvent, MainGrid_KeyDownHandler);
         MainGrid.RemoveHandler(DoubleTappedEvent, MainGrid_OnDoubleTapped);
+        MainGrid.RemoveHandler(PointerPressedEvent, MainGrid_OnPointerPressed);
         MainGrid.Sorting -= MainGrid_OnSorting;
     }
 
@@ -148,6 +150,25 @@ public partial class TransactionListView : ValtBaseUserControl
         if (DataContext is TransactionListViewModel viewModel && sender is DataGrid dataGrid)
         {
             viewModel.UpdateSelectedItems(dataGrid.SelectedItems);
+        }
+    }
+
+    private void MainGrid_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        // Only handle right-click
+        if (!e.GetCurrentPoint(MainGrid).Properties.IsRightButtonPressed)
+            return;
+
+        var originalSource = e.Source as Control;
+        var row = originalSource?.FindAncestorOfType<DataGridRow>();
+
+        if (row?.DataContext is TransactionViewModel transactionVm)
+        {
+            // Only select if not already in selection (preserves multiselect)
+            if (!MainGrid.SelectedItems.Contains(transactionVm))
+            {
+                MainGrid.SelectedItem = transactionVm;
+            }
         }
     }
 

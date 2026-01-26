@@ -9,4 +9,6 @@ public interface ITransactionRepository : IRepository
     Task SaveTransactionAsync(Transaction transaction);
     Task DeleteTransactionAsync(TransactionId transactionId);
     Task<bool> HasAnyTransactionAsync(AccountId accountId);
+    Task<IEnumerable<Transaction>> GetTransactionsByGroupIdAsync(GroupId groupId);
+    Task DeleteTransactionsByGroupIdAsync(GroupId groupId);
 }

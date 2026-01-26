@@ -15,6 +15,7 @@ using Valt.Core.Modules.Budget.Categories;
 using Valt.Core.Modules.Budget.Transactions;
 using Valt.Core.Modules.Budget.Transactions.Contracts;
 using Valt.Core.Modules.Budget.Transactions.Details;
+using Valt.Core.Modules.Budget.Transactions.Services;
 using Valt.Infra;
 using Valt.Infra.Modules.Budget.Accounts.Queries;
 using Valt.Infra.Modules.Budget.Accounts.Queries.DTOs;
@@ -84,10 +85,14 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         nameof(ShowTransferValueField))]
     private AccountDTO? _toAccount;
 
-    [CustomValidation(typeof(TransactionEditorViewModel), nameof(ValidateFromAccountBtcValue))] [ObservableProperty]
+    [CustomValidation(typeof(TransactionEditorViewModel), nameof(ValidateFromAccountBtcValue))]
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(InstallmentValueText))]
     private BtcValue? _fromAccountBtcValue = BtcValue.Empty;
 
-    [CustomValidation(typeof(TransactionEditorViewModel), nameof(ValidateFromAccountFiatValue))] [ObservableProperty]
+    [CustomValidation(typeof(TransactionEditorViewModel), nameof(ValidateFromAccountFiatValue))]
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(InstallmentValueText))]
     private FiatValue? _fromAccountFiatValue = FiatValue.Empty;
 
     [CustomValidation(typeof(TransactionEditorViewModel), nameof(ValidateToAccountBtcValue))] [ObservableProperty]
@@ -103,8 +108,8 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
     [ObservableProperty] private bool _isToBtcInputFocused;
     [ObservableProperty] private bool _isToFiatInputFocused;
 
-    [ObservableProperty] private bool _fromBtcIsBitcoinMode = true;
-    [ObservableProperty] private bool _toBtcIsBitcoinMode = true;
+    [ObservableProperty] private bool _fromBtcIsBitcoinMode;
+    [ObservableProperty] private bool _toBtcIsBitcoinMode;
 
     [NotifyPropertyChangedFor(nameof(IsBoundToFixedExpense), nameof(BoundToFixedExpenseCaption), nameof(HasMetadata))]
     [ObservableProperty]
@@ -113,6 +118,14 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
     [NotifyPropertyChangedFor(nameof(IsBoundToFixedExpense), nameof(BoundToFixedExpenseCaption), nameof(HasMetadata))]
     [ObservableProperty]
     private FixedExpenseDto? _fixedExpense;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowInstallmentCount), nameof(InstallmentValueText))]
+    private bool _useInstallments;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(InstallmentValueText))]
+    private int _installmentCount = 2;
 
     #endregion
 
@@ -254,7 +267,7 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(DebtSelected), nameof(CreditSelected), nameof(TransferSelected),
-        nameof(ShowTransferValueField))]
+        nameof(ShowTransferValueField), nameof(ShowInstallmentsOption), nameof(ShowInstallmentCount))]
     private TransactionTypes _selectedMode;
 
     public bool DebtSelected => SelectedMode == TransactionTypes.Debt;
@@ -263,6 +276,24 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
 
     public bool ShowTransferValueField =>
         SelectedMode == TransactionTypes.Transfer && !AccountsAreSameTypeAndCurrency;
+
+    public bool ShowInstallmentsOption => DebtSelected && _transactionId is null;
+    public bool ShowInstallmentCount => UseInstallments && ShowInstallmentsOption;
+
+    public string InstallmentValueText
+    {
+        get
+        {
+            if (!UseInstallments || InstallmentCount < 2)
+                return string.Empty;
+
+            var value = FromAccountIsBtc
+                ? FromAccountBtcValue?.Sats.ToString() ?? "0"
+                : FromAccountFiatValue?.Value.ToString("N2") ?? "0";
+
+            return $"{InstallmentCount}x of {value}";
+        }
+    }
 
     private bool AccountsAreSameTypeAndCurrency
     {
@@ -523,14 +554,19 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
                 throw new ArgumentOutOfRangeException();
         }
 
-        if (transaction.HasAutoSatAmount)
+        if (!request.CopyTransaction && transaction.HasAutoSatAmount)
         {
             var autoSatAmountDetails = transaction.AutoSatAmountDetails!;
             IsAutoSatAmount = autoSatAmountDetails.IsAutoSatAmount;
 
-            SatAmountStateDescription = autoSatAmountDetails.SatAmountState == SatAmountState.Processed
-                ? $"{autoSatAmountDetails.SatAmount!.Sats} sats"
-                : autoSatAmountDetails.SatAmountState.ToString();
+            SatAmountStateDescription = autoSatAmountDetails.SatAmountState switch
+            {
+                SatAmountState.Processed => $"{autoSatAmountDetails.SatAmount!.Sats} sats",
+                SatAmountState.Manual => language.SatAmountState_Manual,
+                SatAmountState.Pending => language.SatAmountState_Pending,
+                SatAmountState.Missing => language.SatAmountState_Missing,
+                _ => autoSatAmountDetails.SatAmountState.ToString()
+            };
         }
     }
 
@@ -603,12 +639,14 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
     {
         SelectedMode = TransactionTypes.Credit;
         ToAccount = null;
+        UseInstallments = false;
     }
 
     [RelayCommand]
     private void SwitchToTransfer()
     {
         SelectedMode = TransactionTypes.Transfer;
+        UseInstallments = false;
     }
 
     #endregion
@@ -664,14 +702,28 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
                 transaction = await _transactionRepository!.GetTransactionByIdAsync(_transactionId);
 
                 await EditAsync(transaction!);
+                await _transactionRepository!.SaveTransactionAsync(transaction!);
             }
             else
             {
-                transaction = await CreateAsync();
-                newTransactionDate = transaction.Date.ToValtDateTime();
+                if (UseInstallments && InstallmentCount >= 2 && DebtSelected)
+                {
+                    var transactions = await CreateInstallmentsAsync();
+                    foreach (var t in transactions)
+                    {
+                        await _transactionRepository!.SaveTransactionAsync(t);
+                    }
+
+                    newTransactionDate = transactions.First().Date.ToValtDateTime();
+                }
+                else
+                {
+                    transaction = await CreateAsync();
+                    newTransactionDate = transaction.Date.ToValtDateTime();
+                    await _transactionRepository!.SaveTransactionAsync(transaction!);
+                }
             }
 
-            await _transactionRepository!.SaveTransactionAsync(transaction!);
             CloseDialog?.Invoke(new Response(true, newTransactionDate));
         }
     }
@@ -692,6 +744,28 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
 
         return Task.FromResult(Transaction.New(date, name, Category!.Id, transactionDetails, notes,
             TransactionFixedExpenseReference));
+    }
+
+    private Task<List<Transaction>> CreateInstallmentsAsync()
+    {
+        var name = TransactionName.New(Name);
+        var startDate = DateOnly.FromDateTime(Date!.Value);
+        var transactionDetails = BuildTransactionDetailsFromForm();
+        var notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes;
+
+        var groupId = new GroupId();
+        var dates = InstallmentDateCalculator.CalculateInstallmentDates(startDate, InstallmentCount).ToList();
+
+        var transactions = new List<Transaction>();
+        for (var i = 0; i < dates.Count; i++)
+        {
+            var installmentName = TransactionName.New($"{Name} ({i + 1}/{InstallmentCount})");
+            var transaction = Transaction.New(dates[i], installmentName, Category!.Id, transactionDetails, notes,
+                TransactionFixedExpenseReference, groupId);
+            transactions.Add(transaction);
+        }
+
+        return Task.FromResult(transactions);
     }
 
     private Task EditAsync(Transaction transaction)

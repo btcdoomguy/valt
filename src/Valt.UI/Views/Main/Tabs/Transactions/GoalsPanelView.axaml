@@ -46,8 +46,9 @@
             x:Name="GoalsList"
             Classes="regularListBox"
             ItemsSource="{Binding GoalEntries}"
-            SelectedItem="{Binding SelectedGoal}"
+            SelectedItem="{Binding SelectedGoal, Mode=OneWay}"
             SelectionMode="Single"
+            SelectionChanged="GoalsList_OnSelectionChanged"
             BorderBrush="{DynamicResource Background500Brush}"
             CornerRadius="0, 0, 5, 5"
             BorderThickness="1">

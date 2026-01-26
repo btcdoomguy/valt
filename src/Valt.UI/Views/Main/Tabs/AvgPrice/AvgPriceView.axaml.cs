@@ -9,12 +9,15 @@ namespace Valt.UI.Views.Main.Tabs.AvgPrice;
 
 public partial class AvgPriceView : ValtBaseUserControl
 {
+    private bool _isUpdatingSelection;
+
     public AvgPriceView()
     {
         InitializeComponent();
 
         MainGrid.AddHandler(KeyDownEvent, MainGrid_KeyDownHandler, RoutingStrategies.Tunnel, handledEventsToo: true);
         MainGrid.AddHandler(DoubleTappedEvent, MainGrid_OnDoubleTapped, RoutingStrategies.Bubble, handledEventsToo: true);
+        MainGrid.AddHandler(PointerPressedEvent, MainGrid_OnPointerPressed, RoutingStrategies.Tunnel, handledEventsToo: true);
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -33,6 +36,7 @@ public partial class AvgPriceView : ValtBaseUserControl
 
         MainGrid.RemoveHandler(KeyDownEvent, MainGrid_KeyDownHandler);
         MainGrid.RemoveHandler(DoubleTappedEvent, MainGrid_OnDoubleTapped);
+        MainGrid.RemoveHandler(PointerPressedEvent, MainGrid_OnPointerPressed);
     }
 
     private void MainGrid_OnDoubleTapped(object? sender, TappedEventArgs e)
@@ -67,6 +71,41 @@ public partial class AvgPriceView : ValtBaseUserControl
         {
             _ = vm.EditOperationCommand.ExecuteAsync(null);
             e.Handled = true;
+        }
+    }
+
+    private void MainGrid_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        // Select the row on right-click so context menu commands work correctly
+        if (!e.GetCurrentPoint(MainGrid).Properties.IsRightButtonPressed)
+            return;
+
+        var originalSource = e.Source as Control;
+        var row = originalSource?.FindAncestorOfType<DataGridRow>();
+
+        if (row?.DataContext is Models.AvgPriceLineViewModel lineVm)
+        {
+            MainGrid.SelectedItem = lineVm;
+        }
+    }
+
+    private void MainGrid_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_isUpdatingSelection) return;
+
+        try
+        {
+            _isUpdatingSelection = true;
+
+            // Explicitly update SelectedLine to ensure binding stays in sync
+            if (DataContext is AvgPriceViewModel vm && sender is DataGrid dataGrid)
+            {
+                vm.SelectedLine = dataGrid.SelectedItem as Models.AvgPriceLineViewModel;
+            }
+        }
+        finally
+        {
+            _isUpdatingSelection = false;
         }
     }
 }

@@ -19,6 +19,7 @@ public class TransactionBuilder
     private AutoSatAmountDetails? _autoSatAmountDetails = AutoSatAmountDetails.Pending;
     private string? _notes;
     private TransactionFixedExpenseReference? _fixedExpense;
+    private GroupId? _groupId;
     private int _version = 0;
 
     // Public properties for backward compatibility with property initializer syntax
@@ -30,6 +31,7 @@ public class TransactionBuilder
     public AutoSatAmountDetails? AutoSatAmountDetails { get => _autoSatAmountDetails; set => _autoSatAmountDetails = value; }
     public string? Notes { get => _notes; set => _notes = value; }
     public TransactionFixedExpenseReference? FixedExpense { get => _fixedExpense; set => _fixedExpense = value; }
+    public GroupId? GroupId { get => _groupId; set => _groupId = value; }
     public int Version { get => _version; set => _version = value; }
 
     public static TransactionBuilder ATransaction() => new();
@@ -88,14 +90,20 @@ public class TransactionBuilder
         return this;
     }
 
+    public TransactionBuilder WithGroupId(GroupId? groupId)
+    {
+        _groupId = groupId;
+        return this;
+    }
+
     public Transaction BuildDomainObject()
     {
-        return Transaction.Create(_id, _date, _name, _categoryId, _transactionDetails, _autoSatAmountDetails, _notes, _fixedExpense, _version);
+        return Transaction.Create(_id, _date, _name, _categoryId, _transactionDetails, _autoSatAmountDetails, _notes, _fixedExpense, _groupId, _version);
     }
 
     public TransactionEntity Build()
     {
-        var transaction = Transaction.Create(_id, _date, _name, _categoryId, _transactionDetails, _autoSatAmountDetails, _notes, _fixedExpense, _version);
+        var transaction = Transaction.Create(_id, _date, _name, _categoryId, _transactionDetails, _autoSatAmountDetails, _notes, _fixedExpense, _groupId, _version);
         return transaction.AsEntity();
     }
 }

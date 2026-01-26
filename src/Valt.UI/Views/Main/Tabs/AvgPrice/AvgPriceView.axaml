@@ -12,7 +12,6 @@
     <Design.DataContext>
         <avgPrice:AvgPriceViewModel />
     </Design.DataContext>
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
     <Grid MinHeight="500">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -61,7 +60,7 @@
                 <DataGrid Grid.Row="1"
                           x:Name="MainGrid"
                           ItemsSource="{Binding Lines}"
-                          SelectedItem="{Binding SelectedLine}"
+                          SelectedItem="{Binding SelectedLine, Mode=OneWay}"
                           AutoGenerateColumns="False"
                           IsReadOnly="True"
                           CanUserReorderColumns="True"
@@ -69,7 +68,8 @@
                           CanUserSortColumns="False"
                           SelectionMode="Single"
                           HorizontalScrollBarVisibility="Visible"
-                          Margin="0,10,0,0">
+                          Margin="0,10,0,0"
+                          SelectionChanged="MainGrid_OnSelectionChanged">
                     <DataGrid.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="{x:Static lang:language.AvgPrice_Menu_Edit}"
@@ -124,6 +124,7 @@
             </Grid>
         </Border>
         <Border Grid.Column="1" Padding="15">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <StackPanel Orientation="Vertical" Spacing="10">
                 <!-- Year Filter -->
                 <userControls:DateCalendarSelector HorizontalContentAlignment="Center"
@@ -226,7 +227,7 @@
                     </StackPanel>
                 </Border>
             </StackPanel>
+            </ScrollViewer>
         </Border>
     </Grid>
-    </ScrollViewer>
 </UserControl>

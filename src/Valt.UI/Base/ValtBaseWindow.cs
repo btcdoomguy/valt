@@ -14,11 +14,20 @@ public abstract class ValtBaseWindow : Window
 
     protected override void OnOpened(EventArgs e)
     {
-        if (DataContext is not IValtModal vm) return;
+        base.OnOpened(e);
 
-        vm.CloseWindow = Close;
-        vm.CloseDialog = (param) => Close(param);
-        vm.GetWindow = () => this;
+        if (DataContext is IValtModal vm)
+        {
+            vm.CloseWindow = Close;
+            vm.CloseDialog = (param) => Close(param);
+            vm.GetWindow = () => this;
+        }
+
+        // Ensure the modal window takes focus when opened.
+        // This is especially important for windows with SystemDecorations="None".
+        Activate();
+        var firstFocusable = KeyboardNavigationHandler.GetNext(this, NavigationDirection.Next);
+        firstFocusable?.Focus();
     }
 
     private void OnWindowActivated(object? sender, EventArgs e)

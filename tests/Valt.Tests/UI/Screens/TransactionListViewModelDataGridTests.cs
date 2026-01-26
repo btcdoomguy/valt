@@ -5,6 +5,7 @@ using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Modules.Budget.Transactions.Contracts;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers;
 using Valt.Infra.DataAccess;
+using Valt.Infra.Modules.AvgPrice.Queries;
 using Valt.Infra.Modules.Budget.Transactions.Queries;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
@@ -26,6 +27,7 @@ public class TransactionListViewModelDataGridTests : DatabaseTest
     private FilterState _filterState = null!;
     private IClock _clock = null!;
     private ILogger<TransactionListViewModel> _vmLogger = null!;
+    private IAvgPriceQueries _avgPriceQueries = null!;
 
     [SetUp]
     public new void SetUp()
@@ -41,6 +43,7 @@ public class TransactionListViewModelDataGridTests : DatabaseTest
         _filterState = new FilterState();
         _clock = Substitute.For<IClock>();
         _vmLogger = Substitute.For<ILogger<TransactionListViewModel>>();
+        _avgPriceQueries = Substitute.For<IAvgPriceQueries>();
     }
 
     private TransactionListViewModel CreateViewModel()
@@ -66,7 +69,8 @@ public class TransactionListViewModelDataGridTests : DatabaseTest
             _filterState,
             _clock,
             _localStorageService,
-            _vmLogger);
+            _vmLogger,
+            _avgPriceQueries);
     }
 
     #region UpdateSortState Tests

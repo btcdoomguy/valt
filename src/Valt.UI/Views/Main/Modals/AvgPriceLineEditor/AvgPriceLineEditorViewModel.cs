@@ -108,6 +108,21 @@ public partial class AvgPriceLineEditorViewModel : ValtModalValidatorViewModel
             Comment = request.ExistingLine.Comment;
             DisplayOrder = request.ExistingLine.DisplayOrder;
         }
+        else
+        {
+            // Apply preset values if provided
+            if (request.PresetDate.HasValue)
+                Date = request.PresetDate.Value.ToDateTime(TimeOnly.MinValue);
+
+            if (request.PresetLineType.HasValue)
+                LineType = request.PresetLineType.Value;
+
+            if (request.PresetQuantity.HasValue)
+                Quantity = request.PresetQuantity.Value;
+
+            if (request.PresetAmount.HasValue)
+                Amount = FiatValue.New(request.PresetAmount.Value);
+        }
     }
 
     [RelayCommand]
@@ -194,6 +209,12 @@ public partial class AvgPriceLineEditorViewModel : ValtModalValidatorViewModel
         public required string CurrencySymbol { get; init; }
         public required bool CurrencySymbolOnRight { get; init; }
         public AvgPriceLineDTO? ExistingLine { get; init; }
+
+        // Optional preset values from transaction
+        public DateOnly? PresetDate { get; init; }
+        public AvgPriceLineTypes? PresetLineType { get; init; }
+        public decimal? PresetQuantity { get; init; }
+        public decimal? PresetAmount { get; init; }
     }
 
     public record Response(bool Ok);

@@ -449,7 +449,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             await _backgroundJobManager!.StartAllJobsAsync(jobType: BackgroundJobTypes.PriceDatabase, triggerInitialRun: false);
 
             // Run LivePricesUpdater synchronously to ensure rates are available before UI is shown
-            await _backgroundJobManager.TriggerJobManuallyOnCurrentThreadAsync(BackgroundJobSystemNames.LivePricesUpdater);
+            await _backgroundJobManager.TriggerJobAndWaitAsync(BackgroundJobSystemNames.LivePricesUpdater);
 
             // Trigger history updater jobs to run in the background
             _backgroundJobManager.TriggerJobManually(BackgroundJobSystemNames.BitcoinHistoryUpdater);
@@ -508,13 +508,13 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             {
                 LoadingMessage = language.InstallingBitcoinPriceMessage;
             });
-            await _backgroundJobManager!.TriggerJobManuallyOnCurrentThreadAsync(BackgroundJobSystemNames
+            await _backgroundJobManager!.TriggerJobAndWaitAsync(BackgroundJobSystemNames
                 .BitcoinHistoryUpdater);
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 LoadingMessage = language.InstallingFiatPriceMessage;
             });
-            await _backgroundJobManager.TriggerJobManuallyOnCurrentThreadAsync(BackgroundJobSystemNames
+            await _backgroundJobManager.TriggerJobAndWaitAsync(BackgroundJobSystemNames
                 .FiatHistoryUpdater);
         }
         catch (Exception ex)
