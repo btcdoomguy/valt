@@ -1638,6 +1638,9 @@
     <data name="McpServer_ErrorTooltip" xml:space="preserve">
         <value>Erro no servidor MCP: {0}. Clique para tentar novamente.</value>
     </data>
+    <data name="Settings_McpServerEnabled" xml:space="preserve">
+        <value>Servidor MCP (Assistente IA)</value>
+    </data>
     <data name="Settings_McpServerPort" xml:space="preserve">
         <value>Porta do Servidor MCP</value>
     </data>

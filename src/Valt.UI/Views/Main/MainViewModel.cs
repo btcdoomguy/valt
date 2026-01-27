@@ -30,6 +30,7 @@ using Valt.Infra.Settings;
 using Valt.UI.Base;
 using Valt.UI.Lang;
 using Valt.UI.Services;
+using Valt.UI.Services.LocalStorage;
 using Valt.UI.Services.MessageBoxes;
 using Valt.UI.State;
 using Valt.UI.State.Events;
@@ -70,6 +71,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     private readonly McpServerState _mcpServerState = null!;
     private readonly DisplaySettings _displaySettings = null!;
     private readonly TabRefreshState _tabRefreshState = null!;
+    private readonly ILocalStorageService _localStorageService = null!;
 
     public MainView? Window { get; set; }
 
@@ -118,6 +120,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     public string SecureModeIcon => _secureModeState?.IsEnabled == true ? "\xE897" : "\xE898";
 
     // MCP Server status properties
+    public bool IsMcpFeatureEnabled => _localStorageService?.LoadMcpServerEnabled() == true;
     public bool IsMcpServerRunning => _mcpServerState?.IsRunning == true;
     public bool IsMcpServerError => _mcpServerState?.ErrorMessage != null;
     public bool IsMcpProcessing => _mcpServerState?.IsProcessing == true;
@@ -188,7 +191,8 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         McpServerService mcpServerService,
         McpServerState mcpServerState,
         DisplaySettings displaySettings,
-        TabRefreshState tabRefreshState)
+        TabRefreshState tabRefreshState,
+        ILocalStorageService localStorageService)
     {
         _pageFactory = pageFactory;
         _modalFactory = modalFactory;
@@ -209,6 +213,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         _mcpServerState = mcpServerState;
         _displaySettings = displaySettings;
         _tabRefreshState = tabRefreshState;
+        _localStorageService = localStorageService;
 
         _localDatabase.PropertyChanged += LocalDatabaseOnPropertyChanged;
         _mcpServerState.PropertyChanged += McpServerStateOnPropertyChanged;
@@ -235,6 +240,17 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         WeakReferenceMessenger.Default.Register<McpDataChangedNotification>(this, (recipient, message) =>
         {
             _tabRefreshState.SetAllNeedRefresh();
+        });
+
+        WeakReferenceMessenger.Default.Register<McpFeatureEnabledChanged>(this, async (recipient, message) =>
+        {
+            OnPropertyChanged(nameof(IsMcpFeatureEnabled));
+
+            // Stop MCP server if feature is disabled and server is running
+            if (!message.Enabled && _mcpServerState.IsRunning)
+            {
+                await _mcpServerService.StopAsync();
+            }
         });
     }
 

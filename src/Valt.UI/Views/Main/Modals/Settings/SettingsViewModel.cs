@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Valt.Core.Common;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Modules.Configuration;
@@ -21,6 +22,7 @@ using Valt.UI.Services.LocalStorage;
 using Valt.UI.Services.MessageBoxes;
 using Valt.UI.Services.FontScaling;
 using Valt.UI.Services.Theming;
+using Valt.UI.State.Events;
 using Valt.UI.Views.Main.Modals.ChangePassword;
 
 namespace Valt.UI.Views.Main.Modals.Settings;
@@ -42,6 +44,7 @@ public partial class SettingsViewModel : ValtModalViewModel
     [ObservableProperty] private string _currentCulture = string.Empty;
     [ObservableProperty] private ThemeDefinition? _selectedTheme;
     [ObservableProperty] private FontScaleItem? _selectedFontScale;
+    [ObservableProperty] private bool _mcpServerEnabled;
     [ObservableProperty] private int _mcpServerPort = 5200;
 
     private List<string> _initialSelectedCurrencies = new();
@@ -109,6 +112,7 @@ public partial class SettingsViewModel : ValtModalViewModel
         ShowHiddenAccounts = false;
         CurrentCulture = "en-US";
         SelectedFontScale = FontScaleItem.All.First(x => x.Scale == FontScale.Medium);
+        McpServerEnabled = false;
         McpServerPort = 5200;
 
         SelectedFiatCurrencies.CollectionChanged += OnSelectedFiatCurrenciesChanged;
@@ -141,6 +145,7 @@ public partial class SettingsViewModel : ValtModalViewModel
                         ?? _themeService.AvailableThemes.First();
         SelectedFontScale = FontScaleItem.All.FirstOrDefault(x => x.Scale == fontScaleService.CurrentScale)
                             ?? FontScaleItem.All.First(x => x.Scale == FontScale.Medium);
+        McpServerEnabled = _localStorageService.LoadMcpServerEnabled();
         McpServerPort = _displaySettings.McpServerPort;
 
         // Initialize currencies
@@ -273,6 +278,9 @@ public partial class SettingsViewModel : ValtModalViewModel
         }
 
         await _localStorageService.ChangeCultureAsync(CurrentCulture);
+        await _localStorageService.ChangeMcpServerEnabledAsync(McpServerEnabled);
+
+        WeakReferenceMessenger.Default.Send(new McpFeatureEnabledChanged(McpServerEnabled));
 
         CloseDialog?.Invoke(new Response(true));
     }

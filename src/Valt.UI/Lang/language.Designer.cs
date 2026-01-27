@@ -3257,6 +3257,12 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string Settings_McpServerEnabled {
+            get {
+                return ResourceManager.GetString("Settings_McpServerEnabled", resourceCulture);
+            }
+        }
+
         public static string Settings_McpServerPort {
             get {
                 return ResourceManager.GetString("Settings_McpServerPort", resourceCulture);

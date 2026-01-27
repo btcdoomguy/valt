@@ -1643,6 +1643,9 @@
     <data name="McpServer_ErrorTooltip" xml:space="preserve">
         <value>MCP Server error: {0}. Click to retry.</value>
     </data>
+    <data name="Settings_McpServerEnabled" xml:space="preserve">
+        <value>MCP Server (AI Assistant)</value>
+    </data>
     <data name="Settings_McpServerPort" xml:space="preserve">
         <value>MCP Server Port</value>
     </data>

@@ -199,7 +199,8 @@
                             Padding="0"
                             VerticalAlignment="Top"
                             Command="{Binding ToggleMcpServerCommand}"
-                            ToolTip.Tip="{Binding McpServerTooltip}">
+                            ToolTip.Tip="{Binding McpServerTooltip}"
+                            IsVisible="{Binding IsMcpFeatureEnabled}">
                         <Border Background="{DynamicResource Background800Brush}"
                                 BorderBrush="{DynamicResource Background600Brush}"
                                 BorderThickness="1"

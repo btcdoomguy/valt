@@ -105,6 +105,13 @@
                             <DockPanel>
                                 <TextBlock Width="220" TextAlignment="Right" Margin="0,0,5,0"
                                            VerticalAlignment="Center"
+                                           Text="{x:Static local:language.Settings_McpServerEnabled}"
+                                           TextWrapping="Wrap" />
+                                <CheckBox IsChecked="{Binding McpServerEnabled}" />
+                            </DockPanel>
+                            <DockPanel IsVisible="{Binding McpServerEnabled}">
+                                <TextBlock Width="220" TextAlignment="Right" Margin="0,0,5,0"
+                                           VerticalAlignment="Center"
                                            Text="{x:Static local:language.Settings_McpServerPort}"
                                            TextWrapping="Wrap" />
                                 <StackPanel Orientation="Horizontal" Spacing="5">
