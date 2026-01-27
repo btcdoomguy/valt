@@ -1647,7 +1647,4 @@
     <data name="McpNotification_Title" xml:space="preserve">
         <value>Datos cambiados por asistente de IA</value>
     </data>
-    <data name="McpNotification_ClickToRefresh" xml:space="preserve">
-        <value>Datos cambiados. Haga clic para actualizar.</value>
-    </data>
 </root>

@@ -47,7 +47,7 @@
                     <GradientStop Offset="1" Color="{DynamicResource Background800Color}"></GradientStop>
                 </LinearGradientBrush>
             </Border.Background>
-            <Grid ColumnDefinitions="*, *, *, 260">
+            <Grid ColumnDefinitions="*, *, 260">
                 <!--Top bar buttons-->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Height="50" Spacing="15">
                     <DropDownButton Classes="icon" Content="&#xE5D2;">
@@ -81,54 +81,109 @@
                             </MenuFlyout>
                         </DropDownButton.Flyout>
                     </DropDownButton>
+                    <!-- Transactions tab -->
                     <Button Classes="tab" Classes.selected="{Binding IsTransactionButtonSelected}"
                             Command="{Binding SetTransactionsTabCommand}"
                             Margin="5,0">
-                        <StackPanel Orientation="Horizontal">
-                            <Label Classes="icon" Content="&#xE0EE;"></Label>
-                            <Label Content="{x:Static local:language.Main_Transactions}" />
-                        </StackPanel>
+                        <Grid>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Classes="icon" Content="&#xE0EE;"></Label>
+                                <Label Content="{x:Static local:language.Main_Transactions}" />
+                            </StackPanel>
+                            <Ellipse Name="TransactionsNotificationDot"
+                                     Width="8" Height="8"
+                                     Fill="{DynamicResource Accent500Brush}"
+                                     HorizontalAlignment="Right"
+                                     VerticalAlignment="Top"
+                                     Margin="0,0,0,0"
+                                     IsVisible="{Binding TabRefreshState.TransactionsNeedsRefresh}">
+                                <Ellipse.Styles>
+                                    <Style Selector="Ellipse#TransactionsNotificationDot">
+                                        <Style.Animations>
+                                            <Animation Duration="0:0:0.5" IterationCount="INFINITE" PlaybackDirection="Alternate">
+                                                <KeyFrame Cue="0%">
+                                                    <Setter Property="Opacity" Value="0.3" />
+                                                </KeyFrame>
+                                                <KeyFrame Cue="100%">
+                                                    <Setter Property="Opacity" Value="1" />
+                                                </KeyFrame>
+                                            </Animation>
+                                        </Style.Animations>
+                                    </Style>
+                                </Ellipse.Styles>
+                            </Ellipse>
+                        </Grid>
                     </Button>
+                    <!-- Reports tab -->
                     <Button Classes="tab" Classes.selected="{Binding IsReportButtonSelected}"
                             Command="{Binding SetReportsTabCommand}"
                             Margin="5,0">
-                        <StackPanel Orientation="Horizontal">
-                            <Label Classes="icon" Content="&#xE26B;"></Label>
-                            <Label Content="{x:Static local:language.Main_Reports}" />
-                        </StackPanel>
+                        <Grid>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Classes="icon" Content="&#xE26B;"></Label>
+                                <Label Content="{x:Static local:language.Main_Reports}" />
+                            </StackPanel>
+                            <Ellipse Name="ReportsNotificationDot"
+                                     Width="8" Height="8"
+                                     Fill="{DynamicResource Accent500Brush}"
+                                     HorizontalAlignment="Right"
+                                     VerticalAlignment="Top"
+                                     Margin="0,0,0,0"
+                                     IsVisible="{Binding TabRefreshState.ReportsNeedsRefresh}">
+                                <Ellipse.Styles>
+                                    <Style Selector="Ellipse#ReportsNotificationDot">
+                                        <Style.Animations>
+                                            <Animation Duration="0:0:0.5" IterationCount="INFINITE" PlaybackDirection="Alternate">
+                                                <KeyFrame Cue="0%">
+                                                    <Setter Property="Opacity" Value="0.3" />
+                                                </KeyFrame>
+                                                <KeyFrame Cue="100%">
+                                                    <Setter Property="Opacity" Value="1" />
+                                                </KeyFrame>
+                                            </Animation>
+                                        </Style.Animations>
+                                    </Style>
+                                </Ellipse.Styles>
+                            </Ellipse>
+                        </Grid>
                     </Button>
+                    <!-- AvgPrice tab -->
                     <Button Classes="tab" Classes.selected="{Binding IsAvgPriceButtonSelected}"
                             Command="{Binding SetAvgPriceTabCommand}"
                             Margin="5,0">
-                        <StackPanel Orientation="Horizontal">
-                            <Label Classes="icon" Content="&#xE227;"></Label>
-                            <Label Content="{x:Static local:language.Main_AvgPrice}" />
-                        </StackPanel>
+                        <Grid>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Classes="icon" Content="&#xE227;"></Label>
+                                <Label Content="{x:Static local:language.Main_AvgPrice}" />
+                            </StackPanel>
+                            <Ellipse Name="AvgPriceNotificationDot"
+                                     Width="8" Height="8"
+                                     Fill="{DynamicResource Accent500Brush}"
+                                     HorizontalAlignment="Right"
+                                     VerticalAlignment="Top"
+                                     Margin="0,0,0,0"
+                                     IsVisible="{Binding TabRefreshState.AvgPriceNeedsRefresh}">
+                                <Ellipse.Styles>
+                                    <Style Selector="Ellipse#AvgPriceNotificationDot">
+                                        <Style.Animations>
+                                            <Animation Duration="0:0:0.5" IterationCount="INFINITE" PlaybackDirection="Alternate">
+                                                <KeyFrame Cue="0%">
+                                                    <Setter Property="Opacity" Value="0.3" />
+                                                </KeyFrame>
+                                                <KeyFrame Cue="100%">
+                                                    <Setter Property="Opacity" Value="1" />
+                                                </KeyFrame>
+                                            </Animation>
+                                        </Style.Animations>
+                                    </Style>
+                                </Ellipse.Styles>
+                            </Ellipse>
+                        </Grid>
                     </Button>
                 </StackPanel>
-                <!-- MCP Data Changed Notification - Centered -->
-                <Button Grid.Column="1"
-                        IsVisible="{Binding HasPendingMcpChanges}"
-                        Classes="transparent"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Padding="20, 10"
-                        Command="{Binding RefreshCurrentTabCommand}">
-                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Spacing="4">
-                        <TextBlock FontFamily="{DynamicResource MaterialDesign}"
-                                   FontSize="36"
-                                   Foreground="{DynamicResource Vibrant500Brush}"
-                                   Text="&#xE5D5;"
-                                   HorizontalAlignment="Center" />
-                        <TextBlock Foreground="{DynamicResource Vibrant500Brush}"
-                                   FontSize="11"
-                                   FontWeight="SemiBold"
-                                   Text="{x:Static local:language.McpNotification_ClickToRefresh}"
-                                   HorizontalAlignment="Center" />
-                    </StackPanel>
-                </Button>
+      
 
-                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Classes="icon-only transparent link"
                             FontFamily="{DynamicResource MaterialDesign}"
                             FontSize="28"
@@ -272,7 +327,7 @@
                 </StackPanel>
 
                 <!--Top bar prices-->
-                <controls:LiveRates Grid.Column="3" Margin="0, 10, 0, 0" x:Name="LiveRatesControl"
+                <controls:LiveRates Grid.Column="2" Margin="0, 10, 0, 0" x:Name="LiveRatesControl"
                                     DataContext="{Binding LiveRatesViewModel}" />
             </Grid>
         </Border>

@@ -214,6 +214,7 @@ public static class Extensions
         services.AddSingleton<FilterState>();
         services.AddSingleton<LiveRateState>();
         services.AddSingleton<SecureModeState>();
+        services.AddSingleton<TabRefreshState>();
 
         //theming
         services.AddSingleton<IThemeService, ThemeService>();

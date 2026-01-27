@@ -1652,7 +1652,4 @@
     <data name="McpNotification_Title" xml:space="preserve">
         <value>Data changed via AI assistant</value>
     </data>
-    <data name="McpNotification_ClickToRefresh" xml:space="preserve">
-        <value>Data changed. Click to refresh.</value>
-    </data>
 </root>

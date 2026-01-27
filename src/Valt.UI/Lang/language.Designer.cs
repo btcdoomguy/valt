@@ -3275,10 +3275,5 @@ namespace Valt.UI.Lang {
             }
         }
 
-        public static string McpNotification_ClickToRefresh {
-            get {
-                return ResourceManager.GetString("McpNotification_ClickToRefresh", resourceCulture);
-            }
-        }
     }
 }

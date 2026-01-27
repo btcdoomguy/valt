@@ -69,6 +69,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     private readonly McpServerService _mcpServerService = null!;
     private readonly McpServerState _mcpServerState = null!;
     private readonly DisplaySettings _displaySettings = null!;
+    private readonly TabRefreshState _tabRefreshState = null!;
 
     public MainView? Window { get; set; }
 
@@ -110,12 +111,6 @@ public partial class MainViewModel : ValtViewModel, IDisposable
 
     [ObservableProperty] private bool _isOffline;
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasPendingMcpChanges))]
-    private int _pendingMcpChanges;
-
-    public bool HasPendingMcpChanges => PendingMcpChanges > 0;
-
     public LiveRatesViewModel LiveRatesViewModel => _liveRatesViewModel;
     public UpdateIndicatorViewModel UpdateIndicator => _updateIndicatorViewModel;
     public AvaloniaList<JobInfo> Jobs { get; set; } = new();
@@ -138,6 +133,8 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             return language.McpServer_StoppedTooltip;
         }
     }
+
+    public TabRefreshState TabRefreshState => _tabRefreshState;
 
     #region Event subscribers
 
@@ -190,7 +187,8 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         SecureModeState secureModeState,
         McpServerService mcpServerService,
         McpServerState mcpServerState,
-        DisplaySettings displaySettings)
+        DisplaySettings displaySettings,
+        TabRefreshState tabRefreshState)
     {
         _pageFactory = pageFactory;
         _modalFactory = modalFactory;
@@ -210,6 +208,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         _mcpServerService = mcpServerService;
         _mcpServerState = mcpServerState;
         _displaySettings = displaySettings;
+        _tabRefreshState = tabRefreshState;
 
         _localDatabase.PropertyChanged += LocalDatabaseOnPropertyChanged;
         _mcpServerState.PropertyChanged += McpServerStateOnPropertyChanged;
@@ -235,39 +234,46 @@ public partial class MainViewModel : ValtViewModel, IDisposable
 
         WeakReferenceMessenger.Default.Register<McpDataChangedNotification>(this, (recipient, message) =>
         {
-            Dispatcher.UIThread.Post(() => PendingMcpChanges++);
+            _tabRefreshState.SetAllNeedRefresh();
         });
     }
 
     [RelayCommand]
-    private void SetTransactionsTab()
+    private async Task SetTransactionsTab()
     {
-        PendingMcpChanges = 0;
+        var needsRefresh = _tabRefreshState.NeedsRefresh(MainViewTabNames.TransactionsPageContent);
         SelectedTabComponent = _pageFactory.Create(MainViewTabNames.TransactionsPageContent);
-    }
 
-    [RelayCommand]
-    private void SetReportsTab()
-    {
-        PendingMcpChanges = 0;
-        SelectedTabComponent = _pageFactory.Create(MainViewTabNames.ReportsPageContent);
-    }
-
-    [RelayCommand]
-    private void SetAvgPriceTab()
-    {
-        PendingMcpChanges = 0;
-        SelectedTabComponent = _pageFactory.Create(MainViewTabNames.AvgPricePageContent);
-    }
-
-    [RelayCommand]
-    private async Task RefreshCurrentTab()
-    {
-        PendingMcpChanges = 0;
-
-        if (SelectedTabComponent is not null)
+        if (needsRefresh && SelectedTabComponent is not null)
         {
             await SelectedTabComponent.RefreshAsync();
+            _tabRefreshState.ClearRefresh(MainViewTabNames.TransactionsPageContent);
+        }
+    }
+
+    [RelayCommand]
+    private async Task SetReportsTab()
+    {
+        var needsRefresh = _tabRefreshState.NeedsRefresh(MainViewTabNames.ReportsPageContent);
+        SelectedTabComponent = _pageFactory.Create(MainViewTabNames.ReportsPageContent);
+
+        if (needsRefresh && SelectedTabComponent is not null)
+        {
+            await SelectedTabComponent.RefreshAsync();
+            _tabRefreshState.ClearRefresh(MainViewTabNames.ReportsPageContent);
+        }
+    }
+
+    [RelayCommand]
+    private async Task SetAvgPriceTab()
+    {
+        var needsRefresh = _tabRefreshState.NeedsRefresh(MainViewTabNames.AvgPricePageContent);
+        SelectedTabComponent = _pageFactory.Create(MainViewTabNames.AvgPricePageContent);
+
+        if (needsRefresh && SelectedTabComponent is not null)
+        {
+            await SelectedTabComponent.RefreshAsync();
+            _tabRefreshState.ClearRefresh(MainViewTabNames.AvgPricePageContent);
         }
     }
 
