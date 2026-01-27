@@ -19,11 +19,16 @@ public class NotificationPublisher : INotificationPublisher
 
     public async Task PublishAsync<TNotification>(TNotification @event) where TNotification : class, INotification
     {
-        var currentServiceProvider = _contextScope.GetCurrentServiceProvider();
+        var rootServiceProvider = _contextScope.GetCurrentServiceProvider();
+
+        // Create a scope to properly resolve scoped services (required for MCP context)
+        using var scope = rootServiceProvider.CreateScope();
+        var scopedProvider = scope.ServiceProvider;
+
         var eventType = @event.GetType();
         var handlerInterfaceType = typeof(INotificationHandler<>).MakeGenericType(eventType);
 
-        var resolvedHandlers = (IEnumerable)currentServiceProvider.GetServices(handlerInterfaceType);
+        var resolvedHandlers = (IEnumerable)scopedProvider.GetServices(handlerInterfaceType);
         var handlers = resolvedHandlers.Cast<object>().ToList();
 
         foreach (var handler in handlers)

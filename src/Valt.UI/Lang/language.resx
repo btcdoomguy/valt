@@ -1631,11 +1631,17 @@
         <value>All installments</value>
     </data>
     <!-- MCP Server -->
+    <data name="McpServer_Name" xml:space="preserve">
+        <value>MCP Server</value>
+    </data>
     <data name="McpServer_RunningTooltip" xml:space="preserve">
         <value>MCP Server running at {0}. Click to stop.</value>
     </data>
     <data name="McpServer_StoppedTooltip" xml:space="preserve">
         <value>MCP Server stopped. Click to start.</value>
+    </data>
+    <data name="McpServer_ErrorTooltip" xml:space="preserve">
+        <value>MCP Server error: {0}. Click to retry.</value>
     </data>
     <data name="Settings_McpServerPort" xml:space="preserve">
         <value>MCP Server Port</value>
@@ -1647,6 +1653,6 @@
         <value>Data changed via AI assistant</value>
     </data>
     <data name="McpNotification_ClickToRefresh" xml:space="preserve">
-        <value>Click to refresh the current view</value>
+        <value>Data changed. Click to refresh.</value>
     </data>
 </root>

@@ -8,6 +8,7 @@ using Valt.Infra.Crawlers.HistoricPriceCrawlers;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Bitcoin.Providers;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Fiat.Providers;
 using Valt.Infra.DataAccess;
+using Valt.Infra.Kernel.BackgroundJobs;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Modules.Currency.Services;
 using Valt.Infra.Modules.Reports;
@@ -64,9 +65,12 @@ public class McpServerService
 
         if (!_localDatabase.HasDatabaseOpen)
         {
+            _state.LogPool.AddEntry(JobLogLevel.Error, "Cannot start: Database must be open");
             _state.SetError("Database must be open to start MCP server");
             return;
         }
+
+        _state.LogPool.AddEntry(JobLogLevel.Info, "Starting server...");
 
         _cts = new CancellationTokenSource();
 
@@ -80,20 +84,25 @@ public class McpServerService
             {
                 await StartOnPortAsync(port, _cts.Token);
                 _logger.LogInformation("MCP server started on port {Port}", port);
+                _state.LogPool.AddEntry(JobLogLevel.Info, $"Server started on port {port}");
                 _state.SetRunning(port);
                 return;
             }
             catch (Exception ex) when (IsPortInUseException(ex))
             {
                 _logger.LogWarning("Port {Port} is in use, trying next port", port);
+                _state.LogPool.AddEntry(JobLogLevel.Warning, $"Port {port} is in use, trying next port");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to start MCP server on port {Port}", port);
+                _state.LogPool.AddEntry(JobLogLevel.Error, $"Failed to start on port {port}: {ex.Message}");
             }
         }
 
-        _state.SetError($"Could not start MCP server. All ports ({string.Join(", ", portsToTry)}) are in use.");
+        var errorMsg = $"Could not start MCP server. All ports ({string.Join(", ", portsToTry)}) are in use.";
+        _state.LogPool.AddEntry(JobLogLevel.Error, errorMsg);
+        _state.SetError(errorMsg);
     }
 
     private async Task StartOnPortAsync(int port, CancellationToken ct)
@@ -124,6 +133,17 @@ public class McpServerService
 
         _app = builder.Build();
 
+        // Add middleware to signal activity and log MCP requests
+        _app.Use(async (context, next) =>
+        {
+            if (context.Request.Path.StartsWithSegments("/mcp"))
+            {
+                _state.SignalActivity();
+                _state.LogPool.AddEntry(JobLogLevel.Debug, $"Request: {context.Request.Method} {context.Request.Path}");
+            }
+            await next();
+        });
+
         // Map the MCP endpoint (stateless mode uses HTTP streaming, not SSE)
         _app.MapMcp("/mcp");
 
@@ -140,6 +160,7 @@ public class McpServerService
             catch (Exception ex)
             {
                 _logger.LogError(ex, "MCP server error");
+                _state.LogPool.AddEntry(JobLogLevel.Error, $"Server error: {ex.Message}");
                 _state.SetError(ex.Message);
             }
         }, ct);
@@ -164,6 +185,7 @@ public class McpServerService
         }
 
         _logger.LogInformation("Stopping MCP server");
+        _state.LogPool.AddEntry(JobLogLevel.Info, "Stopping server...");
 
         try
         {
@@ -178,10 +200,12 @@ public class McpServerService
             }
 
             await _app.DisposeAsync();
+            _state.LogPool.AddEntry(JobLogLevel.Info, "Server stopped");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error stopping MCP server");
+            _state.LogPool.AddEntry(JobLogLevel.Error, $"Error stopping server: {ex.Message}");
         }
         finally
         {

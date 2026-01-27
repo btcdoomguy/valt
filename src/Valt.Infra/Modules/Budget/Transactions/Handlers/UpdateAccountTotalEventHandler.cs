@@ -96,7 +96,7 @@ internal class UpdateAccountTotalEventHandler(ILocalDatabase localDatabase, IClo
     private void ChangeTotalsForTransactionDetails(DateOnly transactionDate, TransactionDetails transactionDetails, bool add)
     {
         var today = clock.GetCurrentLocalDate();
-        
+
         //change the origin account totals
         var fromAccountBsonId = new ObjectId(transactionDetails.FromAccountId.Value);
         var fromAccountEntity = localDatabase.GetAccounts().FindById(fromAccountBsonId);
@@ -111,7 +111,7 @@ internal class UpdateAccountTotalEventHandler(ILocalDatabase localDatabase, IClo
                     ? transactionDetails.FromAccountFiatValue.GetValueOrDefault()
                     : -transactionDetails.FromAccountFiatValue.GetValueOrDefault();
                 fromAccountCache.Total += value;
-                
+
                 if (transactionDate <= today)
                     fromAccountCache.CurrentTotal += value;
             }
@@ -121,7 +121,7 @@ internal class UpdateAccountTotalEventHandler(ILocalDatabase localDatabase, IClo
                     ? transactionDetails.FromAccountSatsValue.GetValueOrDefault()
                     : -transactionDetails.FromAccountSatsValue.GetValueOrDefault();
                 fromAccountCache.Total += value;
-                
+
                 if (transactionDate <= today)
                     fromAccountCache.CurrentTotal += value;
             }

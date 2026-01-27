@@ -71,6 +71,20 @@ dotnet test --filter "FullyQualifiedName~Valt.Tests.Domain.Budget.Transactions.T
 - **Use DTOs for serialization**: Create separate DTO classes in Infra layer
 - Example: `StackBitcoinGoalType` (domain) maps to `StackBitcoinGoalTypeDto` (infra)
 
+### C# Coding Conventions
+
+- **Use `Lock` class for synchronization**: Always use the strongly-typed `System.Threading.Lock` class instead of `lock(object)`. The `Lock` class (introduced in .NET 9) provides better performance and type safety.
+
+```csharp
+// Good
+private readonly Lock _lock = new();
+lock (_lock) { /* ... */ }
+
+// Avoid
+private readonly object _lock = new();
+lock (_lock) { /* ... */ }
+```
+
 ### Database
 
 - LiteDB (embedded NoSQL) with password protection
@@ -195,6 +209,30 @@ public void OneTimeSetUp() => IdGenerator.Configure(new LiteDbIdProvider());
 - Avalonia 11.3 with Fluent theme
 - LiveChartsCore.SkiaSharpView for charts
 - Custom fonts: Geist, GeistMono, Phosphor, MaterialDesign
+
+### Icons
+
+**Always use the icon mapping file to find Material Design icons:**
+
+The file `src/Valt.UI/Assets/Fonts/MaterialSymbolsOutlined-map.json` contains the mapping of icon names to their unicode values. When you need to use an icon:
+
+1. Search the JSON file for the desired icon by name (e.g., "settings", "home", "check")
+2. Use the `unicode` value with the `&#x` prefix in XAML or `\x` prefix in C#
+
+```json
+// Example entry in the map file
+{ "name": "settings", "unicode": "E8B8", "category": "action" }
+```
+
+```xml
+<!-- XAML usage -->
+<TextBlock FontFamily="{DynamicResource MaterialDesign}" Text="&#xE8B8;" />
+```
+
+```csharp
+// C# usage
+public string SettingsIcon => "\xE8B8";
+```
 
 ### Modal Windows
 

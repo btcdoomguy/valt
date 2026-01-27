@@ -705,6 +705,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
     public override MainViewTabNames TabName => MainViewTabNames.ReportsPageContent;
 
+    public override Task RefreshAsync() => ReloadDataAndFetchAllReportsAsync();
+
     public record SelectItem(string Id, string Name);
 
     #region Event Handlers

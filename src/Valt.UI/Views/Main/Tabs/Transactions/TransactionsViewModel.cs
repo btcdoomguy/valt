@@ -671,6 +671,12 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
     }
 
+    public override async Task RefreshAsync()
+    {
+        await FetchAccounts();
+        _transactionListViewModel.FetchTransactionsCommand.Execute(null);
+    }
+
     public override MainViewTabNames TabName => MainViewTabNames.TransactionsPageContent;
 }
 

@@ -69,6 +69,13 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
 
     public override MainViewTabNames TabName => MainViewTabNames.AvgPricePageContent;
 
+    public override async Task RefreshAsync()
+    {
+        await FetchAvgPriceProfiles();
+        await FetchAvgPriceLines();
+        await FetchTotals();
+    }
+
     public AvgPriceViewModel()
     {
         if (!Design.IsDesignMode)

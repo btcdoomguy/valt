@@ -47,7 +47,7 @@
                     <GradientStop Offset="1" Color="{DynamicResource Background800Color}"></GradientStop>
                 </LinearGradientBrush>
             </Border.Background>
-            <Grid ColumnDefinitions="*, *, 260">
+            <Grid ColumnDefinitions="*, *, *, 260">
                 <!--Top bar buttons-->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Height="50" Spacing="15">
                     <DropDownButton Classes="icon" Content="&#xE5D2;">
@@ -106,43 +106,29 @@
                         </StackPanel>
                     </Button>
                 </StackPanel>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Classes="icon-only transparent link"
-                            FontFamily="{DynamicResource MaterialDesign}"
-                            FontSize="28"
-                            Padding="8"
-                            Margin="0, 24, 10, 0"
-                            VerticalAlignment="Top"
-                            Content="{Binding McpServerIcon}"
-                            Command="{Binding ToggleMcpServerCommand}"
-                            ToolTip.Tip="{Binding McpServerTooltip}" />
-                    <!-- MCP Data Changed Notification -->
-                    <Button IsVisible="{Binding HasPendingMcpChanges}"
-                            Classes="icon-only transparent"
-                            Margin="0, 10, 10, 0"
-                            Padding="8, 14"
-                            VerticalAlignment="Top"
-                            Command="{Binding RefreshCurrentTabCommand}">
-                        <ToolTip.Tip>
-                            <StackPanel>
-                                <TextBlock Text="{x:Static local:language.McpNotification_Title}" />
-                                <TextBlock Text="{x:Static local:language.McpNotification_ClickToRefresh}"
-                                           FontSize="11" Opacity="0.8" />
-                            </StackPanel>
-                        </ToolTip.Tip>
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                            <TextBlock FontFamily="{DynamicResource MaterialDesign}"
-                                       FontSize="20"
-                                       Foreground="{DynamicResource Warning500Brush}"
-                                       Text="&#xE8B5;"
-                                       HorizontalAlignment="Center" />
-                            <TextBlock Foreground="{DynamicResource Warning500Brush}"
-                                       FontSize="9"
-                                       FontWeight="SemiBold"
-                                       Text="REFRESH"
-                                       HorizontalAlignment="Center" />
-                        </StackPanel>
-                    </Button>
+                <!-- MCP Data Changed Notification - Centered -->
+                <Button Grid.Column="1"
+                        IsVisible="{Binding HasPendingMcpChanges}"
+                        Classes="transparent"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Padding="20, 10"
+                        Command="{Binding RefreshCurrentTabCommand}">
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Spacing="4">
+                        <TextBlock FontFamily="{DynamicResource MaterialDesign}"
+                                   FontSize="36"
+                                   Foreground="{DynamicResource Vibrant500Brush}"
+                                   Text="&#xE5D5;"
+                                   HorizontalAlignment="Center" />
+                        <TextBlock Foreground="{DynamicResource Vibrant500Brush}"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Text="{x:Static local:language.McpNotification_ClickToRefresh}"
+                                   HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Classes="icon-only transparent link"
                             FontFamily="{DynamicResource MaterialDesign}"
                             FontSize="28"
@@ -152,6 +138,96 @@
                             Content="{Binding SecureModeIcon}"
                             Command="{Binding ToggleSecureModeCommand}"
                             ToolTip.Tip="{x:Static local:language.SecureMode_ToggleTooltip}" />
+                    <!-- MCP Server Status Indicator -->
+                    <Button Classes="transparent"
+                            Margin="0, 10, 10, 0"
+                            Padding="0"
+                            VerticalAlignment="Top"
+                            Command="{Binding ToggleMcpServerCommand}"
+                            ToolTip.Tip="{Binding McpServerTooltip}">
+                        <Border Background="{DynamicResource Background800Brush}"
+                                BorderBrush="{DynamicResource Background600Brush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="8, 8">
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Spacing="6">
+                                <!-- Toggle Switch -->
+                                <ToggleSwitch IsChecked="{Binding IsMcpServerRunning, Mode=OneWay}"
+                                              OnContent=""
+                                              OffContent=""
+                                              IsHitTestVisible="False"
+                                              Padding="0"
+                                              Margin="0"
+                                              MinWidth="42"
+                                              MinHeight="26"
+                                              HorizontalAlignment="Center">
+                                    <ToggleSwitch.Styles>
+                                        <Style Selector="ToggleSwitch">
+                                            <Setter Property="Height" Value="16" />
+                                            <Setter Property="Width" Value="36" />
+                                        </Style>
+                                        <Style Selector="ToggleSwitch /template/ Border#SwitchKnobBounds">
+                                            <Setter Property="Height" Value="14" />
+                                            <Setter Property="Width" Value="32" />
+                                            <Setter Property="CornerRadius" Value="7" />
+                                        </Style>
+                                        <Style Selector="ToggleSwitch /template/ Border#SwitchKnobBounds > Border#MovingKnobs > Border#OuterKnob">
+                                            <Setter Property="Width" Value="10" />
+                                            <Setter Property="Height" Value="10" />
+                                            <Setter Property="CornerRadius" Value="5" />
+                                        </Style>
+                                    </ToggleSwitch.Styles>
+                                </ToggleSwitch>
+                                <!-- Status Dot -->
+                                <Panel HorizontalAlignment="Center">
+                                    <!-- Grey dot (stopped) -->
+                                    <Ellipse Width="8" Height="8"
+                                             Fill="{DynamicResource Disabled500Brush}"
+                                             IsVisible="{Binding !IsMcpServerRunning}"
+                                             HorizontalAlignment="Center" />
+                                    <!-- Green dot (running) -->
+                                    <Ellipse Width="8" Height="8"
+                                             Fill="{DynamicResource SemanticPositive500Brush}"
+                                             IsVisible="{Binding IsMcpServerRunning}"
+                                             HorizontalAlignment="Center" />
+                                    <!-- Red dot (error) -->
+                                    <Ellipse Width="8" Height="8"
+                                             Fill="{DynamicResource SemanticNegative500Brush}"
+                                             IsVisible="{Binding IsMcpServerError}"
+                                             HorizontalAlignment="Center" />
+                                    <!-- Activity indicator (blinking) -->
+                                    <Ellipse Name="McpActivityDot"
+                                             Width="8"
+                                             Height="8"
+                                             HorizontalAlignment="Center"
+                                             Fill="{DynamicResource WhiteBrush}"
+                                             IsVisible="{Binding IsMcpProcessing}">
+                                        <Ellipse.Styles>
+                                            <Style Selector="Ellipse#McpActivityDot">
+                                                <Style.Animations>
+                                                    <Animation Duration="0:0:0.15" IterationCount="INFINITE" PlaybackDirection="Alternate">
+                                                        <KeyFrame Cue="0%">
+                                                            <Setter Property="Opacity" Value="0" />
+                                                        </KeyFrame>
+                                                        <KeyFrame Cue="100%">
+                                                            <Setter Property="Opacity" Value="1" />
+                                                        </KeyFrame>
+                                                    </Animation>
+                                                </Style.Animations>
+                                            </Style>
+                                        </Ellipse.Styles>
+                                    </Ellipse>
+                                </Panel>
+                                <!-- MCP Label -->
+                                <TextBlock Text="MCP"
+                                           FontSize="10"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource Text400Brush}"
+                                           HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                    </Button>
+
                     <Border IsVisible="{Binding IsOffline}"
                             Margin="0, 10, 10, 0"
                             Padding="8, 14"
@@ -196,7 +272,7 @@
                 </StackPanel>
 
                 <!--Top bar prices-->
-                <controls:LiveRates Grid.Column="2" Margin="0, 10, 0, 0" x:Name="LiveRatesControl"
+                <controls:LiveRates Grid.Column="3" Margin="0, 10, 0, 0" x:Name="LiveRatesControl"
                                     DataContext="{Binding LiveRatesViewModel}" />
             </Grid>
         </Border>

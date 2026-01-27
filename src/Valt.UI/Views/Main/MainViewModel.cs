@@ -122,12 +122,22 @@ public partial class MainViewModel : ValtViewModel, IDisposable
 
     public string SecureModeIcon => _secureModeState?.IsEnabled == true ? "\xE897" : "\xE898";
 
-    // MCP Server icon: E157 (terminal/lan) when running, E5CD (lan-disconnect) when stopped
-    public string McpServerIcon => _mcpServerState?.IsRunning == true ? "\xE157" : "\xE5CD";
+    // MCP Server status properties
+    public bool IsMcpServerRunning => _mcpServerState?.IsRunning == true;
+    public bool IsMcpServerError => _mcpServerState?.ErrorMessage != null;
+    public bool IsMcpProcessing => _mcpServerState?.IsProcessing == true;
 
-    public string McpServerTooltip => _mcpServerState?.IsRunning == true
-        ? string.Format(language.McpServer_RunningTooltip, _mcpServerState.ServerUrl)
-        : language.McpServer_StoppedTooltip;
+    public string McpServerTooltip
+    {
+        get
+        {
+            if (_mcpServerState?.ErrorMessage != null)
+                return string.Format(language.McpServer_ErrorTooltip, _mcpServerState.ErrorMessage);
+            if (_mcpServerState?.IsRunning == true)
+                return string.Format(language.McpServer_RunningTooltip, _mcpServerState.ServerUrl);
+            return language.McpServer_StoppedTooltip;
+        }
+    }
 
     #region Event subscribers
 
@@ -138,7 +148,9 @@ public partial class MainViewModel : ValtViewModel, IDisposable
 
     private void McpServerStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        OnPropertyChanged(nameof(McpServerIcon));
+        OnPropertyChanged(nameof(IsMcpServerRunning));
+        OnPropertyChanged(nameof(IsMcpServerError));
+        OnPropertyChanged(nameof(IsMcpProcessing));
         OnPropertyChanged(nameof(McpServerTooltip));
     }
 
@@ -249,20 +261,14 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     }
 
     [RelayCommand]
-    private void RefreshCurrentTab()
+    private async Task RefreshCurrentTab()
     {
         PendingMcpChanges = 0;
 
-        // Re-trigger current tab initialization
-        var currentTab = SelectedTabComponent;
-        SelectedTabComponent = null;
-        SelectedTabComponent = currentTab?.TabName switch
+        if (SelectedTabComponent is not null)
         {
-            MainViewTabNames.TransactionsPageContent => _pageFactory.Create(MainViewTabNames.TransactionsPageContent),
-            MainViewTabNames.ReportsPageContent => _pageFactory.Create(MainViewTabNames.ReportsPageContent),
-            MainViewTabNames.AvgPricePageContent => _pageFactory.Create(MainViewTabNames.AvgPricePageContent),
-            _ => currentTab
-        };
+            await SelectedTabComponent.RefreshAsync();
+        }
     }
 
     [RelayCommand]

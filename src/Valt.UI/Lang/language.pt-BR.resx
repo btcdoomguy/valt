@@ -1626,11 +1626,17 @@
         <value>Todas as parcelas</value>
     </data>
     <!-- MCP Server -->
+    <data name="McpServer_Name" xml:space="preserve">
+        <value>Servidor MCP</value>
+    </data>
     <data name="McpServer_RunningTooltip" xml:space="preserve">
         <value>Servidor MCP rodando em {0}. Clique para parar.</value>
     </data>
     <data name="McpServer_StoppedTooltip" xml:space="preserve">
         <value>Servidor MCP parado. Clique para iniciar.</value>
+    </data>
+    <data name="McpServer_ErrorTooltip" xml:space="preserve">
+        <value>Erro no servidor MCP: {0}. Clique para tentar novamente.</value>
     </data>
     <data name="Settings_McpServerPort" xml:space="preserve">
         <value>Porta do Servidor MCP</value>
@@ -1642,6 +1648,6 @@
         <value>Dados alterados via assistente de IA</value>
     </data>
     <data name="McpNotification_ClickToRefresh" xml:space="preserve">
-        <value>Clique para atualizar a visualização atual</value>
+        <value>Dados alterados. Clique para atualizar.</value>
     </data>
 </root>

@@ -3233,6 +3233,12 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string McpServer_Name {
+            get {
+                return ResourceManager.GetString("McpServer_Name", resourceCulture);
+            }
+        }
+
         public static string McpServer_RunningTooltip {
             get {
                 return ResourceManager.GetString("McpServer_RunningTooltip", resourceCulture);
@@ -3242,6 +3248,12 @@ namespace Valt.UI.Lang {
         public static string McpServer_StoppedTooltip {
             get {
                 return ResourceManager.GetString("McpServer_StoppedTooltip", resourceCulture);
+            }
+        }
+
+        public static string McpServer_ErrorTooltip {
+            get {
+                return ResourceManager.GetString("McpServer_ErrorTooltip", resourceCulture);
             }
         }
 
