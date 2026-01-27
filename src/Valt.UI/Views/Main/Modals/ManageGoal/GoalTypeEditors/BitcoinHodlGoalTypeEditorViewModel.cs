@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Valt.App.Modules.Goals.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.GoalTypes;
@@ -37,6 +38,19 @@ public partial class BitcoinHodlGoalTypeEditorViewModel : ObservableObject, IGoa
         if (goalType is BitcoinHodlGoalType bitcoinHodl)
         {
             MaxSellableBtcAmount = bitcoinHodl.MaxSellableSats;
+        }
+    }
+
+    public GoalTypeInputDTO CreateGoalTypeDTO()
+    {
+        return new BitcoinHodlGoalTypeDTO { MaxSellableSats = MaxSellableBtcAmount.Sats };
+    }
+
+    public void LoadFromDTO(GoalTypeOutputDTO goalType)
+    {
+        if (goalType is BitcoinHodlGoalTypeOutputDTO hodl)
+        {
+            MaxSellableBtcAmount = hodl.MaxSellableSats;
         }
     }
 }

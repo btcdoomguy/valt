@@ -1,3 +1,5 @@
+using Valt.Infra.Kernel.Notifications;
+
 namespace Valt.Infra.Crawlers.HistoricPriceCrawlers.Messages;
 
-public record BitcoinHistoryPriceUpdatedMessage();
+public record BitcoinHistoryPriceUpdatedMessage() : INotification;

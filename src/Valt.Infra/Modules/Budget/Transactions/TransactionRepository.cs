@@ -1,4 +1,3 @@
-using CommunityToolkit.Mvvm.Messaging;
 using LiteDB;
 using Valt.Core.Kernel.Abstractions.EventSystem;
 using Valt.Core.Modules.Budget.Accounts;
@@ -7,6 +6,7 @@ using Valt.Core.Modules.Budget.Transactions.Contracts;
 using Valt.Core.Modules.Budget.Transactions.Events;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Messages;
 using Valt.Infra.DataAccess;
+using Valt.Infra.Kernel.Notifications;
 
 namespace Valt.Infra.Modules.Budget.Transactions;
 
@@ -15,14 +15,17 @@ internal class TransactionRepository : ITransactionRepository
     private readonly ILocalDatabase _localDatabase;
     private readonly IPriceDatabase _priceDatabase;
     private readonly IDomainEventPublisher _domainEventPublisher;
+    private readonly INotificationPublisher _notificationPublisher;
 
     public TransactionRepository(ILocalDatabase localDatabase,
         IPriceDatabase priceDatabase,
-        IDomainEventPublisher domainEventPublisher)
+        IDomainEventPublisher domainEventPublisher,
+        INotificationPublisher notificationPublisher)
     {
         _localDatabase = localDatabase;
         _priceDatabase = priceDatabase;
         _domainEventPublisher = domainEventPublisher;
+        _notificationPublisher = notificationPublisher;
     }
 
     public Task<Transaction?> GetTransactionByIdAsync(TransactionId transactionId)
@@ -61,7 +64,7 @@ internal class TransactionRepository : ITransactionRepository
             if (fiatData.Count == 0)
             {
                 // No fiat data at all, trigger refresh
-                WeakReferenceMessenger.Default.Send<FiatHistoryRefreshRequestedMessage>();
+                _ = _notificationPublisher.PublishAsync(new FiatHistoryRefreshRequestedMessage());
                 return;
             }
 
@@ -70,7 +73,7 @@ internal class TransactionRepository : ITransactionRepository
             if (transactionDateTime < minFiatDate)
             {
                 // Transaction date is before the earliest fiat data, trigger refresh
-                WeakReferenceMessenger.Default.Send<FiatHistoryRefreshRequestedMessage>();
+                _ = _notificationPublisher.PublishAsync(new FiatHistoryRefreshRequestedMessage());
             }
         }
         catch

@@ -38,22 +38,21 @@ namespace Valt.UI.Views.Main.Tabs.Reports;
 
 public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 {
-    private readonly IAllTimeHighReport _allTimeHighReport;
-    private readonly IMonthlyTotalsReport _monthlyTotalsReport;
-    private readonly IExpensesByCategoryReport _expensesByCategoryReport;
-    private readonly IIncomeByCategoryReport _incomeByCategoryReport;
-    private readonly IStatisticsReport _statisticsReport;
-    private readonly IWealthOverviewReport _wealthOverviewReport;
-    private readonly IReportDataProviderFactory _reportDataProviderFactory;
-    private readonly CurrencySettings _currencySettings;
-    private readonly ILocalDatabase _localDatabase;
-    private readonly IClock _clock;
-    private readonly ILogger<ReportsViewModel> _logger;
-    private readonly AccountsTotalState _accountsTotalState;
-    private readonly RatesState _ratesState;
+    private readonly IAllTimeHighReport _allTimeHighReport = null!;
+    private readonly IMonthlyTotalsReport _monthlyTotalsReport = null!;
+    private readonly IExpensesByCategoryReport _expensesByCategoryReport = null!;
+    private readonly IIncomeByCategoryReport _incomeByCategoryReport = null!;
+    private readonly IStatisticsReport _statisticsReport = null!;
+    private readonly IWealthOverviewReport _wealthOverviewReport = null!;
+    private readonly IReportDataProviderFactory _reportDataProviderFactory = null!;
+    private readonly CurrencySettings _currencySettings = null!;
+    private readonly ILocalDatabase _localDatabase = null!;
+    private readonly IClock _clock = null!;
+    private readonly ILogger<ReportsViewModel> _logger = null!;
+    private readonly AccountsTotalState _accountsTotalState = null!;
+    private readonly RatesState _ratesState = null!;
     
-    [ObservableProperty]
-    private SecureModeState _secureModeState;
+    private readonly SecureModeState _secureModeState = null!;
 
     private const long TotalBtcSupplySats = 21_000_000_00_000_000L; // 21 million BTC in sats
 
@@ -70,9 +69,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private WealthOverviewChartData _wealthOverviewChartData = new();
     [ObservableProperty] private WealthOverviewPeriod _selectedWealthOverviewPeriod = WealthOverviewPeriod.Monthly;
     [ObservableProperty] private DateTime _filterMainDate;
-    [ObservableProperty] private DateRange _filterRange;
+    [ObservableProperty] private DateRange _filterRange = new(DateTime.MinValue, DateTime.MinValue);
     [ObservableProperty] private DateTime _categoryFilterMainDate;
-    [ObservableProperty] private DateRange _categoryFilterRange;
+    [ObservableProperty] private DateRange _categoryFilterRange = new(DateTime.MinValue, DateTime.MinValue);
 
     [ObservableProperty] private bool _isWealthLoading = true;
     [ObservableProperty] private bool _isAllTimeHighLoading = true;
@@ -94,7 +93,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     // Income by category
     [ObservableProperty] private IncomeByCategoryChartData _incomeByCategoryChartData = new();
     [ObservableProperty] private DateTime _incomeCategoryFilterMainDate;
-    [ObservableProperty] private DateRange _incomeCategoryFilterRange;
+    [ObservableProperty] private DateRange _incomeCategoryFilterRange = new(DateTime.MinValue, DateTime.MinValue);
     [ObservableProperty] private AvaloniaList<SelectItem> _incomeSelectedAccounts = new();
     [ObservableProperty] private AvaloniaList<SelectItem> _incomeSelectedCategories = new();
 
@@ -151,7 +150,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         WeakReferenceMessenger.Default.Register<SettingsChangedMessage>(this, (recipient, message) =>
         {
-            switch (message.Value)
+            switch (message.PropertyName)
             {
                 case nameof(CurrencySettings.MainFiatCurrency):
                     IsAllTimeHighLoading = true;
@@ -201,16 +200,16 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _logger.LogDebug("Report data provider unloaded");
     }
 
-    private IReportDataProvider GetOrCreateProvider()
+    private async Task<IReportDataProvider> GetOrCreateProviderAsync()
     {
-        _cachedProvider ??= _reportDataProviderFactory.Create();
+        _cachedProvider ??= await _reportDataProviderFactory.CreateAsync();
         return _cachedProvider;
     }
 
     private async Task LoadDataAndFetchAllReportsAsync()
     {
-        // Create and cache the provider
-        _cachedProvider = _reportDataProviderFactory.Create();
+        // Create and cache the provider with parallel data loading
+        _cachedProvider = await _reportDataProviderFactory.CreateAsync();
 
         // Determine the best default period based on transaction history
         SelectedWealthOverviewPeriod = DetermineDefaultWealthOverviewPeriod(_cachedProvider);
@@ -246,8 +245,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
     private async Task ReloadDataAndFetchAllReportsAsync()
     {
-        // Recreate the provider (data might have changed)
-        _cachedProvider = _reportDataProviderFactory.Create();
+        // Force refresh the provider (data might have changed)
+        _cachedProvider = await _reportDataProviderFactory.CreateAsync(forceRefresh: true);
 
         await FetchAllReportsAsync(_cachedProvider);
     }
@@ -301,8 +300,13 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         if (!_ready) return;
 
         IsMonthlyTotalsLoading = true;
-        var provider = GetOrCreateProvider();
-        FetchMonthlyTotalsAsync(provider).SafeFireAndForget(logger: _logger, callerName: nameof(FetchMonthlyTotalsAsync));
+        FetchMonthlyTotalsWithProviderAsync().SafeFireAndForget(logger: _logger, callerName: nameof(FetchMonthlyTotalsWithProviderAsync));
+    }
+
+    private async Task FetchMonthlyTotalsWithProviderAsync()
+    {
+        var provider = await GetOrCreateProviderAsync();
+        await FetchMonthlyTotalsAsync(provider);
     }
 
     partial void OnCategoryFilterRangeChanged(DateRange value)
@@ -310,8 +314,13 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         if (!_ready) return;
 
         IsSpendingByCategoriesLoading = true;
-        var provider = GetOrCreateProvider();
-        FetchExpensesByCategoryAsync(provider).SafeFireAndForget(logger: _logger, callerName: nameof(FetchExpensesByCategoryAsync));
+        FetchExpensesByCategoryWithProviderAsync().SafeFireAndForget(logger: _logger, callerName: nameof(FetchExpensesByCategoryWithProviderAsync));
+    }
+
+    private async Task FetchExpensesByCategoryWithProviderAsync()
+    {
+        var provider = await GetOrCreateProviderAsync();
+        await FetchExpensesByCategoryAsync(provider);
     }
 
     partial void OnIncomeCategoryFilterRangeChanged(DateRange value)
@@ -319,8 +328,13 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         if (!_ready) return;
 
         IsIncomeByCategoriesLoading = true;
-        var provider = GetOrCreateProvider();
-        FetchIncomeByCategoryAsync(provider).SafeFireAndForget(logger: _logger, callerName: nameof(FetchIncomeByCategoryAsync));
+        FetchIncomeByCategoryWithProviderAsync().SafeFireAndForget(logger: _logger, callerName: nameof(FetchIncomeByCategoryWithProviderAsync));
+    }
+
+    private async Task FetchIncomeByCategoryWithProviderAsync()
+    {
+        var provider = await GetOrCreateProviderAsync();
+        await FetchIncomeByCategoryAsync(provider);
     }
 
     private void OnSelectedFiltersChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -340,7 +354,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         try
         {
             await Task.Delay(FilterDebounceDelayMs, cancellationToken);
-            var provider = GetOrCreateProvider();
+            var provider = await GetOrCreateProviderAsync();
             await FetchExpensesByCategoryAsync(provider);
         }
         catch (TaskCanceledException)
@@ -366,7 +380,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         try
         {
             await Task.Delay(FilterDebounceDelayMs, cancellationToken);
-            var provider = GetOrCreateProvider();
+            var provider = await GetOrCreateProviderAsync();
             await FetchIncomeByCategoryAsync(provider);
         }
         catch (TaskCanceledException)
@@ -680,11 +694,18 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         if (!_ready) return;
 
         IsWealthOverviewLoading = true;
-        var provider = GetOrCreateProvider();
-        FetchWealthOverviewAsync(provider).SafeFireAndForget(logger: _logger, callerName: nameof(FetchWealthOverviewAsync));
+        FetchWealthOverviewWithProviderAsync().SafeFireAndForget(logger: _logger, callerName: nameof(FetchWealthOverviewWithProviderAsync));
+    }
+
+    private async Task FetchWealthOverviewWithProviderAsync()
+    {
+        var provider = await GetOrCreateProviderAsync();
+        await FetchWealthOverviewAsync(provider);
     }
 
     public override MainViewTabNames TabName => MainViewTabNames.ReportsPageContent;
+
+    public override Task RefreshAsync() => ReloadDataAndFetchAllReportsAsync();
 
     public record SelectItem(string Id, string Name);
 

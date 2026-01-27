@@ -18,9 +18,9 @@ namespace Valt.UI.Views.Main.Controls;
 public partial class LiveRatesViewModel : ObservableObject, IDisposable
 {
     private readonly CurrencySettings _currencySettings;
-    private readonly LiveRateState _liveRateState;
-    private readonly ILocalDatabase _localDatabase;
-    private readonly BackgroundJobManager _backgroundJobManager;
+    private readonly LiveRateState _liveRateState = null!;
+    private readonly ILocalDatabase _localDatabase = null!;
+    private readonly BackgroundJobManager _backgroundJobManager = null!;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(BtcUsdText))]
@@ -147,7 +147,7 @@ public partial class LiveRatesViewModel : ObservableObject, IDisposable
     /// </summary>
     public LiveRatesViewModel()
     {
-        _currencySettings = new CurrencySettings(_localDatabase);
+        _currencySettings = new CurrencySettings(_localDatabase, null!);
         
         HasDatabaseOpen = true;
         _currencySettings.MainFiatCurrency = FiatCurrency.Brl.Code;
@@ -167,7 +167,7 @@ public partial class LiveRatesViewModel : ObservableObject, IDisposable
         
         WeakReferenceMessenger.Default.Register<SettingsChangedMessage>(this, (recipient, message) =>
         {
-            if (message.Value == nameof(CurrencySettings.MainFiatCurrency))
+            if (message.PropertyName == nameof(CurrencySettings.MainFiatCurrency))
             {
                 OnPropertyChanged(nameof(UsdWithPairText));
                 OnPropertyChanged(nameof(UsdVariationText));

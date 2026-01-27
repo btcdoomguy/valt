@@ -8,12 +8,18 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.AvgPrice.Commands.DeleteLine;
+using Valt.App.Modules.AvgPrice.Commands.MoveLine;
+using Valt.App.Modules.AvgPrice.DTOs;
+using Valt.App.Modules.AvgPrice.Queries.GetLinesOfProfile;
+using Valt.App.Modules.AvgPrice.Queries.GetProfiles;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Modules.AvgPrice;
 using Valt.Core.Modules.AvgPrice.Calculations;
 using Valt.Infra.Modules.AvgPrice.Queries;
-using Valt.Infra.Modules.AvgPrice.Queries.DTOs;
 using Valt.UI.Base;
 using static Valt.UI.Base.TaskExtensions;
 using Valt.UI.Services;
@@ -29,11 +35,11 @@ namespace Valt.UI.Views.Main.Tabs.AvgPrice;
 
 public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
 {
-    private readonly IAvgPriceQueries _avgPriceQueries;
-    private readonly IAvgPriceRepository _avgPriceRepository;
-    private readonly IAvgPriceTotalizer _avgPriceTotalizer;
-    private readonly IModalFactory _modalFactory;
-    private readonly IClock _clock;
+    private readonly ICommandDispatcher _commandDispatcher = null!;
+    private readonly IQueryDispatcher _queryDispatcher = null!;
+    private readonly IAvgPriceTotalizer _avgPriceTotalizer = null!;
+    private readonly IModalFactory _modalFactory = null!;
+    private readonly IClock _clock = null!;
     private readonly SecureModeState? _secureModeState;
     private readonly ILogger<AvgPriceViewModel>? _logger;
 
@@ -63,6 +69,13 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
 
     public override MainViewTabNames TabName => MainViewTabNames.AvgPricePageContent;
 
+    public override async Task RefreshAsync()
+    {
+        await FetchAvgPriceProfiles();
+        await FetchAvgPriceLines();
+        await FetchTotals();
+    }
+
     public AvgPriceViewModel()
     {
         if (!Design.IsDesignMode)
@@ -87,16 +100,17 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
         TotalsFilterDate = DateTime.Now;
     }
 
-    public AvgPriceViewModel(IAvgPriceQueries avgPriceQueries,
-        IAvgPriceRepository avgPriceRepository,
+    public AvgPriceViewModel(
+        ICommandDispatcher commandDispatcher,
+        IQueryDispatcher queryDispatcher,
         IAvgPriceTotalizer avgPriceTotalizer,
         IModalFactory modalFactory,
         IClock clock,
         SecureModeState secureModeState,
         ILogger<AvgPriceViewModel> logger)
     {
-        _avgPriceQueries = avgPriceQueries;
-        _avgPriceRepository = avgPriceRepository;
+        _commandDispatcher = commandDispatcher;
+        _queryDispatcher = queryDispatcher;
         _avgPriceTotalizer = avgPriceTotalizer;
         _modalFactory = modalFactory;
         _clock = clock;
@@ -120,7 +134,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
 
     private async Task FetchAvgPriceProfiles()
     {
-        var profiles = await _avgPriceQueries.GetProfilesAsync(false);
+        var profiles = await _queryDispatcher.DispatchAsync(new GetProfilesQuery { ShowHidden = false });
 
         Profiles.Clear();
         Profiles.AddRange(profiles);
@@ -148,7 +162,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
             return;
         }
 
-        var dtos = await _avgPriceQueries.GetLinesOfProfileAsync(SelectedProfile.Id);
+        var dtos = await _queryDispatcher.DispatchAsync(new GetLinesOfProfileQuery { ProfileId = SelectedProfile.Id });
         var currency = FiatCurrency.GetFromCode(SelectedProfile.CurrencyCode);
         var viewModels = dtos.Select(dto => new AvgPriceLineViewModel(dto, SelectedProfile.Precision, currency.CultureName)).ToList();
 
@@ -334,40 +348,20 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
                 nextLineId = Lines[currentIndex - 1].Id;
         }
 
-        try
+        var result = await _commandDispatcher.DispatchAsync(new DeleteLineCommand
         {
-            var profileId = new AvgPriceProfileId(SelectedProfile.Id);
-            var profile = await _avgPriceRepository.GetAvgPriceProfileByIdAsync(profileId);
+            ProfileId = SelectedProfile.Id,
+            LineId = SelectedLine.Id
+        });
 
-            if (profile is null)
-                return;
-
-            var lineToDelete = FindLineById(profile, SelectedLine.Id);
-
-            if (lineToDelete is not null)
-            {
-                profile.RemoveLine(lineToDelete);
-                await _avgPriceRepository.SaveAvgPriceProfileAsync(profile);
-            }
-
-            await FetchAvgPriceLines(nextLineId);
-            await FetchTotals();
-        }
-        catch (Exception e)
+        if (result.IsFailure)
         {
-            await MessageBoxHelper.ShowErrorAsync(language.Error, e.Message, ownerWindow);
-        }
-    }
-
-    private static AvgPriceLine? FindLineById(AvgPriceProfile profile, string lineId)
-    {
-        foreach (var line in profile.AvgPriceLines)
-        {
-            if (line.Id.Value == lineId)
-                return line;
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, ownerWindow);
+            return;
         }
 
-        return null;
+        await FetchAvgPriceLines(nextLineId);
+        await FetchTotals();
     }
 
     [RelayCommand(CanExecute = nameof(CanMoveUp))]
@@ -379,30 +373,22 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
         // Save ID before refresh
         var lineIdToSelect = SelectedLine.Id;
 
-        try
+        var result = await _commandDispatcher.DispatchAsync(new MoveLineCommand
         {
-            var profileId = new AvgPriceProfileId(SelectedProfile.Id);
-            var profile = await _avgPriceRepository.GetAvgPriceProfileByIdAsync(profileId);
+            ProfileId = SelectedProfile.Id,
+            LineId = lineIdToSelect,
+            Direction = 0 // Up
+        });
 
-            if (profile is null)
-                return;
-
-            var lineToMove = FindLineById(profile, lineIdToSelect);
-
-            if (lineToMove is not null)
-            {
-                profile.MoveLineUp(lineToMove);
-                await _avgPriceRepository.SaveAvgPriceProfileAsync(profile);
-            }
-
-            await FetchAvgPriceLines(lineIdToSelect);
-            await FetchTotals();
-        }
-        catch (Exception e)
+        if (result.IsFailure)
         {
             var ownerWindow = GetUserControlOwnerWindow()!;
-            await MessageBoxHelper.ShowErrorAsync(language.Error, e.Message, ownerWindow);
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, ownerWindow);
+            return;
         }
+
+        await FetchAvgPriceLines(lineIdToSelect);
+        await FetchTotals();
     }
 
     [RelayCommand(CanExecute = nameof(CanMoveDown))]
@@ -414,30 +400,22 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
         // Save ID before refresh
         var lineIdToSelect = SelectedLine.Id;
 
-        try
+        var result = await _commandDispatcher.DispatchAsync(new MoveLineCommand
         {
-            var profileId = new AvgPriceProfileId(SelectedProfile.Id);
-            var profile = await _avgPriceRepository.GetAvgPriceProfileByIdAsync(profileId);
+            ProfileId = SelectedProfile.Id,
+            LineId = lineIdToSelect,
+            Direction = 1 // Down
+        });
 
-            if (profile is null)
-                return;
-
-            var lineToMove = FindLineById(profile, lineIdToSelect);
-
-            if (lineToMove is not null)
-            {
-                profile.MoveLineDown(lineToMove);
-                await _avgPriceRepository.SaveAvgPriceProfileAsync(profile);
-            }
-
-            await FetchAvgPriceLines(lineIdToSelect);
-            await FetchTotals();
-        }
-        catch (Exception e)
+        if (result.IsFailure)
         {
             var ownerWindow = GetUserControlOwnerWindow()!;
-            await MessageBoxHelper.ShowErrorAsync(language.Error, e.Message, ownerWindow);
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, ownerWindow);
+            return;
         }
+
+        await FetchAvgPriceLines(lineIdToSelect);
+        await FetchTotals();
     }
 
     private async Task FetchTotals()

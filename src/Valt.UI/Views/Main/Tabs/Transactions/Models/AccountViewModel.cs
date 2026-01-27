@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Valt.App.Modules.Budget.Accounts.DTOs;
 using Valt.Core.Common;
 using Valt.Infra.Kernel;
-using Valt.Infra.Modules.Budget.Accounts.Queries.DTOs;
 
 namespace Valt.UI.Views.Main.Tabs.Transactions.Models;
 
@@ -56,7 +56,7 @@ public partial class AccountViewModel : ObservableObject, IAccountListItem
         Type = dto.Type;
         Name = dto.Name;
         Visible = dto.Visible;
-        Icon = dto.Icon;
+        Icon = dto.IconId;
         Currency = dto.Currency;
         CurrencyDisplayName = dto.CurrencyDisplayName;
         IsBtcAccount = dto.IsBtcAccount;

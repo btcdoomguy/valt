@@ -4,10 +4,12 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Valt.App.Kernel.Commands;
+using Valt.App.Modules.AvgPrice.Commands.AddLine;
+using Valt.App.Modules.AvgPrice.Commands.EditLine;
+using Valt.App.Modules.AvgPrice.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Modules.AvgPrice;
-using Valt.Core.Modules.AvgPrice.Calculations;
-using Valt.Infra.Modules.AvgPrice.Queries.DTOs;
 using Valt.UI.Base;
 using Valt.UI.Lang;
 using Valt.UI.Services.MessageBoxes;
@@ -16,7 +18,7 @@ namespace Valt.UI.Views.Main.Modals.AvgPriceLineEditor;
 
 public partial class AvgPriceLineEditorViewModel : ValtModalValidatorViewModel
 {
-    private readonly IAvgPriceRepository _avgPriceRepository;
+    private readonly ICommandDispatcher? _commandDispatcher;
 
     [ObservableProperty] private string _windowTitle = language.AvgPriceLineEditor_AddTitle;
 
@@ -80,9 +82,9 @@ public partial class AvgPriceLineEditorViewModel : ValtModalValidatorViewModel
         if (!Design.IsDesignMode) return;
     }
 
-    public AvgPriceLineEditorViewModel(IAvgPriceRepository avgPriceRepository)
+    public AvgPriceLineEditorViewModel(ICommandDispatcher commandDispatcher)
     {
-        _avgPriceRepository = avgPriceRepository;
+        _commandDispatcher = commandDispatcher;
     }
 
     public override async Task OnBindParameterAsync()
@@ -142,51 +144,47 @@ public partial class AvgPriceLineEditorViewModel : ValtModalValidatorViewModel
         if (HasErrors)
             return;
 
-        try
-        {
-            var profileId = new AvgPriceProfileId(ProfileId);
-            var profile = await _avgPriceRepository.GetAvgPriceProfileByIdAsync(profileId);
+        var date = DateOnly.FromDateTime(Date!.Value);
 
-            if (profile is null)
+        if (IsEditMode)
+        {
+            var result = await _commandDispatcher!.DispatchAsync(new EditLineCommand
             {
-                await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_ProfileNotFound, GetWindow!());
+                ProfileId = ProfileId,
+                LineId = LineId!,
+                Date = date,
+                LineTypeId = (int)LineType,
+                Quantity = Quantity,
+                Amount = Amount!.Value,
+                Comment = string.IsNullOrWhiteSpace(Comment) ? null : Comment
+            });
+
+            if (result.IsFailure)
+            {
+                await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
                 return;
             }
-
-            var date = DateOnly.FromDateTime(Date!.Value);
-
-            if (IsEditMode)
+        }
+        else
+        {
+            var result = await _commandDispatcher!.DispatchAsync(new AddLineCommand
             {
-                // Find and remove the existing line
-                var existingLine = FindLineById(profile, LineId!);
-                if (existingLine is not null)
-                {
-                    profile.RemoveLine(existingLine);
-                }
+                ProfileId = ProfileId,
+                Date = date,
+                LineTypeId = (int)LineType,
+                Quantity = Quantity,
+                Amount = Amount!.Value,
+                Comment = string.IsNullOrWhiteSpace(Comment) ? null : Comment
+            });
+
+            if (result.IsFailure)
+            {
+                await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
+                return;
             }
-
-            // Add the new/updated line
-            profile.AddLine(date, DisplayOrder, LineType, Quantity, Amount!, Comment);
-
-            await _avgPriceRepository.SaveAvgPriceProfileAsync(profile);
-
-            CloseDialog?.Invoke(new Response(true));
-        }
-        catch (Exception e)
-        {
-            await MessageBoxHelper.ShowErrorAsync(language.Error, e.Message, GetWindow!());
-        }
-    }
-
-    private static AvgPriceLine? FindLineById(AvgPriceProfile profile, string lineId)
-    {
-        foreach (var line in profile.AvgPriceLines)
-        {
-            if (line.Id.Value == lineId)
-                return line;
         }
 
-        return null;
+        CloseDialog?.Invoke(new Response(true));
     }
 
     [RelayCommand]

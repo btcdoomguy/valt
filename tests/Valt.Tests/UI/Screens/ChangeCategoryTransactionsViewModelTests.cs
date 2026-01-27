@@ -1,20 +1,21 @@
+using System.Drawing;
 using NSubstitute;
-using Valt.Core.Common;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Budget.Categories.DTOs;
+using Valt.App.Modules.Budget.Categories.Queries.GetCategories;
 using Valt.Core.Kernel.Factories;
 using Valt.Infra.Kernel;
-using Valt.Infra.Modules.Budget.Categories.Queries;
-using Valt.Infra.Modules.Budget.Categories.Queries.DTOs;
 using Valt.Infra.TransactionTerms;
-using Valt.Tests.Builders;
 using Valt.UI.Views.Main.Modals.ChangeCategoryTransactions;
 
 namespace Valt.Tests.UI.Screens;
 
 [TestFixture]
-public class ChangeCategoryTransactionsViewModelTests : DatabaseTest
+public class ChangeCategoryTransactionsViewModelTests
 {
-    private CategoryQueries _categoryQueries;
-    private ITransactionTermService _transactionTermService;
+    private IQueryDispatcher _queryDispatcher = null!;
+    private ITransactionTermService _transactionTermService = null!;
+    private List<CategoryDTO> _testCategories = null!;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -22,33 +23,27 @@ public class ChangeCategoryTransactionsViewModelTests : DatabaseTest
         IdGenerator.Configure(new LiteDbIdProvider());
     }
 
-    private ChangeCategoryTransactionsViewModel CreateInstance()
+    [SetUp]
+    public void SetUp()
     {
-        _categoryQueries = new CategoryQueries(_localDatabase);
-        _transactionTermService = Substitute.For<ITransactionTermService>();
+        _testCategories = new List<CategoryDTO>
+        {
+            new() { Id = "cat1", Name = "Category 1", SimpleName = "Category 1", Unicode = '\0', Color = Color.Black },
+            new() { Id = "cat2", Name = "Category 2", SimpleName = "Category 2", Unicode = '\0', Color = Color.Black }
+        };
 
-        return new ChangeCategoryTransactionsViewModel(
-            _transactionTermService,
-            _categoryQueries);
+        _queryDispatcher = Substitute.For<IQueryDispatcher>();
+        _queryDispatcher.DispatchAsync(Arg.Any<GetCategoriesQuery>(), Arg.Any<CancellationToken>())
+            .Returns(new CategoriesDTO(_testCategories));
+
+        _transactionTermService = Substitute.For<ITransactionTermService>();
     }
 
-    protected override async Task SeedDatabase()
+    private ChangeCategoryTransactionsViewModel CreateInstance()
     {
-        await base.SeedDatabase();
-
-        // Seed some categories
-        var category1 = CategoryBuilder.ACategory()
-            .WithName("Category 1")
-            .WithIcon(Icon.Empty)
-            .Build();
-
-        var category2 = CategoryBuilder.ACategory()
-            .WithName("Category 2")
-            .WithIcon(Icon.Empty)
-            .Build();
-
-        _localDatabase.GetCategories().Insert(category1);
-        _localDatabase.GetCategories().Insert(category2);
+        return new ChangeCategoryTransactionsViewModel(
+            _transactionTermService,
+            _queryDispatcher);
     }
 
     #region Initialization Tests

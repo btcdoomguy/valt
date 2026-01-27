@@ -7,12 +7,16 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Budget.Categories.Commands.ChangeCategoryParent;
+using Valt.App.Modules.Budget.Categories.Commands.CreateCategory;
+using Valt.App.Modules.Budget.Categories.Commands.DeleteCategory;
+using Valt.App.Modules.Budget.Categories.Commands.EditCategory;
+using Valt.App.Modules.Budget.Categories.Queries.GetCategories;
+using Valt.App.Modules.Budget.Categories.Queries.GetCategory;
 using Valt.Core.Common;
-using Valt.Core.Kernel.Exceptions;
 using Valt.Core.Modules.Budget.Categories;
-using Valt.Core.Modules.Budget.Categories.Contracts;
-using Valt.Infra.Modules.Budget.Transactions.Queries;
-using Valt.Infra.Modules.Budget.Transactions.Queries.DTOs;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
 using Valt.UI.Lang;
@@ -25,8 +29,8 @@ namespace Valt.UI.Views.Main.Modals.ManageCategories;
 
 public partial class ManageCategoriesViewModel : ValtModalValidatorViewModel
 {
-    private readonly ICategoryRepository? _categoryRepository;
-    private readonly ITransactionQueries _transactionQueries;
+    private readonly ICommandDispatcher? _commandDispatcher;
+    private readonly IQueryDispatcher? _queryDispatcher;
     private readonly IModalFactory? _modalFactory;
 
     #region Form data
@@ -97,12 +101,13 @@ public partial class ManageCategoriesViewModel : ValtModalValidatorViewModel
         ];
     }
 
-    public ManageCategoriesViewModel(ICategoryRepository categoryRepository,
-        ITransactionQueries transactionQueries,
+    public ManageCategoriesViewModel(
+        ICommandDispatcher commandDispatcher,
+        IQueryDispatcher queryDispatcher,
         IModalFactory modalFactory)
     {
-        _categoryRepository = categoryRepository;
-        _transactionQueries = transactionQueries;
+        _commandDispatcher = commandDispatcher;
+        _queryDispatcher = queryDispatcher;
         _modalFactory = modalFactory;
 
         _ = InitializeAsync();
@@ -115,33 +120,43 @@ public partial class ManageCategoriesViewModel : ValtModalValidatorViewModel
 
     private async Task FetchCategoriesAsync()
     {
-        var categories = (await _categoryRepository!.GetCategoriesAsync()).OrderBy(x => x.Name.Value);
+        var result = await _queryDispatcher!.DispatchAsync(new GetCategoriesQuery());
+        var categories = result.Items.OrderBy(x => x.SimpleName);
 
         NewCategories.Clear();
 
-        //two levels only, so it's easy to manage the tree
+        // Two levels only, so it's easy to manage the tree
         foreach (var rootLevelCategory in categories.Where(x => x.ParentId is null))
         {
-            NewCategories.Add(new CategoryTreeElement(rootLevelCategory.Id.Value, rootLevelCategory.ParentId?.Value,
-                rootLevelCategory.Name.Value,
-                rootLevelCategory.Icon.Unicode, rootLevelCategory.Icon.Color));
+            NewCategories.Add(new CategoryTreeElement(
+                rootLevelCategory.Id,
+                rootLevelCategory.ParentId,
+                rootLevelCategory.SimpleName,
+                rootLevelCategory.Unicode,
+                rootLevelCategory.Color));
         }
 
         foreach (var childLevelCategory in categories.Where(x => x.ParentId is not null))
         {
-            var parent = NewCategories.SingleOrDefault(x => x.Id == childLevelCategory.ParentId!.Value);
+            var parent = NewCategories.SingleOrDefault(x => x.Id == childLevelCategory.ParentId);
 
             if (parent is not null)
             {
-                parent.SubNodes.Add(new CategoryTreeElement(childLevelCategory.Id.Value,
-                    childLevelCategory.ParentId?.Value, childLevelCategory.Name.Value,
-                    childLevelCategory.Icon.Unicode, childLevelCategory.Icon.Color));
+                parent.SubNodes.Add(new CategoryTreeElement(
+                    childLevelCategory.Id,
+                    childLevelCategory.ParentId,
+                    childLevelCategory.SimpleName,
+                    childLevelCategory.Unicode,
+                    childLevelCategory.Color));
             }
             else
             {
-                NewCategories.Add(new CategoryTreeElement(childLevelCategory.Id.Value,
-                    childLevelCategory.ParentId?.Value, childLevelCategory.Name.Value,
-                    childLevelCategory.Icon.Unicode, childLevelCategory.Icon.Color));
+                NewCategories.Add(new CategoryTreeElement(
+                    childLevelCategory.Id,
+                    childLevelCategory.ParentId,
+                    childLevelCategory.SimpleName,
+                    childLevelCategory.Unicode,
+                    childLevelCategory.Color));
             }
         }
     }
@@ -161,24 +176,32 @@ public partial class ManageCategoriesViewModel : ValtModalValidatorViewModel
         {
             if (Id == null)
             {
-                var category = Category.New(CategoryName.New(Name), Icon);
+                var result = await _commandDispatcher!.DispatchAsync(new CreateCategoryCommand
+                {
+                    Name = Name,
+                    IconId = Icon.ToString()
+                });
 
-                await _categoryRepository!.SaveCategoryAsync(category);
+                if (result.IsFailure)
+                {
+                    await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
+                    return;
+                }
             }
             else
             {
-                var id = new CategoryId(Id);
-                var name = CategoryName.New(Name);
+                var result = await _commandDispatcher!.DispatchAsync(new EditCategoryCommand
+                {
+                    CategoryId = Id,
+                    Name = Name,
+                    IconId = Icon.ToString()
+                });
 
-                var category = await _categoryRepository!.GetCategoryByIdAsync(id);
-
-                if (category is null)
-                    throw new EntityNotFoundException(nameof(Category), id);
-
-                category.Rename(name);
-                category.ChangeIcon(Icon);
-
-                await _categoryRepository.SaveCategoryAsync(category);
+                if (result.IsFailure)
+                {
+                    await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
+                    return;
+                }
             }
 
             await FetchCategoriesAsync();
@@ -199,20 +222,17 @@ public partial class ManageCategoriesViewModel : ValtModalValidatorViewModel
         if (SelectedCategory is null)
             return;
 
-        var selectedCategoryId = new CategoryId(SelectedCategory.Id);
-        var transactionsWithCategoryId = await _transactionQueries.GetTransactionsAsync(new TransactionQueryFilter()
+        var result = await _commandDispatcher!.DispatchAsync(new DeleteCategoryCommand
         {
-            Categories = [SelectedCategory.Id]
+            CategoryId = SelectedCategory.Id
         });
 
-        if (transactionsWithCategoryId.Items.Count > 0)
+        if (result.IsFailure)
         {
-            await MessageBoxHelper.ShowErrorAsync(language.Error,
-                "Cannot delete category if it was already used by a transaction.", GetWindow!());
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
             return;
         }
 
-        await _categoryRepository!.DeleteCategoryAsync(selectedCategoryId);
         await FetchCategoriesAsync();
         await ClearSelection();
     }
@@ -289,24 +309,32 @@ public partial class ManageCategoriesViewModel : ValtModalValidatorViewModel
 
     private async Task LoadCategoryInfoAsync(string selectedCategoryId)
     {
-        var category = await _categoryRepository!.GetCategoryByIdAsync(selectedCategoryId);
+        var category = await _queryDispatcher!.DispatchAsync(new GetCategoryQuery { CategoryId = selectedCategoryId });
 
-        Id = category!.Id;
-        Name = category.Name;
-        Icon = category.Icon;
+        if (category is null) return;
+
+        Id = category.Id;
+        Name = category.SimpleName;
+        Icon = category.IconId is not null ? Icon.RestoreFromId(category.IconId) : Icon.Empty;
     }
 
     public async Task ChangeCategoryParent(string categoryId, string? newParentId)
     {
-        var category = await _categoryRepository!.GetCategoryByIdAsync(new CategoryId(categoryId));
+        var result = await _commandDispatcher!.DispatchAsync(new ChangeCategoryParentCommand
+        {
+            CategoryId = categoryId,
+            NewParentId = newParentId
+        });
 
-        category!.ChangeParent(newParentId is not null ? new CategoryId(newParentId) : null);
-
-        await _categoryRepository!.SaveCategoryAsync(category);
+        if (result.IsFailure)
+        {
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
+            return;
+        }
 
         Dispatcher.UIThread.Post(() =>
         {
-            _ = FetchCategoriesAsync(); 
+            _ = FetchCategoriesAsync();
             _ = ClearSelection();
             SelectedCategory = NewCategories.SingleOrDefault(x => x.Id == categoryId);
         });

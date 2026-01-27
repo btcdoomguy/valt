@@ -31,7 +31,7 @@ public class AccountTotalsCalculator : IAccountTotalsCalculator
         if (accountCache is null)
         {
             await _accountCacheService.CalculateTotalsForAccountAsync(accountId);
-            
+
             accountCache = _localDatabase.GetAccountCaches().FindById(accountObjectId);
         }
 
@@ -48,11 +48,11 @@ public class AccountTotalsCalculator : IAccountTotalsCalculator
         var accountObjectId = accountId.AsObjectId();
 
         var accountCache = _localDatabase.GetAccountCaches().FindById(accountObjectId);
-        
+
         if (accountCache is null)
         {
             await _accountCacheService.CalculateTotalsForAccountAsync(accountId);
-            
+
             accountCache = _localDatabase.GetAccountCaches().FindById(accountObjectId);
         }
 

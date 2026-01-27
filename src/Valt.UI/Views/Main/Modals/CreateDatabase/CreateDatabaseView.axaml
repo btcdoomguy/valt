@@ -7,6 +7,7 @@
         xmlns:createDatabase1="clr-namespace:Valt.UI.Views.Main.Modals.CreateDatabase"
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
         Width="600"
+        MinWidth="600"
         MinHeight="400"
         MaxHeight="700"
         SizeToContent="Height"

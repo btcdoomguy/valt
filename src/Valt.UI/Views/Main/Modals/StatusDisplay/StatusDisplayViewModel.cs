@@ -5,21 +5,22 @@ using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Valt.Infra.Kernel.BackgroundJobs;
+using Valt.Infra.Mcp.Server;
 using Valt.UI.Base;
 
 namespace Valt.UI.Views.Main.Modals.StatusDisplay;
 
 public partial class StatusDisplayViewModel : ValtModalViewModel
 {
-    private readonly BackgroundJobManager _jobManager;
-    public AvaloniaList<JobInfo> Jobs { get; set; }
+    private readonly BackgroundJobManager _jobManager = null!;
+    public AvaloniaList<IStatusItem> Items { get; set; } = new();
 
     [ObservableProperty]
-    private JobInfo? _selectedJob;
+    private IStatusItem? _selectedItem;
 
     public StatusDisplayViewModel()
     {
-        Jobs = [
+        Items = [
             new JobInfo(new FooBackgroundJob("Job 1", "Job1")),
             new JobInfo(new FooBackgroundJob("Job 2", "Job2")),
             new JobInfo(new FooBackgroundJob("Job 3", "Job3")),
@@ -27,24 +28,27 @@ public partial class StatusDisplayViewModel : ValtModalViewModel
         ];
     }
 
-    public StatusDisplayViewModel(BackgroundJobManager jobManager)
+    public StatusDisplayViewModel(BackgroundJobManager jobManager, McpServerState mcpServerState)
     {
         _jobManager = jobManager;
-        Jobs = new AvaloniaList<JobInfo>(_jobManager.GetJobInfos());
+        Items = new AvaloniaList<IStatusItem>(_jobManager.GetJobInfos());
+        Items.Add(mcpServerState);
     }
 
     [RelayCommand]
-    private void OpenJobLog(JobInfo? jobInfo)
+    private void OpenItemLog(IStatusItem? item)
     {
-        if (jobInfo == null)
+        if (item == null)
             return;
 
         var logViewer = new JobLogViewerView
         {
-            DataContext = new JobLogViewerViewModel(jobInfo)
+            DataContext = new JobLogViewerViewModel(item)
         };
 
-        logViewer.ShowDialog(GetWindow());
+#pragma warning disable CS8602 // Dereference of a possibly null reference
+        logViewer.ShowDialog(GetWindow()!);
+#pragma warning restore CS8602
     }
 
     public class FooBackgroundJob : IBackgroundJob

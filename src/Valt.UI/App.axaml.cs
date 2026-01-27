@@ -10,10 +10,10 @@ using LiveChartsCore.SkiaSharpView;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SkiaSharp;
+using Valt.App;
 using Valt.Core;
 using Valt.Infra;
 using Valt.Infra.Kernel.BackgroundJobs;
-using Valt.Infra.Modules.Goals.Handlers;
 using Valt.Infra.Settings;
 using Valt.UI.Services.LocalStorage;
 using Valt.UI.Services.FontScaling;
@@ -49,6 +49,7 @@ public partial class App : Application
         collection
             .AddValtCore()
             .AddValtInfrastructure()
+            .AddValtApp()
             .AddValtUI(localStorageService);
 
         var serviceProvider = collection.BuildServiceProvider();
@@ -65,9 +66,6 @@ public partial class App : Application
         //initialize all setting classes
         _ = serviceProvider.GetService<CurrencySettings>();
         _ = serviceProvider.GetService<DisplaySettings>();
-
-        // Initialize handler that marks goals stale when historical prices update
-        _ = serviceProvider.GetRequiredService<MarkGoalsStaleOnPriceUpdateHandler>();
 
         // Initialize theme service (it loads and applies the theme from local storage)
         _ = serviceProvider.GetRequiredService<IThemeService>();

@@ -1,5 +1,6 @@
 using LiteDB;
 using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.EventSystem;
 using Valt.Core.Modules.Budget.Accounts;
@@ -9,6 +10,7 @@ using Valt.Core.Modules.Budget.FixedExpenses.Contracts;
 using Valt.Core.Modules.Budget.Transactions;
 using Valt.Core.Modules.Budget.Transactions.Details;
 using Valt.Infra;
+using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.FixedExpenses;
 using Valt.Infra.Modules.Budget.Transactions;
@@ -109,7 +111,7 @@ public class FixedExpenseProviderTests : IntegrationTest
 
         var transaction = Transaction.New(new DateOnly(2025, 1, 25), "Electricity", new CategoryId(),
             new FiatDetails(brlAccount.Id, FiatValue.New(170m), false), null, new TransactionFixedExpenseReference(_electricityFixedExpenseId.Value, new DateOnly(2025, 1, 30)));
-        var transactionRepo = new TransactionRepository(_localDatabase, _priceDatabase, _serviceProvider.GetRequiredService<IDomainEventPublisher>());
+        var transactionRepo = new TransactionRepository(_localDatabase, _priceDatabase, _serviceProvider.GetRequiredService<IDomainEventPublisher>(), Substitute.For<INotificationPublisher>());
         
         await transactionRepo.SaveTransactionAsync(transaction);
         

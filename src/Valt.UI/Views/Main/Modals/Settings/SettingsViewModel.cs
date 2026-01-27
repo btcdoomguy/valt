@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Valt.Core.Common;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Modules.Configuration;
@@ -21,27 +22,30 @@ using Valt.UI.Services.LocalStorage;
 using Valt.UI.Services.MessageBoxes;
 using Valt.UI.Services.FontScaling;
 using Valt.UI.Services.Theming;
+using Valt.UI.State.Events;
 using Valt.UI.Views.Main.Modals.ChangePassword;
 
 namespace Valt.UI.Views.Main.Modals.Settings;
 
 public partial class SettingsViewModel : ValtModalViewModel
 {
-    private readonly CurrencySettings _currencySettings;
-    private readonly DisplaySettings _displaySettings;
-    private readonly ILocalDatabase _localDatabase;
-    private readonly ITransactionTermService _transactionTermService;
-    private readonly IModalFactory _modalFactory;
-    private readonly ILocalStorageService _localStorageService;
+    private readonly CurrencySettings _currencySettings = null!;
+    private readonly DisplaySettings _displaySettings = null!;
+    private readonly ILocalDatabase _localDatabase = null!;
+    private readonly ITransactionTermService _transactionTermService = null!;
+    private readonly IModalFactory _modalFactory = null!;
+    private readonly ILocalStorageService _localStorageService = null!;
     private readonly IConfigurationManager? _configurationManager;
     private readonly IThemeService? _themeService;
     private readonly IFontScaleService? _fontScaleService;
 
-    [ObservableProperty] private string _mainFiatCurrency;
+    [ObservableProperty] private string _mainFiatCurrency = string.Empty;
     [ObservableProperty] private bool _showHiddenAccounts;
-    [ObservableProperty] private string _currentCulture;
+    [ObservableProperty] private string _currentCulture = string.Empty;
     [ObservableProperty] private ThemeDefinition? _selectedTheme;
     [ObservableProperty] private FontScaleItem? _selectedFontScale;
+    [ObservableProperty] private bool _mcpServerEnabled;
+    [ObservableProperty] private int _mcpServerPort = 5200;
 
     private List<string> _initialSelectedCurrencies = new();
     private HashSet<string> _currenciesInUse = new();
@@ -108,6 +112,8 @@ public partial class SettingsViewModel : ValtModalViewModel
         ShowHiddenAccounts = false;
         CurrentCulture = "en-US";
         SelectedFontScale = FontScaleItem.All.First(x => x.Scale == FontScale.Medium);
+        McpServerEnabled = false;
+        McpServerPort = 5200;
 
         SelectedFiatCurrencies.CollectionChanged += OnSelectedFiatCurrenciesChanged;
     }
@@ -139,6 +145,8 @@ public partial class SettingsViewModel : ValtModalViewModel
                         ?? _themeService.AvailableThemes.First();
         SelectedFontScale = FontScaleItem.All.FirstOrDefault(x => x.Scale == fontScaleService.CurrentScale)
                             ?? FontScaleItem.All.First(x => x.Scale == FontScale.Medium);
+        McpServerEnabled = _localStorageService.LoadMcpServerEnabled();
+        McpServerPort = _displaySettings.McpServerPort;
 
         // Initialize currencies
         InitializeFiatCurrencies();
@@ -246,6 +254,7 @@ public partial class SettingsViewModel : ValtModalViewModel
         _currencySettings.Save();
 
         _displaySettings.ShowHiddenAccounts = ShowHiddenAccounts;
+        _displaySettings.McpServerPort = McpServerPort;
         _displaySettings.Save();
 
         // Apply and save font scale if changed
@@ -269,6 +278,9 @@ public partial class SettingsViewModel : ValtModalViewModel
         }
 
         await _localStorageService.ChangeCultureAsync(CurrentCulture);
+        await _localStorageService.ChangeMcpServerEnabledAsync(McpServerEnabled);
+
+        WeakReferenceMessenger.Default.Send(new McpFeatureEnabledChanged(McpServerEnabled));
 
         CloseDialog?.Invoke(new Response(true));
     }

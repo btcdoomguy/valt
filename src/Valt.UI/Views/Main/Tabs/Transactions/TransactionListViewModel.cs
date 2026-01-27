@@ -13,17 +13,27 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
+using Valt.App.Kernel;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.AvgPrice.DTOs;
+using Valt.App.Modules.AvgPrice.Queries.GetProfiles;
+using Valt.App.Modules.Budget.Transactions.Commands.BindTransactionToFixedExpense;
+using Valt.App.Modules.Budget.Transactions.Commands.BulkChangeCategoryTransactions;
+using Valt.App.Modules.Budget.Transactions.Commands.BulkRenameTransactions;
+using Valt.App.Modules.Budget.Transactions.Commands.DeleteTransaction;
+using Valt.App.Modules.Budget.Transactions.Commands.DeleteTransactionGroup;
+using Valt.App.Modules.Budget.Transactions.Commands.UnbindTransactionFromFixedExpense;
+using Valt.App.Modules.Budget.Transactions.Queries.GetTransactionById;
+using Valt.App.Modules.Budget.Transactions.Queries.GetTransactions;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Budget.Accounts;
-using Valt.Core.Modules.Budget.Categories;
 using Valt.Core.Modules.Budget.Transactions;
-using Valt.Core.Modules.Budget.Transactions.Contracts;
+using Valt.Core.Modules.AvgPrice;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Modules.Budget.Transactions.Messages;
-using Valt.Infra.Modules.Budget.Transactions.Queries;
-using Valt.Infra.Modules.Budget.Transactions.Queries.DTOs;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
 using Valt.UI.Base;
@@ -33,9 +43,6 @@ using Valt.UI.Services;
 using Valt.UI.Services.LocalStorage;
 using Valt.UI.State;
 using Valt.UI.UserControls;
-using Valt.Core.Modules.AvgPrice;
-using Valt.Infra.Modules.AvgPrice.Queries;
-using Valt.Infra.Modules.AvgPrice.Queries.DTOs;
 using Valt.UI.Views.Main.Modals.AvgPriceLineEditor;
 using Valt.UI.Views.Main.Modals.ChangeCategoryTransactions;
 using Valt.UI.Services.MessageBoxes;
@@ -46,18 +53,17 @@ namespace Valt.UI.Views.Main.Tabs.Transactions;
 
 public partial class TransactionListViewModel : ValtViewModel, IDisposable
 {
-    private readonly IModalFactory _modalFactory;
-    private readonly ITransactionRepository _transactionRepository;
-    private readonly ITransactionQueries _transactionQueries;
-    private readonly ITransactionTermService _transactionTermService;
-    private readonly LiveRateState _liveRateState;
-    private readonly ILocalDatabase _localDatabase;
-    private readonly CurrencySettings _currencySettings;
-    private readonly FilterState _filterState;
-    private readonly IClock _clock;
-    private readonly ILocalStorageService _localStorageService;
-    private readonly ILogger<TransactionListViewModel> _logger;
-    private readonly IAvgPriceQueries _avgPriceQueries;
+    private readonly IModalFactory _modalFactory = null!;
+    private readonly ICommandDispatcher _commandDispatcher = null!;
+    private readonly IQueryDispatcher _queryDispatcher = null!;
+    private readonly ITransactionTermService _transactionTermService = null!;
+    private readonly LiveRateState _liveRateState = null!;
+    private readonly ILocalDatabase _localDatabase = null!;
+    private readonly CurrencySettings _currencySettings = null!;
+    private readonly FilterState _filterState = null!;
+    private readonly IClock _clock = null!;
+    private readonly ILocalStorageService _localStorageService = null!;
+    private readonly ILogger<TransactionListViewModel> _logger = null!;
 
     private DateTime _dateForTransaction = DateTime.Now;
 
@@ -89,8 +95,8 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     #endregion
 
     public TransactionListViewModel(IModalFactory modalFactory,
-        ITransactionRepository transactionRepository,
-        ITransactionQueries transactionQueries,
+        ICommandDispatcher commandDispatcher,
+        IQueryDispatcher queryDispatcher,
         ITransactionTermService transactionTermService,
         LiveRateState liveRateState,
         ILocalDatabase localDatabase,
@@ -98,12 +104,11 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
         FilterState filterState,
         IClock clock,
         ILocalStorageService localStorageService,
-        ILogger<TransactionListViewModel> logger,
-        IAvgPriceQueries avgPriceQueries)
+        ILogger<TransactionListViewModel> logger)
     {
         _modalFactory = modalFactory;
-        _transactionRepository = transactionRepository;
-        _transactionQueries = transactionQueries;
+        _commandDispatcher = commandDispatcher;
+        _queryDispatcher = queryDispatcher;
         _transactionTermService = transactionTermService;
         _liveRateState = liveRateState;
         _localDatabase = localDatabase;
@@ -112,7 +117,6 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
         _clock = clock;
         _localStorageService = localStorageService;
         _logger = logger;
-        _avgPriceQueries = avgPriceQueries;
 
         _liveRateState.PropertyChanged += LiveRateStateOnPropertyChanged;
         _localDatabase.PropertyChanged += LocalDatabaseOnPropertyChanged;
@@ -151,9 +155,9 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
 
     public DataGridSettings GetDataGridSettings()
     {
-        if (Design.IsDesignMode) 
+        if (Design.IsDesignMode)
             return new DataGridSettings();
-        
+
         var settings = _localStorageService.LoadDataGridSettings();
         OrderedColumn = settings.OrderedColumn;
         SortDirection = settings.SortDirection;
@@ -164,7 +168,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         if (Design.IsDesignMode)
             return;
-        
+
         var columnList = columns.ToList();
         var settings = new DataGridSettings
         {
@@ -261,7 +265,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         if (selectedTransaction is null)
             return;
-        
+
         var ownerWindow = GetUserControlOwnerWindow()!;
 
         var modal =
@@ -285,7 +289,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         if (selectedTransaction is null)
             return;
-        
+
         var ownerWindow = GetUserControlOwnerWindow()!;
 
         var modal =
@@ -325,8 +329,8 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
             return;
 
         // Check if transaction is part of an installment group
-        var transaction = await _transactionRepository.GetTransactionByIdAsync(selectedTransaction.Id);
-        if (transaction is not null && transaction.IsPartOfGroup)
+        var transaction = await _queryDispatcher.DispatchAsync(new GetTransactionByIdQuery { TransactionId = selectedTransaction.Id });
+        if (transaction is not null && !string.IsNullOrEmpty(transaction.GroupId))
         {
             var deleteAll = await MessageBoxHelper.ShowQuestionAsync(
                 language.DeleteInstallment_Title,
@@ -335,16 +339,43 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
 
             if (deleteAll)
             {
-                await _transactionRepository.DeleteTransactionsByGroupIdAsync(transaction.GroupId!);
+                var groupResult = await _commandDispatcher.DispatchAsync(new DeleteTransactionGroupCommand
+                {
+                    GroupId = transaction.GroupId
+                });
+
+                if (groupResult.IsFailure)
+                {
+                    await MessageBoxHelper.ShowErrorAsync(language.Error, groupResult.Error!.Message, ownerWindow);
+                    return;
+                }
             }
             else
             {
-                await _transactionRepository.DeleteTransactionAsync(selectedTransaction.Id);
+                var deleteResult = await _commandDispatcher.DispatchAsync(new DeleteTransactionCommand
+                {
+                    TransactionId = selectedTransaction.Id
+                });
+
+                if (deleteResult.IsFailure)
+                {
+                    await MessageBoxHelper.ShowErrorAsync(language.Error, deleteResult.Error!.Message, ownerWindow);
+                    return;
+                }
             }
         }
         else
         {
-            await _transactionRepository.DeleteTransactionAsync(selectedTransaction.Id);
+            var deleteResult = await _commandDispatcher.DispatchAsync(new DeleteTransactionCommand
+            {
+                TransactionId = selectedTransaction.Id
+            });
+
+            if (deleteResult.IsFailure)
+            {
+                await MessageBoxHelper.ShowErrorAsync(language.Error, deleteResult.Error!.Message, ownerWindow);
+                return;
+            }
         }
 
         WeakReferenceMessenger.Default.Send(new TransactionListChanged());
@@ -369,25 +400,34 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
         if (SelectedTransactions is null)
             return;
 
-        foreach (var transactionViewModel in SelectedTransactions)
+        var transactionIds = SelectedTransactions.Select(t => t.Id).ToArray();
+
+        if (result.RenameEnabled && !string.IsNullOrWhiteSpace(result.Name))
         {
-            var transaction =
-                await _transactionRepository.GetTransactionByIdAsync(new TransactionId(transactionViewModel.Id));
-
-            if (transaction is null)
-                continue;
-
-            if (result.RenameEnabled && !string.IsNullOrWhiteSpace(result.Name))
+            var renameResult = await _commandDispatcher.DispatchAsync(new BulkRenameTransactionsCommand
             {
-                transaction.Rename(result.Name);
-            }
+                TransactionIds = transactionIds,
+                NewName = result.Name
+            });
 
-            if (result.ChangeCategoryEnabled && result.CategoryId is not null)
+            if (renameResult.IsFailure)
             {
-                transaction.ChangeCategory(new CategoryId(result.CategoryId));
+                await MessageBoxHelper.ShowErrorAsync(language.Error, renameResult.Error!.Message, ownerWindow);
             }
+        }
 
-            await _transactionRepository.SaveTransactionAsync(transaction);
+        if (result.ChangeCategoryEnabled && result.CategoryId is not null)
+        {
+            var changeCategoryResult = await _commandDispatcher.DispatchAsync(new BulkChangeCategoryTransactionsCommand
+            {
+                TransactionIds = transactionIds,
+                NewCategoryId = result.CategoryId
+            });
+
+            if (changeCategoryResult.IsFailure)
+            {
+                await MessageBoxHelper.ShowErrorAsync(language.Error, changeCategoryResult.Error!.Message, ownerWindow);
+            }
         }
 
         await FetchTransactions();
@@ -403,7 +443,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     public bool CanBindToFixedExpense => SelectedTransaction is not null &&
                                          SelectedTransaction.FixedExpenseRecordId is null &&
                                          SelectedFixedExpense is not null;
-    
+
     public string UnbindToFixedExpenseCaption =>
         SelectedTransaction is not null && SelectedTransaction.FixedExpenseRecordId is not null
             ? $"{language.Transactions_Menu_UnbindToFixedExpenseCaption} {SelectedTransaction.FixedExpenseName}"
@@ -425,12 +465,21 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         if (SelectedTransaction is null || SelectedFixedExpense is null) return;
 
-        // Note: Consider extracting to an application service (e.g., TransactionFixedExpenseService)
-        var transaction = await _transactionRepository.GetTransactionByIdAsync(new TransactionId(SelectedTransaction.Id));
+        var result = await _commandDispatcher.DispatchAsync(new BindTransactionToFixedExpenseCommand
+        {
+            TransactionId = SelectedTransaction.Id,
+            FixedExpenseId = SelectedFixedExpense.Id,
+            ReferenceDate = SelectedFixedExpense.ReferenceDate
+        });
 
-        transaction!.SetFixedExpense(new TransactionFixedExpenseReference(SelectedFixedExpense.Id, SelectedFixedExpense.ReferenceDate));
+        if (result.IsFailure)
+        {
+            var ownerWindow = GetUserControlOwnerWindow();
+            if (ownerWindow is not null)
+                await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, ownerWindow);
+            return;
+        }
 
-        await _transactionRepository.SaveTransactionAsync(transaction);
         WeakReferenceMessenger.Default.Send(new TransactionListChanged());
         await FetchTransactions();
     }
@@ -440,12 +489,19 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         if (SelectedTransaction is null) return;
 
-        // Note: Consider extracting to an application service (e.g., TransactionFixedExpenseService)
-        var transaction = await _transactionRepository.GetTransactionByIdAsync(new TransactionId(SelectedTransaction.Id));
+        var result = await _commandDispatcher.DispatchAsync(new UnbindTransactionFromFixedExpenseCommand
+        {
+            TransactionId = SelectedTransaction.Id
+        });
 
-        transaction!.SetFixedExpense(null);
+        if (result.IsFailure)
+        {
+            var ownerWindow = GetUserControlOwnerWindow();
+            if (ownerWindow is not null)
+                await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, ownerWindow);
+            return;
+        }
 
-        await _transactionRepository.SaveTransactionAsync(transaction);
         WeakReferenceMessenger.Default.Send(new TransactionListChanged());
         await FetchTransactions();
     }
@@ -486,7 +542,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
             return;
         }
 
-        var allProfiles = await _avgPriceQueries.GetProfilesAsync(showHidden: false);
+        var allProfiles = await _queryDispatcher.DispatchAsync(new GetProfilesQuery { ShowHidden = false });
 
         var filteredProfiles = allProfiles
             .Where(p => p.AssetName == "BTC" &&
@@ -553,9 +609,9 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         var currentSelectedTransactionId = SelectedTransaction?.Id;
 
-        var transactions = await _transactionQueries.GetTransactionsAsync(new TransactionQueryFilter()
+        var transactions = await _queryDispatcher.DispatchAsync(new GetTransactionsQuery
         {
-            Accounts = SelectedAccount == null ? null : [SelectedAccount.Id],
+            AccountIds = SelectedAccount == null ? null : [SelectedAccount.Id],
             SearchTerm = AppliedSearchTerm,
             From = DateOnly.FromDateTime(_filterState.Range.Start),
             To = DateOnly.FromDateTime(_filterState.Range.End)
@@ -687,7 +743,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         SelectedAccount = message.Value;
     }
-    
+
     private void OnFixedExpenseChanged(object recipient, FixedExpenseChanged message)
     {
         SelectedFixedExpense = message.Value;
@@ -711,7 +767,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         OnPropertyChanged(nameof(CanSendToAvgPrice));
     }
-    
+
 
 
     #endregion

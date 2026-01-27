@@ -1,12 +1,15 @@
+using NSubstitute;
+using Valt.App.Kernel;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Budget.Accounts.DTOs;
+using Valt.App.Modules.Budget.Accounts.Queries.GetAccounts;
+using Valt.App.Modules.Budget.Categories.DTOs;
+using Valt.App.Modules.Budget.Categories.Queries.GetCategories;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Factories;
+using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Transactions;
-using Valt.Infra.Kernel.Time;
-using Valt.Infra.Modules.Budget.Accounts.Queries;
-using Valt.Infra.Modules.Budget.Accounts.Services;
-using Valt.Infra.Modules.Budget.Categories.Queries;
-using Valt.Infra.Modules.Budget.FixedExpenses.Queries;
-using Valt.Infra.Modules.Budget.Transactions;
 using Valt.Infra.Settings;
 using Valt.Tests.Builders;
 using Valt.UI.Views.Main.Modals.TransactionEditor;
@@ -16,28 +19,75 @@ namespace Valt.Tests.UI.Screens;
 [TestFixture]
 public class TransactionEditorViewModelTests : DatabaseTest
 {
-    private AccountQueries _accountQueries;
-    private CategoryQueries _categoryQueries;
-    private FixedExpenseQueries _fixedExpenseQueries;
+    private ICommandDispatcher _commandDispatcher;
+    private IQueryDispatcher _queryDispatcher;
+    private List<AccountDTO> _accounts;
+    private List<CategoryDTO> _categories;
+
+    [SetUp]
+    public new void SetUp()
+    {
+        _commandDispatcher = Substitute.For<ICommandDispatcher>();
+        _queryDispatcher = Substitute.For<IQueryDispatcher>();
+        _accounts = [];
+        _categories = [];
+
+        // Setup default returns
+        _queryDispatcher.DispatchAsync(Arg.Any<GetAccountsQuery>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Task.FromResult<IReadOnlyList<AccountDTO>>(_accounts.ToList()));
+
+        _queryDispatcher.DispatchAsync(Arg.Any<GetCategoriesQuery>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Task.FromResult(new CategoriesDTO(_categories.ToList())));
+    }
 
     private TransactionEditorViewModel CreateInstance()
     {
-        var transactionRepository = new TransactionRepository(_localDatabase, _priceDatabase, _domainEventPublisher);
-        _accountQueries = new AccountQueries(_localDatabase, new AccountTotalsCalculator(_localDatabase, new AccountCacheService(_localDatabase, new Clock())));
-        _categoryQueries = new CategoryQueries(_localDatabase);
-        _fixedExpenseQueries = new FixedExpenseQueries(_localDatabase);
-        var currencySettings = new CurrencySettings(_localDatabase);
-        var displaySettings = new DisplaySettings(_localDatabase);
+        var currencySettings = new CurrencySettings(_localDatabase, null!);
+        var displaySettings = new DisplaySettings(_localDatabase, null!);
 
         return new TransactionEditorViewModel(
-            transactionRepository,
-            _accountQueries,
-            _categoryQueries,
-            _fixedExpenseQueries,
-            null,
-            null,
+            _commandDispatcher,
+            _queryDispatcher,
+            null!,
+            null!,
             currencySettings,
             displaySettings);
+    }
+
+    private void AddFiatAccount(string id, string name, FiatCurrency currency)
+    {
+        _accounts.Add(new AccountDTO(
+            Id: id,
+            Type: nameof(AccountTypes.Fiat),
+            Name: name,
+            CurrencyNickname: "",
+            Visible: true,
+            IconId: null,
+            Unicode: '\0',
+            Color: System.Drawing.Color.Empty,
+            Currency: currency.Code,
+            IsBtcAccount: false,
+            InitialAmountFiat: 0,
+            InitialAmountSats: null,
+            GroupId: null));
+    }
+
+    private void AddBtcAccount(string id, string name)
+    {
+        _accounts.Add(new AccountDTO(
+            Id: id,
+            Type: nameof(AccountTypes.Bitcoin),
+            Name: name,
+            CurrencyNickname: "",
+            Visible: true,
+            IconId: null,
+            Unicode: '\0',
+            Color: System.Drawing.Color.Empty,
+            Currency: null,
+            IsBtcAccount: true,
+            InitialAmountFiat: null,
+            InitialAmountSats: 0,
+            GroupId: null));
     }
 
     [Test]
@@ -74,23 +124,14 @@ public class TransactionEditorViewModelTests : DatabaseTest
     public async Task TransactionEditorViewModel_ShouldModeBeFiat()
     {
         var fromFiatAccountId = IdGenerator.Generate();
-
-        var fiatAccount = new FiatAccountBuilder()
-        {
-            Id = fromFiatAccountId,
-            Name = "Fiat Account",
-            Icon = Icon.Empty,
-            FiatCurrency = FiatCurrency.Brl,
-            Value = 0
-        }.Build();
-
-        _localDatabase.GetAccounts().Insert(fiatAccount);
+        AddFiatAccount(fromFiatAccountId, "Fiat Account", FiatCurrency.Brl);
 
         var model = CreateInstance();
 
-        var accounts = await _accountQueries.GetAccountsAsync(false);
+        // Wait for initialization
+        await Task.Delay(100);
 
-        model.FromAccount = accounts.SingleOrDefault(x => x.Id == fromFiatAccountId);
+        model.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromFiatAccountId);
 
         Assert.That(model.CurrentAccountMode, Is.EqualTo("Fiat"));
     }
@@ -99,22 +140,14 @@ public class TransactionEditorViewModelTests : DatabaseTest
     public async Task TransactionEditorViewModel_ShouldModeBeBtc()
     {
         var fromBtcAccountId = IdGenerator.Generate();
-
-        var btcAccount = new BtcAccountBuilder()
-            {
-                Id = fromBtcAccountId,
-                Name = "Test Btc",
-                Value = 0
-            }
-            .Build();
-
-        _localDatabase.GetAccounts().Insert(btcAccount);
+        AddBtcAccount(fromBtcAccountId, "Test Btc");
 
         var model = CreateInstance();
 
-        var accounts = await _accountQueries.GetAccountsAsync(false);
+        // Wait for initialization
+        await Task.Delay(100);
 
-        model.FromAccount = accounts.SingleOrDefault(x => x.Id == fromBtcAccountId);
+        model.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromBtcAccountId);
 
         Assert.That(model.CurrentAccountMode, Is.EqualTo("Bitcoin"));
     }
@@ -123,35 +156,18 @@ public class TransactionEditorViewModelTests : DatabaseTest
     public async Task TransactionEditorViewModel_ShouldModeBeBtcToBtc()
     {
         var fromBtcAccountId = IdGenerator.Generate();
-
-        var fromBtcAccount = new BtcAccountBuilder()
-            {
-                Id = fromBtcAccountId,
-                Name = "Test Btc",
-                Value = 0
-            }
-            .Build();
-
-        _localDatabase.GetAccounts().Insert(fromBtcAccount);
+        AddBtcAccount(fromBtcAccountId, "Test Btc");
 
         var toBtcAccountId = IdGenerator.Generate();
-
-        var toBtcAccount = new BtcAccountBuilder()
-            {
-                Id = toBtcAccountId,
-                Name = "Test Btc 2",
-                Value = 0
-            }
-            .Build();
-
-        _localDatabase.GetAccounts().Insert(toBtcAccount);
+        AddBtcAccount(toBtcAccountId, "Test Btc 2");
 
         var model = CreateInstance();
 
-        var accounts = await _accountQueries.GetAccountsAsync(false);
+        // Wait for initialization
+        await Task.Delay(100);
 
-        model.FromAccount = accounts.SingleOrDefault(x => x.Id == fromBtcAccountId);
-        model.ToAccount = accounts.SingleOrDefault(x => x.Id == toBtcAccountId);
+        model.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromBtcAccountId);
+        model.ToAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == toBtcAccountId);
 
         Assert.That(model.CurrentAccountMode, Is.EqualTo("BitcoinToBitcoin"));
         Assert.That(model.FromAccountIsBtc, Is.True);
@@ -163,34 +179,18 @@ public class TransactionEditorViewModelTests : DatabaseTest
     public async Task TransactionEditorViewModel_ShouldModeBeBtcToFiat()
     {
         var fromBtcAccountId = IdGenerator.Generate();
-
-        var fromBtcAccount = new BtcAccountBuilder()
-            {
-                Id = fromBtcAccountId,
-                Name = "Test Btc",
-                Value = 0
-            }
-            .Build();
-        _localDatabase.GetAccounts().Insert(fromBtcAccount);
+        AddBtcAccount(fromBtcAccountId, "Test Btc");
 
         var toFiatAccountId = IdGenerator.Generate();
-
-        var toFiatAccount = new FiatAccountBuilder()
-        {
-            Id = toFiatAccountId,
-            Name = "Test Fiat",
-            Icon = Icon.Empty,
-            FiatCurrency = FiatCurrency.Brl,
-            Value = 0
-        }.Build();
-        _localDatabase.GetAccounts().Insert(toFiatAccount);
+        AddFiatAccount(toFiatAccountId, "Test Fiat", FiatCurrency.Brl);
 
         var model = CreateInstance();
 
-        var accounts = await _accountQueries.GetAccountsAsync(false);
+        // Wait for initialization
+        await Task.Delay(100);
 
-        model.FromAccount = accounts.SingleOrDefault(x => x.Id == fromBtcAccountId);
-        model.ToAccount = accounts.SingleOrDefault(x => x.Id == toFiatAccountId);
+        model.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromBtcAccountId);
+        model.ToAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == toFiatAccountId);
 
         model.SwitchToTransferCommand.Execute(null);
 
@@ -205,36 +205,18 @@ public class TransactionEditorViewModelTests : DatabaseTest
     public async Task TransactionEditorViewModel_ShouldModeBeFiatToBtc()
     {
         var fromFiatAccountId = IdGenerator.Generate();
-
-        var fromFiatAccount = new FiatAccountBuilder()
-        {
-            Id = fromFiatAccountId,
-            Name = "Test Fiat",
-            Icon = Icon.Empty,
-            FiatCurrency = FiatCurrency.Brl,
-            Value = 0
-        }.Build();
-
-        _localDatabase.GetAccounts().Insert(fromFiatAccount);
+        AddFiatAccount(fromFiatAccountId, "Test Fiat", FiatCurrency.Brl);
 
         var toBtcAccountId = IdGenerator.Generate();
-
-        var toBtcAccount = new BtcAccountBuilder()
-            {
-                Id = toBtcAccountId,
-                Name = "Test Btc",
-                Value = 0
-            }
-            .Build();
-
-        _localDatabase.GetAccounts().Insert(toBtcAccount);
+        AddBtcAccount(toBtcAccountId, "Test Btc");
 
         var model = CreateInstance();
 
-        var accounts = await _accountQueries.GetAccountsAsync(false);
+        // Wait for initialization
+        await Task.Delay(100);
 
-        model.FromAccount = accounts.SingleOrDefault(x => x.Id == fromFiatAccountId);
-        model.ToAccount = accounts.SingleOrDefault(x => x.Id == toBtcAccountId);
+        model.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromFiatAccountId);
+        model.ToAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == toBtcAccountId);
 
         model.SwitchToTransferCommand.Execute(null);
 
@@ -249,38 +231,21 @@ public class TransactionEditorViewModelTests : DatabaseTest
     public async Task TransactionEditorViewModel_ShouldModeBeFiatToFiatToSameCurrency()
     {
         var fromFiatAccountId = IdGenerator.Generate();
-
-        var fromFiatAccount = new FiatAccountBuilder()
-        {
-            Id = fromFiatAccountId,
-            Name = "Test Fiat 2",
-            Icon = Icon.Empty,
-            FiatCurrency = FiatCurrency.Brl,
-            Value = 0
-        }.Build();
-        _localDatabase.GetAccounts().Insert(fromFiatAccount);
+        AddFiatAccount(fromFiatAccountId, "Test Fiat 1", FiatCurrency.Brl);
 
         var toFiatAccountId = IdGenerator.Generate();
-
-        var toFiatAccount = new FiatAccountBuilder()
-        {
-            Id = toFiatAccountId,
-            Name = "Test Fiat 2",
-            Icon = Icon.Empty,
-            FiatCurrency = FiatCurrency.Brl,
-            Value = 0
-        }.Build();
-
-        _localDatabase.GetAccounts().Insert(toFiatAccount);
+        AddFiatAccount(toFiatAccountId, "Test Fiat 2", FiatCurrency.Brl);
 
         var model = CreateInstance();
+
+        // Wait for initialization
+        await Task.Delay(100);
+
         var propertiesChanged = new List<string>();
-        model.PropertyChanged += (sender, args) => propertiesChanged.Add(args.PropertyName);
+        model.PropertyChanged += (sender, args) => propertiesChanged.Add(args.PropertyName!);
 
-        var accounts = await _accountQueries.GetAccountsAsync(false);
-
-        model.FromAccount = accounts.SingleOrDefault(x => x.Id == fromFiatAccountId);
-        model.ToAccount = accounts.SingleOrDefault(x => x.Id == toFiatAccountId);
+        model.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromFiatAccountId);
+        model.ToAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == toFiatAccountId);
 
         model.SwitchToTransferCommand.Execute(null);
 

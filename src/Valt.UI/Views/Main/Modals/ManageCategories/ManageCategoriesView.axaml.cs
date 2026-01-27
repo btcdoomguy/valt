@@ -36,7 +36,7 @@ public partial class ManageCategoriesView : ValtBaseWindow
         
         var treeView = sender as TreeView;
         var point = e.GetPosition(treeView);
-        var hitTestResult = treeView.InputHitTest(point);
+        var hitTestResult = treeView?.InputHitTest(point);
         var element = hitTestResult as Visual;
 
         // Find the TreeViewItem under the pointer
@@ -68,9 +68,12 @@ public partial class ManageCategoriesView : ValtBaseWindow
             if (distance > 5) // Adjust this threshold as needed
             {
                 _isPotentialDrag = false;
+                if (_draggedItem is null) return;
+#pragma warning disable CS0618 // DataObject and DragDrop.DoDragDrop are obsolete
                 var data = new DataObject();
                 data.Set("draggedItem", _draggedItem);
                 DragDrop.DoDragDrop(e, data, DragDropEffects.Move);
+#pragma warning restore CS0618
                 ResetDragState(e.Pointer);
             }
         }
@@ -101,7 +104,9 @@ public partial class ManageCategoriesView : ValtBaseWindow
     
     private void TreeView_OnDrop(object? sender, DragEventArgs e)
     {
+#pragma warning disable CS0618 // DragEventArgs.Data is obsolete
         var data = e.Data.Get("draggedItem") as CategoryTreeElement;
+#pragma warning restore CS0618
 
         if (data is null)
             return;
@@ -120,7 +125,9 @@ public partial class ManageCategoriesView : ValtBaseWindow
 
     private void TreeView_OnDragOver(object? sender, DragEventArgs e)
     {
+#pragma warning disable CS0618 // DragEventArgs.Data is obsolete
         var data = e.Data.Get("draggedItem") as CategoryTreeElement;
+#pragma warning restore CS0618
         
         if (data is null)
             return;
@@ -171,7 +178,7 @@ public partial class ManageCategoriesView : ValtBaseWindow
                 var newOffset = Math.Max(0, _scrollViewer.Offset.Y - scrollStep);
                 _scrollViewer.Offset = new Vector(_scrollViewer.Offset.X, newOffset);
             }
-            else if (point.Y > treeView.Bounds.Height - scrollMargin)
+            else if (point.Y > treeView!.Bounds.Height - scrollMargin)
             {
                 // Scroll down
                 var maxOffset = _scrollViewer.Extent.Height - _scrollViewer.Viewport.Height;

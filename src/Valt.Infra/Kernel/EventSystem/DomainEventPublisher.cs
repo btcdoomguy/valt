@@ -22,7 +22,12 @@ public class DomainEventPublisher : IDomainEventPublisher
 
     public async Task PublishAsync<TDomainEvent>(TDomainEvent @event) where TDomainEvent : class, IDomainEvent
     {
-        var currentServiceProvider = _contextScope.GetCurrentServiceProvider();
+        var rootServiceProvider = _contextScope.GetCurrentServiceProvider();
+
+        // Create a scope to properly resolve scoped services (required for MCP context)
+        using var scope = rootServiceProvider.CreateScope();
+        var scopedProvider = scope.ServiceProvider;
+
         var eventType = @event.GetType();
         var handlerInterfaceType = typeof(IDomainEventHandler<>).MakeGenericType(eventType);
 
@@ -30,7 +35,7 @@ public class DomainEventPublisher : IDomainEventPublisher
 
         if (!_handlerTypesByEventType.TryGetValue(eventType, out var handlerTypes))
         {
-            var resolvedHandlers = (IEnumerable)currentServiceProvider.GetServices(handlerInterfaceType);
+            var resolvedHandlers = (IEnumerable)scopedProvider.GetServices(handlerInterfaceType);
             var handlerInstances = resolvedHandlers.Cast<object>().ToList();
             var extractedHandlerTypes = handlerInstances.Select(h => h.GetType()).ToList();
 
@@ -40,7 +45,7 @@ public class DomainEventPublisher : IDomainEventPublisher
         }
         else
         {
-            handlers = handlerTypes.Select(ht => ActivatorUtilities.CreateInstance(currentServiceProvider, ht)).ToList();
+            handlers = handlerTypes.Select(ht => ActivatorUtilities.CreateInstance(scopedProvider, ht)).ToList();
         }
 
         foreach (dynamic handler in handlers)

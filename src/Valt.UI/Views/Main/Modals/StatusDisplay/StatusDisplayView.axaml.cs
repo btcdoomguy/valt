@@ -1,5 +1,4 @@
 using Avalonia.Input;
-using Valt.Infra.Kernel.BackgroundJobs;
 using Valt.UI.Base;
 
 namespace Valt.UI.Views.Main.Modals.StatusDisplay;
@@ -13,9 +12,9 @@ public partial class StatusDisplayView : ValtBaseWindow
 
     private void ListBox_DoubleTapped(object? sender, TappedEventArgs e)
     {
-        if (DataContext is StatusDisplayViewModel vm && vm.SelectedJob != null)
+        if (DataContext is StatusDisplayViewModel vm && vm.SelectedItem != null)
         {
-            vm.OpenJobLogCommand.Execute(vm.SelectedJob);
+            vm.OpenItemLogCommand.Execute(vm.SelectedItem);
         }
     }
 }

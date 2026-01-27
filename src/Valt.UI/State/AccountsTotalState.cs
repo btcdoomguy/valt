@@ -7,7 +7,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Messages;
-using Valt.Infra.Modules.Budget.Accounts.Queries.DTOs;
+using Valt.App.Modules.Budget.Accounts.DTOs;
 using Valt.Infra.Settings;
 using Valt.UI.State.Events;
 

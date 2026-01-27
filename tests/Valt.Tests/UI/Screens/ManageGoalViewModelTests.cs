@@ -1,13 +1,17 @@
 using NSubstitute;
+using Valt.App.Kernel;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Budget.Categories.DTOs;
+using Valt.App.Modules.Budget.Categories.Queries.GetCategories;
+using Valt.App.Modules.Goals.Commands.CreateGoal;
+using Valt.App.Modules.Goals.Commands.EditGoal;
+using Valt.App.Modules.Goals.DTOs;
+using Valt.App.Modules.Goals.Queries.GetGoal;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Goals;
-using Valt.Core.Modules.Goals.Contracts;
-using Valt.Core.Modules.Goals.GoalTypes;
 using Valt.Infra.Kernel;
-using Valt.Infra.Modules.Budget.Categories.Queries;
-using Valt.Infra.Modules.Budget.Categories.Queries.DTOs;
-using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Settings;
 using Valt.Tests.Builders;
 using Valt.UI.Views.Main.Modals.ManageGoal;
@@ -18,9 +22,8 @@ namespace Valt.Tests.UI.Screens;
 [TestFixture]
 public class ManageGoalViewModelTests : DatabaseTest
 {
-    private IGoalRepository _goalRepository = null!;
-    private IConfigurationManager _configurationManager = null!;
-    private ICategoryQueries _categoryQueries = null!;
+    private ICommandDispatcher _commandDispatcher = null!;
+    private IQueryDispatcher _queryDispatcher = null!;
     private CurrencySettings _currencySettings = null!;
 
     [OneTimeSetUp]
@@ -32,21 +35,49 @@ public class ManageGoalViewModelTests : DatabaseTest
     [SetUp]
     public new void SetUp()
     {
-        _goalRepository = Substitute.For<IGoalRepository>();
-        _configurationManager = Substitute.For<IConfigurationManager>();
-        _categoryQueries = Substitute.For<ICategoryQueries>();
-        _currencySettings = new CurrencySettings(_localDatabase);
-        _configurationManager.GetAvailableFiatCurrencies().Returns(new List<string> { "USD", "BRL", "EUR" });
-        _categoryQueries.GetCategoriesAsync().Returns(Task.FromResult(new CategoriesDTO(new List<CategoryDTO>())));
+        _commandDispatcher = Substitute.For<ICommandDispatcher>();
+        _queryDispatcher = Substitute.For<IQueryDispatcher>();
+        _currencySettings = new CurrencySettings(_localDatabase, null!);
+        _queryDispatcher.DispatchAsync(Arg.Any<GetCategoriesQuery>(), Arg.Any<CancellationToken>())
+            .Returns(new CategoriesDTO(new List<CategoryDTO>()));
+
+        // Default command setup - success results
+        _commandDispatcher.DispatchAsync(Arg.Any<CreateGoalCommand>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo =>
+            {
+                var cmd = callInfo.Arg<CreateGoalCommand>();
+                return Result<CreateGoalResult>.Success(new CreateGoalResult("new-goal-id"));
+            });
+        _commandDispatcher.DispatchAsync(Arg.Any<EditGoalCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result<EditGoalResult>.Success(new EditGoalResult()));
     }
 
     private ManageGoalViewModel CreateViewModel()
     {
-        var vm = new ManageGoalViewModel(_goalRepository, _configurationManager, _categoryQueries, _currencySettings);
+        var vm = new ManageGoalViewModel(_commandDispatcher, _queryDispatcher, _currencySettings);
         vm.GetWindow = () => null!;
         vm.CloseWindow = () => { };
         vm.CloseDialog = _ => { };
         return vm;
+    }
+
+    private static GoalDTO CreateGoalDTO(
+        string id,
+        DateOnly refDate,
+        GoalPeriods period,
+        GoalTypeOutputDTO goalType)
+    {
+        return new GoalDTO
+        {
+            Id = id,
+            RefDate = refDate,
+            Period = (int)period,
+            Progress = 0m,
+            IsUpToDate = true,
+            LastUpdatedAt = DateTime.UtcNow,
+            State = 0,
+            GoalType = goalType
+        };
     }
 
     #region Initialization Tests
@@ -183,9 +214,9 @@ public class ManageGoalViewModelTests : DatabaseTest
         var stackBitcoinEditor = (StackBitcoinGoalTypeEditorViewModel)vm.CurrentGoalTypeEditor!;
         stackBitcoinEditor.TargetBtcAmount = BtcValue.New(1_000_000);
 
-        Goal? savedGoal = null;
-        _goalRepository.SaveAsync(Arg.Do<Goal>(g => savedGoal = g))
-            .Returns(Task.CompletedTask);
+        CreateGoalCommand? capturedCommand = null;
+        _commandDispatcher.DispatchAsync(Arg.Do<CreateGoalCommand>(c => capturedCommand = c), Arg.Any<CancellationToken>())
+            .Returns(Result<CreateGoalResult>.Success(new CreateGoalResult("new-goal-id")));
 
         object? dialogResult = null;
         vm.CloseDialog = result => dialogResult = result;
@@ -194,14 +225,14 @@ public class ManageGoalViewModelTests : DatabaseTest
         await vm.OkCommand.ExecuteAsync(null);
 
         // Assert
-        Assert.That(savedGoal, Is.Not.Null);
+        Assert.That(capturedCommand, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(savedGoal!.Period, Is.EqualTo(GoalPeriods.Monthly));
-            Assert.That(savedGoal.RefDate.Year, Is.EqualTo(2024));
-            Assert.That(savedGoal.RefDate.Month, Is.EqualTo(6));
-            Assert.That(savedGoal.GoalType, Is.InstanceOf<StackBitcoinGoalType>());
-            Assert.That(((StackBitcoinGoalType)savedGoal.GoalType).TargetSats, Is.EqualTo(1_000_000));
+            Assert.That(capturedCommand!.Period, Is.EqualTo((int)GoalPeriods.Monthly));
+            Assert.That(capturedCommand.RefDate.Year, Is.EqualTo(2024));
+            Assert.That(capturedCommand.RefDate.Month, Is.EqualTo(6));
+            Assert.That(capturedCommand.GoalType, Is.InstanceOf<StackBitcoinGoalTypeDTO>());
+            Assert.That(((StackBitcoinGoalTypeDTO)capturedCommand.GoalType).TargetSats, Is.EqualTo(1_000_000));
             Assert.That(dialogResult, Is.InstanceOf<ManageGoalViewModel.Response>());
             Assert.That(((ManageGoalViewModel.Response)dialogResult!).Ok, Is.True);
         });
@@ -220,9 +251,9 @@ public class ManageGoalViewModelTests : DatabaseTest
         var stackBitcoinEditor = (StackBitcoinGoalTypeEditorViewModel)vm.CurrentGoalTypeEditor!;
         stackBitcoinEditor.TargetBtcAmount = BtcValue.New(5_000_000);
 
-        Goal? savedGoal = null;
-        _goalRepository.SaveAsync(Arg.Do<Goal>(g => savedGoal = g))
-            .Returns(Task.CompletedTask);
+        CreateGoalCommand? capturedCommand = null;
+        _commandDispatcher.DispatchAsync(Arg.Do<CreateGoalCommand>(c => capturedCommand = c), Arg.Any<CancellationToken>())
+            .Returns(Result<CreateGoalResult>.Success(new CreateGoalResult("new-goal-id")));
 
         vm.CloseDialog = _ => { };
 
@@ -230,18 +261,18 @@ public class ManageGoalViewModelTests : DatabaseTest
         await vm.OkCommand.ExecuteAsync(null);
 
         // Assert
-        Assert.That(savedGoal, Is.Not.Null);
+        Assert.That(capturedCommand, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(savedGoal!.Period, Is.EqualTo(GoalPeriods.Yearly));
-            Assert.That(savedGoal.RefDate.Year, Is.EqualTo(2025));
-            Assert.That(savedGoal.RefDate.Month, Is.EqualTo(1), "Yearly goals should have month set to January");
-            Assert.That(savedGoal.RefDate.Day, Is.EqualTo(1));
+            Assert.That(capturedCommand!.Period, Is.EqualTo((int)GoalPeriods.Yearly));
+            Assert.That(capturedCommand.RefDate.Year, Is.EqualTo(2025));
+            Assert.That(capturedCommand.RefDate.Month, Is.EqualTo(1), "Yearly goals should have month set to January");
+            Assert.That(capturedCommand.RefDate.Day, Is.EqualTo(1));
         });
     }
 
     [Test]
-    public async Task OkCommand_Should_Call_SaveAsync_On_Repository()
+    public async Task OkCommand_Should_Dispatch_CreateGoalCommand()
     {
         // Arrange
         var vm = CreateViewModel();
@@ -257,7 +288,7 @@ public class ManageGoalViewModelTests : DatabaseTest
         await vm.OkCommand.ExecuteAsync(null);
 
         // Assert
-        await _goalRepository.Received(1).SaveAsync(Arg.Any<Goal>());
+        await _commandDispatcher.Received(1).DispatchAsync(Arg.Any<CreateGoalCommand>(), Arg.Any<CancellationToken>());
     }
 
     #endregion
@@ -268,18 +299,18 @@ public class ManageGoalViewModelTests : DatabaseTest
     public async Task OnBindParameterAsync_Should_Load_Goal_When_Valid_Id_Provided()
     {
         // Arrange
-        var goalId = new GoalId();
-        var existingGoal = GoalBuilder.AGoal()
-            .WithId(goalId)
-            .WithPeriod(GoalPeriods.Monthly)
-            .WithRefDate(new DateOnly(2024, 3, 1))
-            .WithGoalType(new StackBitcoinGoalType(2_000_000L))
-            .Build();
+        var goalId = "goal-123";
+        var goalDto = CreateGoalDTO(
+            goalId,
+            new DateOnly(2024, 3, 1),
+            GoalPeriods.Monthly,
+            new StackBitcoinGoalTypeOutputDTO { TargetSats = 2_000_000, CalculatedSats = 0 });
 
-        _goalRepository.GetByIdAsync(Arg.Any<GoalId>()).Returns(Task.FromResult<Goal?>(existingGoal));
+        _queryDispatcher.DispatchAsync(Arg.Any<GetGoalQuery>(), Arg.Any<CancellationToken>())
+            .Returns(goalDto);
 
         var vm = CreateViewModel();
-        vm.Parameter = goalId.Value;
+        vm.Parameter = goalId;
 
         // Act
         await vm.OnBindParameterAsync();
@@ -302,18 +333,18 @@ public class ManageGoalViewModelTests : DatabaseTest
     public async Task OnBindParameterAsync_Should_Load_Yearly_Goal()
     {
         // Arrange
-        var goalId = new GoalId();
-        var existingGoal = GoalBuilder.AGoal()
-            .WithId(goalId)
-            .WithPeriod(GoalPeriods.Yearly)
-            .WithRefDate(new DateOnly(2025, 1, 1))
-            .WithGoalType(new StackBitcoinGoalType(10_000_000L))
-            .Build();
+        var goalId = "goal-yearly";
+        var goalDto = CreateGoalDTO(
+            goalId,
+            new DateOnly(2025, 1, 1),
+            GoalPeriods.Yearly,
+            new StackBitcoinGoalTypeOutputDTO { TargetSats = 10_000_000, CalculatedSats = 0 });
 
-        _goalRepository.GetByIdAsync(Arg.Any<GoalId>()).Returns(Task.FromResult<Goal?>(existingGoal));
+        _queryDispatcher.DispatchAsync(Arg.Any<GetGoalQuery>(), Arg.Any<CancellationToken>())
+            .Returns(goalDto);
 
         var vm = CreateViewModel();
-        vm.Parameter = goalId.Value;
+        vm.Parameter = goalId;
 
         // Act
         await vm.OnBindParameterAsync();
@@ -342,26 +373,25 @@ public class ManageGoalViewModelTests : DatabaseTest
 
         // Assert
         Assert.That(vm.IsEditMode, Is.False);
-        await _goalRepository.DidNotReceive().GetByIdAsync(Arg.Any<GoalId>());
+        await _queryDispatcher.DidNotReceive().DispatchAsync(Arg.Any<GetGoalQuery>(), Arg.Any<CancellationToken>());
     }
 
     [Test]
     public async Task OkCommand_Should_Update_Existing_Goal()
     {
         // Arrange
-        var goalId = new GoalId();
-        var existingGoal = GoalBuilder.AGoal()
-            .WithId(goalId)
-            .WithPeriod(GoalPeriods.Monthly)
-            .WithRefDate(new DateOnly(2024, 3, 1))
-            .WithGoalType(new StackBitcoinGoalType(1_000_000L))
-            .WithProgress(50m)
-            .Build();
+        var goalId = "goal-edit";
+        var goalDto = CreateGoalDTO(
+            goalId,
+            new DateOnly(2024, 3, 1),
+            GoalPeriods.Monthly,
+            new StackBitcoinGoalTypeOutputDTO { TargetSats = 1_000_000, CalculatedSats = 500_000 });
 
-        _goalRepository.GetByIdAsync(Arg.Any<GoalId>()).Returns(Task.FromResult<Goal?>(existingGoal));
+        _queryDispatcher.DispatchAsync(Arg.Any<GetGoalQuery>(), Arg.Any<CancellationToken>())
+            .Returns(goalDto);
 
         var vm = CreateViewModel();
-        vm.Parameter = goalId.Value;
+        vm.Parameter = goalId;
         await vm.OnBindParameterAsync();
 
         // Modify values
@@ -370,9 +400,9 @@ public class ManageGoalViewModelTests : DatabaseTest
         var stackBitcoinEditor = (StackBitcoinGoalTypeEditorViewModel)vm.CurrentGoalTypeEditor!;
         stackBitcoinEditor.TargetBtcAmount = BtcValue.New(3_000_000);
 
-        Goal? savedGoal = null;
-        _goalRepository.SaveAsync(Arg.Do<Goal>(g => savedGoal = g))
-            .Returns(Task.CompletedTask);
+        EditGoalCommand? capturedCommand = null;
+        _commandDispatcher.DispatchAsync(Arg.Do<EditGoalCommand>(c => capturedCommand = c), Arg.Any<CancellationToken>())
+            .Returns(Result<EditGoalResult>.Success(new EditGoalResult()));
 
         vm.CloseDialog = _ => { };
 
@@ -380,39 +410,33 @@ public class ManageGoalViewModelTests : DatabaseTest
         await vm.OkCommand.ExecuteAsync(null);
 
         // Assert
-        Assert.That(savedGoal, Is.Not.Null);
+        Assert.That(capturedCommand, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(savedGoal!.Id, Is.EqualTo(goalId));
-            Assert.That(savedGoal.RefDate.Year, Is.EqualTo(2024));
-            Assert.That(savedGoal.RefDate.Month, Is.EqualTo(5));
-            Assert.That(((StackBitcoinGoalType)savedGoal.GoalType).TargetSats, Is.EqualTo(3_000_000));
+            Assert.That(capturedCommand!.GoalId, Is.EqualTo(goalId));
+            Assert.That(capturedCommand.RefDate.Year, Is.EqualTo(2024));
+            Assert.That(capturedCommand.RefDate.Month, Is.EqualTo(5));
+            Assert.That(((StackBitcoinGoalTypeDTO)capturedCommand.GoalType).TargetSats, Is.EqualTo(3_000_000));
         });
     }
 
     [Test]
-    public async Task OkCommand_Should_Preserve_Existing_Progress_When_Editing()
+    public async Task OkCommand_In_Edit_Mode_Should_Dispatch_EditGoalCommand()
     {
         // Arrange
-        var goalId = new GoalId();
-        var existingGoal = GoalBuilder.AGoal()
-            .WithId(goalId)
-            .WithPeriod(GoalPeriods.Monthly)
-            .WithRefDate(new DateOnly(2024, 3, 1))
-            .WithGoalType(new StackBitcoinGoalType(1_000_000L))
-            .WithProgress(75m)
-            .WithState(GoalStates.Open)
-            .Build();
+        var goalId = "goal-for-edit";
+        var goalDto = CreateGoalDTO(
+            goalId,
+            new DateOnly(2024, 3, 1),
+            GoalPeriods.Monthly,
+            new StackBitcoinGoalTypeOutputDTO { TargetSats = 1_000_000, CalculatedSats = 750_000 });
 
-        _goalRepository.GetByIdAsync(Arg.Any<GoalId>()).Returns(Task.FromResult<Goal?>(existingGoal));
+        _queryDispatcher.DispatchAsync(Arg.Any<GetGoalQuery>(), Arg.Any<CancellationToken>())
+            .Returns(goalDto);
 
         var vm = CreateViewModel();
-        vm.Parameter = goalId.Value;
+        vm.Parameter = goalId;
         await vm.OnBindParameterAsync();
-
-        Goal? savedGoal = null;
-        _goalRepository.SaveAsync(Arg.Do<Goal>(g => savedGoal = g))
-            .Returns(Task.CompletedTask);
 
         vm.CloseDialog = _ => { };
 
@@ -420,8 +444,8 @@ public class ManageGoalViewModelTests : DatabaseTest
         await vm.OkCommand.ExecuteAsync(null);
 
         // Assert
-        Assert.That(savedGoal, Is.Not.Null);
-        Assert.That(savedGoal!.Progress, Is.EqualTo(75m), "Progress should be preserved when editing");
+        await _commandDispatcher.Received(1).DispatchAsync(Arg.Any<EditGoalCommand>(), Arg.Any<CancellationToken>());
+        await _commandDispatcher.DidNotReceive().DispatchAsync(Arg.Any<CreateGoalCommand>(), Arg.Any<CancellationToken>());
     }
 
     #endregion
@@ -532,9 +556,9 @@ public class ManageGoalViewModelTests : DatabaseTest
         var spendingLimitEditor = (SpendingLimitGoalTypeEditorViewModel)vm.CurrentGoalTypeEditor!;
         spendingLimitEditor.TargetFiatAmount = FiatValue.New(5000m);
 
-        Goal? savedGoal = null;
-        _goalRepository.SaveAsync(Arg.Do<Goal>(g => savedGoal = g))
-            .Returns(Task.CompletedTask);
+        CreateGoalCommand? capturedCommand = null;
+        _commandDispatcher.DispatchAsync(Arg.Do<CreateGoalCommand>(c => capturedCommand = c), Arg.Any<CancellationToken>())
+            .Returns(Result<CreateGoalResult>.Success(new CreateGoalResult("new-goal-id")));
 
         vm.CloseDialog = _ => { };
 
@@ -542,11 +566,11 @@ public class ManageGoalViewModelTests : DatabaseTest
         await vm.OkCommand.ExecuteAsync(null);
 
         // Assert
-        Assert.That(savedGoal, Is.Not.Null);
+        Assert.That(capturedCommand, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(savedGoal!.GoalType, Is.InstanceOf<SpendingLimitGoalType>());
-            var spendingLimit = (SpendingLimitGoalType)savedGoal.GoalType;
+            Assert.That(capturedCommand!.GoalType, Is.InstanceOf<SpendingLimitGoalTypeDTO>());
+            var spendingLimit = (SpendingLimitGoalTypeDTO)capturedCommand.GoalType;
             Assert.That(spendingLimit.TargetAmount, Is.EqualTo(5000m));
         });
     }
@@ -555,18 +579,18 @@ public class ManageGoalViewModelTests : DatabaseTest
     public async Task OnBindParameterAsync_Should_Load_SpendingLimit_Goal()
     {
         // Arrange
-        var goalId = new GoalId();
-        var existingGoal = GoalBuilder.AGoal()
-            .WithId(goalId)
-            .WithPeriod(GoalPeriods.Monthly)
-            .WithRefDate(new DateOnly(2024, 3, 1))
-            .WithGoalType(new SpendingLimitGoalType(3000m))
-            .Build();
+        var goalId = "goal-spending";
+        var goalDto = CreateGoalDTO(
+            goalId,
+            new DateOnly(2024, 3, 1),
+            GoalPeriods.Monthly,
+            new SpendingLimitGoalTypeOutputDTO { TargetAmount = 3000m, CalculatedSpending = 0m });
 
-        _goalRepository.GetByIdAsync(Arg.Any<GoalId>()).Returns(Task.FromResult<Goal?>(existingGoal));
+        _queryDispatcher.DispatchAsync(Arg.Any<GetGoalQuery>(), Arg.Any<CancellationToken>())
+            .Returns(goalDto);
 
         var vm = CreateViewModel();
-        vm.Parameter = goalId.Value;
+        vm.Parameter = goalId;
 
         // Act
         await vm.OnBindParameterAsync();
@@ -597,9 +621,9 @@ public class ManageGoalViewModelTests : DatabaseTest
         var dcaEditor = (DcaGoalTypeEditorViewModel)vm.CurrentGoalTypeEditor!;
         dcaEditor.TargetPurchaseCount = 8;
 
-        Goal? savedGoal = null;
-        _goalRepository.SaveAsync(Arg.Do<Goal>(g => savedGoal = g))
-            .Returns(Task.CompletedTask);
+        CreateGoalCommand? capturedCommand = null;
+        _commandDispatcher.DispatchAsync(Arg.Do<CreateGoalCommand>(c => capturedCommand = c), Arg.Any<CancellationToken>())
+            .Returns(Result<CreateGoalResult>.Success(new CreateGoalResult("new-goal-id")));
 
         vm.CloseDialog = _ => { };
 
@@ -607,11 +631,11 @@ public class ManageGoalViewModelTests : DatabaseTest
         await vm.OkCommand.ExecuteAsync(null);
 
         // Assert
-        Assert.That(savedGoal, Is.Not.Null);
+        Assert.That(capturedCommand, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(savedGoal!.GoalType, Is.InstanceOf<DcaGoalType>());
-            var dca = (DcaGoalType)savedGoal.GoalType;
+            Assert.That(capturedCommand!.GoalType, Is.InstanceOf<DcaGoalTypeDTO>());
+            var dca = (DcaGoalTypeDTO)capturedCommand.GoalType;
             Assert.That(dca.TargetPurchaseCount, Is.EqualTo(8));
         });
     }
@@ -620,18 +644,18 @@ public class ManageGoalViewModelTests : DatabaseTest
     public async Task OnBindParameterAsync_Should_Load_Dca_Goal()
     {
         // Arrange
-        var goalId = new GoalId();
-        var existingGoal = GoalBuilder.AGoal()
-            .WithId(goalId)
-            .WithPeriod(GoalPeriods.Monthly)
-            .WithRefDate(new DateOnly(2024, 3, 1))
-            .WithGoalType(new DcaGoalType(12))
-            .Build();
+        var goalId = "goal-dca";
+        var goalDto = CreateGoalDTO(
+            goalId,
+            new DateOnly(2024, 3, 1),
+            GoalPeriods.Monthly,
+            new DcaGoalTypeOutputDTO { TargetPurchaseCount = 12, CalculatedPurchaseCount = 0 });
 
-        _goalRepository.GetByIdAsync(Arg.Any<GoalId>()).Returns(Task.FromResult<Goal?>(existingGoal));
+        _queryDispatcher.DispatchAsync(Arg.Any<GetGoalQuery>(), Arg.Any<CancellationToken>())
+            .Returns(goalDto);
 
         var vm = CreateViewModel();
-        vm.Parameter = goalId.Value;
+        vm.Parameter = goalId;
 
         // Act
         await vm.OnBindParameterAsync();

@@ -4,14 +4,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using LiteDB;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Budget.Accounts.Commands.CreateBtcAccount;
+using Valt.App.Modules.Budget.Accounts.Commands.CreateFiatAccount;
+using Valt.App.Modules.Budget.Accounts.Commands.EditAccount;
+using Valt.App.Modules.Budget.Accounts.Queries.GetAccount;
+using Valt.App.Modules.Budget.Accounts.Queries.GetAccountGroups;
+using Valt.App.Modules.Budget.Transactions.Queries.HasTransactionsForAccount;
 using Valt.Core.Common;
-using Valt.Core.Kernel.Exceptions;
 using Valt.Core.Modules.Budget.Accounts;
-using Valt.Core.Modules.Budget.Accounts.Contracts;
-using Valt.Core.Modules.Budget.Accounts.Exceptions;
-using Valt.Core.Modules.Budget.Transactions.Contracts;
-using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Configuration;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
@@ -24,12 +26,10 @@ namespace Valt.UI.Views.Main.Modals.ManageAccount;
 
 public partial class ManageAccountViewModel : ValtModalValidatorViewModel
 {
-    private readonly IAccountRepository? _accountRepository;
-    private readonly IAccountGroupRepository? _accountGroupRepository;
-    private readonly ITransactionRepository? _transactionRepository;
+    private readonly ICommandDispatcher? _commandDispatcher;
+    private readonly IQueryDispatcher? _queryDispatcher;
     private readonly IModalFactory? _modalFactory;
     private readonly IConfigurationManager? _configurationManager;
-    private readonly AccountDisplayOrderManager? _accountDisplayOrderManager;
 
     #region Form Data
 
@@ -102,19 +102,16 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
         InitialFiatAmount = FiatValue.New(123m);
     }
 
-    public ManageAccountViewModel(IAccountRepository accountRepository,
-        IAccountGroupRepository accountGroupRepository,
-        ITransactionRepository transactionRepository,
+    public ManageAccountViewModel(
+        ICommandDispatcher commandDispatcher,
+        IQueryDispatcher queryDispatcher,
         IModalFactory modalFactory,
-        IConfigurationManager configurationManager,
-        AccountDisplayOrderManager accountDisplayOrderManager)
+        IConfigurationManager configurationManager)
     {
-        _accountRepository = accountRepository;
-        _accountGroupRepository = accountGroupRepository;
-        _transactionRepository = transactionRepository;
+        _commandDispatcher = commandDispatcher;
+        _queryDispatcher = queryDispatcher;
         _modalFactory = modalFactory;
         _configurationManager = configurationManager;
-        _accountDisplayOrderManager = accountDisplayOrderManager;
 
         AccountType = AvailableAccountTypes[0];
         Currency = AvailableCurrencies.FirstOrDefault() ?? FiatCurrency.Usd.Code;
@@ -128,7 +125,7 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
 
         if (Parameter is not null && Parameter is string accountId)
         {
-            var account = await _accountRepository!.GetAccountByIdAsync(new AccountId(accountId));
+            var account = await _queryDispatcher!.DispatchAsync(new GetAccountQuery { AccountId = accountId });
 
             if (account is null)
             {
@@ -136,37 +133,38 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
                 return;
             }
 
-            _accountId = account.Id;
-            _existingGroupId = account.GroupId;
+            _accountId = new AccountId(account.Id);
+            _existingGroupId = account.GroupId is not null ? new AccountGroupId(account.GroupId) : null;
             Name = account.Name;
-            CurrencyNickname = account.CurrencyNickname.Value;
+            CurrencyNickname = account.CurrencyNickname;
             Visible = account.Visible;
-            Icon = account.Icon;
+            Icon = account.IconId is not null ? Icon.RestoreFromId(account.IconId) : Icon.Empty;
 
             // Set selected group
             if (account.GroupId is not null)
             {
-                SelectedGroup = AvailableGroups.FirstOrDefault(g => g.Id == account.GroupId.Value);
+                SelectedGroup = AvailableGroups.FirstOrDefault(g => g.Id == account.GroupId);
             }
             else
             {
                 SelectedGroup = AvailableGroups.FirstOrDefault();
             }
 
-            switch (account)
+            if (account.IsBtcAccount)
             {
-                case BtcAccount btcAccount:
-                    InitialBtcAmount = btcAccount.InitialAmount;
-                    AccountType = nameof(AccountTypes.Bitcoin);
-                    break;
-                case FiatAccount fiatAccount:
-                    InitialFiatAmount = fiatAccount.InitialAmount;
-                    Currency = fiatAccount.FiatCurrency.Code;
-                    AccountType = nameof(AccountTypes.Fiat);
-                    break;
+                InitialBtcAmount = account.InitialAmountSats ?? 0;
+                AccountType = nameof(AccountTypes.Bitcoin);
+            }
+            else
+            {
+                InitialFiatAmount = FiatValue.New(account.InitialAmountFiat ?? 0);
+                Currency = account.Currency ?? FiatCurrency.Usd.Code;
+                AccountType = nameof(AccountTypes.Fiat);
             }
 
-            if (await _transactionRepository!.HasAnyTransactionAsync(account.Id))
+            var hasTransactions = await _queryDispatcher!.DispatchAsync(
+                new HasTransactionsForAccountQuery { AccountId = accountId });
+            if (hasTransactions)
                 CanEditAccountStructure = false;
         }
         else
@@ -177,9 +175,9 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
 
     private async Task LoadAvailableGroupsAsync()
     {
-        var groups = await _accountGroupRepository!.GetAllAsync();
+        var groups = await _queryDispatcher!.DispatchAsync(new GetAccountGroupsQuery());
         var groupOptions = new List<GroupOption> { new(null, "(None)") };
-        groupOptions.AddRange(groups.Select(g => new GroupOption(g.Id.Value, g.Name.Value)));
+        groupOptions.AddRange(groups.Select(g => new GroupOption(g.Id, g.Name)));
         AvailableGroups = groupOptions;
     }
 
@@ -213,72 +211,69 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
 
         if (!HasErrors)
         {
-            Account? account;
-            if (AccountType == nameof(AccountTypes.Fiat))
+            if (_accountId is null)
             {
-                if (_accountId is null)
+                // Create new account
+                if (AccountType == nameof(AccountTypes.Fiat))
                 {
-                    account = FiatAccount.New(AccountName.New(Name), CurrencyNickname, Visible, Icon,
-                        FiatCurrency.GetFromCode(Currency), InitialFiatAmount);
+                    var result = await _commandDispatcher!.DispatchAsync(new CreateFiatAccountCommand
+                    {
+                        Name = Name,
+                        CurrencyNickname = CurrencyNickname,
+                        Visible = Visible,
+                        IconId = Icon.ToString(),
+                        Currency = Currency,
+                        InitialAmount = InitialFiatAmount.Value,
+                        GroupId = SelectedGroup?.Id
+                    });
+
+                    if (result.IsFailure)
+                    {
+                        await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
+                        return;
+                    }
                 }
                 else
                 {
-                    account = await _accountRepository!.GetAccountByIdAsync(_accountId);
+                    var result = await _commandDispatcher!.DispatchAsync(new CreateBtcAccountCommand
+                    {
+                        Name = Name,
+                        CurrencyNickname = CurrencyNickname,
+                        Visible = Visible,
+                        IconId = Icon.ToString(),
+                        InitialAmountSats = InitialBtcAmount.Sats,
+                        GroupId = SelectedGroup?.Id
+                    });
 
-                    if (account is null)
-                        throw new EntityNotFoundException(nameof(Account), _accountId);
-
-                    if (account is not FiatAccount fiatAccount)
-                        throw new WrongAccountTypeException(account.Id);
-
-                    fiatAccount.Rename(Name);
-                    fiatAccount.ChangeCurrencyNickname(CurrencyNickname);
-                    fiatAccount.ChangeVisibility(Visible);
-                    fiatAccount.ChangeIcon(Icon);
-                    fiatAccount.ChangeCurrency(FiatCurrency.GetFromCode(Currency));
-                    fiatAccount.ChangeInitialAmount(InitialFiatAmount);
+                    if (result.IsFailure)
+                    {
+                        await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
+                        return;
+                    }
                 }
             }
             else
             {
-                if (_accountId is null)
+                // Edit existing account
+                var result = await _commandDispatcher!.DispatchAsync(new EditAccountCommand
                 {
-                    account = BtcAccount.New(AccountName.New(Name), CurrencyNickname, Visible, Icon, InitialBtcAmount);
-                }
-                else
+                    AccountId = _accountId.Value,
+                    Name = Name,
+                    CurrencyNickname = CurrencyNickname,
+                    Visible = Visible,
+                    IconId = Icon.ToString(),
+                    GroupId = SelectedGroup?.Id,
+                    Currency = AccountType == nameof(AccountTypes.Fiat) ? Currency : null,
+                    InitialAmountFiat = AccountType == nameof(AccountTypes.Fiat) ? InitialFiatAmount.Value : null,
+                    InitialAmountSats = AccountType == nameof(AccountTypes.Bitcoin) ? InitialBtcAmount.Sats : null
+                });
+
+                if (result.IsFailure)
                 {
-                    account = await _accountRepository!.GetAccountByIdAsync(_accountId);
-
-                    if (account is null)
-                        throw new EntityNotFoundException(nameof(Account), _accountId);
-
-                    if (account is not BtcAccount btcAccount)
-                        throw new WrongAccountTypeException(account.Id);
-
-                    btcAccount.Rename(Name);
-                    btcAccount.ChangeCurrencyNickname(CurrencyNickname);
-                    btcAccount.ChangeVisibility(Visible);
-                    btcAccount.ChangeIcon(Icon);
-                    btcAccount.ChangeInitialAmount(InitialBtcAmount);
+                    await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
+                    return;
                 }
             }
-
-            // Apply group selection and reset display order if group changed
-            var selectedGroupId = SelectedGroup?.Id is not null ? new AccountGroupId(SelectedGroup.Id) : null;
-            var groupChanged = _existingGroupId != selectedGroupId;
-            var isNewAccount = _accountId is null;
-
-            if (groupChanged || isNewAccount)
-            {
-                // Get the next display order for the target group
-                var newDisplayOrder = _accountDisplayOrderManager!.GetNextDisplayOrderForGroup(
-                    selectedGroupId is not null ? new ObjectId(selectedGroupId.Value) : null);
-                account.ChangeDisplayOrder(newDisplayOrder);
-            }
-
-            account.AssignToGroup(selectedGroupId);
-
-            await _accountRepository!.SaveAccountAsync(account);
 
             // When creating/updating a fiat account, ensure the currency is in the available currencies list
             if (AccountType == nameof(AccountTypes.Fiat))

@@ -1,12 +1,20 @@
 using System.Drawing;
 using NSubstitute;
+using Valt.App.Kernel;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.AvgPrice.Commands.CreateProfile;
+using Valt.App.Modules.AvgPrice.Commands.DeleteProfile;
+using Valt.App.Modules.AvgPrice.Commands.EditProfile;
+using Valt.App.Modules.AvgPrice.DTOs;
+using Valt.App.Modules.AvgPrice.Queries.GetLinesOfProfile;
+using Valt.App.Modules.AvgPrice.Queries.GetProfile;
+using Valt.App.Modules.AvgPrice.Queries.GetProfiles;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.AvgPrice;
 using Valt.Core.Modules.AvgPrice.Calculations;
 using Valt.Infra.Kernel;
-using Valt.Infra.Modules.AvgPrice.Queries;
-using Valt.Infra.Modules.AvgPrice.Queries.DTOs;
 using Valt.Infra.Modules.Configuration;
 using Valt.UI.Services;
 using Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles;
@@ -17,10 +25,10 @@ namespace Valt.Tests.UI.Screens;
 [TestFixture]
 public class ManageAvgPriceProfilesViewModelTests : DatabaseTest
 {
-    private IModalFactory _modalFactory;
-    private IAvgPriceQueries _avgPriceQueries;
-    private IAvgPriceRepository _avgPriceRepository;
-    private ConfigurationManager _configurationManager;
+    private IModalFactory _modalFactory = null!;
+    private ICommandDispatcher _commandDispatcher = null!;
+    private IQueryDispatcher _queryDispatcher = null!;
+    private ConfigurationManager _configurationManager = null!;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -33,18 +41,32 @@ public class ManageAvgPriceProfilesViewModelTests : DatabaseTest
     {
         base.SetUp();
         _modalFactory = Substitute.For<IModalFactory>();
-        _avgPriceQueries = Substitute.For<IAvgPriceQueries>();
-        _avgPriceRepository = Substitute.For<IAvgPriceRepository>();
+        _commandDispatcher = Substitute.For<ICommandDispatcher>();
+        _queryDispatcher = Substitute.For<IQueryDispatcher>();
         _configurationManager = new ConfigurationManager(_localDatabase);
 
         // Default setup: return empty list of profiles
-        _avgPriceQueries.GetProfilesAsync(Arg.Any<bool>())
-            .Returns(Task.FromResult<IEnumerable<AvgPriceProfileDTO>>(new List<AvgPriceProfileDTO>()));
+        _queryDispatcher.DispatchAsync(Arg.Any<GetProfilesQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<IReadOnlyList<AvgPriceProfileDTO>>(new List<AvgPriceProfileDTO>()));
+
+        // Default setup: return empty list of lines
+        _queryDispatcher.DispatchAsync(Arg.Any<GetLinesOfProfileQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<IReadOnlyList<AvgPriceLineDTO>>(new List<AvgPriceLineDTO>()));
+
+        // Default command results
+        _commandDispatcher.DispatchAsync(Arg.Any<CreateProfileCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result<CreateProfileResult>.Success(new CreateProfileResult("new-profile-id")));
+
+        _commandDispatcher.DispatchAsync(Arg.Any<EditProfileCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result<EditProfileResult>.Success(new EditProfileResult()));
+
+        _commandDispatcher.DispatchAsync(Arg.Any<DeleteProfileCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result<DeleteProfileResult>.Success(new DeleteProfileResult()));
     }
 
     private ManageAvgPriceProfilesViewModel CreateViewModel()
     {
-        return new ManageAvgPriceProfilesViewModel(_modalFactory, _avgPriceQueries, _avgPriceRepository, _configurationManager);
+        return new ManageAvgPriceProfilesViewModel(_modalFactory, _commandDispatcher, _queryDispatcher, _configurationManager);
     }
 
     #region State Tests - EditMode and View States
@@ -71,8 +93,8 @@ public class ManageAvgPriceProfilesViewModelTests : DatabaseTest
         var profileId = new AvgPriceProfileId();
         var profile = CreateProfileItem(profileId.Value, "Test Profile");
 
-        _avgPriceQueries.GetProfileAsync(Arg.Any<AvgPriceProfileId>())
-            .Returns(Task.FromResult(CreateProfileDTO(profileId.Value, "Test Profile")));
+        _queryDispatcher.DispatchAsync(Arg.Any<GetProfileQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<AvgPriceProfileDTO?>(CreateProfileDTO(profileId.Value, "Test Profile")));
 
         // Act
         viewModel.SelectedAveragePriceProfile = profile;
@@ -93,8 +115,8 @@ public class ManageAvgPriceProfilesViewModelTests : DatabaseTest
         var profileId = new AvgPriceProfileId();
         var profile = CreateProfileItem(profileId.Value, "Test Profile");
 
-        _avgPriceQueries.GetProfileAsync(Arg.Any<AvgPriceProfileId>())
-            .Returns(Task.FromResult(CreateProfileDTO(profileId.Value, "Test Profile")));
+        _queryDispatcher.DispatchAsync(Arg.Any<GetProfileQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<AvgPriceProfileDTO?>(CreateProfileDTO(profileId.Value, "Test Profile")));
 
         viewModel.SelectedAveragePriceProfile = profile;
 
@@ -117,8 +139,8 @@ public class ManageAvgPriceProfilesViewModelTests : DatabaseTest
         var profileId = new AvgPriceProfileId();
         var profile = CreateProfileItem(profileId.Value, "Test Profile");
 
-        _avgPriceQueries.GetProfileAsync(Arg.Any<AvgPriceProfileId>())
-            .Returns(Task.FromResult(CreateProfileDTO(profileId.Value, "Test Profile")));
+        _queryDispatcher.DispatchAsync(Arg.Any<GetProfileQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<AvgPriceProfileDTO?>(CreateProfileDTO(profileId.Value, "Test Profile")));
 
         viewModel.SelectedAveragePriceProfile = profile;
         viewModel.EditCommand.Execute(null);
@@ -143,8 +165,8 @@ public class ManageAvgPriceProfilesViewModelTests : DatabaseTest
         var profileId = new AvgPriceProfileId();
         var profile = CreateProfileItem(profileId.Value, "Test Profile");
 
-        _avgPriceQueries.GetProfileAsync(Arg.Any<AvgPriceProfileId>())
-            .Returns(Task.FromResult(CreateProfileDTO(profileId.Value, "Test Profile")));
+        _queryDispatcher.DispatchAsync(Arg.Any<GetProfileQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<AvgPriceProfileDTO?>(CreateProfileDTO(profileId.Value, "Test Profile")));
 
         viewModel.SelectedAveragePriceProfile = profile;
 
@@ -287,7 +309,14 @@ public class ManageAvgPriceProfilesViewModelTests : DatabaseTest
         await viewModel.SaveChangesCommand.ExecuteAsync(null);
 
         // Assert
-        await _avgPriceRepository.Received(1).SaveAvgPriceProfileAsync(Arg.Any<AvgPriceProfile>());
+        await _commandDispatcher.Received(1).DispatchAsync(
+            Arg.Is<CreateProfileCommand>(cmd =>
+                cmd.Name == "New Bitcoin Profile" &&
+                cmd.AssetName == "BTC" &&
+                cmd.Precision == 8 &&
+                cmd.CurrencyCode == "USD" &&
+                cmd.Visible == true),
+            Arg.Any<CancellationToken>());
     }
 
     #endregion
@@ -305,8 +334,8 @@ public class ManageAvgPriceProfilesViewModelTests : DatabaseTest
         var expectedPrecision = 8;
 
         var profileDto = CreateProfileDTO(profileId.Value, expectedName, expectedAssetName, expectedPrecision);
-        _avgPriceQueries.GetProfileAsync(Arg.Any<AvgPriceProfileId>())
-            .Returns(Task.FromResult(profileDto));
+        _queryDispatcher.DispatchAsync(Arg.Any<GetProfileQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<AvgPriceProfileDTO?>(profileDto));
 
         var profile = CreateProfileItem(profileId.Value, expectedName, expectedAssetName);
 
@@ -332,19 +361,8 @@ public class ManageAvgPriceProfilesViewModelTests : DatabaseTest
         var originalName = "Original Name";
 
         var profileDto = CreateProfileDTO(profileId.Value, originalName);
-        _avgPriceQueries.GetProfileAsync(Arg.Any<AvgPriceProfileId>())
-            .Returns(Task.FromResult(profileDto));
-
-        var existingProfile = AvgPriceProfile.New(
-            originalName,
-            new AvgPriceAsset("BTC", 8),
-            true,
-            Icon.Empty,
-            FiatCurrency.Usd,
-            AvgPriceCalculationMethod.BrazilianRule);
-
-        _avgPriceRepository.GetAvgPriceProfileByIdAsync(Arg.Any<AvgPriceProfileId>())
-            .Returns(Task.FromResult<AvgPriceProfile?>(existingProfile));
+        _queryDispatcher.DispatchAsync(Arg.Any<GetProfileQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<AvgPriceProfileDTO?>(profileDto));
 
         var profile = CreateProfileItem(profileId.Value, originalName);
         viewModel.SelectedAveragePriceProfile = profile;
@@ -362,7 +380,11 @@ public class ManageAvgPriceProfilesViewModelTests : DatabaseTest
         await viewModel.SaveChangesCommand.ExecuteAsync(null);
 
         // Assert
-        await _avgPriceRepository.Received(1).SaveAvgPriceProfileAsync(Arg.Any<AvgPriceProfile>());
+        await _commandDispatcher.Received(1).DispatchAsync(
+            Arg.Is<EditProfileCommand>(cmd =>
+                cmd.ProfileId == profileId.Value &&
+                cmd.Name == "Updated Name"),
+            Arg.Any<CancellationToken>());
     }
 
     #endregion
@@ -381,8 +403,10 @@ public class ManageAvgPriceProfilesViewModelTests : DatabaseTest
         // Act
         await viewModel.DeleteCommand.ExecuteAsync(null);
 
-        // Assert - Repository should not be called
-        await _avgPriceRepository.DidNotReceive().DeleteAvgPriceProfileAsync(Arg.Any<AvgPriceProfile>());
+        // Assert - Command dispatcher should not be called for delete
+        await _commandDispatcher.DidNotReceive().DispatchAsync(
+            Arg.Any<DeleteProfileCommand>(),
+            Arg.Any<CancellationToken>());
     }
 
     [Test]
@@ -393,23 +417,10 @@ public class ManageAvgPriceProfilesViewModelTests : DatabaseTest
         var profileId = new AvgPriceProfileId();
 
         var profileDto = CreateProfileDTO(profileId.Value, "Test Profile");
-        _avgPriceQueries.GetProfileAsync(Arg.Any<AvgPriceProfileId>())
-            .Returns(Task.FromResult(profileDto));
+        _queryDispatcher.DispatchAsync(Arg.Any<GetProfileQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<AvgPriceProfileDTO?>(profileDto));
 
-        // No lines for this profile
-        _avgPriceQueries.GetLinesOfProfileAsync(Arg.Any<AvgPriceProfileId>())
-            .Returns(Task.FromResult<IEnumerable<AvgPriceLineDTO>>(new List<AvgPriceLineDTO>()));
-
-        var existingProfile = AvgPriceProfile.New(
-            "Test Profile",
-            new AvgPriceAsset("BTC", 8),
-            true,
-            Icon.Empty,
-            FiatCurrency.Usd,
-            AvgPriceCalculationMethod.BrazilianRule);
-
-        _avgPriceRepository.GetAvgPriceProfileByIdAsync(Arg.Any<AvgPriceProfileId>())
-            .Returns(Task.FromResult<AvgPriceProfile?>(existingProfile));
+        // No lines for this profile (default setup returns empty list)
 
         var profile = CreateProfileItem(profileId.Value, "Test Profile");
         viewModel.SelectedAveragePriceProfile = profile;
@@ -421,7 +432,9 @@ public class ManageAvgPriceProfilesViewModelTests : DatabaseTest
         await viewModel.DeleteCommand.ExecuteAsync(null);
 
         // Assert - Should delete without confirmation dialog (no lines)
-        await _avgPriceRepository.Received(1).DeleteAvgPriceProfileAsync(Arg.Any<AvgPriceProfile>());
+        await _commandDispatcher.Received(1).DispatchAsync(
+            Arg.Is<DeleteProfileCommand>(cmd => cmd.ProfileId == profileId.Value),
+            Arg.Any<CancellationToken>());
     }
 
     [Test]
@@ -432,22 +445,10 @@ public class ManageAvgPriceProfilesViewModelTests : DatabaseTest
         var profileId = new AvgPriceProfileId();
 
         var profileDto = CreateProfileDTO(profileId.Value, "Test Profile");
-        _avgPriceQueries.GetProfileAsync(Arg.Any<AvgPriceProfileId>())
-            .Returns(Task.FromResult(profileDto));
+        _queryDispatcher.DispatchAsync(Arg.Any<GetProfileQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<AvgPriceProfileDTO?>(profileDto));
 
-        _avgPriceQueries.GetLinesOfProfileAsync(Arg.Any<AvgPriceProfileId>())
-            .Returns(Task.FromResult<IEnumerable<AvgPriceLineDTO>>(new List<AvgPriceLineDTO>()));
-
-        var existingProfile = AvgPriceProfile.New(
-            "Test Profile",
-            new AvgPriceAsset("BTC", 8),
-            true,
-            Icon.Empty,
-            FiatCurrency.Usd,
-            AvgPriceCalculationMethod.BrazilianRule);
-
-        _avgPriceRepository.GetAvgPriceProfileByIdAsync(Arg.Any<AvgPriceProfileId>())
-            .Returns(Task.FromResult<AvgPriceProfile?>(existingProfile));
+        // No lines for this profile (default setup returns empty list)
 
         var profile = CreateProfileItem(profileId.Value, "Test Profile");
         viewModel.SelectedAveragePriceProfile = profile;

@@ -11,7 +11,7 @@ namespace Valt.UI.Views.Main.Modals.About;
 
 public partial class AboutViewModel : ValtModalViewModel
 {
-    private readonly ILogger<AboutViewModel> _logger;
+    private readonly ILogger<AboutViewModel> _logger = null!;
     private const string DONATION_URL = "https://raw.githubusercontent.com/btcdoomguy/valt-data/refs/heads/master/donation.txt";
     
     [ObservableProperty]

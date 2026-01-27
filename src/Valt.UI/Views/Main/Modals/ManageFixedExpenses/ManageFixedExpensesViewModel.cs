@@ -6,13 +6,14 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Budget.FixedExpenses.Commands.DeleteFixedExpense;
+using Valt.App.Modules.Budget.FixedExpenses.DTOs;
+using Valt.App.Modules.Budget.FixedExpenses.Queries.GetFixedExpenses;
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.FixedExpenses;
-using Valt.Core.Modules.Budget.FixedExpenses.Contracts;
-using Valt.Core.Modules.Budget.Transactions.Contracts;
 using Valt.Infra.Kernel;
-using Valt.Infra.Modules.Budget.FixedExpenses.Queries;
-using Valt.Infra.Modules.Budget.FixedExpenses.Queries.DTOs;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
 using Valt.UI.Base.Utils;
@@ -28,18 +29,17 @@ namespace Valt.UI.Views.Main.Modals.ManageFixedExpenses;
 
 public partial class ManageFixedExpensesViewModel : ValtModalViewModel
 {
-    private readonly IFixedExpenseQueries _fixedExpenseQueries;
-    private readonly ITransactionRepository _transactionRepository;
-    private readonly IFixedExpenseRepository _fixedExpenseRepository;
-    private readonly IModalFactory _modalFactory;
-    private readonly RatesState _ratesState;
-    private readonly CurrencySettings _currencySettings;
+    private readonly ICommandDispatcher? _commandDispatcher;
+    private readonly IQueryDispatcher? _queryDispatcher;
+    private readonly IModalFactory _modalFactory = null!;
+    private readonly RatesState _ratesState = null!;
+    private readonly CurrencySettings _currencySettings = null!;
 
     public AvaloniaList<FixedExpenseListItemViewModel> FixedExpenses { get; set; } = new();
     [ObservableProperty] private FixedExpenseListItemViewModel? _selectedFixedExpense;
 
-    [ObservableProperty] private string _monthlyExpenses;
-    [ObservableProperty] private string _yearlyExpenses;
+    [ObservableProperty] private string _monthlyExpenses = string.Empty;
+    [ObservableProperty] private string _yearlyExpenses = string.Empty;
 
     /// <summary>
     /// Design-time constructor
@@ -63,16 +63,15 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
         });
     }
 
-    public ManageFixedExpensesViewModel(IFixedExpenseQueries fixedExpenseQueries,
-        ITransactionRepository transactionRepository,
-        IFixedExpenseRepository fixedExpenseRepository,
+    public ManageFixedExpensesViewModel(
+        ICommandDispatcher commandDispatcher,
+        IQueryDispatcher queryDispatcher,
         IModalFactory modalFactory,
         RatesState ratesState,
         CurrencySettings currencySettings)
     {
-        _fixedExpenseQueries = fixedExpenseQueries;
-        _transactionRepository = transactionRepository;
-        _fixedExpenseRepository = fixedExpenseRepository;
+        _commandDispatcher = commandDispatcher;
+        _queryDispatcher = queryDispatcher;
         _modalFactory = modalFactory;
         _ratesState = ratesState;
         _currencySettings = currencySettings;
@@ -87,7 +86,7 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
 
     private async Task FetchFixedExpensesAsync()
     {
-        var fixedExpensesQueryResult = (await _fixedExpenseQueries.GetFixedExpensesAsync())
+        var fixedExpensesQueryResult = (await _queryDispatcher!.DispatchAsync(new GetFixedExpensesQuery()))
             .OrderByDescending(x => x.Enabled)
             .ThenBy(x => x.LatestRange.Day)
             .ToList();
@@ -134,7 +133,7 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
         };
     }
 
-    private async Task RefreshTotalsAsync(IReadOnlyList<FixedExpenseDto> fixedExpensesQueryResult)
+    private async Task RefreshTotalsAsync(IReadOnlyList<FixedExpenseDTO> fixedExpensesQueryResult)
     {
         if (_ratesState.FiatRates is null)
             return;
@@ -186,7 +185,7 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
         var window = (FixedExpenseEditorView)await _modalFactory.CreateAsync(ApplicationModalNames.FixedExpenseEditor,
             currentWindow, new FixedExpenseEditorViewModel.Request()
             {
-                FixedExpenseId = SelectedFixedExpense?.Id
+                FixedExpenseId = SelectedFixedExpense.Id
             })!;
 
         _ = await window.ShowDialog<FixedExpenseEditorViewModel.Response?>(currentWindow);
@@ -222,12 +221,16 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
         if (!response)
             return;
 
-        var fixedExpense = await _fixedExpenseRepository.GetFixedExpenseByIdAsync(SelectedFixedExpense!.Id);
+        var result = await _commandDispatcher!.DispatchAsync(new DeleteFixedExpenseCommand
+        {
+            FixedExpenseId = SelectedFixedExpense.Id
+        });
 
-        if (fixedExpense is null)
+        if (result.IsFailure)
+        {
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
             return;
-
-        await _fixedExpenseRepository.DeleteFixedExpenseAsync(fixedExpense.Id);
+        }
 
         await FetchFixedExpensesAsync();
     }
@@ -241,16 +244,16 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
 
     public record FixedExpenseListItemViewModel
     {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public string Category { get; set; }
-        public Icon CategoryIcon { get; set; }
-        public string DefaultAccount { get; set; }
-        public Icon DefaultAccountIcon { get; set; }
-        public string Currency { get; set; }
-        public string Amount { get; set; }
-        public string Period { get; set; }
-        public string Day { get; set; }
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
+        public Icon CategoryIcon { get; set; } = Icon.Empty;
+        public string DefaultAccount { get; set; } = string.Empty;
+        public Icon DefaultAccountIcon { get; set; } = Icon.Empty;
+        public string Currency { get; set; } = string.Empty;
+        public string Amount { get; set; } = string.Empty;
+        public string Period { get; set; } = string.Empty;
+        public string Day { get; set; } = string.Empty;
         public bool Enabled { get; set; }
 
         public string EnabledDescription => Enabled ? language.Yes : language.No;

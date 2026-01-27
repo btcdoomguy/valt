@@ -1,16 +1,17 @@
-using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
+using Valt.App.Modules.Goals.Contracts;
+using Valt.App.Modules.Goals.DTOs;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.Contracts;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel.BackgroundJobs;
-using Valt.Infra.Modules.Goals.Queries;
+using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Modules.Goals.Queries.DTOs;
 
 namespace Valt.Infra.Modules.Goals.Services;
 
-public record GoalProgressUpdated();
+public record GoalProgressUpdated() : INotification;
 
 internal class GoalProgressUpdaterJob : IBackgroundJob
 {
@@ -19,6 +20,7 @@ internal class GoalProgressUpdaterJob : IBackgroundJob
     private readonly IGoalRepository _goalRepository;
     private readonly IGoalProgressCalculatorFactory _calculatorFactory;
     private readonly GoalProgressState _progressState;
+    private readonly INotificationPublisher _notificationPublisher;
     private readonly IClock _clock;
     private readonly ILogger<GoalProgressUpdaterJob> _logger;
 
@@ -33,6 +35,7 @@ internal class GoalProgressUpdaterJob : IBackgroundJob
         IGoalRepository goalRepository,
         IGoalProgressCalculatorFactory calculatorFactory,
         GoalProgressState progressState,
+        INotificationPublisher notificationPublisher,
         IClock clock,
         ILogger<GoalProgressUpdaterJob> logger)
     {
@@ -41,6 +44,7 @@ internal class GoalProgressUpdaterJob : IBackgroundJob
         _goalRepository = goalRepository;
         _calculatorFactory = calculatorFactory;
         _progressState = progressState;
+        _notificationPublisher = notificationPublisher;
         _clock = clock;
         _logger = logger;
     }
@@ -95,13 +99,14 @@ internal class GoalProgressUpdaterJob : IBackgroundJob
 
             foreach (var staleGoal in staleGoals)
             {
+                var typeName = (GoalTypeNames)staleGoal.TypeId;
                 var input = new GoalProgressInput(
-                    staleGoal.TypeName,
+                    typeName,
                     staleGoal.GoalTypeJson,
                     staleGoal.From,
                     staleGoal.To);
 
-                var calculator = _calculatorFactory.GetCalculator(staleGoal.TypeName);
+                var calculator = _calculatorFactory.GetCalculator(typeName);
                 var result = await calculator.CalculateProgressAsync(input);
 
                 var goal = await _goalRepository.GetByIdAsync(new GoalId(staleGoal.Id));
@@ -120,7 +125,7 @@ internal class GoalProgressUpdaterJob : IBackgroundJob
 
             _logger.LogInformation("[GoalProgressUpdaterJob] Successfully updated {Count} goals", staleGoals.Count);
 
-            WeakReferenceMessenger.Default.Send(new GoalProgressUpdated());
+            await _notificationPublisher.PublishAsync(new GoalProgressUpdated());
         }
         catch (Exception ex)
         {

@@ -7,6 +7,12 @@ namespace Valt.Tests.UI.ViewModels;
 [TestFixture]
 public class TransactionViewModelTests
 {
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
+    {
+        TransactionGridResources.InitializeForTesting();
+    }
+
     [Test]
     public void FiatCurrencyCode_WhenFiatToBitcoin_ReturnsFromCurrency()
     {

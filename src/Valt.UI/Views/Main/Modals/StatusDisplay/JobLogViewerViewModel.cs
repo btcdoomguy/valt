@@ -8,7 +8,7 @@ namespace Valt.UI.Views.Main.Modals.StatusDisplay;
 
 public partial class JobLogViewerViewModel : ValtModalViewModel
 {
-    private readonly JobInfo _jobInfo;
+    private readonly IStatusItem? _statusItem;
 
     [ObservableProperty]
     private string _title = string.Empty;
@@ -21,13 +21,13 @@ public partial class JobLogViewerViewModel : ValtModalViewModel
         // Design-time constructor
         Title = "Job Log: Test Job";
         LogContent = "[2026-01-05 10:00:00] [Info] Job started\n[2026-01-05 10:00:01] [Info] Processing...\n[2026-01-05 10:00:02] [Info] Job completed";
-        _jobInfo = null!;
+        _statusItem = null;
     }
 
-    public JobLogViewerViewModel(JobInfo jobInfo)
+    public JobLogViewerViewModel(IStatusItem statusItem)
     {
-        _jobInfo = jobInfo;
-        Title = string.Format(Lang.language.JobLogViewer_Title, jobInfo.Job.Name);
+        _statusItem = statusItem;
+        Title = string.Format(Lang.language.JobLogViewer_Title, statusItem.Name);
         RefreshLogContent();
     }
 
@@ -40,16 +40,16 @@ public partial class JobLogViewerViewModel : ValtModalViewModel
     [RelayCommand]
     private void ClearLog()
     {
-        _jobInfo?.LogPool.Clear();
+        _statusItem?.LogPool.Clear();
         RefreshLogContent();
     }
 
     private void RefreshLogContent()
     {
-        if (_jobInfo == null)
+        if (_statusItem == null)
             return;
 
-        var content = _jobInfo.LogPool.GetAllText();
+        var content = _statusItem.LogPool.GetAllText();
         LogContent = string.IsNullOrEmpty(content)
             ? Lang.language.JobLogViewer_NoLogs
             : content;

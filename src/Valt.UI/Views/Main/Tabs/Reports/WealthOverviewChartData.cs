@@ -30,7 +30,7 @@ public class WealthOverviewChartData : IDisposable
     private static readonly SKColor GridColor = SKColor.Parse("#4d4d4d");        // Background700
     private static readonly SKColor TextColor = SKColor.Parse("#a8a6a4");        // Text400
 
-    public FiatCurrency FiatCurrency { get; set; }
+    public FiatCurrency FiatCurrency { get; set; } = null!;
 
     // Chart styling
     public SolidColorPaint LegendTextPaint { get; } = new(SKColor.Parse("#eeebe8")) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) };

@@ -1,5 +1,4 @@
 using System.Collections.Frozen;
-using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Transactions;
@@ -7,6 +6,7 @@ using Valt.Core.Modules.Budget.Transactions.Contracts;
 using Valt.Core.Modules.Budget.Transactions.Details;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers;
 using Valt.Infra.DataAccess;
+using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Modules.Budget.Transactions.Messages;
 
 namespace Valt.Infra.Modules.Budget.Transactions.Services;
@@ -16,14 +16,19 @@ public class TransactionAutoSatAmountCalculator : ITransactionAutoSatAmountCalcu
     private readonly ITransactionRepository _transactionRepository;
     private readonly ILocalDatabase _localDatabase;
     private readonly ILocalHistoricalPriceProvider _localHistoricalPriceProvider;
+    private readonly INotificationPublisher _notificationPublisher;
     private readonly ILogger<TransactionAutoSatAmountCalculator> _logger;
 
     public TransactionAutoSatAmountCalculator(ITransactionRepository transactionRepository,
-        ILocalDatabase localDatabase, ILocalHistoricalPriceProvider localHistoricalPriceProvider, ILogger<TransactionAutoSatAmountCalculator> logger)
+        ILocalDatabase localDatabase,
+        ILocalHistoricalPriceProvider localHistoricalPriceProvider,
+        INotificationPublisher notificationPublisher,
+        ILogger<TransactionAutoSatAmountCalculator> logger)
     {
         _transactionRepository = transactionRepository;
         _localDatabase = localDatabase;
         _localHistoricalPriceProvider = localHistoricalPriceProvider;
+        _notificationPublisher = notificationPublisher;
         _logger = logger;
     }
 
@@ -104,7 +109,7 @@ public class TransactionAutoSatAmountCalculator : ITransactionAutoSatAmountCalcu
         }
         
         if (notify)
-            WeakReferenceMessenger.Default.Send(new AutoSatAmountRefreshed(transactionAutoSatAmountsUpdated));
+            await _notificationPublisher.PublishAsync(new AutoSatAmountRefreshed(transactionAutoSatAmountsUpdated));
     }
     
     private async Task<decimal?> GetFiatRate(Transaction transaction, FiatCurrency currency)

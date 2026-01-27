@@ -41,6 +41,7 @@ dotnet test --filter "FullyQualifiedName~Valt.Tests.Domain.Budget.Transactions.T
   - `Crawlers/` - Price providers (Kraken, Coinbase, Frankfurter)
   - `Kernel/BackgroundJobs/` - Periodic tasks
   - `Services/` - Updates, CSV import
+  - `Mcp/` - MCP server and tools for AI assistant integration
 
 - **Valt.UI** - Avalonia desktop application
   - `Views/Main/Tabs/` - Transactions, Reports, AvgPrice tabs
@@ -56,11 +57,33 @@ dotnet test --filter "FullyQualifiedName~Valt.Tests.Domain.Budget.Transactions.T
 - **Strategy Pattern**: `IAvgPriceCalculationStrategy`, `IGoalProgressCalculator`
 - **Weak Messaging**: `WeakReferenceMessenger` for loosely coupled updates
 
+### Important: Cross-Layer Impact
+
+**Always consider the impact of changes across all layers:**
+
+- **MCP Layer**: When adding/modifying features, check if MCP tools need updates. See [MCP Server](#mcp-server) section for the checklist.
+- **UI Layer**: New domain features may need corresponding ViewModels, Views, and localization strings.
+- **Infra Layer**: Domain changes may require repository/query updates and DTO mappings.
+
 ### Domain Layer Constraints
 
 - **No attributes in domain classes**: No `[JsonPropertyName]`, `[BsonField]`, etc.
 - **Use DTOs for serialization**: Create separate DTO classes in Infra layer
 - Example: `StackBitcoinGoalType` (domain) maps to `StackBitcoinGoalTypeDto` (infra)
+
+### C# Coding Conventions
+
+- **Use `Lock` class for synchronization**: Always use the strongly-typed `System.Threading.Lock` class instead of `lock(object)`. The `Lock` class (introduced in .NET 9) provides better performance and type safety.
+
+```csharp
+// Good
+private readonly Lock _lock = new();
+lock (_lock) { /* ... */ }
+
+// Avoid
+private readonly object _lock = new();
+lock (_lock) { /* ... */ }
+```
 
 ### Database
 
@@ -79,6 +102,66 @@ dotnet test --filter "FullyQualifiedName~Valt.Tests.Domain.Budget.Transactions.T
 | `AutoSatAmountJob` | 120s | Calculates sat amounts for eligible transactions |
 | `AccountTotalsJob` | 5s | Refreshes account cache |
 | `GoalProgressUpdaterJob` | 5s | Recalculates stale goal progress |
+
+## MCP Server
+
+Valt includes an embedded MCP (Model Context Protocol) server that exposes application functionality to AI assistants like Claude. The server runs on a configurable port (default 5200) and provides tools for querying and manipulating budget data.
+
+### Structure
+
+```
+src/Valt.Infra/Mcp/
+├── Server/
+│   ├── McpServerService.cs    # Server lifecycle management
+│   └── McpServerState.cs      # Server state tracking
+└── Tools/
+    ├── Budget/
+    │   ├── AccountTools.cs      # Account CRUD operations
+    │   ├── TransactionTools.cs  # Transaction CRUD operations
+    │   ├── CategoryTools.cs     # Category CRUD operations
+    │   └── FixedExpenseTools.cs # Fixed expense operations
+    ├── AvgPriceTools.cs         # Cost basis profile operations
+    ├── GoalTools.cs             # Financial goal operations
+    ├── ReportTools.cs           # Financial reports
+    └── CurrencyTools.cs         # Currency conversion and rates
+```
+
+### Creating MCP Tools
+
+Tools are static methods decorated with `[McpServerTool]` in classes decorated with `[McpServerToolType]`:
+
+```csharp
+[McpServerToolType]
+public class MyTools
+{
+    [McpServerTool, Description("Description shown to AI")]
+    public static async Task<ResultDto> MyTool(
+        IMyService service,  // Injected from DI
+        [Description("Parameter description")] string param)
+    {
+        // Implementation
+        return new ResultDto { ... };
+    }
+}
+```
+
+### Service Forwarding
+
+Services needed by MCP tools must be forwarded from the main app's DI container in `McpServerService.ForwardServicesFromMainApp()`:
+
+```csharp
+services.AddSingleton(_appServices.GetRequiredService<IMyService>());
+```
+
+### MCP Impact Checklist
+
+**IMPORTANT: When adding or modifying features, always consider MCP impact:**
+
+1. **New query/command handlers**: Should this be exposed via MCP? Add corresponding tool if useful for AI assistants.
+2. **New parameters on existing operations**: Update the corresponding MCP tool to expose the new parameter.
+3. **New services**: If the service is needed by MCP tools, add it to `ForwardServicesFromMainApp()`.
+4. **Breaking changes**: If modifying queries/commands used by MCP tools, update the tools accordingly.
+5. **New DTOs**: MCP tools use their own DTOs (defined in the tool file) - don't reuse UI DTOs directly.
 
 ## Testing
 
@@ -127,6 +210,49 @@ public void OneTimeSetUp() => IdGenerator.Configure(new LiteDbIdProvider());
 - LiveChartsCore.SkiaSharpView for charts
 - Custom fonts: Geist, GeistMono, Phosphor, MaterialDesign
 
+### Icons
+
+**Always use the icon mapping file to find Material Design icons:**
+
+The file `src/Valt.UI/Assets/Fonts/MaterialSymbolsOutlined-map.json` contains the mapping of icon names to their unicode values. When you need to use an icon:
+
+1. Search the JSON file for the desired icon by name (e.g., "settings", "home", "check")
+2. Use the `unicode` value with the `&#x` prefix in XAML or `\x` prefix in C#
+
+```json
+// Example entry in the map file
+{ "name": "settings", "unicode": "E8B8", "category": "action" }
+```
+
+```xml
+<!-- XAML usage -->
+<TextBlock FontFamily="{DynamicResource MaterialDesign}" Text="&#xE8B8;" />
+```
+
+```csharp
+// C# usage
+public string SettingsIcon => "\xE8B8";
+```
+
+### Modal Windows
+
+**Always set MinWidth and MinHeight for modal windows** to prevent content from being cut off on small screen resolutions:
+
+```xml
+<Window ...
+        d:DesignWidth="600"
+        d:DesignHeight="400"
+        MinWidth="600"
+        MinHeight="400"
+        MaxWidth="600"
+        MaxHeight="400"
+        ... >
+```
+
+- Use `d:DesignWidth` and `d:DesignHeight` values as the minimum dimensions
+- Modal views are located in `Views/Main/Modals/`
+- All modals use `SystemDecorations="None"` with custom title bar (`CustomTitleBar`)
+
 ### Localization
 
 **Update ALL THREE language files when adding strings:**
@@ -158,6 +284,7 @@ src/
 │   ├── DataAccess/      # LiteDB, migrations
 │   ├── Modules/         # Repositories, queries, reports
 │   ├── Crawlers/        # Price providers
+│   ├── Mcp/             # MCP server and tools
 │   └── Services/        # Updates, CSV import
 └── Valt.UI/             # Presentation layer
     ├── Views/Main/      # Tabs and modals

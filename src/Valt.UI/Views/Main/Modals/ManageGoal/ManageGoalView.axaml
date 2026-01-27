@@ -9,6 +9,8 @@
         mc:Ignorable="d"
         d:DesignWidth="450"
         d:DesignHeight="510"
+        MinWidth="450"
+        MinHeight="510"
         MaxWidth="450"
         MaxHeight="510"
         x:Class="Valt.UI.Views.Main.Modals.ManageGoal.ManageGoalView"

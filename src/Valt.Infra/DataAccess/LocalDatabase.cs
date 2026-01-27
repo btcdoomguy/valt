@@ -17,6 +17,7 @@ namespace Valt.Infra.DataAccess;
 internal sealed class LocalDatabase : ILocalDatabase
 {
     private readonly IClock _clock;
+    private readonly SemaphoreSlim _dbLock = new(1, 1);
     private LiteDatabase? _database;
     private bool _inMemoryDb = true;
     private string? _filePath;
@@ -285,8 +286,62 @@ internal sealed class LocalDatabase : ILocalDatabase
     public void Dispose()
     {
         CloseDatabase();
+        _dbLock.Dispose();
         OnPropertyChanged(nameof(HasDatabaseOpen));
     }
+
+    #region Thread-safe database access for MCP
+
+    /// <summary>
+    /// Executes a database operation with thread-safe locking.
+    /// Use this method for MCP tool operations that may run on a background thread.
+    /// </summary>
+    public async Task<T> ExecuteWithLockAsync<T>(Func<LiteDatabase, T> operation, CancellationToken ct = default)
+    {
+        await _dbLock.WaitAsync(ct);
+        try
+        {
+            return operation(GetOpenDatabase());
+        }
+        finally
+        {
+            _dbLock.Release();
+        }
+    }
+
+    /// <summary>
+    /// Executes a database operation with thread-safe locking (async version).
+    /// </summary>
+    public async Task<T> ExecuteWithLockAsync<T>(Func<LiteDatabase, Task<T>> operation, CancellationToken ct = default)
+    {
+        await _dbLock.WaitAsync(ct);
+        try
+        {
+            return await operation(GetOpenDatabase());
+        }
+        finally
+        {
+            _dbLock.Release();
+        }
+    }
+
+    /// <summary>
+    /// Executes a void database operation with thread-safe locking.
+    /// </summary>
+    public async Task ExecuteWithLockAsync(Action<LiteDatabase> operation, CancellationToken ct = default)
+    {
+        await _dbLock.WaitAsync(ct);
+        try
+        {
+            operation(GetOpenDatabase());
+        }
+        finally
+        {
+            _dbLock.Release();
+        }
+    }
+
+    #endregion
 
     #region INotifyPropertyChanged
 

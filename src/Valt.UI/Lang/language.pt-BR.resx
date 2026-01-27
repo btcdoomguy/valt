@@ -1625,4 +1625,29 @@
     <data name="DeleteInstallment_All" xml:space="preserve">
         <value>Todas as parcelas</value>
     </data>
+    <!-- MCP Server -->
+    <data name="McpServer_Name" xml:space="preserve">
+        <value>Servidor MCP</value>
+    </data>
+    <data name="McpServer_RunningTooltip" xml:space="preserve">
+        <value>Servidor MCP rodando em {0}. Clique para parar.</value>
+    </data>
+    <data name="McpServer_StoppedTooltip" xml:space="preserve">
+        <value>Servidor MCP parado. Clique para iniciar.</value>
+    </data>
+    <data name="McpServer_ErrorTooltip" xml:space="preserve">
+        <value>Erro no servidor MCP: {0}. Clique para tentar novamente.</value>
+    </data>
+    <data name="Settings_McpServerEnabled" xml:space="preserve">
+        <value>Servidor MCP (Assistente IA)</value>
+    </data>
+    <data name="Settings_McpServerPort" xml:space="preserve">
+        <value>Porta do Servidor MCP</value>
+    </data>
+    <data name="Settings_McpServerPort_Hint" xml:space="preserve">
+        <value>(para assistentes de IA)</value>
+    </data>
+    <data name="McpNotification_Title" xml:space="preserve">
+        <value>Dados alterados via assistente de IA</value>
+    </data>
 </root>

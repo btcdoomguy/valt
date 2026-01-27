@@ -48,7 +48,7 @@ public class FixedExpensesPanelViewModelTests : DatabaseTest
         _fixedExpenseRecordService = Substitute.For<IFixedExpenseRecordService>();
         _ratesState = new RatesState();
         _ratesState.FiatRates = new Dictionary<string, decimal> { { "BRL", 5.0m }, { "USD", 1.0m } };
-        _currencySettings = new CurrencySettings(_localDatabase);
+        _currencySettings = new CurrencySettings(_localDatabase, null!);
         _filterState = new FilterState { MainDate = new DateTime(2025, 1, 15) };
         _clock = Substitute.For<IClock>();
         _clock.GetCurrentLocalDate().Returns(new DateOnly(2025, 1, 15));

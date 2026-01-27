@@ -4,11 +4,11 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Budget.FixedExpenses.DTOs;
+using Valt.App.Modules.Budget.FixedExpenses.Queries.GetFixedExpenseHistory;
 using Valt.Core.Common;
-using Valt.Core.Modules.Budget.FixedExpenses;
 using Valt.Core.Modules.Budget.Transactions;
-using Valt.Infra.Modules.Budget.FixedExpenses.Queries;
-using Valt.Infra.Modules.Budget.FixedExpenses.Queries.DTOs;
 using Valt.UI.Base;
 using Valt.UI.Services;
 using Valt.UI.Views.Main.Modals.TransactionEditor;
@@ -17,8 +17,8 @@ namespace Valt.UI.Views.Main.Modals.FixedExpenseHistory;
 
 public partial class FixedExpenseHistoryViewModel : ValtModalViewModel
 {
-    private readonly IFixedExpenseQueries _fixedExpenseQueries;
-    private readonly IModalFactory _modalFactory;
+    private readonly IQueryDispatcher _queryDispatcher = null!;
+    private readonly IModalFactory _modalFactory = null!;
 
     [ObservableProperty] private string _fixedExpenseName = string.Empty;
     [ObservableProperty] private TransactionHistoryItemViewModel? _selectedTransaction;
@@ -58,10 +58,10 @@ public partial class FixedExpenseHistoryViewModel : ValtModalViewModel
     }
 
     public FixedExpenseHistoryViewModel(
-        IFixedExpenseQueries fixedExpenseQueries,
+        IQueryDispatcher queryDispatcher,
         IModalFactory modalFactory)
     {
-        _fixedExpenseQueries = fixedExpenseQueries;
+        _queryDispatcher = queryDispatcher;
         _modalFactory = modalFactory;
     }
 
@@ -75,7 +75,8 @@ public partial class FixedExpenseHistoryViewModel : ValtModalViewModel
 
     private async Task FetchHistoryAsync(string fixedExpenseId)
     {
-        var history = await _fixedExpenseQueries.GetFixedExpenseHistoryAsync(new FixedExpenseId(fixedExpenseId));
+        var history = await _queryDispatcher.DispatchAsync(
+            new GetFixedExpenseHistoryQuery { FixedExpenseId = fixedExpenseId });
 
         if (history is null)
             return;

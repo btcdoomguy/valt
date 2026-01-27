@@ -33,15 +33,15 @@ namespace Valt.UI.Views.Main.Tabs.Transactions;
 
 public partial class FixedExpensesPanelViewModel : ValtViewModel, IDisposable
 {
-    private readonly IModalFactory _modalFactory;
-    private readonly IFixedExpenseProvider _fixedExpenseProvider;
-    private readonly IFixedExpenseRecordService _fixedExpenseRecordService;
-    private readonly RatesState _ratesState;
-    private readonly CurrencySettings _currencySettings;
-    private readonly FilterState _filterState;
-    private readonly IClock _clock;
-    private readonly ILogger<FixedExpensesPanelViewModel> _logger;
-    private readonly SecureModeState _secureModeState;
+    private readonly IModalFactory _modalFactory = null!;
+    private readonly IFixedExpenseProvider _fixedExpenseProvider = null!;
+    private readonly IFixedExpenseRecordService _fixedExpenseRecordService = null!;
+    private readonly RatesState _ratesState = null!;
+    private readonly CurrencySettings _currencySettings = null!;
+    private readonly FilterState _filterState = null!;
+    private readonly IClock _clock = null!;
+    private readonly ILogger<FixedExpensesPanelViewModel> _logger = null!;
+    private readonly SecureModeState _secureModeState = null!;
 
     [ObservableProperty] private AvaloniaList<FixedExpensesEntryViewModel> _fixedExpenseEntries = new();
 

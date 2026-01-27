@@ -1,9 +1,9 @@
-using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Messages;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel.BackgroundJobs;
+using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Modules.DataSources.Fiat;
 
@@ -16,6 +16,7 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
     private readonly IPriceDatabase _priceDatabase;
     private readonly ILocalDatabase _localDatabase;
     private readonly IConfigurationManager _configurationManager;
+    private readonly INotificationPublisher _notificationPublisher;
     private readonly ILogger<FiatHistoryUpdaterJob> _logger;
 
     private readonly IFiatHistoricalDataProvider? _initialSeedProvider;
@@ -32,11 +33,13 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
         ILocalDatabase localDatabase,
         IEnumerable<IFiatHistoricalDataProvider> providers,
         IConfigurationManager configurationManager,
+        INotificationPublisher notificationPublisher,
         ILogger<FiatHistoryUpdaterJob> logger)
     {
         _priceDatabase = priceDatabase;
         _localDatabase = localDatabase;
         _configurationManager = configurationManager;
+        _notificationPublisher = notificationPublisher;
         _logger = logger;
 
         var providersList = providers.ToList();
@@ -84,7 +87,7 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
             updated |= await ProcessCurrenciesWithoutDataAsync(currenciesWithoutData, requiredStartDate, endDate);
             updated |= await ProcessCurrenciesWithDataAsync(currenciesWithData, requiredStartDate, endDate);
 
-            LogUpdateResult(updated, currentRecordCount);
+            await LogUpdateResultAsync(updated, currentRecordCount);
             _logger.LogInformation("[FiatHistoryUpdater] Update cycle completed successfully");
         }
         catch (Exception ex)
@@ -557,14 +560,14 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
         }
     }
 
-    private void LogUpdateResult(bool updated, int previousRecordCount)
+    private async Task LogUpdateResultAsync(bool updated, int previousRecordCount)
     {
         if (updated)
         {
             var newRecordCount = _priceDatabase.GetFiatData().Query().Count();
             _logger.LogInformation("[FiatHistoryUpdater] Database updated. Total records: {Count} (added {Added})",
                 newRecordCount, newRecordCount - previousRecordCount);
-            WeakReferenceMessenger.Default.Send<FiatHistoryPriceUpdatedMessage>();
+            await _notificationPublisher.PublishAsync(new FiatHistoryPriceUpdatedMessage());
         }
         else
         {

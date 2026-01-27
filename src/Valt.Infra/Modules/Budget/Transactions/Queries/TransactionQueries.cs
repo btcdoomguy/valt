@@ -1,9 +1,11 @@
+using LiteDB;
+using Valt.App.Modules.Budget.Categories.DTOs;
+using Valt.App.Modules.Budget.Transactions.Contracts;
+using Valt.App.Modules.Budget.Transactions.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Transactions;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
-using Valt.Infra.Modules.Budget.Categories.Queries.DTOs;
-using Valt.Infra.Modules.Budget.Transactions.Queries.DTOs;
 
 namespace Valt.Infra.Modules.Budget.Transactions.Queries;
 
@@ -37,16 +39,16 @@ public class TransactionQueries : ITransactionQueries
             query = query.Where(x => x.Date <= parsedDate);
         }
 
-        if (filter.Accounts is not null)
+        if (filter.AccountIds is not null)
         {
-            var accountIds = filter.Accounts.Select(x => x.ToObjectId()).ToList();
+            var accountIds = filter.AccountIds.Select(x => new ObjectId(x)).ToList();
             query = query.Where(x =>
                 accountIds.Contains(x.FromAccountId) || (x.ToAccountId != null && accountIds.Contains(x.ToAccountId)));
         }
 
-        if (filter.Categories is not null)
+        if (filter.CategoryIds is not null)
         {
-            var categoryIds = filter.Categories.Select(x => x.ToObjectId()).ToList();
+            var categoryIds = filter.CategoryIds.Select(x => new ObjectId(x)).ToList();
             query = query.Where(x => categoryIds.Contains(x.CategoryId));
         }
 
@@ -109,11 +111,11 @@ public class TransactionQueries : ITransactionQueries
                 Date = DateOnly.FromDateTime(transactionEntity.Date),
                 Name = transactionEntity.Name,
                 CategoryId = transactionEntity.CategoryId.ToString(),
-                CategoryIcon = category.Icon,
+                CategoryIcon = category.IconId,
                 CategoryName = category.Name,
                 FromAccountId = transactionEntity.FromAccountId.ToString(),
                 FromAccountIcon = fromAccount?.Icon,
-                FromAccountName = fromAccount?.Name,
+                FromAccountName = fromAccount?.Name ?? string.Empty,
                 FromAccountCurrency = fromAccount?.Currency,
                 ToAccountId = transactionEntity.ToAccountId?.ToString(),
                 ToAccountIcon = toAccount?.Icon,
@@ -165,6 +167,106 @@ public class TransactionQueries : ITransactionQueries
             }).ToList());
     }
 
+    public Task<TransactionForEditDTO?> GetTransactionByIdAsync(string transactionId)
+    {
+        var entity = _localDatabase.GetTransactions().FindById(new ObjectId(transactionId));
+
+        if (entity is null)
+            return Task.FromResult<TransactionForEditDTO?>(null);
+
+        var fixedExpenseRecord = _localDatabase.GetFixedExpenseRecords()
+            .Include(x => x.FixedExpense)
+            .Find(x => x.Transaction != null && x.Transaction.Id == entity.Id)
+            .FirstOrDefault();
+
+        return Task.FromResult<TransactionForEditDTO?>(MapToTransactionForEditDto(entity, fixedExpenseRecord));
+    }
+
+    public Task<bool> HasAnyTransactionAsync(string accountId)
+    {
+        var accountIdBson = new ObjectId(accountId);
+        var anyTransaction = _localDatabase.GetTransactions()
+            .FindOne(x => x.FromAccountId == accountIdBson || x.ToAccountId == accountIdBson);
+
+        return Task.FromResult(anyTransaction is not null);
+    }
+
+    private static TransactionForEditDTO MapToTransactionForEditDto(TransactionEntity entity, FixedExpenses.FixedExpenseRecordEntity? fixedExpenseRecord)
+    {
+        return new TransactionForEditDTO
+        {
+            Id = entity.Id.ToString(),
+            Date = DateOnly.FromDateTime(entity.Date),
+            Name = entity.Name,
+            CategoryId = entity.CategoryId.ToString(),
+            Notes = entity.Notes,
+            GroupId = entity.GroupId?.ToString(),
+            FixedExpenseReference = fixedExpenseRecord is not null
+                ? new FixedExpenseReferenceDTO
+                {
+                    FixedExpenseId = fixedExpenseRecord.FixedExpense.Id.ToString(),
+                    ReferenceDate = DateOnly.FromDateTime(fixedExpenseRecord.ReferenceDate)
+                }
+                : null,
+            Details = MapDetailsToDto(entity),
+            AutoSatAmountDetails = entity.IsAutoSatAmount == true
+                ? new AutoSatAmountDTO
+                {
+                    IsAutoSatAmount = entity.IsAutoSatAmount.Value,
+                    SatAmountState = ((SatAmountState)entity.SatAmountStateId!).ToString(),
+                    SatAmountSats = entity.SatAmount
+                }
+                : null
+        };
+    }
+
+    private static TransactionDetailsDto MapDetailsToDto(TransactionEntity entity)
+    {
+        return entity.Type switch
+        {
+            TransactionEntityType.Fiat => new FiatTransactionDto
+            {
+                FromAccountId = entity.FromAccountId.ToString(),
+                Amount = Math.Abs(entity.FromFiatAmount!.Value),
+                IsCredit = entity.FromFiatAmount > 0
+            },
+            TransactionEntityType.Bitcoin => new BitcoinTransactionDto
+            {
+                FromAccountId = entity.FromAccountId.ToString(),
+                AmountSats = Math.Abs(entity.FromSatAmount!.Value),
+                IsCredit = entity.FromSatAmount > 0
+            },
+            TransactionEntityType.FiatToFiat => new FiatToFiatTransferDto
+            {
+                FromAccountId = entity.FromAccountId.ToString(),
+                ToAccountId = entity.ToAccountId!.ToString(),
+                FromAmount = Math.Abs(entity.FromFiatAmount!.Value),
+                ToAmount = Math.Abs(entity.ToFiatAmount!.Value)
+            },
+            TransactionEntityType.BitcoinToBitcoin => new BitcoinToBitcoinTransferDto
+            {
+                FromAccountId = entity.FromAccountId.ToString(),
+                ToAccountId = entity.ToAccountId!.ToString(),
+                AmountSats = Math.Abs(entity.FromSatAmount!.Value)
+            },
+            TransactionEntityType.FiatToBitcoin => new FiatToBitcoinTransferDto
+            {
+                FromAccountId = entity.FromAccountId.ToString(),
+                ToAccountId = entity.ToAccountId!.ToString(),
+                FromFiatAmount = Math.Abs(entity.FromFiatAmount!.Value),
+                ToSatsAmount = Math.Abs(entity.ToSatAmount!.Value)
+            },
+            TransactionEntityType.BitcoinToFiat => new BitcoinToFiatTransferDto
+            {
+                FromAccountId = entity.FromAccountId.ToString(),
+                ToAccountId = entity.ToAccountId!.ToString(),
+                FromSatsAmount = Math.Abs(entity.FromSatAmount!.Value),
+                ToFiatAmount = Math.Abs(entity.ToFiatAmount!.Value)
+            },
+            _ => throw new InvalidOperationException($"Unknown transaction type: {entity.Type}")
+        };
+    }
+
     private static string? FormatAmount(long? satAmount, decimal? fiatAmount, string? currency)
     {
         if (satAmount is not null)
@@ -194,7 +296,8 @@ public class TransactionQueries : ITransactionQueries
             {
                 Id = category.Id.ToString(),
                 Name = name,
-                Icon = category.Icon,
+                SimpleName = category.Name,
+                IconId = category.Icon,
                 Unicode = icon.Unicode,
                 Color = icon.Color
             };

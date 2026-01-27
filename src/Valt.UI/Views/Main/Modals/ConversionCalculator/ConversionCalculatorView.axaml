@@ -7,6 +7,8 @@
         xmlns:conv="clr-namespace:Valt.UI.Views.Main.Modals.ConversionCalculator"
         mc:Ignorable="d"
         d:DesignWidth="650" d:DesignHeight="482"
+        MinWidth="650"
+        MinHeight="482"
         MaxWidth="650"
         MaxHeight="482"
         x:Class="Valt.UI.Views.Main.Modals.ConversionCalculator.ConversionCalculatorView"

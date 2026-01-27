@@ -7,6 +7,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+#pragma warning disable CS8981 // The type name only contains lower-cased ascii characters
+
 namespace Valt.UI.Lang {
     using System;
     
@@ -3230,5 +3232,54 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("DeleteInstallment_All", resourceCulture);
             }
         }
+
+        public static string McpServer_Name {
+            get {
+                return ResourceManager.GetString("McpServer_Name", resourceCulture);
+            }
+        }
+
+        public static string McpServer_RunningTooltip {
+            get {
+                return ResourceManager.GetString("McpServer_RunningTooltip", resourceCulture);
+            }
+        }
+
+        public static string McpServer_StoppedTooltip {
+            get {
+                return ResourceManager.GetString("McpServer_StoppedTooltip", resourceCulture);
+            }
+        }
+
+        public static string McpServer_ErrorTooltip {
+            get {
+                return ResourceManager.GetString("McpServer_ErrorTooltip", resourceCulture);
+            }
+        }
+
+        public static string Settings_McpServerEnabled {
+            get {
+                return ResourceManager.GetString("Settings_McpServerEnabled", resourceCulture);
+            }
+        }
+
+        public static string Settings_McpServerPort {
+            get {
+                return ResourceManager.GetString("Settings_McpServerPort", resourceCulture);
+            }
+        }
+
+        public static string Settings_McpServerPort_Hint {
+            get {
+                return ResourceManager.GetString("Settings_McpServerPort_Hint", resourceCulture);
+            }
+        }
+
+        public static string McpNotification_Title {
+            get {
+                return ResourceManager.GetString("McpNotification_Title", resourceCulture);
+            }
+        }
+
     }
 }

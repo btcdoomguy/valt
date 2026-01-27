@@ -25,24 +25,29 @@ using Valt.Infra.Kernel.EventSystem;
 using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Kernel.Scopes;
 using Valt.Infra.Kernel.Time;
+using Valt.App.Modules.AvgPrice.Contracts;
 using Valt.Infra.Modules.AvgPrice;
 using Valt.Infra.Modules.AvgPrice.Queries;
 using Valt.Infra.Modules.Budget;
+using Valt.App.Modules.Budget.Accounts.Contracts;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Accounts.Queries;
 using Valt.Infra.Modules.Budget.Accounts.Services;
+using Valt.App.Modules.Budget.Categories.Contracts;
 using Valt.Infra.Modules.Budget.Categories;
 using Valt.Infra.Modules.Budget.Categories.Queries;
+using Valt.App.Modules.Budget.FixedExpenses.Contracts;
 using Valt.Infra.Modules.Budget.FixedExpenses;
 using Valt.Infra.Modules.Budget.FixedExpenses.Queries;
 using Valt.Infra.Modules.Budget.FixedExpenses.Services;
+using Valt.App.Modules.Budget.Transactions.Contracts;
 using Valt.Infra.Modules.Budget.Transactions;
 using Valt.Infra.Modules.Budget.Transactions.Queries;
 using Valt.Infra.Modules.Budget.Transactions.Services;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Modules.Currency.Services;
+using Valt.App.Modules.Goals.Contracts;
 using Valt.Infra.Modules.Goals;
-using Valt.Infra.Modules.Goals.Handlers;
 using Valt.Infra.Modules.Goals.Queries;
 using Valt.Infra.Modules.Goals.Services;
 using Valt.Infra.Modules.Reports;
@@ -52,6 +57,7 @@ using Valt.Infra.Modules.Reports.IncomeByCategory;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.Infra.Modules.Reports.Statistics;
 using Valt.Infra.Modules.Reports.WealthOverview;
+using Valt.Infra.Mcp.Server;
 using Valt.Infra.Services.CsvExport;
 using Valt.Infra.Services.CsvImport;
 using Valt.Infra.Services.Updates;
@@ -88,6 +94,10 @@ public static class Extensions
         services.AddSingleton<CurrencySettings>();
         services.AddSingleton<DisplaySettings>();
         services.AddSingleton<UISettings>();
+
+        //mcp server
+        services.AddSingleton<McpServerState>();
+        services.AddSingleton<McpServerService>();
 
         //price crawlers bitcoin
         services.AddSingleton<IBitcoinPriceProvider, CoinbaseProvider>();
@@ -131,7 +141,6 @@ public static class Extensions
 
         //background jobs
         services.AddSingleton<BackgroundJobManager>();
-        services.AddSingleton<BackgroundJobCoordinator>();
 
         services.AddSingleton<IDatabaseInitializer, DatabaseInitializer>();
         services.AddSingleton<IConfigurationManager, ConfigurationManager>();
@@ -241,9 +250,6 @@ public static class Extensions
         services.AddSingleton<IGoalProgressCalculator, BitcoinHodlProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculatorFactory, GoalProgressCalculatorFactory>();
         services.AddSingleton<GoalProgressState>();
-
-        //goal price update handler (subscribes to price update messages)
-        services.AddSingleton<MarkGoalsStaleOnPriceUpdateHandler>();
 
         return services;
     }

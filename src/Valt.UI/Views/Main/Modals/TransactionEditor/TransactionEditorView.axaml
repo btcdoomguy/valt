@@ -9,6 +9,8 @@
         mc:Ignorable="d"
         d:DesignWidth="820"
         d:DesignHeight="455"
+        MinWidth="820"
+        MinHeight="455"
         MaxWidth="820"
         MaxHeight="455"
         x:Class="Valt.UI.Views.Main.Modals.TransactionEditor.TransactionEditorView"

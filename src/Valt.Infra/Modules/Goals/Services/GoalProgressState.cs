@@ -1,3 +1,5 @@
+using Valt.App.Modules.Goals.Contracts;
+
 namespace Valt.Infra.Modules.Goals.Services;
 
 /// <summary>
@@ -5,7 +7,7 @@ namespace Valt.Infra.Modules.Goals.Services;
 /// Used to avoid repeated database queries - instead, event handlers set the flag
 /// and the background job checks this flag to know when to recalculate.
 /// </summary>
-public class GoalProgressState
+public class GoalProgressState : IGoalProgressState
 {
     private volatile bool _hasStaleGoals;
     private volatile bool _bootstrapCompleted;

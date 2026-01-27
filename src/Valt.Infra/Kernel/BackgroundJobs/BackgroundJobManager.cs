@@ -114,7 +114,7 @@ public sealed class BackgroundJobManager : IAsyncDisposable
     }
 }
 
-public sealed class JobInfo : INotifyPropertyChanged, IAsyncDisposable
+public sealed class JobInfo : IStatusItem, IAsyncDisposable
 {
     private const int MaxRetryAttempts = 3;
     private static readonly TimeSpan RetryDelay = TimeSpan.FromMilliseconds(100);
@@ -142,6 +142,10 @@ public sealed class JobInfo : INotifyPropertyChanged, IAsyncDisposable
     public IBackgroundJob Job => _job;
     public JobLogPool LogPool => _logPool;
 
+    // IStatusItem implementation
+    public string Name => _job.Name;
+    public string StateDisplay => _state.ToString();
+
     public BackgroundJobState State
     {
         get => _state;
@@ -151,6 +155,7 @@ public sealed class JobInfo : INotifyPropertyChanged, IAsyncDisposable
             {
                 _state = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(StateDisplay));
             }
         }
     }

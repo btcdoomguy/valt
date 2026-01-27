@@ -124,6 +124,20 @@ public class LocalStorageService : ILocalStorageService
         return Task.CompletedTask;
     }
 
+    public bool LoadMcpServerEnabled()
+    {
+        EnsureLoaded();
+        return _valtSettings!.McpServerEnabled;
+    }
+
+    public Task ChangeMcpServerEnabledAsync(bool enabled)
+    {
+        EnsureLoaded();
+        _valtSettings!.McpServerEnabled = enabled;
+        Save();
+        return Task.CompletedTask;
+    }
+
     private void EnsureLoaded()
     {
         if (_valtSettings is not null) return;
@@ -154,6 +168,7 @@ public class LocalStorageService : ILocalStorageService
         public LayoutSettings LayoutSettings { get; set; } = new();
         public WindowSettings WindowSettings { get; set; } = new();
         public List<string> RecentFiles { get; set; } = new();
+        public bool McpServerEnabled { get; set; } = false;
 
         private static string GetDefaultCulture()
         {

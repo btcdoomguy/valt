@@ -30,6 +30,7 @@ using Valt.Infra.Settings;
 using Valt.UI.Base;
 using Valt.UI.Lang;
 using Valt.UI.Services;
+using Valt.UI.Services.LocalStorage;
 using Valt.UI.Services.MessageBoxes;
 using Valt.UI.State;
 using Valt.UI.State.Events;
@@ -43,6 +44,8 @@ using Valt.UI.Views.Main.Modals.StatusDisplay;
 using Valt.UI.Views.Main.Modals.ImportWizard;
 using Valt.UI.Views.Main.Modals.InputPassword;
 using Valt.UI.Views.Main.Modals.ConversionCalculator;
+using Valt.Infra.Mcp.Notifications;
+using Valt.Infra.Mcp.Server;
 
 namespace Valt.UI.Views.Main;
 
@@ -52,18 +55,23 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     private readonly IModalFactory _modalFactory;
 
     private readonly ILocalDatabase? _localDatabase;
-    private readonly IPriceDatabase _priceDatabase;
+    private readonly IPriceDatabase _priceDatabase = null!;
     private readonly CurrencySettings _currencySettings;
     private readonly BackgroundJobManager? _backgroundJobManager;
     private readonly IDatabaseInitializer? _databaseInitializer;
     private readonly IDatabaseVersionChecker? _databaseVersionChecker;
-    private readonly LiveRatesViewModel _liveRatesViewModel;
+    private readonly LiveRatesViewModel _liveRatesViewModel = null!;
     private readonly UpdateIndicatorViewModel _updateIndicatorViewModel;
-    private readonly IAllTimeHighReport _allTimeHighReport;
-    private readonly ICsvExportService _csvExportService;
-    private readonly IClock _clock;
-    private readonly ILogger<MainViewModel> _logger;
-    private readonly SecureModeState _secureModeState;
+    private readonly IAllTimeHighReport _allTimeHighReport = null!;
+    private readonly ICsvExportService _csvExportService = null!;
+    private readonly IClock _clock = null!;
+    private readonly ILogger<MainViewModel> _logger = null!;
+    private readonly SecureModeState _secureModeState = null!;
+    private readonly McpServerService _mcpServerService = null!;
+    private readonly McpServerState _mcpServerState = null!;
+    private readonly DisplaySettings _displaySettings = null!;
+    private readonly TabRefreshState _tabRefreshState = null!;
+    private readonly ILocalStorageService _localStorageService = null!;
 
     public MainView? Window { get; set; }
 
@@ -90,10 +98,10 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     public bool IsAvgPriceButtonSelected =>
         SelectedTabComponent?.TabName == MainViewTabNames.AvgPricePageContent;
 
-    [ObservableProperty] private string _statusDisplay;
+    [ObservableProperty] private string _statusDisplay = string.Empty;
 
     [ObservableProperty] private bool _isLoading;
-    [ObservableProperty] private string _loadingMessage;
+    [ObservableProperty] private string _loadingMessage = string.Empty;
 
     [ObservableProperty] private bool _showPepe;
     [ObservableProperty] private bool _crashing;
@@ -107,15 +115,43 @@ public partial class MainViewModel : ValtViewModel, IDisposable
 
     public LiveRatesViewModel LiveRatesViewModel => _liveRatesViewModel;
     public UpdateIndicatorViewModel UpdateIndicator => _updateIndicatorViewModel;
-    public AvaloniaList<JobInfo> Jobs { get; set; }
+    public AvaloniaList<JobInfo> Jobs { get; set; } = new();
 
     public string SecureModeIcon => _secureModeState?.IsEnabled == true ? "\xE897" : "\xE898";
+
+    // MCP Server status properties
+    public bool IsMcpFeatureEnabled => _localStorageService?.LoadMcpServerEnabled() == true;
+    public bool IsMcpServerRunning => _mcpServerState?.IsRunning == true;
+    public bool IsMcpServerError => _mcpServerState?.ErrorMessage != null;
+    public bool IsMcpProcessing => _mcpServerState?.IsProcessing == true;
+
+    public string McpServerTooltip
+    {
+        get
+        {
+            if (_mcpServerState?.ErrorMessage != null)
+                return string.Format(language.McpServer_ErrorTooltip, _mcpServerState.ErrorMessage);
+            if (_mcpServerState?.IsRunning == true)
+                return string.Format(language.McpServer_RunningTooltip, _mcpServerState.ServerUrl);
+            return language.McpServer_StoppedTooltip;
+        }
+    }
+
+    public TabRefreshState TabRefreshState => _tabRefreshState;
 
     #region Event subscribers
 
     private void LocalDatabaseOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         HasDatabaseOpen = _localDatabase!.HasDatabaseOpen;
+    }
+
+    private void McpServerStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(IsMcpServerRunning));
+        OnPropertyChanged(nameof(IsMcpServerError));
+        OnPropertyChanged(nameof(IsMcpProcessing));
+        OnPropertyChanged(nameof(McpServerTooltip));
     }
 
     #endregion
@@ -127,7 +163,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     {
         _pageFactory = new DesignTimePageFactory();
         _modalFactory = new DesignTimeModalFactory();
-        _currencySettings = new CurrencySettings(_localDatabase);
+        _currencySettings = new CurrencySettings(_localDatabase!, null!);
         _updateIndicatorViewModel = new UpdateIndicatorViewModel();
 
         HasDatabaseOpen = true;
@@ -151,7 +187,12 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         ICsvExportService csvExportService,
         IClock clock,
         ILogger<MainViewModel> logger,
-        SecureModeState secureModeState)
+        SecureModeState secureModeState,
+        McpServerService mcpServerService,
+        McpServerState mcpServerState,
+        DisplaySettings displaySettings,
+        TabRefreshState tabRefreshState,
+        ILocalStorageService localStorageService)
     {
         _pageFactory = pageFactory;
         _modalFactory = modalFactory;
@@ -168,8 +209,14 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         _clock = clock;
         _logger = logger;
         _secureModeState = secureModeState;
+        _mcpServerService = mcpServerService;
+        _mcpServerState = mcpServerState;
+        _displaySettings = displaySettings;
+        _tabRefreshState = tabRefreshState;
+        _localStorageService = localStorageService;
 
         _localDatabase.PropertyChanged += LocalDatabaseOnPropertyChanged;
+        _mcpServerState.PropertyChanged += McpServerStateOnPropertyChanged;
 
         Jobs = new AvaloniaList<JobInfo>(_backgroundJobManager.GetJobInfos());
         foreach (var job in Jobs)
@@ -179,34 +226,71 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         {
             var percentage = liveRateState.PreviousBitcoinPrice.HasValue
                 ? liveRateState.BitcoinPrice / liveRateState.PreviousBitcoinPrice.Value : 0m;
-            
+
             Crashing = percentage <= 0.95m;
             Down = percentage <= 0.97m && !Crashing;
             Pumping = percentage >= 1.05m;
             Up = percentage >= 1.03m && !Pumping;
-            
+
             UpdatePepeImage();
 
             IsOffline = liveRateState.IsOffline;
         });
+
+        WeakReferenceMessenger.Default.Register<McpDataChangedNotification>(this, (recipient, message) =>
+        {
+            _tabRefreshState.SetAllNeedRefresh();
+        });
+
+        WeakReferenceMessenger.Default.Register<McpFeatureEnabledChanged>(this, async (recipient, message) =>
+        {
+            OnPropertyChanged(nameof(IsMcpFeatureEnabled));
+
+            // Stop MCP server if feature is disabled and server is running
+            if (!message.Enabled && _mcpServerState.IsRunning)
+            {
+                await _mcpServerService.StopAsync();
+            }
+        });
     }
 
     [RelayCommand]
-    private void SetTransactionsTab()
+    private async Task SetTransactionsTab()
     {
+        var needsRefresh = _tabRefreshState.NeedsRefresh(MainViewTabNames.TransactionsPageContent);
         SelectedTabComponent = _pageFactory.Create(MainViewTabNames.TransactionsPageContent);
+
+        if (needsRefresh && SelectedTabComponent is not null)
+        {
+            await SelectedTabComponent.RefreshAsync();
+            _tabRefreshState.ClearRefresh(MainViewTabNames.TransactionsPageContent);
+        }
     }
 
     [RelayCommand]
-    private void SetReportsTab()
+    private async Task SetReportsTab()
     {
+        var needsRefresh = _tabRefreshState.NeedsRefresh(MainViewTabNames.ReportsPageContent);
         SelectedTabComponent = _pageFactory.Create(MainViewTabNames.ReportsPageContent);
+
+        if (needsRefresh && SelectedTabComponent is not null)
+        {
+            await SelectedTabComponent.RefreshAsync();
+            _tabRefreshState.ClearRefresh(MainViewTabNames.ReportsPageContent);
+        }
     }
-    
+
     [RelayCommand]
-    private void SetAvgPriceTab()
+    private async Task SetAvgPriceTab()
     {
+        var needsRefresh = _tabRefreshState.NeedsRefresh(MainViewTabNames.AvgPricePageContent);
         SelectedTabComponent = _pageFactory.Create(MainViewTabNames.AvgPricePageContent);
+
+        if (needsRefresh && SelectedTabComponent is not null)
+        {
+            await SelectedTabComponent.RefreshAsync();
+            _tabRefreshState.ClearRefresh(MainViewTabNames.AvgPricePageContent);
+        }
     }
 
     [RelayCommand]
@@ -237,6 +321,12 @@ public partial class MainViewModel : ValtViewModel, IDisposable
 
         _secureModeState.IsEnabled = !_secureModeState.IsEnabled;
         OnPropertyChanged(nameof(SecureModeIcon));
+    }
+
+    [RelayCommand]
+    private async Task ToggleMcpServer()
+    {
+        await _mcpServerService.ToggleAsync(_displaySettings.McpServerPort);
     }
 
     [RelayCommand]
@@ -493,16 +583,13 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         await MessageBoxHelper.ShowAlertAsync(language.InstallPriceDatabase_Title,
             language.InstallPriceDatabase_Info,
             Window!);
-
+        
         _priceDatabase!.OpenDatabase();
 
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
             IsLoading = true;
         });
-
-        // Start jobs first so the channel consumer is running (required for TriggerJobAndWaitAsync)
-        await _backgroundJobManager!.StartAllJobsAsync(jobType: BackgroundJobTypes.PriceDatabase, triggerInitialRun: false);
 
         //execute the main jobs manually
         try
@@ -511,7 +598,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             {
                 LoadingMessage = language.InstallingBitcoinPriceMessage;
             });
-            await _backgroundJobManager.TriggerJobAndWaitAsync(BackgroundJobSystemNames
+            await _backgroundJobManager!.TriggerJobAndWaitAsync(BackgroundJobSystemNames
                 .BitcoinHistoryUpdater);
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
@@ -573,6 +660,12 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         if (_backgroundJobManager is null)
             return;
 
+        // Stop MCP server first
+        if (_mcpServerService is not null)
+        {
+            await _mcpServerService.StopAsync();
+        }
+
         await _backgroundJobManager.StopAll();
 
         // Close databases to trigger checkpoint (merges -log.db into main .db file)
@@ -611,6 +704,10 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         // Unsubscribe from local database PropertyChanged
         if (_localDatabase is not null)
             _localDatabase.PropertyChanged -= LocalDatabaseOnPropertyChanged;
+
+        // Unsubscribe from MCP server state PropertyChanged
+        if (_mcpServerState is not null)
+            _mcpServerState.PropertyChanged -= McpServerStateOnPropertyChanged;
 
         // Unsubscribe from job PropertyChanged events
         foreach (var job in Jobs)

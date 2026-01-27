@@ -85,12 +85,18 @@ internal sealed class ValidPeriodStartForExistingExpenseAttribute : ValidationAt
                 FixedExpenseRange newRange;
                 
                 if (vm.IsFixedSelectorVisible)
-                    newRange = FixedExpenseRange.CreateFixedAmount(vm.FixedAmount, 
+                {
+                    if (vm.FixedAmount is null) return ValidationResult.Success;
+                    newRange = FixedExpenseRange.CreateFixedAmount(vm.FixedAmount,
                         Enum.Parse<FixedExpensePeriods>(vm.Period), date, vm.Day);
+                }
                 else
+                {
+                    if (vm.RangedAmountMin is null || vm.RangedAmountMax is null) return ValidationResult.Success;
                     newRange = FixedExpenseRange.CreateRangedAmount(
                         new RangedFiatValue(vm.RangedAmountMin, vm.RangedAmountMax),
                         Enum.Parse<FixedExpensePeriods>(vm.Period), date, vm.Day);
+                }
 
                 if (vm.CurrentFixedExpenseRange != newRange && 
                     vm.LastFixedExpenseRecordReferenceDate >= newRange.PeriodStart)

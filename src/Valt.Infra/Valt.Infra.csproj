@@ -10,13 +10,14 @@
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
         <ProjectReference Include="..\Valt.Core\Valt.Core.csproj" />
+        <ProjectReference Include="..\Valt.App\Valt.App.csproj" />
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="CommunityToolkit.Mvvm" />
         <PackageReference Include="CsvHelper" />
         <PackageReference Include="LiteDB" />
-        <PackageReference Include="Microsoft.Extensions.Logging" />
+        <PackageReference Include="ModelContextProtocol.AspNetCore" />
         <PackageReference Include="Scrutor" />
         <PackageReference Include="StringMath" />
     </ItemGroup>

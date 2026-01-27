@@ -1,11 +1,13 @@
 using System.Linq;
 using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Budget.Categories.DTOs;
+using Valt.App.Modules.Budget.Categories.Queries.GetCategories;
+using Valt.App.Modules.Goals.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.GoalTypes;
-using Valt.Infra.Modules.Budget.Categories.Queries;
-using Valt.Infra.Modules.Budget.Categories.Queries.DTOs;
 using Valt.Infra.Settings;
 using Valt.UI.Lang;
 
@@ -14,7 +16,7 @@ namespace Valt.UI.Views.Main.Modals.ManageGoal.GoalTypeEditors;
 public partial class ReduceExpenseCategoryGoalTypeEditorViewModel : ObservableObject, IGoalTypeEditorViewModel
 {
     private readonly CurrencySettings? _currencySettings;
-    private readonly ICategoryQueries? _categoryQueries;
+    private readonly IQueryDispatcher? _queryDispatcher;
     private string? _pendingCategoryId;
 
     [ObservableProperty]
@@ -34,17 +36,18 @@ public partial class ReduceExpenseCategoryGoalTypeEditorViewModel : ObservableOb
     {
     }
 
-    public ReduceExpenseCategoryGoalTypeEditorViewModel(CurrencySettings currencySettings, ICategoryQueries categoryQueries)
+    public ReduceExpenseCategoryGoalTypeEditorViewModel(CurrencySettings currencySettings, IQueryDispatcher queryDispatcher)
     {
         _currencySettings = currencySettings;
-        _categoryQueries = categoryQueries;
+        _queryDispatcher = queryDispatcher;
         LoadCategoriesAsync();
     }
 
     private async void LoadCategoriesAsync()
     {
-        if (_categoryQueries is null) return;
-        var categories = (await _categoryQueries.GetCategoriesAsync()).Items.OrderBy(x => x.Name);
+        if (_queryDispatcher is null) return;
+        var result = await _queryDispatcher.DispatchAsync(new GetCategoriesQuery());
+        var categories = result.Items.OrderBy(x => x.Name);
 
         AvailableCategories.Clear();
         foreach (var category in categories)
@@ -115,6 +118,33 @@ public partial class ReduceExpenseCategoryGoalTypeEditorViewModel : ObservableOb
         if (category is not null)
         {
             SelectedCategory = category;
+        }
+    }
+
+    public GoalTypeInputDTO CreateGoalTypeDTO()
+    {
+        return new ReduceExpenseCategoryGoalTypeDTO
+        {
+            TargetAmount = TargetFiatAmount.Value,
+            CategoryId = SelectedCategory?.Id ?? string.Empty
+        };
+    }
+
+    public void LoadFromDTO(GoalTypeOutputDTO goalType)
+    {
+        if (goalType is ReduceExpenseCategoryGoalTypeOutputDTO reduceExpense)
+        {
+            TargetFiatAmount = FiatValue.New(reduceExpense.TargetAmount);
+
+            // If categories are already loaded, select immediately; otherwise store for later
+            if (AvailableCategories.Count > 0)
+            {
+                SelectCategoryById(reduceExpense.CategoryId);
+            }
+            else
+            {
+                _pendingCategoryId = reduceExpense.CategoryId;
+            }
         }
     }
 }

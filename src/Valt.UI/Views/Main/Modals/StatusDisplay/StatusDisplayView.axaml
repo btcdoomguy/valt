@@ -11,6 +11,8 @@
         Title="{x:Static local:language.StatusDisplay_Title}"
         d:DesignWidth="450"
         d:DesignHeight="255"
+        MinWidth="450"
+        MinHeight="255"
         MaxWidth="450"
         MaxHeight="255"
         x:DataType="statusDisplay:StatusDisplayViewModel"
@@ -26,12 +28,12 @@
             <userControls:CustomTitleBar Title="{x:Static local:language.StatusDisplay_Title}" TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
             <Border Classes="form-fields-area" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="214">
-                <ListBox ItemsSource="{Binding Jobs}" SelectedItem="{Binding SelectedJob}" DoubleTapped="ListBox_DoubleTapped">
+                <ListBox ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}" DoubleTapped="ListBox_DoubleTapped">
                     <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="backgroundJobs1:JobInfo">
+                        <DataTemplate x:DataType="backgroundJobs1:IStatusItem">
                             <Grid ColumnDefinitions="5*, 3*" ToolTip.Tip="Double-click to view logs">
-                                <TextBlock Grid.Column="0" Text="{Binding Job.Name}" HorizontalAlignment="Right" Margin="0, 0, 10, 0" />
-                                <TextBlock Grid.Column="1" Text="{Binding State}" Margin="10, 0, 0, 0" />
+                                <TextBlock Grid.Column="0" Text="{Binding Name}" HorizontalAlignment="Right" Margin="0, 0, 10, 0" />
+                                <TextBlock Grid.Column="1" Text="{Binding StateDisplay}" Margin="10, 0, 0, 0" />
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>

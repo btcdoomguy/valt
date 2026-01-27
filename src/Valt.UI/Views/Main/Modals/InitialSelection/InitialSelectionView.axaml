@@ -7,6 +7,8 @@
         xmlns:initialSelection1="clr-namespace:Valt.UI.Views.Main.Modals.InitialSelection"
         mc:Ignorable="d"
         d:DesignWidth="500" d:DesignHeight="465"
+        MinWidth="500"
+        MinHeight="465"
         MaxWidth="500"
         MaxHeight="465"
         x:Class="Valt.UI.Views.Main.Modals.InitialSelection.InitialSelectionView"
