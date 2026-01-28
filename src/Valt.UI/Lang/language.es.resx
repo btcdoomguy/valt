@@ -1077,6 +1077,9 @@
     <data name="InitialSelection.FirstMessage" xml:space="preserve">
         <value>Necesitas crear o seleccionar tu archivo de base de datos personal para almacenar tus datos financieros de forma segura.</value>
     </data>
+    <data name="InitialSelection.Remove" xml:space="preserve">
+        <value>Eliminar</value>
+    </data>
     <data name="JobLogViewer.Title" xml:space="preserve">
         <value>Registro de trabajo: {0}</value>
     </data>

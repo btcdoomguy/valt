@@ -2162,7 +2162,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("InitialSelection.FirstMessage", resourceCulture);
             }
         }
-        
+
+        public static string InitialSelection_Remove {
+            get {
+                return ResourceManager.GetString("InitialSelection.Remove", resourceCulture);
+            }
+        }
+
         public static string JobLogViewer_Title {
             get {
                 return ResourceManager.GetString("JobLogViewer.Title", resourceCulture);

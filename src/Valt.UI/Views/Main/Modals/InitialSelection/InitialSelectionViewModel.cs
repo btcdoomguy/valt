@@ -145,6 +145,19 @@ public partial class InitialSelectionViewModel : ValtModalViewModel
         return Task.CompletedTask;
     }
 
+    [RelayCommand]
+    private async Task RemoveSelectedFile()
+    {
+        if (string.IsNullOrEmpty(SelectedFile))
+            return;
+
+        RecentFiles.Remove(SelectedFile);
+        await _localStorageService!.ChangeRecentFilesAsync(RecentFiles);
+
+        if (RecentFiles.Count > 0)
+            SelectedFile = RecentFiles[0];
+    }
+
     private async Task UpdateRecentFilesAsync(string lastPath)
     {
         RecentFiles.Remove(lastPath);
