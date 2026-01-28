@@ -513,6 +513,12 @@
     <data name="ManageFixedExpenses.YearlyExpenses" xml:space="preserve">
         <value>Gastos fijos anuales:</value>
     </data>
+    <data name="ManageFixedExpenses.Footer.Fiat" xml:space="preserve">
+        <value>Fiat</value>
+    </data>
+    <data name="ManageFixedExpenses.Footer.Sats" xml:space="preserve">
+        <value>Sats</value>
+    </data>
     <data name="Transactions.Columns.Amount" xml:space="preserve">
         <value>Monto</value>
     </data>

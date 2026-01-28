@@ -118,13 +118,50 @@
             <Border Grid.Row="2"
                     Classes="form-fields-area"
                     VerticalAlignment="Stretch"
-                    Margin="10" 
-                    Padding="0">
-                <Grid ColumnDefinitions="*, *" RowDefinitions="30, 30">
-                    <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" Foreground="{DynamicResource Accent200Color}" Content="{x:Static lang:language.ManageFixedExpenses_MonthlyExpenses}" />
-                    <Label Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Content="{Binding MonthlyExpenses}" />
-                    <Label Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" Foreground="{DynamicResource Accent200Color}" Content="{x:Static lang:language.ManageFixedExpenses_YearlyExpenses}" />
-                    <Label Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Content="{Binding YearlyExpenses}" />
+                    Margin="10"
+                    Padding="8">
+                <Grid ColumnDefinitions="Auto, *, *" RowDefinitions="Auto, Auto, Auto">
+                    <!-- Header Row -->
+                    <Label Grid.Row="0" Grid.Column="1"
+                           Content="{x:Static lang:language.ManageFixedExpenses_Footer_Fiat}"
+                           HorizontalAlignment="Center"
+                           Foreground="{DynamicResource Accent200Color}"
+                           FontWeight="SemiBold"
+                           Margin="0,0,0,8" />
+                    <Label Grid.Row="0" Grid.Column="2"
+                           Content="{x:Static lang:language.ManageFixedExpenses_Footer_Sats}"
+                           HorizontalAlignment="Center"
+                           Foreground="{DynamicResource Accent200Color}"
+                           FontWeight="SemiBold"
+                           Margin="0,0,0,8" />
+
+                    <!-- Monthly Row -->
+                    <Label Grid.Row="1" Grid.Column="0"
+                           Content="{x:Static lang:language.ManageFixedExpenses_MonthlyExpenses}"
+                           Foreground="{DynamicResource Accent200Color}"
+                           HorizontalAlignment="Right"
+                           Margin="0,0,15,4" />
+                    <Label Grid.Row="1" Grid.Column="1"
+                           Content="{Binding MonthlyExpenses}"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,4" />
+                    <Label Grid.Row="1" Grid.Column="2"
+                           Content="{Binding MonthlyExpensesSats}"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,4" />
+
+                    <!-- Yearly Row -->
+                    <Label Grid.Row="2" Grid.Column="0"
+                           Content="{x:Static lang:language.ManageFixedExpenses_YearlyExpenses}"
+                           Foreground="{DynamicResource Accent200Color}"
+                           HorizontalAlignment="Right"
+                           Margin="0,0,15,0" />
+                    <Label Grid.Row="2" Grid.Column="1"
+                           Content="{Binding YearlyExpenses}"
+                           HorizontalAlignment="Center" />
+                    <Label Grid.Row="2" Grid.Column="2"
+                           Content="{Binding YearlyExpensesSats}"
+                           HorizontalAlignment="Center" />
                 </Grid>
             </Border>
         </Grid>

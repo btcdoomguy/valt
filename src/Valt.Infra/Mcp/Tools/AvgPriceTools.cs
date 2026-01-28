@@ -203,7 +203,7 @@ public class AvgPriceTools
         INotificationPublisher publisher,
         [Description("The profile ID")] string profileId,
         [Description("Date of acquisition (format: yyyy-MM-dd)")] string date,
-        [Description("Quantity acquired")] decimal quantity,
+        [Description("Quantity acquired (for BTC profiles use BTC not sats, e.g., 0.00213452 for 213452 sats)")] decimal quantity,
         [Description("Total amount paid")] decimal amount,
         [Description("Optional comment")] string? comment = null)
     {
@@ -235,7 +235,7 @@ public class AvgPriceTools
         INotificationPublisher publisher,
         [Description("The profile ID")] string profileId,
         [Description("Date of sale (format: yyyy-MM-dd)")] string date,
-        [Description("Quantity sold")] decimal quantity,
+        [Description("Quantity sold (for BTC profiles use BTC not sats, e.g., 0.00213452 for 213452 sats)")] decimal quantity,
         [Description("Total amount received")] decimal amount,
         [Description("Optional comment")] string? comment = null)
     {
@@ -267,7 +267,7 @@ public class AvgPriceTools
         INotificationPublisher publisher,
         [Description("The profile ID")] string profileId,
         [Description("Date of setup (format: yyyy-MM-dd)")] string date,
-        [Description("Initial quantity")] decimal quantity,
+        [Description("Initial quantity (for BTC profiles use BTC not sats, e.g., 0.00213452 for 213452 sats)")] decimal quantity,
         [Description("Initial cost basis")] decimal amount,
         [Description("Optional comment")] string? comment = null)
     {
@@ -301,7 +301,7 @@ public class AvgPriceTools
         [Description("The line ID to edit")] string lineId,
         [Description("Date (format: yyyy-MM-dd)")] string date,
         [Description("Line type: 0=Buy, 1=Sell, 2=Setup")] int lineTypeId,
-        [Description("Quantity")] decimal quantity,
+        [Description("Quantity (for BTC profiles use BTC not sats, e.g., 0.00213452 for 213452 sats)")] decimal quantity,
         [Description("Amount")] decimal amount,
         [Description("Optional comment")] string? comment = null)
     {
