@@ -40,6 +40,8 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
 
     [ObservableProperty] private string _monthlyExpenses = string.Empty;
     [ObservableProperty] private string _yearlyExpenses = string.Empty;
+    [ObservableProperty] private string _monthlyExpensesSats = string.Empty;
+    [ObservableProperty] private string _yearlyExpensesSats = string.Empty;
 
     /// <summary>
     /// Design-time constructor
@@ -135,7 +137,7 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
 
     private async Task RefreshTotalsAsync(IReadOnlyList<FixedExpenseDTO> fixedExpensesQueryResult)
     {
-        if (_ratesState.FiatRates is null)
+        if (_ratesState.FiatRates is null || _ratesState.BitcoinPrice is null)
             return;
 
         var minTotal = 0m;
@@ -161,6 +163,23 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
             $"{CurrencyDisplay.FormatFiat(minTotal / 12, _currencySettings.MainFiatCurrency)} - {CurrencyDisplay.FormatFiat(maxTotal / 12, _currencySettings.MainFiatCurrency)}";
         YearlyExpenses =
             $"{CurrencyDisplay.FormatFiat(minTotal, _currencySettings.MainFiatCurrency)} - {CurrencyDisplay.FormatFiat(maxTotal, _currencySettings.MainFiatCurrency)}";
+
+        // Calculate sats equivalent
+        var mainCurrency = _currencySettings.MainFiatCurrency;
+        var fiatRateInUsd = mainCurrency == FiatCurrency.Usd.Code
+            ? 1m
+            : _ratesState.FiatRates.GetValueOrDefault(mainCurrency, 1m);
+
+        var yearlyMinSats = BtcPriceCalculator.CalculateBtcAmountOfFiat(
+            minTotal, fiatRateInUsd, _ratesState.BitcoinPrice.Value);
+        var yearlyMaxSats = BtcPriceCalculator.CalculateBtcAmountOfFiat(
+            maxTotal, fiatRateInUsd, _ratesState.BitcoinPrice.Value);
+
+        var monthlyMinSats = yearlyMinSats / 12;
+        var monthlyMaxSats = yearlyMaxSats / 12;
+
+        MonthlyExpensesSats = $"{CurrencyDisplay.FormatSatsAsNumber(monthlyMinSats)} - {CurrencyDisplay.FormatSatsAsNumber(monthlyMaxSats)} sats";
+        YearlyExpensesSats = $"{CurrencyDisplay.FormatSatsAsNumber(yearlyMinSats)} - {CurrencyDisplay.FormatSatsAsNumber(yearlyMaxSats)} sats";
     }
 
     [RelayCommand]

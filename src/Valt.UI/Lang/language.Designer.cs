@@ -7,8 +7,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-#pragma warning disable CS8981 // The type name only contains lower-cased ascii characters
-
 namespace Valt.UI.Lang {
     using System;
     
@@ -1037,6 +1035,18 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string ManageFixedExpenses_Footer_Fiat {
+            get {
+                return ResourceManager.GetString("ManageFixedExpenses.Footer.Fiat", resourceCulture);
+            }
+        }
+        
+        public static string ManageFixedExpenses_Footer_Sats {
+            get {
+                return ResourceManager.GetString("ManageFixedExpenses.Footer.Sats", resourceCulture);
+            }
+        }
+        
         public static string Transactions_Columns_Amount {
             get {
                 return ResourceManager.GetString("Transactions.Columns.Amount", resourceCulture);
@@ -1216,31 +1226,31 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("ManageTransactions.Properties.PriceInSats", resourceCulture);
             }
         }
-
+        
         public static string SatAmountState_Manual {
             get {
                 return ResourceManager.GetString("SatAmountState.Manual", resourceCulture);
             }
         }
-
+        
         public static string SatAmountState_Pending {
             get {
                 return ResourceManager.GetString("SatAmountState.Pending", resourceCulture);
             }
         }
-
+        
         public static string SatAmountState_Missing {
             get {
                 return ResourceManager.GetString("SatAmountState.Missing", resourceCulture);
             }
         }
-
+        
         public static string ManageTransactions_Properties_None {
             get {
                 return ResourceManager.GetString("ManageTransactions.Properties.None", resourceCulture);
             }
         }
-
+        
         public static string ChangePasswordTitle {
             get {
                 return ResourceManager.GetString("ChangePasswordTitle", resourceCulture);
@@ -3190,96 +3200,95 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Menu_Tools", resourceCulture);
             }
         }
-
+        
         public static string Menu_ConversionCalculator {
             get {
                 return ResourceManager.GetString("Menu_ConversionCalculator", resourceCulture);
             }
         }
-
+        
         public static string ConversionCalculator_Title {
             get {
                 return ResourceManager.GetString("ConversionCalculator_Title", resourceCulture);
             }
         }
-
+        
         public static string ManageTransactions_UseInstallments {
             get {
                 return ResourceManager.GetString("ManageTransactions_UseInstallments", resourceCulture);
             }
         }
-
+        
         public static string DeleteInstallment_Title {
             get {
                 return ResourceManager.GetString("DeleteInstallment_Title", resourceCulture);
             }
         }
-
+        
         public static string DeleteInstallment_Message {
             get {
                 return ResourceManager.GetString("DeleteInstallment_Message", resourceCulture);
             }
         }
-
+        
         public static string DeleteInstallment_OnlyThis {
             get {
                 return ResourceManager.GetString("DeleteInstallment_OnlyThis", resourceCulture);
             }
         }
-
+        
         public static string DeleteInstallment_All {
             get {
                 return ResourceManager.GetString("DeleteInstallment_All", resourceCulture);
             }
         }
-
+        
         public static string McpServer_Name {
             get {
                 return ResourceManager.GetString("McpServer_Name", resourceCulture);
             }
         }
-
+        
         public static string McpServer_RunningTooltip {
             get {
                 return ResourceManager.GetString("McpServer_RunningTooltip", resourceCulture);
             }
         }
-
+        
         public static string McpServer_StoppedTooltip {
             get {
                 return ResourceManager.GetString("McpServer_StoppedTooltip", resourceCulture);
             }
         }
-
+        
         public static string McpServer_ErrorTooltip {
             get {
                 return ResourceManager.GetString("McpServer_ErrorTooltip", resourceCulture);
             }
         }
-
+        
         public static string Settings_McpServerEnabled {
             get {
                 return ResourceManager.GetString("Settings_McpServerEnabled", resourceCulture);
             }
         }
-
+        
         public static string Settings_McpServerPort {
             get {
                 return ResourceManager.GetString("Settings_McpServerPort", resourceCulture);
             }
         }
-
+        
         public static string Settings_McpServerPort_Hint {
             get {
                 return ResourceManager.GetString("Settings_McpServerPort_Hint", resourceCulture);
             }
         }
-
+        
         public static string McpNotification_Title {
             get {
                 return ResourceManager.GetString("McpNotification_Title", resourceCulture);
             }
         }
-
     }
 }
