@@ -24,16 +24,16 @@ public static class RoseQuartzTheme
         resources["Accent800Color"] = Color.Parse("#831843");
         resources["Accent900Color"] = Color.Parse("#500724");
 
-        // Secondary (Fuchsia/Magenta)
-        resources["Secondary100Color"] = Color.Parse("#FAE8FF");
-        resources["Secondary200Color"] = Color.Parse("#F5D0FE");
-        resources["Secondary300Color"] = Color.Parse("#E879F9");
-        resources["Secondary400Color"] = Color.Parse("#D946EF");
-        resources["Secondary500Color"] = Color.Parse("#C026D3");
-        resources["Secondary600Color"] = Color.Parse("#A21CAF");
-        resources["Secondary700Color"] = Color.Parse("#86198F");
-        resources["Secondary800Color"] = Color.Parse("#701A75");
-        resources["Secondary900Color"] = Color.Parse("#4A044E");
+        // Secondary (Teal/Seafoam - complementary to rose)
+        resources["Secondary100Color"] = Color.Parse("#CCFBF1");
+        resources["Secondary200Color"] = Color.Parse("#99F6E4");
+        resources["Secondary300Color"] = Color.Parse("#5EEAD4");
+        resources["Secondary400Color"] = Color.Parse("#2DD4BF");
+        resources["Secondary500Color"] = Color.Parse("#14B8A6");
+        resources["Secondary600Color"] = Color.Parse("#0D9488");
+        resources["Secondary700Color"] = Color.Parse("#0F766E");
+        resources["Secondary800Color"] = Color.Parse("#115E59");
+        resources["Secondary900Color"] = Color.Parse("#134E4A");
 
         // Text (Warm rose-tinted white)
         resources["Text100Color"] = Color.Parse("#FFF1F2");
@@ -79,16 +79,16 @@ public static class RoseQuartzTheme
         resources["Divider800Color"] = Color.Parse("#281A1E");
         resources["Divider900Color"] = Color.Parse("#180E12");
 
-        // Icon (Rose tinted)
-        resources["Icon100Color"] = Color.Parse("#FECDD3");
-        resources["Icon200Color"] = Color.Parse("#FBB6C4");
-        resources["Icon300Color"] = Color.Parse("#F687A5");
-        resources["Icon400Color"] = Color.Parse("#EC4889");
-        resources["Icon500Color"] = Color.Parse("#DB2777");
-        resources["Icon600Color"] = Color.Parse("#BE185D");
-        resources["Icon700Color"] = Color.Parse("#9D174D");
-        resources["Icon800Color"] = Color.Parse("#831843");
-        resources["Icon900Color"] = Color.Parse("#500724");
+        // Icon (Teal/Seafoam - complementary to rose)
+        resources["Icon100Color"] = Color.Parse("#CCFBF1");
+        resources["Icon200Color"] = Color.Parse("#99F6E4");
+        resources["Icon300Color"] = Color.Parse("#5EEAD4");
+        resources["Icon400Color"] = Color.Parse("#2DD4BF");
+        resources["Icon500Color"] = Color.Parse("#14B8A6");
+        resources["Icon600Color"] = Color.Parse("#0D9488");
+        resources["Icon700Color"] = Color.Parse("#0F766E");
+        resources["Icon800Color"] = Color.Parse("#115E59");
+        resources["Icon900Color"] = Color.Parse("#134E4A");
 
         // Semantic Info (Blue)
         resources["SemanticInfo100Color"] = Color.Parse("#BAE6FD");

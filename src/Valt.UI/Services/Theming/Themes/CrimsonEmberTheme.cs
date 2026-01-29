@@ -23,16 +23,16 @@ public static class CrimsonEmberTheme
         resources["Accent800Color"] = Color.Parse("#881337");
         resources["Accent900Color"] = Color.Parse("#4C0519");
 
-        // Secondary (Amber/Gold)
-        resources["Secondary100Color"] = Color.Parse("#FEF3C7");
-        resources["Secondary200Color"] = Color.Parse("#FDE68A");
-        resources["Secondary300Color"] = Color.Parse("#FCD34D");
-        resources["Secondary400Color"] = Color.Parse("#FBBF24");
-        resources["Secondary500Color"] = Color.Parse("#F59E0B");
-        resources["Secondary600Color"] = Color.Parse("#D97706");
-        resources["Secondary700Color"] = Color.Parse("#B45309");
-        resources["Secondary800Color"] = Color.Parse("#92400E");
-        resources["Secondary900Color"] = Color.Parse("#451A03");
+        // Secondary (Cyan/Teal - complementary to crimson)
+        resources["Secondary100Color"] = Color.Parse("#CFFAFE");
+        resources["Secondary200Color"] = Color.Parse("#A5F3FC");
+        resources["Secondary300Color"] = Color.Parse("#67E8F9");
+        resources["Secondary400Color"] = Color.Parse("#22D3EE");
+        resources["Secondary500Color"] = Color.Parse("#06B6D4");
+        resources["Secondary600Color"] = Color.Parse("#0891B2");
+        resources["Secondary700Color"] = Color.Parse("#0E7490");
+        resources["Secondary800Color"] = Color.Parse("#155E75");
+        resources["Secondary900Color"] = Color.Parse("#164E63");
 
         // Text (Warm rose-gray)
         resources["Text100Color"] = Color.Parse("#FFF1F2");
@@ -78,16 +78,16 @@ public static class CrimsonEmberTheme
         resources["Divider800Color"] = Color.Parse("#3A2428");
         resources["Divider900Color"] = Color.Parse("#201416");
 
-        // Icon (Crimson tinted)
-        resources["Icon100Color"] = Color.Parse("#FECDD3");
-        resources["Icon200Color"] = Color.Parse("#FDA4AF");
-        resources["Icon300Color"] = Color.Parse("#FB7185");
-        resources["Icon400Color"] = Color.Parse("#F43F5E");
-        resources["Icon500Color"] = Color.Parse("#E11D48");
-        resources["Icon600Color"] = Color.Parse("#BE123C");
-        resources["Icon700Color"] = Color.Parse("#9F1239");
-        resources["Icon800Color"] = Color.Parse("#881337");
-        resources["Icon900Color"] = Color.Parse("#4C0519");
+        // Icon (Cyan/Teal - complementary to crimson)
+        resources["Icon100Color"] = Color.Parse("#CFFAFE");
+        resources["Icon200Color"] = Color.Parse("#A5F3FC");
+        resources["Icon300Color"] = Color.Parse("#67E8F9");
+        resources["Icon400Color"] = Color.Parse("#22D3EE");
+        resources["Icon500Color"] = Color.Parse("#06B6D4");
+        resources["Icon600Color"] = Color.Parse("#0891B2");
+        resources["Icon700Color"] = Color.Parse("#0E7490");
+        resources["Icon800Color"] = Color.Parse("#155E75");
+        resources["Icon900Color"] = Color.Parse("#164E63");
 
         // Semantic Info (Sky Blue)
         resources["SemanticInfo100Color"] = Color.Parse("#BAE6FD");

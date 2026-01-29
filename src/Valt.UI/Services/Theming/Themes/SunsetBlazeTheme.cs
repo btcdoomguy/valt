@@ -24,16 +24,16 @@ public static class SunsetBlazeTheme
         resources["Accent800Color"] = Color.Parse("#9A3412");
         resources["Accent900Color"] = Color.Parse("#7C2D12");
 
-        // Secondary (Red-Orange/Vermillion)
-        resources["Secondary100Color"] = Color.Parse("#FEE2E2");
-        resources["Secondary200Color"] = Color.Parse("#FECACA");
-        resources["Secondary300Color"] = Color.Parse("#FCA5A5");
-        resources["Secondary400Color"] = Color.Parse("#F87171");
-        resources["Secondary500Color"] = Color.Parse("#EF4444");
-        resources["Secondary600Color"] = Color.Parse("#DC2626");
-        resources["Secondary700Color"] = Color.Parse("#B91C1C");
-        resources["Secondary800Color"] = Color.Parse("#991B1B");
-        resources["Secondary900Color"] = Color.Parse("#7F1D1D");
+        // Secondary (Blue/Cyan - complementary to orange)
+        resources["Secondary100Color"] = Color.Parse("#CFFAFE");
+        resources["Secondary200Color"] = Color.Parse("#A5F3FC");
+        resources["Secondary300Color"] = Color.Parse("#67E8F9");
+        resources["Secondary400Color"] = Color.Parse("#22D3EE");
+        resources["Secondary500Color"] = Color.Parse("#06B6D4");
+        resources["Secondary600Color"] = Color.Parse("#0891B2");
+        resources["Secondary700Color"] = Color.Parse("#0E7490");
+        resources["Secondary800Color"] = Color.Parse("#155E75");
+        resources["Secondary900Color"] = Color.Parse("#164E63");
 
         // Text (Warm cream-tinted)
         resources["Text100Color"] = Color.Parse("#FFFBEB");
@@ -79,16 +79,16 @@ public static class SunsetBlazeTheme
         resources["Divider800Color"] = Color.Parse("#281C16");
         resources["Divider900Color"] = Color.Parse("#180E0C");
 
-        // Icon (Orange tinted)
-        resources["Icon100Color"] = Color.Parse("#FFEDD5");
-        resources["Icon200Color"] = Color.Parse("#FED7AA");
-        resources["Icon300Color"] = Color.Parse("#FDBA74");
-        resources["Icon400Color"] = Color.Parse("#FB923C");
-        resources["Icon500Color"] = Color.Parse("#F97316");
-        resources["Icon600Color"] = Color.Parse("#EA580C");
-        resources["Icon700Color"] = Color.Parse("#C2410C");
-        resources["Icon800Color"] = Color.Parse("#9A3412");
-        resources["Icon900Color"] = Color.Parse("#7C2D12");
+        // Icon (Blue/Cyan - complementary to orange)
+        resources["Icon100Color"] = Color.Parse("#CFFAFE");
+        resources["Icon200Color"] = Color.Parse("#A5F3FC");
+        resources["Icon300Color"] = Color.Parse("#67E8F9");
+        resources["Icon400Color"] = Color.Parse("#22D3EE");
+        resources["Icon500Color"] = Color.Parse("#06B6D4");
+        resources["Icon600Color"] = Color.Parse("#0891B2");
+        resources["Icon700Color"] = Color.Parse("#0E7490");
+        resources["Icon800Color"] = Color.Parse("#155E75");
+        resources["Icon900Color"] = Color.Parse("#164E63");
 
         // Semantic Info (Blue)
         resources["SemanticInfo100Color"] = Color.Parse("#BAE6FD");
