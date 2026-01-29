@@ -19,7 +19,7 @@ internal class GoalProgressUpdaterJob : IBackgroundJob
     private readonly IGoalQueries _goalQueries;
     private readonly IGoalRepository _goalRepository;
     private readonly IGoalProgressCalculatorFactory _calculatorFactory;
-    private readonly GoalProgressState _progressState;
+    private readonly IGoalProgressState _progressState;
     private readonly INotificationPublisher _notificationPublisher;
     private readonly IClock _clock;
     private readonly ILogger<GoalProgressUpdaterJob> _logger;
@@ -34,7 +34,7 @@ internal class GoalProgressUpdaterJob : IBackgroundJob
         IGoalQueries goalQueries,
         IGoalRepository goalRepository,
         IGoalProgressCalculatorFactory calculatorFactory,
-        GoalProgressState progressState,
+        IGoalProgressState progressState,
         INotificationPublisher notificationPublisher,
         IClock clock,
         ILogger<GoalProgressUpdaterJob> logger)

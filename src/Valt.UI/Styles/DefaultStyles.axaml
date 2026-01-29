@@ -644,7 +644,7 @@
 
     <!-- DataGrid column header styling - override template to remove sort icon reserved space -->
     <Style Selector="DataGridColumnHeader">
-        <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+        <Setter Property="Background" Value="{DynamicResource Background600Brush}" />
         <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -679,6 +679,11 @@
                 </Grid>
             </ControlTemplate>
         </Setter>
+    </Style>
+
+    <!-- Disable hover effect on column headers -->
+    <Style Selector="DataGridColumnHeader:pointerover /template/ Grid#PART_ColumnHeaderRoot">
+        <Setter Property="Background" Value="{DynamicResource Background600Brush}" />
     </Style>
 
     <Style Selector="DataGridCell TextBlock">

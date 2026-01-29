@@ -1,7 +1,7 @@
+using Valt.App.Modules.Goals.Contracts;
 using Valt.Core.Kernel.Abstractions.EventSystem;
 using Valt.Core.Modules.Budget.Transactions.Events;
 using Valt.Core.Modules.Goals.Contracts;
-using Valt.Infra.Modules.Goals.Services;
 
 namespace Valt.Infra.Modules.Goals.Handlers;
 
@@ -11,11 +11,11 @@ internal class MarkGoalsStaleEventHandler :
     IDomainEventHandler<TransactionDeletedEvent>
 {
     private readonly IGoalRepository _goalRepository;
-    private readonly GoalProgressState _progressState;
+    private readonly IGoalProgressState _progressState;
 
     public MarkGoalsStaleEventHandler(
         IGoalRepository goalRepository,
-        GoalProgressState progressState)
+        IGoalProgressState progressState)
     {
         _goalRepository = goalRepository;
         _progressState = progressState;
