@@ -25,15 +25,15 @@ public static class SunsetBlazeTheme
         resources["Accent900Color"] = Color.Parse("#7C2D12");
 
         // Secondary (Blue/Cyan - complementary to orange)
-        resources["Secondary100Color"] = Color.Parse("#CFFAFE");
-        resources["Secondary200Color"] = Color.Parse("#A5F3FC");
-        resources["Secondary300Color"] = Color.Parse("#67E8F9");
-        resources["Secondary400Color"] = Color.Parse("#22D3EE");
-        resources["Secondary500Color"] = Color.Parse("#06B6D4");
-        resources["Secondary600Color"] = Color.Parse("#0891B2");
-        resources["Secondary700Color"] = Color.Parse("#0E7490");
-        resources["Secondary800Color"] = Color.Parse("#155E75");
-        resources["Secondary900Color"] = Color.Parse("#164E63");
+        resources["Secondary100Color"] = Color.Parse("#C4EDF1");
+        resources["Secondary200Color"] = Color.Parse("#9CE7EF");
+        resources["Secondary300Color"] = Color.Parse("#62DCEC");
+        resources["Secondary400Color"] = Color.Parse("#20C8E2");
+        resources["Secondary500Color"] = Color.Parse("#05ADC9");
+        resources["Secondary600Color"] = Color.Parse("#088AA9");
+        resources["Secondary700Color"] = Color.Parse("#0D6E89");
+        resources["Secondary800Color"] = Color.Parse("#14596F");
+        resources["Secondary900Color"] = Color.Parse("#154A5E");
 
         // Text (Warm cream-tinted)
         resources["Text100Color"] = Color.Parse("#FFFBEB");

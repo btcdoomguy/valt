@@ -25,15 +25,15 @@ public static class ArcticFrostTheme
         resources["Accent900Color"] = Color.Parse("#0C4A6E");
 
         // Secondary (Coral/Peach - complementary to ice blue)
-        resources["Secondary100Color"] = Color.Parse("#FFEDD5");
-        resources["Secondary200Color"] = Color.Parse("#FED7AA");
-        resources["Secondary300Color"] = Color.Parse("#FDBA74");
-        resources["Secondary400Color"] = Color.Parse("#FB923C");
-        resources["Secondary500Color"] = Color.Parse("#F97316");
-        resources["Secondary600Color"] = Color.Parse("#EA580C");
-        resources["Secondary700Color"] = Color.Parse("#C2410C");
-        resources["Secondary800Color"] = Color.Parse("#9A3412");
-        resources["Secondary900Color"] = Color.Parse("#7C2D12");
+        resources["Secondary100Color"] = Color.Parse("#F2E1CA");
+        resources["Secondary200Color"] = Color.Parse("#F1CCA1");
+        resources["Secondary300Color"] = Color.Parse("#F0B16E");
+        resources["Secondary400Color"] = Color.Parse("#EE8A39");
+        resources["Secondary500Color"] = Color.Parse("#ED6D15");
+        resources["Secondary600Color"] = Color.Parse("#DF530B");
+        resources["Secondary700Color"] = Color.Parse("#B83E0B");
+        resources["Secondary800Color"] = Color.Parse("#923111");
+        resources["Secondary900Color"] = Color.Parse("#762B11");
 
         // Text (Cool blue-white)
         resources["Text100Color"] = Color.Parse("#F8FAFC");

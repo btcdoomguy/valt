@@ -25,15 +25,15 @@ public static class GoldenHourTheme
         resources["Accent900Color"] = Color.Parse("#78350F");
 
         // Secondary (Blue/Indigo - complementary to gold)
-        resources["Secondary100Color"] = Color.Parse("#DBEAFE");
-        resources["Secondary200Color"] = Color.Parse("#BFDBFE");
-        resources["Secondary300Color"] = Color.Parse("#93C5FD");
-        resources["Secondary400Color"] = Color.Parse("#60A5FA");
-        resources["Secondary500Color"] = Color.Parse("#3B82F6");
-        resources["Secondary600Color"] = Color.Parse("#2563EB");
-        resources["Secondary700Color"] = Color.Parse("#1D4ED8");
-        resources["Secondary800Color"] = Color.Parse("#1E40AF");
-        resources["Secondary900Color"] = Color.Parse("#1E3A8A");
+        resources["Secondary100Color"] = Color.Parse("#D0DEF1");
+        resources["Secondary200Color"] = Color.Parse("#B5D0F1");
+        resources["Secondary300Color"] = Color.Parse("#8CBBF0");
+        resources["Secondary400Color"] = Color.Parse("#5B9DEE");
+        resources["Secondary500Color"] = Color.Parse("#387BE9");
+        resources["Secondary600Color"] = Color.Parse("#235EDF");
+        resources["Secondary700Color"] = Color.Parse("#1C4ACD");
+        resources["Secondary800Color"] = Color.Parse("#1C3DA6");
+        resources["Secondary900Color"] = Color.Parse("#1C3783");
 
         // Text (Warm cream-tinted)
         resources["Text100Color"] = Color.Parse("#FFFBEB");

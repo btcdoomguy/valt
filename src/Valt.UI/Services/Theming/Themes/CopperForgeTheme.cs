@@ -25,15 +25,15 @@ public static class CopperForgeTheme
         resources["Accent900Color"] = Color.Parse("#402710");
 
         // Secondary (Teal/Cyan - complementary to copper)
-        resources["Secondary100Color"] = Color.Parse("#B2F5EA");
-        resources["Secondary200Color"] = Color.Parse("#81E6D9");
-        resources["Secondary300Color"] = Color.Parse("#4FD1C5");
-        resources["Secondary400Color"] = Color.Parse("#38B2AC");
-        resources["Secondary500Color"] = Color.Parse("#319795");
-        resources["Secondary600Color"] = Color.Parse("#2C7A7B");
-        resources["Secondary700Color"] = Color.Parse("#285E61");
-        resources["Secondary800Color"] = Color.Parse("#234E52");
-        resources["Secondary900Color"] = Color.Parse("#1D4044");
+        resources["Secondary100Color"] = Color.Parse("#A9E9DE");
+        resources["Secondary200Color"] = Color.Parse("#7ADACE");
+        resources["Secondary300Color"] = Color.Parse("#4BC6BB");
+        resources["Secondary400Color"] = Color.Parse("#35A9A3");
+        resources["Secondary500Color"] = Color.Parse("#2E8F8D");
+        resources["Secondary600Color"] = Color.Parse("#2A7474");
+        resources["Secondary700Color"] = Color.Parse("#26595C");
+        resources["Secondary800Color"] = Color.Parse("#214A4E");
+        resources["Secondary900Color"] = Color.Parse("#1C3D40");
 
         // Text (Warm metallic-tinted)
         resources["Text100Color"] = Color.Parse("#FAF5F0");

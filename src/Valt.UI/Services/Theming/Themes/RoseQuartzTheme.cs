@@ -25,15 +25,15 @@ public static class RoseQuartzTheme
         resources["Accent900Color"] = Color.Parse("#500724");
 
         // Secondary (Teal/Seafoam - complementary to rose)
-        resources["Secondary100Color"] = Color.Parse("#CCFBF1");
-        resources["Secondary200Color"] = Color.Parse("#99F6E4");
-        resources["Secondary300Color"] = Color.Parse("#5EEAD4");
-        resources["Secondary400Color"] = Color.Parse("#2DD4BF");
-        resources["Secondary500Color"] = Color.Parse("#14B8A6");
-        resources["Secondary600Color"] = Color.Parse("#0D9488");
-        resources["Secondary700Color"] = Color.Parse("#0F766E");
-        resources["Secondary800Color"] = Color.Parse("#115E59");
-        resources["Secondary900Color"] = Color.Parse("#134E4A");
+        resources["Secondary100Color"] = Color.Parse("#C2EEE4");
+        resources["Secondary200Color"] = Color.Parse("#91E9D8");
+        resources["Secondary300Color"] = Color.Parse("#59DDC9");
+        resources["Secondary400Color"] = Color.Parse("#2BC9B5");
+        resources["Secondary500Color"] = Color.Parse("#13AF9E");
+        resources["Secondary600Color"] = Color.Parse("#0C8D81");
+        resources["Secondary700Color"] = Color.Parse("#0E7068");
+        resources["Secondary800Color"] = Color.Parse("#105954");
+        resources["Secondary900Color"] = Color.Parse("#124A46");
 
         // Text (Warm rose-tinted white)
         resources["Text100Color"] = Color.Parse("#FFF1F2");

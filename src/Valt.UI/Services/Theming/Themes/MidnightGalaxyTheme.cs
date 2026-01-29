@@ -24,15 +24,15 @@ public static class MidnightGalaxyTheme
         resources["Accent900Color"] = Color.Parse("#322659");
 
         // Secondary (Gold/Amber - complementary to violet)
-        resources["Secondary100Color"] = Color.Parse("#FEF3C7");
-        resources["Secondary200Color"] = Color.Parse("#FDE68A");
-        resources["Secondary300Color"] = Color.Parse("#FCD34D");
-        resources["Secondary400Color"] = Color.Parse("#FBBF24");
-        resources["Secondary500Color"] = Color.Parse("#F59E0B");
-        resources["Secondary600Color"] = Color.Parse("#D97706");
-        resources["Secondary700Color"] = Color.Parse("#B45309");
-        resources["Secondary800Color"] = Color.Parse("#92400E");
-        resources["Secondary900Color"] = Color.Parse("#78350F");
+        resources["Secondary100Color"] = Color.Parse("#F1E7BC");
+        resources["Secondary200Color"] = Color.Parse("#F0DA83");
+        resources["Secondary300Color"] = Color.Parse("#EFC849");
+        resources["Secondary400Color"] = Color.Parse("#EEB522");
+        resources["Secondary500Color"] = Color.Parse("#E9960A");
+        resources["Secondary600Color"] = Color.Parse("#CE7106");
+        resources["Secondary700Color"] = Color.Parse("#AB4F09");
+        resources["Secondary800Color"] = Color.Parse("#8B3D0D");
+        resources["Secondary900Color"] = Color.Parse("#72320E");
 
         // Text (Cool violet-tinted gray)
         resources["Text100Color"] = Color.Parse("#FAF5FF");

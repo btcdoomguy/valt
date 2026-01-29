@@ -24,15 +24,15 @@ public static class OceanTheme
         resources["Accent900Color"] = Color.Parse("#1D4044");
 
         // Secondary (Coral/Salmon - complementary to teal)
-        resources["Secondary100Color"] = Color.Parse("#FED7D7");
-        resources["Secondary200Color"] = Color.Parse("#FEB2B2");
-        resources["Secondary300Color"] = Color.Parse("#FC8181");
-        resources["Secondary400Color"] = Color.Parse("#F56565");
-        resources["Secondary500Color"] = Color.Parse("#E53E3E");
-        resources["Secondary600Color"] = Color.Parse("#C53030");
-        resources["Secondary700Color"] = Color.Parse("#9B2C2C");
-        resources["Secondary800Color"] = Color.Parse("#822727");
-        resources["Secondary900Color"] = Color.Parse("#63171B");
+        resources["Secondary100Color"] = Color.Parse("#F1CCCC");
+        resources["Secondary200Color"] = Color.Parse("#F1A9A9");
+        resources["Secondary300Color"] = Color.Parse("#EF7A7A");
+        resources["Secondary400Color"] = Color.Parse("#E86060");
+        resources["Secondary500Color"] = Color.Parse("#D93B3B");
+        resources["Secondary600Color"] = Color.Parse("#BB2D2D");
+        resources["Secondary700Color"] = Color.Parse("#932A2A");
+        resources["Secondary800Color"] = Color.Parse("#7B2525");
+        resources["Secondary900Color"] = Color.Parse("#5E1619");
 
         // Text (Cool Gray for dark backgrounds)
         resources["Text100Color"] = Color.Parse("#F7FAFC");

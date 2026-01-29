@@ -25,15 +25,15 @@ public static class ForestCanopyTheme
         resources["Accent900Color"] = Color.Parse("#064E3B");
 
         // Secondary (Rose/Coral - complementary to forest green)
-        resources["Secondary100Color"] = Color.Parse("#FFE4E6");
-        resources["Secondary200Color"] = Color.Parse("#FECDD3");
-        resources["Secondary300Color"] = Color.Parse("#FDA4AF");
-        resources["Secondary400Color"] = Color.Parse("#FB7185");
-        resources["Secondary500Color"] = Color.Parse("#F43F5E");
-        resources["Secondary600Color"] = Color.Parse("#E11D48");
-        resources["Secondary700Color"] = Color.Parse("#BE123C");
-        resources["Secondary800Color"] = Color.Parse("#9F1239");
-        resources["Secondary900Color"] = Color.Parse("#881337");
+        resources["Secondary100Color"] = Color.Parse("#F2D8DA");
+        resources["Secondary200Color"] = Color.Parse("#F1C2C8");
+        resources["Secondary300Color"] = Color.Parse("#F09BA6");
+        resources["Secondary400Color"] = Color.Parse("#EE6B7E");
+        resources["Secondary500Color"] = Color.Parse("#E83C59");
+        resources["Secondary600Color"] = Color.Parse("#D61B44");
+        resources["Secondary700Color"] = Color.Parse("#B41139");
+        resources["Secondary800Color"] = Color.Parse("#971136");
+        resources["Secondary900Color"] = Color.Parse("#811234");
 
         // Text (Warm off-white)
         resources["Text100Color"] = Color.Parse("#F5F5F0");
