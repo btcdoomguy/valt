@@ -159,10 +159,122 @@
 
     <Style Selector="TextBox">
         <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="CaretBrush" Value="{DynamicResource Accent400Brush}" />
+        <Setter Property="SelectionBrush" Value="{DynamicResource Accent600Brush}" />
+    </Style>
+
+    <Style Selector="TextBox /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Accent500Brush}" />
     </Style>
 
     <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Accent500Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style Selector="TextBox:disabled /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource Disabled800Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Disabled600Brush}" />
+    </Style>
+
+    <Style Selector="TextBox:disabled">
+        <Setter Property="Foreground" Value="{DynamicResource Text500Brush}" />
+    </Style>
+
+    <Style Selector="TextBox /template/ TextBlock#PART_Watermark">
+        <Setter Property="Foreground" Value="{DynamicResource Text500Brush}" />
+    </Style>
+
+    <!-- AutoCompleteBox styling -->
+    <Style Selector="AutoCompleteBox">
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style Selector="AutoCompleteBox /template/ Border#PART_Border">
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style Selector="AutoCompleteBox:pointerover /template/ Border#PART_Border">
+        <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Accent500Brush}" />
+    </Style>
+
+    <Style Selector="AutoCompleteBox:focus /template/ Border#PART_Border">
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Accent500Brush}" />
+    </Style>
+
+    <Style Selector="AutoCompleteBox:disabled /template/ Border#PART_Border">
+        <Setter Property="Background" Value="{DynamicResource Disabled800Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Disabled600Brush}" />
+    </Style>
+
+    <Style Selector="AutoCompleteBox:disabled">
+        <Setter Property="Foreground" Value="{DynamicResource Text500Brush}" />
+    </Style>
+
+    <Style Selector="AutoCompleteBox /template/ TextBox#PART_TextBox">
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CaretBrush" Value="{DynamicResource Accent400Brush}" />
+        <Setter Property="SelectionBrush" Value="{DynamicResource Accent600Brush}" />
+    </Style>
+
+    <Style Selector="AutoCompleteBox /template/ TextBox#PART_TextBox /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="AutoCompleteBox /template/ TextBox#PART_TextBox /template/ TextBlock#PART_Watermark">
+        <Setter Property="Foreground" Value="{DynamicResource Text500Brush}" />
+    </Style>
+
+    <!-- AutoCompleteBox Popup styling -->
+    <Style Selector="AutoCompleteBox /template/ Border#PART_SuggestionsContainerBorder">
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Margin" Value="0,2,0,0" />
+    </Style>
+
+    <Style Selector="AutoCompleteBox ListBoxItem">
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="8,4" />
+    </Style>
+
+    <Style Selector="AutoCompleteBox ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+    </Style>
+
+    <Style Selector="AutoCompleteBox ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Secondary800Brush}" />
+    </Style>
+
+    <Style Selector="AutoCompleteBox ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Secondary700Brush}" />
     </Style>
 
     <Style Selector="ComboBox">
@@ -205,11 +317,28 @@
         <Setter Property="Margin" Value="0,2,0,0" />
     </Style>
 
+    <Style Selector="ComboBox /template/ Popup > Border">
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
     <Style Selector="ComboBox /template/ Border#PopupBorder">
         <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <!-- ComboBox popup ListBox styling -->
+    <Style Selector="ComboBox /template/ ListBox">
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="ComboBox /template/ ScrollViewer">
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
     </Style>
 
     <!-- ComboBoxItem styling -->
@@ -320,12 +449,120 @@
         <Setter Property="Foreground" Value="{DynamicResource Text500Brush}" />
     </Style>
 
+    <!-- ToggleSwitch styling -->
+    <Style Selector="ToggleSwitch">
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        <Setter Property="OnContent" Value="" />
+        <Setter Property="OffContent" Value="" />
+    </Style>
+
+    <!-- ToggleSwitch track (outer container) -->
+    <Style Selector="ToggleSwitch /template/ Border#OuterBorder">
+        <Setter Property="Background" Value="{DynamicResource Background600Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="10" />
+    </Style>
+
+    <Style Selector="ToggleSwitch:pointerover /template/ Border#OuterBorder">
+        <Setter Property="Background" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Accent600Brush}" />
+    </Style>
+
+    <!-- ToggleSwitch checked state -->
+    <Style Selector="ToggleSwitch:checked /template/ Border#OuterBorder">
+        <Setter Property="Background" Value="{DynamicResource Accent600Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Accent500Brush}" />
+    </Style>
+
+    <Style Selector="ToggleSwitch:checked:pointerover /template/ Border#OuterBorder">
+        <Setter Property="Background" Value="{DynamicResource Accent500Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Accent400Brush}" />
+    </Style>
+
+    <!-- ToggleSwitch knob -->
+    <Style Selector="ToggleSwitch /template/ Border#SwitchKnob">
+        <Setter Property="Background" Value="{DynamicResource Text200Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Text300Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style Selector="ToggleSwitch:checked /template/ Border#SwitchKnob">
+        <Setter Property="Background" Value="{DynamicResource Text100Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Text200Brush}" />
+    </Style>
+
+    <!-- ToggleSwitch disabled state -->
+    <Style Selector="ToggleSwitch:disabled /template/ Border#OuterBorder">
+        <Setter Property="Background" Value="{DynamicResource Disabled700Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Disabled600Brush}" />
+    </Style>
+
+    <Style Selector="ToggleSwitch:disabled /template/ Border#SwitchKnob">
+        <Setter Property="Background" Value="{DynamicResource Disabled400Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Disabled500Brush}" />
+    </Style>
+
+    <Style Selector="ToggleSwitch:disabled">
+        <Setter Property="Foreground" Value="{DynamicResource Text500Brush}" />
+    </Style>
+
     <Style Selector="NumericUpDown">
         <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style Selector="NumericUpDown /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style Selector="NumericUpDown:pointerover /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Accent500Brush}" />
+    </Style>
+
+    <Style Selector="NumericUpDown:focus /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="{DynamicResource Accent500Brush}" />
+    </Style>
+
+    <Style Selector="NumericUpDown:disabled /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource Disabled800Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Disabled600Brush}" />
+    </Style>
+
+    <Style Selector="NumericUpDown:disabled">
+        <Setter Property="Foreground" Value="{DynamicResource Text500Brush}" />
     </Style>
 
     <Style Selector="NumericUpDown /template/ TextBox">
         <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        <Setter Property="CaretBrush" Value="{DynamicResource Accent400Brush}" />
+        <Setter Property="SelectionBrush" Value="{DynamicResource Accent600Brush}" />
+    </Style>
+
+    <Style Selector="NumericUpDown /template/ ButtonSpinner /template/ Button">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <Style Selector="NumericUpDown /template/ ButtonSpinner /template/ Button:pointerover">
+        <Setter Property="Background" Value="{DynamicResource Background600Brush}" />
+    </Style>
+
+    <Style Selector="NumericUpDown /template/ ButtonSpinner /template/ Button:pressed">
+        <Setter Property="Background" Value="{DynamicResource Accent700Brush}" />
+    </Style>
+
+    <Style Selector="NumericUpDown /template/ ButtonSpinner /template/ Button /template/ ContentPresenter">
+        <Setter Property="Foreground" Value="{DynamicResource Text300Brush}" />
+    </Style>
+
+    <Style Selector="NumericUpDown /template/ ButtonSpinner /template/ Button:pointerover /template/ ContentPresenter">
+        <Setter Property="Foreground" Value="{DynamicResource Accent400Brush}" />
     </Style>
 
     <!-- ═══════════════════════════════════════════════════════════════════════════════
@@ -736,6 +973,121 @@
         </Style>
     </Style>
 
+    <!-- General DropDownButton styling -->
+    <Style Selector="DropDownButton">
+        <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="8,4" />
+    </Style>
+
+    <Style Selector="DropDownButton /template/ Border#RootBorder">
+        <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style Selector="DropDownButton:pointerover /template/ Border#RootBorder">
+        <Setter Property="Background" Value="{DynamicResource Background600Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Accent500Brush}" />
+    </Style>
+
+    <Style Selector="DropDownButton:pressed /template/ Border#RootBorder">
+        <Setter Property="Background" Value="{DynamicResource Accent700Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Accent500Brush}" />
+    </Style>
+
+    <Style Selector="DropDownButton /template/ PathIcon#DropDownGlyph">
+        <Setter Property="Foreground" Value="{DynamicResource Text300Brush}" />
+    </Style>
+
+    <Style Selector="DropDownButton:pointerover /template/ PathIcon#DropDownGlyph">
+        <Setter Property="Foreground" Value="{DynamicResource Accent400Brush}" />
+    </Style>
+
+    <Style Selector="DropDownButton:disabled">
+        <Setter Property="Foreground" Value="{DynamicResource Text500Brush}" />
+    </Style>
+
+    <Style Selector="DropDownButton:disabled /template/ Border#RootBorder">
+        <Setter Property="Background" Value="{DynamicResource Disabled800Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Disabled600Brush}" />
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         MENU FLYOUT
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="MenuFlyoutPresenter">
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="2" />
+    </Style>
+
+    <Style Selector="MenuItem">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="CornerRadius" Value="2" />
+    </Style>
+
+    <Style Selector="MenuItem:pointerover /template/ Border#PART_LayoutRoot">
+        <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+    </Style>
+
+    <Style Selector="MenuItem:selected /template/ Border#PART_LayoutRoot">
+        <Setter Property="Background" Value="{DynamicResource Secondary800Brush}" />
+    </Style>
+
+    <Style Selector="MenuItem:pressed /template/ Border#PART_LayoutRoot">
+        <Setter Property="Background" Value="{DynamicResource Accent700Brush}" />
+    </Style>
+
+    <Style Selector="MenuItem:disabled">
+        <Setter Property="Foreground" Value="{DynamicResource Text500Brush}" />
+    </Style>
+
+    <Style Selector="MenuItem /template/ PathIcon#PART_ChevronPath">
+        <Setter Property="Foreground" Value="{DynamicResource Text300Brush}" />
+    </Style>
+
+    <Style Selector="MenuItem /template/ Path#PART_IconPath">
+        <Setter Property="Fill" Value="{DynamicResource Text200Brush}" />
+    </Style>
+
+    <Style Selector="MenuItem:pointerover /template/ Path#PART_IconPath">
+        <Setter Property="Fill" Value="{DynamicResource Accent400Brush}" />
+    </Style>
+
+    <!-- Menu separator -->
+    <Style Selector="Separator">
+        <Setter Property="Background" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="Margin" Value="4,2" />
+        <Setter Property="Height" Value="1" />
+    </Style>
+
+    <!-- MenuItem submenu popup (for nested menus) -->
+    <Style Selector="MenuItem > Popup > Border">
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="2" />
+    </Style>
+
+    <!-- ContextMenu styling -->
+    <Style Selector="ContextMenu">
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="2" />
+    </Style>
+
     <!-- ═══════════════════════════════════════════════════════════════════════════════
          DATA GRID
          ═══════════════════════════════════════════════════════════════════════════════ -->
@@ -854,6 +1206,74 @@
          CALENDAR DATE PICKER
          ═══════════════════════════════════════════════════════════════════════════════ -->
 
+    <Style Selector="CalendarDatePicker">
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style Selector="CalendarDatePicker /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource Background800Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style Selector="CalendarDatePicker:pointerover /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Accent500Brush}" />
+    </Style>
+
+    <Style Selector="CalendarDatePicker:focus /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="{DynamicResource Accent500Brush}" />
+    </Style>
+
+    <Style Selector="CalendarDatePicker:disabled /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource Disabled800Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Disabled600Brush}" />
+    </Style>
+
+    <Style Selector="CalendarDatePicker:disabled">
+        <Setter Property="Foreground" Value="{DynamicResource Text500Brush}" />
+    </Style>
+
+    <Style Selector="CalendarDatePicker /template/ TextBox#PART_TextBox">
+        <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CaretBrush" Value="{DynamicResource Accent400Brush}" />
+        <Setter Property="SelectionBrush" Value="{DynamicResource Accent600Brush}" />
+    </Style>
+
+    <Style Selector="CalendarDatePicker /template/ TextBox#PART_TextBox /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="CalendarDatePicker /template/ TextBox#PART_TextBox:focus /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="CalendarDatePicker /template/ TextBox#PART_TextBox:pointerover /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <!-- CalendarDatePicker Popup styling -->
+    <Style Selector="CalendarDatePicker /template/ Popup#PART_Popup">
+        <Setter Property="Margin" Value="0,2,0,0" />
+    </Style>
+
+    <Style Selector="CalendarDatePicker /template/ Popup#PART_Popup > Border">
+        <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="4" />
+    </Style>
+
     <!-- Override CalendarDatePicker button template to use Material Design icon -->
     <Style Selector="CalendarDatePicker /template/ Button#PART_Button">
         <Setter Property="Width" Value="32" />
@@ -885,6 +1305,13 @@
     <!-- Calendar - set compact size -->
     <Style Selector="Calendar">
         <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+    </Style>
+
+    <Style Selector="Calendar /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        <Setter Property="CornerRadius" Value="4" />
     </Style>
 
     <!-- CalendarItem - the main container -->
