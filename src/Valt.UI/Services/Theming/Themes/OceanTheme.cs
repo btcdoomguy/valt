@@ -23,16 +23,16 @@ public static class OceanTheme
         resources["Accent800Color"] = Color.Parse("#234E52");
         resources["Accent900Color"] = Color.Parse("#1D4044");
 
-        // Secondary (Deep Blue)
-        resources["Secondary100Color"] = Color.Parse("#BEE3F8");
-        resources["Secondary200Color"] = Color.Parse("#90CDF4");
-        resources["Secondary300Color"] = Color.Parse("#63B3ED");
-        resources["Secondary400Color"] = Color.Parse("#4299E1");
-        resources["Secondary500Color"] = Color.Parse("#3182CE");
-        resources["Secondary600Color"] = Color.Parse("#2B6CB0");
-        resources["Secondary700Color"] = Color.Parse("#2C5282");
-        resources["Secondary800Color"] = Color.Parse("#2A4365");
-        resources["Secondary900Color"] = Color.Parse("#1A365D");
+        // Secondary (Coral/Salmon - complementary to teal)
+        resources["Secondary100Color"] = Color.Parse("#F1CCCC");
+        resources["Secondary200Color"] = Color.Parse("#F1A9A9");
+        resources["Secondary300Color"] = Color.Parse("#EF7A7A");
+        resources["Secondary400Color"] = Color.Parse("#E86060");
+        resources["Secondary500Color"] = Color.Parse("#D93B3B");
+        resources["Secondary600Color"] = Color.Parse("#BB2D2D");
+        resources["Secondary700Color"] = Color.Parse("#932A2A");
+        resources["Secondary800Color"] = Color.Parse("#7B2525");
+        resources["Secondary900Color"] = Color.Parse("#5E1619");
 
         // Text (Cool Gray for dark backgrounds)
         resources["Text100Color"] = Color.Parse("#F7FAFC");
@@ -78,16 +78,16 @@ public static class OceanTheme
         resources["Divider800Color"] = Color.Parse("#171923");
         resources["Divider900Color"] = Color.Parse("#0D1117");
 
-        // Icon (Teal tinted)
-        resources["Icon100Color"] = Color.Parse("#B2F5EA");
-        resources["Icon200Color"] = Color.Parse("#81E6D9");
-        resources["Icon300Color"] = Color.Parse("#4FD1C5");
-        resources["Icon400Color"] = Color.Parse("#38B2AC");
-        resources["Icon500Color"] = Color.Parse("#319795");
-        resources["Icon600Color"] = Color.Parse("#2C7A7B");
-        resources["Icon700Color"] = Color.Parse("#285E61");
-        resources["Icon800Color"] = Color.Parse("#234E52");
-        resources["Icon900Color"] = Color.Parse("#1D4044");
+        // Icon (Coral/Salmon - complementary to teal)
+        resources["Icon100Color"] = Color.Parse("#FED7D7");
+        resources["Icon200Color"] = Color.Parse("#FEB2B2");
+        resources["Icon300Color"] = Color.Parse("#FC8181");
+        resources["Icon400Color"] = Color.Parse("#F56565");
+        resources["Icon500Color"] = Color.Parse("#E53E3E");
+        resources["Icon600Color"] = Color.Parse("#C53030");
+        resources["Icon700Color"] = Color.Parse("#9B2C2C");
+        resources["Icon800Color"] = Color.Parse("#822727");
+        resources["Icon900Color"] = Color.Parse("#63171B");
 
         // Semantic Info (Blue)
         resources["SemanticInfo100Color"] = Color.Parse("#90CDF4");

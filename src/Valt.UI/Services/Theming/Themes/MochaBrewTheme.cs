@@ -24,16 +24,16 @@ public static class MochaBrewTheme
         resources["Accent800Color"] = Color.Parse("#3F3225");
         resources["Accent900Color"] = Color.Parse("#2A2119");
 
-        // Secondary (Warm Cream/Latte)
-        resources["Secondary100Color"] = Color.Parse("#FAF5EB");
-        resources["Secondary200Color"] = Color.Parse("#F5EBD9");
-        resources["Secondary300Color"] = Color.Parse("#E8D8BF");
-        resources["Secondary400Color"] = Color.Parse("#D4C2A0");
-        resources["Secondary500Color"] = Color.Parse("#BBA882");
-        resources["Secondary600Color"] = Color.Parse("#9A8866");
-        resources["Secondary700Color"] = Color.Parse("#7A6A4E");
-        resources["Secondary800Color"] = Color.Parse("#5C503C");
-        resources["Secondary900Color"] = Color.Parse("#3E362A");
+        // Secondary (Teal/Cyan - complementary to coffee brown)
+        resources["Secondary100Color"] = Color.Parse("#C2EEE4");
+        resources["Secondary200Color"] = Color.Parse("#91E9D8");
+        resources["Secondary300Color"] = Color.Parse("#59DDC9");
+        resources["Secondary400Color"] = Color.Parse("#2BC9B5");
+        resources["Secondary500Color"] = Color.Parse("#13AF9E");
+        resources["Secondary600Color"] = Color.Parse("#0C8D81");
+        resources["Secondary700Color"] = Color.Parse("#0E7068");
+        resources["Secondary800Color"] = Color.Parse("#105954");
+        resources["Secondary900Color"] = Color.Parse("#124A46");
 
         // Text (Warm cream-tinted)
         resources["Text100Color"] = Color.Parse("#FAF7F2");
@@ -79,16 +79,16 @@ public static class MochaBrewTheme
         resources["Divider800Color"] = Color.Parse("#28201A");
         resources["Divider900Color"] = Color.Parse("#18120E");
 
-        // Icon (Coffee tinted)
-        resources["Icon100Color"] = Color.Parse("#E7D4C0");
-        resources["Icon200Color"] = Color.Parse("#D4BC9E");
-        resources["Icon300Color"] = Color.Parse("#C4A882");
-        resources["Icon400Color"] = Color.Parse("#A8876A");
-        resources["Icon500Color"] = Color.Parse("#8B6F55");
-        resources["Icon600Color"] = Color.Parse("#6F5842");
-        resources["Icon700Color"] = Color.Parse("#574533");
-        resources["Icon800Color"] = Color.Parse("#3F3225");
-        resources["Icon900Color"] = Color.Parse("#2A2119");
+        // Icon (Teal/Cyan - complementary to coffee brown)
+        resources["Icon100Color"] = Color.Parse("#CCFBF1");
+        resources["Icon200Color"] = Color.Parse("#99F6E4");
+        resources["Icon300Color"] = Color.Parse("#5EEAD4");
+        resources["Icon400Color"] = Color.Parse("#2DD4BF");
+        resources["Icon500Color"] = Color.Parse("#14B8A6");
+        resources["Icon600Color"] = Color.Parse("#0D9488");
+        resources["Icon700Color"] = Color.Parse("#0F766E");
+        resources["Icon800Color"] = Color.Parse("#115E59");
+        resources["Icon900Color"] = Color.Parse("#134E4A");
 
         // Semantic Info (Blue)
         resources["SemanticInfo100Color"] = Color.Parse("#BAE6FD");

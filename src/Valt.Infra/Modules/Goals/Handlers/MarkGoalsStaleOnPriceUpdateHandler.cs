@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Logging;
+using Valt.App.Modules.Goals.Contracts;
 using Valt.Core.Modules.Goals.Contracts;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Messages;
 using Valt.Infra.Kernel.Notifications;
-using Valt.Infra.Modules.Goals.Services;
 
 namespace Valt.Infra.Modules.Goals.Handlers;
 
@@ -16,12 +16,12 @@ internal class MarkGoalsStaleOnPriceUpdateHandler :
     INotificationHandler<BitcoinHistoryPriceUpdatedMessage>
 {
     private readonly IGoalRepository _goalRepository;
-    private readonly GoalProgressState _progressState;
+    private readonly IGoalProgressState _progressState;
     private readonly ILogger<MarkGoalsStaleOnPriceUpdateHandler> _logger;
 
     public MarkGoalsStaleOnPriceUpdateHandler(
         IGoalRepository goalRepository,
-        GoalProgressState progressState,
+        IGoalProgressState progressState,
         ILogger<MarkGoalsStaleOnPriceUpdateHandler> logger)
     {
         _goalRepository = goalRepository;

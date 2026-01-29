@@ -56,6 +56,12 @@
                          SelectionMode="AlwaysSelected"
                          SelectedItem="{Binding SelectedFile, Mode=TwoWay}"
                          KeyDown="RecentFilesList_OnKeyDown">
+                    <ListBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="{x:Static local:language.InitialSelection_Remove}"
+                                      Command="{Binding RemoveSelectedFileCommand}" />
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <!-- Had to add the background transparent to handle click properly-->

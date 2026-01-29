@@ -24,16 +24,16 @@ public static class GoldenHourTheme
         resources["Accent800Color"] = Color.Parse("#92400E");
         resources["Accent900Color"] = Color.Parse("#78350F");
 
-        // Secondary (Warm Red/Coral)
-        resources["Secondary100Color"] = Color.Parse("#FED7D7");
-        resources["Secondary200Color"] = Color.Parse("#FEB2B2");
-        resources["Secondary300Color"] = Color.Parse("#FC8181");
-        resources["Secondary400Color"] = Color.Parse("#F56565");
-        resources["Secondary500Color"] = Color.Parse("#E53E3E");
-        resources["Secondary600Color"] = Color.Parse("#C53030");
-        resources["Secondary700Color"] = Color.Parse("#9B2C2C");
-        resources["Secondary800Color"] = Color.Parse("#822727");
-        resources["Secondary900Color"] = Color.Parse("#63171B");
+        // Secondary (Blue/Indigo - complementary to gold)
+        resources["Secondary100Color"] = Color.Parse("#D0DEF1");
+        resources["Secondary200Color"] = Color.Parse("#B5D0F1");
+        resources["Secondary300Color"] = Color.Parse("#8CBBF0");
+        resources["Secondary400Color"] = Color.Parse("#5B9DEE");
+        resources["Secondary500Color"] = Color.Parse("#387BE9");
+        resources["Secondary600Color"] = Color.Parse("#235EDF");
+        resources["Secondary700Color"] = Color.Parse("#1C4ACD");
+        resources["Secondary800Color"] = Color.Parse("#1C3DA6");
+        resources["Secondary900Color"] = Color.Parse("#1C3783");
 
         // Text (Warm cream-tinted)
         resources["Text100Color"] = Color.Parse("#FFFBEB");
@@ -79,16 +79,16 @@ public static class GoldenHourTheme
         resources["Divider800Color"] = Color.Parse("#1F1A15");
         resources["Divider900Color"] = Color.Parse("#100D0A");
 
-        // Icon (Gold tinted)
-        resources["Icon100Color"] = Color.Parse("#FEF3C7");
-        resources["Icon200Color"] = Color.Parse("#FDE68A");
-        resources["Icon300Color"] = Color.Parse("#FCD34D");
-        resources["Icon400Color"] = Color.Parse("#FBBF24");
-        resources["Icon500Color"] = Color.Parse("#F59E0B");
-        resources["Icon600Color"] = Color.Parse("#D97706");
-        resources["Icon700Color"] = Color.Parse("#B45309");
-        resources["Icon800Color"] = Color.Parse("#92400E");
-        resources["Icon900Color"] = Color.Parse("#78350F");
+        // Icon (Blue/Indigo - complementary to gold)
+        resources["Icon100Color"] = Color.Parse("#DBEAFE");
+        resources["Icon200Color"] = Color.Parse("#BFDBFE");
+        resources["Icon300Color"] = Color.Parse("#93C5FD");
+        resources["Icon400Color"] = Color.Parse("#60A5FA");
+        resources["Icon500Color"] = Color.Parse("#3B82F6");
+        resources["Icon600Color"] = Color.Parse("#2563EB");
+        resources["Icon700Color"] = Color.Parse("#1D4ED8");
+        resources["Icon800Color"] = Color.Parse("#1E40AF");
+        resources["Icon900Color"] = Color.Parse("#1E3A8A");
 
         // Semantic Info (Blue)
         resources["SemanticInfo100Color"] = Color.Parse("#90CDF4");

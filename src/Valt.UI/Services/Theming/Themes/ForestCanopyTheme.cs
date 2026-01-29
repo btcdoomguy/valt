@@ -24,16 +24,16 @@ public static class ForestCanopyTheme
         resources["Accent800Color"] = Color.Parse("#065F46");
         resources["Accent900Color"] = Color.Parse("#064E3B");
 
-        // Secondary (Earth Brown)
-        resources["Secondary100Color"] = Color.Parse("#E7D8C9");
-        resources["Secondary200Color"] = Color.Parse("#D4C4B0");
-        resources["Secondary300Color"] = Color.Parse("#BCA88E");
-        resources["Secondary400Color"] = Color.Parse("#A08B6C");
-        resources["Secondary500Color"] = Color.Parse("#857050");
-        resources["Secondary600Color"] = Color.Parse("#6B5A40");
-        resources["Secondary700Color"] = Color.Parse("#524432");
-        resources["Secondary800Color"] = Color.Parse("#3D3326");
-        resources["Secondary900Color"] = Color.Parse("#2A231A");
+        // Secondary (Rose/Coral - complementary to forest green)
+        resources["Secondary100Color"] = Color.Parse("#F2D8DA");
+        resources["Secondary200Color"] = Color.Parse("#F1C2C8");
+        resources["Secondary300Color"] = Color.Parse("#F09BA6");
+        resources["Secondary400Color"] = Color.Parse("#EE6B7E");
+        resources["Secondary500Color"] = Color.Parse("#E83C59");
+        resources["Secondary600Color"] = Color.Parse("#D61B44");
+        resources["Secondary700Color"] = Color.Parse("#B41139");
+        resources["Secondary800Color"] = Color.Parse("#971136");
+        resources["Secondary900Color"] = Color.Parse("#811234");
 
         // Text (Warm off-white)
         resources["Text100Color"] = Color.Parse("#F5F5F0");
@@ -79,16 +79,16 @@ public static class ForestCanopyTheme
         resources["Divider800Color"] = Color.Parse("#1A201A");
         resources["Divider900Color"] = Color.Parse("#0C100C");
 
-        // Icon (Forest green tinted)
-        resources["Icon100Color"] = Color.Parse("#D1FAE5");
-        resources["Icon200Color"] = Color.Parse("#A7F3D0");
-        resources["Icon300Color"] = Color.Parse("#6EE7B7");
-        resources["Icon400Color"] = Color.Parse("#34D399");
-        resources["Icon500Color"] = Color.Parse("#10B981");
-        resources["Icon600Color"] = Color.Parse("#059669");
-        resources["Icon700Color"] = Color.Parse("#047857");
-        resources["Icon800Color"] = Color.Parse("#065F46");
-        resources["Icon900Color"] = Color.Parse("#064E3B");
+        // Icon (Rose/Coral - complementary to forest green)
+        resources["Icon100Color"] = Color.Parse("#FFE4E6");
+        resources["Icon200Color"] = Color.Parse("#FECDD3");
+        resources["Icon300Color"] = Color.Parse("#FDA4AF");
+        resources["Icon400Color"] = Color.Parse("#FB7185");
+        resources["Icon500Color"] = Color.Parse("#F43F5E");
+        resources["Icon600Color"] = Color.Parse("#E11D48");
+        resources["Icon700Color"] = Color.Parse("#BE123C");
+        resources["Icon800Color"] = Color.Parse("#9F1239");
+        resources["Icon900Color"] = Color.Parse("#881337");
 
         // Semantic Info (Blue-green)
         resources["SemanticInfo100Color"] = Color.Parse("#99F6E4");

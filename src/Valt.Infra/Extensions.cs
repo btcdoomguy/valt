@@ -249,7 +249,7 @@ public static class Extensions
         services.AddSingleton<IGoalProgressCalculator, ReduceExpenseCategoryProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculator, BitcoinHodlProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculatorFactory, GoalProgressCalculatorFactory>();
-        services.AddSingleton<GoalProgressState>();
+        services.AddSingleton<IGoalProgressState, GoalProgressState>();
 
         return services;
     }

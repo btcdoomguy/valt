@@ -1,6 +1,6 @@
+using Valt.App.Modules.Goals.Contracts;
 using Valt.Core.Kernel.Abstractions.EventSystem;
 using Valt.Core.Modules.Goals.Events;
-using Valt.Infra.Modules.Goals.Services;
 
 namespace Valt.Infra.Modules.Goals.Handlers;
 
@@ -9,9 +9,9 @@ internal class GoalEventHandler :
     IDomainEventHandler<GoalUpdatedEvent>,
     IDomainEventHandler<GoalDeletedEvent>
 {
-    private readonly GoalProgressState _progressState;
+    private readonly IGoalProgressState _progressState;
 
-    public GoalEventHandler(GoalProgressState progressState)
+    public GoalEventHandler(IGoalProgressState progressState)
     {
         _progressState = progressState;
     }

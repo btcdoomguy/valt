@@ -1082,6 +1082,9 @@
     <data name="InitialSelection.FirstMessage" xml:space="preserve">
         <value>You need to create or select your personal database file to store your financial data safely.</value>
     </data>
+    <data name="InitialSelection.Remove" xml:space="preserve">
+        <value>Remove</value>
+    </data>
     <data name="JobLogViewer.Title" xml:space="preserve">
         <value>Job Log: {0}</value>
     </data>

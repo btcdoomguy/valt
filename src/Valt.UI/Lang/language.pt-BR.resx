@@ -1047,6 +1047,9 @@
     <data name="InitialSelection.FirstMessage" xml:space="preserve">
         <value>Crie ou selecione seu banco de dados pessoal para armazenar suas informações financeiras.</value>
     </data>
+    <data name="InitialSelection.Remove" xml:space="preserve">
+        <value>Remover</value>
+    </data>
     <data name="Settings.FiatCurrencies" xml:space="preserve">
         <value>Moedas fiduciárias</value>
     </data>

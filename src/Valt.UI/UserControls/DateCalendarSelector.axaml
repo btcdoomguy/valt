@@ -33,9 +33,10 @@
                    Width="160"
                    Margin="0, 1, 0, 0"
                    Padding="7" />
-            <DropDownButton Background="{DynamicResource Background900Brush}" 
+            <DropDownButton Background="{DynamicResource Background900Brush}"
                             Height="33"
-                            Margin="0, 0, 0, 0">
+                            Margin="0, 0, 0, 0"
+                            BorderThickness="0">
                 <DropDownButton.Flyout>
                     <MenuFlyout Placement="Bottom"
                                 Opening="PopupFlyoutBase_OnOpening"

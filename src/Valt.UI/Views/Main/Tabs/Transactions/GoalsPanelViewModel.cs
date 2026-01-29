@@ -13,6 +13,7 @@ using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Goals.Commands.CopyGoalsFromLastMonth;
 using Valt.App.Modules.Goals.Commands.DeleteGoal;
 using Valt.App.Modules.Goals.Commands.RecalculateGoal;
+using Valt.App.Modules.Goals.Contracts;
 using Valt.App.Modules.Goals.DTOs;
 using Valt.App.Modules.Goals.Queries.GetGoals;
 using Valt.Core.Modules.Goals;
@@ -33,7 +34,7 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
     private readonly ICommandDispatcher _commandDispatcher = null!;
     private readonly IQueryDispatcher _queryDispatcher = null!;
     private readonly IModalFactory _modalFactory = null!;
-    private readonly GoalProgressState _goalProgressState = null!;
+    private readonly IGoalProgressState _goalProgressState = null!;
     private readonly CurrencySettings _currencySettings = null!;
     private readonly FilterState _filterState = null!;
     private readonly ILogger<GoalsPanelViewModel> _logger = null!;
@@ -47,7 +48,7 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
         ICommandDispatcher commandDispatcher,
         IQueryDispatcher queryDispatcher,
         IModalFactory modalFactory,
-        GoalProgressState goalProgressState,
+        IGoalProgressState goalProgressState,
         CurrencySettings currencySettings,
         FilterState filterState,
         ILogger<GoalsPanelViewModel> logger,
