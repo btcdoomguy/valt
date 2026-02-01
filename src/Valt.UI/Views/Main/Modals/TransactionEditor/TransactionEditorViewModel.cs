@@ -738,6 +738,8 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
                     var dates = InstallmentDateCalculator.CalculateInstallmentDates(
                         DateOnly.FromDateTime(Date!.Value), InstallmentCount).ToList();
 
+                    var groupId = new GroupId();
+
                     for (var i = 0; i < dates.Count; i++)
                     {
                         var installmentName = $"{Name} ({i + 1}/{InstallmentCount})";
@@ -751,7 +753,8 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
                             Details = detailsDto,
                             Notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes,
                             FixedExpenseId = TransactionFixedExpenseReference?.FixedExpenseId.Value,
-                            FixedExpenseReferenceDate = TransactionFixedExpenseReference?.ReferenceDate
+                            FixedExpenseReferenceDate = TransactionFixedExpenseReference?.ReferenceDate,
+                            GroupId = groupId.Value
                         });
 
                         if (result.IsFailure)

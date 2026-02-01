@@ -12,6 +12,7 @@ public record AddTransactionCommand : ICommand<AddTransactionResult>
     public string? Notes { get; init; }
     public string? FixedExpenseId { get; init; }
     public DateOnly? FixedExpenseReferenceDate { get; init; }
+    public string? GroupId { get; init; }
 }
 
 public record AddTransactionResult(string TransactionId, DateOnly Date);
