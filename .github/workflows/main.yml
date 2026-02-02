@@ -140,16 +140,34 @@ jobs:
             /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true \
             --verbosity detailed -o ${{ github.workspace }}/publish/osx-${{ matrix.arch }}
 
+      - name: Install ImageMagick
+        run: brew install imagemagick
+
       - name: Generate macOS icon
         run: |
-          mkdir -p ${{ github.workspace }}/valt-logo.iconset
-          for size in 16 32 64 128 256 512; do
-            sips -z $size $size ${{ github.workspace }}/src/Valt.UI/Assets/valt-logo.png \
-              --out ${{ github.workspace }}/valt-logo.iconset/icon_${size}x${size}.png
-            sips -z $((size*2)) $((size*2)) ${{ github.workspace }}/src/Valt.UI/Assets/valt-logo.png \
-              --out ${{ github.workspace }}/valt-logo.iconset/icon_${size}x${size}@2x.png
-          done
-          iconutil -c icns ${{ github.workspace }}/valt-logo.iconset -o ${{ github.workspace }}/valt-logo.icns
+          ICONSET="${{ github.workspace }}/valt-logo.iconset"
+          SOURCE="${{ github.workspace }}/src/Valt.UI/Assets/valt-logo.png"
+          mkdir -p "$ICONSET"
+
+          # Generate all required iconset sizes
+          # Standard sizes: 16, 32, 128, 256, 512
+          # @2x sizes: 32 (16@2x), 64 (32@2x), 256 (128@2x), 512 (256@2x), 1024 (512@2x)
+          magick "$SOURCE" -resize 16x16     "$ICONSET/icon_16x16.png"
+          magick "$SOURCE" -resize 32x32     "$ICONSET/icon_16x16@2x.png"
+          magick "$SOURCE" -resize 32x32     "$ICONSET/icon_32x32.png"
+          magick "$SOURCE" -resize 64x64     "$ICONSET/icon_32x32@2x.png"
+          magick "$SOURCE" -resize 128x128   "$ICONSET/icon_128x128.png"
+          magick "$SOURCE" -resize 256x256   "$ICONSET/icon_128x128@2x.png"
+          magick "$SOURCE" -resize 256x256   "$ICONSET/icon_256x256.png"
+          magick "$SOURCE" -resize 512x512   "$ICONSET/icon_256x256@2x.png"
+          magick "$SOURCE" -resize 512x512   "$ICONSET/icon_512x512.png"
+          magick "$SOURCE" -resize 1024x1024 "$ICONSET/icon_512x512@2x.png"
+
+          # Verify iconset contents
+          ls -la "$ICONSET"
+
+          # Generate icns
+          iconutil -c icns "$ICONSET" -o ${{ github.workspace }}/valt-logo.icns
 
       - name: Create macOS app bundle
         run: |
