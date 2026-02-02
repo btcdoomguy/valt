@@ -186,7 +186,12 @@ internal sealed class LocalDatabase : ILocalDatabase
 
     public ILiteCollection<AccountEntity> GetAccounts()
     {
-        return GetOpenDatabase().GetCollection<AccountEntity>("budget_accounts");
+        var collection = GetOpenDatabase().GetCollection<AccountEntity>("budget_accounts");
+
+        collection.EnsureIndex(x => x.Visible);
+        collection.EnsureIndex(x => x.GroupId);
+
+        return collection;
     }
 
     public ILiteCollection<AccountGroupEntity> GetAccountGroups()
@@ -241,6 +246,7 @@ internal sealed class LocalDatabase : ILocalDatabase
         collection.EnsureIndex(x => x.CategoryId);
         collection.EnsureIndex(x => x.SatAmountStateId);
         collection.EnsureIndex(x => x.Type);
+        collection.EnsureIndex(x => x.GroupId);
 
         return collection;
     }

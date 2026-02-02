@@ -1,6 +1,4 @@
-using System.Text.Json;
 using Valt.Core.Modules.Goals;
-using Valt.Core.Modules.Goals.GoalTypes;
 using Valt.Infra.Modules.Goals.Queries.DTOs;
 
 namespace Valt.Infra.Modules.Goals.Services;
@@ -18,9 +16,7 @@ internal class SpendingLimitProgressCalculator : IGoalProgressCalculator
 
     public Task<GoalProgressResult> CalculateProgressAsync(GoalProgressInput input)
     {
-        var dto = JsonSerializer.Deserialize<SpendingLimitGoalTypeDto>(input.GoalTypeJson)
-                  ?? throw new InvalidOperationException("Failed to deserialize SpendingLimitGoalType");
-        var config = new SpendingLimitGoalType(dto.TargetAmount, dto.CalculatedSpending);
+        var config = GoalTypeSerializer.DeserializeSpendingLimit(input.GoalTypeJson);
 
         // Calculate total expenses in main fiat currency
         var totalSpending = _transactionReader.CalculateTotalExpenses(input.From, input.To);

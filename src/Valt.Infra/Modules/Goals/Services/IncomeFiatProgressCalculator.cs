@@ -1,6 +1,4 @@
-using System.Text.Json;
 using Valt.Core.Modules.Goals;
-using Valt.Core.Modules.Goals.GoalTypes;
 using Valt.Infra.Modules.Goals.Queries.DTOs;
 
 namespace Valt.Infra.Modules.Goals.Services;
@@ -18,9 +16,7 @@ internal class IncomeFiatProgressCalculator : IGoalProgressCalculator
 
     public Task<GoalProgressResult> CalculateProgressAsync(GoalProgressInput input)
     {
-        var dto = JsonSerializer.Deserialize<IncomeFiatGoalTypeDto>(input.GoalTypeJson)
-                  ?? throw new InvalidOperationException("Failed to deserialize IncomeFiatGoalType");
-        var config = new IncomeFiatGoalType(dto.TargetAmount, dto.CalculatedIncome);
+        var config = GoalTypeSerializer.DeserializeIncomeFiat(input.GoalTypeJson);
 
         // Calculate total income in main fiat currency
         var totalIncome = _transactionReader.CalculateTotalIncome(input.From, input.To);

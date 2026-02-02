@@ -49,11 +49,12 @@ public class AccountQueries : IAccountQueries
 
     public async Task<AccountSummariesDTO> GetAccountSummariesAsync(bool showHiddenAccounts)
     {
-        var accounts = _localDatabase.GetAccounts().FindAll().OrderBy(x => x.DisplayOrder);
+        var accounts = showHiddenAccounts
+            ? _localDatabase.GetAccounts().FindAll().OrderBy(x => x.DisplayOrder)
+            : _localDatabase.GetAccounts().Find(x => x.Visible).OrderBy(x => x.DisplayOrder);
         var groups = _localDatabase.GetAccountGroups().FindAll().ToDictionary(g => g.Id, g => g.Name);
 
-        var summaryTasks = (from account in accounts where account.Visible || showHiddenAccounts select CreateAccountSummaryAsync(account, groups))
-            .ToList();
+        var summaryTasks = accounts.Select(account => CreateAccountSummaryAsync(account, groups)).ToList();
 
         var dtos = await Task.WhenAll(summaryTasks);
         return new AccountSummariesDTO(dtos.ToList());
@@ -61,7 +62,9 @@ public class AccountQueries : IAccountQueries
 
     public Task<IEnumerable<AccountDTO>> GetAccountsAsync(bool showHiddenAccounts)
     {
-        var accounts = _localDatabase.GetAccounts().FindAll().Where(account => account.Visible || showHiddenAccounts).OrderBy(x => x.DisplayOrder);
+        var accounts = showHiddenAccounts
+            ? _localDatabase.GetAccounts().FindAll().OrderBy(x => x.DisplayOrder)
+            : _localDatabase.GetAccounts().Find(x => x.Visible).OrderBy(x => x.DisplayOrder);
 
         return Task.FromResult(accounts.Select(account =>
         {

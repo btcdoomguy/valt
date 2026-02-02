@@ -631,25 +631,56 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     
     private void JobOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (Jobs.All(x => x.State == BackgroundJobState.Ok))
+        // Single-pass to determine job states instead of multiple All()/Any() calls
+        var hasOk = false;
+        var hasError = false;
+        var hasRunning = false;
+        var allOk = true;
+        var allError = true;
+
+        foreach (var job in Jobs)
+        {
+            switch (job.State)
+            {
+                case BackgroundJobState.Ok:
+                    hasOk = true;
+                    allError = false;
+                    break;
+                case BackgroundJobState.Error:
+                    hasError = true;
+                    allOk = false;
+                    break;
+                case BackgroundJobState.Running:
+                    hasRunning = true;
+                    allOk = false;
+                    allError = false;
+                    break;
+                default:
+                    allOk = false;
+                    allError = false;
+                    break;
+            }
+        }
+
+        if (allOk && Jobs.Count > 0)
         {
             StatusDisplay = "Status: OK";
             return;
         }
 
-        if (Jobs.All(x => x.State == BackgroundJobState.Error))
+        if (allError && Jobs.Count > 0)
         {
             StatusDisplay = "Status: Error";
             return;
         }
 
-        if (Jobs.Any(x => x.State == BackgroundJobState.Running))
+        if (hasRunning)
         {
             StatusDisplay = "Status: Running";
             return;
         }
 
-        if (Jobs.Any(x => x.State == BackgroundJobState.Ok))
+        if (hasOk)
         {
             StatusDisplay = "Status: Unstable";
         }

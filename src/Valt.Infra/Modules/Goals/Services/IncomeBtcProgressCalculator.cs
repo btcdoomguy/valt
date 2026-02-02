@@ -1,6 +1,4 @@
-using System.Text.Json;
 using Valt.Core.Modules.Goals;
-using Valt.Core.Modules.Goals.GoalTypes;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Budget.Transactions;
@@ -21,9 +19,7 @@ internal class IncomeBtcProgressCalculator : IGoalProgressCalculator
 
     public Task<GoalProgressResult> CalculateProgressAsync(GoalProgressInput input)
     {
-        var dto = JsonSerializer.Deserialize<IncomeBtcGoalTypeDto>(input.GoalTypeJson)
-                  ?? throw new InvalidOperationException("Failed to deserialize IncomeBtcGoalType");
-        var config = new IncomeBtcGoalType(dto.TargetSats, dto.CalculatedSats);
+        var config = GoalTypeSerializer.DeserializeIncomeBtc(input.GoalTypeJson);
 
         var fromDate = input.From.ToValtDateTime();
         var toDate = input.To.ToValtDateTime().AddDays(1).AddTicks(-1);

@@ -177,20 +177,48 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
             IEnumerable<TransactionEntity> fromTransactions,
             IEnumerable<TransactionEntity> toTransactions)
         {
-            var balanceChange = fromTransactions.Sum(x => x.FromSatAmount.GetValueOrDefault() / SatoshisPerBitcoin) +
-                                toTransactions.Sum(x => x.ToSatAmount.GetValueOrDefault() / SatoshisPerBitcoin);
+            // Single-pass aggregation for fromTransactions to avoid multiple iterations
+            var fromBalanceChange = 0m;
+            var income = 0m;
+            var expense = 0m;
+            var sale = 0m;
 
+            foreach (var tx in fromTransactions)
+            {
+                var satAmount = tx.FromSatAmount.GetValueOrDefault() / SatoshisPerBitcoin;
+                fromBalanceChange += satAmount;
+
+                if (tx.Type == TransactionEntityType.Bitcoin)
+                {
+                    if (tx.FromSatAmount > 0)
+                        income += satAmount;
+                    else if (tx.FromSatAmount < 0)
+                        expense += satAmount;
+                }
+                else if (tx.Type == TransactionEntityType.BitcoinToFiat && tx.FromSatAmount < 0)
+                {
+                    sale += satAmount;
+                }
+            }
+
+            // Single-pass aggregation for toTransactions
+            var toBalanceChange = 0m;
+            var purchase = 0m;
+
+            foreach (var tx in toTransactions)
+            {
+                var satAmount = tx.ToSatAmount.GetValueOrDefault() / SatoshisPerBitcoin;
+                toBalanceChange += satAmount;
+
+                if (tx.Type == TransactionEntityType.FiatToBitcoin && tx.ToSatAmount > 0)
+                {
+                    purchase += satAmount;
+                }
+            }
+
+            var balanceChange = fromBalanceChange + toBalanceChange;
             accountBalances[accountId] += balanceChange;
             bitcoinDailyTotal += balanceChange;
-
-            var income = fromTransactions.Where(x => x.Type == TransactionEntityType.Bitcoin && x.FromSatAmount > 0)
-                .Sum(x => x.FromSatAmount.GetValueOrDefault() / SatoshisPerBitcoin);
-            var expense = fromTransactions.Where(x => x.Type == TransactionEntityType.Bitcoin && x.FromSatAmount < 0)
-                .Sum(x => x.FromSatAmount.GetValueOrDefault() / SatoshisPerBitcoin);
-            var purchase = toTransactions.Where(x => x.Type == TransactionEntityType.FiatToBitcoin && x.ToSatAmount > 0)
-                .Sum(x => x.ToSatAmount.GetValueOrDefault() / SatoshisPerBitcoin);
-            var sale = fromTransactions.Where(x => x.Type == TransactionEntityType.BitcoinToFiat && x.FromSatAmount < 0)
-                .Sum(x => x.FromSatAmount.GetValueOrDefault() / SatoshisPerBitcoin);
 
             accountIncomes[accountId] += income;
             accountExpenses[accountId] += expense;
@@ -206,16 +234,33 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
             IEnumerable<TransactionEntity> fromTransactions,
             IEnumerable<TransactionEntity> toTransactions)
         {
-            var balanceChange = fromTransactions.Sum(x => x.FromFiatAmount.GetValueOrDefault()) +
-                                toTransactions.Sum(x => x.ToFiatAmount.GetValueOrDefault());
+            // Single-pass aggregation for fromTransactions
+            var fromBalanceChange = 0m;
+            var income = 0m;
+            var expense = 0m;
 
-            accountBalances[accountId] += balanceChange;
+            foreach (var tx in fromTransactions)
+            {
+                var fiatAmount = tx.FromFiatAmount.GetValueOrDefault();
+                fromBalanceChange += fiatAmount;
 
-            var income = fromTransactions.Where(x => x.Type == TransactionEntityType.Fiat && x.FromFiatAmount > 0)
-                .Sum(x => x.FromFiatAmount.GetValueOrDefault());
-            var expense = fromTransactions.Where(x => x.Type == TransactionEntityType.Fiat && x.FromFiatAmount < 0)
-                .Sum(x => x.FromFiatAmount.GetValueOrDefault());
+                if (tx.Type == TransactionEntityType.Fiat)
+                {
+                    if (tx.FromFiatAmount > 0)
+                        income += fiatAmount;
+                    else if (tx.FromFiatAmount < 0)
+                        expense += fiatAmount;
+                }
+            }
 
+            // Single-pass for toTransactions
+            var toBalanceChange = 0m;
+            foreach (var tx in toTransactions)
+            {
+                toBalanceChange += tx.ToFiatAmount.GetValueOrDefault();
+            }
+
+            accountBalances[accountId] += fromBalanceChange + toBalanceChange;
             accountIncomes[accountId] += income;
             accountExpenses[accountId] += expense;
         }
@@ -308,22 +353,24 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
             Dictionary<ObjectId, decimal> accountBitcoinPurchases,
             Dictionary<ObjectId, decimal> accountBitcoinSales)
         {
-            foreach (var key in accountIncomes.Keys.ToList())
+            // Clear and recreate to avoid Keys.ToList() allocation
+            // Using simple foreach on Keys is safe when we set values, not add/remove
+            foreach (var key in accountIncomes.Keys)
             {
                 accountIncomes[key] = 0;
             }
 
-            foreach (var key in accountExpenses.Keys.ToList())
+            foreach (var key in accountExpenses.Keys)
             {
                 accountExpenses[key] = 0;
             }
 
-            foreach (var key in accountBitcoinPurchases.Keys.ToList())
+            foreach (var key in accountBitcoinPurchases.Keys)
             {
                 accountBitcoinPurchases[key] = 0;
             }
 
-            foreach (var key in accountBitcoinSales.Keys.ToList())
+            foreach (var key in accountBitcoinSales.Keys)
             {
                 accountBitcoinSales[key] = 0;
             }
