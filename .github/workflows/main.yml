@@ -12,7 +12,7 @@ on:
         default: 'v0.0.0-test'
 
 env:
-  VERSION: ${{ inputs.version || github.ref_name }}
+  RELEASE_VERSION: ${{ inputs.version || github.ref_name }}
 
 jobs:
   build-windows:
@@ -40,18 +40,18 @@ jobs:
             /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true \
             --verbosity detailed -o ${{ github.workspace }}/publish/win-x64
           cd ${{ github.workspace }}/publish/win-x64
-          zip -r ${{ github.workspace }}/Valt-Windows-${{ env.VERSION }}.zip .
+          zip -r ${{ github.workspace }}/Valt-Windows-${{ env.RELEASE_VERSION }}.zip .
 
       - name: Attest Windows artifact
         uses: actions/attest-build-provenance@v2
         with:
-          subject-path: Valt-Windows-${{ env.VERSION }}.zip
+          subject-path: Valt-Windows-${{ env.RELEASE_VERSION }}.zip
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
           name: windows-build
-          path: Valt-Windows-${{ env.VERSION }}.zip
+          path: Valt-Windows-${{ env.RELEASE_VERSION }}.zip
 
   build-linux:
     runs-on: ubuntu-latest
@@ -98,19 +98,19 @@ jobs:
           cp ${{ github.workspace }}/src/Valt.UI/linux/install.sh .
           chmod +x install.sh
           chmod +x Valt
-          tar -czvf ${{ github.workspace }}/Valt-Linux-${{ env.VERSION }}.tar.gz \
+          tar -czvf ${{ github.workspace }}/Valt-Linux-${{ env.RELEASE_VERSION }}.tar.gz \
             Valt valt.desktop install.sh icons/
 
       - name: Attest Linux artifact
         uses: actions/attest-build-provenance@v2
         with:
-          subject-path: Valt-Linux-${{ env.VERSION }}.tar.gz
+          subject-path: Valt-Linux-${{ env.RELEASE_VERSION }}.tar.gz
 
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
         with:
           name: linux-build
-          path: Valt-Linux-${{ env.VERSION }}.tar.gz
+          path: Valt-Linux-${{ env.RELEASE_VERSION }}.tar.gz
 
   build-macos:
     runs-on: macos-latest
@@ -165,7 +165,7 @@ jobs:
           cp ${{ github.workspace }}/valt-logo.icns "$APP_DIR/Contents/Resources/"
 
           # Create Info.plist with version
-          VERSION="${{ env.VERSION }}"
+          VERSION="${{ env.RELEASE_VERSION }}"
           VERSION="${VERSION#v}"  # Remove 'v' prefix
           sed "s/VERSION_PLACEHOLDER/$VERSION/g" ${{ github.workspace }}/src/Valt.UI/Info.plist > "$APP_DIR/Contents/Info.plist"
 
@@ -175,18 +175,18 @@ jobs:
       - name: Package macOS build
         run: |
           cd ${{ github.workspace }}
-          zip -r Valt-MacOS-${{ matrix.arch }}-${{ env.VERSION }}.zip Valt.app
+          zip -r Valt-MacOS-${{ matrix.arch }}-${{ env.RELEASE_VERSION }}.zip Valt.app
 
       - name: Attest macOS artifact
         uses: actions/attest-build-provenance@v2
         with:
-          subject-path: Valt-MacOS-${{ matrix.arch }}-${{ env.VERSION }}.zip
+          subject-path: Valt-MacOS-${{ matrix.arch }}-${{ env.RELEASE_VERSION }}.zip
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
           name: macos-${{ matrix.arch }}-build
-          path: Valt-MacOS-${{ matrix.arch }}-${{ env.VERSION }}.zip
+          path: Valt-MacOS-${{ matrix.arch }}-${{ env.RELEASE_VERSION }}.zip
 
   release:
     needs: [build-windows, build-linux, build-macos]
@@ -210,12 +210,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.VERSION }}
-          name: Release ${{ env.VERSION }}
+          tag_name: ${{ env.RELEASE_VERSION }}
+          name: Release ${{ env.RELEASE_VERSION }}
           draft: false
           prerelease: false
           files: |
-            artifacts/windows-build/Valt-Windows-${{ env.VERSION }}.zip
-            artifacts/linux-build/Valt-Linux-${{ env.VERSION }}.tar.gz
-            artifacts/macos-x64-build/Valt-MacOS-x64-${{ env.VERSION }}.zip
-            artifacts/macos-arm64-build/Valt-MacOS-arm64-${{ env.VERSION }}.zip
+            artifacts/windows-build/Valt-Windows-${{ env.RELEASE_VERSION }}.zip
+            artifacts/linux-build/Valt-Linux-${{ env.RELEASE_VERSION }}.tar.gz
+            artifacts/macos-x64-build/Valt-MacOS-x64-${{ env.RELEASE_VERSION }}.zip
+            artifacts/macos-arm64-build/Valt-MacOS-arm64-${{ env.RELEASE_VERSION }}.zip
