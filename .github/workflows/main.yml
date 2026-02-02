@@ -4,14 +4,23 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version for testing (e.g., v0.0.0-test)'
+        required: true
+        default: 'v0.0.0-test'
+
+env:
+  VERSION: ${{ inputs.version || github.ref_name }}
 
 jobs:
-  build:
+  build-windows:
     runs-on: ubuntu-latest
     permissions:
-      contents: write       # Required for softprops/action-gh-release
-      id-token: write       # Required for artifact attestations (OIDC)
-      attestations: write   # Required for artifact attestations
+      contents: write
+      id-token: write
+      attestations: write
 
     steps:
       - name: Checkout code
@@ -25,58 +34,188 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore src/Valt.UI/Valt.UI.csproj
 
-      - name: Build
-        run: dotnet build src/Valt.UI/Valt.UI.csproj --no-restore -c Release
-
       - name: Publish for Windows
         run: |
           dotnet publish src/Valt.UI/Valt.UI.csproj -c Release -r win-x64 --self-contained true \
             /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true \
             --verbosity detailed -o ${{ github.workspace }}/publish/win-x64
           cd ${{ github.workspace }}/publish/win-x64
-          zip -r ${{ github.workspace }}/Valt-Windows-${{ github.ref_name }}.zip .
+          zip -r ${{ github.workspace }}/Valt-Windows-${{ env.VERSION }}.zip .
+
+      - name: Attest Windows artifact
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: Valt-Windows-${{ env.VERSION }}.zip
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: Valt-Windows-${{ env.VERSION }}.zip
+
+  build-linux:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Install ImageMagick
+        run: sudo apt-get update && sudo apt-get install -y imagemagick
+
+      - name: Restore dependencies
+        run: dotnet restore src/Valt.UI/Valt.UI.csproj
 
       - name: Publish for Linux
         run: |
           dotnet publish src/Valt.UI/Valt.UI.csproj -c Release -r linux-x64 --self-contained true \
             /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true \
             --verbosity detailed -o ${{ github.workspace }}/publish/linux-x64
-          cd ${{ github.workspace }}/publish/linux-x64
-          zip -r ${{ github.workspace }}/Valt-Linux-${{ github.ref_name }}.zip .
-          
-      - name: Publish for macOS
-        run: |
-          dotnet publish src/Valt.UI/Valt.UI.csproj -c Release -r osx-x64 --self-contained true \
-            /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true \
-            --verbosity detailed -o ${{ github.workspace }}/publish/osx-x64
-          cd ${{ github.workspace }}/publish/osx-x64
-          zip -r ${{ github.workspace }}/Valt-MacOS-experimental-${{ github.ref_name }}.zip .
 
-      - name: Attest Windows artifact
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-path: Valt-Windows-${{ github.ref_name }}.zip
+      - name: Generate Linux icons
+        run: |
+          cd ${{ github.workspace }}/publish/linux-x64
+          mkdir -p icons
+          for size in 16 32 48 64 128 256 512; do
+            mkdir -p "icons/${size}x${size}"
+            convert "${{ github.workspace }}/src/Valt.UI/Assets/valt-logo.png" \
+              -resize ${size}x${size} "icons/${size}x${size}/valt.png"
+          done
+
+      - name: Package Linux build
+        run: |
+          cd ${{ github.workspace }}/publish/linux-x64
+          cp ${{ github.workspace }}/src/Valt.UI/valt.desktop .
+          cp ${{ github.workspace }}/src/Valt.UI/linux/install.sh .
+          chmod +x install.sh
+          chmod +x Valt
+          tar -czvf ${{ github.workspace }}/Valt-Linux-${{ env.VERSION }}.tar.gz \
+            Valt valt.desktop install.sh icons/
 
       - name: Attest Linux artifact
         uses: actions/attest-build-provenance@v2
         with:
-          subject-path: Valt-Linux-${{ github.ref_name }}.zip
+          subject-path: Valt-Linux-${{ env.VERSION }}.tar.gz
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-build
+          path: Valt-Linux-${{ env.VERSION }}.tar.gz
+
+  build-macos:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    strategy:
+      matrix:
+        arch: [x64, arm64]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore src/Valt.UI/Valt.UI.csproj
+
+      - name: Publish for macOS ${{ matrix.arch }}
+        run: |
+          dotnet publish src/Valt.UI/Valt.UI.csproj -c Release -r osx-${{ matrix.arch }} --self-contained true \
+            /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true \
+            --verbosity detailed -o ${{ github.workspace }}/publish/osx-${{ matrix.arch }}
+
+      - name: Generate macOS icon
+        run: |
+          mkdir -p ${{ github.workspace }}/valt-logo.iconset
+          for size in 16 32 64 128 256 512; do
+            sips -z $size $size ${{ github.workspace }}/src/Valt.UI/Assets/valt-logo.png \
+              --out ${{ github.workspace }}/valt-logo.iconset/icon_${size}x${size}.png
+            sips -z $((size*2)) $((size*2)) ${{ github.workspace }}/src/Valt.UI/Assets/valt-logo.png \
+              --out ${{ github.workspace }}/valt-logo.iconset/icon_${size}x${size}@2x.png
+          done
+          iconutil -c icns ${{ github.workspace }}/valt-logo.iconset -o ${{ github.workspace }}/valt-logo.icns
+
+      - name: Create macOS app bundle
+        run: |
+          APP_DIR="${{ github.workspace }}/Valt.app"
+          mkdir -p "$APP_DIR/Contents/MacOS"
+          mkdir -p "$APP_DIR/Contents/Resources"
+
+          # Copy executable
+          cp ${{ github.workspace }}/publish/osx-${{ matrix.arch }}/Valt "$APP_DIR/Contents/MacOS/"
+          chmod +x "$APP_DIR/Contents/MacOS/Valt"
+
+          # Copy icon
+          cp ${{ github.workspace }}/valt-logo.icns "$APP_DIR/Contents/Resources/"
+
+          # Create Info.plist with version
+          VERSION="${{ env.VERSION }}"
+          VERSION="${VERSION#v}"  # Remove 'v' prefix
+          sed "s/VERSION_PLACEHOLDER/$VERSION/g" ${{ github.workspace }}/src/Valt.UI/Info.plist > "$APP_DIR/Contents/Info.plist"
+
+          # Create PkgInfo
+          echo -n "APPL????" > "$APP_DIR/Contents/PkgInfo"
+
+      - name: Package macOS build
+        run: |
+          cd ${{ github.workspace }}
+          zip -r Valt-MacOS-${{ matrix.arch }}-${{ env.VERSION }}.zip Valt.app
 
       - name: Attest macOS artifact
         uses: actions/attest-build-provenance@v2
         with:
-          subject-path: Valt-MacOS-experimental-${{ github.ref_name }}.zip
+          subject-path: Valt-MacOS-${{ matrix.arch }}-${{ env.VERSION }}.zip
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-${{ matrix.arch }}-build
+          path: Valt-MacOS-${{ matrix.arch }}-${{ env.VERSION }}.zip
+
+  release:
+    needs: [build-windows, build-linux, build-macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    # Only create release for tag pushes, not manual runs
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: List artifacts
+        run: find artifacts -type f
 
       - name: Release
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
+          tag_name: ${{ env.VERSION }}
+          name: Release ${{ env.VERSION }}
           draft: false
           prerelease: false
           files: |
-            Valt-Windows-${{ github.ref_name }}.zip
-            Valt-Linux-${{ github.ref_name }}.zip
-            Valt-MacOS-experimental-${{ github.ref_name }}.zip
+            artifacts/windows-build/Valt-Windows-${{ env.VERSION }}.zip
+            artifacts/linux-build/Valt-Linux-${{ env.VERSION }}.tar.gz
+            artifacts/macos-x64-build/Valt-MacOS-x64-${{ env.VERSION }}.zip
+            artifacts/macos-arm64-build/Valt-MacOS-arm64-${{ env.VERSION }}.zip

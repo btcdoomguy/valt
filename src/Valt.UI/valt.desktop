@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=0.2
+Name=Valt
+GenericName=Budget Manager
+Comment=Personal budget management for bitcoiners
+Exec=valt
+Icon=valt
+Terminal=false
+Type=Application
+Categories=Office;Finance;
+Keywords=bitcoin;budget;finance;money;
+StartupWMClass=Valt
