@@ -525,18 +525,24 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     {
         try
         {
+            var jobsAlreadyStarted = false;
+
             if (!_priceDatabase.DatabaseFileExists() || IsPriceDatabaseEmpty())
             {
                 var installResult = await InstallProcessAsync();
 
                 if (!installResult)
                     return false;
+
+                // Jobs were started in InstallProcessAsync
+                jobsAlreadyStarted = true;
             }
 
             if (!_priceDatabase.HasDatabaseOpen)
                 _priceDatabase!.OpenDatabase();
 
-            await _backgroundJobManager!.StartAllJobsAsync(jobType: BackgroundJobTypes.PriceDatabase, triggerInitialRun: false);
+            if (!jobsAlreadyStarted)
+                await _backgroundJobManager!.StartAllJobsAsync(jobType: BackgroundJobTypes.PriceDatabase, triggerInitialRun: false);
 
             // Run LivePricesUpdater synchronously to ensure rates are available before UI is shown
             await _backgroundJobManager.TriggerJobAndWaitAsync(BackgroundJobSystemNames.LivePricesUpdater);
@@ -594,11 +600,16 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         //execute the main jobs manually
         try
         {
+            // Start jobs first so their consumer loops are ready to process requests
+            await _backgroundJobManager!.StartAllJobsAsync(
+                jobType: BackgroundJobTypes.PriceDatabase,
+                triggerInitialRun: false);
+
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 LoadingMessage = language.InstallingBitcoinPriceMessage;
             });
-            await _backgroundJobManager!.TriggerJobAndWaitAsync(BackgroundJobSystemNames
+            await _backgroundJobManager.TriggerJobAndWaitAsync(BackgroundJobSystemNames
                 .BitcoinHistoryUpdater);
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
