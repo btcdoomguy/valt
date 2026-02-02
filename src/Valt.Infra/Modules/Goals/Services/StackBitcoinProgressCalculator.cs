@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.GoalTypes;
 using Valt.Infra.DataAccess;
@@ -21,9 +20,7 @@ internal class StackBitcoinProgressCalculator : IGoalProgressCalculator
 
     public Task<GoalProgressResult> CalculateProgressAsync(GoalProgressInput input)
     {
-        var dto = JsonSerializer.Deserialize<StackBitcoinGoalTypeDto>(input.GoalTypeJson)
-                  ?? throw new InvalidOperationException("Failed to deserialize StackBitcoinGoalType");
-        var config = new StackBitcoinGoalType(dto.TargetSats, dto.CalculatedSats);
+        var config = GoalTypeSerializer.DeserializeStackBitcoin(input.GoalTypeJson);
 
         var fromDate = input.From.ToValtDateTime();
         var toDate = input.To.ToValtDateTime().AddDays(1).AddTicks(-1);

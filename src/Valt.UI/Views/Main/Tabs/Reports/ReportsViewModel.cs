@@ -11,6 +11,7 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
@@ -19,6 +20,7 @@ using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Categories;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
+using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
 using Valt.Infra.Modules.Reports.ExpensesByCategory;
@@ -30,8 +32,10 @@ using Valt.Infra.Settings;
 using Valt.UI.Base;
 using static Valt.UI.Base.TaskExtensions;
 using Valt.UI.Lang;
+using Valt.UI.Services;
 using Valt.UI.State;
 using Valt.UI.UserControls;
+using Valt.UI.Views.Main.Modals.StatisticsConfig;
 using Valt.UI.Views.Main.Tabs.Reports.Models;
 
 namespace Valt.UI.Views.Main.Tabs.Reports;
@@ -51,8 +55,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly ILogger<ReportsViewModel> _logger = null!;
     private readonly AccountsTotalState _accountsTotalState = null!;
     private readonly RatesState _ratesState = null!;
-    
     private readonly SecureModeState _secureModeState = null!;
+    private readonly IConfigurationManager _configurationManager = null!;
+    private readonly IModalFactory _modalFactory = null!;
 
     private const long TotalBtcSupplySats = 21_000_000_00_000_000L; // 21 million BTC in sats
 
@@ -116,7 +121,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         ILogger<ReportsViewModel> logger,
         AccountsTotalState accountsTotalState,
         RatesState ratesState,
-        SecureModeState secureModeState)
+        SecureModeState secureModeState,
+        IConfigurationManager configurationManager,
+        IModalFactory modalFactory)
     {
         _allTimeHighReport = allTimeHighReport;
         _monthlyTotalsReport = monthlyTotalsReport;
@@ -132,6 +139,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _accountsTotalState = accountsTotalState;
         _ratesState = ratesState;
         _secureModeState = secureModeState;
+        _configurationManager = configurationManager;
+        _modalFactory = modalFactory;
 
         _secureModeState.PropertyChanged += OnSecureModeStatePropertyChanged;
 
@@ -442,7 +451,14 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             // Get current wealth in main fiat currency
             var currentWealthInFiat = currentWealth.AllWealthInMainFiatCurrency;
 
-            var statisticsData = await _statisticsReport.GetAsync(fiatCurrency, currentWealthInFiat, provider);
+            // Get excluded category IDs from configuration
+            var excludedCategoryIds = _configurationManager.GetStatisticsExcludedCategoryIds().ToHashSet();
+
+            var statisticsData = await _statisticsReport.GetAsync(
+                fiatCurrency,
+                currentWealthInFiat,
+                provider,
+                excludedCategoryIds.Count > 0 ? excludedCategoryIds : null);
 
             var rows = new ObservableCollection<RowItem>
             {
@@ -486,7 +502,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
             rows.Add(new RowItem(language.Reports_Statistics_WealthCoverage, statisticsData.WealthCoverageFormatted, language.Reports_Statistics_WealthCoverage_Tooltip));
 
-            StatisticsData = new DashboardData(language.Reports_Statistics_Title, rows);
+            StatisticsData = new DashboardData(language.Reports_Statistics_Title, rows, OpenStatisticsConfigCommand);
 
             IsStatisticsLoading = false;
         }
@@ -495,13 +511,36 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             _logger.LogError(ex, "Error fetching statistics data");
             StatisticsData = new DashboardData(language.Reports_Statistics_Title,
                 new ObservableCollection<RowItem>
-                {
-                    new(language.Error, ex.Message)
-                });
+                    {
+                        new(language.Error, ex.Message)
+                    },
+                OpenStatisticsConfigCommand);
         }
         finally
         {
             IsStatisticsLoading = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task OpenStatisticsConfig()
+    {
+        var ownerWindow = GetUserControlOwnerWindow?.Invoke();
+        if (ownerWindow is null)
+            return;
+
+        var modal = (StatisticsConfigView)await _modalFactory.CreateAsync(
+            ApplicationModalNames.StatisticsConfig,
+            ownerWindow);
+
+        var result = await modal.ShowDialog<StatisticsConfigViewModel.Response?>(ownerWindow);
+
+        // Refresh statistics after config change
+        if (result?.Ok == true)
+        {
+            IsStatisticsLoading = true;
+            var provider = await GetOrCreateProviderAsync();
+            await FetchStatisticsDataAsync(provider);
         }
     }
 

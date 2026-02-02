@@ -1659,4 +1659,14 @@
     <data name="McpNotification_Title" xml:space="preserve">
         <value>Dados alterados via assistente de IA</value>
     </data>
+    <!-- Statistics Configuration -->
+    <data name="Statistics_Config_Title" xml:space="preserve">
+        <value>Configuração de Estatísticas</value>
+    </data>
+    <data name="Statistics_Config_Description" xml:space="preserve">
+        <value>Selecione categorias para excluir dos cálculos de estatísticas. Por padrão, todas as categorias são incluídas nos cálculos de gastos medianos.</value>
+    </data>
+    <data name="Statistics_Config_ExcludedCategories" xml:space="preserve">
+        <value>Categorias Excluídas</value>
+    </data>
 </root>

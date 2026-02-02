@@ -1,10 +1,13 @@
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 using LiveChartsCore.Kernel;
 
 namespace Valt.UI.Views.Main.Tabs.Reports;
 
-public record DashboardData(string Title, ObservableCollection<RowItem> Rows)
+public record DashboardData(string Title, ObservableCollection<RowItem> Rows, ICommand? ConfigureCommand = null)
 {
+    public bool HasConfiguration => ConfigureCommand is not null;
+
     public static DashboardData Empty => new(string.Empty, new ObservableCollection<RowItem>());
 
     public static DashboardData DesignTimeSample => new(

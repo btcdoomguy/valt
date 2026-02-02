@@ -2,6 +2,7 @@ using LiteDB;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Infra.Modules.Budget.Accounts;
+using Valt.Infra.Modules.Budget.Transactions;
 
 namespace Valt.Infra.Modules.Reports.AllTimeHigh;
 
@@ -60,6 +61,36 @@ internal class AllTimeHighReport : IAllTimeHighReport
 
             var accountCurrentScanDateTotals = new Dictionary<ObjectId, decimal>();
 
+            // Pre-compute transaction groups per date to avoid repeated Where() calls
+            // Group by (Date, AccountId, IsFromAccount) for O(1) lookups
+            var fromTransactionsByDateAndAccount = new Dictionary<(DateOnly, ObjectId), List<TransactionEntity>>();
+            var toTransactionsByDateAndAccount = new Dictionary<(DateOnly, ObjectId), List<TransactionEntity>>();
+
+            foreach (var (date, transactions) in _provider.TransactionsByDate)
+            {
+                foreach (var tx in transactions)
+                {
+                    var key = (date, tx.FromAccountId);
+                    if (!fromTransactionsByDateAndAccount.TryGetValue(key, out var fromList))
+                    {
+                        fromList = new List<TransactionEntity>();
+                        fromTransactionsByDateAndAccount[key] = fromList;
+                    }
+                    fromList.Add(tx);
+
+                    if (tx.ToAccountId is not null)
+                    {
+                        var toKey = (date, tx.ToAccountId);
+                        if (!toTransactionsByDateAndAccount.TryGetValue(toKey, out var toList))
+                        {
+                            toList = new List<TransactionEntity>();
+                            toTransactionsByDateAndAccount[toKey] = toList;
+                        }
+                        toList.Add(tx);
+                    }
+                }
+            }
+
             var currentScanDate = _startDate.AddDays(-1);
             while (currentScanDate < _endDate)
             {
@@ -78,22 +109,21 @@ internal class AllTimeHighReport : IAllTimeHighReport
                                     : account.InitialAmount / SatoshisPerBitcoin;
                         }
 
-                        var transactionsOfDate = _provider.TransactionsByDate[currentScanDate];
-
-                        var fromAccount = transactionsOfDate.Where(x => x.FromAccountId == accountId);
-                        var toAccount = transactionsOfDate.Where(x => x.ToAccountId == accountId);
+                        // Use pre-grouped transactions for O(1) lookup
+                        fromTransactionsByDateAndAccount.TryGetValue((currentScanDate, accountId), out var fromAccount);
+                        toTransactionsByDateAndAccount.TryGetValue((currentScanDate, accountId), out var toAccount);
 
                         if (account.AccountEntityType == AccountEntityType.Bitcoin)
                         {
-                            var change = fromAccount.Sum(x => x.FromSatAmount.GetValueOrDefault() / SatoshisPerBitcoin);
-                            change += toAccount.Sum(x => x.ToSatAmount.GetValueOrDefault() / SatoshisPerBitcoin);
+                            var change = (fromAccount?.Sum(x => x.FromSatAmount.GetValueOrDefault() / SatoshisPerBitcoin) ?? 0m);
+                            change += (toAccount?.Sum(x => x.ToSatAmount.GetValueOrDefault() / SatoshisPerBitcoin) ?? 0m);
 
                             accountCurrentScanDateTotals[accountId] += change;
                         }
                         else
                         {
-                            var change = fromAccount.Sum(x => x.FromFiatAmount.GetValueOrDefault());
-                            change += toAccount.Sum(x => x.ToFiatAmount.GetValueOrDefault());
+                            var change = (fromAccount?.Sum(x => x.FromFiatAmount.GetValueOrDefault()) ?? 0m);
+                            change += (toAccount?.Sum(x => x.ToFiatAmount.GetValueOrDefault()) ?? 0m);
 
                             accountCurrentScanDateTotals[accountId] += change;
                         }

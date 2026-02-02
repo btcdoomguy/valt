@@ -525,18 +525,24 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     {
         try
         {
+            var jobsAlreadyStarted = false;
+
             if (!_priceDatabase.DatabaseFileExists() || IsPriceDatabaseEmpty())
             {
                 var installResult = await InstallProcessAsync();
 
                 if (!installResult)
                     return false;
+
+                // Jobs were started in InstallProcessAsync
+                jobsAlreadyStarted = true;
             }
 
             if (!_priceDatabase.HasDatabaseOpen)
                 _priceDatabase!.OpenDatabase();
 
-            await _backgroundJobManager!.StartAllJobsAsync(jobType: BackgroundJobTypes.PriceDatabase, triggerInitialRun: false);
+            if (!jobsAlreadyStarted)
+                await _backgroundJobManager!.StartAllJobsAsync(jobType: BackgroundJobTypes.PriceDatabase, triggerInitialRun: false);
 
             // Run LivePricesUpdater synchronously to ensure rates are available before UI is shown
             await _backgroundJobManager.TriggerJobAndWaitAsync(BackgroundJobSystemNames.LivePricesUpdater);
@@ -594,11 +600,16 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         //execute the main jobs manually
         try
         {
+            // Start jobs first so their consumer loops are ready to process requests
+            await _backgroundJobManager!.StartAllJobsAsync(
+                jobType: BackgroundJobTypes.PriceDatabase,
+                triggerInitialRun: false);
+
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 LoadingMessage = language.InstallingBitcoinPriceMessage;
             });
-            await _backgroundJobManager!.TriggerJobAndWaitAsync(BackgroundJobSystemNames
+            await _backgroundJobManager.TriggerJobAndWaitAsync(BackgroundJobSystemNames
                 .BitcoinHistoryUpdater);
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
@@ -631,25 +642,56 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     
     private void JobOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (Jobs.All(x => x.State == BackgroundJobState.Ok))
+        // Single-pass to determine job states instead of multiple All()/Any() calls
+        var hasOk = false;
+        var hasError = false;
+        var hasRunning = false;
+        var allOk = true;
+        var allError = true;
+
+        foreach (var job in Jobs)
+        {
+            switch (job.State)
+            {
+                case BackgroundJobState.Ok:
+                    hasOk = true;
+                    allError = false;
+                    break;
+                case BackgroundJobState.Error:
+                    hasError = true;
+                    allOk = false;
+                    break;
+                case BackgroundJobState.Running:
+                    hasRunning = true;
+                    allOk = false;
+                    allError = false;
+                    break;
+                default:
+                    allOk = false;
+                    allError = false;
+                    break;
+            }
+        }
+
+        if (allOk && Jobs.Count > 0)
         {
             StatusDisplay = "Status: OK";
             return;
         }
 
-        if (Jobs.All(x => x.State == BackgroundJobState.Error))
+        if (allError && Jobs.Count > 0)
         {
             StatusDisplay = "Status: Error";
             return;
         }
 
-        if (Jobs.Any(x => x.State == BackgroundJobState.Running))
+        if (hasRunning)
         {
             StatusDisplay = "Status: Running";
             return;
         }
 
-        if (Jobs.Any(x => x.State == BackgroundJobState.Ok))
+        if (hasOk)
         {
             StatusDisplay = "Status: Unstable";
         }

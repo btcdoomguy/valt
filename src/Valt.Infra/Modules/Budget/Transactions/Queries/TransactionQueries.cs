@@ -25,6 +25,10 @@ public class TransactionQueries : ITransactionQueries
         var allCategoriesList = _localDatabase.GetCategories().FindAll().ToList();
         var allCategories = ConvertToCategoriesDTO(allCategoriesList);
 
+        // Build dictionaries for O(1) lookups instead of O(n) SingleOrDefault
+        var categoryDict = allCategories.Items.ToDictionary(x => x.Id);
+        var accountDict = allAccountsList.ToDictionary(a => a.Id);
+
         var query = _localDatabase.GetTransactions().Query();
 
         if (filter.From is not null)
@@ -90,10 +94,10 @@ public class TransactionQueries : ITransactionQueries
         {
             fixedExpenseRecords.TryGetValue(transactionEntity.Id, out var fixedExpenseRecord);
 
-            var category = allCategories.Items.SingleOrDefault(x => x.Id == transactionEntity.CategoryId.ToString())!;
-            var fromAccount = allAccountsList.SingleOrDefault(a => a.Id == transactionEntity.FromAccountId);
-            var toAccount = transactionEntity.ToAccountId is not null
-                ? allAccountsList.SingleOrDefault(a => a.Id == transactionEntity.ToAccountId)
+            categoryDict.TryGetValue(transactionEntity.CategoryId.ToString(), out var category);
+            accountDict.TryGetValue(transactionEntity.FromAccountId, out var fromAccount);
+            var toAccount = transactionEntity.ToAccountId is not null && accountDict.TryGetValue(transactionEntity.ToAccountId, out var ta)
+                ? ta
                 : null;
             var transferType = transactionEntity.Type.ToString();
 
@@ -111,8 +115,8 @@ public class TransactionQueries : ITransactionQueries
                 Date = DateOnly.FromDateTime(transactionEntity.Date),
                 Name = transactionEntity.Name,
                 CategoryId = transactionEntity.CategoryId.ToString(),
-                CategoryIcon = category.IconId,
-                CategoryName = category.Name,
+                CategoryIcon = category?.IconId,
+                CategoryName = category?.Name ?? string.Empty,
                 FromAccountId = transactionEntity.FromAccountId.ToString(),
                 FromAccountIcon = fromAccount?.Icon,
                 FromAccountName = fromAccount?.Name ?? string.Empty,

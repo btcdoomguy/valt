@@ -91,7 +91,24 @@ public partial class CheckboxListSelector : UserControl
 
     private static void OnItemsSourceChanged(CheckboxListSelector selector, AvaloniaPropertyChangedEventArgs e)
     {
+        // Unsubscribe from old collection
+        if (e.OldValue is INotifyCollectionChanged oldCollection)
+        {
+            oldCollection.CollectionChanged -= selector.OnItemsSourceCollectionChanged;
+        }
+
+        // Subscribe to new collection
+        if (e.NewValue is INotifyCollectionChanged newCollection)
+        {
+            newCollection.CollectionChanged += selector.OnItemsSourceCollectionChanged;
+        }
+
         selector.RebuildInternalItems();
+    }
+
+    private void OnItemsSourceCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        RebuildInternalItems();
     }
 
     private static void OnSelectedItemsChanged(CheckboxListSelector selector, AvaloniaPropertyChangedEventArgs e)

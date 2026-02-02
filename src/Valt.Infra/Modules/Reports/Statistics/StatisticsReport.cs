@@ -16,7 +16,11 @@ internal class StatisticsReport : IStatisticsReport
         _monthlyTotalsReport = monthlyTotalsReport;
     }
 
-    public async Task<StatisticsData> GetAsync(FiatCurrency currency, decimal currentWealthInFiat, IReportDataProvider provider)
+    public async Task<StatisticsData> GetAsync(
+        FiatCurrency currency,
+        decimal currentWealthInFiat,
+        IReportDataProvider provider,
+        IReadOnlySet<string>? excludedCategoryIds = null)
     {
         var currentDate = _clock.GetCurrentLocalDate();
 
@@ -28,12 +32,12 @@ internal class StatisticsReport : IStatisticsReport
         var previousPeriodStart = new DateOnly(previousPeriodEnd.AddMonths(-11).Year, previousPeriodEnd.AddMonths(-11).Month, 1);
 
         // Calculate fiat medians using existing MonthlyTotalsReport
-        var medianExpenses = await CalculateMedianExpensesForPeriodAsync(currency, provider, currentDate);
-        var previousMedianExpenses = await CalculateMedianExpensesForPeriodAsync(currency, provider, currentPeriodStart);
+        var medianExpenses = await CalculateMedianExpensesForPeriodAsync(currency, provider, currentDate, excludedCategoryIds);
+        var previousMedianExpenses = await CalculateMedianExpensesForPeriodAsync(currency, provider, currentPeriodStart, excludedCategoryIds);
 
         // Calculate sat medians directly from transactions (optimized single pass)
         var (currentSatMedian, previousSatMedian) = CalculateSatMediansForBothPeriods(
-            provider, currentPeriodStart, currentPeriodEnd, previousPeriodStart, previousPeriodEnd);
+            provider, currentPeriodStart, currentPeriodEnd, previousPeriodStart, previousPeriodEnd, excludedCategoryIds);
 
         var (coverageMonths, coverageFormatted) = CalculateWealthCoverage(currentWealthInFiat, medianExpenses);
 
@@ -80,7 +84,8 @@ internal class StatisticsReport : IStatisticsReport
         DateOnly currentPeriodStart,
         DateOnly currentPeriodEnd,
         DateOnly previousPeriodStart,
-        DateOnly previousPeriodEnd)
+        DateOnly previousPeriodEnd,
+        IReadOnlySet<string>? excludedCategoryIds = null)
     {
         // Pre-allocate dictionaries for monthly sat totals
         var currentPeriodMonthlyExpenses = new Dictionary<DateOnly, long>();
@@ -90,7 +95,7 @@ internal class StatisticsReport : IStatisticsReport
         foreach (var transaction in provider.AllTransactions)
         {
             // Get the sat amount for this expense, returns null if not applicable
-            var satExpense = GetSatExpenseAmount(transaction);
+            var satExpense = GetSatExpenseAmount(transaction, excludedCategoryIds);
             if (!satExpense.HasValue)
                 continue;
 
@@ -123,8 +128,13 @@ internal class StatisticsReport : IStatisticsReport
     /// Gets the sat expense amount for a transaction if it qualifies as an expense (debit, not transfer).
     /// Returns null if the transaction is not an expense or doesn't have sat data.
     /// </summary>
-    private static long? GetSatExpenseAmount(TransactionEntity transaction)
+    private static long? GetSatExpenseAmount(TransactionEntity transaction, IReadOnlySet<string>? excludedCategoryIds = null)
     {
+        // Check if category should be excluded
+        if (excludedCategoryIds is not null && transaction.CategoryId is not null &&
+            excludedCategoryIds.Contains(transaction.CategoryId.ToString()))
+            return null;
+
         // Check if it's a transfer (has "To" amount) - transfers are not expenses
         var hasToAmount = (transaction.ToFiatAmount.HasValue && transaction.ToFiatAmount.Value != 0) ||
                           (transaction.ToSatAmount.HasValue && transaction.ToSatAmount.Value != 0);
@@ -160,7 +170,11 @@ internal class StatisticsReport : IStatisticsReport
         return null;
     }
 
-    private async Task<decimal> CalculateMedianExpensesForPeriodAsync(FiatCurrency currency, IReportDataProvider provider, DateOnly referenceDate)
+    private async Task<decimal> CalculateMedianExpensesForPeriodAsync(
+        FiatCurrency currency,
+        IReportDataProvider provider,
+        DateOnly referenceDate,
+        IReadOnlySet<string>? excludedCategoryIds = null)
     {
         if (provider.AllTransactions.Count == 0)
         {
@@ -176,7 +190,7 @@ internal class StatisticsReport : IStatisticsReport
 
         try
         {
-            var monthlyData = await _monthlyTotalsReport.GetAsync(referenceDate, displayRange, currency, provider);
+            var monthlyData = await _monthlyTotalsReport.GetAsync(referenceDate, displayRange, currency, provider, excludedCategoryIds);
 
             // Get the absolute values of expenses for each month (expenses are stored as negative)
             var monthlyExpenses = monthlyData.Items

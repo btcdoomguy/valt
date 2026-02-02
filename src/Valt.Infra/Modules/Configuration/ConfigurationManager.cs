@@ -213,4 +213,43 @@ public class ConfigurationManager : IConfigurationManager
 
         return currenciesInUse.ToList();
     }
+
+    /// <summary>
+    /// Gets the list of category IDs excluded from statistics calculations.
+    /// Returns an empty list if no exclusions have been configured.
+    /// </summary>
+    public List<string> GetStatisticsExcludedCategoryIds()
+    {
+        var config = _localDatabase.GetConfiguration()
+            .FindOne(x => x.Key == ConfigurationKeys.StatisticsExcludedCategories);
+
+        if (config is null || string.IsNullOrWhiteSpace(config.Value))
+            return new List<string>();
+
+        return config.Value.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(id => id.Trim())
+            .Distinct()
+            .ToList();
+    }
+
+    /// <summary>
+    /// Sets the list of category IDs to exclude from statistics calculations.
+    /// </summary>
+    public void SetStatisticsExcludedCategoryIds(IEnumerable<string> categoryIds)
+    {
+        var config = _localDatabase.GetConfiguration()
+            .FindOne(x => x.Key == ConfigurationKeys.StatisticsExcludedCategories);
+
+        if (config is null)
+            config = new ConfigurationEntity { Key = ConfigurationKeys.StatisticsExcludedCategories };
+
+        var distinctIds = categoryIds
+            .Where(id => !string.IsNullOrWhiteSpace(id))
+            .Select(id => id.Trim())
+            .Distinct();
+
+        config.Value = string.Join(",", distinctIds);
+
+        _localDatabase.GetConfiguration().Upsert(config);
+    }
 }

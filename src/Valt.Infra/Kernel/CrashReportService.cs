@@ -18,8 +18,33 @@ public static class CrashReportService
 
     private static void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
+        // Filter out known harmless DBus exceptions on Linux
+        // These occur when Avalonia tries to register with services that aren't available
+        if (IsHarmlessDBusException(e.Exception))
+        {
+            e.SetObserved();
+            return;
+        }
+
         WriteCrashReport(e.Exception, "UnobservedTaskException");
         e.SetObserved();
+    }
+
+    private static bool IsHarmlessDBusException(AggregateException? exception)
+    {
+        if (exception is null) return false;
+
+        foreach (var inner in exception.InnerExceptions)
+        {
+            var message = inner.Message;
+
+            // Ubuntu global menu service - not available on non-Unity desktops
+            // This is a known harmless error when Avalonia tries to register with the service
+            if (message.Contains("com.canonical.AppMenu.Registrar"))
+                return true;
+        }
+
+        return false;
     }
 
     public static void WriteCrashReport(Exception? exception, string source)

@@ -51,8 +51,8 @@ internal class AutoSatAmountJob : IBackgroundJob
 
         try
         {
-            var btcRecordCount = _priceDatabase.GetBitcoinData().Query().Count();
-            if (btcRecordCount == 0)
+            var hasBtcRecords = _priceDatabase.GetBitcoinData().Query().Exists();
+            if (!hasBtcRecords)
             {
                 _logger.LogInformation("[AutoSatAmountJob] No BTC price data available, skipping");
                 return;

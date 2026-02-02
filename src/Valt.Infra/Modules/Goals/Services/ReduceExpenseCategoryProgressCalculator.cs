@@ -1,7 +1,5 @@
 using LiteDB;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 using Valt.Core.Modules.Goals;
-using Valt.Core.Modules.Goals.GoalTypes;
 using Valt.Infra.Modules.Goals.Queries.DTOs;
 
 namespace Valt.Infra.Modules.Goals.Services;
@@ -19,9 +17,7 @@ internal class ReduceExpenseCategoryProgressCalculator : IGoalProgressCalculator
 
     public Task<GoalProgressResult> CalculateProgressAsync(GoalProgressInput input)
     {
-        var dto = JsonSerializer.Deserialize<ReduceExpenseCategoryGoalTypeDto>(input.GoalTypeJson)
-                  ?? throw new InvalidOperationException("Failed to deserialize ReduceExpenseCategoryGoalType");
-        var config = new ReduceExpenseCategoryGoalType(dto.TargetAmount, dto.CategoryId, dto.CategoryName, dto.CalculatedSpending);
+        var config = GoalTypeSerializer.DeserializeReduceExpenseCategory(input.GoalTypeJson);
 
         var targetCategoryId = new ObjectId(config.CategoryId);
 

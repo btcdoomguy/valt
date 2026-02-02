@@ -82,13 +82,18 @@ internal sealed class AddTransactionHandler : ICommandHandler<AddTransactionComm
         // Create transaction
         var name = TransactionName.New(command.Name);
         var notes = string.IsNullOrWhiteSpace(command.Notes) ? null : command.Notes;
+        var groupId = string.IsNullOrEmpty(command.GroupId)
+            ? null
+            : new GroupId(command.GroupId);
+
         var transaction = Transaction.New(
             command.Date,
             name,
             categoryId,
             transactionDetails,
             notes,
-            fixedExpenseReference);
+            fixedExpenseReference,
+            groupId);
 
         await _transactionRepository.SaveTransactionAsync(transaction);
 

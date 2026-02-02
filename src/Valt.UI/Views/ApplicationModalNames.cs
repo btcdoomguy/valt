@@ -22,5 +22,6 @@ public enum ApplicationModalNames
     ImportWizard = 18,
     ManageGoal = 19,
     ConversionCalculator = 20,
-    ManageAccountGroup = 21
+    ManageAccountGroup = 21,
+    StatisticsConfig = 22
 }

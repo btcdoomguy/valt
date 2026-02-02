@@ -1,0 +1,60 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        xmlns:statisticsConfig="clr-namespace:Valt.UI.Views.Main.Modals.StatisticsConfig"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Views.Main.Modals.StatisticsConfig.StatisticsConfigView"
+        x:DataType="statisticsConfig:StatisticsConfigViewModel"
+        Title="{x:Static local:language.Statistics_Config_Title}"
+        WindowStartupLocation="CenterOwner"
+        d:DesignWidth="450"
+        d:DesignHeight="500"
+        MinWidth="450"
+        MinHeight="500"
+        MaxWidth="450"
+        MaxHeight="500"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <statisticsConfig:StatisticsConfigViewModel />
+    </Design.DataContext>
+    <Border>
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="{x:Static local:language.Statistics_Config_Title}"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+            <Border Classes="form-fields-area" Height="410">
+                <StackPanel Orientation="Vertical" Spacing="15" Margin="15">
+                    <!-- Description -->
+                    <TextBlock TextWrapping="Wrap"
+                               FontSize="{DynamicResource FontSizeSmall}"
+                               Foreground="{DynamicResource Text300Brush}"
+                               Text="{x:Static local:language.Statistics_Config_Description}" />
+
+                    <!-- Category selector -->
+                    <userControls:CheckboxListSelector
+                        Title="{x:Static local:language.Statistics_Config_ExcludedCategories}"
+                        DisplayMemberPath="Name"
+                        Height="300"
+                        MaxListHeight="300"
+                        ItemsSource="{Binding AllCategories}"
+                        SelectedItems="{Binding ExcludedCategories}" />
+                </StackPanel>
+            </Border>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10"
+                        Margin="0,0,0,0">
+                <Button Width="100" Content="{x:Static local:language.SaveButton}" HorizontalContentAlignment="Center"
+                        Command="{Binding SaveCommand}"
+                        IsDefault="True" />
+                <Button Width="100" Content="{x:Static local:language.CancelButton}"
+                        HorizontalContentAlignment="Center"
+                        Command="{Binding CancelCommand}"
+                        IsCancel="True" />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>
