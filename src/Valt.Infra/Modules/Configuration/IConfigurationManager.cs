@@ -54,4 +54,14 @@ public interface IConfigurationManager
     /// Gets the list of fiat currencies currently in use by accounts, fixed expenses, and avg price profiles.
     /// </summary>
     List<string> GetCurrenciesInUse();
+
+    /// <summary>
+    /// Gets the list of category IDs excluded from statistics calculations.
+    /// </summary>
+    List<string> GetStatisticsExcludedCategoryIds();
+
+    /// <summary>
+    /// Sets the list of category IDs to exclude from statistics calculations.
+    /// </summary>
+    void SetStatisticsExcludedCategoryIds(IEnumerable<string> categoryIds);
 }

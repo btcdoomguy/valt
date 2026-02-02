@@ -18,7 +18,12 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
         _logger = logger;
     }
 
-    public Task<MonthlyTotalsData> GetAsync(DateOnly baseDate, DateOnlyRange displayRange, FiatCurrency currency, IReportDataProvider provider)
+    public Task<MonthlyTotalsData> GetAsync(
+        DateOnly baseDate,
+        DateOnlyRange displayRange,
+        FiatCurrency currency,
+        IReportDataProvider provider,
+        IReadOnlySet<string>? excludedCategoryIds = null)
     {
         if (provider.AllTransactions.Count == 0)
         {
@@ -29,7 +34,7 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
         var currentDate = _clock.GetCurrentLocalDate();
         var maxDate = displayRangeEnd < currentDate ? displayRangeEnd : currentDate;
 
-        var calculator = new Calculator(currency, provider, provider.MinTransactionDate, maxDate, displayRange);
+        var calculator = new Calculator(currency, provider, provider.MinTransactionDate, maxDate, displayRange, excludedCategoryIds);
 
         try
         {
@@ -51,19 +56,22 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
         private readonly DateOnly _startDate;
         private readonly DateOnly _endDate;
         private readonly DateOnlyRange _displayRange;
+        private readonly IReadOnlySet<string>? _excludedCategoryIds;
 
         public Calculator(
             FiatCurrency currency,
             IReportDataProvider provider,
             DateOnly startDate,
             DateOnly endDate,
-            DateOnlyRange displayRange)
+            DateOnlyRange displayRange,
+            IReadOnlySet<string>? excludedCategoryIds = null)
         {
             _currency = currency;
             _provider = provider;
             _startDate = startDate;
             _endDate = endDate;
             _displayRange = displayRange;
+            _excludedCategoryIds = excludedCategoryIds;
         }
 
         public MonthlyTotalsData Calculate()
@@ -166,7 +174,7 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
             accountBitcoinSales.TryAdd(accountId, 0);
         }
 
-        private static void UpdateBitcoinAccountTotals(
+        private void UpdateBitcoinAccountTotals(
             Dictionary<ObjectId, decimal> accountBalances,
             ref decimal bitcoinDailyTotal,
             Dictionary<ObjectId, decimal> accountIncomes,
@@ -188,7 +196,11 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
                 var satAmount = tx.FromSatAmount.GetValueOrDefault() / SatoshisPerBitcoin;
                 fromBalanceChange += satAmount;
 
-                if (tx.Type == TransactionEntityType.Bitcoin)
+                // Check if category is excluded (only for income/expense tracking, not balance)
+                var isExcluded = _excludedCategoryIds is not null && tx.CategoryId is not null &&
+                                 _excludedCategoryIds.Contains(tx.CategoryId.ToString());
+
+                if (tx.Type == TransactionEntityType.Bitcoin && !isExcluded)
                 {
                     if (tx.FromSatAmount > 0)
                         income += satAmount;
@@ -226,7 +238,7 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
             accountBitcoinSales[accountId] += sale;
         }
 
-        private static void UpdateFiatAccountTotals(
+        private void UpdateFiatAccountTotals(
             Dictionary<ObjectId, decimal> accountBalances,
             Dictionary<ObjectId, decimal> accountIncomes,
             Dictionary<ObjectId, decimal> accountExpenses,
@@ -246,10 +258,17 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
 
                 if (tx.Type == TransactionEntityType.Fiat)
                 {
-                    if (tx.FromFiatAmount > 0)
-                        income += fiatAmount;
-                    else if (tx.FromFiatAmount < 0)
-                        expense += fiatAmount;
+                    // Check if category is excluded (only for income/expense tracking, not balance)
+                    var isExcluded = _excludedCategoryIds is not null && tx.CategoryId is not null &&
+                                     _excludedCategoryIds.Contains(tx.CategoryId.ToString());
+
+                    if (!isExcluded)
+                    {
+                        if (tx.FromFiatAmount > 0)
+                            income += fiatAmount;
+                        else if (tx.FromFiatAmount < 0)
+                            expense += fiatAmount;
+                    }
                 }
             }
 

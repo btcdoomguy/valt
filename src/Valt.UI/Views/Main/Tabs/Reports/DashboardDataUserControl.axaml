@@ -19,12 +19,38 @@
             <Border Background="{DynamicResource Background600Brush}"
                     Padding="12, 8"
                     CornerRadius="4, 4, 0, 0">
-                <Label HorizontalContentAlignment="Left"
-                       Content="{Binding Title}"
-                       Foreground="{DynamicResource Accent200Brush}"
-                       FontSize="{DynamicResource FontSizeNormal}"
-                       FontWeight="SemiBold"
-                       Padding="0" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Column="0"
+                           HorizontalContentAlignment="Left"
+                           Content="{Binding Title}"
+                           Foreground="{DynamicResource Accent200Brush}"
+                           FontSize="{DynamicResource FontSizeNormal}"
+                           FontWeight="SemiBold"
+                           Padding="0" />
+
+                    <!-- Settings gear icon - only visible when HasConfiguration is true -->
+                    <Button Grid.Column="1"
+                            Classes="transparent"
+                            IsVisible="{Binding HasConfiguration}"
+                            Margin="-4"
+                            Command="{Binding ConfigureCommand}"
+                            ToolTip.Tip="Configure"
+                            Padding="0"
+                            MinWidth="16"
+                            MinHeight="16">
+                        <TextBlock FontFamily="{DynamicResource MaterialDesign}"
+                                   Text="&#xE8B8;"
+                                   FontSize="16"
+                                   Foreground="{DynamicResource Text300Brush}"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center" />
+                    </Button>
+                </Grid>
             </Border>
 
             <ItemsControl ItemsSource="{Binding Rows}">

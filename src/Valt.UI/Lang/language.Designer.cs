@@ -3296,5 +3296,23 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("McpNotification_Title", resourceCulture);
             }
         }
+
+        public static string Statistics_Config_Title {
+            get {
+                return ResourceManager.GetString("Statistics_Config_Title", resourceCulture);
+            }
+        }
+
+        public static string Statistics_Config_Description {
+            get {
+                return ResourceManager.GetString("Statistics_Config_Description", resourceCulture);
+            }
+        }
+
+        public static string Statistics_Config_ExcludedCategories {
+            get {
+                return ResourceManager.GetString("Statistics_Config_ExcludedCategories", resourceCulture);
+            }
+        }
     }
 }
