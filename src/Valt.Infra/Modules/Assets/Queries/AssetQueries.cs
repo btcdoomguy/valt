@@ -60,7 +60,7 @@ internal sealed class AssetQueries : IAssetQueries
             .Select(g => new AssetValueByCurrencyDTO
             {
                 CurrencyCode = g.Key,
-                TotalValue = g.Sum(a => a.GetCurrentValue()),
+                TotalValue = g.Sum(a => GetValueForSummary(a)),
                 AssetCount = g.Count()
             })
             .ToList();
@@ -72,7 +72,7 @@ internal sealed class AssetQueries : IAssetQueries
         {
             foreach (var asset in includedAssets)
             {
-                var value = asset.GetCurrentValue();
+                var value = GetValueForSummary(asset);
                 var currency = asset.GetCurrencyCode();
 
                 // Convert to USD first
@@ -112,6 +112,21 @@ internal sealed class AssetQueries : IAssetQueries
         };
 
         return Task.FromResult(summary);
+    }
+
+    /// <summary>
+    /// Gets the value to use for portfolio summary calculations.
+    /// For leveraged positions, returns only the P&amp;L (not the full position value).
+    /// For other assets, returns the current value.
+    /// </summary>
+    private static decimal GetValueForSummary(Asset asset)
+    {
+        if (asset.Details is LeveragedPositionDetails leveraged)
+        {
+            // For leveraged positions, use P&L only (not full position value)
+            return leveraged.CalculatePnL(leveraged.CurrentPrice);
+        }
+        return asset.GetCurrentValue();
     }
 
     private static AssetDTO MapToDto(AssetEntity entity)

@@ -3267,6 +3267,30 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string ManageAsset_CheckSymbol {
+            get {
+                return ResourceManager.GetString("ManageAsset_CheckSymbol", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_SymbolValid {
+            get {
+                return ResourceManager.GetString("ManageAsset_SymbolValid", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_SymbolInvalid {
+            get {
+                return ResourceManager.GetString("ManageAsset_SymbolInvalid", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_CheckingSymbol {
+            get {
+                return ResourceManager.GetString("ManageAsset_CheckingSymbol", resourceCulture);
+            }
+        }
+
         public static string Assets_Type_Stock {
             get {
                 return ResourceManager.GetString("Assets.Type.Stock", resourceCulture);
@@ -3321,9 +3345,27 @@ namespace Valt.UI.Lang {
             }
         }
 
-        public static string Assets_PriceSource_CoinGecko {
+        public static string Assets_PriceSource_LivePrice {
             get {
-                return ResourceManager.GetString("Assets.PriceSource.CoinGecko", resourceCulture);
+                return ResourceManager.GetString("Assets.PriceSource.LivePrice", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_UnderlyingAsset {
+            get {
+                return ResourceManager.GetString("ManageAsset_UnderlyingAsset", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_Bitcoin {
+            get {
+                return ResourceManager.GetString("ManageAsset_Bitcoin", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_CustomAsset {
+            get {
+                return ResourceManager.GetString("ManageAsset_CustomAsset", resourceCulture);
             }
         }
 

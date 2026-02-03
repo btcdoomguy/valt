@@ -28,6 +28,7 @@ using Valt.Infra.Kernel.Scopes;
 using Valt.Infra.Kernel.Time;
 using Valt.App.Modules.AvgPrice.Contracts;
 using Valt.Infra.Modules.Assets;
+using Valt.Infra.Modules.Assets.PriceProviders;
 using Valt.Infra.Modules.Assets.Queries;
 using Valt.Infra.Modules.AvgPrice;
 using Valt.Infra.Modules.AvgPrice.Queries;
@@ -243,6 +244,11 @@ public static class Extensions
 
         //csv export
         services.AddSingleton<ICsvExportService, CsvExportService>();
+
+        //asset price providers
+        services.AddSingleton<IAssetPriceProvider, YahooFinancePriceProvider>();
+        services.AddSingleton<IAssetPriceProvider, LivePricePriceProvider>();
+        services.AddSingleton<IAssetPriceProviderSelector, AssetPriceProviderSelector>();
 
         //goals
         services.AddSingleton<IGoalTransactionReader, GoalTransactionReader>();

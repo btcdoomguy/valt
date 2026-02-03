@@ -66,7 +66,7 @@ For stocks, ETFs, crypto, commodities, and custom assets.
 **Properties:**
 - `Quantity: decimal` - Number of units held
 - `Symbol: string?` - Ticker symbol (e.g., "AAPL", "BTC")
-- `PriceSource: AssetPriceSource` - Manual, YahooFinance, or CoinGecko
+- `PriceSource: AssetPriceSource` - Manual or YahooFinance
 - `CurrentPrice: decimal` - Price per unit
 - `CurrencyCode: string` - Currency (e.g., "USD", "BRL")
 
@@ -131,7 +131,7 @@ Short: Collateral * (1 - leveragedChange)
 |-------|------|-------------|
 | 0 | Manual | User-entered prices |
 | 1 | YahooFinance | Auto-fetch from Yahoo Finance |
-| 2 | CoinGecko | Auto-fetch from CoinGecko |
+| 2 | LivePrice | Auto-fetch from app's live BTC price (BTC/USD only) |
 
 ### Domain Events
 

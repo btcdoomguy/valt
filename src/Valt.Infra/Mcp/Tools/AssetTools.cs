@@ -74,7 +74,7 @@ public class AssetTools
         [Description("Ticker symbol (e.g., AAPL, BTC)")] string symbol,
         [Description("Quantity held")] decimal quantity,
         [Description("Current price per unit")] decimal currentPrice,
-        [Description("Price source: 0=Manual, 1=YahooFinance, 2=CoinGecko")] int priceSource = 0,
+        [Description("Price source: 0=Manual, 1=YahooFinance, 2=LivePrice (for BTC only)")] int priceSource = 0,
         [Description("Include in net worth calculation")] bool includeInNetWorth = true,
         [Description("Visible in list")] bool visible = true,
         [Description("Icon identifier (optional)")] string? icon = null)
@@ -165,7 +165,7 @@ public class AssetTools
         [Description("Leverage multiplier (e.g., 2, 5, 10)")] decimal leverage,
         [Description("Liquidation price")] decimal liquidationPrice,
         [Description("True for long position, false for short")] bool isLong = true,
-        [Description("Price source: 0=Manual, 1=YahooFinance, 2=CoinGecko")] int priceSource = 0,
+        [Description("Price source: 0=Manual, 1=YahooFinance, 2=LivePrice (for BTC only)")] int priceSource = 0,
         [Description("Include in net worth calculation")] bool includeInNetWorth = true,
         [Description("Visible in list")] bool visible = true,
         [Description("Icon identifier (optional)")] string? icon = null)

@@ -10,6 +10,7 @@ using Valt.Core.Common;
 using Valt.Core.Modules.Assets;
 using Valt.Core.Modules.Assets.Contracts;
 using Valt.Core.Modules.Assets.Details;
+using Valt.Infra.Modules.Assets.PriceProviders;
 using Valt.Infra.Modules.Assets.Queries;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Settings;
@@ -24,6 +25,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
 {
     private readonly IAssetRepository? _assetRepository;
     private readonly IAssetQueries? _assetQueries;
+    private readonly IAssetPriceProviderSelector? _priceProviderSelector;
     private readonly CurrencySettings? _currencySettings;
     private readonly IConfigurationManager? _configurationManager;
     private readonly ILogger<ManageAssetViewModel>? _logger;
@@ -48,8 +50,16 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     [NotifyPropertyChangedFor(nameof(SymbolOnRight))]
     private string _selectedCurrency = "USD";
 
+    // Leveraged position underlying asset toggle (Bitcoin vs Custom)
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsBitcoinLeveraged))]
+    [NotifyPropertyChangedFor(nameof(IsCustomLeveraged))]
+    [NotifyPropertyChangedFor(nameof(ShowLeveragedSymbolRow))]
+    private bool _isBitcoinUnderlyingAsset = false;
+
     // Basic asset fields
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsBitcoinLeveraged))]
     private string _symbol = string.Empty;
 
     [ObservableProperty]
@@ -59,6 +69,10 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     private FiatValue _currentPriceFiat = FiatValue.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowCheckSymbolButton))]
+    [NotifyPropertyChangedFor(nameof(ShowCurrentPriceField))]
+    [NotifyPropertyChangedFor(nameof(IsBitcoinLeveraged))]
+    [NotifyPropertyChangedFor(nameof(IsCustomLeveraged))]
     private string _selectedPriceSource = AssetPriceSource.Manual.ToString();
 
     // Real estate fields
@@ -101,10 +115,28 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     [ObservableProperty]
     private bool _isEditMode;
 
+    // Symbol validation
+    [ObservableProperty]
+    private bool _isCheckingSymbol;
+
+    [ObservableProperty]
+    private string? _symbolValidationMessage;
+
+    [ObservableProperty]
+    private bool _isSymbolValid;
+
+    public bool ShowCheckSymbolButton => SelectedPriceSource != AssetPriceSource.Manual.ToString();
+    public bool ShowCurrentPriceField => SelectedPriceSource == AssetPriceSource.Manual.ToString();
+
     // Visibility helpers
     public bool ShowBasicFields => SelectedAssetType is "Stock" or "Etf" or "Crypto" or "Commodity" or "Custom";
     public bool ShowRealEstateFields => SelectedAssetType == "RealEstate";
     public bool ShowLeveragedFields => SelectedAssetType == "LeveragedPosition";
+
+    // Leveraged position Bitcoin/Custom toggle helpers
+    public bool IsBitcoinLeveraged => ShowLeveragedFields && IsBitcoinUnderlyingAsset;
+    public bool IsCustomLeveraged => ShowLeveragedFields && !IsBitcoinUnderlyingAsset;
+    public bool ShowLeveragedSymbolRow => ShowLeveragedFields && !IsBitcoinUnderlyingAsset;
 
     public static List<ComboBoxValue> AvailableAssetTypes =>
     [
@@ -121,7 +153,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     [
         new(language.Assets_PriceSource_Manual, AssetPriceSource.Manual.ToString()),
         new(language.Assets_PriceSource_YahooFinance, AssetPriceSource.YahooFinance.ToString()),
-        new(language.Assets_PriceSource_CoinGecko, AssetPriceSource.CoinGecko.ToString())
+        new(language.Assets_PriceSource_LivePrice, AssetPriceSource.LivePrice.ToString())
     ];
 
     public List<string> AvailableCurrencies => _configurationManager?.GetAvailableFiatCurrencies()
@@ -141,12 +173,14 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     public ManageAssetViewModel(
         IAssetRepository assetRepository,
         IAssetQueries assetQueries,
+        IAssetPriceProviderSelector priceProviderSelector,
         CurrencySettings currencySettings,
         IConfigurationManager configurationManager,
         ILogger<ManageAssetViewModel> logger)
     {
         _assetRepository = assetRepository;
         _assetQueries = assetQueries;
+        _priceProviderSelector = priceProviderSelector;
         _currencySettings = currencySettings;
         _configurationManager = configurationManager;
         _logger = logger;
@@ -205,9 +239,75 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                     LiquidationPriceFiat = FiatValue.New(assetDto.LiquidationPrice ?? 0);
                     IsLong = assetDto.IsLong ?? true;
                     SelectedPriceSource = ((AssetPriceSource)(assetDto.PriceSourceId ?? 0)).ToString();
+                    // Detect if this is a Bitcoin leveraged position
+                    IsBitcoinUnderlyingAsset = (AssetPriceSource)(assetDto.PriceSourceId ?? 0) == AssetPriceSource.LivePrice &&
+                                                Symbol.Equals("BTC", StringComparison.OrdinalIgnoreCase);
                     break;
             }
         }
+    }
+
+    [RelayCommand]
+    private async Task CheckSymbol()
+    {
+        if (string.IsNullOrWhiteSpace(Symbol) || _priceProviderSelector is null)
+        {
+            SymbolValidationMessage = language.ManageAsset_SymbolInvalid;
+            IsSymbolValid = false;
+            return;
+        }
+
+        try
+        {
+            IsCheckingSymbol = true;
+            SymbolValidationMessage = language.ManageAsset_CheckingSymbol;
+            IsSymbolValid = false;
+
+            var priceSource = Enum.Parse<AssetPriceSource>(SelectedPriceSource);
+            var isValid = await _priceProviderSelector.ValidateSymbolAsync(priceSource, Symbol);
+
+            if (isValid)
+            {
+                SymbolValidationMessage = language.ManageAsset_SymbolValid;
+                IsSymbolValid = true;
+            }
+            else
+            {
+                SymbolValidationMessage = language.ManageAsset_SymbolInvalid;
+                IsSymbolValid = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Error validating symbol {Symbol}", Symbol);
+            SymbolValidationMessage = language.ManageAsset_SymbolInvalid;
+            IsSymbolValid = false;
+        }
+        finally
+        {
+            IsCheckingSymbol = false;
+        }
+    }
+
+    [RelayCommand]
+    private void SetBitcoinLeveraged()
+    {
+        IsBitcoinUnderlyingAsset = true;
+        Symbol = "BTC";
+        SelectedPriceSource = AssetPriceSource.LivePrice.ToString();
+        SelectedCurrency = "USD";
+        SymbolValidationMessage = null;
+        IsSymbolValid = true;
+    }
+
+    [RelayCommand]
+    private void SetCustomLeveraged()
+    {
+        IsBitcoinUnderlyingAsset = false;
+        Symbol = string.Empty;
+        SelectedPriceSource = AssetPriceSource.Manual.ToString();
+        SymbolValidationMessage = null;
+        IsSymbolValid = false;
     }
 
     [RelayCommand]
@@ -232,12 +332,24 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                 case AssetTypes.Commodity:
                 case AssetTypes.Custom:
                     var priceSource = Enum.Parse<AssetPriceSource>(SelectedPriceSource);
+                    var currentPrice = CurrentPriceFiat.Value;
+
+                    // Fetch price from provider if not Manual
+                    if (priceSource != AssetPriceSource.Manual && !string.IsNullOrWhiteSpace(Symbol))
+                    {
+                        var result = await _priceProviderSelector!.GetPriceAsync(priceSource, Symbol, SelectedCurrency);
+                        if (result is not null)
+                        {
+                            currentPrice = result.Price;
+                        }
+                    }
+
                     details = new BasicAssetDetails(
                         assetType: assetType,
                         quantity: Quantity,
                         symbol: Symbol,
                         priceSource: priceSource,
-                        currentPrice: CurrentPriceFiat.Value,
+                        currentPrice: currentPrice,
                         currencyCode: SelectedCurrency);
                     break;
 
@@ -251,12 +363,24 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
 
                 case AssetTypes.LeveragedPosition:
                     var leveragedPriceSource = Enum.Parse<AssetPriceSource>(SelectedPriceSource);
+                    var leveragedCurrentPrice = CurrentPriceFiat.Value;
+
+                    // Fetch price from provider if not Manual
+                    if (leveragedPriceSource != AssetPriceSource.Manual && !string.IsNullOrWhiteSpace(Symbol))
+                    {
+                        var result = await _priceProviderSelector!.GetPriceAsync(leveragedPriceSource, Symbol, SelectedCurrency);
+                        if (result is not null)
+                        {
+                            leveragedCurrentPrice = result.Price;
+                        }
+                    }
+
                     details = new LeveragedPositionDetails(
                         collateral: CollateralFiat.Value,
                         entryPrice: EntryPriceFiat.Value,
                         leverage: Leverage,
                         liquidationPrice: LiquidationPriceFiat.Value,
-                        currentPrice: CurrentPriceFiat.Value,
+                        currentPrice: leveragedCurrentPrice,
                         currencyCode: SelectedCurrency,
                         symbol: Symbol,
                         priceSource: leveragedPriceSource,

@@ -8,5 +8,6 @@ public enum BackgroundJobSystemNames
     AutoSatAmountUpdater,
     LivePricesUpdater,
     AccountTotalsCalculator,
-    GoalProgressUpdater
+    GoalProgressUpdater,
+    AssetPriceUpdater
 }

@@ -1057,6 +1057,18 @@
     <data name="ManageAsset_Visible" xml:space="preserve">
         <value>Visible</value>
     </data>
+    <data name="ManageAsset_CheckSymbol" xml:space="preserve">
+        <value>Verificar</value>
+    </data>
+    <data name="ManageAsset_SymbolValid" xml:space="preserve">
+        <value>Símbolo encontrado</value>
+    </data>
+    <data name="ManageAsset_SymbolInvalid" xml:space="preserve">
+        <value>Símbolo no encontrado</value>
+    </data>
+    <data name="ManageAsset_CheckingSymbol" xml:space="preserve">
+        <value>Verificando...</value>
+    </data>
     <data name="Assets.Type.Stock" xml:space="preserve">
         <value>Acción</value>
     </data>
@@ -1084,8 +1096,17 @@
     <data name="Assets.PriceSource.YahooFinance" xml:space="preserve">
         <value>Yahoo Finance</value>
     </data>
-    <data name="Assets.PriceSource.CoinGecko" xml:space="preserve">
-        <value>CoinGecko</value>
+    <data name="Assets.PriceSource.LivePrice" xml:space="preserve">
+        <value>Precio en Vivo</value>
+    </data>
+    <data name="ManageAsset_UnderlyingAsset" xml:space="preserve">
+        <value>Activo Subyacente</value>
+    </data>
+    <data name="ManageAsset_Bitcoin" xml:space="preserve">
+        <value>Bitcoin</value>
+    </data>
+    <data name="ManageAsset_CustomAsset" xml:space="preserve">
+        <value>Activo Personalizado</value>
     </data>
     <data name="Error.AssetNotFound" xml:space="preserve">
         <value>Activo no encontrado</value>

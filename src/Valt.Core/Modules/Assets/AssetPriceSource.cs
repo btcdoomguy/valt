@@ -4,5 +4,5 @@ public enum AssetPriceSource
 {
     Manual = 0,
     YahooFinance = 1,
-    CoinGecko = 2
+    LivePrice = 2
 }
