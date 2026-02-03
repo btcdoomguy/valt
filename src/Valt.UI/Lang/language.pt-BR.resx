@@ -762,6 +762,9 @@
     <data name="Reports.AllTimeHigh.MaxDrawdownPercent" xml:space="preserve">
         <value>Maior queda</value>
     </data>
+    <data name="Reports.AllTimeHigh.BtcPriceToHitAth" xml:space="preserve">
+        <value>Preço do BTC p/ bater ATH</value>
+    </data>
     <data name="Reports.Wealth.Title" xml:space="preserve">
         <value>Patrimônio</value>
     </data>

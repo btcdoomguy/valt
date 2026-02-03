@@ -422,6 +422,24 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     allTimeHighData.MaxDrawdownDate.Value.ToString()));
             }
 
+            // Add BTC price to hit ATH calculation
+            var currentWealth = _accountsTotalState.CurrentWealth;
+            var currentFiat = currentWealth.WealthInMainFiatCurrency;
+            var currentBtcInBtc = currentWealth.WealthInSats / 100_000_000m;
+
+            if (currentBtcInBtc > 0)
+            {
+                var targetAthValue = allTimeHighData.Value.Value;
+                var requiredBtcPriceValue = targetAthValue - currentFiat;
+
+                if (requiredBtcPriceValue > 0)
+                {
+                    var requiredBtcPrice = requiredBtcPriceValue / currentBtcInBtc;
+                    rows.Add(new RowItem(language.Reports_AllTimeHigh_BtcPriceToHitAth,
+                        CurrencyDisplay.FormatFiat(requiredBtcPrice, fiatCurrency.Code)));
+                }
+            }
+
             AllTimeHighData = new DashboardData(language.Reports_AllTimeHigh_Title, rows);
 
             IsAllTimeHighLoading = false;

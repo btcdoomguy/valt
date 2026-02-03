@@ -800,6 +800,9 @@
     <data name="Reports.AllTimeHigh.MaxDrawdownPercent" xml:space="preserve">
         <value>Max drawdown</value>
     </data>
+    <data name="Reports.AllTimeHigh.BtcPriceToHitAth" xml:space="preserve">
+        <value>BTC price to hit ATH</value>
+    </data>
     <data name="Reports.Wealth.Title" xml:space="preserve">
         <value>Wealth</value>
     </data>

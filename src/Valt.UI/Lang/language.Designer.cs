@@ -1598,6 +1598,12 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.AllTimeHigh.MaxDrawdownPercent", resourceCulture);
             }
         }
+
+        public static string Reports_AllTimeHigh_BtcPriceToHitAth {
+            get {
+                return ResourceManager.GetString("Reports.AllTimeHigh.BtcPriceToHitAth", resourceCulture);
+            }
+        }
         
         public static string Reports_Wealth_Title {
             get {
