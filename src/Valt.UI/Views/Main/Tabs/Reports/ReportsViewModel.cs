@@ -584,6 +584,18 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 new(language.Transactions_Ratio, btcRatio)
             };
 
+            // Add assets and net worth if assets exist
+            if (wealth.AssetsWealthInMainFiatCurrency > 0 || wealth.AssetsWealthInSats > 0)
+            {
+                var assetsWealth = CurrencyDisplay.FormatFiat(wealth.AssetsWealthInMainFiatCurrency, fiatCurrency.Code);
+                var netWorthFiat = CurrencyDisplay.FormatFiat(wealth.NetWorthInMainFiatCurrency, fiatCurrency.Code);
+                var netWorthSats = wealth.NetWorthInSats.ToString("N0", CultureInfo.CurrentCulture) + " sats";
+
+                rows.Add(new RowItem(language.Reports_Wealth_MyAssets, assetsWealth));
+                rows.Add(new RowItem(language.Reports_Wealth_NetWorth, netWorthFiat));
+                rows.Add(new RowItem(language.Reports_Wealth_NetWorthInSats, netWorthSats));
+            }
+
             WealthData = new DashboardData(language.Reports_Wealth_Title, rows);
             IsWealthLoading = false;
         }

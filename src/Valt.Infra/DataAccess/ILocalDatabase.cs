@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using LiteDB;
+using Valt.Infra.Modules.Assets;
 using Valt.Infra.Modules.AvgPrice;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Categories;
@@ -64,6 +65,12 @@ public interface ILocalDatabase : INotifyPropertyChanged, IDisposable
     #region Goals module
 
     ILiteCollection<GoalEntity> GetGoals();
+
+    #endregion
+
+    #region Assets module
+
+    ILiteCollection<AssetEntity> GetAssets();
 
     #endregion
 

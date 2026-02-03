@@ -2,48 +2,84 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Messages;
 using Valt.App.Modules.Budget.Accounts.DTOs;
+using Valt.Infra.Modules.Assets.Queries;
+using Valt.Infra.Modules.Assets.Queries.DTOs;
 using Valt.Infra.Settings;
 using Valt.UI.State.Events;
 
 namespace Valt.UI.State;
 
 public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpdated>,
-    IRecipient<AccountSummariesDTO>, IDisposable
+    IRecipient<AccountSummariesDTO>, IRecipient<AssetSummaryUpdatedMessage>, IDisposable
 {
     private readonly Lock _calculationLock = new();
-    
+
     private readonly CurrencySettings _currencySettings;
     private readonly RatesState _ratesState;
+    private readonly IAssetQueries _assetQueries;
     private readonly ILogger<AccountsTotalState> _logger;
-    
+
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(CurrentWealth))]
     private AccountSummariesDTO? _accountSummaries;
 
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(CurrentWealth))]
+    private AssetSummaryDTO? _assetSummary;
+
     public Wealth CurrentWealth => CalculateCurrentWealth();
 
-    public AccountsTotalState(CurrencySettings currencySettings, RatesState ratesState, ILogger<AccountsTotalState> logger)
+    public AccountsTotalState(CurrencySettings currencySettings, RatesState ratesState, IAssetQueries assetQueries, ILogger<AccountsTotalState> logger)
     {
         _currencySettings = currencySettings;
         _ratesState = ratesState;
+        _assetQueries = assetQueries;
         _logger = logger;
         WeakReferenceMessenger.Default.Register<RatesUpdated>(this);
         WeakReferenceMessenger.Default.Register<AccountSummariesDTO>(this);
+        WeakReferenceMessenger.Default.Register<AssetSummaryUpdatedMessage>(this);
     }
 
     public void Receive(AccountSummariesDTO message)
     {
         AccountSummaries = message;
     }
-    
+
     public void Receive(RatesUpdated message)
     {
-        OnPropertyChanged(nameof(CurrentWealth));
+        RefreshAssetSummaryAsync().ContinueWith(_ => OnPropertyChanged(nameof(CurrentWealth)));
+    }
+
+    public void Receive(AssetSummaryUpdatedMessage message)
+    {
+        RefreshAssetSummaryAsync().ContinueWith(_ => OnPropertyChanged(nameof(CurrentWealth)));
+    }
+
+    /// <summary>
+    /// Refreshes the asset summary from the database.
+    /// Call this when assets have been modified.
+    /// </summary>
+    public async Task RefreshAssetSummaryAsync()
+    {
+        try
+        {
+            var btcPriceUsd = _ratesState.BitcoinPrice;
+            var fiatRates = _ratesState.FiatRates;
+
+            AssetSummary = await _assetQueries.GetSummaryAsync(
+                _currencySettings.MainFiatCurrency,
+                btcPriceUsd,
+                fiatRates);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[AccountsTotalState] Error refreshing asset summary");
+        }
     }
 
     // Note: This calculation should have unit tests covering currency conversions and edge cases
@@ -113,8 +149,24 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
                 if (allWealthPricedInSats > 0)
                     wealthInBtcRatio = Math.Round((wealthInSats / (decimal)allWealthPricedInSats) * 100m, 2);
 
-                return new Wealth(currentWealthInFiat, wealthInMainFiatCurrency, wealthInSats, allWealthPricedInSats,
-                    wealthInBtcRatio);
+                // Include assets in net worth calculation
+                var assetsWealthInMainFiatCurrency = AssetSummary?.TotalValueInMainCurrency ?? 0m;
+                var assetsWealthInSats = AssetSummary?.TotalValueInSats ?? 0L;
+
+                // Net worth = accounts + assets
+                var netWorthInMainFiatCurrency = currentWealthInFiat + assetsWealthInMainFiatCurrency;
+                var netWorthInSats = allWealthPricedInSats + assetsWealthInSats;
+
+                return new Wealth(
+                    currentWealthInFiat,
+                    wealthInMainFiatCurrency,
+                    wealthInSats,
+                    allWealthPricedInSats,
+                    wealthInBtcRatio,
+                    assetsWealthInMainFiatCurrency,
+                    assetsWealthInSats,
+                    netWorthInMainFiatCurrency,
+                    netWorthInSats);
             }
             catch (Exception ex)
             {
@@ -129,19 +181,25 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
         decimal WealthInMainFiatCurrency,
         long WealthInSats,
         long AllWealthInSats,
-        decimal WealthInBtcRatio)
+        decimal WealthInBtcRatio,
+        decimal AssetsWealthInMainFiatCurrency,
+        long AssetsWealthInSats,
+        decimal NetWorthInMainFiatCurrency,
+        long NetWorthInSats)
     {
-        public static Wealth Empty => new(0, 0, 0, 0, 0);
+        public static Wealth Empty => new(0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
     public void Reset()
     {
         AccountSummaries = null;
+        AssetSummary = null;
     }
 
     public void Dispose()
     {
         WeakReferenceMessenger.Default.Unregister<RatesUpdated>(this);
         WeakReferenceMessenger.Default.Unregister<AccountSummariesDTO>(this);
+        WeakReferenceMessenger.Default.Unregister<AssetSummaryUpdatedMessage>(this);
     }
 }

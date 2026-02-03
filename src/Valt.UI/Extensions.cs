@@ -28,6 +28,7 @@ using Valt.UI.Views.Main.Modals.ManageFixedExpenses;
 using Valt.UI.Views.Main.Modals.TransactionEditor;
 using Valt.UI.Views.Main.Modals.Settings;
 using Valt.UI.Views.Main.Modals.StatusDisplay;
+using Valt.UI.Views.Main.Tabs.Assets;
 using Valt.UI.Views.Main.Tabs.AvgPrice;
 using Valt.UI.Views.Main.Tabs.Reports;
 using Valt.UI.Services.LocalStorage;
@@ -38,6 +39,7 @@ using Valt.UI.Views.Main.Modals.ManageGoal;
 using Valt.UI.Views.Main.Modals.ConversionCalculator;
 using Valt.UI.Views.Main.Modals.ManageAccountGroup;
 using Valt.UI.Views.Main.Modals.StatisticsConfig;
+using Valt.UI.Views.Main.Modals.ManageAsset;
 using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Tabs.Transactions;
 
@@ -58,6 +60,7 @@ public static class Extensions
         services.AddSingleton<TransactionsViewModel>();
         services.AddSingleton<ReportsViewModel>();
         services.AddSingleton<AvgPriceViewModel>();
+        services.AddSingleton<AssetsViewModel>();
 
         //panel ViewModels
         services.AddSingleton<FixedExpensesPanelViewModel>();
@@ -70,6 +73,7 @@ public static class Extensions
                 MainViewTabNames.TransactionsPageContent => services.GetRequiredService<TransactionsViewModel>(),
                 MainViewTabNames.ReportsPageContent => services.GetRequiredService<ReportsViewModel>(),
                 MainViewTabNames.AvgPricePageContent => services.GetRequiredService<AvgPriceViewModel>(),
+                MainViewTabNames.AssetsPageContent => services.GetRequiredService<AssetsViewModel>(),
                 _ => throw new ArgumentOutOfRangeException(nameof(pageNames), pageNames, null)
             };
         });
@@ -111,6 +115,7 @@ public static class Extensions
         services.AddTransient<ConversionCalculatorViewModel>();
         services.AddTransient<ManageAccountGroupViewModel>();
         services.AddTransient<StatisticsConfigViewModel>();
+        services.AddTransient<ManageAssetViewModel>();
 
         //other
         services.AddSingleton<IInitialCategoryNameLanguageProvider, InitialCategoryNameLanguageProvider>();
@@ -208,6 +213,10 @@ public static class Extensions
                 ApplicationModalNames.StatisticsConfig => new StatisticsConfigView()
                 {
                     DataContext = services.GetRequiredService<StatisticsConfigViewModel>(),
+                },
+                ApplicationModalNames.ManageAsset => new ManageAssetView()
+                {
+                    DataContext = services.GetRequiredService<ManageAssetViewModel>(),
                 },
                 _ => throw new ArgumentOutOfRangeException(nameof(modalNames), modalNames, null)
             };

@@ -85,10 +85,11 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         ? new GridLength(30)
         : new GridLength(0);
 
-    [ObservableProperty] 
+    [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsTransactionButtonSelected))]
     [NotifyPropertyChangedFor(nameof(IsReportButtonSelected))]
     [NotifyPropertyChangedFor(nameof(IsAvgPriceButtonSelected))]
+    [NotifyPropertyChangedFor(nameof(IsAssetsButtonSelected))]
     private ValtTabViewModel? _selectedTabComponent;
 
     public bool IsTransactionButtonSelected =>
@@ -96,9 +97,12 @@ public partial class MainViewModel : ValtViewModel, IDisposable
 
     public bool IsReportButtonSelected =>
         SelectedTabComponent?.TabName == MainViewTabNames.ReportsPageContent;
-    
+
     public bool IsAvgPriceButtonSelected =>
         SelectedTabComponent?.TabName == MainViewTabNames.AvgPricePageContent;
+
+    public bool IsAssetsButtonSelected =>
+        SelectedTabComponent?.TabName == MainViewTabNames.AssetsPageContent;
 
     [ObservableProperty] private string _statusDisplay = string.Empty;
 
@@ -296,6 +300,19 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         {
             await SelectedTabComponent.RefreshAsync();
             _tabRefreshState.ClearRefresh(MainViewTabNames.AvgPricePageContent);
+        }
+    }
+
+    [RelayCommand]
+    private async Task SetAssetsTab()
+    {
+        var needsRefresh = _tabRefreshState.NeedsRefresh(MainViewTabNames.AssetsPageContent);
+        SelectedTabComponent = _pageFactory.Create(MainViewTabNames.AssetsPageContent);
+
+        if (needsRefresh && SelectedTabComponent is not null)
+        {
+            await SelectedTabComponent.RefreshAsync();
+            _tabRefreshState.ClearRefresh(MainViewTabNames.AssetsPageContent);
         }
     }
 

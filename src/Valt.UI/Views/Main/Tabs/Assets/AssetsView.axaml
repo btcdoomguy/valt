@@ -1,0 +1,288 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:assets="clr-namespace:Valt.UI.Views.Main.Tabs.Assets"
+             xmlns:models="clr-namespace:Valt.UI.Views.Main.Tabs.Assets.Models"
+             xmlns:lang="clr-namespace:Valt.UI.Lang"
+             mc:Ignorable="d" d:DesignWidth="1300" d:DesignHeight="650"
+             x:Class="Valt.UI.Views.Main.Tabs.Assets.AssetsView"
+             x:DataType="assets:AssetsViewModel">
+    <Grid MinHeight="500">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="350" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Main Assets List -->
+        <Border Grid.Column="0" Padding="15">
+            <Grid RowDefinitions="50, *">
+                <!-- Header Row with Add Button -->
+                <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" VerticalAlignment="Center">
+                    <TextBlock Grid.Column="0"
+                               Text="{x:Static lang:language.Main_Assets}"
+                               FontSize="{DynamicResource FontSizeXLarge}"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Button Command="{Binding AddAssetCommand}"
+                                Content="{x:Static lang:language.Assets_Add}" />
+                    </StackPanel>
+                </Grid>
+
+                <!-- Assets DataGrid -->
+                <DataGrid Grid.Row="1"
+                          x:Name="AssetsGrid"
+                          ItemsSource="{Binding Assets}"
+                          SelectedItem="{Binding SelectedAsset, Mode=OneWay}"
+                          SelectionChanged="AssetsGrid_OnSelectionChanged"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserReorderColumns="True"
+                          CanUserResizeColumns="True"
+                          CanUserSortColumns="True"
+                          SelectionMode="Single"
+                          HorizontalScrollBarVisibility="Auto"
+                          Margin="0,10,0,0"
+                          IsVisible="{Binding !IsLoading}">
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="{x:Static lang:language.Assets_Edit}"
+                                      Command="{Binding EditAssetCommand}"
+                                      CommandParameter="{Binding SelectedAsset}" />
+                            <MenuItem Header="{x:Static lang:language.Assets_Delete}"
+                                      Command="{Binding DeleteAssetCommand}"
+                                      CommandParameter="{Binding SelectedAsset}" />
+                            <Separator />
+                            <MenuItem Header="{x:Static lang:language.Assets_ToggleVisibility}"
+                                      Command="{Binding ToggleVisibilityCommand}"
+                                      CommandParameter="{Binding SelectedAsset}" />
+                            <MenuItem Header="{x:Static lang:language.Assets_ToggleNetWorth}"
+                                      Command="{Binding ToggleIncludeInNetWorthCommand}"
+                                      CommandParameter="{Binding SelectedAsset}" />
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{x:Static lang:language.Assets_Column_Name}"
+                                            Binding="{Binding Name}"
+                                            Width="150" />
+                        <DataGridTextColumn Header="{x:Static lang:language.Assets_Column_Type}"
+                                            Binding="{Binding AssetTypeName}"
+                                            Width="100" />
+                        <DataGridTextColumn Header="{x:Static lang:language.Assets_Column_Symbol}"
+                                            Binding="{Binding Symbol}"
+                                            Width="80" />
+                        <DataGridTextColumn Header="{x:Static lang:language.Assets_Column_Quantity}"
+                                            Binding="{Binding QuantityFormatted}"
+                                            Width="100" />
+                        <DataGridTextColumn Header="{x:Static lang:language.Assets_Column_Price}"
+                                            Binding="{Binding CurrentPriceFormatted}"
+                                            Width="120" />
+                        <DataGridTemplateColumn Header="{x:Static lang:language.Assets_Column_Value}"
+                                                Width="200">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate DataType="models:AssetViewModel">
+                                    <TextBlock Text="{Binding DisplayValueFormatted}"
+                                               Foreground="{Binding ValueColor}"
+                                               VerticalAlignment="Center"
+                                               Margin="8,0" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridCheckBoxColumn Header="{x:Static lang:language.Assets_Column_Visible}"
+                                                Binding="{Binding Visible}"
+                                                Width="70" />
+                        <DataGridCheckBoxColumn Header="{x:Static lang:language.Assets_Column_NetWorth}"
+                                                Binding="{Binding IncludeInNetWorth}"
+                                                Width="90" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <TextBlock Grid.Row="1"
+                           Text="{x:Static lang:language.Loading}"
+                           FontSize="{DynamicResource FontSizeMedium}"
+                           Foreground="{DynamicResource Text400Brush}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           IsVisible="{Binding IsLoading}" />
+            </Grid>
+        </Border>
+
+        <!-- Summary Panel -->
+        <Border Grid.Column="1" Padding="15">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel Orientation="Vertical" Spacing="15">
+                    <!-- Summary Card -->
+                    <Border Background="{DynamicResource Background700Brush}"
+                            BorderBrush="{DynamicResource Background500Brush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="16">
+                        <StackPanel Spacing="12" IsVisible="{Binding !IsSecureModeEnabled}">
+                            <TextBlock Text="{x:Static lang:language.Assets_Summary_Title}"
+                                       FontSize="{DynamicResource FontSizeLarge}"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,8" />
+
+                            <Grid ColumnDefinitions="*, Auto">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Summary_TotalAssets}"
+                                           FontSize="{DynamicResource FontSizeMedium}"
+                                           Foreground="{DynamicResource Text400Brush}"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding Summary.TotalAssets}"
+                                           FontSize="{DynamicResource FontSizeLarge}"
+                                           FontWeight="SemiBold"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+
+                            <Grid ColumnDefinitions="*, Auto">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Summary_InNetWorth}"
+                                           FontSize="{DynamicResource FontSizeMedium}"
+                                           Foreground="{DynamicResource Text400Brush}"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding Summary.AssetsIncludedInNetWorth}"
+                                           FontSize="{DynamicResource FontSizeLarge}"
+                                           FontWeight="SemiBold"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+
+                            <Separator Margin="0,8" />
+
+                            <Grid ColumnDefinitions="*, Auto">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Summary_TotalValue}"
+                                           FontSize="{DynamicResource FontSizeMedium}"
+                                           Foreground="{DynamicResource Text400Brush}"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding TotalValueFormatted}"
+                                           Foreground="{Binding TotalValueColor}"
+                                           FontSize="{DynamicResource FontSizeXLarge}"
+                                           FontWeight="SemiBold"
+                                           FontFamily="Consolas, Menlo, Monaco, monospace"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+
+                            <Grid ColumnDefinitions="*, Auto">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Summary_TotalSats}"
+                                           FontSize="{DynamicResource FontSizeMedium}"
+                                           Foreground="{DynamicResource Text400Brush}"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding Summary.TotalValueInSats, StringFormat='{}{0:N0} sats'}"
+                                           Foreground="{Binding TotalSatsColor}"
+                                           FontSize="{DynamicResource FontSizeLarge}"
+                                           FontWeight="SemiBold"
+                                           FontFamily="Consolas, Menlo, Monaco, monospace"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Secure Mode Placeholder -->
+                    <TextBlock Text="---"
+                               FontSize="{DynamicResource FontSizeMedium}"
+                               Foreground="{DynamicResource Text400Brush}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               IsVisible="{Binding IsSecureModeEnabled}" />
+
+                    <!-- Selected Asset Details -->
+                    <Border Background="{DynamicResource Background700Brush}"
+                            BorderBrush="{DynamicResource Background500Brush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="16"
+                            IsVisible="{Binding SelectedAsset, Converter={x:Static ObjectConverters.IsNotNull}}">
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="{x:Static lang:language.Assets_Details_Title}"
+                                       FontSize="{DynamicResource FontSizeLarge}"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,8" />
+
+                            <TextBlock Text="{Binding SelectedAsset.Name}"
+                                       FontSize="{DynamicResource FontSizeXLarge}"
+                                       FontWeight="Bold" />
+
+                            <TextBlock Text="{Binding SelectedAsset.AssetTypeName}"
+                                       FontSize="{DynamicResource FontSizeMedium}"
+                                       Foreground="{DynamicResource Text400Brush}" />
+
+                            <!-- Leveraged Position Details -->
+                            <StackPanel Spacing="8" IsVisible="{Binding SelectedAsset.IsLeveragedPosition}">
+                                <Separator Margin="0,4" />
+
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <TextBlock Grid.Column="0" Text="{x:Static lang:language.Assets_Leverage}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding SelectedAsset.LeverageFormatted}" FontWeight="SemiBold" />
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <TextBlock Grid.Column="0" Text="{x:Static lang:language.Assets_EntryPrice}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding SelectedAsset.EntryPriceFormatted}" FontWeight="SemiBold" />
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <TextBlock Grid.Column="0" Text="{x:Static lang:language.Assets_Collateral}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding SelectedAsset.CollateralFormatted}" FontWeight="SemiBold" />
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <TextBlock Grid.Column="0" Text="{x:Static lang:language.Assets_Liquidation}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding SelectedAsset.LiquidationPriceFormatted}" FontWeight="SemiBold" />
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <TextBlock Grid.Column="0" Text="{x:Static lang:language.Assets_DistanceToLiq}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding SelectedAsset.DistanceToLiquidationFormatted}" FontWeight="SemiBold" />
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <TextBlock Grid.Column="0" Text="{x:Static lang:language.Assets_PnL}" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding SelectedAsset.PnLFormatted}"
+                                               Foreground="{Binding SelectedAsset.PnLColor}"
+                                               FontWeight="SemiBold" />
+                                </Grid>
+
+                                <Border Background="#F44336"
+                                        CornerRadius="4"
+                                        Padding="8,4"
+                                        IsVisible="{Binding SelectedAsset.IsAtRisk}">
+                                    <TextBlock Text="{x:Static lang:language.Assets_AtRisk}"
+                                               Foreground="White"
+                                               FontWeight="SemiBold"
+                                               HorizontalAlignment="Center" />
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Real Estate Details -->
+                            <StackPanel Spacing="8" IsVisible="{Binding SelectedAsset.IsRealEstate}">
+                                <Separator Margin="0,4" />
+
+                                <Grid ColumnDefinitions="*, Auto" IsVisible="{Binding SelectedAsset.Address, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                    <TextBlock Grid.Column="0" Text="{x:Static lang:language.Assets_Address}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding SelectedAsset.Address}" FontWeight="SemiBold" />
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*, Auto" IsVisible="{Binding SelectedAsset.MonthlyRentalIncome, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                    <TextBlock Grid.Column="0" Text="{x:Static lang:language.Assets_RentalIncome}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding SelectedAsset.MonthlyRentalIncomeFormatted}" FontWeight="SemiBold" />
+                                </Grid>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

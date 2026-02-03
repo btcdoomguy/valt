@@ -4,5 +4,6 @@ public enum MainViewTabNames
 {
     TransactionsPageContent,
     ReportsPageContent,
-    AvgPricePageContent
+    AvgPricePageContent,
+    AssetsPageContent
 }

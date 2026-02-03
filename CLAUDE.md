@@ -14,6 +14,7 @@ For detailed documentation on specific modules, see:
 - **[AvgPrice Module](.claude/docs/avgprice.md)** - Cost basis tracking (BrazilianRule, FIFO)
 - **[Goals Module](.claude/docs/goals.md)** - Financial goal tracking with auto-progress
 - **[Fixed Expenses Module](.claude/docs/fixedexpenses.md)** - Recurring expense management
+- **[Assets Module](.claude/docs/assets.md)** - External investments (stocks, ETFs, crypto, real estate, leveraged positions)
 
 ## Build and Run Commands
 

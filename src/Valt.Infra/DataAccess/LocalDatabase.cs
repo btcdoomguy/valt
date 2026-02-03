@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using LiteDB;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Infra.DataAccess.LiteDBMappers;
+using Valt.Infra.Modules.Assets;
 using Valt.Infra.Modules.AvgPrice;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Categories;
@@ -285,6 +286,21 @@ internal sealed class LocalDatabase : ILocalDatabase
 
         collection.EnsureIndex(x => x.RefDate);
         collection.EnsureIndex(x => x.IsUpToDate);
+
+        return collection;
+    }
+
+    #endregion
+
+    #region Assets module
+
+    public ILiteCollection<AssetEntity> GetAssets()
+    {
+        var collection = GetOpenDatabase().GetCollection<AssetEntity>("assets");
+
+        collection.EnsureIndex(x => x.Visible);
+        collection.EnsureIndex(x => x.IncludeInNetWorth);
+        collection.EnsureIndex(x => x.DisplayOrder);
 
         return collection;
     }

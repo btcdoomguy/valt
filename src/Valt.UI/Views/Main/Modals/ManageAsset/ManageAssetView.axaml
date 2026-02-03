@@ -1,0 +1,200 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        xmlns:manageAsset="clr-namespace:Valt.UI.Views.Main.Modals.ManageAsset"
+        mc:Ignorable="d"
+        d:DesignWidth="500"
+        d:DesignHeight="600"
+        MinWidth="500"
+        MinHeight="600"
+        MaxWidth="500"
+        MaxHeight="600"
+        x:Class="Valt.UI.Views.Main.Modals.ManageAsset.ManageAssetView"
+        x:DataType="manageAsset:ManageAssetViewModel"
+        Title="{x:Static local:language.ManageAsset_Title}"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <manageAsset:ManageAssetViewModel />
+    </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" />
+    </Window.KeyBindings>
+    <Border>
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="{x:Static local:language.ManageAsset_Title}"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+            <Border Classes="form-fields-area" Height="520">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <!-- Name Field -->
+                        <StackPanel Classes="form-field">
+                            <TextBlock Text="{x:Static local:language.ManageAsset_Name}" />
+                            <TextBox Text="{Binding Name}" Width="420" />
+                        </StackPanel>
+
+                        <!-- Asset Type and Currency Row -->
+                        <Grid ColumnDefinitions="200, 20, 200">
+                            <StackPanel Grid.Column="0" Classes="form-field">
+                                <TextBlock Text="{x:Static local:language.ManageAsset_AssetType}" />
+                                <ComboBox ItemsSource="{Binding AvailableAssetTypes}"
+                                          SelectedValue="{Binding SelectedAssetType}"
+                                          DisplayMemberBinding="{Binding Text}"
+                                          SelectedValueBinding="{Binding Value}"
+                                          Width="200"
+                                          IsEnabled="{Binding !IsEditMode}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Classes="form-field">
+                                <TextBlock Text="{x:Static local:language.ManageAsset_Currency}" />
+                                <ComboBox ItemsSource="{Binding AvailableCurrencies}"
+                                          SelectedItem="{Binding SelectedCurrency}"
+                                          Width="200" />
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Basic Asset Fields -->
+                        <StackPanel IsVisible="{Binding ShowBasicFields}">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static local:language.ManageAsset_Symbol}" />
+                                <TextBox Text="{Binding Symbol}" Width="200" />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="200, 20, 200">
+                                <StackPanel Grid.Column="0" Classes="form-field">
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_Quantity}" />
+                                    <TextBox Text="{Binding Quantity}" Width="200" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" Classes="form-field">
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_CurrentPrice}" />
+                                    <userControls:FiatInput FiatValue="{Binding CurrentPriceFiat, Mode=TwoWay}"
+                                                            CurrencySymbol="{Binding CurrencySymbol}"
+                                                            SymbolOnRight="{Binding SymbolOnRight}"
+                                                            Width="200" />
+                                </StackPanel>
+                            </Grid>
+
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static local:language.ManageAsset_PriceSource}" />
+                                <ComboBox ItemsSource="{Binding AvailablePriceSources}"
+                                          SelectedValue="{Binding SelectedPriceSource}"
+                                          DisplayMemberBinding="{Binding Text}"
+                                          SelectedValueBinding="{Binding Value}"
+                                          Width="200" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Real Estate Fields -->
+                        <StackPanel IsVisible="{Binding ShowRealEstateFields}">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static local:language.ManageAsset_Address}" />
+                                <TextBox Text="{Binding Address}" Width="420" />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="200, 20, 200">
+                                <StackPanel Grid.Column="0" Classes="form-field">
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_CurrentValue}" />
+                                    <userControls:FiatInput FiatValue="{Binding CurrentValueFiat, Mode=TwoWay}"
+                                                            CurrencySymbol="{Binding CurrencySymbol}"
+                                                            SymbolOnRight="{Binding SymbolOnRight}"
+                                                            Width="200" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" Classes="form-field">
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_RentalIncome}" />
+                                    <userControls:FiatInput FiatValue="{Binding MonthlyRentalIncomeFiat, Mode=TwoWay}"
+                                                            CurrencySymbol="{Binding CurrencySymbol}"
+                                                            SymbolOnRight="{Binding SymbolOnRight}"
+                                                            Width="200" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- Leveraged Position Fields -->
+                        <StackPanel IsVisible="{Binding ShowLeveragedFields}">
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static local:language.ManageAsset_Symbol}" />
+                                <TextBox Text="{Binding Symbol}" Width="200" />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="200, 20, 200">
+                                <StackPanel Grid.Column="0" Classes="form-field">
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_Collateral}" />
+                                    <userControls:FiatInput FiatValue="{Binding CollateralFiat, Mode=TwoWay}"
+                                                            CurrencySymbol="{Binding CurrencySymbol}"
+                                                            SymbolOnRight="{Binding SymbolOnRight}"
+                                                            Width="200" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" Classes="form-field">
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_Leverage}" />
+                                    <TextBox Text="{Binding Leverage}" Width="200" />
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid ColumnDefinitions="200, 20, 200">
+                                <StackPanel Grid.Column="0" Classes="form-field">
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_EntryPrice}" />
+                                    <userControls:FiatInput FiatValue="{Binding EntryPriceFiat, Mode=TwoWay}"
+                                                            CurrencySymbol="{Binding CurrencySymbol}"
+                                                            SymbolOnRight="{Binding SymbolOnRight}"
+                                                            Width="200" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" Classes="form-field">
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_CurrentPrice}" />
+                                    <userControls:FiatInput FiatValue="{Binding CurrentPriceFiat, Mode=TwoWay}"
+                                                            CurrencySymbol="{Binding CurrencySymbol}"
+                                                            SymbolOnRight="{Binding SymbolOnRight}"
+                                                            Width="200" />
+                                </StackPanel>
+                            </Grid>
+
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static local:language.ManageAsset_LiquidationPrice}" />
+                                <userControls:FiatInput FiatValue="{Binding LiquidationPriceFiat, Mode=TwoWay}"
+                                                        CurrencySymbol="{Binding CurrencySymbol}"
+                                                        SymbolOnRight="{Binding SymbolOnRight}"
+                                                        Width="200" />
+                            </StackPanel>
+
+                            <StackPanel Classes="form-field">
+                                <CheckBox Content="{x:Static local:language.ManageAsset_IsLong}"
+                                          IsChecked="{Binding IsLong}" />
+                            </StackPanel>
+
+                            <StackPanel Classes="form-field">
+                                <TextBlock Text="{x:Static local:language.ManageAsset_PriceSource}" />
+                                <ComboBox ItemsSource="{Binding AvailablePriceSources}"
+                                          SelectedValue="{Binding SelectedPriceSource}"
+                                          DisplayMemberBinding="{Binding Text}"
+                                          SelectedValueBinding="{Binding Value}"
+                                          Width="200" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Common Fields -->
+                        <Separator Margin="0,16" />
+
+                        <StackPanel Classes="form-field">
+                            <CheckBox Content="{x:Static local:language.ManageAsset_IncludeInNetWorth}"
+                                      IsChecked="{Binding IncludeInNetWorth}" />
+                        </StackPanel>
+
+                        <StackPanel Classes="form-field">
+                            <CheckBox Content="{x:Static local:language.ManageAsset_Visible}"
+                                      IsChecked="{Binding Visible}" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10"
+                        Margin="0, 0, 0, 0">
+                <Button Width="100" Content="{x:Static local:language.OkButton}" HorizontalContentAlignment="Center" Command="{Binding OkCommand}" />
+                <Button Width="100" Content="{x:Static local:language.CancelButton}" HorizontalContentAlignment="Center" Command="{Binding CancelCommand}" />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>
