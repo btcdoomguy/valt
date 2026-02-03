@@ -17,7 +17,13 @@ public partial class FilterState :  ObservableObject
     {
         WeakReferenceMessenger.Default.Send(new FilterDateRangeChanged());
     }
-    
+
+    public void Reset()
+    {
+        MainDate = DateTime.MinValue;
+        Range = new DateRange(DateTime.MinValue, DateTime.MinValue);
+    }
+
     /*partial void OnSelectedFixedExpenseChanged(FixedExpenseProviderEntry? value)
     {
         WeakReferenceMessenger.Default.Send(new FilterFixedExpenseChanged());

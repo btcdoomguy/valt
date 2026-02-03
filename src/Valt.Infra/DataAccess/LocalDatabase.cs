@@ -18,6 +18,7 @@ internal sealed class LocalDatabase : ILocalDatabase
 {
     private readonly IClock _clock;
     private readonly SemaphoreSlim _dbLock = new(1, 1);
+    private readonly BsonMapper _mapper;
     private LiteDatabase? _database;
     private bool _inMemoryDb = true;
     private string? _filePath;
@@ -27,6 +28,7 @@ internal sealed class LocalDatabase : ILocalDatabase
     public LocalDatabase(IClock clock)
     {
         _clock = clock;
+        _mapper = CreateMapper();
     }
     
     public void OpenDatabase(string filePath, string password)
@@ -36,7 +38,7 @@ internal sealed class LocalDatabase : ILocalDatabase
 
         var connectionString = new ConnectionString(filePath) { Password = password, Connection = ConnectionType.Direct };
 
-        _database = new LiteDatabase(connectionString, CreateMapper());
+        _database = new LiteDatabase(connectionString, _mapper);
         _filePath = filePath;
         _inMemoryDb = false;
         _password = password;
@@ -49,11 +51,11 @@ internal sealed class LocalDatabase : ILocalDatabase
         if (HasDatabaseOpen)
             throw new InvalidOperationException("A database is already open.");
 
-        _database = new LiteDatabase(stream, CreateMapper());
+        _database = new LiteDatabase(stream, _mapper);
         _filePath = null;
         _inMemoryDb = true;
         _password = null;
-        
+
         OnPropertyChanged(nameof(HasDatabaseOpen));
     }
 
@@ -97,8 +99,8 @@ internal sealed class LocalDatabase : ILocalDatabase
         var sourceConnectionString = new ConnectionString(filePath) { Password = password, Connection = ConnectionType.Shared };
         var targetConnectionString = new ConnectionString(targetFilePath) { Password = newPassword, Connection = ConnectionType.Direct };
         
-        var sourceDb = new LiteDatabase(sourceConnectionString, CreateMapper());
-        var targetDb = new LiteDatabase(targetConnectionString, CreateMapper());
+        var sourceDb = new LiteDatabase(sourceConnectionString, _mapper);
+        var targetDb = new LiteDatabase(targetConnectionString, _mapper);
 
         try
         {

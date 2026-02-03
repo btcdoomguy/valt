@@ -34,6 +34,12 @@ internal class AccountTotalsJob : IBackgroundJob
         _logger.LogInformation("[AccountTotalsCalculator] Started");
     }
 
+    public void ResetState()
+    {
+        _currentDay = null;
+        _logger.LogInformation("[AccountTotalsCalculator] State reset");
+    }
+
     public async Task RunAsync(CancellationToken stoppingToken)
     {
         try

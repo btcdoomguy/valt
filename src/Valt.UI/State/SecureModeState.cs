@@ -43,4 +43,10 @@ public partial class SecureModeState : ObservableObject
         var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(password));
         return Convert.ToHexString(bytes);
     }
+
+    public void Reset()
+    {
+        _passwordHash = null;
+        IsEnabled = false;
+    }
 }

@@ -134,6 +134,11 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
         public static Wealth Empty => new(0, 0, 0, 0, 0);
     }
 
+    public void Reset()
+    {
+        AccountSummaries = null;
+    }
+
     public void Dispose()
     {
         WeakReferenceMessenger.Default.Unregister<RatesUpdated>(this);

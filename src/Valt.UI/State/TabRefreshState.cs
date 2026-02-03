@@ -67,4 +67,17 @@ public partial class TabRefreshState : ObservableObject
             });
         }
     }
+
+    public void ClearAll()
+    {
+        lock (_lock)
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                TransactionsNeedsRefresh = false;
+                ReportsNeedsRefresh = false;
+                AvgPriceNeedsRefresh = false;
+            });
+        }
+    }
 }

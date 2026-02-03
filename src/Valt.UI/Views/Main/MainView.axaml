@@ -69,6 +69,10 @@
                                           Command="{Binding ExportTransactionsCommand}">
                                 </MenuItem>
                                 <Separator />
+                                <MenuItem Header="{x:Static local:language.Menu_CloseDatabase}"
+                                          Command="{Binding CloseDatabaseCommand}">
+                                </MenuItem>
+                                <Separator />
                                 <MenuItem Header="{x:Static local:language.Main_Menu_Settings}"
                                           Command="{Binding ManageSettingsCommand}">
                                 </MenuItem>

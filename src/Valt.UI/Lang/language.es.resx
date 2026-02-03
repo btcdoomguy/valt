@@ -1318,6 +1318,9 @@
     <data name="Menu_ExportTransactions" xml:space="preserve">
         <value>Exportar transacciones...</value>
     </data>
+    <data name="Menu_CloseDatabase" xml:space="preserve">
+        <value>Cerrar Base de Datos</value>
+    </data>
     <data name="ImportWizard_SelectFile" xml:space="preserve">
         <value>Seleccionar archivo CSV</value>
     </data>
