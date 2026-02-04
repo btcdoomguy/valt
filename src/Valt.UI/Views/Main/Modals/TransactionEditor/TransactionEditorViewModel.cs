@@ -477,6 +477,16 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
                 FixedExpenseId = TransactionFixedExpenseReference.FixedExpenseId.Value
             });
         }
+
+        if (request.Notes is not null)
+        {
+            Notes = request.Notes;
+        }
+
+        if (request.DefaultMode is not null)
+        {
+            SelectedMode = request.DefaultMode.Value;
+        }
     }
 
     private async Task OnBindParameterForEditingAsync(Request request)
@@ -998,6 +1008,9 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         public TransactionFixedExpenseReference? FixedExpenseReference { get; set; }
 
         public bool CopyTransaction { get; init; }
+
+        public string? Notes { get; init; }
+        public TransactionTypes? DefaultMode { get; init; }
     }
 
     public record Response(bool Ok, DateTime? TransactionDate);

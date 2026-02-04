@@ -1931,4 +1931,37 @@
     <data name="Assets_Card_PnL" xml:space="preserve">
         <value>P&amp;L:</value>
     </data>
+    <data name="Assets.Sell" xml:space="preserve">
+        <value>Sell</value>
+    </data>
+    <data name="Assets.Sell.Alert" xml:space="preserve">
+        <value>Sell Asset</value>
+    </data>
+    <data name="Assets.Sell.Message" xml:space="preserve">
+        <value>Do you want to register the sell of this asset in a transaction and delete the asset from this list?</value>
+    </data>
+    <data name="Assets.Sell.TransactionName.Profit" xml:space="preserve">
+        <value>Profit from {0}</value>
+    </data>
+    <data name="Assets.Sell.TransactionName.Loss" xml:space="preserve">
+        <value>Loss from {0}</value>
+    </data>
+    <data name="Assets.Sell.Profit" xml:space="preserve">
+        <value>Profit</value>
+    </data>
+    <data name="Assets.Sell.Loss" xml:space="preserve">
+        <value>Loss</value>
+    </data>
+    <data name="Assets.Sell.Notes.Leveraged" xml:space="preserve">
+        <value>{0} from leveraged position - entry {1}, leverage {2}</value>
+    </data>
+    <data name="Assets.Sell.Notes.RealEstate" xml:space="preserve">
+        <value>Sale of property at {0} - acquisition price {1}</value>
+    </data>
+    <data name="Assets.Sell.Notes.Basic" xml:space="preserve">
+        <value>Sell of {0} - acquisition price {1}</value>
+    </data>
+    <data name="Assets.RefreshPrices" xml:space="preserve">
+        <value>Refresh Prices</value>
+    </data>
 </root>

@@ -1857,6 +1857,72 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string Assets_Sell {
+            get {
+                return ResourceManager.GetString("Assets.Sell", resourceCulture);
+            }
+        }
+
+        public static string Assets_Sell_Alert {
+            get {
+                return ResourceManager.GetString("Assets.Sell.Alert", resourceCulture);
+            }
+        }
+
+        public static string Assets_Sell_Message {
+            get {
+                return ResourceManager.GetString("Assets.Sell.Message", resourceCulture);
+            }
+        }
+
+        public static string Assets_Sell_TransactionName_Profit {
+            get {
+                return ResourceManager.GetString("Assets.Sell.TransactionName.Profit", resourceCulture);
+            }
+        }
+
+        public static string Assets_Sell_TransactionName_Loss {
+            get {
+                return ResourceManager.GetString("Assets.Sell.TransactionName.Loss", resourceCulture);
+            }
+        }
+
+        public static string Assets_Sell_Profit {
+            get {
+                return ResourceManager.GetString("Assets.Sell.Profit", resourceCulture);
+            }
+        }
+
+        public static string Assets_Sell_Loss {
+            get {
+                return ResourceManager.GetString("Assets.Sell.Loss", resourceCulture);
+            }
+        }
+
+        public static string Assets_Sell_Notes_Leveraged {
+            get {
+                return ResourceManager.GetString("Assets.Sell.Notes.Leveraged", resourceCulture);
+            }
+        }
+
+        public static string Assets_Sell_Notes_RealEstate {
+            get {
+                return ResourceManager.GetString("Assets.Sell.Notes.RealEstate", resourceCulture);
+            }
+        }
+
+        public static string Assets_Sell_Notes_Basic {
+            get {
+                return ResourceManager.GetString("Assets.Sell.Notes.Basic", resourceCulture);
+            }
+        }
+
+        public static string Assets_RefreshPrices {
+            get {
+                return ResourceManager.GetString("Assets.RefreshPrices", resourceCulture);
+            }
+        }
+
         public static string Assets_ToggleVisibility {
             get {
                 return ResourceManager.GetString("Assets.ToggleVisibility", resourceCulture);

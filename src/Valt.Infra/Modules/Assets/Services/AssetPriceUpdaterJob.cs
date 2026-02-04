@@ -13,7 +13,7 @@ public record AssetPricesUpdated() : INotification;
 
 internal sealed class AssetPriceUpdaterJob : IBackgroundJob
 {
-    private static readonly TimeSpan StaleThreshold = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan StaleThreshold = TimeSpan.FromSeconds(30);
     private static readonly TimeSpan DelayBetweenRequests = TimeSpan.FromSeconds(1);
 
     private readonly ILocalDatabase _localDatabase;

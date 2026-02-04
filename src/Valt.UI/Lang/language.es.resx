@@ -1926,4 +1926,37 @@
     <data name="Assets_Card_PnL" xml:space="preserve">
         <value>G/P:</value>
     </data>
+    <data name="Assets.Sell" xml:space="preserve">
+        <value>Vender</value>
+    </data>
+    <data name="Assets.Sell.Alert" xml:space="preserve">
+        <value>Vender Activo</value>
+    </data>
+    <data name="Assets.Sell.Message" xml:space="preserve">
+        <value>¿Desea registrar la venta de este activo en una transacción y eliminar el activo de esta lista?</value>
+    </data>
+    <data name="Assets.Sell.TransactionName.Profit" xml:space="preserve">
+        <value>Ganancia de {0}</value>
+    </data>
+    <data name="Assets.Sell.TransactionName.Loss" xml:space="preserve">
+        <value>Pérdida de {0}</value>
+    </data>
+    <data name="Assets.Sell.Profit" xml:space="preserve">
+        <value>Ganancia</value>
+    </data>
+    <data name="Assets.Sell.Loss" xml:space="preserve">
+        <value>Pérdida</value>
+    </data>
+    <data name="Assets.Sell.Notes.Leveraged" xml:space="preserve">
+        <value>{0} de posición apalancada - entrada {1}, apalancamiento {2}</value>
+    </data>
+    <data name="Assets.Sell.Notes.RealEstate" xml:space="preserve">
+        <value>Venta de propiedad en {0} - precio de adquisición {1}</value>
+    </data>
+    <data name="Assets.Sell.Notes.Basic" xml:space="preserve">
+        <value>Venta de {0} - precio de adquisición {1}</value>
+    </data>
+    <data name="Assets.RefreshPrices" xml:space="preserve">
+        <value>Actualizar Precios</value>
+    </data>
 </root>
