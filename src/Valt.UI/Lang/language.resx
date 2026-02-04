@@ -1074,6 +1074,15 @@
     <data name="ManageAsset_CheckingSymbol" xml:space="preserve">
         <value>Checking...</value>
     </data>
+    <data name="ManageAsset_YahooFinanceHelp_Line1" xml:space="preserve">
+        <value>You can crawl prices from the Yahoo Finance API.</value>
+    </data>
+    <data name="ManageAsset_YahooFinanceHelp_Line2" xml:space="preserve">
+        <value>Check for the correct asset code in their website, especially in their URL. For example, to crawl prices for the Brazilian company PETR4, the correct code is PETR4.SA.</value>
+    </data>
+    <data name="ManageAsset_YahooFinanceHelp_Hint" xml:space="preserve">
+        <value>Hover for Yahoo Finance tips</value>
+    </data>
     <data name="Assets.Type.Stock" xml:space="preserve">
         <value>Stock</value>
     </data>

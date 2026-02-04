@@ -76,6 +76,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowCheckSymbolButton))]
     [NotifyPropertyChangedFor(nameof(ShowCurrentPriceField))]
+    [NotifyPropertyChangedFor(nameof(ShowYahooFinanceHelp))]
     [NotifyPropertyChangedFor(nameof(IsBitcoinLeveraged))]
     [NotifyPropertyChangedFor(nameof(IsCustomLeveraged))]
     private string _selectedPriceSource = AssetPriceSource.Manual.ToString();
@@ -139,6 +140,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
 
     public bool ShowCheckSymbolButton => SelectedPriceSource != AssetPriceSource.Manual.ToString();
     public bool ShowCurrentPriceField => SelectedPriceSource == AssetPriceSource.Manual.ToString();
+    public bool ShowYahooFinanceHelp => SelectedPriceSource == AssetPriceSource.YahooFinance.ToString();
 
     // Visibility helpers
     public bool ShowBasicFields => SelectedAssetType is "Stock" or "Etf" or "Crypto" or "Commodity" or "Custom";

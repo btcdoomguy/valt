@@ -1039,6 +1039,15 @@
     <data name="ManageAsset_CheckingSymbol" xml:space="preserve">
         <value>Verificando...</value>
     </data>
+    <data name="ManageAsset_YahooFinanceHelp_Line1" xml:space="preserve">
+        <value>Você pode buscar preços da API do Yahoo Finance.</value>
+    </data>
+    <data name="ManageAsset_YahooFinanceHelp_Line2" xml:space="preserve">
+        <value>Verifique o código correto do ativo no site deles, especialmente na URL. Por exemplo, para buscar preços da empresa brasileira PETR4, o código correto é PETR4.SA.</value>
+    </data>
+    <data name="ManageAsset_YahooFinanceHelp_Hint" xml:space="preserve">
+        <value>Passe o mouse para dicas do Yahoo Finance</value>
+    </data>
     <data name="Assets.Type.Stock" xml:space="preserve">
         <value>Ação</value>
     </data>

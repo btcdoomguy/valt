@@ -3357,6 +3357,24 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string ManageAsset_YahooFinanceHelp_Line1 {
+            get {
+                return ResourceManager.GetString("ManageAsset_YahooFinanceHelp_Line1", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_YahooFinanceHelp_Line2 {
+            get {
+                return ResourceManager.GetString("ManageAsset_YahooFinanceHelp_Line2", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_YahooFinanceHelp_Hint {
+            get {
+                return ResourceManager.GetString("ManageAsset_YahooFinanceHelp_Hint", resourceCulture);
+            }
+        }
+
         public static string Assets_Type_Stock {
             get {
                 return ResourceManager.GetString("Assets.Type.Stock", resourceCulture);

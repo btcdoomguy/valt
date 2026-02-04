@@ -1069,6 +1069,15 @@
     <data name="ManageAsset_CheckingSymbol" xml:space="preserve">
         <value>Verificando...</value>
     </data>
+    <data name="ManageAsset_YahooFinanceHelp_Line1" xml:space="preserve">
+        <value>Puedes obtener precios desde la API de Yahoo Finance.</value>
+    </data>
+    <data name="ManageAsset_YahooFinanceHelp_Line2" xml:space="preserve">
+        <value>Verifica el código correcto del activo en su sitio web, especialmente en la URL. Por ejemplo, para obtener precios de la empresa brasileña PETR4, el código correcto es PETR4.SA.</value>
+    </data>
+    <data name="ManageAsset_YahooFinanceHelp_Hint" xml:space="preserve">
+        <value>Pasa el cursor para consejos de Yahoo Finance</value>
+    </data>
     <data name="Assets.Type.Stock" xml:space="preserve">
         <value>Acción</value>
     </data>

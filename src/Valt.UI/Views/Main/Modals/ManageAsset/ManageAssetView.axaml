@@ -99,6 +99,30 @@
                                                Foreground="#F44336"
                                                FontSize="12" />
                                 </StackPanel>
+                                <!-- Yahoo Finance Help -->
+                                <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,6,0,0"
+                                            IsVisible="{Binding ShowYahooFinanceHelp}">
+                                    <userControls:ModuleHelperText>
+                                        <userControls:ModuleHelperText.HelpContent>
+                                            <StackPanel Spacing="8" MaxWidth="320">
+                                                <TextBlock FontSize="{DynamicResource FontSizeSmall}"
+                                                           Text="{x:Static local:language.ManageAsset_YahooFinanceHelp_Line1}"
+                                                           TextWrapping="Wrap" />
+                                                <TextBlock FontSize="{DynamicResource FontSizeSmall}"
+                                                           Text="{x:Static local:language.ManageAsset_YahooFinanceHelp_Line2}"
+                                                           TextWrapping="Wrap" />
+                                                <TextBlock FontSize="{DynamicResource FontSizeSmall}"
+                                                           Text="https://finance.yahoo.com/quote/PETR4.SA/"
+                                                           TextWrapping="Wrap"
+                                                           Foreground="{DynamicResource AccentBrush}" />
+                                            </StackPanel>
+                                        </userControls:ModuleHelperText.HelpContent>
+                                    </userControls:ModuleHelperText>
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_YahooFinanceHelp_Hint}"
+                                               FontSize="{DynamicResource FontSizeSmall}"
+                                               Foreground="{DynamicResource Text400Brush}"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
                             </StackPanel>
 
                             <Grid ColumnDefinitions="200, 20, 200">
@@ -228,6 +252,30 @@
                                                IsVisible="{Binding !IsSymbolValid}"
                                                Foreground="#F44336"
                                                FontSize="12" />
+                                </StackPanel>
+                                <!-- Yahoo Finance Help -->
+                                <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,6,0,0"
+                                            IsVisible="{Binding ShowYahooFinanceHelp}">
+                                    <userControls:ModuleHelperText>
+                                        <userControls:ModuleHelperText.HelpContent>
+                                            <StackPanel Spacing="8" MaxWidth="320">
+                                                <TextBlock FontSize="{DynamicResource FontSizeSmall}"
+                                                           Text="{x:Static local:language.ManageAsset_YahooFinanceHelp_Line1}"
+                                                           TextWrapping="Wrap" />
+                                                <TextBlock FontSize="{DynamicResource FontSizeSmall}"
+                                                           Text="{x:Static local:language.ManageAsset_YahooFinanceHelp_Line2}"
+                                                           TextWrapping="Wrap" />
+                                                <TextBlock FontSize="{DynamicResource FontSizeSmall}"
+                                                           Text="https://finance.yahoo.com/quote/PETR4.SA/"
+                                                           TextWrapping="Wrap"
+                                                           Foreground="{DynamicResource AccentBrush}" />
+                                            </StackPanel>
+                                        </userControls:ModuleHelperText.HelpContent>
+                                    </userControls:ModuleHelperText>
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_YahooFinanceHelp_Hint}"
+                                               FontSize="{DynamicResource FontSizeSmall}"
+                                               Foreground="{DynamicResource Text400Brush}"
+                                               VerticalAlignment="Center" />
                                 </StackPanel>
                             </StackPanel>
 
