@@ -75,7 +75,7 @@ public partial class AssetViewModel : ObservableObject
     public bool IsLeveragedPosition => AssetType == AssetTypes.LeveragedPosition;
 
     // Returns P&L for leveraged positions, Value for others
-    public string DisplayValueFormatted => IsLeveragedPosition ? PnLCombinedFormatted : CurrentValueFormatted;
+    public string DisplayValueFormatted => IsLeveragedPosition ? PnLFormatted : CurrentValueFormatted;
     public string PositionDirection => IsLong == true ? "Long" : "Short";
     public string PnLColor => PnL >= 0 ? "#4CAF50" : "#F44336";
     public string AtRiskIndicator => IsAtRisk == true ? "!" : "";

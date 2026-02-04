@@ -250,7 +250,7 @@
                                                                    FontSize="{DynamicResource FontSizeXSmall}"
                                                                    Foreground="{DynamicResource AssetCardTextBrush}" />
                                                     </Grid>
-                                                    <TextBlock Text="{Binding PnLFormatted}"
+                                                    <TextBlock Text="{Binding PnLPercentageFormatted}"
                                                                FontSize="{DynamicResource FontSizeSmall}"
                                                                FontWeight="SemiBold"
                                                                Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}"
