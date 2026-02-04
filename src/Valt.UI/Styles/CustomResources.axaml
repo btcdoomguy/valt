@@ -8,6 +8,7 @@
     <converters:AvgPriceLineTypeConverter x:Key="AvgPriceLineTypeConverter" />
     <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
     <converters:BoolToExpanderIconConverter x:Key="BoolToExpanderIconConverter" />
+    <converters:StringToColorBrushConverter x:Key="StringToColorBrushConverter" />
 
     <FontFamily x:Key="GeistMono">/Assets/Fonts/GeistMono-Regular.ttf#Geist Mono</FontFamily>
     <FontFamily x:Key="Geist">/Assets/Fonts/Geist-Regular.ttf#Geist</FontFamily>
@@ -90,6 +91,13 @@
     </ControlTheme>
 
     <!-- Custom button theme for CalendarDatePicker - simple calendar icon -->
+    <!-- Asset Card Colors -->
+    <SolidColorBrush x:Key="AssetCardBackgroundBrush" Color="#FAFAF5" />
+    <SolidColorBrush x:Key="AssetCardSeparatorBrush" Color="#CCCCCC" />
+    <SolidColorBrush x:Key="AssetCardLabelBrush" Color="#666666" />
+    <SolidColorBrush x:Key="AssetCardTextBrush" Color="#1A1A1A" />
+    <SolidColorBrush x:Key="AssetCardMutedBrush" Color="#888888" />
+
     <ControlTheme x:Key="ValtCalendarDatePickerButton" TargetType="Button">
         <Setter Property="Width" Value="28" />
         <Setter Property="Height" Value="28" />

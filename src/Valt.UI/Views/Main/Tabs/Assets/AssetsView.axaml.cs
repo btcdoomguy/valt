@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.VisualTree;
 using Valt.UI.Base;
 using Valt.UI.Views.Main.Tabs.Assets.Models;
 
@@ -10,15 +9,11 @@ namespace Valt.UI.Views.Main.Tabs.Assets;
 
 public partial class AssetsView : ValtBaseUserControl
 {
-    private bool _isUpdatingSelection;
-
     public AssetsView()
     {
         InitializeComponent();
 
-        AssetsGrid.AddHandler(KeyDownEvent, AssetsGrid_KeyDownHandler, RoutingStrategies.Tunnel, handledEventsToo: true);
-        AssetsGrid.AddHandler(DoubleTappedEvent, AssetsGrid_OnDoubleTapped, RoutingStrategies.Bubble, handledEventsToo: true);
-        AssetsGrid.AddHandler(PointerPressedEvent, AssetsGrid_OnPointerPressed, RoutingStrategies.Tunnel, handledEventsToo: true);
+        AssetsItemsControl.AddHandler(KeyDownEvent, AssetsItemsControl_KeyDownHandler, RoutingStrategies.Tunnel, handledEventsToo: true);
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -35,26 +30,10 @@ public partial class AssetsView : ValtBaseUserControl
     {
         base.OnUnloaded(e);
 
-        AssetsGrid.RemoveHandler(KeyDownEvent, AssetsGrid_KeyDownHandler);
-        AssetsGrid.RemoveHandler(DoubleTappedEvent, AssetsGrid_OnDoubleTapped);
-        AssetsGrid.RemoveHandler(PointerPressedEvent, AssetsGrid_OnPointerPressed);
+        AssetsItemsControl.RemoveHandler(KeyDownEvent, AssetsItemsControl_KeyDownHandler);
     }
 
-    private void AssetsGrid_OnDoubleTapped(object? sender, TappedEventArgs e)
-    {
-        var vm = DataContext as AssetsViewModel;
-        if (vm is null) return;
-
-        var originalSource = e.Source as Control;
-        var row = originalSource?.FindAncestorOfType<DataGridRow>();
-
-        if (row is null || vm.SelectedAsset is null) return;
-
-        _ = vm.EditAssetCommand.ExecuteAsync(vm.SelectedAsset);
-        e.Handled = true;
-    }
-
-    private void AssetsGrid_KeyDownHandler(object? sender, KeyEventArgs e)
+    private void AssetsItemsControl_KeyDownHandler(object? sender, KeyEventArgs e)
     {
         var vm = DataContext as AssetsViewModel;
         if (vm is null) return;
@@ -75,37 +54,45 @@ public partial class AssetsView : ValtBaseUserControl
         }
     }
 
-    private void AssetsGrid_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    private void AssetCard_PointerEntered(object? sender, PointerEventArgs e)
     {
-        // Select the row on right-click so context menu commands work correctly
-        if (!e.GetCurrentPoint(AssetsGrid).Properties.IsRightButtonPressed)
-            return;
-
-        var originalSource = e.Source as Control;
-        var row = originalSource?.FindAncestorOfType<DataGridRow>();
-
-        if (row?.DataContext is AssetViewModel assetVm)
+        if (sender is Border { DataContext: AssetViewModel assetVm })
         {
-            AssetsGrid.SelectedItem = assetVm;
+            assetVm.IsHovered = true;
         }
     }
 
-    private void AssetsGrid_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    private void AssetCard_PointerExited(object? sender, PointerEventArgs e)
     {
-        if (_isUpdatingSelection) return;
-
-        try
+        if (sender is Border { DataContext: AssetViewModel assetVm })
         {
-            _isUpdatingSelection = true;
-
-            if (DataContext is AssetsViewModel vm && sender is DataGrid dataGrid)
-            {
-                vm.SelectedAsset = dataGrid.SelectedItem as AssetViewModel;
-            }
+            assetVm.IsHovered = false;
         }
-        finally
+    }
+
+    private void AssetCard_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (sender is not Border { DataContext: AssetViewModel assetVm })
+            return;
+
+        var vm = DataContext as AssetsViewModel;
+        if (vm is null) return;
+
+        // Clear previous selection
+        if (vm.SelectedAsset is not null && vm.SelectedAsset != assetVm)
         {
-            _isUpdatingSelection = false;
+            vm.SelectedAsset.IsSelected = false;
+        }
+
+        // Set new selection
+        assetVm.IsSelected = true;
+        vm.SelectedAsset = assetVm;
+
+        // Handle double-click for edit
+        if (e.ClickCount == 2)
+        {
+            _ = vm.EditAssetCommand.ExecuteAsync(assetVm);
+            e.Handled = true;
         }
     }
 }

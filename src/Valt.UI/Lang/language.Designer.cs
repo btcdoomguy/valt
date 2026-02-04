@@ -3752,5 +3752,59 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Statistics_Config_ExcludedCategories", resourceCulture);
             }
         }
+
+        public static string Assets_Card_Symbol {
+            get {
+                return ResourceManager.GetString("Assets_Card_Symbol", resourceCulture);
+            }
+        }
+
+        public static string Assets_Card_Quantity {
+            get {
+                return ResourceManager.GetString("Assets_Card_Quantity", resourceCulture);
+            }
+        }
+
+        public static string Assets_Card_Price {
+            get {
+                return ResourceManager.GetString("Assets_Card_Price", resourceCulture);
+            }
+        }
+
+        public static string Assets_Card_Rent {
+            get {
+                return ResourceManager.GetString("Assets_Card_Rent", resourceCulture);
+            }
+        }
+
+        public static string Assets_Card_Entry {
+            get {
+                return ResourceManager.GetString("Assets_Card_Entry", resourceCulture);
+            }
+        }
+
+        public static string Assets_Card_Liquidation {
+            get {
+                return ResourceManager.GetString("Assets_Card_Liquidation", resourceCulture);
+            }
+        }
+
+        public static string Assets_Card_Distance {
+            get {
+                return ResourceManager.GetString("Assets_Card_Distance", resourceCulture);
+            }
+        }
+
+        public static string Assets_Card_AtRisk {
+            get {
+                return ResourceManager.GetString("Assets_Card_AtRisk", resourceCulture);
+            }
+        }
+
+        public static string Assets_Card_NetWorth {
+            get {
+                return ResourceManager.GetString("Assets_Card_NetWorth", resourceCulture);
+            }
+        }
     }
 }

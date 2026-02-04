@@ -1894,4 +1894,32 @@
     <data name="Statistics_Config_ExcludedCategories" xml:space="preserve">
         <value>Excluded Categories</value>
     </data>
+    <!-- Asset Card Labels -->
+    <data name="Assets_Card_Symbol" xml:space="preserve">
+        <value>Symbol:</value>
+    </data>
+    <data name="Assets_Card_Quantity" xml:space="preserve">
+        <value>Qty:</value>
+    </data>
+    <data name="Assets_Card_Price" xml:space="preserve">
+        <value>Price:</value>
+    </data>
+    <data name="Assets_Card_Rent" xml:space="preserve">
+        <value>Rent:</value>
+    </data>
+    <data name="Assets_Card_Entry" xml:space="preserve">
+        <value>Entry:</value>
+    </data>
+    <data name="Assets_Card_Liquidation" xml:space="preserve">
+        <value>Liq:</value>
+    </data>
+    <data name="Assets_Card_Distance" xml:space="preserve">
+        <value>Dist:</value>
+    </data>
+    <data name="Assets_Card_AtRisk" xml:space="preserve">
+        <value>AT RISK</value>
+    </data>
+    <data name="Assets_Card_NetWorth" xml:space="preserve">
+        <value>NetWorth</value>
+    </data>
 </root>
