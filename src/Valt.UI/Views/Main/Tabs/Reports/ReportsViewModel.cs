@@ -569,10 +569,10 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             var wealth = _accountsTotalState.CurrentWealth;
             var fiatCurrency = FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency);
 
-            var totalInBtc = CurrencyDisplay.FormatSatsAsBitcoin(wealth.AllWealthInSats);
+            var totalInBtc = CurrencyDisplay.FormatSatsAsBitcoin(wealth.NetWorthInSats);
             var btcWealth = CurrencyDisplay.FormatSatsAsBitcoin(wealth.WealthInSats);
             var fiatWealth = CurrencyDisplay.FormatFiat(wealth.WealthInMainFiatCurrency, fiatCurrency.Code);
-            var totalInFiat = CurrencyDisplay.FormatFiat(wealth.AllWealthInMainFiatCurrency, fiatCurrency.Code);
+            var totalInFiat = CurrencyDisplay.FormatFiat(wealth.NetWorthInMainFiatCurrency, fiatCurrency.Code);
             var btcRatio = wealth.WealthInBtcRatio.ToString(CultureInfo.InvariantCulture) + "%";
 
             var rows = new ObservableCollection<RowItem>
@@ -580,21 +580,17 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 new(language.Transactions_Total, totalInBtc + " BTC", language.Reports_Wealth_TotalInBtc_Tooltip),
                 new(language.Transactions_TotalInFiat, totalInFiat),
                 new(language.Transactions_MyStack, btcWealth + " BTC"),
-                new(language.Transactions_MyOther, fiatWealth),
-                new(language.Transactions_Ratio, btcRatio)
+                new(language.Transactions_MyOther, fiatWealth)
             };
 
-            // Add assets and net worth if assets exist
-            if (wealth.AssetsWealthInMainFiatCurrency > 0 || wealth.AssetsWealthInSats > 0)
+            // Add assets line if there are any assets (positive or negative)
+            if (wealth.AssetsWealthInMainFiatCurrency != 0 || wealth.AssetsWealthInSats != 0)
             {
                 var assetsWealth = CurrencyDisplay.FormatFiat(wealth.AssetsWealthInMainFiatCurrency, fiatCurrency.Code);
-                var netWorthFiat = CurrencyDisplay.FormatFiat(wealth.NetWorthInMainFiatCurrency, fiatCurrency.Code);
-                var netWorthSats = wealth.NetWorthInSats.ToString("N0", CultureInfo.CurrentCulture) + " sats";
-
                 rows.Add(new RowItem(language.Reports_Wealth_MyAssets, assetsWealth));
-                rows.Add(new RowItem(language.Reports_Wealth_NetWorth, netWorthFiat));
-                rows.Add(new RowItem(language.Reports_Wealth_NetWorthInSats, netWorthSats));
             }
+
+            rows.Add(new RowItem(language.Transactions_Ratio, btcRatio));
 
             WealthData = new DashboardData(language.Reports_Wealth_Title, rows);
             IsWealthLoading = false;

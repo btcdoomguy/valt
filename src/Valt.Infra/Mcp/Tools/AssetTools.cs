@@ -1,13 +1,23 @@
 using System.ComponentModel;
 using ModelContextProtocol.Server;
-using Valt.Core.Common;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Assets.Commands.CreateBasicAsset;
+using Valt.App.Modules.Assets.Commands.CreateLeveragedPosition;
+using Valt.App.Modules.Assets.Commands.CreateRealEstateAsset;
+using Valt.App.Modules.Assets.Commands.DeleteAsset;
+using Valt.App.Modules.Assets.Commands.SetAssetIncludeInNetWorth;
+using Valt.App.Modules.Assets.Commands.SetAssetVisibility;
+using Valt.App.Modules.Assets.Commands.UpdateAssetPrice;
+using Valt.App.Modules.Assets.Commands.UpdateAssetQuantity;
+using Valt.App.Modules.Assets.DTOs;
+using Valt.App.Modules.Assets.Queries.GetAsset;
+using Valt.App.Modules.Assets.Queries.GetAssets;
+using Valt.App.Modules.Assets.Queries.GetAssetSummary;
+using Valt.App.Modules.Assets.Queries.GetVisibleAssets;
 using Valt.Core.Modules.Assets;
-using Valt.Core.Modules.Assets.Contracts;
-using Valt.Core.Modules.Assets.Details;
 using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Mcp.Notifications;
-using Valt.Infra.Modules.Assets.Queries;
-using Valt.Infra.Modules.Assets.Queries.DTOs;
 using Valt.Infra.Settings;
 
 namespace Valt.Infra.Mcp.Tools;
@@ -24,9 +34,9 @@ public class AssetTools
     /// </summary>
     [McpServerTool, Description("Get all tracked assets (investments like stocks, ETFs, crypto, real estate, etc.)")]
     public static async Task<IReadOnlyList<AssetDTO>> GetAssets(
-        IAssetQueries queries)
+        IQueryDispatcher queryDispatcher)
     {
-        return await queries.GetAllAsync();
+        return await queryDispatcher.DispatchAsync(new GetAssetsQuery());
     }
 
     /// <summary>
@@ -34,9 +44,9 @@ public class AssetTools
     /// </summary>
     [McpServerTool, Description("Get only visible assets")]
     public static async Task<IReadOnlyList<AssetDTO>> GetVisibleAssets(
-        IAssetQueries queries)
+        IQueryDispatcher queryDispatcher)
     {
-        return await queries.GetVisibleAsync();
+        return await queryDispatcher.DispatchAsync(new GetVisibleAssetsQuery());
     }
 
     /// <summary>
@@ -44,10 +54,10 @@ public class AssetTools
     /// </summary>
     [McpServerTool, Description("Get a single asset by its ID")]
     public static async Task<AssetDTO?> GetAsset(
-        IAssetQueries queries,
+        IQueryDispatcher queryDispatcher,
         [Description("The asset ID")] string assetId)
     {
-        return await queries.GetByIdAsync(assetId);
+        return await queryDispatcher.DispatchAsync(new GetAssetQuery { AssetId = assetId });
     }
 
     /// <summary>
@@ -55,10 +65,13 @@ public class AssetTools
     /// </summary>
     [McpServerTool, Description("Get asset summary with totals in main currency and sats")]
     public static async Task<AssetSummaryDTO> GetAssetsSummary(
-        IAssetQueries queries,
+        IQueryDispatcher queryDispatcher,
         CurrencySettings currencySettings)
     {
-        return await queries.GetSummaryAsync(currencySettings.MainFiatCurrency);
+        return await queryDispatcher.DispatchAsync(new GetAssetSummaryQuery
+        {
+            MainCurrencyCode = currencySettings.MainFiatCurrency
+        });
     }
 
     /// <summary>
@@ -66,7 +79,7 @@ public class AssetTools
     /// </summary>
     [McpServerTool, Description("Create a basic asset (stock, ETF, crypto, commodity, or custom)")]
     public static async Task<string> CreateBasicAsset(
-        IAssetRepository repository,
+        ICommandDispatcher commandDispatcher,
         INotificationPublisher publisher,
         [Description("Asset name")] string name,
         [Description("Asset type: 0=Stock, 1=Etf, 2=Crypto, 3=Commodity, 6=Custom")] int assetType,
@@ -79,33 +92,27 @@ public class AssetTools
         [Description("Visible in list")] bool visible = true,
         [Description("Icon identifier (optional)")] string? icon = null)
     {
-        var assetName = new AssetName(name);
-        var assetTypeEnum = (AssetTypes)assetType;
-        var priceSourceEnum = (AssetPriceSource)priceSource;
+        var result = await commandDispatcher.DispatchAsync(new CreateBasicAssetCommand
+        {
+            Name = name,
+            AssetType = assetType,
+            CurrencyCode = currencyCode,
+            Symbol = symbol,
+            Quantity = quantity,
+            CurrentPrice = currentPrice,
+            PriceSource = priceSource,
+            IncludeInNetWorth = includeInNetWorth,
+            Visible = visible,
+            Icon = icon
+        });
 
-        var details = new BasicAssetDetails(
-            assetType: assetTypeEnum,
-            quantity: quantity,
-            symbol: symbol,
-            priceSource: priceSourceEnum,
-            currentPrice: currentPrice,
-            currencyCode: currencyCode);
-
-        var parsedIcon = string.IsNullOrWhiteSpace(icon)
-            ? Icon.Empty
-            : Icon.RestoreFromId(icon);
-
-        var asset = Asset.New(
-            assetName,
-            details,
-            parsedIcon,
-            includeInNetWorth,
-            visible);
-
-        await repository.SaveAsync(asset);
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error!.Message}";
+        }
 
         await publisher.PublishAsync(new McpDataChangedNotification());
-        return $"Basic asset created with ID: {asset.Id}";
+        return $"Basic asset created with ID: {result.Value}";
     }
 
     /// <summary>
@@ -113,7 +120,7 @@ public class AssetTools
     /// </summary>
     [McpServerTool, Description("Create a real estate asset")]
     public static async Task<string> CreateRealEstateAsset(
-        IAssetRepository repository,
+        ICommandDispatcher commandDispatcher,
         INotificationPublisher publisher,
         [Description("Property name")] string name,
         [Description("Currency code (e.g., USD, BRL)")] string currencyCode,
@@ -124,29 +131,25 @@ public class AssetTools
         [Description("Visible in list")] bool visible = true,
         [Description("Icon identifier (optional)")] string? icon = null)
     {
-        var assetName = new AssetName(name);
+        var result = await commandDispatcher.DispatchAsync(new CreateRealEstateAssetCommand
+        {
+            Name = name,
+            CurrencyCode = currencyCode,
+            CurrentValue = currentValue,
+            Address = address,
+            MonthlyRentalIncome = monthlyRentalIncome,
+            IncludeInNetWorth = includeInNetWorth,
+            Visible = visible,
+            Icon = icon
+        });
 
-        var details = new RealEstateAssetDetails(
-            address: address,
-            currentValue: currentValue,
-            currencyCode: currencyCode,
-            monthlyRentalIncome: monthlyRentalIncome);
-
-        var parsedIcon = string.IsNullOrWhiteSpace(icon)
-            ? Icon.Empty
-            : Icon.RestoreFromId(icon);
-
-        var asset = Asset.New(
-            assetName,
-            details,
-            parsedIcon,
-            includeInNetWorth,
-            visible);
-
-        await repository.SaveAsync(asset);
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error!.Message}";
+        }
 
         await publisher.PublishAsync(new McpDataChangedNotification());
-        return $"Real estate asset created with ID: {asset.Id}";
+        return $"Real estate asset created with ID: {result.Value}";
     }
 
     /// <summary>
@@ -154,7 +157,7 @@ public class AssetTools
     /// </summary>
     [McpServerTool, Description("Create a leveraged trading position (futures, perpetuals, margin)")]
     public static async Task<string> CreateLeveragedPosition(
-        IAssetRepository repository,
+        ICommandDispatcher commandDispatcher,
         INotificationPublisher publisher,
         [Description("Position name")] string name,
         [Description("Currency code for collateral and P&L (e.g., USD)")] string currencyCode,
@@ -170,35 +173,30 @@ public class AssetTools
         [Description("Visible in list")] bool visible = true,
         [Description("Icon identifier (optional)")] string? icon = null)
     {
-        var assetName = new AssetName(name);
-        var priceSourceEnum = (AssetPriceSource)priceSource;
+        var result = await commandDispatcher.DispatchAsync(new CreateLeveragedPositionCommand
+        {
+            Name = name,
+            CurrencyCode = currencyCode,
+            Symbol = symbol,
+            Collateral = collateral,
+            EntryPrice = entryPrice,
+            CurrentPrice = currentPrice,
+            Leverage = leverage,
+            LiquidationPrice = liquidationPrice,
+            IsLong = isLong,
+            PriceSource = priceSource,
+            IncludeInNetWorth = includeInNetWorth,
+            Visible = visible,
+            Icon = icon
+        });
 
-        var details = new LeveragedPositionDetails(
-            collateral: collateral,
-            entryPrice: entryPrice,
-            leverage: leverage,
-            liquidationPrice: liquidationPrice,
-            currentPrice: currentPrice,
-            currencyCode: currencyCode,
-            symbol: symbol,
-            priceSource: priceSourceEnum,
-            isLong: isLong);
-
-        var parsedIcon = string.IsNullOrWhiteSpace(icon)
-            ? Icon.Empty
-            : Icon.RestoreFromId(icon);
-
-        var asset = Asset.New(
-            assetName,
-            details,
-            parsedIcon,
-            includeInNetWorth,
-            visible);
-
-        await repository.SaveAsync(asset);
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error!.Message}";
+        }
 
         await publisher.PublishAsync(new McpDataChangedNotification());
-        return $"Leveraged position created with ID: {asset.Id}";
+        return $"Leveraged position created with ID: {result.Value}";
     }
 
     /// <summary>
@@ -206,19 +204,21 @@ public class AssetTools
     /// </summary>
     [McpServerTool, Description("Update the current price of an asset")]
     public static async Task<string> UpdateAssetPrice(
-        IAssetRepository repository,
+        ICommandDispatcher commandDispatcher,
         INotificationPublisher publisher,
         [Description("The asset ID")] string assetId,
         [Description("New current price")] decimal newPrice)
     {
-        var asset = await repository.GetByIdAsync(new AssetId(assetId));
-        if (asset is null)
+        var result = await commandDispatcher.DispatchAsync(new UpdateAssetPriceCommand
         {
-            return $"Error: Asset with ID {assetId} not found";
-        }
+            AssetId = assetId,
+            NewPrice = newPrice
+        });
 
-        asset.UpdatePrice(newPrice);
-        await repository.SaveAsync(asset);
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error!.Message}";
+        }
 
         await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Asset {assetId} price updated to {newPrice}";
@@ -229,26 +229,21 @@ public class AssetTools
     /// </summary>
     [McpServerTool, Description("Update the quantity of a basic asset")]
     public static async Task<string> UpdateAssetQuantity(
-        IAssetRepository repository,
+        ICommandDispatcher commandDispatcher,
         INotificationPublisher publisher,
         [Description("The asset ID")] string assetId,
         [Description("New quantity")] decimal newQuantity)
     {
-        var asset = await repository.GetByIdAsync(new AssetId(assetId));
-        if (asset is null)
+        var result = await commandDispatcher.DispatchAsync(new UpdateAssetQuantityCommand
         {
-            return $"Error: Asset with ID {assetId} not found";
-        }
+            AssetId = assetId,
+            NewQuantity = newQuantity
+        });
 
-        if (asset.Details is not BasicAssetDetails basicDetails)
+        if (result.IsFailure)
         {
-            return $"Error: Asset {assetId} is not a basic asset (cannot update quantity)";
+            return $"Error: {result.Error!.Message}";
         }
-
-        // Edit the asset with updated details
-        var newDetails = basicDetails.WithQuantity(newQuantity);
-        asset.Edit(asset.Name, newDetails, asset.Icon, asset.IncludeInNetWorth, asset.Visible);
-        await repository.SaveAsync(asset);
 
         await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Asset {assetId} quantity updated to {newQuantity}";
@@ -259,21 +254,30 @@ public class AssetTools
     /// </summary>
     [McpServerTool, Description("Toggle the visibility of an asset")]
     public static async Task<string> ToggleAssetVisibility(
-        IAssetRepository repository,
+        IQueryDispatcher queryDispatcher,
+        ICommandDispatcher commandDispatcher,
         INotificationPublisher publisher,
         [Description("The asset ID")] string assetId)
     {
-        var asset = await repository.GetByIdAsync(new AssetId(assetId));
+        var asset = await queryDispatcher.DispatchAsync(new GetAssetQuery { AssetId = assetId });
         if (asset is null)
         {
             return $"Error: Asset with ID {assetId} not found";
         }
 
-        asset.SetVisibility(!asset.Visible);
-        await repository.SaveAsync(asset);
+        var result = await commandDispatcher.DispatchAsync(new SetAssetVisibilityCommand
+        {
+            AssetId = assetId,
+            Visible = !asset.Visible
+        });
+
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error!.Message}";
+        }
 
         await publisher.PublishAsync(new McpDataChangedNotification());
-        return $"Asset {assetId} visibility set to {asset.Visible}";
+        return $"Asset {assetId} visibility set to {!asset.Visible}";
     }
 
     /// <summary>
@@ -281,21 +285,30 @@ public class AssetTools
     /// </summary>
     [McpServerTool, Description("Toggle whether an asset is included in net worth calculation")]
     public static async Task<string> ToggleAssetNetWorthInclusion(
-        IAssetRepository repository,
+        IQueryDispatcher queryDispatcher,
+        ICommandDispatcher commandDispatcher,
         INotificationPublisher publisher,
         [Description("The asset ID")] string assetId)
     {
-        var asset = await repository.GetByIdAsync(new AssetId(assetId));
+        var asset = await queryDispatcher.DispatchAsync(new GetAssetQuery { AssetId = assetId });
         if (asset is null)
         {
             return $"Error: Asset with ID {assetId} not found";
         }
 
-        asset.SetIncludeInNetWorth(!asset.IncludeInNetWorth);
-        await repository.SaveAsync(asset);
+        var result = await commandDispatcher.DispatchAsync(new SetAssetIncludeInNetWorthCommand
+        {
+            AssetId = assetId,
+            IncludeInNetWorth = !asset.IncludeInNetWorth
+        });
+
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error!.Message}";
+        }
 
         await publisher.PublishAsync(new McpDataChangedNotification());
-        return $"Asset {assetId} include in net worth set to {asset.IncludeInNetWorth}";
+        return $"Asset {assetId} include in net worth set to {!asset.IncludeInNetWorth}";
     }
 
     /// <summary>
@@ -303,17 +316,19 @@ public class AssetTools
     /// </summary>
     [McpServerTool, Description("Delete an asset")]
     public static async Task<string> DeleteAsset(
-        IAssetRepository repository,
+        ICommandDispatcher commandDispatcher,
         INotificationPublisher publisher,
         [Description("The asset ID to delete")] string assetId)
     {
-        var asset = await repository.GetByIdAsync(new AssetId(assetId));
-        if (asset is null)
+        var result = await commandDispatcher.DispatchAsync(new DeleteAssetCommand
         {
-            return $"Error: Asset with ID {assetId} not found";
-        }
+            AssetId = assetId
+        });
 
-        await repository.DeleteAsync(asset);
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error!.Message}";
+        }
 
         await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Asset {assetId} deleted successfully";

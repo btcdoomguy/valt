@@ -1,8 +1,9 @@
+using Valt.App.Modules.Assets.Contracts;
+using Valt.App.Modules.Assets.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Modules.Assets;
 using Valt.Core.Modules.Assets.Details;
 using Valt.Infra.DataAccess;
-using Valt.Infra.Modules.Assets.Queries.DTOs;
 
 namespace Valt.Infra.Modules.Assets.Queries;
 
@@ -60,10 +61,10 @@ internal sealed class AssetQueries : IAssetQueries
             .Select(g => new AssetValueByCurrencyDTO
             {
                 CurrencyCode = g.Key,
-                TotalValue = g.Sum(a => GetValueForSummary(a)),
+                TotalValue = g.Sum(GetValueForSummary),
                 AssetCount = g.Count()
             })
-            .ToList();
+            .ToList<AssetValueByCurrencyDTO>();
 
         var totalValueInMainCurrency = 0m;
         long totalValueInSats = 0;
@@ -132,7 +133,52 @@ internal sealed class AssetQueries : IAssetQueries
     private static AssetDTO MapToDto(AssetEntity entity)
     {
         var asset = entity.AsDomainObject();
-        var dto = new AssetDTO
+
+        // Extract type-specific fields
+        decimal? quantity = null;
+        string? symbol = null;
+        int? priceSourceId = null;
+        string? address = null;
+        decimal? monthlyRentalIncome = null;
+        decimal? collateral = null;
+        decimal? entryPrice = null;
+        decimal? leverage = null;
+        decimal? liquidationPrice = null;
+        bool? isLong = null;
+        decimal? pnl = null;
+        decimal? pnlPercentage = null;
+        decimal? distanceToLiquidation = null;
+        bool? isAtRisk = null;
+
+        switch (asset.Details)
+        {
+            case BasicAssetDetails basic:
+                quantity = basic.Quantity;
+                symbol = basic.Symbol;
+                priceSourceId = (int)basic.PriceSource;
+                break;
+
+            case RealEstateAssetDetails realEstate:
+                address = realEstate.Address;
+                monthlyRentalIncome = realEstate.MonthlyRentalIncome;
+                break;
+
+            case LeveragedPositionDetails leveraged:
+                collateral = leveraged.Collateral;
+                entryPrice = leveraged.EntryPrice;
+                leverage = leveraged.Leverage;
+                liquidationPrice = leveraged.LiquidationPrice;
+                isLong = leveraged.IsLong;
+                symbol = leveraged.Symbol;
+                priceSourceId = (int)leveraged.PriceSource;
+                pnl = leveraged.CalculatePnL(leveraged.CurrentPrice);
+                pnlPercentage = leveraged.CalculatePnLPercentage(leveraged.CurrentPrice);
+                distanceToLiquidation = leveraged.CalculateDistanceToLiquidation(leveraged.CurrentPrice);
+                isAtRisk = leveraged.IsAtRisk(leveraged.CurrentPrice);
+                break;
+        }
+
+        return new AssetDTO
         {
             Id = entity.Id.ToString(),
             Name = entity.Name,
@@ -146,38 +192,22 @@ internal sealed class AssetQueries : IAssetQueries
             DisplayOrder = entity.DisplayOrder,
             CurrentPrice = asset.GetCurrentPrice(),
             CurrentValue = asset.GetCurrentValue(),
-            CurrencyCode = asset.GetCurrencyCode()
+            CurrencyCode = asset.GetCurrencyCode(),
+            // Type-specific fields
+            Quantity = quantity,
+            Symbol = symbol,
+            PriceSourceId = priceSourceId,
+            Address = address,
+            MonthlyRentalIncome = monthlyRentalIncome,
+            Collateral = collateral,
+            EntryPrice = entryPrice,
+            Leverage = leverage,
+            LiquidationPrice = liquidationPrice,
+            IsLong = isLong,
+            PnL = pnl,
+            PnLPercentage = pnlPercentage,
+            DistanceToLiquidation = distanceToLiquidation,
+            IsAtRisk = isAtRisk
         };
-
-        // Fill in type-specific details
-        switch (asset.Details)
-        {
-            case BasicAssetDetails basic:
-                dto.Quantity = basic.Quantity;
-                dto.Symbol = basic.Symbol;
-                dto.PriceSourceId = (int)basic.PriceSource;
-                break;
-
-            case RealEstateAssetDetails realEstate:
-                dto.Address = realEstate.Address;
-                dto.MonthlyRentalIncome = realEstate.MonthlyRentalIncome;
-                break;
-
-            case LeveragedPositionDetails leveraged:
-                dto.Collateral = leveraged.Collateral;
-                dto.EntryPrice = leveraged.EntryPrice;
-                dto.Leverage = leveraged.Leverage;
-                dto.LiquidationPrice = leveraged.LiquidationPrice;
-                dto.IsLong = leveraged.IsLong;
-                dto.Symbol = leveraged.Symbol;
-                dto.PriceSourceId = (int)leveraged.PriceSource;
-                dto.PnL = leveraged.CalculatePnL(leveraged.CurrentPrice);
-                dto.PnLPercentage = leveraged.CalculatePnLPercentage(leveraged.CurrentPrice);
-                dto.DistanceToLiquidation = leveraged.CalculateDistanceToLiquidation(leveraged.CurrentPrice);
-                dto.IsAtRisk = leveraged.IsAtRisk(leveraged.CurrentPrice);
-                break;
-        }
-
-        return dto;
     }
 }

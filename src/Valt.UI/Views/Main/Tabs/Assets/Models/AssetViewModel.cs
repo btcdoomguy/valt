@@ -1,10 +1,10 @@
 using System;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Valt.App.Modules.Assets.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Modules.Assets;
 using Valt.Infra.Kernel;
-using Valt.Infra.Modules.Assets.Queries.DTOs;
 using Valt.UI.Lang;
 
 namespace Valt.UI.Views.Main.Tabs.Assets.Models;

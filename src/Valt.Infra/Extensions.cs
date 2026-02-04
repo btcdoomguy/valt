@@ -26,6 +26,7 @@ using Valt.Infra.Kernel.EventSystem;
 using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Kernel.Scopes;
 using Valt.Infra.Kernel.Time;
+using Valt.App.Modules.Assets.Contracts;
 using Valt.App.Modules.AvgPrice.Contracts;
 using Valt.Infra.Modules.Assets;
 using Valt.Infra.Modules.Assets.PriceProviders;

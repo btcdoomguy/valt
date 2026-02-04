@@ -6,12 +6,17 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Assets.Commands.CreateBasicAsset;
+using Valt.App.Modules.Assets.Commands.CreateLeveragedPosition;
+using Valt.App.Modules.Assets.Commands.CreateRealEstateAsset;
+using Valt.App.Modules.Assets.Commands.EditAsset;
+using Valt.App.Modules.Assets.DTOs;
+using Valt.App.Modules.Assets.Queries.GetAsset;
 using Valt.Core.Common;
 using Valt.Core.Modules.Assets;
-using Valt.Core.Modules.Assets.Contracts;
-using Valt.Core.Modules.Assets.Details;
 using Valt.Infra.Modules.Assets.PriceProviders;
-using Valt.Infra.Modules.Assets.Queries;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
@@ -23,8 +28,8 @@ namespace Valt.UI.Views.Main.Modals.ManageAsset;
 
 public partial class ManageAssetViewModel : ValtModalValidatorViewModel
 {
-    private readonly IAssetRepository? _assetRepository;
-    private readonly IAssetQueries? _assetQueries;
+    private readonly IQueryDispatcher? _queryDispatcher;
+    private readonly ICommandDispatcher? _commandDispatcher;
     private readonly IAssetPriceProviderSelector? _priceProviderSelector;
     private readonly CurrencySettings? _currencySettings;
     private readonly IConfigurationManager? _configurationManager;
@@ -171,15 +176,15 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     }
 
     public ManageAssetViewModel(
-        IAssetRepository assetRepository,
-        IAssetQueries assetQueries,
+        IQueryDispatcher queryDispatcher,
+        ICommandDispatcher commandDispatcher,
         IAssetPriceProviderSelector priceProviderSelector,
         CurrencySettings currencySettings,
         IConfigurationManager configurationManager,
         ILogger<ManageAssetViewModel> logger)
     {
-        _assetRepository = assetRepository;
-        _assetQueries = assetQueries;
+        _queryDispatcher = queryDispatcher;
+        _commandDispatcher = commandDispatcher;
         _priceProviderSelector = priceProviderSelector;
         _currencySettings = currencySettings;
         _configurationManager = configurationManager;
@@ -193,7 +198,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     {
         if (Parameter is string assetId && !string.IsNullOrWhiteSpace(assetId))
         {
-            var assetDto = await _assetQueries!.GetByIdAsync(assetId);
+            var assetDto = await _queryDispatcher!.DispatchAsync(new GetAssetQuery { AssetId = assetId });
             if (assetDto is null)
             {
                 await MessageBoxHelper.ShowAlertAsync(language.Error_ValidationError, language.Error_AssetNotFound, GetWindow!());
@@ -321,97 +326,16 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
         try
         {
             var assetType = Enum.Parse<AssetTypes>(SelectedAssetType);
-            var assetName = new AssetName(Name);
-            IAssetDetails details;
-
-            switch (assetType)
-            {
-                case AssetTypes.Stock:
-                case AssetTypes.Etf:
-                case AssetTypes.Crypto:
-                case AssetTypes.Commodity:
-                case AssetTypes.Custom:
-                    var priceSource = Enum.Parse<AssetPriceSource>(SelectedPriceSource);
-                    var currentPrice = CurrentPriceFiat.Value;
-
-                    // Fetch price from provider if not Manual
-                    if (priceSource != AssetPriceSource.Manual && !string.IsNullOrWhiteSpace(Symbol))
-                    {
-                        var result = await _priceProviderSelector!.GetPriceAsync(priceSource, Symbol, SelectedCurrency);
-                        if (result is not null)
-                        {
-                            currentPrice = result.Price;
-                        }
-                    }
-
-                    details = new BasicAssetDetails(
-                        assetType: assetType,
-                        quantity: Quantity,
-                        symbol: Symbol,
-                        priceSource: priceSource,
-                        currentPrice: currentPrice,
-                        currencyCode: SelectedCurrency);
-                    break;
-
-                case AssetTypes.RealEstate:
-                    details = new RealEstateAssetDetails(
-                        address: string.IsNullOrWhiteSpace(Address) ? null : Address,
-                        currentValue: CurrentValueFiat.Value,
-                        currencyCode: SelectedCurrency,
-                        monthlyRentalIncome: MonthlyRentalIncomeFiat.Value > 0 ? MonthlyRentalIncomeFiat.Value : null);
-                    break;
-
-                case AssetTypes.LeveragedPosition:
-                    var leveragedPriceSource = Enum.Parse<AssetPriceSource>(SelectedPriceSource);
-                    var leveragedCurrentPrice = CurrentPriceFiat.Value;
-
-                    // Fetch price from provider if not Manual
-                    if (leveragedPriceSource != AssetPriceSource.Manual && !string.IsNullOrWhiteSpace(Symbol))
-                    {
-                        var result = await _priceProviderSelector!.GetPriceAsync(leveragedPriceSource, Symbol, SelectedCurrency);
-                        if (result is not null)
-                        {
-                            leveragedCurrentPrice = result.Price;
-                        }
-                    }
-
-                    details = new LeveragedPositionDetails(
-                        collateral: CollateralFiat.Value,
-                        entryPrice: EntryPriceFiat.Value,
-                        leverage: Leverage,
-                        liquidationPrice: LiquidationPriceFiat.Value,
-                        currentPrice: leveragedCurrentPrice,
-                        currencyCode: SelectedCurrency,
-                        symbol: Symbol,
-                        priceSource: leveragedPriceSource,
-                        isLong: IsLong);
-                    break;
-
-                default:
-                    await MessageBoxHelper.ShowErrorAsync(language.Error, "Unsupported asset type", GetWindow!());
-                    return;
-            }
 
             if (_assetId is null)
             {
                 // Create new asset
-                var asset = Asset.New(assetName, details, Icon.Empty, IncludeInNetWorth, Visible);
-                await _assetRepository!.SaveAsync(asset);
-                CloseDialog?.Invoke(new Response(true, asset.Id.ToString()));
+                await CreateNewAssetAsync(assetType);
             }
             else
             {
                 // Edit existing asset
-                var asset = await _assetRepository!.GetByIdAsync(new AssetId(_assetId));
-                if (asset is null)
-                {
-                    await MessageBoxHelper.ShowErrorAsync(language.Error, language.Error_AssetNotFound, GetWindow!());
-                    return;
-                }
-
-                asset.Edit(assetName, details, asset.Icon, IncludeInNetWorth, Visible);
-                await _assetRepository.SaveAsync(asset);
-                CloseDialog?.Invoke(new Response(true, _assetId));
+                await EditExistingAssetAsync(assetType);
             }
         }
         catch (Exception ex)
@@ -419,6 +343,212 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
             _logger?.LogError(ex, "Error saving asset");
             await MessageBoxHelper.ShowErrorAsync(language.Error, ex.Message, GetWindow!());
         }
+    }
+
+    private async Task CreateNewAssetAsync(AssetTypes assetType)
+    {
+        switch (assetType)
+        {
+            case AssetTypes.Stock:
+            case AssetTypes.Etf:
+            case AssetTypes.Crypto:
+            case AssetTypes.Commodity:
+            case AssetTypes.Custom:
+                var priceSource = Enum.Parse<AssetPriceSource>(SelectedPriceSource);
+                var currentPrice = CurrentPriceFiat.Value;
+
+                // Fetch price from provider if not Manual
+                if (priceSource != AssetPriceSource.Manual && !string.IsNullOrWhiteSpace(Symbol))
+                {
+                    var priceResult = await _priceProviderSelector!.GetPriceAsync(priceSource, Symbol, SelectedCurrency);
+                    if (priceResult is not null)
+                    {
+                        currentPrice = priceResult.Price;
+                    }
+                }
+
+                var basicResult = await _commandDispatcher!.DispatchAsync(new CreateBasicAssetCommand
+                {
+                    Name = Name,
+                    AssetType = (int)assetType,
+                    CurrencyCode = SelectedCurrency,
+                    Symbol = Symbol,
+                    Quantity = Quantity,
+                    CurrentPrice = currentPrice,
+                    PriceSource = (int)priceSource,
+                    IncludeInNetWorth = IncludeInNetWorth,
+                    Visible = Visible
+                });
+
+                if (basicResult.IsFailure)
+                {
+                    await MessageBoxHelper.ShowErrorAsync(language.Error, basicResult.Error!.Message, GetWindow!());
+                    return;
+                }
+
+                CloseDialog?.Invoke(new Response(true, basicResult.Value!.AssetId));
+                break;
+
+            case AssetTypes.RealEstate:
+                var realEstateResult = await _commandDispatcher!.DispatchAsync(new CreateRealEstateAssetCommand
+                {
+                    Name = Name,
+                    CurrencyCode = SelectedCurrency,
+                    CurrentValue = CurrentValueFiat.Value,
+                    Address = string.IsNullOrWhiteSpace(Address) ? null : Address,
+                    MonthlyRentalIncome = MonthlyRentalIncomeFiat.Value > 0 ? MonthlyRentalIncomeFiat.Value : null,
+                    IncludeInNetWorth = IncludeInNetWorth,
+                    Visible = Visible
+                });
+
+                if (realEstateResult.IsFailure)
+                {
+                    await MessageBoxHelper.ShowErrorAsync(language.Error, realEstateResult.Error!.Message, GetWindow!());
+                    return;
+                }
+
+                CloseDialog?.Invoke(new Response(true, realEstateResult.Value!.AssetId));
+                break;
+
+            case AssetTypes.LeveragedPosition:
+                var leveragedPriceSource = Enum.Parse<AssetPriceSource>(SelectedPriceSource);
+                var leveragedCurrentPrice = CurrentPriceFiat.Value;
+
+                // Fetch price from provider if not Manual
+                if (leveragedPriceSource != AssetPriceSource.Manual && !string.IsNullOrWhiteSpace(Symbol))
+                {
+                    var priceResult = await _priceProviderSelector!.GetPriceAsync(leveragedPriceSource, Symbol, SelectedCurrency);
+                    if (priceResult is not null)
+                    {
+                        leveragedCurrentPrice = priceResult.Price;
+                    }
+                }
+
+                var leveragedResult = await _commandDispatcher!.DispatchAsync(new CreateLeveragedPositionCommand
+                {
+                    Name = Name,
+                    CurrencyCode = SelectedCurrency,
+                    Symbol = Symbol,
+                    Collateral = CollateralFiat.Value,
+                    EntryPrice = EntryPriceFiat.Value,
+                    CurrentPrice = leveragedCurrentPrice,
+                    Leverage = Leverage,
+                    LiquidationPrice = LiquidationPriceFiat.Value,
+                    IsLong = IsLong,
+                    PriceSource = (int)leveragedPriceSource,
+                    IncludeInNetWorth = IncludeInNetWorth,
+                    Visible = Visible
+                });
+
+                if (leveragedResult.IsFailure)
+                {
+                    await MessageBoxHelper.ShowErrorAsync(language.Error, leveragedResult.Error!.Message, GetWindow!());
+                    return;
+                }
+
+                CloseDialog?.Invoke(new Response(true, leveragedResult.Value!.AssetId));
+                break;
+
+            default:
+                await MessageBoxHelper.ShowErrorAsync(language.Error, "Unsupported asset type", GetWindow!());
+                return;
+        }
+    }
+
+    private async Task EditExistingAssetAsync(AssetTypes assetType)
+    {
+        AssetDetailsInputDTO details;
+
+        switch (assetType)
+        {
+            case AssetTypes.Stock:
+            case AssetTypes.Etf:
+            case AssetTypes.Crypto:
+            case AssetTypes.Commodity:
+            case AssetTypes.Custom:
+                var priceSource = Enum.Parse<AssetPriceSource>(SelectedPriceSource);
+                var currentPrice = CurrentPriceFiat.Value;
+
+                // Fetch price from provider if not Manual
+                if (priceSource != AssetPriceSource.Manual && !string.IsNullOrWhiteSpace(Symbol))
+                {
+                    var priceResult = await _priceProviderSelector!.GetPriceAsync(priceSource, Symbol, SelectedCurrency);
+                    if (priceResult is not null)
+                    {
+                        currentPrice = priceResult.Price;
+                    }
+                }
+
+                details = new BasicAssetDetailsInputDTO
+                {
+                    AssetType = (int)assetType,
+                    CurrencyCode = SelectedCurrency,
+                    Symbol = Symbol,
+                    Quantity = Quantity,
+                    CurrentPrice = currentPrice,
+                    PriceSource = (int)priceSource
+                };
+                break;
+
+            case AssetTypes.RealEstate:
+                details = new RealEstateAssetDetailsInputDTO
+                {
+                    CurrencyCode = SelectedCurrency,
+                    CurrentValue = CurrentValueFiat.Value,
+                    Address = string.IsNullOrWhiteSpace(Address) ? null : Address,
+                    MonthlyRentalIncome = MonthlyRentalIncomeFiat.Value > 0 ? MonthlyRentalIncomeFiat.Value : null
+                };
+                break;
+
+            case AssetTypes.LeveragedPosition:
+                var leveragedPriceSource = Enum.Parse<AssetPriceSource>(SelectedPriceSource);
+                var leveragedCurrentPrice = CurrentPriceFiat.Value;
+
+                // Fetch price from provider if not Manual
+                if (leveragedPriceSource != AssetPriceSource.Manual && !string.IsNullOrWhiteSpace(Symbol))
+                {
+                    var priceResult = await _priceProviderSelector!.GetPriceAsync(leveragedPriceSource, Symbol, SelectedCurrency);
+                    if (priceResult is not null)
+                    {
+                        leveragedCurrentPrice = priceResult.Price;
+                    }
+                }
+
+                details = new LeveragedPositionDetailsInputDTO
+                {
+                    CurrencyCode = SelectedCurrency,
+                    Symbol = Symbol,
+                    Collateral = CollateralFiat.Value,
+                    EntryPrice = EntryPriceFiat.Value,
+                    CurrentPrice = leveragedCurrentPrice,
+                    Leverage = Leverage,
+                    LiquidationPrice = LiquidationPriceFiat.Value,
+                    IsLong = IsLong,
+                    PriceSource = (int)leveragedPriceSource
+                };
+                break;
+
+            default:
+                await MessageBoxHelper.ShowErrorAsync(language.Error, "Unsupported asset type", GetWindow!());
+                return;
+        }
+
+        var result = await _commandDispatcher!.DispatchAsync(new EditAssetCommand
+        {
+            AssetId = _assetId!,
+            Name = Name,
+            Details = details,
+            IncludeInNetWorth = IncludeInNetWorth,
+            Visible = Visible
+        });
+
+        if (result.IsFailure)
+        {
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
+            return;
+        }
+
+        CloseDialog?.Invoke(new Response(true, _assetId));
     }
 
     [RelayCommand]

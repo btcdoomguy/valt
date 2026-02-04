@@ -231,7 +231,7 @@
         <value>Service status</value>
     </data>
     <data name="Transactions.Ratio" xml:space="preserve">
-        <value>Wealth in BTC</value>
+        <value>BTC Spot %</value>
     </data>
     <data name="Transactions.TotalInFiat" xml:space="preserve">
         <value>Total</value>

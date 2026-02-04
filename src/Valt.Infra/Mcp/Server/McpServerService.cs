@@ -19,8 +19,6 @@ using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.Infra.Modules.Reports.Statistics;
 using Valt.Infra.Modules.Reports.WealthOverview;
 using Valt.Infra.Kernel.Notifications;
-using Valt.Infra.Modules.Assets.Queries;
-using Valt.Core.Modules.Assets.Contracts;
 using Valt.Infra.Settings;
 
 namespace Valt.Infra.Mcp.Server;
@@ -274,9 +272,5 @@ public class McpServerService
         services.AddSingleton(_appServices.GetRequiredService<ILocalHistoricalPriceProvider>());
         services.AddSingleton(_appServices.GetRequiredService<IBitcoinPriceProvider>());
         services.AddSingleton(_appServices.GetRequiredService<IFiatPriceProviderSelector>());
-
-        // Asset services (needed by AssetTools)
-        services.AddSingleton(_appServices.GetRequiredService<IAssetQueries>());
-        services.AddSingleton(_appServices.GetRequiredService<IAssetRepository>());
     }
 }

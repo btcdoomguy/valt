@@ -475,7 +475,7 @@
         <value>Ao excluir uma despesa fixa, todas as transações atreladas a irão perder o vínculo. Deseja continuar?</value>
     </data>
     <data name="Transactions.Ratio" xml:space="preserve">
-        <value>Patrimônio em BTC</value>
+        <value>% à Vista em BTC</value>
     </data>
     <data name="Transactions.TotalInFiat" xml:space="preserve">
         <value>Total</value>

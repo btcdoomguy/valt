@@ -7,10 +7,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Assets.DTOs;
+using Valt.App.Modules.Assets.Queries.GetAssetSummary;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Messages;
 using Valt.App.Modules.Budget.Accounts.DTOs;
-using Valt.Infra.Modules.Assets.Queries;
-using Valt.Infra.Modules.Assets.Queries.DTOs;
 using Valt.Infra.Settings;
 using Valt.UI.State.Events;
 
@@ -23,7 +24,7 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
 
     private readonly CurrencySettings _currencySettings;
     private readonly RatesState _ratesState;
-    private readonly IAssetQueries _assetQueries;
+    private readonly IQueryDispatcher _queryDispatcher;
     private readonly ILogger<AccountsTotalState> _logger;
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(CurrentWealth))]
@@ -34,11 +35,11 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
 
     public Wealth CurrentWealth => CalculateCurrentWealth();
 
-    public AccountsTotalState(CurrencySettings currencySettings, RatesState ratesState, IAssetQueries assetQueries, ILogger<AccountsTotalState> logger)
+    public AccountsTotalState(CurrencySettings currencySettings, RatesState ratesState, IQueryDispatcher queryDispatcher, ILogger<AccountsTotalState> logger)
     {
         _currencySettings = currencySettings;
         _ratesState = ratesState;
-        _assetQueries = assetQueries;
+        _queryDispatcher = queryDispatcher;
         _logger = logger;
         WeakReferenceMessenger.Default.Register<RatesUpdated>(this);
         WeakReferenceMessenger.Default.Register<AccountSummariesDTO>(this);
@@ -71,10 +72,12 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
             var btcPriceUsd = _ratesState.BitcoinPrice;
             var fiatRates = _ratesState.FiatRates;
 
-            AssetSummary = await _assetQueries.GetSummaryAsync(
-                _currencySettings.MainFiatCurrency,
-                btcPriceUsd,
-                fiatRates);
+            AssetSummary = await _queryDispatcher.DispatchAsync(new GetAssetSummaryQuery
+            {
+                MainCurrencyCode = _currencySettings.MainFiatCurrency,
+                BtcPriceUsd = btcPriceUsd,
+                FiatRates = fiatRates
+            });
         }
         catch (Exception ex)
         {

@@ -226,7 +226,7 @@
         <value>Estado del servicio</value>
     </data>
     <data name="Transactions.Ratio" xml:space="preserve">
-        <value>Patrimonio en BTC</value>
+        <value>% BTC al Contado</value>
     </data>
     <data name="Transactions.TotalInFiat" xml:space="preserve">
         <value>Total</value>

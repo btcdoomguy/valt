@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Collections;
@@ -8,12 +7,15 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
-using Valt.Core.Common;
-using Valt.Core.Modules.Assets;
-using Valt.Core.Modules.Assets.Contracts;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Assets.Commands.DeleteAsset;
+using Valt.App.Modules.Assets.Commands.SetAssetIncludeInNetWorth;
+using Valt.App.Modules.Assets.Commands.SetAssetVisibility;
+using Valt.App.Modules.Assets.DTOs;
+using Valt.App.Modules.Assets.Queries.GetAssets;
+using Valt.App.Modules.Assets.Queries.GetAssetSummary;
 using Valt.Infra.Kernel;
-using Valt.Infra.Modules.Assets.Queries;
-using Valt.Infra.Modules.Assets.Queries.DTOs;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
 using Valt.UI.Lang;
@@ -30,8 +32,8 @@ namespace Valt.UI.Views.Main.Tabs.Assets;
 
 public partial class AssetsViewModel : ValtTabViewModel, IDisposable
 {
-    private readonly IAssetQueries _assetQueries;
-    private readonly IAssetRepository _assetRepository;
+    private readonly IQueryDispatcher _queryDispatcher;
+    private readonly ICommandDispatcher _commandDispatcher;
     private readonly CurrencySettings _currencySettings;
     private readonly RatesState _ratesState;
     private readonly SecureModeState _secureModeState;
@@ -59,16 +61,16 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
         : "-";
 
     public AssetsViewModel(
-        IAssetQueries assetQueries,
-        IAssetRepository assetRepository,
+        IQueryDispatcher queryDispatcher,
+        ICommandDispatcher commandDispatcher,
         CurrencySettings currencySettings,
         RatesState ratesState,
         SecureModeState secureModeState,
         IModalFactory modalFactory,
         ILogger<AssetsViewModel> logger)
     {
-        _assetQueries = assetQueries;
-        _assetRepository = assetRepository;
+        _queryDispatcher = queryDispatcher;
+        _commandDispatcher = commandDispatcher;
         _currencySettings = currencySettings;
         _ratesState = ratesState;
         _secureModeState = secureModeState;
@@ -106,7 +108,7 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
         {
             IsLoading = true;
 
-            var assets = await _assetQueries.GetAllAsync();
+            var assets = await _queryDispatcher.DispatchAsync(new GetAssetsQuery());
             var viewModels = assets.Select(a => new AssetViewModel(a, _currencySettings.MainFiatCurrency)).ToList();
 
             // Save current selection before clearing
@@ -128,10 +130,12 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
             var btcPriceUsd = _ratesState.BitcoinPrice;
             var fiatRates = _ratesState.FiatRates;
 
-            Summary = await _assetQueries.GetSummaryAsync(
-                _currencySettings.MainFiatCurrency,
-                btcPriceUsd,
-                fiatRates);
+            Summary = await _queryDispatcher.DispatchAsync(new GetAssetSummaryQuery
+            {
+                MainCurrencyCode = _currencySettings.MainFiatCurrency,
+                BtcPriceUsd = btcPriceUsd,
+                FiatRates = fiatRates
+            });
         }
         catch (Exception ex)
         {
@@ -205,11 +209,17 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
         if (!confirmed)
             return;
 
-        var domainAsset = await _assetRepository.GetByIdAsync(new AssetId(asset.Id));
-        if (domainAsset is null)
-            return;
+        var result = await _commandDispatcher.DispatchAsync(new DeleteAssetCommand
+        {
+            AssetId = asset.Id
+        });
 
-        await _assetRepository.DeleteAsync(domainAsset);
+        if (result.IsFailure)
+        {
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, ownerWindow);
+            return;
+        }
+
         await LoadAssetsAsync();
         NotifyAssetSummaryUpdated();
     }
@@ -220,12 +230,22 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
         if (asset is null)
             return;
 
-        var domainAsset = await _assetRepository.GetByIdAsync(new AssetId(asset.Id));
-        if (domainAsset is null)
-            return;
+        var result = await _commandDispatcher.DispatchAsync(new SetAssetVisibilityCommand
+        {
+            AssetId = asset.Id,
+            Visible = !asset.Visible
+        });
 
-        domainAsset.SetVisibility(!domainAsset.Visible);
-        await _assetRepository.SaveAsync(domainAsset);
+        if (result.IsFailure)
+        {
+            var ownerWindow = GetUserControlOwnerWindow?.Invoke();
+            if (ownerWindow is not null)
+            {
+                await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, ownerWindow);
+            }
+            return;
+        }
+
         await LoadAssetsAsync();
         NotifyAssetSummaryUpdated();
     }
@@ -236,12 +256,22 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
         if (asset is null)
             return;
 
-        var domainAsset = await _assetRepository.GetByIdAsync(new AssetId(asset.Id));
-        if (domainAsset is null)
-            return;
+        var result = await _commandDispatcher.DispatchAsync(new SetAssetIncludeInNetWorthCommand
+        {
+            AssetId = asset.Id,
+            IncludeInNetWorth = !asset.IncludeInNetWorth
+        });
 
-        domainAsset.SetIncludeInNetWorth(!domainAsset.IncludeInNetWorth);
-        await _assetRepository.SaveAsync(domainAsset);
+        if (result.IsFailure)
+        {
+            var ownerWindow = GetUserControlOwnerWindow?.Invoke();
+            if (ownerWindow is not null)
+            {
+                await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, ownerWindow);
+            }
+            return;
+        }
+
         await LoadAssetsAsync();
         NotifyAssetSummaryUpdated();
     }
