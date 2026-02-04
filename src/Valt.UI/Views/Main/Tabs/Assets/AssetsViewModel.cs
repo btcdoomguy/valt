@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Collections;
@@ -32,13 +33,13 @@ namespace Valt.UI.Views.Main.Tabs.Assets;
 
 public partial class AssetsViewModel : ValtTabViewModel, IDisposable
 {
-    private readonly IQueryDispatcher _queryDispatcher;
-    private readonly ICommandDispatcher _commandDispatcher;
-    private readonly CurrencySettings _currencySettings;
-    private readonly RatesState _ratesState;
-    private readonly SecureModeState _secureModeState;
-    private readonly IModalFactory _modalFactory;
-    private readonly ILogger<AssetsViewModel> _logger;
+    private readonly IQueryDispatcher _queryDispatcher = null!;
+    private readonly ICommandDispatcher _commandDispatcher = null!;
+    private readonly CurrencySettings _currencySettings = null!;
+    private readonly RatesState _ratesState = null!;
+    private readonly SecureModeState _secureModeState = null!;
+    private readonly IModalFactory _modalFactory = null!;
+    private readonly ILogger<AssetsViewModel> _logger = null!;
 
     [ObservableProperty] private AvaloniaList<AssetViewModel> _assets = new();
     [ObservableProperty] private bool _isLoading = true;
@@ -49,9 +50,9 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
     private AssetSummaryDTO? _summary;
     [ObservableProperty] private AssetViewModel? _selectedAsset;
 
-    public bool IsSecureModeEnabled => _secureModeState.IsEnabled;
+    public bool IsSecureModeEnabled => _secureModeState?.IsEnabled ?? false;
 
-    public string MainCurrencyCode => _currencySettings.MainFiatCurrency;
+    public string MainCurrencyCode => _currencySettings?.MainFiatCurrency ?? "USD";
 
     public string TotalValueColor => Summary?.TotalValueInMainCurrency >= 0 ? "#FFFFFF" : "#F44336";
     public string TotalSatsColor => Summary?.TotalValueInSats >= 0 ? "#FFFFFF" : "#F44336";
@@ -59,6 +60,84 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
     public string TotalValueFormatted => Summary != null
         ? CurrencyDisplay.FormatFiat(Summary.TotalValueInMainCurrency, MainCurrencyCode)
         : "-";
+
+    /// <summary>
+    /// Design-time sample data for XAML previewer.
+    /// </summary>
+    public static AssetsViewModel DesignTimeSample
+    {
+        get
+        {
+            var vm = new AssetsViewModel
+            {
+                IsLoading = false,
+                Summary = new AssetSummaryDTO
+                {
+                    TotalAssets = 5,
+                    VisibleAssets = 5,
+                    AssetsIncludedInNetWorth = 4,
+                    ValuesByCurrency = new List<AssetValueByCurrencyDTO>
+                    {
+                        new() { CurrencyCode = "USD", TotalValue = 125432.50m, AssetCount = 3 },
+                        new() { CurrencyCode = "BRL", TotalValue = 50000m, AssetCount = 2 }
+                    },
+                    TotalValueInMainCurrency = 135432.50m,
+                    TotalValueInSats = 1_350_000_000
+                },
+                Assets = new AvaloniaList<AssetViewModel>
+                {
+                    new(new AssetDTO
+                    {
+                        Id = "1", Name = "Apple Inc.", AssetTypeId = 0, AssetTypeName = "Stock",
+                        Icon = "\xE8F5", IncludeInNetWorth = true, Visible = true,
+                        LastPriceUpdateAt = DateTime.Now, CreatedAt = DateTime.Now, DisplayOrder = 1,
+                        CurrentPrice = 185.50m, CurrentValue = 18550m, CurrencyCode = "USD",
+                        Quantity = 100, Symbol = "AAPL"
+                    }, "USD"),
+                    new(new AssetDTO
+                    {
+                        Id = "2", Name = "Bitcoin ETF", AssetTypeId = 1, AssetTypeName = "ETF",
+                        Icon = "\xE8F5", IncludeInNetWorth = true, Visible = true,
+                        LastPriceUpdateAt = DateTime.Now, CreatedAt = DateTime.Now, DisplayOrder = 2,
+                        CurrentPrice = 52.30m, CurrentValue = 52300m, CurrencyCode = "USD",
+                        Quantity = 1000, Symbol = "IBIT"
+                    }, "USD"),
+                    new(new AssetDTO
+                    {
+                        Id = "3", Name = "Beach House", AssetTypeId = 3, AssetTypeName = "Real Estate",
+                        Icon = "\xE88A", IncludeInNetWorth = true, Visible = true,
+                        LastPriceUpdateAt = DateTime.Now, CreatedAt = DateTime.Now, DisplayOrder = 3,
+                        CurrentPrice = 450000m, CurrentValue = 450000m, CurrencyCode = "USD",
+                        Address = "123 Ocean Drive, Miami FL", MonthlyRentalIncome = 3500m
+                    }, "USD"),
+                    new(new AssetDTO
+                    {
+                        Id = "4", Name = "BTC Long 5x", AssetTypeId = 5, AssetTypeName = "Leveraged Position",
+                        Icon = "\xE8F5", IncludeInNetWorth = true, Visible = true,
+                        LastPriceUpdateAt = DateTime.Now, CreatedAt = DateTime.Now, DisplayOrder = 4,
+                        CurrentPrice = 98500m, CurrentValue = 12500m, CurrencyCode = "USD",
+                        Collateral = 10000m, EntryPrice = 95000m, Leverage = 5m,
+                        LiquidationPrice = 78000m, IsLong = true, PnL = 2500m,
+                        PnLPercentage = 25m, DistanceToLiquidation = 20.8m, IsAtRisk = false
+                    }, "USD"),
+                    new(new AssetDTO
+                    {
+                        Id = "5", Name = "Gold Bars", AssetTypeId = 4, AssetTypeName = "Commodity",
+                        Icon = "\xE8F5", IncludeInNetWorth = false, Visible = true,
+                        LastPriceUpdateAt = DateTime.Now, CreatedAt = DateTime.Now, DisplayOrder = 5,
+                        CurrentPrice = 2050m, CurrentValue = 10250m, CurrencyCode = "USD",
+                        Quantity = 5, Symbol = "XAU"
+                    }, "USD")
+                }
+            };
+            return vm;
+        }
+    }
+
+    /// <summary>
+    /// Private constructor for design-time use only.
+    /// </summary>
+    private AssetsViewModel() { }
 
     public AssetsViewModel(
         IQueryDispatcher queryDispatcher,

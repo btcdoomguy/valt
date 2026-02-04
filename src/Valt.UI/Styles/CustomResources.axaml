@@ -91,12 +91,15 @@
     </ControlTheme>
 
     <!-- Custom button theme for CalendarDatePicker - simple calendar icon -->
-    <!-- Asset Card Colors -->
-    <SolidColorBrush x:Key="AssetCardBackgroundBrush" Color="#FAFAF5" />
-    <SolidColorBrush x:Key="AssetCardSeparatorBrush" Color="#CCCCCC" />
-    <SolidColorBrush x:Key="AssetCardLabelBrush" Color="#666666" />
-    <SolidColorBrush x:Key="AssetCardTextBrush" Color="#1A1A1A" />
-    <SolidColorBrush x:Key="AssetCardMutedBrush" Color="#888888" />
+    <!-- Asset Card Colors (theme-aware) -->
+    <SolidColorBrush x:Key="AssetCardBackgroundBrush" Color="{DynamicResource Background700Color}" />
+    <SolidColorBrush x:Key="AssetCardSeparatorBrush" Color="{DynamicResource Divider500Color}" />
+    <SolidColorBrush x:Key="AssetCardLabelBrush" Color="{DynamicResource Text400Color}" />
+    <SolidColorBrush x:Key="AssetCardTextBrush" Color="{DynamicResource Text100Color}" />
+    <SolidColorBrush x:Key="AssetCardMutedBrush" Color="{DynamicResource Text500Color}" />
+    <SolidColorBrush x:Key="AssetCardBorderBrush" Color="{DynamicResource Background500Color}" />
+    <SolidColorBrush x:Key="AssetCardBorderHoverBrush" Color="{DynamicResource Secondary400Color}" />
+    <SolidColorBrush x:Key="AssetCardBorderSelectedBrush" Color="{DynamicResource Accent500Color}" />
 
     <ControlTheme x:Key="ValtCalendarDatePickerButton" TargetType="Button">
         <Setter Property="Width" Value="28" />

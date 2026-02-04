@@ -8,7 +8,22 @@
              mc:Ignorable="d" d:DesignWidth="1300" d:DesignHeight="650"
              x:Class="Valt.UI.Views.Main.Tabs.Assets.AssetsView"
              x:DataType="assets:AssetsViewModel">
-    <!-- Hover/selection handled via ViewModel bindings (IsHovered, IsSelected -> CardBorderBrush) -->
+    <Design.DataContext>
+        <x:Static Member="assets:AssetsViewModel.DesignTimeSample" />
+    </Design.DataContext>
+
+    <!-- Card border styling based on selection/hover state -->
+    <UserControl.Styles>
+        <Style Selector="Border.AssetCard">
+            <Setter Property="BorderBrush" Value="{DynamicResource AssetCardBorderBrush}" />
+        </Style>
+        <Style Selector="Border.AssetCard:pointerover">
+            <Setter Property="BorderBrush" Value="{DynamicResource AssetCardBorderHoverBrush}" />
+        </Style>
+        <Style Selector="Border.AssetCard.selected">
+            <Setter Property="BorderBrush" Value="{DynamicResource AssetCardBorderSelectedBrush}" />
+        </Style>
+    </UserControl.Styles>
 
     <Grid MinHeight="500">
         <Grid.ColumnDefinitions>
@@ -47,44 +62,42 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="models:AssetViewModel">
-                                <!-- Outer frame (Monopoly-style black border) -->
+                                <!-- Asset Card -->
                                 <Border Width="200"
                                         Height="260"
                                         Margin="0,0,12,12"
                                         CornerRadius="4"
-                                        BorderThickness="3"
-                                        BorderBrush="{Binding CardBorderBrush, Converter={StaticResource StringToColorBrushConverter}}"
+                                        BorderThickness="1"
+                                        Classes="AssetCard"
+                                        Classes.selected="{Binding IsSelected}"
                                         Background="{DynamicResource AssetCardBackgroundBrush}"
                                         ClipToBounds="True"
                                         Cursor="Hand"
                                         Opacity="{Binding Visible, Converter={StaticResource BoolToOpacityConverter}}"
-                                        PointerEntered="AssetCard_PointerEntered"
-                                        PointerExited="AssetCard_PointerExited"
                                         PointerPressed="AssetCard_PointerPressed">
                                     <Border.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Header="{x:Static lang:language.Assets_Edit}"
-                                                      Command="{Binding $parent[ItemsControl].((assets:AssetsViewModel)DataContext).EditAssetCommand}"
+                                                      Command="{Binding $parent[UserControl].((assets:AssetsViewModel)DataContext).EditAssetCommand}"
                                                       CommandParameter="{Binding}" />
                                             <MenuItem Header="{x:Static lang:language.Assets_Delete}"
-                                                      Command="{Binding $parent[ItemsControl].((assets:AssetsViewModel)DataContext).DeleteAssetCommand}"
+                                                      Command="{Binding $parent[UserControl].((assets:AssetsViewModel)DataContext).DeleteAssetCommand}"
                                                       CommandParameter="{Binding}" />
                                             <Separator />
                                             <MenuItem Header="{x:Static lang:language.Assets_ToggleVisibility}"
-                                                      Command="{Binding $parent[ItemsControl].((assets:AssetsViewModel)DataContext).ToggleVisibilityCommand}"
+                                                      Command="{Binding $parent[UserControl].((assets:AssetsViewModel)DataContext).ToggleVisibilityCommand}"
                                                       CommandParameter="{Binding}" />
                                             <MenuItem Header="{x:Static lang:language.Assets_ToggleNetWorth}"
-                                                      Command="{Binding $parent[ItemsControl].((assets:AssetsViewModel)DataContext).ToggleIncludeInNetWorthCommand}"
+                                                      Command="{Binding $parent[UserControl].((assets:AssetsViewModel)DataContext).ToggleIncludeInNetWorthCommand}"
                                                       CommandParameter="{Binding}" />
                                         </ContextMenu>
                                     </Border.ContextMenu>
-                                    <!-- Inner frame (Monopoly-style thin border) -->
-                                    <Border Margin="3" BorderBrush="{Binding CardBorderBrush, Converter={StaticResource StringToColorBrushConverter}}" BorderThickness="1" CornerRadius="1">
-                                        <Grid RowDefinitions="50, *">
+                                    <!-- Card Content -->
+                                    <Grid RowDefinitions="50, *">
                                         <!-- Title Bar -->
                                         <Border Grid.Row="0"
                                                 Background="{Binding TitleBarColor, Converter={StaticResource StringToColorBrushConverter}}"
-                                                Padding="12,8">
+                                                Padding="12, 4">
                                             <StackPanel Spacing="2">
                                                 <TextBlock Text="{Binding Name}"
                                                            FontSize="{DynamicResource FontSizeMedium}"
@@ -99,7 +112,7 @@
                                         </Border>
 
                                         <!-- Main Content (cream/white background with dark text) -->
-                                        <Border Grid.Row="1" Padding="12,8">
+                                        <Border Grid.Row="1" Padding="12,8" Background="{DynamicResource Background900Brush}">
                                             <Grid RowDefinitions="*, Auto, Auto">
                                                 <!-- Type-specific content -->
                                                 <StackPanel Grid.Row="0" Spacing="4">
@@ -265,7 +278,6 @@
                                             </Grid>
                                         </Border>
                                     </Grid>
-                                    </Border>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

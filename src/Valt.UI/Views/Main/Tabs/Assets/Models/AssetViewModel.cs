@@ -21,14 +21,9 @@ public partial class AssetViewModel : ObservableObject
     public DateTime LastPriceUpdateAt { get; }
     public string CurrencyCode { get; }
 
-    // Selection and hover state for card visuals
+    // Selection state for card visuals (hover handled via CSS :pointerover)
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CardBorderBrush))]
     private bool _isSelected;
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CardBorderBrush))]
-    private bool _isHovered;
 
     // Price and value
     public decimal CurrentPrice { get; }
@@ -78,28 +73,25 @@ public partial class AssetViewModel : ObservableObject
     public string PositionDirection => IsLong == true ? "Long" : "Short";
     public string PnLColor => PnL >= 0 ? "#4CAF50" : "#F44336";
     public string AtRiskIndicator => IsAtRisk == true ? "!" : "";
-    public string ValueColor => CurrentValue >= 0 ? "#1A1A1A" : "#F44336";
+    public string ValueColor => CurrentValue >= 0 ? "#4CAF50" : "#F44336";
     public bool IsNegativeValue => CurrentValue < 0;
 
-    // Card display properties
+    // Card display properties (darker tones for white text readability)
     public string TitleBarColor => AssetType switch
     {
-        AssetTypes.Stock => "#35654D",
-        AssetTypes.Etf => "#1FB2A6",
-        AssetTypes.Crypto => "#F5A623",
-        AssetTypes.RealEstate => "#8B0000",
-        AssetTypes.Commodity => "#C4A35A",
-        AssetTypes.LeveragedPosition => "#9932CC",
-        AssetTypes.Custom => "#4A4A4A",
+        AssetTypes.Stock => "#2D5442",        // Dark forest green
+        AssetTypes.Etf => "#157A73",          // Dark teal
+        AssetTypes.Crypto => "#B8860B",       // Dark goldenrod
+        AssetTypes.RealEstate => "#8B0000",   // Dark red
+        AssetTypes.Commodity => "#7A6B4E",    // Dark bronze
+        AssetTypes.LeveragedPosition => "#6B238E", // Dark purple
+        AssetTypes.Custom => "#4A4A4A",       // Dark gray
         _ => "#4A4A4A"
     };
     public string TitleBarTextColor => "#FFFFFF";
     public string NetWorthIcon => IncludeInNetWorth ? "\xE86C" : "\xE5C9";
     public string NetWorthIconColor => IncludeInNetWorth ? "#4CAF50" : "#757575";
     public string VisibilityIcon => "\xE8F5";
-
-    // Card border color based on selection/hover state
-    public string CardBorderBrush => IsSelected ? "#FF6200" : IsHovered ? "#666666" : "#1A1A1A";
 
     public AssetViewModel(AssetDTO dto, string mainCurrencyCode)
     {

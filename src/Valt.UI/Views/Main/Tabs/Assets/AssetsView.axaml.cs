@@ -54,22 +54,6 @@ public partial class AssetsView : ValtBaseUserControl
         }
     }
 
-    private void AssetCard_PointerEntered(object? sender, PointerEventArgs e)
-    {
-        if (sender is Border { DataContext: AssetViewModel assetVm })
-        {
-            assetVm.IsHovered = true;
-        }
-    }
-
-    private void AssetCard_PointerExited(object? sender, PointerEventArgs e)
-    {
-        if (sender is Border { DataContext: AssetViewModel assetVm })
-        {
-            assetVm.IsHovered = false;
-        }
-    }
-
     private void AssetCard_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (sender is not Border { DataContext: AssetViewModel assetVm })
