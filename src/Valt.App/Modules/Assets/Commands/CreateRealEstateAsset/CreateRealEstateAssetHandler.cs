@@ -46,10 +46,12 @@ internal sealed class CreateRealEstateAssetHandler : ICommandHandler<CreateRealE
         var assetName = new AssetName(command.Name);
 
         var details = new RealEstateAssetDetails(
-            address: command.Address,
             currentValue: command.CurrentValue,
             currencyCode: command.CurrencyCode,
-            monthlyRentalIncome: command.MonthlyRentalIncome);
+            address: command.Address,
+            monthlyRentalIncome: command.MonthlyRentalIncome,
+            acquisitionDate: command.AcquisitionDate,
+            acquisitionPrice: command.AcquisitionPrice);
 
         var icon = string.IsNullOrWhiteSpace(command.Icon)
             ? Icon.Empty

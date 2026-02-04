@@ -158,4 +158,121 @@ public class RealEstateAssetDetailsTests
     }
 
     #endregion
+
+    #region Acquisition and P&L Tests
+
+    [Test]
+    public void Should_Create_With_Acquisition_Data()
+    {
+        // Act
+        var details = new RealEstateAssetDetails(
+            600000m, "USD", "123 Main St", 2500m,
+            acquisitionDate: new DateOnly(2020, 6, 1), acquisitionPrice: 450000m);
+
+        // Assert
+        Assert.That(details.AcquisitionDate, Is.EqualTo(new DateOnly(2020, 6, 1)));
+        Assert.That(details.AcquisitionPrice, Is.EqualTo(450000m));
+    }
+
+    [Test]
+    public void Should_Create_Without_Acquisition_Data()
+    {
+        // Act
+        var details = new RealEstateAssetDetails(600000m, "USD");
+
+        // Assert
+        Assert.That(details.AcquisitionDate, Is.Null);
+        Assert.That(details.AcquisitionPrice, Is.Null);
+    }
+
+    [Test]
+    public void Should_Calculate_PnL_With_Appreciation()
+    {
+        // Arrange
+        var details = new RealEstateAssetDetails(
+            600000m, "USD", acquisitionPrice: 450000m);
+
+        // Act
+        var pnl = details.CalculatePnL();
+
+        // Assert: 600000 - 450000 = 150000
+        Assert.That(pnl, Is.EqualTo(150000m));
+    }
+
+    [Test]
+    public void Should_Calculate_PnL_With_Depreciation()
+    {
+        // Arrange
+        var details = new RealEstateAssetDetails(
+            400000m, "USD", acquisitionPrice: 450000m);
+
+        // Act
+        var pnl = details.CalculatePnL();
+
+        // Assert: 400000 - 450000 = -50000
+        Assert.That(pnl, Is.EqualTo(-50000m));
+    }
+
+    [Test]
+    public void Should_Calculate_PnL_Zero_Without_Acquisition_Price()
+    {
+        // Arrange
+        var details = new RealEstateAssetDetails(600000m, "USD");
+
+        // Act
+        var pnl = details.CalculatePnL();
+
+        // Assert
+        Assert.That(pnl, Is.EqualTo(0m));
+    }
+
+    [Test]
+    public void Should_Calculate_PnL_Percentage()
+    {
+        // Arrange
+        var details = new RealEstateAssetDetails(
+            600000m, "USD", acquisitionPrice: 450000m);
+
+        // Act
+        var pnlPct = details.CalculatePnLPercentage();
+
+        // Assert: (600000 - 450000) / 450000 * 100 = 33.33%
+        Assert.That(pnlPct, Is.EqualTo(33.33m));
+    }
+
+    [Test]
+    public void Should_Preserve_Acquisition_Data_On_WithUpdatedPrice()
+    {
+        // Arrange
+        var original = new RealEstateAssetDetails(
+            500000m, "USD", "123 Main St", 2500m,
+            acquisitionDate: new DateOnly(2020, 6, 1), acquisitionPrice: 450000m);
+
+        // Act
+        var updated = (RealEstateAssetDetails)original.WithUpdatedPrice(600000m);
+
+        // Assert
+        Assert.That(updated.CurrentValue, Is.EqualTo(600000m));
+        Assert.That(updated.AcquisitionDate, Is.EqualTo(new DateOnly(2020, 6, 1)));
+        Assert.That(updated.AcquisitionPrice, Is.EqualTo(450000m));
+    }
+
+    [Test]
+    public void Should_Preserve_Acquisition_Data_On_WithRentalIncome()
+    {
+        // Arrange
+        var original = new RealEstateAssetDetails(
+            500000m, "USD", "123 Main St", 2500m,
+            acquisitionDate: new DateOnly(2020, 6, 1), acquisitionPrice: 450000m);
+
+        // Act
+        var updated = original.WithRentalIncome(3000m);
+
+        // Assert
+        Assert.That(updated.MonthlyRentalIncome, Is.EqualTo(3000m));
+        Assert.That(updated.AcquisitionDate, Is.EqualTo(new DateOnly(2020, 6, 1)));
+        Assert.That(updated.AcquisitionPrice, Is.EqualTo(450000m));
+    }
+
+    #endregion
 }

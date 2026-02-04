@@ -3806,5 +3806,23 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Assets_Card_NetWorth", resourceCulture);
             }
         }
+
+        public static string Assets_AcquisitionDate {
+            get {
+                return ResourceManager.GetString("Assets_AcquisitionDate", resourceCulture);
+            }
+        }
+
+        public static string Assets_AcquisitionPrice {
+            get {
+                return ResourceManager.GetString("Assets_AcquisitionPrice", resourceCulture);
+            }
+        }
+
+        public static string Assets_Card_PnL {
+            get {
+                return ResourceManager.GetString("Assets_Card_PnL", resourceCulture);
+            }
+        }
     }
 }

@@ -36,7 +36,9 @@ internal static class AssetDetailsSerializer
             dto.Symbol,
             (AssetPriceSource)dto.PriceSourceId,
             dto.CurrentPrice,
-            dto.CurrencyCode);
+            dto.CurrencyCode,
+            string.IsNullOrEmpty(dto.AcquisitionDate) ? null : DateOnly.Parse(dto.AcquisitionDate),
+            dto.AcquisitionPrice);
     }
 
     public static RealEstateAssetDetails DeserializeRealEstate(string json)
@@ -46,7 +48,9 @@ internal static class AssetDetailsSerializer
             dto.CurrentValue,
             dto.CurrencyCode,
             dto.Address,
-            dto.MonthlyRentalIncome);
+            dto.MonthlyRentalIncome,
+            string.IsNullOrEmpty(dto.AcquisitionDate) ? null : DateOnly.Parse(dto.AcquisitionDate),
+            dto.AcquisitionPrice);
     }
 
     public static LeveragedPositionDetails DeserializeLeveragedPosition(string json)
@@ -83,7 +87,9 @@ internal static class AssetDetailsSerializer
             Symbol = details.Symbol,
             PriceSourceId = (int)details.PriceSource,
             CurrentPrice = details.CurrentPrice,
-            CurrencyCode = details.CurrencyCode
+            CurrencyCode = details.CurrencyCode,
+            AcquisitionDate = details.AcquisitionDate?.ToString("O"),
+            AcquisitionPrice = details.AcquisitionPrice
         };
         return JsonSerializer.Serialize(dto);
     }
@@ -95,7 +101,9 @@ internal static class AssetDetailsSerializer
             CurrentValue = details.CurrentValue,
             CurrencyCode = details.CurrencyCode,
             Address = details.Address,
-            MonthlyRentalIncome = details.MonthlyRentalIncome
+            MonthlyRentalIncome = details.MonthlyRentalIncome,
+            AcquisitionDate = details.AcquisitionDate?.ToString("O"),
+            AcquisitionPrice = details.AcquisitionPrice
         };
         return JsonSerializer.Serialize(dto);
     }
@@ -126,6 +134,8 @@ internal class BasicAssetDetailsDto
     public int PriceSourceId { get; set; }
     public decimal CurrentPrice { get; set; }
     public string CurrencyCode { get; set; } = null!;
+    public string? AcquisitionDate { get; set; }
+    public decimal? AcquisitionPrice { get; set; }
 }
 
 internal class RealEstateAssetDetailsDto
@@ -134,6 +144,8 @@ internal class RealEstateAssetDetailsDto
     public string CurrencyCode { get; set; } = null!;
     public string? Address { get; set; }
     public decimal? MonthlyRentalIncome { get; set; }
+    public string? AcquisitionDate { get; set; }
+    public decimal? AcquisitionPrice { get; set; }
 }
 
 internal class LeveragedPositionDetailsDto

@@ -73,13 +73,17 @@ internal sealed class EditAssetHandler : ICommandHandler<EditAssetCommand, Unit>
                 symbol: basic.Symbol,
                 priceSource: (AssetPriceSource)basic.PriceSource,
                 currentPrice: basic.CurrentPrice,
-                currencyCode: basic.CurrencyCode)),
+                currencyCode: basic.CurrencyCode,
+                acquisitionDate: basic.AcquisitionDate,
+                acquisitionPrice: basic.AcquisitionPrice)),
 
             RealEstateAssetDetailsInputDTO realEstate => Result<IAssetDetails>.Success(new RealEstateAssetDetails(
-                address: realEstate.Address,
                 currentValue: realEstate.CurrentValue,
                 currencyCode: realEstate.CurrencyCode,
-                monthlyRentalIncome: realEstate.MonthlyRentalIncome)),
+                address: realEstate.Address,
+                monthlyRentalIncome: realEstate.MonthlyRentalIncome,
+                acquisitionDate: realEstate.AcquisitionDate,
+                acquisitionPrice: realEstate.AcquisitionPrice)),
 
             LeveragedPositionDetailsInputDTO leveraged => Result<IAssetDetails>.Success(new LeveragedPositionDetails(
                 collateral: leveraged.Collateral,

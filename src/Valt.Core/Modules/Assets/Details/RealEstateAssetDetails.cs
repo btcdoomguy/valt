@@ -27,11 +27,23 @@ public sealed class RealEstateAssetDetails : IAssetDetails
     /// </summary>
     public decimal? MonthlyRentalIncome { get; }
 
+    /// <summary>
+    /// The date when the property was acquired (optional).
+    /// </summary>
+    public DateOnly? AcquisitionDate { get; }
+
+    /// <summary>
+    /// The total purchase price at acquisition (optional).
+    /// </summary>
+    public decimal? AcquisitionPrice { get; }
+
     public RealEstateAssetDetails(
         decimal currentValue,
         string currencyCode,
         string? address = null,
-        decimal? monthlyRentalIncome = null)
+        decimal? monthlyRentalIncome = null,
+        DateOnly? acquisitionDate = null,
+        decimal? acquisitionPrice = null)
     {
         if (currentValue < 0)
             throw new ArgumentException("Current value cannot be negative", nameof(currentValue));
@@ -40,9 +52,25 @@ public sealed class RealEstateAssetDetails : IAssetDetails
         CurrencyCode = currencyCode;
         Address = address;
         MonthlyRentalIncome = monthlyRentalIncome;
+        AcquisitionDate = acquisitionDate;
+        AcquisitionPrice = acquisitionPrice;
     }
 
     public decimal CalculateCurrentValue(decimal currentPrice) => CurrentValue;
+
+    /// <summary>
+    /// Calculates the profit/loss based on acquisition price.
+    /// </summary>
+    public decimal CalculatePnL() => AcquisitionPrice.HasValue
+        ? CurrentValue - AcquisitionPrice.Value
+        : 0;
+
+    /// <summary>
+    /// Calculates the profit/loss percentage based on acquisition price.
+    /// </summary>
+    public decimal CalculatePnLPercentage() => AcquisitionPrice.HasValue && AcquisitionPrice.Value != 0
+        ? Math.Round((CurrentValue - AcquisitionPrice.Value) / AcquisitionPrice.Value * 100, 2)
+        : 0;
 
     public IAssetDetails WithUpdatedPrice(decimal newPrice)
     {
@@ -50,7 +78,9 @@ public sealed class RealEstateAssetDetails : IAssetDetails
             newPrice,
             CurrencyCode,
             Address,
-            MonthlyRentalIncome);
+            MonthlyRentalIncome,
+            AcquisitionDate,
+            AcquisitionPrice);
     }
 
     public RealEstateAssetDetails WithRentalIncome(decimal? monthlyRentalIncome)
@@ -59,6 +89,8 @@ public sealed class RealEstateAssetDetails : IAssetDetails
             CurrentValue,
             CurrencyCode,
             Address,
-            monthlyRentalIncome);
+            monthlyRentalIncome,
+            AcquisitionDate,
+            AcquisitionPrice);
     }
 }

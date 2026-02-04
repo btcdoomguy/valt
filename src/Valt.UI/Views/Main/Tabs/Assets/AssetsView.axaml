@@ -154,6 +154,18 @@
                                                                    FontWeight="SemiBold"
                                                                    Foreground="{DynamicResource AssetCardTextBrush}" />
                                                     </Grid>
+                                                    <Grid ColumnDefinitions="Auto, *" IsVisible="{Binding HasAcquisitionData}">
+                                                        <TextBlock Grid.Column="0"
+                                                                   Text="{x:Static lang:language.Assets_Card_PnL}"
+                                                                   FontSize="{DynamicResource FontSizeSmall}"
+                                                                   Foreground="{DynamicResource AssetCardLabelBrush}"
+                                                                   Margin="0,0,8,0" />
+                                                        <TextBlock Grid.Column="1"
+                                                                   Text="{Binding PnLCombinedFormatted}"
+                                                                   FontSize="{DynamicResource FontSizeSmall}"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}" />
+                                                    </Grid>
                                                 </StackPanel>
 
                                                 <!-- Real Estate content -->
@@ -175,6 +187,18 @@
                                                                    FontSize="{DynamicResource FontSizeSmall}"
                                                                    FontWeight="SemiBold"
                                                                    Foreground="{DynamicResource AssetCardTextBrush}" />
+                                                    </Grid>
+                                                    <Grid ColumnDefinitions="Auto, *" IsVisible="{Binding HasAcquisitionData}">
+                                                        <TextBlock Grid.Column="0"
+                                                                   Text="{x:Static lang:language.Assets_Card_PnL}"
+                                                                   FontSize="{DynamicResource FontSizeSmall}"
+                                                                   Foreground="{DynamicResource AssetCardLabelBrush}"
+                                                                   Margin="0,0,8,0" />
+                                                        <TextBlock Grid.Column="1"
+                                                                   Text="{Binding PnLCombinedFormatted}"
+                                                                   FontSize="{DynamicResource FontSizeSmall}"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}" />
                                                     </Grid>
                                                 </StackPanel>
 

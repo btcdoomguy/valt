@@ -53,7 +53,9 @@ internal sealed class CreateBasicAssetHandler : ICommandHandler<CreateBasicAsset
             symbol: command.Symbol,
             priceSource: priceSource,
             currentPrice: command.CurrentPrice,
-            currencyCode: command.CurrencyCode);
+            currencyCode: command.CurrencyCode,
+            acquisitionDate: command.AcquisitionDate,
+            acquisitionPrice: command.AcquisitionPrice);
 
         var icon = string.IsNullOrWhiteSpace(command.Icon)
             ? Icon.Empty

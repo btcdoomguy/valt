@@ -90,6 +90,13 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     [ObservableProperty]
     private FiatValue _monthlyRentalIncomeFiat = FiatValue.Empty;
 
+    // Acquisition fields (common for basic assets and real estate)
+    [ObservableProperty]
+    private DateTimeOffset? _acquisitionDate;
+
+    [ObservableProperty]
+    private FiatValue _acquisitionPriceFiat = FiatValue.Empty;
+
     // Leveraged position fields
     [ObservableProperty]
     private FiatValue _collateralFiat = FiatValue.Empty;
@@ -157,8 +164,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     public static List<ComboBoxValue> AvailablePriceSources =>
     [
         new(language.Assets_PriceSource_Manual, AssetPriceSource.Manual.ToString()),
-        new(language.Assets_PriceSource_YahooFinance, AssetPriceSource.YahooFinance.ToString()),
-        new(language.Assets_PriceSource_LivePrice, AssetPriceSource.LivePrice.ToString())
+        new(language.Assets_PriceSource_YahooFinance, AssetPriceSource.YahooFinance.ToString())
     ];
 
     public List<string> AvailableCurrencies => _configurationManager?.GetAvailableFiatCurrencies()
@@ -227,12 +233,18 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                     Quantity = assetDto.Quantity ?? 0;
                     CurrentPriceFiat = FiatValue.New(assetDto.CurrentPrice);
                     SelectedPriceSource = ((AssetPriceSource)(assetDto.PriceSourceId ?? 0)).ToString();
+                    if (assetDto.AcquisitionDate.HasValue)
+                        AcquisitionDate = assetDto.AcquisitionDate.Value.ToDateTime(TimeOnly.MinValue);
+                    AcquisitionPriceFiat = FiatValue.New(assetDto.AcquisitionPrice ?? 0);
                     break;
 
                 case AssetTypes.RealEstate:
                     Address = assetDto.Address ?? string.Empty;
                     CurrentValueFiat = FiatValue.New(assetDto.CurrentValue);
                     MonthlyRentalIncomeFiat = FiatValue.New(assetDto.MonthlyRentalIncome ?? 0);
+                    if (assetDto.AcquisitionDate.HasValue)
+                        AcquisitionDate = assetDto.AcquisitionDate.Value.ToDateTime(TimeOnly.MinValue);
+                    AcquisitionPriceFiat = FiatValue.New(assetDto.AcquisitionPrice ?? 0);
                     break;
 
                 case AssetTypes.LeveragedPosition:
@@ -246,7 +258,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                     SelectedPriceSource = ((AssetPriceSource)(assetDto.PriceSourceId ?? 0)).ToString();
                     // Detect if this is a Bitcoin leveraged position
                     IsBitcoinUnderlyingAsset = (AssetPriceSource)(assetDto.PriceSourceId ?? 0) == AssetPriceSource.LivePrice &&
-                                                Symbol.Equals("BTC", StringComparison.OrdinalIgnoreCase);
+                                                Symbol.StartsWith("BTC", StringComparison.OrdinalIgnoreCase);
                     break;
             }
         }
@@ -300,7 +312,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
         IsBitcoinUnderlyingAsset = true;
         Symbol = "BTC";
         SelectedPriceSource = AssetPriceSource.LivePrice.ToString();
-        SelectedCurrency = "USD";
+        // Keep user's selected currency - don't force USD
         SymbolValidationMessage = null;
         IsSymbolValid = true;
     }
@@ -376,6 +388,8 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                     Quantity = Quantity,
                     CurrentPrice = currentPrice,
                     PriceSource = (int)priceSource,
+                    AcquisitionDate = AcquisitionDate.HasValue ? DateOnly.FromDateTime(AcquisitionDate.Value.DateTime) : null,
+                    AcquisitionPrice = AcquisitionPriceFiat.Value > 0 ? AcquisitionPriceFiat.Value : null,
                     IncludeInNetWorth = IncludeInNetWorth,
                     Visible = Visible
                 });
@@ -397,6 +411,8 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                     CurrentValue = CurrentValueFiat.Value,
                     Address = string.IsNullOrWhiteSpace(Address) ? null : Address,
                     MonthlyRentalIncome = MonthlyRentalIncomeFiat.Value > 0 ? MonthlyRentalIncomeFiat.Value : null,
+                    AcquisitionDate = AcquisitionDate.HasValue ? DateOnly.FromDateTime(AcquisitionDate.Value.DateTime) : null,
+                    AcquisitionPrice = AcquisitionPriceFiat.Value > 0 ? AcquisitionPriceFiat.Value : null,
                     IncludeInNetWorth = IncludeInNetWorth,
                     Visible = Visible
                 });
@@ -486,7 +502,9 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                     Symbol = Symbol,
                     Quantity = Quantity,
                     CurrentPrice = currentPrice,
-                    PriceSource = (int)priceSource
+                    PriceSource = (int)priceSource,
+                    AcquisitionDate = AcquisitionDate.HasValue ? DateOnly.FromDateTime(AcquisitionDate.Value.DateTime) : null,
+                    AcquisitionPrice = AcquisitionPriceFiat.Value > 0 ? AcquisitionPriceFiat.Value : null
                 };
                 break;
 
@@ -496,7 +514,9 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                     CurrencyCode = SelectedCurrency,
                     CurrentValue = CurrentValueFiat.Value,
                     Address = string.IsNullOrWhiteSpace(Address) ? null : Address,
-                    MonthlyRentalIncome = MonthlyRentalIncomeFiat.Value > 0 ? MonthlyRentalIncomeFiat.Value : null
+                    MonthlyRentalIncome = MonthlyRentalIncomeFiat.Value > 0 ? MonthlyRentalIncomeFiat.Value : null,
+                    AcquisitionDate = AcquisitionDate.HasValue ? DateOnly.FromDateTime(AcquisitionDate.Value.DateTime) : null,
+                    AcquisitionPrice = AcquisitionPriceFiat.Value > 0 ? AcquisitionPriceFiat.Value : null
                 };
                 break;
 

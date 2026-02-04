@@ -1917,4 +1917,13 @@
     <data name="Assets_Card_NetWorth" xml:space="preserve">
         <value>Patrimônio</value>
     </data>
+    <data name="Assets_AcquisitionDate" xml:space="preserve">
+        <value>Data de Aquisição</value>
+    </data>
+    <data name="Assets_AcquisitionPrice" xml:space="preserve">
+        <value>Preço de Aquisição</value>
+    </data>
+    <data name="Assets_Card_PnL" xml:space="preserve">
+        <value>L/P:</value>
+    </data>
 </root>

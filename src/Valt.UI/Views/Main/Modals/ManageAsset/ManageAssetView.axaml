@@ -115,6 +115,21 @@
                                                             Width="200" />
                                 </StackPanel>
                             </Grid>
+
+                            <!-- Acquisition Fields for Basic Assets -->
+                            <Grid ColumnDefinitions="200, 20, 200">
+                                <StackPanel Grid.Column="0" Classes="form-field">
+                                    <TextBlock Text="{x:Static local:language.Assets_AcquisitionDate}" />
+                                    <CalendarDatePicker SelectedDate="{Binding AcquisitionDate}" Width="200" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" Classes="form-field">
+                                    <TextBlock Text="{x:Static local:language.Assets_AcquisitionPrice}" />
+                                    <userControls:FiatInput FiatValue="{Binding AcquisitionPriceFiat, Mode=TwoWay}"
+                                                            CurrencySymbol="{Binding CurrencySymbol}"
+                                                            SymbolOnRight="{Binding SymbolOnRight}"
+                                                            Width="200" />
+                                </StackPanel>
+                            </Grid>
                         </StackPanel>
 
                         <!-- Real Estate Fields -->
@@ -135,6 +150,21 @@
                                 <StackPanel Grid.Column="2" Classes="form-field">
                                     <TextBlock Text="{x:Static local:language.ManageAsset_RentalIncome}" />
                                     <userControls:FiatInput FiatValue="{Binding MonthlyRentalIncomeFiat, Mode=TwoWay}"
+                                                            CurrencySymbol="{Binding CurrencySymbol}"
+                                                            SymbolOnRight="{Binding SymbolOnRight}"
+                                                            Width="200" />
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Acquisition Fields for Real Estate -->
+                            <Grid ColumnDefinitions="200, 20, 200">
+                                <StackPanel Grid.Column="0" Classes="form-field">
+                                    <TextBlock Text="{x:Static local:language.Assets_AcquisitionDate}" />
+                                    <CalendarDatePicker SelectedDate="{Binding AcquisitionDate}" Width="200" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" Classes="form-field">
+                                    <TextBlock Text="{x:Static local:language.Assets_AcquisitionPrice}" />
+                                    <userControls:FiatInput FiatValue="{Binding AcquisitionPriceFiat, Mode=TwoWay}"
                                                             CurrencySymbol="{Binding CurrencySymbol}"
                                                             SymbolOnRight="{Binding SymbolOnRight}"
                                                             Width="200" />

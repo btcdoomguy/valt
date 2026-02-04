@@ -38,9 +38,19 @@ public record CreateBasicAssetCommand : ICommand<CreateBasicAssetResult>
     public required decimal CurrentPrice { get; init; }
 
     /// <summary>
-    /// Price source: 0=Manual, 1=YahooFinance, 2=LivePrice
+    /// Price source: 0=Manual, 1=YahooFinance
     /// </summary>
     public int PriceSource { get; init; } = 0;
+
+    /// <summary>
+    /// Acquisition date (optional).
+    /// </summary>
+    public DateOnly? AcquisitionDate { get; init; }
+
+    /// <summary>
+    /// Price per unit at acquisition (optional).
+    /// </summary>
+    public decimal? AcquisitionPrice { get; init; }
 
     /// <summary>
     /// Include in net worth calculation.

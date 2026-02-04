@@ -32,7 +32,7 @@ public record BasicAssetDetailsInputDTO : AssetDetailsInputDTO
     public required string Symbol { get; init; }
 
     /// <summary>
-    /// Price source: 0=Manual, 1=YahooFinance, 2=LivePrice
+    /// Price source: 0=Manual, 1=YahooFinance
     /// </summary>
     public required int PriceSource { get; init; }
 
@@ -40,6 +40,16 @@ public record BasicAssetDetailsInputDTO : AssetDetailsInputDTO
     /// Current price per unit.
     /// </summary>
     public required decimal CurrentPrice { get; init; }
+
+    /// <summary>
+    /// Acquisition date (optional).
+    /// </summary>
+    public DateOnly? AcquisitionDate { get; init; }
+
+    /// <summary>
+    /// Price per unit at acquisition (optional).
+    /// </summary>
+    public decimal? AcquisitionPrice { get; init; }
 }
 
 /// <summary>
@@ -61,6 +71,16 @@ public record RealEstateAssetDetailsInputDTO : AssetDetailsInputDTO
     /// Monthly rental income (optional).
     /// </summary>
     public decimal? MonthlyRentalIncome { get; init; }
+
+    /// <summary>
+    /// Acquisition date (optional).
+    /// </summary>
+    public DateOnly? AcquisitionDate { get; init; }
+
+    /// <summary>
+    /// Total purchase price at acquisition (optional).
+    /// </summary>
+    public decimal? AcquisitionPrice { get; init; }
 }
 
 /// <summary>
@@ -104,7 +124,7 @@ public record LeveragedPositionDetailsInputDTO : AssetDetailsInputDTO
     public required bool IsLong { get; init; }
 
     /// <summary>
-    /// Price source: 0=Manual, 1=YahooFinance, 2=LivePrice
+    /// Price source: 0=Manual, 1=YahooFinance
     /// </summary>
     public required int PriceSource { get; init; }
 }

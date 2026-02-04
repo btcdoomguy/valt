@@ -32,13 +32,25 @@ public sealed class BasicAssetDetails : IAssetDetails
     /// </summary>
     public string CurrencyCode { get; }
 
+    /// <summary>
+    /// The date when the asset was acquired (optional).
+    /// </summary>
+    public DateOnly? AcquisitionDate { get; }
+
+    /// <summary>
+    /// The price per unit at acquisition (optional).
+    /// </summary>
+    public decimal? AcquisitionPrice { get; }
+
     public BasicAssetDetails(
         AssetTypes assetType,
         decimal quantity,
         string? symbol,
         AssetPriceSource priceSource,
         decimal currentPrice,
-        string currencyCode)
+        string currencyCode,
+        DateOnly? acquisitionDate = null,
+        decimal? acquisitionPrice = null)
     {
         if (assetType is AssetTypes.RealEstate or AssetTypes.LeveragedPosition)
             throw new ArgumentException($"Invalid asset type {assetType} for BasicAssetDetails", nameof(assetType));
@@ -49,9 +61,25 @@ public sealed class BasicAssetDetails : IAssetDetails
         PriceSource = priceSource;
         CurrentPrice = currentPrice;
         CurrencyCode = currencyCode;
+        AcquisitionDate = acquisitionDate;
+        AcquisitionPrice = acquisitionPrice;
     }
 
     public decimal CalculateCurrentValue(decimal currentPrice) => Quantity * currentPrice;
+
+    /// <summary>
+    /// Calculates the profit/loss based on acquisition price.
+    /// </summary>
+    public decimal CalculatePnL() => AcquisitionPrice.HasValue
+        ? (CurrentPrice - AcquisitionPrice.Value) * Quantity
+        : 0;
+
+    /// <summary>
+    /// Calculates the profit/loss percentage based on acquisition price.
+    /// </summary>
+    public decimal CalculatePnLPercentage() => AcquisitionPrice.HasValue && AcquisitionPrice.Value != 0
+        ? Math.Round((CurrentPrice - AcquisitionPrice.Value) / AcquisitionPrice.Value * 100, 2)
+        : 0;
 
     public IAssetDetails WithUpdatedPrice(decimal newPrice)
     {
@@ -61,7 +89,9 @@ public sealed class BasicAssetDetails : IAssetDetails
             Symbol,
             PriceSource,
             newPrice,
-            CurrencyCode);
+            CurrencyCode,
+            AcquisitionDate,
+            AcquisitionPrice);
     }
 
     public BasicAssetDetails WithQuantity(decimal newQuantity)
@@ -72,6 +102,8 @@ public sealed class BasicAssetDetails : IAssetDetails
             Symbol,
             PriceSource,
             CurrentPrice,
-            CurrencyCode);
+            CurrencyCode,
+            AcquisitionDate,
+            AcquisitionPrice);
     }
 }

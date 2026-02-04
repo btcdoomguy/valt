@@ -36,8 +36,12 @@ public record AssetDTO
     public decimal? Leverage { get; init; }
     public decimal? LiquidationPrice { get; init; }
     public bool? IsLong { get; init; }
-    public decimal? PnL { get; init; }
-    public decimal? PnLPercentage { get; init; }
     public decimal? DistanceToLiquidation { get; init; }
     public bool? IsAtRisk { get; init; }
+
+    // Common acquisition and P&L fields (for all asset types)
+    public DateOnly? AcquisitionDate { get; init; }
+    public decimal? AcquisitionPrice { get; init; }
+    public decimal? PnL { get; init; }
+    public decimal? PnLPercentage { get; init; }
 }

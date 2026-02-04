@@ -48,10 +48,16 @@ public partial class AssetViewModel : ObservableObject
     public decimal? Leverage { get; }
     public decimal? LiquidationPrice { get; }
     public bool? IsLong { get; }
-    public decimal? PnL { get; }
-    public decimal? PnLPercentage { get; }
     public decimal? DistanceToLiquidation { get; }
     public bool? IsAtRisk { get; }
+
+    // Common acquisition and P&L fields
+    public DateOnly? AcquisitionDate { get; }
+    public decimal? AcquisitionPrice { get; }
+    public decimal? PnL { get; }
+    public decimal? PnLPercentage { get; }
+    public string AcquisitionPriceFormatted { get; }
+    public bool HasAcquisitionData { get; }
 
     public string PnLFormatted { get; }
     public string PnLPercentageFormatted { get; }
@@ -122,10 +128,15 @@ public partial class AssetViewModel : ObservableObject
         Leverage = dto.Leverage;
         LiquidationPrice = dto.LiquidationPrice;
         IsLong = dto.IsLong;
-        PnL = dto.PnL;
-        PnLPercentage = dto.PnLPercentage;
         DistanceToLiquidation = dto.DistanceToLiquidation;
         IsAtRisk = dto.IsAtRisk;
+
+        // Common acquisition and P&L fields
+        AcquisitionDate = dto.AcquisitionDate;
+        AcquisitionPrice = dto.AcquisitionPrice;
+        PnL = dto.PnL;
+        PnLPercentage = dto.PnLPercentage;
+        HasAcquisitionData = dto.AcquisitionPrice.HasValue;
 
         // Format values
         CurrentValueFormatted = CurrencyDisplay.FormatFiat(CurrentValue, CurrencyCode);
@@ -166,6 +177,10 @@ public partial class AssetViewModel : ObservableObject
 
         CollateralFormatted = Collateral.HasValue
             ? CurrencyDisplay.FormatFiat(Collateral.Value, CurrencyCode)
+            : "-";
+
+        AcquisitionPriceFormatted = AcquisitionPrice.HasValue
+            ? CurrencyDisplay.FormatFiat(AcquisitionPrice.Value, CurrencyCode)
             : "-";
     }
 

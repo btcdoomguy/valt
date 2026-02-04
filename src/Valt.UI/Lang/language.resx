@@ -1922,4 +1922,13 @@
     <data name="Assets_Card_NetWorth" xml:space="preserve">
         <value>NetWorth</value>
     </data>
+    <data name="Assets_AcquisitionDate" xml:space="preserve">
+        <value>Acquisition Date</value>
+    </data>
+    <data name="Assets_AcquisitionPrice" xml:space="preserve">
+        <value>Acquisition Price</value>
+    </data>
+    <data name="Assets_Card_PnL" xml:space="preserve">
+        <value>P&amp;L:</value>
+    </data>
 </root>

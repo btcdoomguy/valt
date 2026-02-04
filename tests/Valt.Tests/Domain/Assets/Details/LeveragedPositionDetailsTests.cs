@@ -480,6 +480,17 @@ public class LeveragedPositionDetailsTests
     #region Price Source Tests
 
     [Test]
+    public void Should_Support_YahooFinance_PriceSource()
+    {
+        // Act
+        var details = new LeveragedPositionDetails(
+            1000m, 50000m, 10m, 45000m, 55000m, "USD", "BTC", AssetPriceSource.YahooFinance, true);
+
+        // Assert
+        Assert.That(details.PriceSource, Is.EqualTo(AssetPriceSource.YahooFinance));
+    }
+
+    [Test]
     public void Should_Support_LivePrice_PriceSource()
     {
         // Act

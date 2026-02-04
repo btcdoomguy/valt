@@ -30,9 +30,9 @@ internal sealed class CreateBasicAssetValidator : IValidator<CreateBasicAssetCom
             builder.AddError(nameof(instance.CurrentPrice), "Current price cannot be negative.");
 
         // Validate price source
-        var validPriceSources = new[] { (int)AssetPriceSource.Manual, (int)AssetPriceSource.YahooFinance, (int)AssetPriceSource.LivePrice };
+        var validPriceSources = new[] { (int)AssetPriceSource.Manual, (int)AssetPriceSource.YahooFinance };
         if (!validPriceSources.Contains(instance.PriceSource))
-            builder.AddError(nameof(instance.PriceSource), "Price source must be Manual (0), YahooFinance (1), or LivePrice (2).");
+            builder.AddError(nameof(instance.PriceSource), "Price source must be Manual (0) or YahooFinance (1).");
 
         return builder.Build();
     }

@@ -200,14 +200,141 @@ public class BasicAssetDetailsTests
         Assert.That(details.PriceSource, Is.EqualTo(AssetPriceSource.YahooFinance));
     }
 
+    #endregion
+
+    #region Acquisition and P&L Tests
+
     [Test]
-    public void Should_Support_LivePrice_PriceSource()
+    public void Should_Create_With_Acquisition_Data()
     {
         // Act
-        var details = new BasicAssetDetails(AssetTypes.Crypto, 1, "BTC", AssetPriceSource.LivePrice, 50000m, "USD");
+        var details = new BasicAssetDetails(
+            AssetTypes.Stock, 10, "AAPL", AssetPriceSource.Manual, 150m, "USD",
+            acquisitionDate: new DateOnly(2024, 1, 15), acquisitionPrice: 120m);
 
         // Assert
-        Assert.That(details.PriceSource, Is.EqualTo(AssetPriceSource.LivePrice));
+        Assert.That(details.AcquisitionDate, Is.EqualTo(new DateOnly(2024, 1, 15)));
+        Assert.That(details.AcquisitionPrice, Is.EqualTo(120m));
+    }
+
+    [Test]
+    public void Should_Create_Without_Acquisition_Data()
+    {
+        // Act
+        var details = new BasicAssetDetails(
+            AssetTypes.Stock, 10, "AAPL", AssetPriceSource.Manual, 150m, "USD");
+
+        // Assert
+        Assert.That(details.AcquisitionDate, Is.Null);
+        Assert.That(details.AcquisitionPrice, Is.Null);
+    }
+
+    [Test]
+    public void Should_Calculate_PnL_With_Profit()
+    {
+        // Arrange
+        var details = new BasicAssetDetails(
+            AssetTypes.Stock, 10, "AAPL", AssetPriceSource.Manual, 150m, "USD",
+            acquisitionPrice: 100m);
+
+        // Act
+        var pnl = details.CalculatePnL();
+
+        // Assert: (150 - 100) * 10 = 500
+        Assert.That(pnl, Is.EqualTo(500m));
+    }
+
+    [Test]
+    public void Should_Calculate_PnL_With_Loss()
+    {
+        // Arrange
+        var details = new BasicAssetDetails(
+            AssetTypes.Stock, 10, "AAPL", AssetPriceSource.Manual, 80m, "USD",
+            acquisitionPrice: 100m);
+
+        // Act
+        var pnl = details.CalculatePnL();
+
+        // Assert: (80 - 100) * 10 = -200
+        Assert.That(pnl, Is.EqualTo(-200m));
+    }
+
+    [Test]
+    public void Should_Calculate_PnL_Zero_Without_Acquisition_Price()
+    {
+        // Arrange
+        var details = new BasicAssetDetails(
+            AssetTypes.Stock, 10, "AAPL", AssetPriceSource.Manual, 150m, "USD");
+
+        // Act
+        var pnl = details.CalculatePnL();
+
+        // Assert
+        Assert.That(pnl, Is.EqualTo(0m));
+    }
+
+    [Test]
+    public void Should_Calculate_PnL_Percentage_Positive()
+    {
+        // Arrange
+        var details = new BasicAssetDetails(
+            AssetTypes.Stock, 10, "AAPL", AssetPriceSource.Manual, 150m, "USD",
+            acquisitionPrice: 100m);
+
+        // Act
+        var pnlPct = details.CalculatePnLPercentage();
+
+        // Assert: (150 - 100) / 100 * 100 = 50%
+        Assert.That(pnlPct, Is.EqualTo(50m));
+    }
+
+    [Test]
+    public void Should_Calculate_PnL_Percentage_Negative()
+    {
+        // Arrange
+        var details = new BasicAssetDetails(
+            AssetTypes.Stock, 10, "AAPL", AssetPriceSource.Manual, 80m, "USD",
+            acquisitionPrice: 100m);
+
+        // Act
+        var pnlPct = details.CalculatePnLPercentage();
+
+        // Assert: (80 - 100) / 100 * 100 = -20%
+        Assert.That(pnlPct, Is.EqualTo(-20m));
+    }
+
+    [Test]
+    public void Should_Preserve_Acquisition_Data_On_WithUpdatedPrice()
+    {
+        // Arrange
+        var original = new BasicAssetDetails(
+            AssetTypes.Stock, 10, "AAPL", AssetPriceSource.Manual, 150m, "USD",
+            acquisitionDate: new DateOnly(2024, 1, 15), acquisitionPrice: 120m);
+
+        // Act
+        var updated = (BasicAssetDetails)original.WithUpdatedPrice(200m);
+
+        // Assert
+        Assert.That(updated.CurrentPrice, Is.EqualTo(200m));
+        Assert.That(updated.AcquisitionDate, Is.EqualTo(new DateOnly(2024, 1, 15)));
+        Assert.That(updated.AcquisitionPrice, Is.EqualTo(120m));
+    }
+
+    [Test]
+    public void Should_Preserve_Acquisition_Data_On_WithQuantity()
+    {
+        // Arrange
+        var original = new BasicAssetDetails(
+            AssetTypes.Stock, 10, "AAPL", AssetPriceSource.Manual, 150m, "USD",
+            acquisitionDate: new DateOnly(2024, 1, 15), acquisitionPrice: 120m);
+
+        // Act
+        var updated = original.WithQuantity(20);
+
+        // Assert
+        Assert.That(updated.Quantity, Is.EqualTo(20));
+        Assert.That(updated.AcquisitionDate, Is.EqualTo(new DateOnly(2024, 1, 15)));
+        Assert.That(updated.AcquisitionPrice, Is.EqualTo(120m));
     }
 
     #endregion

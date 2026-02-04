@@ -61,9 +61,9 @@ internal sealed class EditAssetValidator : IValidator<EditAssetCommand>
         if (details.CurrentPrice < 0)
             builder.AddError("Details.CurrentPrice", "Current price cannot be negative.");
 
-        var validPriceSources = new[] { (int)AssetPriceSource.Manual, (int)AssetPriceSource.YahooFinance, (int)AssetPriceSource.LivePrice };
+        var validPriceSources = new[] { (int)AssetPriceSource.Manual, (int)AssetPriceSource.YahooFinance };
         if (!validPriceSources.Contains(details.PriceSource))
-            builder.AddError("Details.PriceSource", "Price source must be Manual (0), YahooFinance (1), or LivePrice (2).");
+            builder.AddError("Details.PriceSource", "Price source must be Manual (0) or YahooFinance (1).");
     }
 
     private void ValidateRealEstateDetails(RealEstateAssetDetailsInputDTO details, ValidationResultBuilder builder)

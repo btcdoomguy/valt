@@ -33,6 +33,16 @@ public record CreateRealEstateAssetCommand : ICommand<CreateRealEstateAssetResul
     public decimal? MonthlyRentalIncome { get; init; }
 
     /// <summary>
+    /// Acquisition date (optional).
+    /// </summary>
+    public DateOnly? AcquisitionDate { get; init; }
+
+    /// <summary>
+    /// Total purchase price at acquisition (optional).
+    /// </summary>
+    public decimal? AcquisitionPrice { get; init; }
+
+    /// <summary>
     /// Include in net worth calculation.
     /// </summary>
     public bool IncludeInNetWorth { get; init; } = true;

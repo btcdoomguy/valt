@@ -149,6 +149,8 @@ internal sealed class AssetQueries : IAssetQueries
         decimal? pnlPercentage = null;
         decimal? distanceToLiquidation = null;
         bool? isAtRisk = null;
+        DateOnly? acquisitionDate = null;
+        decimal? acquisitionPrice = null;
 
         switch (asset.Details)
         {
@@ -156,11 +158,25 @@ internal sealed class AssetQueries : IAssetQueries
                 quantity = basic.Quantity;
                 symbol = basic.Symbol;
                 priceSourceId = (int)basic.PriceSource;
+                acquisitionDate = basic.AcquisitionDate;
+                acquisitionPrice = basic.AcquisitionPrice;
+                if (basic.AcquisitionPrice.HasValue)
+                {
+                    pnl = basic.CalculatePnL();
+                    pnlPercentage = basic.CalculatePnLPercentage();
+                }
                 break;
 
             case RealEstateAssetDetails realEstate:
                 address = realEstate.Address;
                 monthlyRentalIncome = realEstate.MonthlyRentalIncome;
+                acquisitionDate = realEstate.AcquisitionDate;
+                acquisitionPrice = realEstate.AcquisitionPrice;
+                if (realEstate.AcquisitionPrice.HasValue)
+                {
+                    pnl = realEstate.CalculatePnL();
+                    pnlPercentage = realEstate.CalculatePnLPercentage();
+                }
                 break;
 
             case LeveragedPositionDetails leveraged:
@@ -204,10 +220,13 @@ internal sealed class AssetQueries : IAssetQueries
             Leverage = leverage,
             LiquidationPrice = liquidationPrice,
             IsLong = isLong,
-            PnL = pnl,
-            PnLPercentage = pnlPercentage,
             DistanceToLiquidation = distanceToLiquidation,
-            IsAtRisk = isAtRisk
+            IsAtRisk = isAtRisk,
+            // Common acquisition and P&L fields
+            AcquisitionDate = acquisitionDate,
+            AcquisitionPrice = acquisitionPrice,
+            PnL = pnl,
+            PnLPercentage = pnlPercentage
         };
     }
 }
