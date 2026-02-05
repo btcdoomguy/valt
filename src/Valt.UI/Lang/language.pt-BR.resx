@@ -796,16 +796,16 @@
         <value>Quantidade máxima de pessoas que podem ter o mesmo stack que você</value>
     </data>
     <data name="Reports.LeveragePositions.Title" xml:space="preserve">
-        <value>Posicoes Alavancadas</value>
+        <value>Posições Alavancadas</value>
     </data>
     <data name="Reports.LeveragePositions.LeveragedStack" xml:space="preserve">
         <value>Stack Alavancado</value>
     </data>
     <data name="Reports.LeveragePositions.LeveragedStack.Tooltip" xml:space="preserve">
-        <value>Seu BTC spot mais sua exposicao efetiva de BTC em posicoes alavancadas</value>
+        <value>Seu BTC spot mais sua exposição efetiva de BTC em posições alavancadas</value>
     </data>
     <data name="Reports.LeveragePositions.LeverageExposure" xml:space="preserve">
-        <value>Exposicao de Alavancagem</value>
+        <value>Exposição de Alavancagem</value>
     </data>
     <data name="Reports.LeveragePositions.LeveragePercentage" xml:space="preserve">
         <value>% de Alavancagem</value>
@@ -814,7 +814,7 @@
         <value>Percentual do seu stack alavancado que vem de alavancagem</value>
     </data>
     <data name="Reports.LeveragePositions.PositionCount" xml:space="preserve">
-        <value>Posicoes Ativas</value>
+        <value>Posições Ativas</value>
     </data>
     <data name="Reports.Statistics.Title" xml:space="preserve">
         <value>Estatísticas</value>
@@ -1107,6 +1107,18 @@
     </data>
     <data name="ManageAsset_CustomAsset" xml:space="preserve">
         <value>Ativo Personalizado</value>
+    </data>
+    <data name="ManageAsset_Section_BasicInfo" xml:space="preserve">
+        <value>Informações Básicas</value>
+    </data>
+    <data name="ManageAsset_Section_AssetDetails" xml:space="preserve">
+        <value>Detalhes do Ativo</value>
+    </data>
+    <data name="ManageAsset_Section_Acquisition" xml:space="preserve">
+        <value>Aquisição</value>
+    </data>
+    <data name="ManageAsset_Section_Display" xml:space="preserve">
+        <value>Configurações de Exibição</value>
     </data>
     <data name="Error.AssetNotFound" xml:space="preserve">
         <value>Ativo não encontrado</value>

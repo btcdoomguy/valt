@@ -1574,6 +1574,23 @@
         <Setter Property="Margin" Value="0, 0, 0, 5" />
     </Style>
 
+    <!-- Form section grouping -->
+    <Style Selector="Border.form-section">
+        <Setter Property="Background" Value="{DynamicResource Background700Brush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="Padding" Value="16,12"/>
+        <Setter Property="Margin" Value="0,0,0,12"/>
+    </Style>
+
+    <Style Selector="TextBlock.form-section-header">
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Margin" Value="0,0,0,10"/>
+        <Setter Property="Foreground" Value="{DynamicResource Text200Brush}"/>
+    </Style>
+
     <!-- Hint box - informational message with left accent border -->
     <Style Selector="Border.hint-box">
         <Setter Property="Background" Value="{DynamicResource Secondary800Brush}" />

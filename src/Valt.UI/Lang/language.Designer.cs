@@ -2282,7 +2282,31 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("ManageAsset_CustomAsset", resourceCulture);
             }
         }
-        
+
+        public static string ManageAsset_Section_BasicInfo {
+            get {
+                return ResourceManager.GetString("ManageAsset_Section_BasicInfo", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_Section_AssetDetails {
+            get {
+                return ResourceManager.GetString("ManageAsset_Section_AssetDetails", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_Section_Acquisition {
+            get {
+                return ResourceManager.GetString("ManageAsset_Section_Acquisition", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_Section_Display {
+            get {
+                return ResourceManager.GetString("ManageAsset_Section_Display", resourceCulture);
+            }
+        }
+
         public static string Error_AssetNotFound {
             get {
                 return ResourceManager.GetString("Error.AssetNotFound", resourceCulture);

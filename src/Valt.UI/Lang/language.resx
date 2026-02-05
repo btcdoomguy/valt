@@ -1143,6 +1143,18 @@
     <data name="ManageAsset_CustomAsset" xml:space="preserve">
         <value>Custom Asset</value>
     </data>
+    <data name="ManageAsset_Section_BasicInfo" xml:space="preserve">
+        <value>Basic Information</value>
+    </data>
+    <data name="ManageAsset_Section_AssetDetails" xml:space="preserve">
+        <value>Asset Details</value>
+    </data>
+    <data name="ManageAsset_Section_Acquisition" xml:space="preserve">
+        <value>Acquisition</value>
+    </data>
+    <data name="ManageAsset_Section_Display" xml:space="preserve">
+        <value>Display Settings</value>
+    </data>
     <data name="Error.AssetNotFound" xml:space="preserve">
         <value>Asset not found</value>
     </data>

@@ -6,12 +6,12 @@
         xmlns:local="clr-namespace:Valt.UI.Lang"
         xmlns:manageAsset="clr-namespace:Valt.UI.Views.Main.Modals.ManageAsset"
         mc:Ignorable="d"
-        d:DesignWidth="500"
-        d:DesignHeight="600"
-        MinWidth="500"
-        MinHeight="600"
-        MaxWidth="500"
-        MaxHeight="600"
+        d:DesignWidth="650"
+        d:DesignHeight="700"
+        MinWidth="650"
+        MinHeight="700"
+        MaxWidth="650"
+        MaxHeight="700"
         x:Class="Valt.UI.Views.Main.Modals.ManageAsset.ManageAssetView"
         x:DataType="manageAsset:ManageAssetViewModel"
         Title="{x:Static local:language.ManageAsset_Title}"
@@ -30,313 +30,348 @@
             <userControls:CustomTitleBar Title="{x:Static local:language.ManageAsset_Title}"
                                          TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
-            <Border Classes="form-fields-area" Height="520">
+            <Border Classes="form-fields-area" Height="620">
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <!-- Name Field -->
-                        <StackPanel Classes="form-field" HorizontalAlignment="Left">
-                            <TextBlock Text="{x:Static local:language.ManageAsset_Name}" />
-                            <TextBox Text="{Binding Name}" Width="200" />
-                        </StackPanel>
+                        <!-- Section 1: Basic Information -->
+                        <Border Classes="form-section">
+                            <StackPanel>
+                                <TextBlock Classes="form-section-header" Text="{x:Static local:language.ManageAsset_Section_BasicInfo}" />
 
-                        <!-- Asset Type and Currency Row -->
-                        <Grid ColumnDefinitions="200, 20, 200">
-                            <StackPanel Grid.Column="0" Classes="form-field">
-                                <TextBlock Text="{x:Static local:language.ManageAsset_AssetType}" />
-                                <ComboBox ItemsSource="{Binding AvailableAssetTypes}"
-                                          SelectedValue="{Binding SelectedAssetType}"
-                                          DisplayMemberBinding="{Binding Text}"
-                                          SelectedValueBinding="{Binding Value}"
-                                          Width="200"
-                                          IsEnabled="{Binding !IsEditMode}" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="2" Classes="form-field">
-                                <TextBlock Text="{x:Static local:language.ManageAsset_Currency}" />
-                                <ComboBox ItemsSource="{Binding AvailableCurrencies}"
-                                          SelectedItem="{Binding SelectedCurrency}"
-                                          Width="200" />
-                            </StackPanel>
-                        </Grid>
+                                <!-- Name Field -->
+                                <StackPanel Classes="form-field" HorizontalAlignment="Left">
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_Name}" />
+                                    <TextBox Text="{Binding Name}" Width="250" />
+                                </StackPanel>
 
-                        <!-- Basic Asset Fields -->
-                        <StackPanel IsVisible="{Binding ShowBasicFields}">
-                            <StackPanel Classes="form-field">
-                                <TextBlock Text="{x:Static local:language.ManageAsset_Symbol}" />
-                                <Grid ColumnDefinitions="130, 10, 130, 10, Auto">
-                                    <TextBox Grid.Column="0" Text="{Binding Symbol}" Width="130" />
-                                    <ComboBox Grid.Column="2"
-                                              ItemsSource="{Binding AvailablePriceSources}"
-                                              SelectedValue="{Binding SelectedPriceSource}"
-                                              DisplayMemberBinding="{Binding Text}"
-                                              SelectedValueBinding="{Binding Value}"
-                                              Width="130" />
-                                    <Button Grid.Column="4"
-                                            Content="{x:Static local:language.ManageAsset_CheckSymbol}"
-                                            Command="{Binding CheckSymbolCommand}"
-                                            IsVisible="{Binding ShowCheckSymbolButton}"
-                                            IsEnabled="{Binding !IsCheckingSymbol}"
-                                            Width="80"
-                                            HorizontalContentAlignment="Center" />
+                                <!-- Asset Type and Currency Row -->
+                                <Grid ColumnDefinitions="250, 20, 250">
+                                    <StackPanel Grid.Column="0" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_AssetType}" />
+                                        <ComboBox ItemsSource="{Binding AvailableAssetTypes}"
+                                                  SelectedValue="{Binding SelectedAssetType}"
+                                                  DisplayMemberBinding="{Binding Text}"
+                                                  SelectedValueBinding="{Binding Value}"
+                                                  Width="250"
+                                                  IsEnabled="{Binding !IsEditMode}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_Currency}" />
+                                        <ComboBox ItemsSource="{Binding AvailableCurrencies}"
+                                                  SelectedItem="{Binding SelectedCurrency}"
+                                                  Width="250" />
+                                    </StackPanel>
                                 </Grid>
-                                <StackPanel Orientation="Horizontal" Spacing="5" Margin="0,4,0,0"
-                                            IsVisible="{Binding SymbolValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                                    <TextBlock FontFamily="{DynamicResource MaterialDesign}"
-                                               Text="&#xE86C;"
-                                               Foreground="#4CAF50"
-                                               IsVisible="{Binding IsSymbolValid}"
-                                               FontSize="16" />
-                                    <TextBlock FontFamily="{DynamicResource MaterialDesign}"
-                                               Text="&#xE000;"
-                                               Foreground="#F44336"
-                                               IsVisible="{Binding !IsSymbolValid}"
-                                               FontSize="16" />
-                                    <TextBlock Text="{Binding SymbolValidationMessage}"
-                                               IsVisible="{Binding IsSymbolValid}"
-                                               Foreground="#4CAF50"
-                                               FontSize="12" />
-                                    <TextBlock Text="{Binding SymbolValidationMessage}"
-                                               IsVisible="{Binding !IsSymbolValid}"
-                                               Foreground="#F44336"
-                                               FontSize="12" />
-                                </StackPanel>
-                                <!-- Yahoo Finance Help -->
-                                <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,6,0,0"
-                                            IsVisible="{Binding ShowYahooFinanceHelp}">
-                                    <userControls:ModuleHelperText>
-                                        <userControls:ModuleHelperText.HelpContent>
-                                            <StackPanel Spacing="8" MaxWidth="320">
-                                                <TextBlock FontSize="{DynamicResource FontSizeSmall}"
-                                                           Text="{x:Static local:language.ManageAsset_YahooFinanceHelp_Line1}"
-                                                           TextWrapping="Wrap" />
-                                                <TextBlock FontSize="{DynamicResource FontSizeSmall}"
-                                                           Text="{x:Static local:language.ManageAsset_YahooFinanceHelp_Line2}"
-                                                           TextWrapping="Wrap" />
-                                                <TextBlock FontSize="{DynamicResource FontSizeSmall}"
-                                                           Text="https://finance.yahoo.com/quote/PETR4.SA/"
-                                                           TextWrapping="Wrap"
-                                                           Foreground="{DynamicResource AccentBrush}" />
-                                            </StackPanel>
-                                        </userControls:ModuleHelperText.HelpContent>
-                                    </userControls:ModuleHelperText>
-                                    <TextBlock Text="{x:Static local:language.ManageAsset_YahooFinanceHelp_Hint}"
-                                               FontSize="{DynamicResource FontSizeSmall}"
-                                               Foreground="{DynamicResource Text400Brush}"
-                                               VerticalAlignment="Center" />
-                                </StackPanel>
                             </StackPanel>
+                        </Border>
 
-                            <Grid ColumnDefinitions="200, 20, 200">
-                                <StackPanel Grid.Column="0" Classes="form-field">
-                                    <TextBlock Text="{x:Static local:language.ManageAsset_Quantity}" />
-                                    <TextBox Text="{Binding Quantity}" Width="200" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="2" Classes="form-field"
-                                            IsVisible="{Binding ShowCurrentPriceField}">
-                                    <TextBlock Text="{x:Static local:language.ManageAsset_CurrentPrice}" />
-                                    <userControls:FiatInput FiatValue="{Binding CurrentPriceFiat, Mode=TwoWay}"
-                                                            CurrencySymbol="{Binding CurrencySymbol}"
-                                                            SymbolOnRight="{Binding SymbolOnRight}"
-                                                            Width="200" />
-                                </StackPanel>
-                            </Grid>
+                        <!-- Section 2: Asset Details (Basic Assets) -->
+                        <Border Classes="form-section" IsVisible="{Binding ShowBasicFields}">
+                            <StackPanel>
+                                <TextBlock Classes="form-section-header" Text="{x:Static local:language.ManageAsset_Section_AssetDetails}" />
 
-                            <!-- Acquisition Fields for Basic Assets -->
-                            <Grid ColumnDefinitions="200, 20, 200">
-                                <StackPanel Grid.Column="0" Classes="form-field">
-                                    <TextBlock Text="{x:Static local:language.Assets_AcquisitionDate}" />
-                                    <CalendarDatePicker SelectedDate="{Binding AcquisitionDate}" Width="200" />
+                                <StackPanel Classes="form-field">
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_Symbol}" />
+                                    <Grid ColumnDefinitions="160, 10, 160, 10, Auto">
+                                        <TextBox Grid.Column="0" Text="{Binding Symbol}" Width="160" />
+                                        <ComboBox Grid.Column="2"
+                                                  ItemsSource="{Binding AvailablePriceSources}"
+                                                  SelectedValue="{Binding SelectedPriceSource}"
+                                                  DisplayMemberBinding="{Binding Text}"
+                                                  SelectedValueBinding="{Binding Value}"
+                                                  Width="160" />
+                                        <Button Grid.Column="4"
+                                                Content="{x:Static local:language.ManageAsset_CheckSymbol}"
+                                                Command="{Binding CheckSymbolCommand}"
+                                                IsVisible="{Binding ShowCheckSymbolButton}"
+                                                IsEnabled="{Binding !IsCheckingSymbol}"
+                                                Width="80"
+                                                HorizontalContentAlignment="Center" />
+                                    </Grid>
+                                    <StackPanel Orientation="Horizontal" Spacing="5" Margin="0,4,0,0"
+                                                IsVisible="{Binding SymbolValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                        <TextBlock FontFamily="{DynamicResource MaterialDesign}"
+                                                   Text="&#xE86C;"
+                                                   Foreground="#4CAF50"
+                                                   IsVisible="{Binding IsSymbolValid}"
+                                                   FontSize="16" />
+                                        <TextBlock FontFamily="{DynamicResource MaterialDesign}"
+                                                   Text="&#xE000;"
+                                                   Foreground="#F44336"
+                                                   IsVisible="{Binding !IsSymbolValid}"
+                                                   FontSize="16" />
+                                        <TextBlock Text="{Binding SymbolValidationMessage}"
+                                                   IsVisible="{Binding IsSymbolValid}"
+                                                   Foreground="#4CAF50"
+                                                   FontSize="12" />
+                                        <TextBlock Text="{Binding SymbolValidationMessage}"
+                                                   IsVisible="{Binding !IsSymbolValid}"
+                                                   Foreground="#F44336"
+                                                   FontSize="12" />
+                                    </StackPanel>
+                                    <!-- Yahoo Finance Help -->
+                                    <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,6,0,0"
+                                                IsVisible="{Binding ShowYahooFinanceHelp}">
+                                        <userControls:ModuleHelperText>
+                                            <userControls:ModuleHelperText.HelpContent>
+                                                <StackPanel Spacing="8" MaxWidth="320">
+                                                    <TextBlock FontSize="{DynamicResource FontSizeSmall}"
+                                                               Text="{x:Static local:language.ManageAsset_YahooFinanceHelp_Line1}"
+                                                               TextWrapping="Wrap" />
+                                                    <TextBlock FontSize="{DynamicResource FontSizeSmall}"
+                                                               Text="{x:Static local:language.ManageAsset_YahooFinanceHelp_Line2}"
+                                                               TextWrapping="Wrap" />
+                                                    <TextBlock FontSize="{DynamicResource FontSizeSmall}"
+                                                               Text="https://finance.yahoo.com/quote/PETR4.SA/"
+                                                               TextWrapping="Wrap"
+                                                               Foreground="{DynamicResource AccentBrush}" />
+                                                </StackPanel>
+                                            </userControls:ModuleHelperText.HelpContent>
+                                        </userControls:ModuleHelperText>
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_YahooFinanceHelp_Hint}"
+                                                   FontSize="{DynamicResource FontSizeSmall}"
+                                                   Foreground="{DynamicResource Text400Brush}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
                                 </StackPanel>
-                                <StackPanel Grid.Column="2" Classes="form-field">
-                                    <TextBlock Text="{x:Static local:language.Assets_AcquisitionPrice}" />
-                                    <userControls:FiatInput FiatValue="{Binding AcquisitionPriceFiat, Mode=TwoWay}"
-                                                            CurrencySymbol="{Binding CurrencySymbol}"
-                                                            SymbolOnRight="{Binding SymbolOnRight}"
-                                                            Width="200" />
-                                </StackPanel>
-                            </Grid>
-                        </StackPanel>
 
-                        <!-- Real Estate Fields -->
-                        <StackPanel IsVisible="{Binding ShowRealEstateFields}">
-                            <StackPanel Classes="form-field">
-                                <TextBlock Text="{x:Static local:language.ManageAsset_Address}" />
-                                <TextBox Text="{Binding Address}" Width="420" />
-                            </StackPanel>
-
-                            <Grid ColumnDefinitions="200, 20, 200">
-                                <StackPanel Grid.Column="0" Classes="form-field">
-                                    <TextBlock Text="{x:Static local:language.ManageAsset_CurrentValue}" />
-                                    <userControls:FiatInput FiatValue="{Binding CurrentValueFiat, Mode=TwoWay}"
-                                                            CurrencySymbol="{Binding CurrencySymbol}"
-                                                            SymbolOnRight="{Binding SymbolOnRight}"
-                                                            Width="200" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="2" Classes="form-field">
-                                    <TextBlock Text="{x:Static local:language.ManageAsset_RentalIncome}" />
-                                    <userControls:FiatInput FiatValue="{Binding MonthlyRentalIncomeFiat, Mode=TwoWay}"
-                                                            CurrencySymbol="{Binding CurrencySymbol}"
-                                                            SymbolOnRight="{Binding SymbolOnRight}"
-                                                            Width="200" />
-                                </StackPanel>
-                            </Grid>
-
-                            <!-- Acquisition Fields for Real Estate -->
-                            <Grid ColumnDefinitions="200, 20, 200">
-                                <StackPanel Grid.Column="0" Classes="form-field">
-                                    <TextBlock Text="{x:Static local:language.Assets_AcquisitionDate}" />
-                                    <CalendarDatePicker SelectedDate="{Binding AcquisitionDate}" Width="200" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="2" Classes="form-field">
-                                    <TextBlock Text="{x:Static local:language.Assets_AcquisitionPrice}" />
-                                    <userControls:FiatInput FiatValue="{Binding AcquisitionPriceFiat, Mode=TwoWay}"
-                                                            CurrencySymbol="{Binding CurrencySymbol}"
-                                                            SymbolOnRight="{Binding SymbolOnRight}"
-                                                            Width="200" />
-                                </StackPanel>
-                            </Grid>
-                        </StackPanel>
-
-                        <!-- Leveraged Position Fields -->
-                        <StackPanel IsVisible="{Binding ShowLeveragedFields}">
-                            <!-- Underlying Asset Toggle (Bitcoin/Custom) -->
-                            <StackPanel Classes="form-field">
-                                <TextBlock Text="{x:Static local:language.ManageAsset_UnderlyingAsset}" />
-                                <StackPanel Orientation="Horizontal" Spacing="20">
-                                    <RadioButton Content="{x:Static local:language.ManageAsset_Bitcoin}"
-                                                 IsChecked="{Binding IsBitcoinLeveraged}"
-                                                 Command="{Binding SetBitcoinLeveragedCommand}"
-                                                 GroupName="UnderlyingAsset" />
-                                    <RadioButton Content="{x:Static local:language.ManageAsset_CustomAsset}"
-                                                 IsChecked="{Binding IsCustomLeveraged}"
-                                                 Command="{Binding SetCustomLeveragedCommand}"
-                                                 GroupName="UnderlyingAsset" />
-                                </StackPanel>
-                            </StackPanel>
-
-                            <!-- Symbol + Price Source row (only for Custom) -->
-                            <StackPanel Classes="form-field" IsVisible="{Binding ShowLeveragedSymbolRow}">
-                                <TextBlock Text="{x:Static local:language.ManageAsset_Symbol}" />
-                                <Grid ColumnDefinitions="130, 10, 130, 10, Auto">
-                                    <TextBox Grid.Column="0" Text="{Binding Symbol}" Width="130" />
-                                    <ComboBox Grid.Column="2"
-                                              ItemsSource="{Binding AvailablePriceSources}"
-                                              SelectedValue="{Binding SelectedPriceSource}"
-                                              DisplayMemberBinding="{Binding Text}"
-                                              SelectedValueBinding="{Binding Value}"
-                                              Width="130" />
-                                    <Button Grid.Column="4"
-                                            Content="{x:Static local:language.ManageAsset_CheckSymbol}"
-                                            Command="{Binding CheckSymbolCommand}"
-                                            IsVisible="{Binding ShowCheckSymbolButton}"
-                                            IsEnabled="{Binding !IsCheckingSymbol}"
-                                            Width="80"
-                                            HorizontalContentAlignment="Center" />
+                                <Grid ColumnDefinitions="250, 20, 250">
+                                    <StackPanel Grid.Column="0" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_Quantity}" />
+                                        <TextBox Text="{Binding Quantity}" Width="250" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Classes="form-field"
+                                                IsVisible="{Binding ShowCurrentPriceField}">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_CurrentPrice}" />
+                                        <userControls:FiatInput FiatValue="{Binding CurrentPriceFiat, Mode=TwoWay}"
+                                                                CurrencySymbol="{Binding CurrencySymbol}"
+                                                                SymbolOnRight="{Binding SymbolOnRight}"
+                                                                Width="250" />
+                                    </StackPanel>
                                 </Grid>
-                                <StackPanel Orientation="Horizontal" Spacing="5" Margin="0,4,0,0"
-                                            IsVisible="{Binding SymbolValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                                    <TextBlock FontFamily="{DynamicResource MaterialDesign}"
-                                               Text="&#xE86C;"
-                                               Foreground="#4CAF50"
-                                               IsVisible="{Binding IsSymbolValid}"
-                                               FontSize="16" />
-                                    <TextBlock FontFamily="{DynamicResource MaterialDesign}"
-                                               Text="&#xE000;"
-                                               Foreground="#F44336"
-                                               IsVisible="{Binding !IsSymbolValid}"
-                                               FontSize="16" />
-                                    <TextBlock Text="{Binding SymbolValidationMessage}"
-                                               IsVisible="{Binding IsSymbolValid}"
-                                               Foreground="#4CAF50"
-                                               FontSize="12" />
-                                    <TextBlock Text="{Binding SymbolValidationMessage}"
-                                               IsVisible="{Binding !IsSymbolValid}"
-                                               Foreground="#F44336"
-                                               FontSize="12" />
-                                </StackPanel>
-                                <!-- Yahoo Finance Help -->
-                                <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,6,0,0"
-                                            IsVisible="{Binding ShowYahooFinanceHelp}">
-                                    <userControls:ModuleHelperText>
-                                        <userControls:ModuleHelperText.HelpContent>
-                                            <StackPanel Spacing="8" MaxWidth="320">
-                                                <TextBlock FontSize="{DynamicResource FontSizeSmall}"
-                                                           Text="{x:Static local:language.ManageAsset_YahooFinanceHelp_Line1}"
-                                                           TextWrapping="Wrap" />
-                                                <TextBlock FontSize="{DynamicResource FontSizeSmall}"
-                                                           Text="{x:Static local:language.ManageAsset_YahooFinanceHelp_Line2}"
-                                                           TextWrapping="Wrap" />
-                                                <TextBlock FontSize="{DynamicResource FontSizeSmall}"
-                                                           Text="https://finance.yahoo.com/quote/PETR4.SA/"
-                                                           TextWrapping="Wrap"
-                                                           Foreground="{DynamicResource AccentBrush}" />
-                                            </StackPanel>
-                                        </userControls:ModuleHelperText.HelpContent>
-                                    </userControls:ModuleHelperText>
-                                    <TextBlock Text="{x:Static local:language.ManageAsset_YahooFinanceHelp_Hint}"
-                                               FontSize="{DynamicResource FontSizeSmall}"
-                                               Foreground="{DynamicResource Text400Brush}"
-                                               VerticalAlignment="Center" />
-                                </StackPanel>
                             </StackPanel>
+                        </Border>
 
-                            <Grid ColumnDefinitions="200, 20, 200">
-                                <StackPanel Grid.Column="0" Classes="form-field">
-                                    <TextBlock Text="{x:Static local:language.ManageAsset_Collateral}" />
-                                    <userControls:FiatInput FiatValue="{Binding CollateralFiat, Mode=TwoWay}"
+                        <!-- Section 2: Asset Details (Real Estate) -->
+                        <Border Classes="form-section" IsVisible="{Binding ShowRealEstateFields}">
+                            <StackPanel>
+                                <TextBlock Classes="form-section-header" Text="{x:Static local:language.ManageAsset_Section_AssetDetails}" />
+
+                                <StackPanel Classes="form-field">
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_Address}" />
+                                    <TextBox Text="{Binding Address}" Width="540" />
+                                </StackPanel>
+
+                                <Grid ColumnDefinitions="250, 20, 250">
+                                    <StackPanel Grid.Column="0" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_CurrentValue}" />
+                                        <userControls:FiatInput FiatValue="{Binding CurrentValueFiat, Mode=TwoWay}"
+                                                                CurrencySymbol="{Binding CurrencySymbol}"
+                                                                SymbolOnRight="{Binding SymbolOnRight}"
+                                                                Width="250" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_RentalIncome}" />
+                                        <userControls:FiatInput FiatValue="{Binding MonthlyRentalIncomeFiat, Mode=TwoWay}"
+                                                                CurrencySymbol="{Binding CurrencySymbol}"
+                                                                SymbolOnRight="{Binding SymbolOnRight}"
+                                                                Width="250" />
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Section 2: Asset Details (Leveraged Position) -->
+                        <Border Classes="form-section" IsVisible="{Binding ShowLeveragedFields}">
+                            <StackPanel>
+                                <TextBlock Classes="form-section-header" Text="{x:Static local:language.ManageAsset_Section_AssetDetails}" />
+
+                                <!-- Underlying Asset Toggle (Bitcoin/Custom) -->
+                                <StackPanel Classes="form-field">
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_UnderlyingAsset}" />
+                                    <StackPanel Orientation="Horizontal" Spacing="20">
+                                        <RadioButton Content="{x:Static local:language.ManageAsset_Bitcoin}"
+                                                     IsChecked="{Binding IsBitcoinLeveraged}"
+                                                     Command="{Binding SetBitcoinLeveragedCommand}"
+                                                     GroupName="UnderlyingAsset" />
+                                        <RadioButton Content="{x:Static local:language.ManageAsset_CustomAsset}"
+                                                     IsChecked="{Binding IsCustomLeveraged}"
+                                                     Command="{Binding SetCustomLeveragedCommand}"
+                                                     GroupName="UnderlyingAsset" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <!-- Symbol + Price Source row (only for Custom) -->
+                                <StackPanel Classes="form-field" IsVisible="{Binding ShowLeveragedSymbolRow}">
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_Symbol}" />
+                                    <Grid ColumnDefinitions="160, 10, 160, 10, Auto">
+                                        <TextBox Grid.Column="0" Text="{Binding Symbol}" Width="160" />
+                                        <ComboBox Grid.Column="2"
+                                                  ItemsSource="{Binding AvailablePriceSources}"
+                                                  SelectedValue="{Binding SelectedPriceSource}"
+                                                  DisplayMemberBinding="{Binding Text}"
+                                                  SelectedValueBinding="{Binding Value}"
+                                                  Width="160" />
+                                        <Button Grid.Column="4"
+                                                Content="{x:Static local:language.ManageAsset_CheckSymbol}"
+                                                Command="{Binding CheckSymbolCommand}"
+                                                IsVisible="{Binding ShowCheckSymbolButton}"
+                                                IsEnabled="{Binding !IsCheckingSymbol}"
+                                                Width="80"
+                                                HorizontalContentAlignment="Center" />
+                                    </Grid>
+                                    <StackPanel Orientation="Horizontal" Spacing="5" Margin="0,4,0,0"
+                                                IsVisible="{Binding SymbolValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                        <TextBlock FontFamily="{DynamicResource MaterialDesign}"
+                                                   Text="&#xE86C;"
+                                                   Foreground="#4CAF50"
+                                                   IsVisible="{Binding IsSymbolValid}"
+                                                   FontSize="16" />
+                                        <TextBlock FontFamily="{DynamicResource MaterialDesign}"
+                                                   Text="&#xE000;"
+                                                   Foreground="#F44336"
+                                                   IsVisible="{Binding !IsSymbolValid}"
+                                                   FontSize="16" />
+                                        <TextBlock Text="{Binding SymbolValidationMessage}"
+                                                   IsVisible="{Binding IsSymbolValid}"
+                                                   Foreground="#4CAF50"
+                                                   FontSize="12" />
+                                        <TextBlock Text="{Binding SymbolValidationMessage}"
+                                                   IsVisible="{Binding !IsSymbolValid}"
+                                                   Foreground="#F44336"
+                                                   FontSize="12" />
+                                    </StackPanel>
+                                    <!-- Yahoo Finance Help -->
+                                    <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,6,0,0"
+                                                IsVisible="{Binding ShowYahooFinanceHelp}">
+                                        <userControls:ModuleHelperText>
+                                            <userControls:ModuleHelperText.HelpContent>
+                                                <StackPanel Spacing="8" MaxWidth="320">
+                                                    <TextBlock FontSize="{DynamicResource FontSizeSmall}"
+                                                               Text="{x:Static local:language.ManageAsset_YahooFinanceHelp_Line1}"
+                                                               TextWrapping="Wrap" />
+                                                    <TextBlock FontSize="{DynamicResource FontSizeSmall}"
+                                                               Text="{x:Static local:language.ManageAsset_YahooFinanceHelp_Line2}"
+                                                               TextWrapping="Wrap" />
+                                                    <TextBlock FontSize="{DynamicResource FontSizeSmall}"
+                                                               Text="https://finance.yahoo.com/quote/PETR4.SA/"
+                                                               TextWrapping="Wrap"
+                                                               Foreground="{DynamicResource AccentBrush}" />
+                                                </StackPanel>
+                                            </userControls:ModuleHelperText.HelpContent>
+                                        </userControls:ModuleHelperText>
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_YahooFinanceHelp_Hint}"
+                                                   FontSize="{DynamicResource FontSizeSmall}"
+                                                   Foreground="{DynamicResource Text400Brush}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <Grid ColumnDefinitions="250, 20, 250">
+                                    <StackPanel Grid.Column="0" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_Collateral}" />
+                                        <userControls:FiatInput FiatValue="{Binding CollateralFiat, Mode=TwoWay}"
+                                                                CurrencySymbol="{Binding CurrencySymbol}"
+                                                                SymbolOnRight="{Binding SymbolOnRight}"
+                                                                Width="250" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_Leverage}" />
+                                        <TextBox Text="{Binding Leverage}" Width="250" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="250, 20, 250">
+                                    <StackPanel Grid.Column="0" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_EntryPrice}" />
+                                        <userControls:FiatInput FiatValue="{Binding EntryPriceFiat, Mode=TwoWay}"
+                                                                CurrencySymbol="{Binding CurrencySymbol}"
+                                                                SymbolOnRight="{Binding SymbolOnRight}"
+                                                                Width="250" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Classes="form-field"
+                                                IsVisible="{Binding ShowCurrentPriceField}">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_CurrentPrice}" />
+                                        <userControls:FiatInput FiatValue="{Binding CurrentPriceFiat, Mode=TwoWay}"
+                                                                CurrencySymbol="{Binding CurrencySymbol}"
+                                                                SymbolOnRight="{Binding SymbolOnRight}"
+                                                                Width="250" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <StackPanel Classes="form-field" HorizontalAlignment="Left">
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_LiquidationPrice}" />
+                                    <userControls:FiatInput FiatValue="{Binding LiquidationPriceFiat, Mode=TwoWay}"
                                                             CurrencySymbol="{Binding CurrencySymbol}"
                                                             SymbolOnRight="{Binding SymbolOnRight}"
-                                                            Width="200" />
+                                                            Width="250" />
                                 </StackPanel>
-                                <StackPanel Grid.Column="2" Classes="form-field">
-                                    <TextBlock Text="{x:Static local:language.ManageAsset_Leverage}" />
-                                    <TextBox Text="{Binding Leverage}" Width="200" />
-                                </StackPanel>
-                            </Grid>
 
-                            <Grid ColumnDefinitions="200, 20, 200">
-                                <StackPanel Grid.Column="0" Classes="form-field">
-                                    <TextBlock Text="{x:Static local:language.ManageAsset_EntryPrice}" />
-                                    <userControls:FiatInput FiatValue="{Binding EntryPriceFiat, Mode=TwoWay}"
-                                                            CurrencySymbol="{Binding CurrencySymbol}"
-                                                            SymbolOnRight="{Binding SymbolOnRight}"
-                                                            Width="200" />
+                                <StackPanel Classes="form-field">
+                                    <CheckBox Content="{x:Static local:language.ManageAsset_IsLong}"
+                                              IsChecked="{Binding IsLong}" />
                                 </StackPanel>
-                                <StackPanel Grid.Column="2" Classes="form-field"
-                                            IsVisible="{Binding ShowCurrentPriceField}">
-                                    <TextBlock Text="{x:Static local:language.ManageAsset_CurrentPrice}" />
-                                    <userControls:FiatInput FiatValue="{Binding CurrentPriceFiat, Mode=TwoWay}"
-                                                            CurrencySymbol="{Binding CurrencySymbol}"
-                                                            SymbolOnRight="{Binding SymbolOnRight}"
-                                                            Width="200" />
-                                </StackPanel>
-                            </Grid>
-
-                            <StackPanel Classes="form-field">
-                                <TextBlock Text="{x:Static local:language.ManageAsset_LiquidationPrice}" />
-                                <userControls:FiatInput FiatValue="{Binding LiquidationPriceFiat, Mode=TwoWay}"
-                                                        CurrencySymbol="{Binding CurrencySymbol}"
-                                                        SymbolOnRight="{Binding SymbolOnRight}"
-                                                        Width="200" />
                             </StackPanel>
+                        </Border>
 
-                            <StackPanel Classes="form-field">
-                                <CheckBox Content="{x:Static local:language.ManageAsset_IsLong}"
-                                          IsChecked="{Binding IsLong}" />
+                        <!-- Section 3: Acquisition (for Basic Assets) -->
+                        <Border Classes="form-section" IsVisible="{Binding ShowBasicFields}">
+                            <StackPanel>
+                                <TextBlock Classes="form-section-header" Text="{x:Static local:language.ManageAsset_Section_Acquisition}" />
+
+                                <Grid ColumnDefinitions="250, 20, 250">
+                                    <StackPanel Grid.Column="0" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.Assets_AcquisitionDate}" />
+                                        <CalendarDatePicker SelectedDate="{Binding AcquisitionDate}" Width="250" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.Assets_AcquisitionPrice}" />
+                                        <userControls:FiatInput FiatValue="{Binding AcquisitionPriceFiat, Mode=TwoWay}"
+                                                                CurrencySymbol="{Binding CurrencySymbol}"
+                                                                SymbolOnRight="{Binding SymbolOnRight}"
+                                                                Width="250" />
+                                    </StackPanel>
+                                </Grid>
                             </StackPanel>
-                        </StackPanel>
+                        </Border>
 
-                        <!-- Common Fields -->
-                        <Separator Margin="0,16" />
+                        <!-- Section 3: Acquisition (for Real Estate) -->
+                        <Border Classes="form-section" IsVisible="{Binding ShowRealEstateFields}">
+                            <StackPanel>
+                                <TextBlock Classes="form-section-header" Text="{x:Static local:language.ManageAsset_Section_Acquisition}" />
 
-                        <StackPanel Classes="form-field">
-                            <CheckBox Content="{x:Static local:language.ManageAsset_IncludeInNetWorth}"
-                                      IsChecked="{Binding IncludeInNetWorth}" />
-                        </StackPanel>
+                                <Grid ColumnDefinitions="250, 20, 250">
+                                    <StackPanel Grid.Column="0" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.Assets_AcquisitionDate}" />
+                                        <CalendarDatePicker SelectedDate="{Binding AcquisitionDate}" Width="250" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.Assets_AcquisitionPrice}" />
+                                        <userControls:FiatInput FiatValue="{Binding AcquisitionPriceFiat, Mode=TwoWay}"
+                                                                CurrencySymbol="{Binding CurrencySymbol}"
+                                                                SymbolOnRight="{Binding SymbolOnRight}"
+                                                                Width="250" />
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
 
-                        <StackPanel Classes="form-field">
-                            <CheckBox Content="{x:Static local:language.ManageAsset_Visible}"
-                                      IsChecked="{Binding Visible}" />
-                        </StackPanel>
+                        <!-- Section 4: Display Settings -->
+                        <Border Classes="form-section">
+                            <StackPanel>
+                                <TextBlock Classes="form-section-header" Text="{x:Static local:language.ManageAsset_Section_Display}" />
+
+                                <StackPanel Classes="form-field">
+                                    <CheckBox Content="{x:Static local:language.ManageAsset_IncludeInNetWorth}"
+                                              IsChecked="{Binding IncludeInNetWorth}" />
+                                </StackPanel>
+
+                                <StackPanel Classes="form-field">
+                                    <CheckBox Content="{x:Static local:language.ManageAsset_Visible}"
+                                              IsChecked="{Binding Visible}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
                 </ScrollViewer>
             </Border>
