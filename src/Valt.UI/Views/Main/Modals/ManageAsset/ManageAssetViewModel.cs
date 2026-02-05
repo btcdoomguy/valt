@@ -48,6 +48,9 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     [NotifyPropertyChangedFor(nameof(ShowBasicFields))]
     [NotifyPropertyChangedFor(nameof(ShowRealEstateFields))]
     [NotifyPropertyChangedFor(nameof(ShowLeveragedFields))]
+    [NotifyPropertyChangedFor(nameof(IsBitcoinLeveraged))]
+    [NotifyPropertyChangedFor(nameof(IsCustomLeveraged))]
+    [NotifyPropertyChangedFor(nameof(ShowLeveragedSymbolRow))]
     private string _selectedAssetType = AssetTypes.Stock.ToString();
 
     [ObservableProperty]

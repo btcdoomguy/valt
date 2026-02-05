@@ -34,7 +34,7 @@
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                     <StackPanel>
                         <!-- Name Field -->
-                        <StackPanel Classes="form-field">
+                        <StackPanel Classes="form-field" HorizontalAlignment="Left">
                             <TextBlock Text="{x:Static local:language.ManageAsset_Name}" />
                             <TextBox Text="{Binding Name}" Width="200" />
                         </StackPanel>
