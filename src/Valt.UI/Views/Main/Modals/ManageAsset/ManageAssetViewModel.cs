@@ -66,9 +66,18 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     private bool _isBitcoinUnderlyingAsset = false;
 
     // Basic asset fields
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsBitcoinLeveraged))]
     private string _symbol = string.Empty;
+    public string Symbol
+    {
+        get => _symbol;
+        set
+        {
+            if (SetProperty(ref _symbol, value?.ToUpperInvariant() ?? string.Empty))
+            {
+                OnPropertyChanged(nameof(IsBitcoinLeveraged));
+            }
+        }
+    }
 
     [ObservableProperty]
     private decimal _quantity;

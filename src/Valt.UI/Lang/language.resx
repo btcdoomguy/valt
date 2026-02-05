@@ -890,6 +890,12 @@
     <data name="Reports.MonthlyTotals.Obs" xml:space="preserve">
         <value>* latest totals are calculated based on yesterday amounts</value>
     </data>
+    <data name="Reports.DoesntIncludeAssets" xml:space="preserve">
+        <value>* doesn't include Assets</value>
+    </data>
+    <data name="Transactions.MyAssets" xml:space="preserve">
+        <value>Assets</value>
+    </data>
     <data name="Reports.MonthlyTotals.Income" xml:space="preserve">
         <value>Income (Fiat)</value>
     </data>
@@ -2005,5 +2011,23 @@
     </data>
     <data name="Assets.RefreshPrices" xml:space="preserve">
         <value>Refresh Prices</value>
+    </data>
+    <data name="Assets.Help.Title" xml:space="preserve">
+        <value>About Assets</value>
+    </data>
+    <data name="Assets.Help.Description" xml:space="preserve">
+        <value>Track any asset in your portfolio: stocks, ETFs, crypto, real estate, or leveraged positions.</value>
+    </data>
+    <data name="Assets.Help.NetWorth" xml:space="preserve">
+        <value>Net Worth:</value>
+    </data>
+    <data name="Assets.Help.NetWorthDescription" xml:space="preserve">
+        <value>Assets can optionally be included in your net worth calculation. Since we don't track historical values, they are not directly added to account totals.</value>
+    </data>
+    <data name="Assets.Help.Selling" xml:space="preserve">
+        <value>Selling Assets:</value>
+    </data>
+    <data name="Assets.Help.SellingDescription" xml:space="preserve">
+        <value>Use the Sell option (right-click) to register profit or loss as a transaction in your accounts.</value>
     </data>
 </root>

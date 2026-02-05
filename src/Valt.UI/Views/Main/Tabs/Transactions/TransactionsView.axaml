@@ -36,7 +36,7 @@
         <Panel Grid.Column="0">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="110" />
+                    <RowDefinition Height="130" />
                     <RowDefinition Height="*" /> <!-- List -->
                 </Grid.RowDefinitions>
 
@@ -82,6 +82,17 @@
                             <TextBlock Grid.Column="1"
                                        Classes="wealth-value"
                                        Text="{Binding DisplayWealthInFiat}" />
+                        </Grid>
+
+                        <!-- My Assets -->
+                        <Grid ColumnDefinitions="Auto, *" Height="22" IsVisible="{Binding HasAssets}">
+                            <TextBlock Grid.Column="0"
+                                       Classes="wealth-label"
+                                       Foreground="{DynamicResource Text400Brush}"
+                                       Text="{x:Static local:language.Transactions_MyAssets}" />
+                            <TextBlock Grid.Column="1"
+                                       Classes="wealth-value"
+                                       Text="{Binding DisplayAssetsWealth}" />
                         </Grid>
 
                         <!-- Total in Fiat -->

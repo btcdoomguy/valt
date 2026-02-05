@@ -132,6 +132,10 @@
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    IsVisible="{Binding IsWealthOverviewLoading}" />
                     </Grid>
+                    <TextBlock Text="{x:Static lang:language.Reports_DoesntIncludeAssets}"
+                               FontSize="{DynamicResource FontSizeSmall}"
+                               Foreground="{DynamicResource Text500Brush}"
+                               Margin="0, 5, 0, 0" />
                 </StackPanel>
             </Expander>
             <!--Monthly totals-->
@@ -286,6 +290,10 @@
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    IsVisible="{Binding IsMonthlyTotalsLoading}" />
                     </Grid>
+                    <TextBlock Text="{x:Static lang:language.Reports_DoesntIncludeAssets}"
+                               FontSize="{DynamicResource FontSizeSmall}"
+                               Foreground="{DynamicResource Text500Brush}"
+                               Margin="0, 5, 0, 0" />
                 </StackPanel>
             </Expander>
             <!--Categories-->

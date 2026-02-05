@@ -686,7 +686,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Transactions.MyOther", resourceCulture);
             }
         }
-        
+
+        public static string Transactions_MyAssets {
+            get {
+                return ResourceManager.GetString("Transactions.MyAssets", resourceCulture);
+            }
+        }
+
         public static string ManageTransactions_SelectToday {
             get {
                 return ResourceManager.GetString("ManageTransactions.SelectToday", resourceCulture);
@@ -1778,7 +1784,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.MonthlyTotals.Obs", resourceCulture);
             }
         }
-        
+
+        public static string Reports_DoesntIncludeAssets {
+            get {
+                return ResourceManager.GetString("Reports.DoesntIncludeAssets", resourceCulture);
+            }
+        }
+
         public static string Reports_MonthlyTotals_Income {
             get {
                 return ResourceManager.GetString("Reports.MonthlyTotals.Income", resourceCulture);
@@ -3972,6 +3984,42 @@ namespace Valt.UI.Lang {
         public static string Assets_RefreshPrices {
             get {
                 return ResourceManager.GetString("Assets.RefreshPrices", resourceCulture);
+            }
+        }
+
+        public static string Assets_Help_Title {
+            get {
+                return ResourceManager.GetString("Assets.Help.Title", resourceCulture);
+            }
+        }
+
+        public static string Assets_Help_Description {
+            get {
+                return ResourceManager.GetString("Assets.Help.Description", resourceCulture);
+            }
+        }
+
+        public static string Assets_Help_NetWorth {
+            get {
+                return ResourceManager.GetString("Assets.Help.NetWorth", resourceCulture);
+            }
+        }
+
+        public static string Assets_Help_NetWorthDescription {
+            get {
+                return ResourceManager.GetString("Assets.Help.NetWorthDescription", resourceCulture);
+            }
+        }
+
+        public static string Assets_Help_Selling {
+            get {
+                return ResourceManager.GetString("Assets.Help.Selling", resourceCulture);
+            }
+        }
+
+        public static string Assets_Help_SellingDescription {
+            get {
+                return ResourceManager.GetString("Assets.Help.SellingDescription", resourceCulture);
             }
         }
     }

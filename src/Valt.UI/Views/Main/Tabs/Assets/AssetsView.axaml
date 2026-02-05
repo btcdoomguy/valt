@@ -5,6 +5,7 @@
              xmlns:assets="clr-namespace:Valt.UI.Views.Main.Tabs.Assets"
              xmlns:models="clr-namespace:Valt.UI.Views.Main.Tabs.Assets.Models"
              xmlns:lang="clr-namespace:Valt.UI.Lang"
+             xmlns:userControls="clr-namespace:Valt.UI.UserControls"
              mc:Ignorable="d" d:DesignWidth="1300" d:DesignHeight="650"
              x:Class="Valt.UI.Views.Main.Tabs.Assets.AssetsView"
              x:DataType="assets:AssetsViewModel">
@@ -35,13 +36,35 @@
         <Border Grid.Column="0" Padding="15">
             <Grid RowDefinitions="50, *">
                 <!-- Header Row with Add Button -->
-                <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" VerticalAlignment="Center">
+                <Grid Grid.Row="0" ColumnDefinitions="Auto, Auto, *, Auto" VerticalAlignment="Center">
                     <TextBlock Grid.Column="0"
                                Text="{x:Static lang:language.Main_Assets}"
                                FontSize="{DynamicResource FontSizeXLarge}"
                                FontWeight="SemiBold"
                                VerticalAlignment="Center" />
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <userControls:ModuleHelperText Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
+                        <userControls:ModuleHelperText.HelpContent>
+                            <StackPanel Spacing="8" MaxWidth="320">
+                                <TextBlock FontWeight="Bold" FontSize="{DynamicResource FontSizeMedium}"
+                                           Text="{x:Static lang:language.Assets_Help_Title}" />
+                                <TextBlock TextWrapping="Wrap"
+                                           Text="{x:Static lang:language.Assets_Help_Description}" />
+                                <StackPanel Spacing="2">
+                                    <TextBlock FontWeight="SemiBold"
+                                               Text="{x:Static lang:language.Assets_Help_NetWorth}" />
+                                    <TextBlock TextWrapping="Wrap"
+                                               Text="{x:Static lang:language.Assets_Help_NetWorthDescription}" />
+                                </StackPanel>
+                                <StackPanel Spacing="2">
+                                    <TextBlock FontWeight="SemiBold"
+                                               Text="{x:Static lang:language.Assets_Help_Selling}" />
+                                    <TextBlock TextWrapping="Wrap"
+                                               Text="{x:Static lang:language.Assets_Help_SellingDescription}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </userControls:ModuleHelperText.HelpContent>
+                    </userControls:ModuleHelperText>
+                    <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" VerticalAlignment="Center">
                         <Button Command="{Binding RefreshPricesCommand}"
                                 Classes="transparent"
                                 IsEnabled="{Binding !IsRefreshingPrices}"

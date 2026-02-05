@@ -852,6 +852,12 @@
     <data name="Reports.MonthlyTotals.Obs" xml:space="preserve">
         <value>* o total atual é baseado nos valores do dia anterior</value>
     </data>
+    <data name="Reports.DoesntIncludeAssets" xml:space="preserve">
+        <value>* não inclui Ativos</value>
+    </data>
+    <data name="Transactions.MyAssets" xml:space="preserve">
+        <value>Ativos</value>
+    </data>
     <data name="Loading" xml:space="preserve">
         <value>Carregando...</value>
     </data>
@@ -2000,5 +2006,23 @@
     </data>
     <data name="Assets.RefreshPrices" xml:space="preserve">
         <value>Atualizar Preços</value>
+    </data>
+    <data name="Assets.Help.Title" xml:space="preserve">
+        <value>Sobre Ativos</value>
+    </data>
+    <data name="Assets.Help.Description" xml:space="preserve">
+        <value>Acompanhe qualquer ativo do seu portfólio: ações, ETFs, criptomoedas, imóveis ou posições alavancadas.</value>
+    </data>
+    <data name="Assets.Help.NetWorth" xml:space="preserve">
+        <value>Patrimônio Líquido:</value>
+    </data>
+    <data name="Assets.Help.NetWorthDescription" xml:space="preserve">
+        <value>Ativos podem ser incluídos opcionalmente no cálculo do patrimônio líquido. Como não rastreamos valores históricos, eles não são somados diretamente aos totais das contas.</value>
+    </data>
+    <data name="Assets.Help.Selling" xml:space="preserve">
+        <value>Vendendo Ativos:</value>
+    </data>
+    <data name="Assets.Help.SellingDescription" xml:space="preserve">
+        <value>Use a opção Vender (clique direito) para registrar lucro ou prejuízo como transação nas suas contas.</value>
     </data>
 </root>

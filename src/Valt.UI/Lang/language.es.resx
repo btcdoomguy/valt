@@ -885,6 +885,12 @@
     <data name="Reports.MonthlyTotals.Obs" xml:space="preserve">
         <value>* los totales actuales se calculan basándose en los montos de ayer</value>
     </data>
+    <data name="Reports.DoesntIncludeAssets" xml:space="preserve">
+        <value>* no incluye Activos</value>
+    </data>
+    <data name="Transactions.MyAssets" xml:space="preserve">
+        <value>Activos</value>
+    </data>
     <data name="Reports.MonthlyTotals.Income" xml:space="preserve">
         <value>Ingresos (Fiat)</value>
     </data>
@@ -2000,5 +2006,23 @@
     </data>
     <data name="Assets.RefreshPrices" xml:space="preserve">
         <value>Actualizar Precios</value>
+    </data>
+    <data name="Assets.Help.Title" xml:space="preserve">
+        <value>Acerca de Activos</value>
+    </data>
+    <data name="Assets.Help.Description" xml:space="preserve">
+        <value>Registra cualquier activo de tu cartera: acciones, ETFs, criptomonedas, bienes raíces o posiciones apalancadas.</value>
+    </data>
+    <data name="Assets.Help.NetWorth" xml:space="preserve">
+        <value>Patrimonio Neto:</value>
+    </data>
+    <data name="Assets.Help.NetWorthDescription" xml:space="preserve">
+        <value>Los activos pueden incluirse opcionalmente en el cálculo del patrimonio neto. Como no rastreamos valores históricos, no se suman directamente a los totales de las cuentas.</value>
+    </data>
+    <data name="Assets.Help.Selling" xml:space="preserve">
+        <value>Vender Activos:</value>
+    </data>
+    <data name="Assets.Help.SellingDescription" xml:space="preserve">
+        <value>Usa la opción Vender (clic derecho) para registrar ganancias o pérdidas como transacción en tus cuentas.</value>
     </data>
 </root>
