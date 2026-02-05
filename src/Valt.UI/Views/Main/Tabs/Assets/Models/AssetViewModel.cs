@@ -49,7 +49,13 @@ public partial class AssetViewModel : ObservableObject
     public decimal? LiquidationPrice { get; }
     public bool? IsLong { get; }
     public decimal? DistanceToLiquidation { get; }
-    public bool? IsAtRisk { get; }
+
+    /// <summary>
+    /// Indicates if the leveraged position is at risk of liquidation.
+    /// Only true when within 10% of liquidation AND PnL is negative or small.
+    /// A position with significant profit (> 50% PnL) cannot be close to liquidation.
+    /// </summary>
+    public bool IsAtRisk { get; }
 
     // Common acquisition and P&L fields
     public DateOnly? AcquisitionDate { get; }
@@ -78,7 +84,7 @@ public partial class AssetViewModel : ObservableObject
     public string DisplayValueFormatted => IsLeveragedPosition ? PnLFormatted : CurrentValueFormatted;
     public string PositionDirection => IsLong == true ? "Long" : "Short";
     public string PnLColor => PnL >= 0 ? "#4CAF50" : "#F44336";
-    public string AtRiskIndicator => IsAtRisk == true ? "!" : "";
+    public string AtRiskIndicator => IsAtRisk ? "!" : "";
     public string ValueColor => CurrentValue >= 0 ? "#4CAF50" : "#F44336";
     public bool IsNegativeValue => CurrentValue < 0;
 
@@ -91,8 +97,8 @@ public partial class AssetViewModel : ObservableObject
         AssetTypes.RealEstate => "#8B0000",   // Dark red
         AssetTypes.Commodity => "#7A6B4E",    // Dark bronze
         AssetTypes.LeveragedPosition => "#6B238E", // Dark purple
-        AssetTypes.Custom => "#4A4A4A",       // Dark gray
-        _ => "#4A4A4A"
+        AssetTypes.Custom => "#3A3A3A",       // Dark gray
+        _ => "#3A3A3A"
     };
     public string TitleBarTextColor => "#FFFFFF";
     public string NetWorthIcon => IncludeInNetWorth ? "\xE86C" : "\xE5C9";
@@ -129,7 +135,9 @@ public partial class AssetViewModel : ObservableObject
         LiquidationPrice = dto.LiquidationPrice;
         IsLong = dto.IsLong;
         DistanceToLiquidation = dto.DistanceToLiquidation;
-        IsAtRisk = dto.IsAtRisk;
+        // Only show at risk if reported AND PnL is not significantly positive
+        // A position with > 50% profit cannot logically be close to liquidation
+        IsAtRisk = dto.IsAtRisk == true && (dto.PnLPercentage == null || dto.PnLPercentage <= 50);
 
         // Common acquisition and P&L fields
         AcquisitionDate = dto.AcquisitionDate;

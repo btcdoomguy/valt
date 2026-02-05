@@ -90,8 +90,8 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="models:AssetViewModel">
                                 <!-- Asset Card -->
-                                <Border Width="200"
-                                        Height="260"
+                                <Border Width="230"
+                                        Height="299"
                                         Margin="0,0,12,12"
                                         CornerRadius="4"
                                         BorderThickness="1"
@@ -141,7 +141,7 @@
                                             </StackPanel>
                                         </Border>
 
-                                        <!-- Main Content (cream/white background with dark text) -->
+                                        <!-- Main Content -->
                                         <Border Grid.Row="1" Padding="12,8" Background="{DynamicResource Background900Brush}">
                                             <Grid RowDefinitions="*, Auto, Auto">
                                                 <!-- Type-specific content -->
@@ -184,18 +184,25 @@
                                                                    FontWeight="SemiBold"
                                                                    Foreground="{DynamicResource AssetCardTextBrush}" />
                                                     </Grid>
-                                                    <Grid ColumnDefinitions="Auto, *" IsVisible="{Binding HasAcquisitionData}">
-                                                        <TextBlock Grid.Column="0"
-                                                                   Text="{x:Static lang:language.Assets_Card_PnL}"
-                                                                   FontSize="{DynamicResource FontSizeSmall}"
-                                                                   Foreground="{DynamicResource AssetCardLabelBrush}"
-                                                                   Margin="0,0,8,0" />
-                                                        <TextBlock Grid.Column="1"
-                                                                   Text="{Binding PnLCombinedFormatted}"
+                                                    <StackPanel Spacing="2" IsVisible="{Binding HasAcquisitionData}">
+                                                        <Grid ColumnDefinitions="Auto, *">
+                                                            <TextBlock Grid.Column="0"
+                                                                       Text="{x:Static lang:language.Assets_Card_PnL}"
+                                                                       FontSize="{DynamicResource FontSizeSmall}"
+                                                                       Foreground="{DynamicResource AssetCardLabelBrush}"
+                                                                       Margin="0,0,8,0" />
+                                                            <TextBlock Grid.Column="1"
+                                                                       Text="{Binding PnLFormatted}"
+                                                                       FontSize="{DynamicResource FontSizeSmall}"
+                                                                       FontWeight="SemiBold"
+                                                                       Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}" />
+                                                        </Grid>
+                                                        <TextBlock Text="{Binding PnLPercentageFormatted}"
                                                                    FontSize="{DynamicResource FontSizeSmall}"
                                                                    FontWeight="SemiBold"
-                                                                   Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}" />
-                                                    </Grid>
+                                                                   Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}"
+                                                                   HorizontalAlignment="Right" />
+                                                    </StackPanel>
                                                 </StackPanel>
 
                                                 <!-- Real Estate content -->
@@ -218,18 +225,25 @@
                                                                    FontWeight="SemiBold"
                                                                    Foreground="{DynamicResource AssetCardTextBrush}" />
                                                     </Grid>
-                                                    <Grid ColumnDefinitions="Auto, *" IsVisible="{Binding HasAcquisitionData}">
-                                                        <TextBlock Grid.Column="0"
-                                                                   Text="{x:Static lang:language.Assets_Card_PnL}"
-                                                                   FontSize="{DynamicResource FontSizeSmall}"
-                                                                   Foreground="{DynamicResource AssetCardLabelBrush}"
-                                                                   Margin="0,0,8,0" />
-                                                        <TextBlock Grid.Column="1"
-                                                                   Text="{Binding PnLCombinedFormatted}"
+                                                    <StackPanel Spacing="2" IsVisible="{Binding HasAcquisitionData}">
+                                                        <Grid ColumnDefinitions="Auto, *">
+                                                            <TextBlock Grid.Column="0"
+                                                                       Text="{x:Static lang:language.Assets_Card_PnL}"
+                                                                       FontSize="{DynamicResource FontSizeSmall}"
+                                                                       Foreground="{DynamicResource AssetCardLabelBrush}"
+                                                                       Margin="0,0,8,0" />
+                                                            <TextBlock Grid.Column="1"
+                                                                       Text="{Binding PnLFormatted}"
+                                                                       FontSize="{DynamicResource FontSizeSmall}"
+                                                                       FontWeight="SemiBold"
+                                                                       Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}" />
+                                                        </Grid>
+                                                        <TextBlock Text="{Binding PnLPercentageFormatted}"
                                                                    FontSize="{DynamicResource FontSizeSmall}"
                                                                    FontWeight="SemiBold"
-                                                                   Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}" />
-                                                    </Grid>
+                                                                   Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}"
+                                                                   HorizontalAlignment="Right" />
+                                                    </StackPanel>
                                                 </StackPanel>
 
                                                 <!-- Leveraged Position content -->
@@ -284,7 +298,7 @@
                                                                FontSize="{DynamicResource FontSizeSmall}"
                                                                FontWeight="SemiBold"
                                                                Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}"
-                                                               HorizontalAlignment="Center"
+                                                               HorizontalAlignment="Right"
                                                                Margin="0,4,0,0" />
                                                     <Border Background="{DynamicResource SemanticNegative500Brush}"
                                                             CornerRadius="4"

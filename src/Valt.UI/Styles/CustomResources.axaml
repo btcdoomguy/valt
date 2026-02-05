@@ -92,7 +92,7 @@
 
     <!-- Custom button theme for CalendarDatePicker - simple calendar icon -->
     <!-- Asset Card Colors (theme-aware) -->
-    <SolidColorBrush x:Key="AssetCardBackgroundBrush" Color="{DynamicResource Background700Color}" />
+    <SolidColorBrush x:Key="AssetCardBackgroundBrush" Color="{DynamicResource Background800Color}" />
     <SolidColorBrush x:Key="AssetCardSeparatorBrush" Color="{DynamicResource Divider500Color}" />
     <SolidColorBrush x:Key="AssetCardLabelBrush" Color="{DynamicResource Text400Color}" />
     <SolidColorBrush x:Key="AssetCardTextBrush" Color="{DynamicResource Text100Color}" />

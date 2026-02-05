@@ -551,9 +551,6 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             // Initialize filter state with current date for the new database
             _filterState.MainDate = DateTime.Now;
 
-            // Mark all tabs as needing refresh so they reload data from the new database
-            _tabRefreshState.SetAllNeedRefresh();
-
             // Set the transactions tab and force refresh to load data from the new database
             SelectedTabComponent = _pageFactory.Create(MainViewTabNames.TransactionsPageContent);
             if (SelectedTabComponent is not null)
