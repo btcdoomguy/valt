@@ -20,6 +20,7 @@
         <PackageReference Include="ModelContextProtocol.AspNetCore" />
         <PackageReference Include="Scrutor" />
         <PackageReference Include="StringMath" />
+        <PackageReference Include="YahooFinanceApi" />
     </ItemGroup>
 
     <ItemGroup>

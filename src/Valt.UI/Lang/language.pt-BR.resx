@@ -280,7 +280,7 @@
         <value>Remover do Grupo</value>
     </data>
     <data name="Transactions.Total" xml:space="preserve">
-        <value>Total em BTC</value>
+        <value>Total (em BTC)</value>
     </data>
     <data name="Transactions.ViewAllAccounts" xml:space="preserve">
         <value>Ver todas as contas</value>
@@ -475,10 +475,10 @@
         <value>Ao excluir uma despesa fixa, todas as transações atreladas a irão perder o vínculo. Deseja continuar?</value>
     </data>
     <data name="Transactions.Ratio" xml:space="preserve">
-        <value>Patrimônio em BTC</value>
+        <value>% à Vista em BTC</value>
     </data>
     <data name="Transactions.TotalInFiat" xml:space="preserve">
-        <value>Total</value>
+        <value>Total (em Fiat)</value>
     </data>
     <data name="Yes" xml:space="preserve">
         <value>Sim</value>
@@ -762,11 +762,23 @@
     <data name="Reports.AllTimeHigh.MaxDrawdownPercent" xml:space="preserve">
         <value>Maior queda</value>
     </data>
+    <data name="Reports.AllTimeHigh.BtcPriceToHitAth" xml:space="preserve">
+        <value>Preço do BTC p/ bater ATH</value>
+    </data>
     <data name="Reports.Wealth.Title" xml:space="preserve">
         <value>Patrimônio</value>
     </data>
     <data name="Reports.Wealth.TotalInBtc.Tooltip" xml:space="preserve">
         <value>Esse é o seu patrimônio total representado em bitcoin como unidade de conta</value>
+    </data>
+    <data name="Reports.Wealth.MyAssets" xml:space="preserve">
+        <value>Meus Ativos</value>
+    </data>
+    <data name="Reports.Wealth.NetWorth" xml:space="preserve">
+        <value>Patrimônio Líquido</value>
+    </data>
+    <data name="Reports.Wealth.NetWorthInSats" xml:space="preserve">
+        <value>Patrimônio Líquido (sats)</value>
     </data>
     <data name="Reports.BtcStack.Title" xml:space="preserve">
         <value>Seu stack</value>
@@ -782,6 +794,27 @@
     </data>
     <data name="Reports.BtcStack.PeopleWithSameStack.Tooltip" xml:space="preserve">
         <value>Quantidade máxima de pessoas que podem ter o mesmo stack que você</value>
+    </data>
+    <data name="Reports.LeveragePositions.Title" xml:space="preserve">
+        <value>Posições Alavancadas</value>
+    </data>
+    <data name="Reports.LeveragePositions.LeveragedStack" xml:space="preserve">
+        <value>Stack Alavancado</value>
+    </data>
+    <data name="Reports.LeveragePositions.LeveragedStack.Tooltip" xml:space="preserve">
+        <value>Seu BTC spot mais sua exposição efetiva de BTC em posições alavancadas</value>
+    </data>
+    <data name="Reports.LeveragePositions.LeverageExposure" xml:space="preserve">
+        <value>Exposição de Alavancagem</value>
+    </data>
+    <data name="Reports.LeveragePositions.LeveragePercentage" xml:space="preserve">
+        <value>% de Alavancagem</value>
+    </data>
+    <data name="Reports.LeveragePositions.LeveragePercentage.Tooltip" xml:space="preserve">
+        <value>Percentual do seu stack alavancado que vem de alavancagem</value>
+    </data>
+    <data name="Reports.LeveragePositions.PositionCount" xml:space="preserve">
+        <value>Posições Ativas</value>
     </data>
     <data name="Reports.Statistics.Title" xml:space="preserve">
         <value>Estatísticas</value>
@@ -818,6 +851,12 @@
     </data>
     <data name="Reports.MonthlyTotals.Obs" xml:space="preserve">
         <value>* o total atual é baseado nos valores do dia anterior</value>
+    </data>
+    <data name="Reports.DoesntIncludeAssets" xml:space="preserve">
+        <value>* não inclui Ativos</value>
+    </data>
+    <data name="Transactions.MyAssets" xml:space="preserve">
+        <value>Ativos</value>
     </data>
     <data name="Loading" xml:space="preserve">
         <value>Carregando...</value>
@@ -863,6 +902,232 @@
     </data>
     <data name="Main.AvgPrice" xml:space="preserve">
         <value>Preço-médio</value>
+    </data>
+    <data name="Main.Assets" xml:space="preserve">
+        <value>Ativos</value>
+    </data>
+    <data name="Assets.Add" xml:space="preserve">
+        <value>Adicionar Ativo</value>
+    </data>
+    <data name="Assets.Edit" xml:space="preserve">
+        <value>Editar</value>
+    </data>
+    <data name="Assets.Delete" xml:space="preserve">
+        <value>Excluir</value>
+    </data>
+    <data name="Assets.Delete.Alert" xml:space="preserve">
+        <value>Excluir Ativo</value>
+    </data>
+    <data name="Assets.Delete.Message" xml:space="preserve">
+        <value>Tem certeza que deseja excluir este ativo?</value>
+    </data>
+    <data name="Assets.ToggleVisibility" xml:space="preserve">
+        <value>Alternar Visibilidade</value>
+    </data>
+    <data name="Assets.ToggleNetWorth" xml:space="preserve">
+        <value>Alternar Inclusão no Patrimônio</value>
+    </data>
+    <data name="Assets.Column.Name" xml:space="preserve">
+        <value>Nome</value>
+    </data>
+    <data name="Assets.Column.Type" xml:space="preserve">
+        <value>Tipo</value>
+    </data>
+    <data name="Assets.Column.Symbol" xml:space="preserve">
+        <value>Símbolo</value>
+    </data>
+    <data name="Assets.Column.Quantity" xml:space="preserve">
+        <value>Quantidade</value>
+    </data>
+    <data name="Assets.Column.Price" xml:space="preserve">
+        <value>Preço</value>
+    </data>
+    <data name="Assets.Column.Value" xml:space="preserve">
+        <value>Valor</value>
+    </data>
+    <data name="Assets.Column.PnL" xml:space="preserve">
+        <value>L&amp;P</value>
+    </data>
+    <data name="Assets.Column.Visible" xml:space="preserve">
+        <value>Visível</value>
+    </data>
+    <data name="Assets.Column.NetWorth" xml:space="preserve">
+        <value>Patrimônio</value>
+    </data>
+    <data name="Assets.Summary.Title" xml:space="preserve">
+        <value>Resumo do Portfólio</value>
+    </data>
+    <data name="Assets.Summary.TotalAssets" xml:space="preserve">
+        <value>Total de Ativos</value>
+    </data>
+    <data name="Assets.Summary.InNetWorth" xml:space="preserve">
+        <value>Incluídos no Patrimônio</value>
+    </data>
+    <data name="Assets.Summary.TotalValue" xml:space="preserve">
+        <value>Valor Total</value>
+    </data>
+    <data name="Assets.Summary.TotalSats" xml:space="preserve">
+        <value>Valor em Sats</value>
+    </data>
+    <data name="Assets.Details.Title" xml:space="preserve">
+        <value>Detalhes do Ativo</value>
+    </data>
+    <data name="Assets.Leverage" xml:space="preserve">
+        <value>Alavancagem</value>
+    </data>
+    <data name="Assets.EntryPrice" xml:space="preserve">
+        <value>Preço de Entrada</value>
+    </data>
+    <data name="Assets.Collateral" xml:space="preserve">
+        <value>Colateral</value>
+    </data>
+    <data name="Assets.Liquidation" xml:space="preserve">
+        <value>Preço de Liquidação</value>
+    </data>
+    <data name="Assets.DistanceToLiq" xml:space="preserve">
+        <value>Distância da Liquidação</value>
+    </data>
+    <data name="Assets.PnL" xml:space="preserve">
+        <value>L&amp;P</value>
+    </data>
+    <data name="Assets.AtRisk" xml:space="preserve">
+        <value>Posição em Risco!</value>
+    </data>
+    <data name="Assets.Address" xml:space="preserve">
+        <value>Endereço</value>
+    </data>
+    <data name="Assets.RentalIncome" xml:space="preserve">
+        <value>Renda de Aluguel Mensal</value>
+    </data>
+    <!-- Manage Asset Modal -->
+    <data name="ManageAsset_Title" xml:space="preserve">
+        <value>Adicionar/Editar Ativo</value>
+    </data>
+    <data name="ManageAsset_Name" xml:space="preserve">
+        <value>Nome</value>
+    </data>
+    <data name="ManageAsset_AssetType" xml:space="preserve">
+        <value>Tipo de Ativo</value>
+    </data>
+    <data name="ManageAsset_Currency" xml:space="preserve">
+        <value>Moeda</value>
+    </data>
+    <data name="ManageAsset_Symbol" xml:space="preserve">
+        <value>Símbolo</value>
+    </data>
+    <data name="ManageAsset_Quantity" xml:space="preserve">
+        <value>Quantidade</value>
+    </data>
+    <data name="ManageAsset_CurrentPrice" xml:space="preserve">
+        <value>Preço Atual</value>
+    </data>
+    <data name="ManageAsset_CurrentValue" xml:space="preserve">
+        <value>Valor Atual</value>
+    </data>
+    <data name="ManageAsset_PriceSource" xml:space="preserve">
+        <value>Fonte de Preço</value>
+    </data>
+    <data name="ManageAsset_Address" xml:space="preserve">
+        <value>Endereço</value>
+    </data>
+    <data name="ManageAsset_RentalIncome" xml:space="preserve">
+        <value>Renda de Aluguel Mensal</value>
+    </data>
+    <data name="ManageAsset_Collateral" xml:space="preserve">
+        <value>Colateral</value>
+    </data>
+    <data name="ManageAsset_EntryPrice" xml:space="preserve">
+        <value>Preço de Entrada</value>
+    </data>
+    <data name="ManageAsset_Leverage" xml:space="preserve">
+        <value>Alavancagem</value>
+    </data>
+    <data name="ManageAsset_LiquidationPrice" xml:space="preserve">
+        <value>Preço de Liquidação</value>
+    </data>
+    <data name="ManageAsset_IsLong" xml:space="preserve">
+        <value>Posição Comprada</value>
+    </data>
+    <data name="ManageAsset_IncludeInNetWorth" xml:space="preserve">
+        <value>Incluir no Patrimônio Líquido</value>
+    </data>
+    <data name="ManageAsset_Visible" xml:space="preserve">
+        <value>Visível</value>
+    </data>
+    <data name="ManageAsset_CheckSymbol" xml:space="preserve">
+        <value>Verificar</value>
+    </data>
+    <data name="ManageAsset_SymbolValid" xml:space="preserve">
+        <value>Símbolo encontrado</value>
+    </data>
+    <data name="ManageAsset_SymbolInvalid" xml:space="preserve">
+        <value>Símbolo não encontrado</value>
+    </data>
+    <data name="ManageAsset_CheckingSymbol" xml:space="preserve">
+        <value>Verificando...</value>
+    </data>
+    <data name="ManageAsset_YahooFinanceHelp_Line1" xml:space="preserve">
+        <value>Você pode buscar preços da API do Yahoo Finance.</value>
+    </data>
+    <data name="ManageAsset_YahooFinanceHelp_Line2" xml:space="preserve">
+        <value>Verifique o código correto do ativo no site deles, especialmente na URL. Por exemplo, para buscar preços da empresa brasileira PETR4, o código correto é PETR4.SA.</value>
+    </data>
+    <data name="ManageAsset_YahooFinanceHelp_Hint" xml:space="preserve">
+        <value>Passe o mouse para dicas do Yahoo Finance</value>
+    </data>
+    <data name="Assets.Type.Stock" xml:space="preserve">
+        <value>Ação</value>
+    </data>
+    <data name="Assets.Type.Etf" xml:space="preserve">
+        <value>ETF</value>
+    </data>
+    <data name="Assets.Type.Crypto" xml:space="preserve">
+        <value>Criptomoeda</value>
+    </data>
+    <data name="Assets.Type.Commodity" xml:space="preserve">
+        <value>Commodity</value>
+    </data>
+    <data name="Assets.Type.RealEstate" xml:space="preserve">
+        <value>Imóvel</value>
+    </data>
+    <data name="Assets.Type.LeveragedPosition" xml:space="preserve">
+        <value>Posição Alavancada</value>
+    </data>
+    <data name="Assets.Type.Custom" xml:space="preserve">
+        <value>Personalizado</value>
+    </data>
+    <data name="Assets.PriceSource.Manual" xml:space="preserve">
+        <value>Manual</value>
+    </data>
+    <data name="Assets.PriceSource.YahooFinance" xml:space="preserve">
+        <value>Yahoo Finance</value>
+    </data>
+    <data name="Assets.PriceSource.LivePrice" xml:space="preserve">
+        <value>Preço ao Vivo</value>
+    </data>
+    <data name="ManageAsset_UnderlyingAsset" xml:space="preserve">
+        <value>Ativo Subjacente</value>
+    </data>
+    <data name="ManageAsset_Bitcoin" xml:space="preserve">
+        <value>Bitcoin</value>
+    </data>
+    <data name="ManageAsset_CustomAsset" xml:space="preserve">
+        <value>Ativo Personalizado</value>
+    </data>
+    <data name="ManageAsset_Section_BasicInfo" xml:space="preserve">
+        <value>Informações Básicas</value>
+    </data>
+    <data name="ManageAsset_Section_AssetDetails" xml:space="preserve">
+        <value>Detalhes do Ativo</value>
+    </data>
+    <data name="ManageAsset_Section_Acquisition" xml:space="preserve">
+        <value>Aquisição</value>
+    </data>
+    <data name="ManageAsset_Section_Display" xml:space="preserve">
+        <value>Configurações de Exibição</value>
+    </data>
+    <data name="Error.AssetNotFound" xml:space="preserve">
+        <value>Ativo não encontrado</value>
     </data>
     <data name="Reports.MonthlyTotals.AllIncomeInFiat" xml:space="preserve">
         <value>Entradas (Total)</value>
@@ -1303,6 +1568,9 @@
     <data name="Menu_ExportTransactions" xml:space="preserve">
         <value>Exportar Transações...</value>
     </data>
+    <data name="Menu_CloseDatabase" xml:space="preserve">
+        <value>Fechar Banco de Dados</value>
+    </data>
     <data name="ImportWizard_SelectFile" xml:space="preserve">
         <value>Selecionar Arquivo CSV</value>
     </data>
@@ -1668,5 +1936,93 @@
     </data>
     <data name="Statistics_Config_ExcludedCategories" xml:space="preserve">
         <value>Categorias Excluídas</value>
+    </data>
+    <!-- Asset Card Labels -->
+    <data name="Assets_Card_Symbol" xml:space="preserve">
+        <value>Símbolo:</value>
+    </data>
+    <data name="Assets_Card_Quantity" xml:space="preserve">
+        <value>Qtd:</value>
+    </data>
+    <data name="Assets_Card_Price" xml:space="preserve">
+        <value>Preço:</value>
+    </data>
+    <data name="Assets_Card_Rent" xml:space="preserve">
+        <value>Aluguel:</value>
+    </data>
+    <data name="Assets_Card_Entry" xml:space="preserve">
+        <value>Entrada:</value>
+    </data>
+    <data name="Assets_Card_Liquidation" xml:space="preserve">
+        <value>Liq:</value>
+    </data>
+    <data name="Assets_Card_Distance" xml:space="preserve">
+        <value>Dist:</value>
+    </data>
+    <data name="Assets_Card_AtRisk" xml:space="preserve">
+        <value>EM RISCO</value>
+    </data>
+    <data name="Assets_Card_NetWorth" xml:space="preserve">
+        <value>Patrimônio</value>
+    </data>
+    <data name="Assets_AcquisitionDate" xml:space="preserve">
+        <value>Data de Aquisição</value>
+    </data>
+    <data name="Assets_AcquisitionPrice" xml:space="preserve">
+        <value>Preço de Aquisição</value>
+    </data>
+    <data name="Assets_Card_PnL" xml:space="preserve">
+        <value>L/P:</value>
+    </data>
+    <data name="Assets.Sell" xml:space="preserve">
+        <value>Vender</value>
+    </data>
+    <data name="Assets.Sell.Alert" xml:space="preserve">
+        <value>Vender Ativo</value>
+    </data>
+    <data name="Assets.Sell.Message" xml:space="preserve">
+        <value>Deseja registrar a venda deste ativo em uma transação e remover o ativo desta lista?</value>
+    </data>
+    <data name="Assets.Sell.TransactionName.Profit" xml:space="preserve">
+        <value>Lucro de {0}</value>
+    </data>
+    <data name="Assets.Sell.TransactionName.Loss" xml:space="preserve">
+        <value>Prejuízo de {0}</value>
+    </data>
+    <data name="Assets.Sell.Profit" xml:space="preserve">
+        <value>Lucro</value>
+    </data>
+    <data name="Assets.Sell.Loss" xml:space="preserve">
+        <value>Prejuízo</value>
+    </data>
+    <data name="Assets.Sell.Notes.Leveraged" xml:space="preserve">
+        <value>{0} de posição alavancada - entrada {1}, alavancagem {2}</value>
+    </data>
+    <data name="Assets.Sell.Notes.RealEstate" xml:space="preserve">
+        <value>Venda de imóvel em {0} - preço de aquisição {1}</value>
+    </data>
+    <data name="Assets.Sell.Notes.Basic" xml:space="preserve">
+        <value>Venda de {0} - preço de aquisição {1}</value>
+    </data>
+    <data name="Assets.RefreshPrices" xml:space="preserve">
+        <value>Atualizar Preços</value>
+    </data>
+    <data name="Assets.Help.Title" xml:space="preserve">
+        <value>Sobre Ativos</value>
+    </data>
+    <data name="Assets.Help.Description" xml:space="preserve">
+        <value>Acompanhe qualquer ativo do seu portfólio: ações, ETFs, criptomoedas, imóveis ou posições alavancadas.</value>
+    </data>
+    <data name="Assets.Help.NetWorth" xml:space="preserve">
+        <value>Patrimônio Líquido:</value>
+    </data>
+    <data name="Assets.Help.NetWorthDescription" xml:space="preserve">
+        <value>Ativos podem ser incluídos opcionalmente no cálculo do patrimônio líquido. Como não rastreamos valores históricos, eles não são somados diretamente aos totais das contas.</value>
+    </data>
+    <data name="Assets.Help.Selling" xml:space="preserve">
+        <value>Vendendo Ativos:</value>
+    </data>
+    <data name="Assets.Help.SellingDescription" xml:space="preserve">
+        <value>Use a opção Vender (clique direito) para registrar lucro ou prejuízo como transação nas suas contas.</value>
     </data>
 </root>

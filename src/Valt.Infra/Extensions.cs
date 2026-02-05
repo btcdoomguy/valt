@@ -8,6 +8,7 @@ using Valt.Core.Modules.Budget.Accounts.Contracts;
 using Valt.Core.Modules.Budget.Categories.Contracts;
 using Valt.Core.Modules.Budget.FixedExpenses.Contracts;
 using Valt.Core.Modules.Budget.Transactions.Contracts;
+using Valt.Core.Modules.Assets.Contracts;
 using Valt.Core.Modules.Goals.Contracts;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Bitcoin;
@@ -25,7 +26,11 @@ using Valt.Infra.Kernel.EventSystem;
 using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Kernel.Scopes;
 using Valt.Infra.Kernel.Time;
+using Valt.App.Modules.Assets.Contracts;
 using Valt.App.Modules.AvgPrice.Contracts;
+using Valt.Infra.Modules.Assets;
+using Valt.Infra.Modules.Assets.PriceProviders;
+using Valt.Infra.Modules.Assets.Queries;
 using Valt.Infra.Modules.AvgPrice;
 using Valt.Infra.Modules.AvgPrice.Queries;
 using Valt.Infra.Modules.Budget;
@@ -204,6 +209,7 @@ public static class Extensions
         services.AddSingleton<IFixedExpenseRepository, FixedExpenseRepository>();
         services.AddSingleton<ITransactionRepository, TransactionRepository>();
         services.AddSingleton<IGoalRepository, GoalRepository>();
+        services.AddSingleton<IAssetRepository, AssetRepository>();
 
         return services;
     }
@@ -216,6 +222,7 @@ public static class Extensions
         services.AddSingleton<IFixedExpenseQueries, FixedExpenseQueries>();
         services.AddSingleton<ITransactionQueries, TransactionQueries>();
         services.AddSingleton<IGoalQueries, GoalQueries>();
+        services.AddSingleton<IAssetQueries, AssetQueries>();
 
         return services;
     }
@@ -238,6 +245,11 @@ public static class Extensions
 
         //csv export
         services.AddSingleton<ICsvExportService, CsvExportService>();
+
+        //asset price providers
+        services.AddSingleton<IAssetPriceProvider, YahooFinancePriceProvider>();
+        services.AddSingleton<IAssetPriceProvider, LivePricePriceProvider>();
+        services.AddSingleton<IAssetPriceProviderSelector, AssetPriceProviderSelector>();
 
         //goals
         services.AddSingleton<IGoalTransactionReader, GoalTransactionReader>();

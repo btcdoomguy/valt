@@ -1,10 +1,12 @@
 using NSubstitute;
+using Valt.App.Modules.Assets.Contracts;
 using Valt.App.Modules.Budget.Accounts.Contracts;
 using Valt.App.Modules.Budget.Categories.Contracts;
 using Valt.App.Modules.Budget.Transactions.Contracts;
 using Valt.App.Modules.Goals.Contracts;
 using Valt.Core.Kernel.Abstractions.EventSystem;
 using Valt.Core.Kernel.Factories;
+using Valt.Core.Modules.Assets.Contracts;
 using Valt.Core.Modules.Budget.Accounts.Contracts;
 using Valt.Core.Modules.Budget.Categories.Contracts;
 using Valt.Core.Modules.Budget.FixedExpenses.Contracts;
@@ -15,6 +17,8 @@ using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
 using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Kernel.Time;
+using Valt.Infra.Modules.Assets;
+using Valt.Infra.Modules.Assets.Queries;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Accounts.Queries;
 using Valt.Infra.Modules.Budget.Categories;
@@ -48,12 +52,14 @@ public abstract class DatabaseTest
     protected IFixedExpenseRepository _fixedExpenseRepository;
     protected IGoalRepository _goalRepository;
     protected IAvgPriceRepository _avgPriceRepository;
+    protected IAssetRepository _assetRepository;
 
     // Query implementations
     protected IAccountQueries _accountQueries;
     protected ICategoryQueries _categoryQueries;
     protected ITransactionQueries _transactionQueries;
     protected IGoalQueries _goalQueries;
+    protected IAssetQueries _assetQueries;
 
     protected DatabaseTest()
     {
@@ -72,12 +78,14 @@ public abstract class DatabaseTest
         _fixedExpenseRepository = new FixedExpenseRepository(_localDatabase, _domainEventPublisher);
         _goalRepository = new GoalRepository(_localDatabase, _domainEventPublisher);
         _avgPriceRepository = new AvgPriceRepository(_localDatabase, _domainEventPublisher);
+        _assetRepository = new AssetRepository(_localDatabase, _domainEventPublisher);
 
         // Query implementations
         _categoryQueries = new CategoryQueries(_localDatabase);
         _accountQueries = new AccountQueries(_localDatabase, Substitute.For<IAccountTotalsCalculator>());
         _transactionQueries = new TransactionQueries(_localDatabase);
         _goalQueries = new GoalQueries(_localDatabase);
+        _assetQueries = new AssetQueries(_localDatabase);
     }
 
     [OneTimeSetUp]

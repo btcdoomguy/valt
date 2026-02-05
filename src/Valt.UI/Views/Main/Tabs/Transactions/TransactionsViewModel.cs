@@ -79,6 +79,10 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     private decimal _targetWealthInBtcRatio;
     private decimal _startWealthInBtcRatio;
 
+    private decimal _animatedAssetsWealth;
+    private decimal _targetAssetsWealth;
+    private decimal _startAssetsWealth;
+
     [ObservableProperty] private AvaloniaList<AccountViewModel> _accounts = new();
 
     /// <summary>
@@ -177,7 +181,9 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
             OnPropertyChanged(nameof(DisplayWealthInSats));
             OnPropertyChanged(nameof(DisplayWealthInFiat));
             OnPropertyChanged(nameof(DisplayAllWealthInFiat));
+            OnPropertyChanged(nameof(DisplayAssetsWealth));
             OnPropertyChanged(nameof(DisplayWealthInBtcRatio));
+            OnPropertyChanged(nameof(HasAssets));
 
             // Update account display for secure mode
             foreach (var account in Accounts)
@@ -199,7 +205,10 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     public string DisplayWealthInSats => _secureModeState.IsEnabled ? "---" : CurrencyDisplay.FormatSatsAsBitcoin(_animatedWealthInSats);
     public string DisplayWealthInFiat => _secureModeState.IsEnabled ? "---" : CurrencyDisplay.FormatFiat(_animatedWealthInFiat, _currencySettings?.MainFiatCurrency ?? "USD");
     public string DisplayAllWealthInFiat => _secureModeState.IsEnabled ? "---" : CurrencyDisplay.FormatFiat(_animatedAllWealthInFiat, _currencySettings?.MainFiatCurrency ?? "USD");
+    public string DisplayAssetsWealth => _secureModeState.IsEnabled ? "---" : CurrencyDisplay.FormatFiat(_animatedAssetsWealth, _currencySettings?.MainFiatCurrency ?? "USD");
     public string DisplayWealthInBtcRatio => _secureModeState.IsEnabled ? "---" : _animatedWealthInBtcRatio.ToString("F1", CultureInfo.InvariantCulture) + "%";
+    public bool HasAssets => _accountsTotalState?.CurrentWealth.AssetsWealthInMainFiatCurrency != 0 ||
+                             _accountsTotalState?.CurrentWealth.AssetsWealthInSats != 0;
 
     private void AccountsTotalStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -221,33 +230,40 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
                 _accountsTotalState.CurrentWealth.WealthInBtcRatio.ToString(CultureInfo.InvariantCulture) + "%";
 
             // Start animation to new target values
+            // Note: DisplayAllWealthInFiat now shows NetWorth (accounts + assets)
             StartWealthAnimation(
                 _accountsTotalState.CurrentWealth.WealthInSats,
                 _accountsTotalState.CurrentWealth.WealthInMainFiatCurrency,
-                _accountsTotalState.CurrentWealth.AllWealthInMainFiatCurrency,
-                _accountsTotalState.CurrentWealth.WealthInBtcRatio);
+                _accountsTotalState.CurrentWealth.NetWorthInMainFiatCurrency,
+                _accountsTotalState.CurrentWealth.WealthInBtcRatio,
+                _accountsTotalState.CurrentWealth.AssetsWealthInMainFiatCurrency);
+
+            OnPropertyChanged(nameof(HasAssets));
         });
     }
 
-    private void StartWealthAnimation(long targetSats, decimal targetFiat, decimal targetAllFiat, decimal targetRatio)
+    private void StartWealthAnimation(long targetSats, decimal targetFiat, decimal targetAllFiat, decimal targetRatio, decimal targetAssets)
     {
         // Store current animated values as start values
         _startWealthInSats = _animatedWealthInSats;
         _startWealthInFiat = _animatedWealthInFiat;
         _startAllWealthInFiat = _animatedAllWealthInFiat;
         _startWealthInBtcRatio = _animatedWealthInBtcRatio;
+        _startAssetsWealth = _animatedAssetsWealth;
 
         // Set target values
         _targetWealthInSats = targetSats;
         _targetWealthInFiat = targetFiat;
         _targetAllWealthInFiat = targetAllFiat;
         _targetWealthInBtcRatio = targetRatio;
+        _targetAssetsWealth = targetAssets;
 
         // If all values are the same, no need to animate
         if (_startWealthInSats == _targetWealthInSats &&
             _startWealthInFiat == _targetWealthInFiat &&
             _startAllWealthInFiat == _targetAllWealthInFiat &&
-            _startWealthInBtcRatio == _targetWealthInBtcRatio)
+            _startWealthInBtcRatio == _targetWealthInBtcRatio &&
+            _startAssetsWealth == _targetAssetsWealth)
         {
             return;
         }
@@ -272,6 +288,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         var currentFiat = _startWealthInFiat + (decimal)easedProgress * (_targetWealthInFiat - _startWealthInFiat);
         var currentAllFiat = _startAllWealthInFiat + (decimal)easedProgress * (_targetAllWealthInFiat - _startAllWealthInFiat);
         var currentRatio = _startWealthInBtcRatio + (decimal)easedProgress * (_targetWealthInBtcRatio - _startWealthInBtcRatio);
+        var currentAssets = _startAssetsWealth + (decimal)easedProgress * (_targetAssetsWealth - _startAssetsWealth);
 
         Dispatcher.UIThread.Post(() =>
         {
@@ -279,10 +296,12 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
             _animatedWealthInFiat = currentFiat;
             _animatedAllWealthInFiat = currentAllFiat;
             _animatedWealthInBtcRatio = currentRatio;
+            _animatedAssetsWealth = currentAssets;
 
             OnPropertyChanged(nameof(DisplayWealthInSats));
             OnPropertyChanged(nameof(DisplayWealthInFiat));
             OnPropertyChanged(nameof(DisplayAllWealthInFiat));
+            OnPropertyChanged(nameof(DisplayAssetsWealth));
             OnPropertyChanged(nameof(DisplayWealthInBtcRatio));
         });
 

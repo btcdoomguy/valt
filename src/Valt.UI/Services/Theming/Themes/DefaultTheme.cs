@@ -52,7 +52,7 @@ public static class DefaultTheme
         resources["Background400Color"] = Color.Parse("#a6a6a6");
         resources["Background500Color"] = Color.Parse("#808080");
         resources["Background600Color"] = Color.Parse("#666666");
-        resources["Background700Color"] = Color.Parse("#4d4d4d");
+        resources["Background700Color"] = Color.Parse("#414141");
         resources["Background800Color"] = Color.Parse("#333333");
         resources["Background900Color"] = Color.Parse("#1a1a1a");
 

@@ -8,4 +8,10 @@ public interface IBackgroundJob
     TimeSpan Interval { get; }
     Task StartAsync(CancellationToken stoppingToken);
     Task RunAsync(CancellationToken stoppingToken);
+
+    /// <summary>
+    /// Resets any internal state that should be cleared when the job is stopped.
+    /// Default implementation does nothing. Override to clear cached state.
+    /// </summary>
+    void ResetState() { }
 }

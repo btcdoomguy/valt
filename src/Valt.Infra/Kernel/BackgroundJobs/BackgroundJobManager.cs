@@ -73,10 +73,31 @@ public sealed class BackgroundJobManager : IAsyncDisposable
     {
         foreach (var token in _ctsMap.Values)
             await token.CancelAsync();
-        
+
         var tasks = _jobInfos.Values
             .Select(j => j.StopAsync());
         await Task.WhenAll(tasks);
+    }
+
+    public async Task StopJobsByTypeAsync(BackgroundJobTypes jobType)
+    {
+        // Cancel the CancellationTokenSource for this job type
+        if (_ctsMap.TryGetValue(jobType, out var cts))
+        {
+            await cts.CancelAsync();
+            _ctsMap.Remove(jobType);
+        }
+
+        // Stop all jobs of this type
+        var jobsOfType = _jobInfos.Where(x => x.Key.JobType == jobType).ToList();
+        var stopTasks = jobsOfType.Select(x => x.Value.StopAsync());
+        await Task.WhenAll(stopTasks);
+
+        // Reset state on all stopped jobs so they start fresh next time
+        foreach (var job in jobsOfType)
+        {
+            job.Key.ResetState();
+        }
     }
 
     private CancellationToken GetCancellationToken(BackgroundJobTypes jobType)
@@ -120,7 +141,7 @@ public sealed class JobInfo : IStatusItem, IAsyncDisposable
     private static readonly TimeSpan RetryDelay = TimeSpan.FromMilliseconds(100);
 
     private readonly IBackgroundJob _job;
-    private readonly Channel<JobExecutionRequest> _channel;
+    private Channel<JobExecutionRequest> _channel;
     private readonly JobLogPool _logPool = new();
     private Task? _consumerTask;
     private Timer? _periodicTimer;
@@ -130,7 +151,12 @@ public sealed class JobInfo : IStatusItem, IAsyncDisposable
     public JobInfo(IBackgroundJob job)
     {
         _job = job;
-        _channel = Channel.CreateBounded<JobExecutionRequest>(
+        _channel = CreateChannel();
+    }
+
+    private static Channel<JobExecutionRequest> CreateChannel()
+    {
+        return Channel.CreateBounded<JobExecutionRequest>(
             new BoundedChannelOptions(1)
             {
                 FullMode = BoundedChannelFullMode.DropWrite,
@@ -172,6 +198,9 @@ public sealed class JobInfo : IStatusItem, IAsyncDisposable
     public void Start(CancellationToken token)
     {
         if (_consumerTask != null) return;
+
+        // Recreate channel if it was completed during a previous stop
+        _channel = CreateChannel();
 
         _cts = CancellationTokenSource.CreateLinkedTokenSource(token);
 

@@ -72,6 +72,8 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     private readonly DisplaySettings _displaySettings = null!;
     private readonly TabRefreshState _tabRefreshState = null!;
     private readonly ILocalStorageService _localStorageService = null!;
+    private readonly AccountsTotalState _accountsTotalState = null!;
+    private readonly FilterState _filterState = null!;
 
     public MainView? Window { get; set; }
 
@@ -83,10 +85,11 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         ? new GridLength(30)
         : new GridLength(0);
 
-    [ObservableProperty] 
+    [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsTransactionButtonSelected))]
     [NotifyPropertyChangedFor(nameof(IsReportButtonSelected))]
     [NotifyPropertyChangedFor(nameof(IsAvgPriceButtonSelected))]
+    [NotifyPropertyChangedFor(nameof(IsAssetsButtonSelected))]
     private ValtTabViewModel? _selectedTabComponent;
 
     public bool IsTransactionButtonSelected =>
@@ -94,9 +97,12 @@ public partial class MainViewModel : ValtViewModel, IDisposable
 
     public bool IsReportButtonSelected =>
         SelectedTabComponent?.TabName == MainViewTabNames.ReportsPageContent;
-    
+
     public bool IsAvgPriceButtonSelected =>
         SelectedTabComponent?.TabName == MainViewTabNames.AvgPricePageContent;
+
+    public bool IsAssetsButtonSelected =>
+        SelectedTabComponent?.TabName == MainViewTabNames.AssetsPageContent;
 
     [ObservableProperty] private string _statusDisplay = string.Empty;
 
@@ -192,7 +198,9 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         McpServerState mcpServerState,
         DisplaySettings displaySettings,
         TabRefreshState tabRefreshState,
-        ILocalStorageService localStorageService)
+        ILocalStorageService localStorageService,
+        AccountsTotalState accountsTotalState,
+        FilterState filterState)
     {
         _pageFactory = pageFactory;
         _modalFactory = modalFactory;
@@ -214,6 +222,8 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         _displaySettings = displaySettings;
         _tabRefreshState = tabRefreshState;
         _localStorageService = localStorageService;
+        _accountsTotalState = accountsTotalState;
+        _filterState = filterState;
 
         _localDatabase.PropertyChanged += LocalDatabaseOnPropertyChanged;
         _mcpServerState.PropertyChanged += McpServerStateOnPropertyChanged;
@@ -290,6 +300,19 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         {
             await SelectedTabComponent.RefreshAsync();
             _tabRefreshState.ClearRefresh(MainViewTabNames.AvgPricePageContent);
+        }
+    }
+
+    [RelayCommand]
+    private async Task SetAssetsTab()
+    {
+        var needsRefresh = _tabRefreshState.NeedsRefresh(MainViewTabNames.AssetsPageContent);
+        SelectedTabComponent = _pageFactory.Create(MainViewTabNames.AssetsPageContent);
+
+        if (needsRefresh && SelectedTabComponent is not null)
+        {
+            await SelectedTabComponent.RefreshAsync();
+            _tabRefreshState.ClearRefresh(MainViewTabNames.AssetsPageContent);
         }
     }
 
@@ -376,6 +399,42 @@ public partial class MainViewModel : ValtViewModel, IDisposable
 
         var csv = await _csvExportService.ExportTransactionsAsync();
         await File.WriteAllTextAsync(result.Path.LocalPath, csv);
+    }
+
+    [RelayCommand]
+    private async Task CloseDatabase()
+    {
+        // 1. Clear the selected tab first to stop ViewModels from fetching data
+        SelectedTabComponent = null;
+
+        // 2. Give UI thread time to process the tab removal
+        await Task.Delay(100);
+
+        // 3. Stop MCP server (depends on database)
+        if (_mcpServerService is not null && _mcpServerState.IsRunning)
+        {
+            await _mcpServerService.StopAsync();
+        }
+
+        // 4. Stop all background jobs (both ValtDatabase and PriceDatabase)
+        await _backgroundJobManager!.StopJobsByTypeAsync(BackgroundJobTypes.ValtDatabase);
+        await _backgroundJobManager!.StopJobsByTypeAsync(BackgroundJobTypes.PriceDatabase);
+
+        // 5. Close both databases
+        _localDatabase!.CloseDatabase();
+        _priceDatabase.CloseDatabase();
+
+        // 6. Reset all UI state
+        _accountsTotalState.Reset();
+        _filterState.Reset();
+        _secureModeState.Reset();
+        _tabRefreshState.ClearAll();
+
+        // 7. Update UI
+        OnPropertyChanged(nameof(SecureModeIcon));
+
+        // 8. Navigate back to initial selection modal
+        await OpenInitialSelectionModal();
     }
 
     [RelayCommand]
@@ -488,7 +547,16 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             }
 
             openedFile = true;
-            SetTransactionsTab();
+
+            // Initialize filter state with current date for the new database
+            _filterState.MainDate = DateTime.Now;
+
+            // Set the transactions tab and force refresh to load data from the new database
+            SelectedTabComponent = _pageFactory.Create(MainViewTabNames.TransactionsPageContent);
+            if (SelectedTabComponent is not null)
+            {
+                await SelectedTabComponent.RefreshAsync();
+            }
 
             // Store the password hash for secure mode verification
             _secureModeState.SetPassword(result.Password);

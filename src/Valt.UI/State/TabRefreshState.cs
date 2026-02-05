@@ -19,6 +19,9 @@ public partial class TabRefreshState : ObservableObject
     [ObservableProperty]
     private bool _avgPriceNeedsRefresh;
 
+    [ObservableProperty]
+    private bool _assetsNeedsRefresh;
+
     public bool NeedsRefresh(MainViewTabNames tab)
     {
         lock (_lock)
@@ -28,6 +31,7 @@ public partial class TabRefreshState : ObservableObject
                 MainViewTabNames.TransactionsPageContent => TransactionsNeedsRefresh,
                 MainViewTabNames.ReportsPageContent => ReportsNeedsRefresh,
                 MainViewTabNames.AvgPricePageContent => AvgPriceNeedsRefresh,
+                MainViewTabNames.AssetsPageContent => AssetsNeedsRefresh,
                 _ => false
             };
         }
@@ -42,6 +46,7 @@ public partial class TabRefreshState : ObservableObject
                 TransactionsNeedsRefresh = true;
                 ReportsNeedsRefresh = true;
                 AvgPriceNeedsRefresh = true;
+                AssetsNeedsRefresh = true;
             });
         }
     }
@@ -63,7 +68,24 @@ public partial class TabRefreshState : ObservableObject
                     case MainViewTabNames.AvgPricePageContent:
                         AvgPriceNeedsRefresh = false;
                         break;
+                    case MainViewTabNames.AssetsPageContent:
+                        AssetsNeedsRefresh = false;
+                        break;
                 }
+            });
+        }
+    }
+
+    public void ClearAll()
+    {
+        lock (_lock)
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                TransactionsNeedsRefresh = false;
+                ReportsNeedsRefresh = false;
+                AvgPriceNeedsRefresh = false;
+                AssetsNeedsRefresh = false;
             });
         }
     }

@@ -14,6 +14,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Assets.Queries.GetVisibleAssets;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Modules.Budget.Accounts;
@@ -34,6 +36,7 @@ using static Valt.UI.Base.TaskExtensions;
 using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.State;
+using Valt.UI.State.Events;
 using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Modals.StatisticsConfig;
 using Valt.UI.Views.Main.Tabs.Reports.Models;
@@ -58,6 +61,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly SecureModeState _secureModeState = null!;
     private readonly IConfigurationManager _configurationManager = null!;
     private readonly IModalFactory _modalFactory = null!;
+    private readonly IQueryDispatcher _queryDispatcher = null!;
 
     private const long TotalBtcSupplySats = 21_000_000_00_000_000L; // 21 million BTC in sats
 
@@ -67,6 +71,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private DashboardData _wealthData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _allTimeHighData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _btcStackData = DashboardData.Empty;
+    [ObservableProperty] private DashboardData _leveragePositionsData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _statisticsData = DashboardData.Empty;
     [ObservableProperty] private AvaloniaList<MonthlyReportItemViewModel> _monthlyReportItems = new();
     [ObservableProperty] private MonthlyTotalsChartData _monthlyTotalsChartData = new();
@@ -81,6 +86,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private bool _isWealthLoading = true;
     [ObservableProperty] private bool _isAllTimeHighLoading = true;
     [ObservableProperty] private bool _isBtcStackLoading = true;
+    [ObservableProperty] private bool _isLeveragePositionsLoading = true;
+    [ObservableProperty] private bool _isLeveragePositionsVisible;
     [ObservableProperty] private bool _isStatisticsLoading = true;
     [ObservableProperty] private bool _isMonthlyTotalsLoading = true;
     [ObservableProperty] private bool _isSpendingByCategoriesLoading = true;
@@ -123,7 +130,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         RatesState ratesState,
         SecureModeState secureModeState,
         IConfigurationManager configurationManager,
-        IModalFactory modalFactory)
+        IModalFactory modalFactory,
+        IQueryDispatcher queryDispatcher)
     {
         _allTimeHighReport = allTimeHighReport;
         _monthlyTotalsReport = monthlyTotalsReport;
@@ -141,6 +149,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _secureModeState = secureModeState;
         _configurationManager = configurationManager;
         _modalFactory = modalFactory;
+        _queryDispatcher = queryDispatcher;
 
         _secureModeState.PropertyChanged += OnSecureModeStatePropertyChanged;
 
@@ -176,6 +185,11 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         _accountsTotalState.PropertyChanged += OnAccountsTotalStatePropertyChanged;
 
+        WeakReferenceMessenger.Default.Register<AssetSummaryUpdatedMessage>(this, (recipient, message) =>
+        {
+            UpdateLeveragePositionsDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateLeveragePositionsDataAsync));
+        });
+
         _ready = true;
     }
 
@@ -198,6 +212,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         LoadDataAndFetchAllReportsAsync().SafeFireAndForget(logger: _logger, callerName: nameof(LoadDataAndFetchAllReportsAsync));
         UpdateWealthData();
         UpdateBtcStackData();
+        UpdateLeveragePositionsDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateLeveragePositionsDataAsync));
     }
 
     /// <summary>
@@ -422,6 +437,24 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     allTimeHighData.MaxDrawdownDate.Value.ToString()));
             }
 
+            // Add BTC price to hit ATH calculation
+            var currentWealth = _accountsTotalState.CurrentWealth;
+            var currentFiat = currentWealth.WealthInMainFiatCurrency;
+            var currentBtcInBtc = currentWealth.WealthInSats / 100_000_000m;
+
+            if (currentBtcInBtc > 0)
+            {
+                var targetAthValue = allTimeHighData.Value.Value;
+                var requiredBtcPriceValue = targetAthValue - currentFiat;
+
+                if (requiredBtcPriceValue > 0)
+                {
+                    var requiredBtcPrice = requiredBtcPriceValue / currentBtcInBtc;
+                    rows.Add(new RowItem(language.Reports_AllTimeHigh_BtcPriceToHitAth,
+                        CurrencyDisplay.FormatFiat(requiredBtcPrice, fiatCurrency.Code)));
+                }
+            }
+
             AllTimeHighData = new DashboardData(language.Reports_AllTimeHigh_Title, rows);
 
             IsAllTimeHighLoading = false;
@@ -551,10 +584,10 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             var wealth = _accountsTotalState.CurrentWealth;
             var fiatCurrency = FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency);
 
-            var totalInBtc = CurrencyDisplay.FormatSatsAsBitcoin(wealth.AllWealthInSats);
+            var totalInBtc = CurrencyDisplay.FormatSatsAsBitcoin(wealth.NetWorthInSats);
             var btcWealth = CurrencyDisplay.FormatSatsAsBitcoin(wealth.WealthInSats);
             var fiatWealth = CurrencyDisplay.FormatFiat(wealth.WealthInMainFiatCurrency, fiatCurrency.Code);
-            var totalInFiat = CurrencyDisplay.FormatFiat(wealth.AllWealthInMainFiatCurrency, fiatCurrency.Code);
+            var totalInFiat = CurrencyDisplay.FormatFiat(wealth.NetWorthInMainFiatCurrency, fiatCurrency.Code);
             var btcRatio = wealth.WealthInBtcRatio.ToString(CultureInfo.InvariantCulture) + "%";
 
             var rows = new ObservableCollection<RowItem>
@@ -562,9 +595,17 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 new(language.Transactions_Total, totalInBtc + " BTC", language.Reports_Wealth_TotalInBtc_Tooltip),
                 new(language.Transactions_TotalInFiat, totalInFiat),
                 new(language.Transactions_MyStack, btcWealth + " BTC"),
-                new(language.Transactions_MyOther, fiatWealth),
-                new(language.Transactions_Ratio, btcRatio)
+                new(language.Transactions_MyOther, fiatWealth)
             };
+
+            // Add assets line if there are any assets (positive or negative)
+            if (wealth.AssetsWealthInMainFiatCurrency != 0 || wealth.AssetsWealthInSats != 0)
+            {
+                var assetsWealth = CurrencyDisplay.FormatFiat(wealth.AssetsWealthInMainFiatCurrency, fiatCurrency.Code);
+                rows.Add(new RowItem(language.Reports_Wealth_MyAssets, assetsWealth));
+            }
+
+            rows.Add(new RowItem(language.Transactions_Ratio, btcRatio));
 
             WealthData = new DashboardData(language.Reports_Wealth_Title, rows);
             IsWealthLoading = false;
@@ -613,6 +654,95 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         {
             _logger.LogError(ex, "Error updating BTC stack data");
             IsBtcStackLoading = false;
+        }
+    }
+
+    private async Task UpdateLeveragePositionsDataAsync()
+    {
+        try
+        {
+            IsLeveragePositionsLoading = true;
+
+            var assets = await _queryDispatcher.DispatchAsync(new GetVisibleAssetsQuery());
+
+            // Filter to leveraged positions that are visible and included in net worth
+            var leveragedPositions = assets
+                .Where(a => a.IsLong.HasValue && a.IncludeInNetWorth && a.Visible)
+                .ToList();
+
+            if (leveragedPositions.Count == 0)
+            {
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    IsLeveragePositionsVisible = false;
+                    IsLeveragePositionsLoading = false;
+                });
+                return;
+            }
+
+            var wealth = _accountsTotalState.CurrentWealth;
+            var btcSpotSats = wealth.WealthInSats;
+
+            // Calculate BTC exposure from leveraged positions
+            decimal totalBtcExposure = 0;
+            foreach (var position in leveragedPositions)
+            {
+                if (!position.Collateral.HasValue || !position.Leverage.HasValue || !position.EntryPrice.HasValue || position.EntryPrice.Value == 0)
+                    continue;
+
+                // Notional value = Collateral * Leverage
+                var notionalValue = position.Collateral.Value * position.Leverage.Value;
+                // BTC exposure = Notional / Entry Price
+                var btcExposure = notionalValue / position.EntryPrice.Value;
+
+                // Apply direction: Long = positive, Short = negative
+                if (!position.IsLong!.Value)
+                    btcExposure = -btcExposure;
+
+                totalBtcExposure += btcExposure;
+            }
+
+            // Convert BTC exposure to sats
+            var exposureSats = (long)(totalBtcExposure * 100_000_000m);
+
+            // Leveraged stack = BTC spot + exposure from leverage
+            var leveragedStackSats = btcSpotSats + exposureSats;
+
+            // Calculate leverage percentage: |exposure| / |leveraged stack| * 100
+            decimal leveragePercentage = 0;
+            if (leveragedStackSats != 0)
+            {
+                leveragePercentage = Math.Abs(totalBtcExposure) / Math.Abs(leveragedStackSats / 100_000_000m) * 100m;
+            }
+
+            var leveragedStackFormatted = CurrencyDisplay.FormatSatsAsBitcoin(leveragedStackSats) + " BTC";
+            var exposureFormatted = (totalBtcExposure >= 0 ? "+" : "") + totalBtcExposure.ToString("0.########") + " BTC";
+            var leveragePercentFormatted = leveragePercentage.ToString("0.##") + "%";
+            var positionCountFormatted = leveragedPositions.Count.ToString();
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                var rows = new ObservableCollection<RowItem>
+                {
+                    new(language.Reports_LeveragePositions_LeveragedStack, leveragedStackFormatted, language.Reports_LeveragePositions_LeveragedStack_Tooltip),
+                    new(language.Reports_LeveragePositions_LeverageExposure, exposureFormatted),
+                    new(language.Reports_LeveragePositions_LeveragePercentage, leveragePercentFormatted, language.Reports_LeveragePositions_LeveragePercentage_Tooltip),
+                    new(language.Reports_LeveragePositions_PositionCount, positionCountFormatted)
+                };
+
+                LeveragePositionsData = new DashboardData(language.Reports_LeveragePositions_Title, rows);
+                IsLeveragePositionsVisible = true;
+                IsLeveragePositionsLoading = false;
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating leverage positions data");
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                IsLeveragePositionsVisible = false;
+                IsLeveragePositionsLoading = false;
+            });
         }
     }
 
@@ -761,6 +891,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         {
             Dispatcher.UIThread.Post(UpdateWealthData);
             Dispatcher.UIThread.Post(UpdateBtcStackData);
+            UpdateLeveragePositionsDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateLeveragePositionsDataAsync));
         }
     }
 
@@ -783,6 +914,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _accountsTotalState.PropertyChanged -= OnAccountsTotalStatePropertyChanged;
 
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
+        WeakReferenceMessenger.Default.Unregister<AssetSummaryUpdatedMessage>(this);
 
         MonthlyTotalsChartData.Dispose();
         ExpensesByCategoryChartData.Dispose();

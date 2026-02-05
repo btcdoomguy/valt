@@ -14,6 +14,7 @@ For detailed documentation on specific modules, see:
 - **[AvgPrice Module](.claude/docs/avgprice.md)** - Cost basis tracking (BrazilianRule, FIFO)
 - **[Goals Module](.claude/docs/goals.md)** - Financial goal tracking with auto-progress
 - **[Fixed Expenses Module](.claude/docs/fixedexpenses.md)** - Recurring expense management
+- **[Assets Module](.claude/docs/assets.md)** - External investments (stocks, ETFs, crypto, real estate, leveraged positions)
 
 ## Build and Run Commands
 
@@ -33,11 +34,19 @@ dotnet test --filter "FullyQualifiedName~Valt.Tests.Domain.Budget.Transactions.T
   - `Modules/Budget/` - Accounts, Categories, Transactions, FixedExpenses
   - `Modules/AvgPrice/` - Cost basis tracking
   - `Modules/Goals/` - Financial goals
+  - `Modules/Assets/` - External investments
   - `Common/` - Value objects (`BtcValue`, `FiatValue`, `FiatCurrency`, `Icon`)
+
+- **Valt.App** - Application layer: CQRS commands, queries, and business orchestration. See [CQRS Architecture](#cqrs-architecture).
+  - `Kernel/` - Command/Query dispatchers, validation, Result type
+  - `Modules/Budget/` - Account, Category, Transaction, FixedExpense commands and queries
+  - `Modules/AvgPrice/` - Cost basis profile commands and queries
+  - `Modules/Goals/` - Goal commands and queries
+  - `Modules/Assets/` - Asset commands and queries
 
 - **Valt.Infra** - Infrastructure layer: persistence, external services
   - `DataAccess/` - LiteDB database access
-  - `Modules/` - Repositories, queries, DTOs, reports
+  - `Modules/` - Repositories, queries, reports
   - `Crawlers/` - Price providers (Kraken, Coinbase, Frankfurter)
   - `Kernel/BackgroundJobs/` - Periodic tasks
   - `Services/` - Updates, CSV import
@@ -52,10 +61,134 @@ dotnet test --filter "FullyQualifiedName~Valt.Tests.Domain.Budget.Transactions.T
 ### Key Patterns
 
 - **MVVM**: ViewModels inherit from `ValtViewModel` (CommunityToolkit.Mvvm)
+- **CQRS**: Commands and Queries through `ICommandDispatcher` and `IQueryDispatcher`
 - **Domain Events**: Aggregate roots emit events via `AddEvent()`, published through `IDomainEventPublisher`
 - **Factory Pattern**: `IModalFactory`, `IPageFactory` for view creation
 - **Strategy Pattern**: `IAvgPriceCalculationStrategy`, `IGoalProgressCalculator`
 - **Weak Messaging**: `WeakReferenceMessenger` for loosely coupled updates
+
+### CQRS Architecture
+
+**IMPORTANT: Always use the Valt.App layer for new modules and features.** The App layer implements CQRS (Command Query Responsibility Segregation) pattern to separate read and write operations.
+
+#### Commands (Write Operations)
+
+Commands modify data and are located in `Valt.App/Modules/{Module}/Commands/`:
+
+```csharp
+// Command definition
+public sealed class CreateAssetCommand : ICommand<string>  // Returns asset ID
+{
+    public required string Name { get; init; }
+    public required string CurrencyCode { get; init; }
+    // ... other properties
+}
+
+// Validator
+internal sealed class CreateAssetValidator : IValidator<CreateAssetCommand>
+{
+    public ValidationResult Validate(CreateAssetCommand command)
+    {
+        var errors = new List<ValidationError>();
+        if (string.IsNullOrWhiteSpace(command.Name))
+            errors.Add(new("Name", "Name is required"));
+        return new ValidationResult(errors.Count == 0, errors);
+    }
+}
+
+// Handler
+internal sealed class CreateAssetHandler : ICommandHandler<CreateAssetCommand, string>
+{
+    public async Task<Result<string>> HandleAsync(CreateAssetCommand command, CancellationToken ct)
+    {
+        var validation = _validator.Validate(command);
+        if (!validation.IsValid)
+            return Result<string>.Failure(new Error("VALIDATION_FAILED", "...", validation.Errors));
+
+        // Domain logic here
+        return Result<string>.Success(asset.Id.Value);
+    }
+}
+```
+
+For commands that don't return a value, use `ICommand<Unit>` and `ICommandHandler<TCommand, Unit>`.
+
+#### Queries (Read Operations)
+
+Queries read data and are located in `Valt.App/Modules/{Module}/Queries/`:
+
+```csharp
+// Query definition
+public sealed class GetAssetsQuery : IQuery<IReadOnlyList<AssetDTO>> { }
+
+// Handler
+internal sealed class GetAssetsHandler : IQueryHandler<GetAssetsQuery, IReadOnlyList<AssetDTO>>
+{
+    public async Task<IReadOnlyList<AssetDTO>> HandleAsync(GetAssetsQuery query, CancellationToken ct)
+    {
+        return await _assetQueries.GetAllAsync();
+    }
+}
+```
+
+#### DTOs
+
+DTOs for commands and queries are defined in `Valt.App/Modules/{Module}/DTOs/`. Use records with required init properties:
+
+```csharp
+public sealed record AssetDTO
+{
+    public required string Id { get; init; }
+    public required string Name { get; init; }
+    // ... other properties
+}
+```
+
+#### Using Dispatchers in ViewModels
+
+ViewModels should use `ICommandDispatcher` and `IQueryDispatcher` instead of direct repository access:
+
+```csharp
+public class AssetsViewModel
+{
+    private readonly IQueryDispatcher _queryDispatcher;
+    private readonly ICommandDispatcher _commandDispatcher;
+
+    public async Task LoadAsync()
+    {
+        var assets = await _queryDispatcher.DispatchAsync(new GetAssetsQuery());
+    }
+
+    public async Task DeleteAsync(string id)
+    {
+        var result = await _commandDispatcher.DispatchAsync(new DeleteAssetCommand { AssetId = id });
+        if (result.IsFailure)
+        {
+            await ShowError(result.Error!.Message);
+            return;
+        }
+        await LoadAsync();
+    }
+}
+```
+
+#### Result Type
+
+Commands return `Result<T>` for railway-oriented error handling:
+
+```csharp
+var result = await _commandDispatcher.DispatchAsync(command);
+if (result.IsFailure)
+{
+    // Handle error: result.Error contains code and message
+    return;
+}
+// Use result.Value
+```
+
+#### Registration
+
+Commands and queries are auto-registered via `Valt.App.Extensions.AddApplication()` which scans for implementations.
 
 ### Important: Cross-Layer Impact
 
@@ -120,6 +253,7 @@ src/Valt.Infra/Mcp/
     │   ├── TransactionTools.cs  # Transaction CRUD operations
     │   ├── CategoryTools.cs     # Category CRUD operations
     │   └── FixedExpenseTools.cs # Fixed expense operations
+    ├── AssetTools.cs            # Asset management operations
     ├── AvgPriceTools.cs         # Cost basis profile operations
     ├── GoalTools.cs             # Financial goal operations
     ├── ReportTools.cs           # Financial reports
@@ -279,7 +413,14 @@ src/
 │   ├── Modules/Budget/  # Accounts, Categories, Transactions, FixedExpenses
 │   ├── Modules/AvgPrice/# Cost basis tracking
 │   ├── Modules/Goals/   # Financial goals
+│   ├── Modules/Assets/  # External investments
 │   └── Common/          # Value objects
+├── Valt.App/            # Application layer (CQRS)
+│   ├── Kernel/          # Command/Query dispatchers, validation, Result type
+│   ├── Modules/Budget/  # Account, Category, Transaction commands/queries
+│   ├── Modules/AvgPrice/# AvgPrice commands/queries
+│   ├── Modules/Goals/   # Goal commands/queries
+│   └── Modules/Assets/  # Asset commands/queries
 ├── Valt.Infra/          # Infrastructure layer
 │   ├── DataAccess/      # LiteDB, migrations
 │   ├── Modules/         # Repositories, queries, reports
