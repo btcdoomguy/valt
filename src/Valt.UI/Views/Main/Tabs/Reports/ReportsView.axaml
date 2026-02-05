@@ -59,6 +59,15 @@
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    IsVisible="{Binding IsBtcStackLoading}" />
                     </Grid>
+                    <!-- Leverage Positions Dashboard -->
+                    <Grid MinHeight="150" IsVisible="{Binding IsLeveragePositionsVisible}">
+                        <Panel IsVisible="{Binding !IsLeveragePositionsLoading}">
+                            <reports1:DashboardDataUserControl DataContext="{Binding LeveragePositionsData}" />
+                        </Panel>
+                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   IsVisible="{Binding IsLeveragePositionsLoading}" />
+                    </Grid>
                     <!-- Statistics Dashboard -->
                     <Grid MinHeight="150">
                         <Panel IsVisible="{Binding !IsStatisticsLoading}">

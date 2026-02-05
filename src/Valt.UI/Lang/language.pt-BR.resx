@@ -280,7 +280,7 @@
         <value>Remover do Grupo</value>
     </data>
     <data name="Transactions.Total" xml:space="preserve">
-        <value>Total em BTC</value>
+        <value>Total (em BTC)</value>
     </data>
     <data name="Transactions.ViewAllAccounts" xml:space="preserve">
         <value>Ver todas as contas</value>
@@ -478,7 +478,7 @@
         <value>% à Vista em BTC</value>
     </data>
     <data name="Transactions.TotalInFiat" xml:space="preserve">
-        <value>Total</value>
+        <value>Total (em Fiat)</value>
     </data>
     <data name="Yes" xml:space="preserve">
         <value>Sim</value>
@@ -794,6 +794,27 @@
     </data>
     <data name="Reports.BtcStack.PeopleWithSameStack.Tooltip" xml:space="preserve">
         <value>Quantidade máxima de pessoas que podem ter o mesmo stack que você</value>
+    </data>
+    <data name="Reports.LeveragePositions.Title" xml:space="preserve">
+        <value>Posicoes Alavancadas</value>
+    </data>
+    <data name="Reports.LeveragePositions.LeveragedStack" xml:space="preserve">
+        <value>Stack Alavancado</value>
+    </data>
+    <data name="Reports.LeveragePositions.LeveragedStack.Tooltip" xml:space="preserve">
+        <value>Seu BTC spot mais sua exposicao efetiva de BTC em posicoes alavancadas</value>
+    </data>
+    <data name="Reports.LeveragePositions.LeverageExposure" xml:space="preserve">
+        <value>Exposicao de Alavancagem</value>
+    </data>
+    <data name="Reports.LeveragePositions.LeveragePercentage" xml:space="preserve">
+        <value>% de Alavancagem</value>
+    </data>
+    <data name="Reports.LeveragePositions.LeveragePercentage.Tooltip" xml:space="preserve">
+        <value>Percentual do seu stack alavancado que vem de alavancagem</value>
+    </data>
+    <data name="Reports.LeveragePositions.PositionCount" xml:space="preserve">
+        <value>Posicoes Ativas</value>
     </data>
     <data name="Reports.Statistics.Title" xml:space="preserve">
         <value>Estatísticas</value>

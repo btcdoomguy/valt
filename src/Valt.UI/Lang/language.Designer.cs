@@ -1598,7 +1598,7 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.AllTimeHigh.MaxDrawdownPercent", resourceCulture);
             }
         }
-
+        
         public static string Reports_AllTimeHigh_BtcPriceToHitAth {
             get {
                 return ResourceManager.GetString("Reports.AllTimeHigh.BtcPriceToHitAth", resourceCulture);
@@ -1616,25 +1616,25 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.Wealth.TotalInBtc.Tooltip", resourceCulture);
             }
         }
-
+        
         public static string Reports_Wealth_MyAssets {
             get {
                 return ResourceManager.GetString("Reports.Wealth.MyAssets", resourceCulture);
             }
         }
-
+        
         public static string Reports_Wealth_NetWorth {
             get {
                 return ResourceManager.GetString("Reports.Wealth.NetWorth", resourceCulture);
             }
         }
-
+        
         public static string Reports_Wealth_NetWorthInSats {
             get {
                 return ResourceManager.GetString("Reports.Wealth.NetWorthInSats", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcStack_Title {
             get {
                 return ResourceManager.GetString("Reports.BtcStack.Title", resourceCulture);
@@ -1662,6 +1662,48 @@ namespace Valt.UI.Lang {
         public static string Reports_BtcStack_PeopleWithSameStack_Tooltip {
             get {
                 return ResourceManager.GetString("Reports.BtcStack.PeopleWithSameStack.Tooltip", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LeveragePositions_Title {
+            get {
+                return ResourceManager.GetString("Reports.LeveragePositions.Title", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LeveragePositions_LeveragedStack {
+            get {
+                return ResourceManager.GetString("Reports.LeveragePositions.LeveragedStack", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LeveragePositions_LeveragedStack_Tooltip {
+            get {
+                return ResourceManager.GetString("Reports.LeveragePositions.LeveragedStack.Tooltip", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LeveragePositions_LeverageExposure {
+            get {
+                return ResourceManager.GetString("Reports.LeveragePositions.LeverageExposure", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LeveragePositions_LeveragePercentage {
+            get {
+                return ResourceManager.GetString("Reports.LeveragePositions.LeveragePercentage", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LeveragePositions_LeveragePercentage_Tooltip {
+            get {
+                return ResourceManager.GetString("Reports.LeveragePositions.LeveragePercentage.Tooltip", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LeveragePositions_PositionCount {
+            get {
+                return ResourceManager.GetString("Reports.LeveragePositions.PositionCount", resourceCulture);
             }
         }
         
@@ -1820,265 +1862,433 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Main.AvgPrice", resourceCulture);
             }
         }
-
+        
         public static string Main_Assets {
             get {
                 return ResourceManager.GetString("Main.Assets", resourceCulture);
             }
         }
-
+        
         public static string Assets_Add {
             get {
                 return ResourceManager.GetString("Assets.Add", resourceCulture);
             }
         }
-
+        
         public static string Assets_Edit {
             get {
                 return ResourceManager.GetString("Assets.Edit", resourceCulture);
             }
         }
-
+        
         public static string Assets_Delete {
             get {
                 return ResourceManager.GetString("Assets.Delete", resourceCulture);
             }
         }
-
+        
         public static string Assets_Delete_Alert {
             get {
                 return ResourceManager.GetString("Assets.Delete.Alert", resourceCulture);
             }
         }
-
+        
         public static string Assets_Delete_Message {
             get {
                 return ResourceManager.GetString("Assets.Delete.Message", resourceCulture);
             }
         }
-
-        public static string Assets_Sell {
-            get {
-                return ResourceManager.GetString("Assets.Sell", resourceCulture);
-            }
-        }
-
-        public static string Assets_Sell_Alert {
-            get {
-                return ResourceManager.GetString("Assets.Sell.Alert", resourceCulture);
-            }
-        }
-
-        public static string Assets_Sell_Message {
-            get {
-                return ResourceManager.GetString("Assets.Sell.Message", resourceCulture);
-            }
-        }
-
-        public static string Assets_Sell_TransactionName_Profit {
-            get {
-                return ResourceManager.GetString("Assets.Sell.TransactionName.Profit", resourceCulture);
-            }
-        }
-
-        public static string Assets_Sell_TransactionName_Loss {
-            get {
-                return ResourceManager.GetString("Assets.Sell.TransactionName.Loss", resourceCulture);
-            }
-        }
-
-        public static string Assets_Sell_Profit {
-            get {
-                return ResourceManager.GetString("Assets.Sell.Profit", resourceCulture);
-            }
-        }
-
-        public static string Assets_Sell_Loss {
-            get {
-                return ResourceManager.GetString("Assets.Sell.Loss", resourceCulture);
-            }
-        }
-
-        public static string Assets_Sell_Notes_Leveraged {
-            get {
-                return ResourceManager.GetString("Assets.Sell.Notes.Leveraged", resourceCulture);
-            }
-        }
-
-        public static string Assets_Sell_Notes_RealEstate {
-            get {
-                return ResourceManager.GetString("Assets.Sell.Notes.RealEstate", resourceCulture);
-            }
-        }
-
-        public static string Assets_Sell_Notes_Basic {
-            get {
-                return ResourceManager.GetString("Assets.Sell.Notes.Basic", resourceCulture);
-            }
-        }
-
-        public static string Assets_RefreshPrices {
-            get {
-                return ResourceManager.GetString("Assets.RefreshPrices", resourceCulture);
-            }
-        }
-
+        
         public static string Assets_ToggleVisibility {
             get {
                 return ResourceManager.GetString("Assets.ToggleVisibility", resourceCulture);
             }
         }
-
+        
         public static string Assets_ToggleNetWorth {
             get {
                 return ResourceManager.GetString("Assets.ToggleNetWorth", resourceCulture);
             }
         }
-
+        
         public static string Assets_Column_Name {
             get {
                 return ResourceManager.GetString("Assets.Column.Name", resourceCulture);
             }
         }
-
+        
         public static string Assets_Column_Type {
             get {
                 return ResourceManager.GetString("Assets.Column.Type", resourceCulture);
             }
         }
-
+        
         public static string Assets_Column_Symbol {
             get {
                 return ResourceManager.GetString("Assets.Column.Symbol", resourceCulture);
             }
         }
-
+        
         public static string Assets_Column_Quantity {
             get {
                 return ResourceManager.GetString("Assets.Column.Quantity", resourceCulture);
             }
         }
-
+        
         public static string Assets_Column_Price {
             get {
                 return ResourceManager.GetString("Assets.Column.Price", resourceCulture);
             }
         }
-
+        
         public static string Assets_Column_Value {
             get {
                 return ResourceManager.GetString("Assets.Column.Value", resourceCulture);
             }
         }
-
+        
         public static string Assets_Column_PnL {
             get {
                 return ResourceManager.GetString("Assets.Column.PnL", resourceCulture);
             }
         }
-
+        
         public static string Assets_Column_Visible {
             get {
                 return ResourceManager.GetString("Assets.Column.Visible", resourceCulture);
             }
         }
-
+        
         public static string Assets_Column_NetWorth {
             get {
                 return ResourceManager.GetString("Assets.Column.NetWorth", resourceCulture);
             }
         }
-
+        
         public static string Assets_Summary_Title {
             get {
                 return ResourceManager.GetString("Assets.Summary.Title", resourceCulture);
             }
         }
-
+        
         public static string Assets_Summary_TotalAssets {
             get {
                 return ResourceManager.GetString("Assets.Summary.TotalAssets", resourceCulture);
             }
         }
-
+        
         public static string Assets_Summary_InNetWorth {
             get {
                 return ResourceManager.GetString("Assets.Summary.InNetWorth", resourceCulture);
             }
         }
-
+        
         public static string Assets_Summary_TotalValue {
             get {
                 return ResourceManager.GetString("Assets.Summary.TotalValue", resourceCulture);
             }
         }
-
+        
         public static string Assets_Summary_TotalSats {
             get {
                 return ResourceManager.GetString("Assets.Summary.TotalSats", resourceCulture);
             }
         }
-
+        
         public static string Assets_Details_Title {
             get {
                 return ResourceManager.GetString("Assets.Details.Title", resourceCulture);
             }
         }
-
+        
         public static string Assets_Leverage {
             get {
                 return ResourceManager.GetString("Assets.Leverage", resourceCulture);
             }
         }
-
+        
         public static string Assets_EntryPrice {
             get {
                 return ResourceManager.GetString("Assets.EntryPrice", resourceCulture);
             }
         }
-
+        
         public static string Assets_Collateral {
             get {
                 return ResourceManager.GetString("Assets.Collateral", resourceCulture);
             }
         }
-
+        
         public static string Assets_Liquidation {
             get {
                 return ResourceManager.GetString("Assets.Liquidation", resourceCulture);
             }
         }
-
+        
         public static string Assets_DistanceToLiq {
             get {
                 return ResourceManager.GetString("Assets.DistanceToLiq", resourceCulture);
             }
         }
-
+        
         public static string Assets_PnL {
             get {
                 return ResourceManager.GetString("Assets.PnL", resourceCulture);
             }
         }
-
+        
         public static string Assets_AtRisk {
             get {
                 return ResourceManager.GetString("Assets.AtRisk", resourceCulture);
             }
         }
-
+        
         public static string Assets_Address {
             get {
                 return ResourceManager.GetString("Assets.Address", resourceCulture);
             }
         }
-
+        
         public static string Assets_RentalIncome {
             get {
                 return ResourceManager.GetString("Assets.RentalIncome", resourceCulture);
             }
         }
-
+        
+        public static string ManageAsset_Title {
+            get {
+                return ResourceManager.GetString("ManageAsset_Title", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_Name {
+            get {
+                return ResourceManager.GetString("ManageAsset_Name", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_AssetType {
+            get {
+                return ResourceManager.GetString("ManageAsset_AssetType", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_Currency {
+            get {
+                return ResourceManager.GetString("ManageAsset_Currency", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_Symbol {
+            get {
+                return ResourceManager.GetString("ManageAsset_Symbol", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_Quantity {
+            get {
+                return ResourceManager.GetString("ManageAsset_Quantity", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_CurrentPrice {
+            get {
+                return ResourceManager.GetString("ManageAsset_CurrentPrice", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_CurrentValue {
+            get {
+                return ResourceManager.GetString("ManageAsset_CurrentValue", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_PriceSource {
+            get {
+                return ResourceManager.GetString("ManageAsset_PriceSource", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_Address {
+            get {
+                return ResourceManager.GetString("ManageAsset_Address", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_RentalIncome {
+            get {
+                return ResourceManager.GetString("ManageAsset_RentalIncome", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_Collateral {
+            get {
+                return ResourceManager.GetString("ManageAsset_Collateral", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_EntryPrice {
+            get {
+                return ResourceManager.GetString("ManageAsset_EntryPrice", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_Leverage {
+            get {
+                return ResourceManager.GetString("ManageAsset_Leverage", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_LiquidationPrice {
+            get {
+                return ResourceManager.GetString("ManageAsset_LiquidationPrice", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_IsLong {
+            get {
+                return ResourceManager.GetString("ManageAsset_IsLong", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_IncludeInNetWorth {
+            get {
+                return ResourceManager.GetString("ManageAsset_IncludeInNetWorth", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_Visible {
+            get {
+                return ResourceManager.GetString("ManageAsset_Visible", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_CheckSymbol {
+            get {
+                return ResourceManager.GetString("ManageAsset_CheckSymbol", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_SymbolValid {
+            get {
+                return ResourceManager.GetString("ManageAsset_SymbolValid", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_SymbolInvalid {
+            get {
+                return ResourceManager.GetString("ManageAsset_SymbolInvalid", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_CheckingSymbol {
+            get {
+                return ResourceManager.GetString("ManageAsset_CheckingSymbol", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_YahooFinanceHelp_Line1 {
+            get {
+                return ResourceManager.GetString("ManageAsset_YahooFinanceHelp_Line1", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_YahooFinanceHelp_Line2 {
+            get {
+                return ResourceManager.GetString("ManageAsset_YahooFinanceHelp_Line2", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_YahooFinanceHelp_Hint {
+            get {
+                return ResourceManager.GetString("ManageAsset_YahooFinanceHelp_Hint", resourceCulture);
+            }
+        }
+        
+        public static string Assets_Type_Stock {
+            get {
+                return ResourceManager.GetString("Assets.Type.Stock", resourceCulture);
+            }
+        }
+        
+        public static string Assets_Type_Etf {
+            get {
+                return ResourceManager.GetString("Assets.Type.Etf", resourceCulture);
+            }
+        }
+        
+        public static string Assets_Type_Crypto {
+            get {
+                return ResourceManager.GetString("Assets.Type.Crypto", resourceCulture);
+            }
+        }
+        
+        public static string Assets_Type_Commodity {
+            get {
+                return ResourceManager.GetString("Assets.Type.Commodity", resourceCulture);
+            }
+        }
+        
+        public static string Assets_Type_RealEstate {
+            get {
+                return ResourceManager.GetString("Assets.Type.RealEstate", resourceCulture);
+            }
+        }
+        
+        public static string Assets_Type_LeveragedPosition {
+            get {
+                return ResourceManager.GetString("Assets.Type.LeveragedPosition", resourceCulture);
+            }
+        }
+        
+        public static string Assets_Type_Custom {
+            get {
+                return ResourceManager.GetString("Assets.Type.Custom", resourceCulture);
+            }
+        }
+        
+        public static string Assets_PriceSource_Manual {
+            get {
+                return ResourceManager.GetString("Assets.PriceSource.Manual", resourceCulture);
+            }
+        }
+        
+        public static string Assets_PriceSource_YahooFinance {
+            get {
+                return ResourceManager.GetString("Assets.PriceSource.YahooFinance", resourceCulture);
+            }
+        }
+        
+        public static string Assets_PriceSource_LivePrice {
+            get {
+                return ResourceManager.GetString("Assets.PriceSource.LivePrice", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_UnderlyingAsset {
+            get {
+                return ResourceManager.GetString("ManageAsset_UnderlyingAsset", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_Bitcoin {
+            get {
+                return ResourceManager.GetString("ManageAsset_Bitcoin", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_CustomAsset {
+            get {
+                return ResourceManager.GetString("ManageAsset_CustomAsset", resourceCulture);
+            }
+        }
+        
+        public static string Error_AssetNotFound {
+            get {
+                return ResourceManager.GetString("Error.AssetNotFound", resourceCulture);
+            }
+        }
+        
         public static string Reports_MonthlyTotals_AllIncomeInFiat {
             get {
                 return ResourceManager.GetString("Reports.MonthlyTotals.AllIncomeInFiat", resourceCulture);
@@ -2444,13 +2654,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("InitialSelection.FirstMessage", resourceCulture);
             }
         }
-
+        
         public static string InitialSelection_Remove {
             get {
                 return ResourceManager.GetString("InitialSelection.Remove", resourceCulture);
             }
         }
-
+        
         public static string JobLogViewer_Title {
             get {
                 return ResourceManager.GetString("JobLogViewer.Title", resourceCulture);
@@ -2906,13 +3116,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Menu_ExportTransactions", resourceCulture);
             }
         }
-
+        
         public static string Menu_CloseDatabase {
             get {
                 return ResourceManager.GetString("Menu_CloseDatabase", resourceCulture);
             }
         }
-
+        
         public static string ImportWizard_SelectFile {
             get {
                 return ResourceManager.GetString("ImportWizard_SelectFile", resourceCulture);
@@ -3218,241 +3428,7 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Error.GoalNotFound", resourceCulture);
             }
         }
-
-        public static string Error_AssetNotFound {
-            get {
-                return ResourceManager.GetString("Error.AssetNotFound", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_Title {
-            get {
-                return ResourceManager.GetString("ManageAsset_Title", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_Name {
-            get {
-                return ResourceManager.GetString("ManageAsset_Name", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_AssetType {
-            get {
-                return ResourceManager.GetString("ManageAsset_AssetType", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_Currency {
-            get {
-                return ResourceManager.GetString("ManageAsset_Currency", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_Symbol {
-            get {
-                return ResourceManager.GetString("ManageAsset_Symbol", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_Quantity {
-            get {
-                return ResourceManager.GetString("ManageAsset_Quantity", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_CurrentPrice {
-            get {
-                return ResourceManager.GetString("ManageAsset_CurrentPrice", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_CurrentValue {
-            get {
-                return ResourceManager.GetString("ManageAsset_CurrentValue", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_PriceSource {
-            get {
-                return ResourceManager.GetString("ManageAsset_PriceSource", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_Address {
-            get {
-                return ResourceManager.GetString("ManageAsset_Address", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_RentalIncome {
-            get {
-                return ResourceManager.GetString("ManageAsset_RentalIncome", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_Collateral {
-            get {
-                return ResourceManager.GetString("ManageAsset_Collateral", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_EntryPrice {
-            get {
-                return ResourceManager.GetString("ManageAsset_EntryPrice", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_Leverage {
-            get {
-                return ResourceManager.GetString("ManageAsset_Leverage", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_LiquidationPrice {
-            get {
-                return ResourceManager.GetString("ManageAsset_LiquidationPrice", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_IsLong {
-            get {
-                return ResourceManager.GetString("ManageAsset_IsLong", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_IncludeInNetWorth {
-            get {
-                return ResourceManager.GetString("ManageAsset_IncludeInNetWorth", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_Visible {
-            get {
-                return ResourceManager.GetString("ManageAsset_Visible", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_CheckSymbol {
-            get {
-                return ResourceManager.GetString("ManageAsset_CheckSymbol", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_SymbolValid {
-            get {
-                return ResourceManager.GetString("ManageAsset_SymbolValid", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_SymbolInvalid {
-            get {
-                return ResourceManager.GetString("ManageAsset_SymbolInvalid", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_CheckingSymbol {
-            get {
-                return ResourceManager.GetString("ManageAsset_CheckingSymbol", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_YahooFinanceHelp_Line1 {
-            get {
-                return ResourceManager.GetString("ManageAsset_YahooFinanceHelp_Line1", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_YahooFinanceHelp_Line2 {
-            get {
-                return ResourceManager.GetString("ManageAsset_YahooFinanceHelp_Line2", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_YahooFinanceHelp_Hint {
-            get {
-                return ResourceManager.GetString("ManageAsset_YahooFinanceHelp_Hint", resourceCulture);
-            }
-        }
-
-        public static string Assets_Type_Stock {
-            get {
-                return ResourceManager.GetString("Assets.Type.Stock", resourceCulture);
-            }
-        }
-
-        public static string Assets_Type_Etf {
-            get {
-                return ResourceManager.GetString("Assets.Type.Etf", resourceCulture);
-            }
-        }
-
-        public static string Assets_Type_Crypto {
-            get {
-                return ResourceManager.GetString("Assets.Type.Crypto", resourceCulture);
-            }
-        }
-
-        public static string Assets_Type_Commodity {
-            get {
-                return ResourceManager.GetString("Assets.Type.Commodity", resourceCulture);
-            }
-        }
-
-        public static string Assets_Type_RealEstate {
-            get {
-                return ResourceManager.GetString("Assets.Type.RealEstate", resourceCulture);
-            }
-        }
-
-        public static string Assets_Type_LeveragedPosition {
-            get {
-                return ResourceManager.GetString("Assets.Type.LeveragedPosition", resourceCulture);
-            }
-        }
-
-        public static string Assets_Type_Custom {
-            get {
-                return ResourceManager.GetString("Assets.Type.Custom", resourceCulture);
-            }
-        }
-
-        public static string Assets_PriceSource_Manual {
-            get {
-                return ResourceManager.GetString("Assets.PriceSource.Manual", resourceCulture);
-            }
-        }
-
-        public static string Assets_PriceSource_YahooFinance {
-            get {
-                return ResourceManager.GetString("Assets.PriceSource.YahooFinance", resourceCulture);
-            }
-        }
-
-        public static string Assets_PriceSource_LivePrice {
-            get {
-                return ResourceManager.GetString("Assets.PriceSource.LivePrice", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_UnderlyingAsset {
-            get {
-                return ResourceManager.GetString("ManageAsset_UnderlyingAsset", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_Bitcoin {
-            get {
-                return ResourceManager.GetString("ManageAsset_Bitcoin", resourceCulture);
-            }
-        }
-
-        public static string ManageAsset_CustomAsset {
-            get {
-                return ResourceManager.GetString("ManageAsset_CustomAsset", resourceCulture);
-            }
-        }
-
+        
         public static string GoalPeriod_Monthly {
             get {
                 return ResourceManager.GetString("GoalPeriod_Monthly", resourceCulture);
@@ -3818,94 +3794,160 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("McpNotification_Title", resourceCulture);
             }
         }
-
+        
         public static string Statistics_Config_Title {
             get {
                 return ResourceManager.GetString("Statistics_Config_Title", resourceCulture);
             }
         }
-
+        
         public static string Statistics_Config_Description {
             get {
                 return ResourceManager.GetString("Statistics_Config_Description", resourceCulture);
             }
         }
-
+        
         public static string Statistics_Config_ExcludedCategories {
             get {
                 return ResourceManager.GetString("Statistics_Config_ExcludedCategories", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_Symbol {
             get {
                 return ResourceManager.GetString("Assets_Card_Symbol", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_Quantity {
             get {
                 return ResourceManager.GetString("Assets_Card_Quantity", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_Price {
             get {
                 return ResourceManager.GetString("Assets_Card_Price", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_Rent {
             get {
                 return ResourceManager.GetString("Assets_Card_Rent", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_Entry {
             get {
                 return ResourceManager.GetString("Assets_Card_Entry", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_Liquidation {
             get {
                 return ResourceManager.GetString("Assets_Card_Liquidation", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_Distance {
             get {
                 return ResourceManager.GetString("Assets_Card_Distance", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_AtRisk {
             get {
                 return ResourceManager.GetString("Assets_Card_AtRisk", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_NetWorth {
             get {
                 return ResourceManager.GetString("Assets_Card_NetWorth", resourceCulture);
             }
         }
-
+        
         public static string Assets_AcquisitionDate {
             get {
                 return ResourceManager.GetString("Assets_AcquisitionDate", resourceCulture);
             }
         }
-
+        
         public static string Assets_AcquisitionPrice {
             get {
                 return ResourceManager.GetString("Assets_AcquisitionPrice", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_PnL {
             get {
                 return ResourceManager.GetString("Assets_Card_PnL", resourceCulture);
+            }
+        }
+        
+        public static string Assets_Sell {
+            get {
+                return ResourceManager.GetString("Assets.Sell", resourceCulture);
+            }
+        }
+        
+        public static string Assets_Sell_Alert {
+            get {
+                return ResourceManager.GetString("Assets.Sell.Alert", resourceCulture);
+            }
+        }
+        
+        public static string Assets_Sell_Message {
+            get {
+                return ResourceManager.GetString("Assets.Sell.Message", resourceCulture);
+            }
+        }
+        
+        public static string Assets_Sell_TransactionName_Profit {
+            get {
+                return ResourceManager.GetString("Assets.Sell.TransactionName.Profit", resourceCulture);
+            }
+        }
+        
+        public static string Assets_Sell_TransactionName_Loss {
+            get {
+                return ResourceManager.GetString("Assets.Sell.TransactionName.Loss", resourceCulture);
+            }
+        }
+        
+        public static string Assets_Sell_Profit {
+            get {
+                return ResourceManager.GetString("Assets.Sell.Profit", resourceCulture);
+            }
+        }
+        
+        public static string Assets_Sell_Loss {
+            get {
+                return ResourceManager.GetString("Assets.Sell.Loss", resourceCulture);
+            }
+        }
+        
+        public static string Assets_Sell_Notes_Leveraged {
+            get {
+                return ResourceManager.GetString("Assets.Sell.Notes.Leveraged", resourceCulture);
+            }
+        }
+        
+        public static string Assets_Sell_Notes_RealEstate {
+            get {
+                return ResourceManager.GetString("Assets.Sell.Notes.RealEstate", resourceCulture);
+            }
+        }
+        
+        public static string Assets_Sell_Notes_Basic {
+            get {
+                return ResourceManager.GetString("Assets.Sell.Notes.Basic", resourceCulture);
+            }
+        }
+        
+        public static string Assets_RefreshPrices {
+            get {
+                return ResourceManager.GetString("Assets.RefreshPrices", resourceCulture);
             }
         }
     }
