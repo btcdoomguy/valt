@@ -78,7 +78,7 @@
                                            VerticalAlignment="Center"
                                            IsVisible="{Binding !IsRefreshingPrices}" />
                                 <!-- Sync icon rotated (shown when refreshing) -->
-                                <TextBlock Text="&#xE8DF;"
+                                <TextBlock Text="&#xE627;"
                                            FontFamily="{StaticResource MaterialDesign}"
                                            FontSize="18"
                                            HorizontalAlignment="Center"

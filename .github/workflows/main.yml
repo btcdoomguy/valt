@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write     # Required for softprops/action-gh-release
+      contents: write       # Required for softprops/action-gh-release
       id-token: write       # Required for artifact attestations (OIDC)
       attestations: write   # Required for artifact attestations
 

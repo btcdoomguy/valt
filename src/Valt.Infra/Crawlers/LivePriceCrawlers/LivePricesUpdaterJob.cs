@@ -69,7 +69,7 @@ internal class LivePricesUpdaterJob : IBackgroundJob
             }
 
             // Skip if price database is not open or empty
-            if (!_priceDatabase.HasDatabaseOpen || _priceDatabase.GetFiatData().Query().Count() == 0)
+            if (!_priceDatabase.HasDatabaseOpen || !_priceDatabase.GetFiatData().Exists(x => true))
             {
                 _logger.LogInformation("[LivePricesUpdaterJob] Price database is empty, skipping update");
                 return;
@@ -140,7 +140,7 @@ internal class LivePricesUpdaterJob : IBackgroundJob
             }
 
             if (refreshLastPrice && _priceDatabase.HasDatabaseOpen &&
-                _priceDatabase.GetBitcoinData().Query().Count() > 0)
+                _priceDatabase.GetBitcoinData().Exists(x => true))
             {
                 var lastDateParsed = _priceDatabase.GetBitcoinData().Max(x => x.Date).Date;
                 var previousPrice =
@@ -177,7 +177,7 @@ internal class LivePricesUpdaterJob : IBackgroundJob
             return;
         }
 
-        if (_priceDatabase.GetBitcoinData().Query().Count() == 0)
+        if (!_priceDatabase.GetBitcoinData().Exists(x => true))
         {
             _logger.LogError("[LivePricesUpdaterJob] Bitcoin history not loaded");
             return;

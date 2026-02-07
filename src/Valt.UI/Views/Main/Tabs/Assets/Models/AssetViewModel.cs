@@ -85,7 +85,7 @@ public partial class AssetViewModel : ObservableObject
     public string PositionDirection => IsLong == true ? "Long" : "Short";
     public string PnLColor => PnL >= 0 ? "#4CAF50" : "#F44336";
     public string AtRiskIndicator => IsAtRisk ? "!" : "";
-    public string ValueColor => CurrentValue >= 0 ? "#4CAF50" : "#F44336";
+    public string ValueColor => (IsLeveragedPosition ? PnL ?? 0 : CurrentValue) >= 0 ? "#4CAF50" : "#F44336";
     public bool IsNegativeValue => CurrentValue < 0;
 
     // Card display properties (darker tones for white text readability)

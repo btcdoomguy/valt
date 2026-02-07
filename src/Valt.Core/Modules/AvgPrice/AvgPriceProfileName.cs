@@ -18,7 +18,7 @@ public record AvgPriceProfileName
             throw new EmptyAvgPriceProfileException();
 
         if (value.Length > 30)
-            throw new MaximumFieldLengthException(nameof(AvgPriceProfileName), 20);
+            throw new MaximumFieldLengthException(nameof(AvgPriceProfileName), 30);
 
         return new AvgPriceProfileName(value);
     }

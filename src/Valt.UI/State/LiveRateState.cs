@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
@@ -110,7 +111,7 @@ public partial class LiveRateState : ObservableObject, IRecipient<RatesUpdated>,
 
             if (refreshLastPrice)
             {
-                RefreshLastPrice();
+                _ = RefreshLastPriceAsync();
             }
 
             if (_lastFiatClosingPrice is not null && PreviousUsdPrice != _lastFiatClosingPrice.Value)
@@ -133,7 +134,7 @@ public partial class LiveRateState : ObservableObject, IRecipient<RatesUpdated>,
         }
     }
 
-    private void RefreshLastPrice()
+    private async Task RefreshLastPriceAsync()
     {
         try
         {
@@ -143,8 +144,8 @@ public partial class LiveRateState : ObservableObject, IRecipient<RatesUpdated>,
                 .Max(x => x.Date)
                 .Date;
             var previousPrice =
-                _localHistoricalPriceProvider.GetFiatRateAtAsync(DateOnly.FromDateTime(lastDateParsed),
-                    FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency)).GetAwaiter().GetResult();
+                await _localHistoricalPriceProvider.GetFiatRateAtAsync(DateOnly.FromDateTime(lastDateParsed),
+                    FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency));
 
             _lastFiatClosingDate = DateOnly.FromDateTime(lastDateParsed);
             _lastFiatClosingPrice = previousPrice;
