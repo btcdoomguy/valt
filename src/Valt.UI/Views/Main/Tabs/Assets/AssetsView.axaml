@@ -117,7 +117,7 @@
                                         Height="299"
                                         Margin="0,0,12,12"
                                         CornerRadius="4"
-                                        BorderThickness="1"
+                                        BorderThickness="3"
                                         Classes="AssetCard"
                                         Classes.selected="{Binding IsSelected}"
                                         Background="{DynamicResource AssetCardBackgroundBrush}"
