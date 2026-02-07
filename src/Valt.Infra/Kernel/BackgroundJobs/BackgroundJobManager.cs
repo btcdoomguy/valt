@@ -159,7 +159,7 @@ public sealed class JobInfo : IStatusItem, IAsyncDisposable
         return Channel.CreateBounded<JobExecutionRequest>(
             new BoundedChannelOptions(1)
             {
-                FullMode = BoundedChannelFullMode.DropWrite,
+                FullMode = BoundedChannelFullMode.Wait,
                 SingleReader = true,
                 SingleWriter = false
             });
