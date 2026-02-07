@@ -678,6 +678,8 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         _wealthAnimationTimer?.Dispose();
         _wealthAnimationTimer = null;
 
+        _transactionListViewModel?.Dispose();
+
         if (_accountsTotalState is not null)
             _accountsTotalState.PropertyChanged -= AccountsTotalStateOnPropertyChanged;
 

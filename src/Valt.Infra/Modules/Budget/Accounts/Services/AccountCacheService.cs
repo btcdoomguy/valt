@@ -21,6 +21,9 @@ internal class AccountCacheService : IAccountCacheService
         var accountObjectId = accountId.AsObjectId();
         var account = _localDatabase.GetAccounts().FindById(accountObjectId);
 
+        if (account is null)
+            return;
+
         _localDatabase.GetAccountCaches().Delete(accountObjectId);
 
         // Single query to get all transactions for this account (as From or To)

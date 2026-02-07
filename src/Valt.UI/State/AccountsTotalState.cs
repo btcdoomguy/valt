@@ -53,12 +53,25 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
 
     public void Receive(RatesUpdated message)
     {
-        RefreshAssetSummaryAsync().ContinueWith(_ => OnPropertyChanged(nameof(CurrentWealth)));
+        _ = RefreshAndNotifyAsync();
     }
 
     public void Receive(AssetSummaryUpdatedMessage message)
     {
-        RefreshAssetSummaryAsync().ContinueWith(_ => OnPropertyChanged(nameof(CurrentWealth)));
+        _ = RefreshAndNotifyAsync();
+    }
+
+    private async Task RefreshAndNotifyAsync()
+    {
+        try
+        {
+            await RefreshAssetSummaryAsync();
+            OnPropertyChanged(nameof(CurrentWealth));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[AccountsTotalState] Error refreshing and notifying");
+        }
     }
 
     /// <summary>

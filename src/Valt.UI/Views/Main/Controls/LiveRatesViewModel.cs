@@ -17,6 +17,10 @@ namespace Valt.UI.Views.Main.Controls;
 
 public partial class LiveRatesViewModel : ObservableObject, IDisposable
 {
+    private static readonly SolidColorBrush NeutralBrush = new(Colors.White);
+    private static readonly SolidColorBrush PositiveBrush = new(Colors.LightGreen);
+    private static readonly SolidColorBrush NegativeBrush = new(Colors.Red);
+
     private readonly CurrencySettings _currencySettings;
     private readonly LiveRateState _liveRateState = null!;
     private readonly ILocalDatabase _localDatabase = null!;
@@ -76,11 +80,11 @@ public partial class LiveRatesViewModel : ObservableObject, IDisposable
         get
         {
             if (PreviousBtcUsdPrice is null)
-                return new SolidColorBrush(Colors.White);
-            
+                return NeutralBrush;
+
             var variation = Math.Round((decimal)((BtcUsdPrice - PreviousBtcUsdPrice.Value) / PreviousBtcUsdPrice.Value * 100), 2);
-            
-            return variation >= 0 ? new SolidColorBrush(Colors.LightGreen) : new SolidColorBrush(Colors.Red);
+
+            return variation >= 0 ? PositiveBrush : NegativeBrush;
         }
     }
     
@@ -105,11 +109,11 @@ public partial class LiveRatesViewModel : ObservableObject, IDisposable
         get
         {
             if (PreviousBtcFiatPrice is null)
-                return new SolidColorBrush(Colors.White);
-            
+                return NeutralBrush;
+
             var variation = Math.Round((decimal)((BtcFiatPrice - PreviousBtcFiatPrice.Value) / PreviousBtcFiatPrice.Value * 100), 2);
-            
-            return variation >= 0 ? new SolidColorBrush(Colors.LightGreen) : new SolidColorBrush(Colors.Red);
+
+            return variation >= 0 ? PositiveBrush : NegativeBrush;
         }
     }
     
@@ -134,11 +138,11 @@ public partial class LiveRatesViewModel : ObservableObject, IDisposable
         get
         {
             if (PreviousUsdPrice is null || PreviousUsdPrice.Value == 0m)
-                return new SolidColorBrush(Colors.White);
-            
+                return NeutralBrush;
+
             var variation = Math.Round((decimal)((UsdPrice - PreviousUsdPrice.Value) / PreviousUsdPrice.Value * 100), 2);
-            
-            return variation >= 0 ? new SolidColorBrush(Colors.LightGreen) : new SolidColorBrush(Colors.Red);
+
+            return variation >= 0 ? PositiveBrush : NegativeBrush;
         }
     }
 

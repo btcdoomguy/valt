@@ -30,12 +30,12 @@ public class FixedExpenseQueries(ILocalDatabase localDatabase) : IFixedExpenseQu
     {
         var data = localDatabase.GetFixedExpenses().FindAll().ToList();
 
-        var allAccounts = localDatabase.GetAccounts().FindAll().ToList();
-        var allCategories = localDatabase.GetCategories().FindAll().ToList();
+        var accountsById = localDatabase.GetAccounts().FindAll().ToDictionary(x => x.Id);
+        var categoriesById = localDatabase.GetCategories().FindAll().ToDictionary(x => x.Id);
 
         var dto = data.Select(entity => ConvertToDto(entity,
-            allAccounts.SingleOrDefault(x => x.Id == entity.DefaultAccountId),
-            allCategories.SingleOrDefault(x => x.Id == entity.CategoryId)!));
+            entity.DefaultAccountId is not null && accountsById.TryGetValue(entity.DefaultAccountId, out var account) ? account : null,
+            entity.CategoryId is not null && categoriesById.TryGetValue(entity.CategoryId, out var category) ? category : null));
 
         return Task.FromResult(dto);
     }
@@ -60,12 +60,13 @@ public class FixedExpenseQueries(ILocalDatabase localDatabase) : IFixedExpenseQu
         if (fixedExpense is null)
             return Task.FromResult<FixedExpenseHistoryDTO?>(null);
 
-        // Load accounts and categories once - reuse throughout the method
-        var allAccounts = localDatabase.GetAccounts().FindAll().ToList();
-        var allCategories = localDatabase.GetCategories().FindAll().ToList();
+        // Load accounts and categories once - use dictionaries for O(1) lookups
+        var accountsById = localDatabase.GetAccounts().FindAll().ToDictionary(x => x.Id);
+        var categoriesById = localDatabase.GetCategories().FindAll().ToDictionary(x => x.Id);
 
         var account = fixedExpense.DefaultAccountId is not null
-            ? allAccounts.SingleOrDefault(a => a.Id == fixedExpense.DefaultAccountId)
+            && accountsById.TryGetValue(fixedExpense.DefaultAccountId, out var defaultAccount)
+            ? defaultAccount
             : null;
 
         var displayCurrency = fixedExpense.Currency ?? account?.Currency ?? "USD";
@@ -81,8 +82,10 @@ public class FixedExpenseQueries(ILocalDatabase localDatabase) : IFixedExpenseQu
             .Select(record =>
             {
                 var transaction = record.Transaction!;
-                var transactionAccount = allAccounts.SingleOrDefault(a => a.Id == transaction.FromAccountId);
-                var category = allCategories.SingleOrDefault(c => c.Id == transaction.CategoryId);
+                var transactionAccount = transaction.FromAccountId is not null
+                    && accountsById.TryGetValue(transaction.FromAccountId, out var txAccount) ? txAccount : null;
+                var category = transaction.CategoryId is not null
+                    && categoriesById.TryGetValue(transaction.CategoryId, out var txCategory) ? txCategory : null;
 
                 var amount = transaction.FromFiatAmount is not null
                     ? CurrencyDisplay.FormatFiat(transaction.FromFiatAmount.Value, transactionAccount?.Currency ?? displayCurrency)

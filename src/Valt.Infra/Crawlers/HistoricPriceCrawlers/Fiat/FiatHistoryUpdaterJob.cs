@@ -192,10 +192,10 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
 
         try
         {
-            var transactions = _localDatabase.GetTransactions().FindAll().ToList();
-            if (transactions.Count > 0)
+            var hasTransactions = _localDatabase.GetTransactions().Exists(x => true);
+            if (hasTransactions)
             {
-                var lowestTransactionDate = transactions.Min(x => x.Date);
+                var lowestTransactionDate = _localDatabase.GetTransactions().Min(x => x.Date);
                 if (lowestTransactionDate < startDate)
                 {
                     startDate = lowestTransactionDate;
@@ -216,11 +216,10 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
     {
         try
         {
-            var fiatData = _priceDatabase.GetFiatData().FindAll().ToList();
-            if (fiatData.Count == 0)
+            if (!_priceDatabase.GetFiatData().Exists(x => true))
                 return (null, null);
 
-            return (fiatData.Min(x => x.Date), fiatData.Max(x => x.Date));
+            return (_priceDatabase.GetFiatData().Min(x => x.Date), _priceDatabase.GetFiatData().Max(x => x.Date));
         }
         catch (Exception)
         {
