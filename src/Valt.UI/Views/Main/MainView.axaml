@@ -26,6 +26,7 @@
     <Window.KeyBindings>
         <KeyBinding Gesture="F2" Command="{Binding SendF2Command}" />
         <KeyBinding Gesture="F10" Command="{Binding OpenConversionCalculatorCommand}" />
+        <KeyBinding Gesture="F11" Command="{Binding OpenLeverageSimulatorCommand}" />
     </Window.KeyBindings>
     <Grid>
         <Grid.RowDefinitions>
@@ -59,6 +60,9 @@
                                 <MenuItem Header="{x:Static local:language.Menu_Tools}">
                                     <MenuItem Header="{x:Static local:language.Menu_ConversionCalculator}"
                                               Command="{Binding OpenConversionCalculatorCommand}">
+                                    </MenuItem>
+                                    <MenuItem Header="{x:Static local:language.Menu_LeverageSimulator}"
+                                              Command="{Binding OpenLeverageSimulatorCommand}">
                                     </MenuItem>
                                 </MenuItem>
                                 <Separator />

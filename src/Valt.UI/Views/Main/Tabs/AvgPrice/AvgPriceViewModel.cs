@@ -7,6 +7,7 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Queries;
@@ -26,6 +27,7 @@ using Valt.UI.Services;
 using Valt.UI.Lang;
 using Valt.UI.Services.MessageBoxes;
 using Valt.UI.UserControls;
+using Valt.UI.Views.Main;
 using Valt.UI.Views.Main.Modals.AvgPriceLineEditor;
 using Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles;
 using Valt.UI.State;
@@ -119,7 +121,14 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
 
         _secureModeState.PropertyChanged += OnSecureModeStatePropertyChanged;
 
+        WeakReferenceMessenger.Default.Register<AddAvgPriceLineRequested>(this, OnAddAvgPriceLineRequested);
+
         TotalsFilterDate = _clock.GetCurrentDateTimeUtc();
+    }
+
+    private void OnAddAvgPriceLineRequested(object recipient, AddAvgPriceLineRequested message)
+    {
+        AddOperationCommand.Execute(null);
     }
 
     public void Initialize()

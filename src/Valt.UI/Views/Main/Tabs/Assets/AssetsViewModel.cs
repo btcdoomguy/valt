@@ -30,6 +30,7 @@ using Valt.UI.Services.MessageBoxes;
 using Valt.Core.Common;
 using Valt.Core.Modules.Assets;
 using Valt.Core.Modules.Budget.Transactions;
+using Valt.UI.Views.Main;
 using Valt.UI.Views.Main.Modals.ManageAsset;
 using Valt.UI.Views.Main.Modals.TransactionEditor;
 using Valt.UI.Views.Main.Tabs.Assets.Models;
@@ -187,6 +188,13 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
                 LoadAssetsAsync().SafeFireAndForget(logger: _logger, callerName: nameof(LoadAssetsAsync));
             }
         });
+
+        WeakReferenceMessenger.Default.Register<AddAssetRequested>(this, OnAddAssetRequested);
+    }
+
+    private void OnAddAssetRequested(object recipient, AddAssetRequested message)
+    {
+        AddAssetCommand.Execute(null);
     }
 
     public void Initialize()

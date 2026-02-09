@@ -4088,5 +4088,119 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Assets.Help.SellingDescription", resourceCulture);
             }
         }
+
+        public static string Menu_LeverageSimulator {
+            get {
+                return ResourceManager.GetString("Menu_LeverageSimulator", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_Title {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_Title", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_PositionType {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_PositionType", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_Long {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_Long", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_Short {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_Short", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_EntryPrice {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_EntryPrice", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_Collateral {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_Collateral", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_Leverage {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_Leverage", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_LiquidationPrice {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_LiquidationPrice", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_SimulatedPrice {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_SimulatedPrice", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_Results {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_Results", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_PositionValue {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_PositionValue", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_PnL {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_PnL", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_PnLPercentage {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_PnLPercentage", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_DistanceToLiquidation {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_DistanceToLiquidation", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_LoadPosition {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_LoadPosition", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_NewSimulation {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_NewSimulation", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_InSats {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_InSats", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_Currency {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_Currency", resourceCulture);
+            }
+        }
     }
 }

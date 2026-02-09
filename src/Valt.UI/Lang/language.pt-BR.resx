@@ -2058,4 +2058,61 @@
     <data name="Assets.Help.SellingDescription" xml:space="preserve">
         <value>Use a opção Vender (clique direito) para registrar lucro ou prejuízo como transação nas suas contas.</value>
     </data>
+    <data name="Menu_LeverageSimulator" xml:space="preserve">
+        <value>Simulador de Alavancagem</value>
+    </data>
+    <data name="LeverageSimulator_Title" xml:space="preserve">
+        <value>Simulador de Alavancagem</value>
+    </data>
+    <data name="LeverageSimulator_PositionType" xml:space="preserve">
+        <value>Tipo de Posição</value>
+    </data>
+    <data name="LeverageSimulator_Long" xml:space="preserve">
+        <value>Long</value>
+    </data>
+    <data name="LeverageSimulator_Short" xml:space="preserve">
+        <value>Short</value>
+    </data>
+    <data name="LeverageSimulator_EntryPrice" xml:space="preserve">
+        <value>Preço de Entrada</value>
+    </data>
+    <data name="LeverageSimulator_Collateral" xml:space="preserve">
+        <value>Colateral</value>
+    </data>
+    <data name="LeverageSimulator_Leverage" xml:space="preserve">
+        <value>Alavancagem</value>
+    </data>
+    <data name="LeverageSimulator_LiquidationPrice" xml:space="preserve">
+        <value>Preço de Liquidação</value>
+    </data>
+    <data name="LeverageSimulator_SimulatedPrice" xml:space="preserve">
+        <value>Preço Simulado do BTC</value>
+    </data>
+    <data name="LeverageSimulator_Results" xml:space="preserve">
+        <value>Resultados</value>
+    </data>
+    <data name="LeverageSimulator_PositionValue" xml:space="preserve">
+        <value>Valor da Posição</value>
+    </data>
+    <data name="LeverageSimulator_PnL" xml:space="preserve">
+        <value>P&amp;L Não Realizado</value>
+    </data>
+    <data name="LeverageSimulator_PnLPercentage" xml:space="preserve">
+        <value>P&amp;L %</value>
+    </data>
+    <data name="LeverageSimulator_DistanceToLiquidation" xml:space="preserve">
+        <value>Distância p/ Liquidação</value>
+    </data>
+    <data name="LeverageSimulator_LoadPosition" xml:space="preserve">
+        <value>Carregar posição</value>
+    </data>
+    <data name="LeverageSimulator_NewSimulation" xml:space="preserve">
+        <value>Nova Simulação</value>
+    </data>
+    <data name="LeverageSimulator_InSats" xml:space="preserve">
+        <value>em sats</value>
+    </data>
+    <data name="LeverageSimulator_Currency" xml:space="preserve">
+        <value>Moeda</value>
+    </data>
 </root>
