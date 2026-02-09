@@ -1871,6 +1871,39 @@
     <data name="GoalTarget_NoSales" xml:space="preserve">
         <value>No sales</value>
     </data>
+    <data name="GoalType_SaveFiat" xml:space="preserve">
+        <value>Save Fiat</value>
+    </data>
+    <data name="GoalType_SaveFiat_Description" xml:space="preserve">
+        <value>Save a target fiat amount (income minus expenses)</value>
+    </data>
+    <data name="GoalDescription_SaveFiat" xml:space="preserve">
+        <value>Saved {0} of {1} target</value>
+    </data>
+    <data name="GoalType_SavingsRate" xml:space="preserve">
+        <value>Savings Rate</value>
+    </data>
+    <data name="GoalType_SavingsRate_Description" xml:space="preserve">
+        <value>Save a target percentage of income</value>
+    </data>
+    <data name="GoalDescription_SavingsRate" xml:space="preserve">
+        <value>Savings rate {0}% of {1}% target</value>
+    </data>
+    <data name="GoalType_NetWorthBtc" xml:space="preserve">
+        <value>Net Worth in BTC</value>
+    </data>
+    <data name="GoalType_NetWorthBtc_Description" xml:space="preserve">
+        <value>Reach a target net worth in bitcoin</value>
+    </data>
+    <data name="GoalDescription_NetWorthBtc" xml:space="preserve">
+        <value>Net worth {0} of {1} sats target</value>
+    </data>
+    <data name="ManageGoal_TargetSavingsAmount" xml:space="preserve">
+        <value>Target Savings Amount</value>
+    </data>
+    <data name="ManageGoal_TargetSavingsRate" xml:space="preserve">
+        <value>Target Savings Rate (%)</value>
+    </data>
     <data name="Settings_FontScale" xml:space="preserve">
         <value>Font Size</value>
     </data>

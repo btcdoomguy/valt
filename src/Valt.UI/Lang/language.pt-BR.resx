@@ -1851,6 +1851,39 @@
     <data name="GoalTarget_NoSales" xml:space="preserve">
         <value>Sem vendas</value>
     </data>
+    <data name="GoalType_SaveFiat" xml:space="preserve">
+        <value>Economizar Fiat</value>
+    </data>
+    <data name="GoalType_SaveFiat_Description" xml:space="preserve">
+        <value>Economizar um valor alvo em fiat (renda menos despesas)</value>
+    </data>
+    <data name="GoalDescription_SaveFiat" xml:space="preserve">
+        <value>Economizou {0} de {1} alvo</value>
+    </data>
+    <data name="GoalType_SavingsRate" xml:space="preserve">
+        <value>Taxa de Economia</value>
+    </data>
+    <data name="GoalType_SavingsRate_Description" xml:space="preserve">
+        <value>Economizar um percentual alvo da renda</value>
+    </data>
+    <data name="GoalDescription_SavingsRate" xml:space="preserve">
+        <value>Taxa de economia {0}% de {1}% alvo</value>
+    </data>
+    <data name="GoalType_NetWorthBtc" xml:space="preserve">
+        <value>Patrimônio em BTC</value>
+    </data>
+    <data name="GoalType_NetWorthBtc_Description" xml:space="preserve">
+        <value>Atingir um patrimônio alvo em bitcoin</value>
+    </data>
+    <data name="GoalDescription_NetWorthBtc" xml:space="preserve">
+        <value>Patrimônio {0} de {1} sats alvo</value>
+    </data>
+    <data name="ManageGoal_TargetSavingsAmount" xml:space="preserve">
+        <value>Valor Alvo de Economia</value>
+    </data>
+    <data name="ManageGoal_TargetSavingsRate" xml:space="preserve">
+        <value>Taxa Alvo de Economia (%)</value>
+    </data>
     <data name="Settings.Tab.Advanced" xml:space="preserve">
         <value>Avançado</value>
     </data>

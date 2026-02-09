@@ -104,4 +104,16 @@ public class GoalBuilder
     public static GoalBuilder AReduceExpenseCategoryGoal(decimal targetAmount = 500m, string categoryId = "cat-1", string categoryName = "Test Category") =>
         new GoalBuilder()
             .WithGoalType(new ReduceExpenseCategoryGoalType(targetAmount, categoryId, categoryName));
+
+    public static GoalBuilder ASaveFiatGoal(decimal targetAmount = 1000m) =>
+        new GoalBuilder()
+            .WithGoalType(new SaveFiatGoalType(targetAmount));
+
+    public static GoalBuilder ASavingsRateGoal(decimal targetPercentage = 20m) =>
+        new GoalBuilder()
+            .WithGoalType(new SavingsRateGoalType(targetPercentage));
+
+    public static GoalBuilder ANetWorthBtcGoal(long targetSats = 10_000_000) =>
+        new GoalBuilder()
+            .WithGoalType(new NetWorthBtcGoalType(targetSats));
 }

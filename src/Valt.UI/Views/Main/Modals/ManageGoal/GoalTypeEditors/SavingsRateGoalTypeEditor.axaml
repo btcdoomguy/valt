@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Valt.UI.Lang"
+             xmlns:editors="clr-namespace:Valt.UI.Views.Main.Modals.ManageGoal.GoalTypeEditors"
+             mc:Ignorable="d"
+             d:DesignWidth="400"
+             d:DesignHeight="100"
+             x:Class="Valt.UI.Views.Main.Modals.ManageGoal.GoalTypeEditors.SavingsRateGoalTypeEditor"
+             x:DataType="editors:SavingsRateGoalTypeEditorViewModel">
+    <StackPanel>
+        <TextBlock Text="{Binding Description}"
+                   FontSize="{DynamicResource FontSizeXSmall}"
+                   Opacity="0.7"
+                   TextWrapping="Wrap"
+                   Margin="0, 0, 0, 8" />
+        <StackPanel Classes="form-field">
+            <TextBlock Text="{x:Static local:language.ManageGoal_TargetSavingsRate}" />
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <NumericUpDown Value="{Binding TargetPercentage}"
+                               Minimum="1"
+                               Maximum="100"
+                               Increment="1"
+                               FormatString="F0"
+                               Width="100" />
+                <TextBlock Text="%" VerticalAlignment="Center" />
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

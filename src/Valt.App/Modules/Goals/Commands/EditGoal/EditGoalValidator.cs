@@ -70,6 +70,21 @@ public class EditGoalValidator : IValidator<EditGoalCommand>
                     errors.Add("GoalType.MaxSellableSats", ["Max sellable sats cannot be negative"]);
                 break;
 
+            case SaveFiatGoalTypeDTO saveFiat:
+                if (saveFiat.TargetAmount <= 0)
+                    errors.Add("GoalType.TargetAmount", ["Target amount must be greater than zero"]);
+                break;
+
+            case SavingsRateGoalTypeDTO savingsRate:
+                if (savingsRate.TargetPercentage <= 0 || savingsRate.TargetPercentage > 100)
+                    errors.Add("GoalType.TargetPercentage", ["Target percentage must be between 1 and 100"]);
+                break;
+
+            case NetWorthBtcGoalTypeDTO netWorthBtc:
+                if (netWorthBtc.TargetSats <= 0)
+                    errors.Add("GoalType.TargetSats", ["Target sats must be greater than zero"]);
+                break;
+
             default:
                 errors.Add(nameof(EditGoalCommand.GoalType), ["Unknown goal type"]);
                 break;

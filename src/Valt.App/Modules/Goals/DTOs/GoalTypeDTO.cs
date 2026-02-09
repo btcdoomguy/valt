@@ -7,7 +7,7 @@ namespace Valt.App.Modules.Goals.DTOs;
 public abstract record GoalTypeInputDTO
 {
     /// <summary>
-    /// Goal type: 0=StackBitcoin, 1=SpendingLimit, 2=Dca, 3=IncomeFiat, 4=IncomeBtc, 5=ReduceExpenseCategory, 6=BitcoinHodl
+    /// Goal type: 0=StackBitcoin, 1=SpendingLimit, 2=Dca, 3=IncomeFiat, 4=IncomeBtc, 5=ReduceExpenseCategory, 6=BitcoinHodl, 7=SaveFiat, 8=SavingsRate, 9=NetWorthBtc
     /// </summary>
     public abstract int TypeId { get; }
 }
@@ -82,4 +82,34 @@ public record BitcoinHodlGoalTypeDTO : GoalTypeInputDTO
 {
     public override int TypeId => 6;
     public required long MaxSellableSats { get; init; }
+}
+
+/// <summary>
+/// Save a target fiat amount (income - expenses).
+/// Progress: 0% to 100% (success)
+/// </summary>
+public record SaveFiatGoalTypeDTO : GoalTypeInputDTO
+{
+    public override int TypeId => 7;
+    public required decimal TargetAmount { get; init; }
+}
+
+/// <summary>
+/// Save a target percentage of income.
+/// Progress: 0% to 100% (success)
+/// </summary>
+public record SavingsRateGoalTypeDTO : GoalTypeInputDTO
+{
+    public override int TypeId => 8;
+    public required decimal TargetPercentage { get; init; }
+}
+
+/// <summary>
+/// Reach a target net worth in bitcoin (sats).
+/// Progress: 0% to 100% (success)
+/// </summary>
+public record NetWorthBtcGoalTypeDTO : GoalTypeInputDTO
+{
+    public override int TypeId => 9;
+    public required long TargetSats { get; init; }
 }

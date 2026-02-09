@@ -319,4 +319,157 @@ public class GoalTypeTests
     }
 
     #endregion
+
+    #region SaveFiatGoalType Tests
+
+    [Test]
+    public void SaveFiatGoalType_HasSameTargetAs_ReturnsTrueForSameTarget()
+    {
+        var type1 = new SaveFiatGoalType(5000m, 2500m);
+        var type2 = new SaveFiatGoalType(5000m, 1000m);
+
+        Assert.That(type1.HasSameTargetAs(type2), Is.True);
+    }
+
+    [Test]
+    public void SaveFiatGoalType_HasSameTargetAs_ReturnsFalseForDifferentTarget()
+    {
+        var type1 = new SaveFiatGoalType(5000m, 2500m);
+        var type2 = new SaveFiatGoalType(7500m, 2500m);
+
+        Assert.That(type1.HasSameTargetAs(type2), Is.False);
+    }
+
+    [Test]
+    public void SaveFiatGoalType_HasSameTargetAs_ReturnsFalseForDifferentType()
+    {
+        var saveFiat = new SaveFiatGoalType(5000m, 2500m);
+        var incomeFiat = new IncomeFiatGoalType(5000m, 2500m);
+
+        Assert.That(saveFiat.HasSameTargetAs(incomeFiat), Is.False);
+    }
+
+    [Test]
+    public void SaveFiatGoalType_WithResetProgress_ResetsCalculatedSavingsToZero()
+    {
+        var original = new SaveFiatGoalType(5000m, 3500m);
+
+        var reset = (SaveFiatGoalType)original.WithResetProgress();
+
+        Assert.That(reset.CalculatedSavings, Is.EqualTo(0m));
+    }
+
+    [Test]
+    public void SaveFiatGoalType_WithResetProgress_PreservesTargetAmount()
+    {
+        var original = new SaveFiatGoalType(5000m, 3500m);
+
+        var reset = (SaveFiatGoalType)original.WithResetProgress();
+
+        Assert.That(reset.TargetAmount, Is.EqualTo(5000m));
+    }
+
+    #endregion
+
+    #region SavingsRateGoalType Tests
+
+    [Test]
+    public void SavingsRateGoalType_HasSameTargetAs_ReturnsTrueForSameTarget()
+    {
+        var type1 = new SavingsRateGoalType(20m, 15m);
+        var type2 = new SavingsRateGoalType(20m, 10m);
+
+        Assert.That(type1.HasSameTargetAs(type2), Is.True);
+    }
+
+    [Test]
+    public void SavingsRateGoalType_HasSameTargetAs_ReturnsFalseForDifferentTarget()
+    {
+        var type1 = new SavingsRateGoalType(20m, 15m);
+        var type2 = new SavingsRateGoalType(30m, 15m);
+
+        Assert.That(type1.HasSameTargetAs(type2), Is.False);
+    }
+
+    [Test]
+    public void SavingsRateGoalType_HasSameTargetAs_ReturnsFalseForDifferentType()
+    {
+        var savingsRate = new SavingsRateGoalType(20m, 15m);
+        var saveFiat = new SaveFiatGoalType(20m, 15m);
+
+        Assert.That(savingsRate.HasSameTargetAs(saveFiat), Is.False);
+    }
+
+    [Test]
+    public void SavingsRateGoalType_WithResetProgress_ResetsCalculatedPercentageToZero()
+    {
+        var original = new SavingsRateGoalType(20m, 15m);
+
+        var reset = (SavingsRateGoalType)original.WithResetProgress();
+
+        Assert.That(reset.CalculatedPercentage, Is.EqualTo(0m));
+    }
+
+    [Test]
+    public void SavingsRateGoalType_WithResetProgress_PreservesTargetPercentage()
+    {
+        var original = new SavingsRateGoalType(20m, 15m);
+
+        var reset = (SavingsRateGoalType)original.WithResetProgress();
+
+        Assert.That(reset.TargetPercentage, Is.EqualTo(20m));
+    }
+
+    #endregion
+
+    #region NetWorthBtcGoalType Tests
+
+    [Test]
+    public void NetWorthBtcGoalType_HasSameTargetAs_ReturnsTrueForSameTarget()
+    {
+        var type1 = new NetWorthBtcGoalType(10_000_000L, 5_000_000L);
+        var type2 = new NetWorthBtcGoalType(10_000_000L, 2_500_000L);
+
+        Assert.That(type1.HasSameTargetAs(type2), Is.True);
+    }
+
+    [Test]
+    public void NetWorthBtcGoalType_HasSameTargetAs_ReturnsFalseForDifferentTarget()
+    {
+        var type1 = new NetWorthBtcGoalType(10_000_000L, 5_000_000L);
+        var type2 = new NetWorthBtcGoalType(20_000_000L, 5_000_000L);
+
+        Assert.That(type1.HasSameTargetAs(type2), Is.False);
+    }
+
+    [Test]
+    public void NetWorthBtcGoalType_HasSameTargetAs_ReturnsFalseForDifferentType()
+    {
+        var netWorth = new NetWorthBtcGoalType(10_000_000L, 5_000_000L);
+        var stackBitcoin = new StackBitcoinGoalType(10_000_000L, 5_000_000L);
+
+        Assert.That(netWorth.HasSameTargetAs(stackBitcoin), Is.False);
+    }
+
+    [Test]
+    public void NetWorthBtcGoalType_WithResetProgress_ResetsCalculatedSatsToZero()
+    {
+        var original = new NetWorthBtcGoalType(10_000_000L, 7_500_000L);
+
+        var reset = (NetWorthBtcGoalType)original.WithResetProgress();
+
+        Assert.That(reset.CalculatedSats, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void NetWorthBtcGoalType_WithResetProgress_PreservesTargetSats()
+    {
+        var original = new NetWorthBtcGoalType(10_000_000L, 7_500_000L);
+
+        var reset = (NetWorthBtcGoalType)original.WithResetProgress();
+
+        Assert.That(reset.TargetSats, Is.EqualTo(10_000_000L));
+    }
+
+    #endregion
 }

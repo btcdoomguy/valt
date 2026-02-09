@@ -32,6 +32,9 @@ internal static class GoalTypeSerializer
             GoalTypeNames.IncomeBtc => DeserializeIncomeBtc(json),
             GoalTypeNames.ReduceExpenseCategory => DeserializeReduceExpenseCategory(json),
             GoalTypeNames.BitcoinHodl => DeserializeBitcoinHodl(json),
+            GoalTypeNames.SaveFiat => DeserializeSaveFiat(json),
+            GoalTypeNames.SavingsRate => DeserializeSavingsRate(json),
+            GoalTypeNames.NetWorthBtc => DeserializeNetWorthBtc(json),
             _ => throw new NotSupportedException($"Goal type {typeName} is not supported")
         };
     }
@@ -78,6 +81,24 @@ internal static class GoalTypeSerializer
         return new BitcoinHodlGoalType(dto.MaxSellableSats, dto.CalculatedSoldSats);
     }
 
+    public static SaveFiatGoalType DeserializeSaveFiat(string json)
+    {
+        var dto = Deserialize<SaveFiatGoalTypeDto>(json, nameof(SaveFiatGoalType));
+        return new SaveFiatGoalType(dto.TargetAmount, dto.CalculatedSavings);
+    }
+
+    public static SavingsRateGoalType DeserializeSavingsRate(string json)
+    {
+        var dto = Deserialize<SavingsRateGoalTypeDto>(json, nameof(SavingsRateGoalType));
+        return new SavingsRateGoalType(dto.TargetPercentage, dto.CalculatedPercentage);
+    }
+
+    public static NetWorthBtcGoalType DeserializeNetWorthBtc(string json)
+    {
+        var dto = Deserialize<NetWorthBtcGoalTypeDto>(json, nameof(NetWorthBtcGoalType));
+        return new NetWorthBtcGoalType(dto.TargetSats, dto.CalculatedSats);
+    }
+
     /// <summary>
     /// Serializes a goal type to JSON.
     /// </summary>
@@ -92,6 +113,9 @@ internal static class GoalTypeSerializer
             GoalTypeNames.IncomeBtc => SerializeIncomeBtc((IncomeBtcGoalType)goalType),
             GoalTypeNames.ReduceExpenseCategory => SerializeReduceExpenseCategory((ReduceExpenseCategoryGoalType)goalType),
             GoalTypeNames.BitcoinHodl => SerializeBitcoinHodl((BitcoinHodlGoalType)goalType),
+            GoalTypeNames.SaveFiat => SerializeSaveFiat((SaveFiatGoalType)goalType),
+            GoalTypeNames.SavingsRate => SerializeSavingsRate((SavingsRateGoalType)goalType),
+            GoalTypeNames.NetWorthBtc => SerializeNetWorthBtc((NetWorthBtcGoalType)goalType),
             _ => throw new NotSupportedException($"Goal type {goalType.TypeName} is not supported")
         };
     }
@@ -164,6 +188,36 @@ internal static class GoalTypeSerializer
         {
             MaxSellableSats = goalType.MaxSellableSats,
             CalculatedSoldSats = goalType.CalculatedSoldSats
+        };
+        return JsonSerializer.Serialize(dto);
+    }
+
+    private static string SerializeSaveFiat(SaveFiatGoalType goalType)
+    {
+        var dto = new SaveFiatGoalTypeDto
+        {
+            TargetAmount = goalType.TargetAmount,
+            CalculatedSavings = goalType.CalculatedSavings
+        };
+        return JsonSerializer.Serialize(dto);
+    }
+
+    private static string SerializeSavingsRate(SavingsRateGoalType goalType)
+    {
+        var dto = new SavingsRateGoalTypeDto
+        {
+            TargetPercentage = goalType.TargetPercentage,
+            CalculatedPercentage = goalType.CalculatedPercentage
+        };
+        return JsonSerializer.Serialize(dto);
+    }
+
+    private static string SerializeNetWorthBtc(NetWorthBtcGoalType goalType)
+    {
+        var dto = new NetWorthBtcGoalTypeDto
+        {
+            TargetSats = goalType.TargetSats,
+            CalculatedSats = goalType.CalculatedSats
         };
         return JsonSerializer.Serialize(dto);
     }

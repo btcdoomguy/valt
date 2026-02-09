@@ -3710,7 +3710,73 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("GoalTarget_NoSales", resourceCulture);
             }
         }
-        
+
+        public static string GoalType_SaveFiat {
+            get {
+                return ResourceManager.GetString("GoalType_SaveFiat", resourceCulture);
+            }
+        }
+
+        public static string GoalType_SaveFiat_Description {
+            get {
+                return ResourceManager.GetString("GoalType_SaveFiat_Description", resourceCulture);
+            }
+        }
+
+        public static string GoalDescription_SaveFiat {
+            get {
+                return ResourceManager.GetString("GoalDescription_SaveFiat", resourceCulture);
+            }
+        }
+
+        public static string GoalType_SavingsRate {
+            get {
+                return ResourceManager.GetString("GoalType_SavingsRate", resourceCulture);
+            }
+        }
+
+        public static string GoalType_SavingsRate_Description {
+            get {
+                return ResourceManager.GetString("GoalType_SavingsRate_Description", resourceCulture);
+            }
+        }
+
+        public static string GoalDescription_SavingsRate {
+            get {
+                return ResourceManager.GetString("GoalDescription_SavingsRate", resourceCulture);
+            }
+        }
+
+        public static string GoalType_NetWorthBtc {
+            get {
+                return ResourceManager.GetString("GoalType_NetWorthBtc", resourceCulture);
+            }
+        }
+
+        public static string GoalType_NetWorthBtc_Description {
+            get {
+                return ResourceManager.GetString("GoalType_NetWorthBtc_Description", resourceCulture);
+            }
+        }
+
+        public static string GoalDescription_NetWorthBtc {
+            get {
+                return ResourceManager.GetString("GoalDescription_NetWorthBtc", resourceCulture);
+            }
+        }
+
+        public static string ManageGoal_TargetSavingsAmount {
+            get {
+                return ResourceManager.GetString("ManageGoal_TargetSavingsAmount", resourceCulture);
+            }
+        }
+
+        public static string ManageGoal_TargetSavingsRate {
+            get {
+                return ResourceManager.GetString("ManageGoal_TargetSavingsRate", resourceCulture);
+            }
+        }
+
         public static string Settings_FontScale {
             get {
                 return ResourceManager.GetString("Settings_FontScale", resourceCulture);

@@ -1866,6 +1866,39 @@
     <data name="GoalTarget_NoSales" xml:space="preserve">
         <value>Sin ventas</value>
     </data>
+    <data name="GoalType_SaveFiat" xml:space="preserve">
+        <value>Ahorrar Fiat</value>
+    </data>
+    <data name="GoalType_SaveFiat_Description" xml:space="preserve">
+        <value>Ahorrar una cantidad objetivo en fiat (ingresos menos gastos)</value>
+    </data>
+    <data name="GoalDescription_SaveFiat" xml:space="preserve">
+        <value>Ahorrado {0} de {1} objetivo</value>
+    </data>
+    <data name="GoalType_SavingsRate" xml:space="preserve">
+        <value>Tasa de Ahorro</value>
+    </data>
+    <data name="GoalType_SavingsRate_Description" xml:space="preserve">
+        <value>Ahorrar un porcentaje objetivo de ingresos</value>
+    </data>
+    <data name="GoalDescription_SavingsRate" xml:space="preserve">
+        <value>Tasa de ahorro {0}% de {1}% objetivo</value>
+    </data>
+    <data name="GoalType_NetWorthBtc" xml:space="preserve">
+        <value>Patrimonio en BTC</value>
+    </data>
+    <data name="GoalType_NetWorthBtc_Description" xml:space="preserve">
+        <value>Alcanzar un patrimonio objetivo en bitcoin</value>
+    </data>
+    <data name="GoalDescription_NetWorthBtc" xml:space="preserve">
+        <value>Patrimonio {0} de {1} sats objetivo</value>
+    </data>
+    <data name="ManageGoal_TargetSavingsAmount" xml:space="preserve">
+        <value>Monto Objetivo de Ahorro</value>
+    </data>
+    <data name="ManageGoal_TargetSavingsRate" xml:space="preserve">
+        <value>Tasa Objetivo de Ahorro (%)</value>
+    </data>
     <data name="Settings_FontScale" xml:space="preserve">
         <value>Tamaño de Fuente</value>
     </data>
