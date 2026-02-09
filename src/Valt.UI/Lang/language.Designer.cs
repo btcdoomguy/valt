@@ -3710,7 +3710,73 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("GoalTarget_NoSales", resourceCulture);
             }
         }
-        
+
+        public static string GoalType_SaveFiat {
+            get {
+                return ResourceManager.GetString("GoalType_SaveFiat", resourceCulture);
+            }
+        }
+
+        public static string GoalType_SaveFiat_Description {
+            get {
+                return ResourceManager.GetString("GoalType_SaveFiat_Description", resourceCulture);
+            }
+        }
+
+        public static string GoalDescription_SaveFiat {
+            get {
+                return ResourceManager.GetString("GoalDescription_SaveFiat", resourceCulture);
+            }
+        }
+
+        public static string GoalType_SavingsRate {
+            get {
+                return ResourceManager.GetString("GoalType_SavingsRate", resourceCulture);
+            }
+        }
+
+        public static string GoalType_SavingsRate_Description {
+            get {
+                return ResourceManager.GetString("GoalType_SavingsRate_Description", resourceCulture);
+            }
+        }
+
+        public static string GoalDescription_SavingsRate {
+            get {
+                return ResourceManager.GetString("GoalDescription_SavingsRate", resourceCulture);
+            }
+        }
+
+        public static string GoalType_NetWorthBtc {
+            get {
+                return ResourceManager.GetString("GoalType_NetWorthBtc", resourceCulture);
+            }
+        }
+
+        public static string GoalType_NetWorthBtc_Description {
+            get {
+                return ResourceManager.GetString("GoalType_NetWorthBtc_Description", resourceCulture);
+            }
+        }
+
+        public static string GoalDescription_NetWorthBtc {
+            get {
+                return ResourceManager.GetString("GoalDescription_NetWorthBtc", resourceCulture);
+            }
+        }
+
+        public static string ManageGoal_TargetSavingsAmount {
+            get {
+                return ResourceManager.GetString("ManageGoal_TargetSavingsAmount", resourceCulture);
+            }
+        }
+
+        public static string ManageGoal_TargetSavingsRate {
+            get {
+                return ResourceManager.GetString("ManageGoal_TargetSavingsRate", resourceCulture);
+            }
+        }
+
         public static string Settings_FontScale {
             get {
                 return ResourceManager.GetString("Settings_FontScale", resourceCulture);
@@ -4020,6 +4086,120 @@ namespace Valt.UI.Lang {
         public static string Assets_Help_SellingDescription {
             get {
                 return ResourceManager.GetString("Assets.Help.SellingDescription", resourceCulture);
+            }
+        }
+
+        public static string Menu_LeverageSimulator {
+            get {
+                return ResourceManager.GetString("Menu_LeverageSimulator", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_Title {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_Title", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_PositionType {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_PositionType", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_Long {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_Long", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_Short {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_Short", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_EntryPrice {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_EntryPrice", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_Collateral {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_Collateral", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_Leverage {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_Leverage", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_LiquidationPrice {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_LiquidationPrice", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_SimulatedPrice {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_SimulatedPrice", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_Results {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_Results", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_PositionValue {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_PositionValue", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_PnL {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_PnL", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_PnLPercentage {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_PnLPercentage", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_DistanceToLiquidation {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_DistanceToLiquidation", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_LoadPosition {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_LoadPosition", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_NewSimulation {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_NewSimulation", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_InSats {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_InSats", resourceCulture);
+            }
+        }
+
+        public static string LeverageSimulator_Currency {
+            get {
+                return ResourceManager.GetString("LeverageSimulator_Currency", resourceCulture);
             }
         }
     }

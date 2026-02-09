@@ -22,7 +22,7 @@ public record GoalDTO
 public abstract record GoalTypeOutputDTO
 {
     /// <summary>
-    /// Goal type: 0=StackBitcoin, 1=SpendingLimit, 2=Dca, 3=IncomeFiat, 4=IncomeBtc, 5=ReduceExpenseCategory, 6=BitcoinHodl
+    /// Goal type: 0=StackBitcoin, 1=SpendingLimit, 2=Dca, 3=IncomeFiat, 4=IncomeBtc, 5=ReduceExpenseCategory, 6=BitcoinHodl, 7=SaveFiat, 8=SavingsRate, 9=NetWorthBtc
     /// </summary>
     public abstract int TypeId { get; }
 
@@ -128,4 +128,43 @@ public record BitcoinHodlGoalTypeOutputDTO : GoalTypeOutputDTO
 
     public required long MaxSellableSats { get; init; }
     public required long CalculatedSoldSats { get; init; }
+}
+
+/// <summary>
+/// Save a target fiat amount (income - expenses).
+/// </summary>
+public record SaveFiatGoalTypeOutputDTO : GoalTypeOutputDTO
+{
+    public override int TypeId => 7;
+    public override bool RequiresPriceData => true;
+    public override int ProgressionMode => 0; // ZeroToSuccess
+
+    public required decimal TargetAmount { get; init; }
+    public required decimal CalculatedSavings { get; init; }
+}
+
+/// <summary>
+/// Save a target percentage of income.
+/// </summary>
+public record SavingsRateGoalTypeOutputDTO : GoalTypeOutputDTO
+{
+    public override int TypeId => 8;
+    public override bool RequiresPriceData => true;
+    public override int ProgressionMode => 0; // ZeroToSuccess
+
+    public required decimal TargetPercentage { get; init; }
+    public required decimal CalculatedPercentage { get; init; }
+}
+
+/// <summary>
+/// Reach a target net worth in bitcoin (sats).
+/// </summary>
+public record NetWorthBtcGoalTypeOutputDTO : GoalTypeOutputDTO
+{
+    public override int TypeId => 9;
+    public override bool RequiresPriceData => true;
+    public override int ProgressionMode => 0; // ZeroToSuccess
+
+    public required long TargetSats { get; init; }
+    public required long CalculatedSats { get; init; }
 }

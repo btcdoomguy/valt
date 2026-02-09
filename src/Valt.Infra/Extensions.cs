@@ -260,6 +260,9 @@ public static class Extensions
         services.AddSingleton<IGoalProgressCalculator, IncomeBtcProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculator, ReduceExpenseCategoryProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculator, BitcoinHodlProgressCalculator>();
+        services.AddSingleton<IGoalProgressCalculator, SaveFiatProgressCalculator>();
+        services.AddSingleton<IGoalProgressCalculator, SavingsRateProgressCalculator>();
+        services.AddSingleton<IGoalProgressCalculator, NetWorthBtcProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculatorFactory, GoalProgressCalculatorFactory>();
         services.AddSingleton<IGoalProgressState, GoalProgressState>();
 

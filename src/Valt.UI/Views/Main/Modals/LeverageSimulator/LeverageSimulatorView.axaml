@@ -1,0 +1,220 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        xmlns:vm="clr-namespace:Valt.UI.Views.Main.Modals.LeverageSimulator"
+        mc:Ignorable="d"
+        d:DesignWidth="700" d:DesignHeight="615"
+        MinWidth="700"
+        MinHeight="615"
+        MaxWidth="700"
+        MaxHeight="615"
+        x:Class="Valt.UI.Views.Main.Modals.LeverageSimulator.LeverageSimulatorView"
+        x:DataType="vm:LeverageSimulatorViewModel"
+        Title="{x:Static local:language.LeverageSimulator_Title}"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Window.Styles>
+        <Style Selector="TextBox.sim-input">
+            <Setter Property="MinHeight" Value="32" />
+            <Setter Property="FontFamily" Value="{DynamicResource GeistMono}" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="TextBlock.label">
+            <Setter Property="Foreground" Value="{DynamicResource Text300Brush}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="0, 8, 0, 3" />
+        </Style>
+        <Style Selector="TextBlock.result-label">
+            <Setter Property="Foreground" Value="{DynamicResource Text300Brush}" />
+            <Setter Property="FontSize" Value="13" />
+        </Style>
+        <Style Selector="TextBlock.result-value">
+            <Setter Property="FontFamily" Value="{DynamicResource GeistMono}" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style Selector="ToggleButton.position-toggle">
+            <Setter Property="MinWidth" Value="80" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        </Style>
+        <Style Selector="ToggleButton.position-toggle:checked /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Accent700Brush}" />
+        </Style>
+    </Window.Styles>
+    <Design.DataContext>
+        <vm:LeverageSimulatorViewModel />
+    </Design.DataContext>
+    <Border Name="MainBorder" Focusable="True">
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="{x:Static local:language.LeverageSimulator_Title}"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+            <Border Classes="form-fields-area" Padding="20">
+                <Grid ColumnDefinitions="300, 20, *">
+                    <!-- Left column: Inputs -->
+                    <StackPanel Grid.Column="0" Orientation="Vertical">
+                        <!-- Load from position -->
+                        <TextBlock Classes="label" Text="{x:Static local:language.LeverageSimulator_LoadPosition}" Margin="0, 0, 0, 3" />
+                        <ComboBox ItemsSource="{Binding AvailablePositions}"
+                                  SelectedItem="{Binding SelectedPosition}"
+                                  HorizontalAlignment="Stretch"
+                                  MinHeight="32">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:LeveragePositionItem">
+                                    <TextBlock Text="{Binding DisplayName}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <!-- Currency -->
+                        <TextBlock Classes="label" Text="{x:Static local:language.LeverageSimulator_Currency}" />
+                        <ComboBox ItemsSource="{Binding AvailableCurrencies}"
+                                  SelectedItem="{Binding SelectedCurrency}"
+                                  HorizontalAlignment="Stretch"
+                                  MinHeight="32">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock>
+                                        <Run Text="{Binding Code}" />
+                                        <Run Text=" " />
+                                        <Run Text="{Binding Symbol}" />
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <!-- Position Type -->
+                        <TextBlock Classes="label" Text="{x:Static local:language.LeverageSimulator_PositionType}" />
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <ToggleButton Classes="position-toggle"
+                                          IsChecked="{Binding IsLong}"
+                                          Command="{Binding SetLongCommand}"
+                                          Content="{x:Static local:language.LeverageSimulator_Long}" />
+                            <ToggleButton Classes="position-toggle"
+                                          IsChecked="{Binding !IsLong}"
+                                          Command="{Binding SetShortCommand}"
+                                          Content="{x:Static local:language.LeverageSimulator_Short}" />
+                        </StackPanel>
+
+                        <!-- Entry Price -->
+                        <TextBlock Classes="label">
+                            <Run Text="{x:Static local:language.LeverageSimulator_EntryPrice}" />
+                            <Run Text=" (" /><Run Text="{Binding CurrencyCode, Mode=OneWay}" /><Run Text=")" />
+                        </TextBlock>
+                        <TextBox Classes="sim-input" Text="{Binding EntryPriceText}" Watermark="0.00" />
+
+                        <!-- Collateral -->
+                        <TextBlock Classes="label">
+                            <Run Text="{x:Static local:language.LeverageSimulator_Collateral}" />
+                            <Run Text=" (" /><Run Text="{Binding CurrencyCode, Mode=OneWay}" /><Run Text=")" />
+                        </TextBlock>
+                        <TextBox Classes="sim-input" Text="{Binding CollateralText}" Watermark="0.00" />
+
+                        <!-- Leverage -->
+                        <TextBlock Classes="label">
+                            <Run Text="{x:Static local:language.LeverageSimulator_Leverage}" />
+                            <Run Text=" (x)" />
+                        </TextBlock>
+                        <TextBox Classes="sim-input" Text="{Binding LeverageText}" Watermark="1.0" />
+
+                        <!-- Liquidation Price -->
+                        <TextBlock Classes="label">
+                            <Run Text="{x:Static local:language.LeverageSimulator_LiquidationPrice}" />
+                            <Run Text=" (" /><Run Text="{Binding CurrencyCode, Mode=OneWay}" /><Run Text=")" />
+                        </TextBlock>
+                        <TextBox Classes="sim-input" Text="{Binding LiquidationPriceText}" Watermark="0" />
+
+                        <!-- Simulated BTC Price (prominent) -->
+                        <TextBlock FontSize="13" FontWeight="SemiBold" Margin="0, 14, 0, 3"
+                                   Foreground="{DynamicResource Accent300Brush}">
+                            <Run Text="{x:Static local:language.LeverageSimulator_SimulatedPrice}" />
+                            <Run Text=" (" /><Run Text="{Binding CurrencyCode, Mode=OneWay}" /><Run Text=")" />
+                        </TextBlock>
+                        <TextBox Classes="sim-input" Text="{Binding SimulatedPriceText}" Watermark="0.00"
+                                 FontSize="15" FontWeight="SemiBold"
+                                 BorderBrush="{DynamicResource Accent500Brush}" />
+                    </StackPanel>
+
+                    <!-- Right column: Results -->
+                    <Border Grid.Column="2"
+                            Background="{DynamicResource Background900Brush}"
+                            BorderBrush="{DynamicResource Background500Brush}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="20, 15">
+                        <StackPanel Orientation="Vertical" Spacing="5">
+                            <TextBlock Text="{x:Static local:language.LeverageSimulator_Results}"
+                                       FontSize="16" FontWeight="SemiBold" Margin="0, 0, 0, 10" />
+
+                            <!-- No results placeholder -->
+                            <TextBlock Text="---"
+                                       IsVisible="{Binding !HasResults}"
+                                       Foreground="{DynamicResource Text400Brush}"
+                                       FontSize="14"
+                                       HorizontalAlignment="Center"
+                                       Margin="0, 40, 0, 0" />
+
+                            <StackPanel IsVisible="{Binding HasResults}" Spacing="18">
+                                <!-- Position Value (Fiat) -->
+                                <StackPanel Spacing="2">
+                                    <TextBlock Classes="result-label"
+                                               Text="{x:Static local:language.LeverageSimulator_PositionValue}" />
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <TextBlock Classes="result-value" Text="{Binding PositionValueFiat}" />
+                                        <TextBlock Text="{Binding CurrencyCode}" VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource Text400Brush}" FontSize="12" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <!-- Position Value (Sats) -->
+                                <StackPanel Spacing="2">
+                                    <TextBlock Classes="result-label"
+                                               Text="{x:Static local:language.LeverageSimulator_InSats}" />
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <TextBlock Classes="result-value" Text="{Binding PositionValueSats}" />
+                                        <TextBlock Text="sats" VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource Text400Brush}" FontSize="12" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <!-- P&L Fiat -->
+                                <StackPanel Spacing="2">
+                                    <TextBlock Classes="result-label"
+                                               Text="{x:Static local:language.LeverageSimulator_PnL}" />
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <TextBlock Classes="result-value" Text="{Binding PnLFiat}"
+                                                   Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}" />
+                                        <TextBlock Text="{Binding CurrencyCode}" VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource Text400Brush}" FontSize="12" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <!-- P&L Percentage -->
+                                <StackPanel Spacing="2">
+                                    <TextBlock Classes="result-label"
+                                               Text="{x:Static local:language.LeverageSimulator_PnLPercentage}" />
+                                    <TextBlock Classes="result-value" Text="{Binding PnLPercentage}"
+                                               Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}" />
+                                </StackPanel>
+
+                                <!-- Distance to Liquidation -->
+                                <StackPanel Spacing="2" IsVisible="{Binding ShowLiquidation}">
+                                    <TextBlock Classes="result-label"
+                                               Text="{x:Static local:language.LeverageSimulator_DistanceToLiquidation}" />
+                                    <TextBlock Classes="result-value" Text="{Binding DistanceToLiquidation}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </StackPanel>
+    </Border>
+</Window>

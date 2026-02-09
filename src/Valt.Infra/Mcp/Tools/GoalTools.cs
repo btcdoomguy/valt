@@ -240,6 +240,87 @@ public class GoalTools
     }
 
     /// <summary>
+    /// Creates a Save Fiat goal (save a target fiat amount from income minus expenses).
+    /// </summary>
+    [McpServerTool, Description("Create a goal to save a target fiat amount (income minus expenses)")]
+    public static async Task<string> CreateSaveFiatGoal(
+        ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
+        [Description("Reference date (format: yyyy-MM-dd)")] string refDate,
+        [Description("Period type: 0=Monthly, 1=Yearly")] int period,
+        [Description("Target savings amount")] decimal targetAmount)
+    {
+        var result = await dispatcher.DispatchAsync(new CreateGoalCommand
+        {
+            RefDate = DateOnly.Parse(refDate),
+            Period = period,
+            GoalType = new SaveFiatGoalTypeDTO { TargetAmount = targetAmount }
+        });
+
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error?.Message ?? "Unknown error"}";
+        }
+
+        await publisher.PublishAsync(new McpDataChangedNotification());
+        return $"Save Fiat goal created with ID: {result.Value.GoalId}";
+    }
+
+    /// <summary>
+    /// Creates a Savings Rate goal (save a target percentage of income).
+    /// </summary>
+    [McpServerTool, Description("Create a goal to save a target percentage of income")]
+    public static async Task<string> CreateSavingsRateGoal(
+        ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
+        [Description("Reference date (format: yyyy-MM-dd)")] string refDate,
+        [Description("Period type: 0=Monthly, 1=Yearly")] int period,
+        [Description("Target savings rate percentage (1-100)")] decimal targetPercentage)
+    {
+        var result = await dispatcher.DispatchAsync(new CreateGoalCommand
+        {
+            RefDate = DateOnly.Parse(refDate),
+            Period = period,
+            GoalType = new SavingsRateGoalTypeDTO { TargetPercentage = targetPercentage }
+        });
+
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error?.Message ?? "Unknown error"}";
+        }
+
+        await publisher.PublishAsync(new McpDataChangedNotification());
+        return $"Savings Rate goal created with ID: {result.Value.GoalId}";
+    }
+
+    /// <summary>
+    /// Creates a Net Worth BTC goal (reach a target net worth in sats).
+    /// </summary>
+    [McpServerTool, Description("Create a goal to reach a target net worth in bitcoin (sats)")]
+    public static async Task<string> CreateNetWorthBtcGoal(
+        ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
+        [Description("Reference date (format: yyyy-MM-dd)")] string refDate,
+        [Description("Period type: 0=Monthly, 1=Yearly")] int period,
+        [Description("Target net worth in satoshis")] long targetSats)
+    {
+        var result = await dispatcher.DispatchAsync(new CreateGoalCommand
+        {
+            RefDate = DateOnly.Parse(refDate),
+            Period = period,
+            GoalType = new NetWorthBtcGoalTypeDTO { TargetSats = targetSats }
+        });
+
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error?.Message ?? "Unknown error"}";
+        }
+
+        await publisher.PublishAsync(new McpDataChangedNotification());
+        return $"Net Worth BTC goal created with ID: {result.Value.GoalId}";
+    }
+
+    /// <summary>
     /// Deletes a goal.
     /// </summary>
     [McpServerTool, Description("Delete a financial goal")]

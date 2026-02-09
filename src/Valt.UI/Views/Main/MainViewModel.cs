@@ -44,6 +44,7 @@ using Valt.UI.Views.Main.Modals.StatusDisplay;
 using Valt.UI.Views.Main.Modals.ImportWizard;
 using Valt.UI.Views.Main.Modals.InputPassword;
 using Valt.UI.Views.Main.Modals.ConversionCalculator;
+using Valt.UI.Views.Main.Modals.LeverageSimulator;
 using Valt.Infra.Mcp.Notifications;
 using Valt.Infra.Mcp.Server;
 
@@ -456,6 +457,15 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     }
 
     [RelayCommand]
+    private async Task OpenLeverageSimulator()
+    {
+        var modal =
+            (LeverageSimulatorView)await _modalFactory.CreateAsync(ApplicationModalNames.LeverageSimulator, Window)!;
+
+        await modal.ShowDialog(Window!);
+    }
+
+    [RelayCommand]
     private void HowToUse()
     {
         try
@@ -477,7 +487,11 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     {
         if (SelectedTabComponent?.TabName == MainViewTabNames.TransactionsPageContent)
             WeakReferenceMessenger.Default.Send(new AddTransactionRequested());
-        
+        else if (SelectedTabComponent?.TabName == MainViewTabNames.AvgPricePageContent)
+            WeakReferenceMessenger.Default.Send(new AddAvgPriceLineRequested());
+        else if (SelectedTabComponent?.TabName == MainViewTabNames.AssetsPageContent)
+            WeakReferenceMessenger.Default.Send(new AddAssetRequested());
+
         return Task.CompletedTask;
     }
 

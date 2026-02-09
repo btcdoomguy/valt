@@ -326,6 +326,10 @@ public class FiatHistoryUpdaterJobTests
         fiatDataCollection.Query().Returns(queryable);
         fiatDataCollection.FindAll().Returns(existingData);
         fiatDataCollection.Find(Arg.Any<System.Linq.Expressions.Expression<Func<FiatDataEntity, bool>>>()).Returns(existingData);
+        fiatDataCollection.Min(Arg.Any<System.Linq.Expressions.Expression<Func<FiatDataEntity, DateTime>>>())
+            .Returns(new DateOnly(2024, 1, 10).ToValtDateTime());
+        fiatDataCollection.Max(Arg.Any<System.Linq.Expressions.Expression<Func<FiatDataEntity, DateTime>>>())
+            .Returns(new DateOnly(2024, 1, 10).ToValtDateTime());
 
         _priceDatabase.GetFiatData().Returns(fiatDataCollection);
 

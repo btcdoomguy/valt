@@ -1866,6 +1866,39 @@
     <data name="GoalTarget_NoSales" xml:space="preserve">
         <value>Sin ventas</value>
     </data>
+    <data name="GoalType_SaveFiat" xml:space="preserve">
+        <value>Ahorrar Fiat</value>
+    </data>
+    <data name="GoalType_SaveFiat_Description" xml:space="preserve">
+        <value>Ahorrar una cantidad objetivo en fiat (ingresos menos gastos)</value>
+    </data>
+    <data name="GoalDescription_SaveFiat" xml:space="preserve">
+        <value>Ahorrado {0} de {1} objetivo</value>
+    </data>
+    <data name="GoalType_SavingsRate" xml:space="preserve">
+        <value>Tasa de Ahorro</value>
+    </data>
+    <data name="GoalType_SavingsRate_Description" xml:space="preserve">
+        <value>Ahorrar un porcentaje objetivo de ingresos</value>
+    </data>
+    <data name="GoalDescription_SavingsRate" xml:space="preserve">
+        <value>Tasa de ahorro {0}% de {1}% objetivo</value>
+    </data>
+    <data name="GoalType_NetWorthBtc" xml:space="preserve">
+        <value>Patrimonio en BTC</value>
+    </data>
+    <data name="GoalType_NetWorthBtc_Description" xml:space="preserve">
+        <value>Alcanzar un patrimonio objetivo en bitcoin</value>
+    </data>
+    <data name="GoalDescription_NetWorthBtc" xml:space="preserve">
+        <value>Patrimonio {0} de {1} sats objetivo</value>
+    </data>
+    <data name="ManageGoal_TargetSavingsAmount" xml:space="preserve">
+        <value>Monto Objetivo de Ahorro</value>
+    </data>
+    <data name="ManageGoal_TargetSavingsRate" xml:space="preserve">
+        <value>Tasa Objetivo de Ahorro (%)</value>
+    </data>
     <data name="Settings_FontScale" xml:space="preserve">
         <value>Tamaño de Fuente</value>
     </data>
@@ -2024,5 +2057,62 @@
     </data>
     <data name="Assets.Help.SellingDescription" xml:space="preserve">
         <value>Usa la opción Vender (clic derecho) para registrar ganancias o pérdidas como transacción en tus cuentas.</value>
+    </data>
+    <data name="Menu_LeverageSimulator" xml:space="preserve">
+        <value>Simulador de Apalancamiento</value>
+    </data>
+    <data name="LeverageSimulator_Title" xml:space="preserve">
+        <value>Simulador de Apalancamiento</value>
+    </data>
+    <data name="LeverageSimulator_PositionType" xml:space="preserve">
+        <value>Tipo de Posición</value>
+    </data>
+    <data name="LeverageSimulator_Long" xml:space="preserve">
+        <value>Long</value>
+    </data>
+    <data name="LeverageSimulator_Short" xml:space="preserve">
+        <value>Short</value>
+    </data>
+    <data name="LeverageSimulator_EntryPrice" xml:space="preserve">
+        <value>Precio de Entrada</value>
+    </data>
+    <data name="LeverageSimulator_Collateral" xml:space="preserve">
+        <value>Colateral</value>
+    </data>
+    <data name="LeverageSimulator_Leverage" xml:space="preserve">
+        <value>Apalancamiento</value>
+    </data>
+    <data name="LeverageSimulator_LiquidationPrice" xml:space="preserve">
+        <value>Precio de Liquidación</value>
+    </data>
+    <data name="LeverageSimulator_SimulatedPrice" xml:space="preserve">
+        <value>Precio Simulado de BTC</value>
+    </data>
+    <data name="LeverageSimulator_Results" xml:space="preserve">
+        <value>Resultados</value>
+    </data>
+    <data name="LeverageSimulator_PositionValue" xml:space="preserve">
+        <value>Valor de la Posición</value>
+    </data>
+    <data name="LeverageSimulator_PnL" xml:space="preserve">
+        <value>P&amp;L No Realizado</value>
+    </data>
+    <data name="LeverageSimulator_PnLPercentage" xml:space="preserve">
+        <value>P&amp;L %</value>
+    </data>
+    <data name="LeverageSimulator_DistanceToLiquidation" xml:space="preserve">
+        <value>Distancia a Liquidación</value>
+    </data>
+    <data name="LeverageSimulator_LoadPosition" xml:space="preserve">
+        <value>Cargar posición</value>
+    </data>
+    <data name="LeverageSimulator_NewSimulation" xml:space="preserve">
+        <value>Nueva Simulación</value>
+    </data>
+    <data name="LeverageSimulator_InSats" xml:space="preserve">
+        <value>en sats</value>
+    </data>
+    <data name="LeverageSimulator_Currency" xml:space="preserve">
+        <value>Moneda</value>
     </data>
 </root>

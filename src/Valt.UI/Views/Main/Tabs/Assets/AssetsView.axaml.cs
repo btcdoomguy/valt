@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -72,8 +73,9 @@ public partial class AssetsView : ValtBaseUserControl
         assetVm.IsSelected = true;
         vm.SelectedAsset = assetVm;
 
-        // Handle double-click for edit
-        if (e.ClickCount == 2)
+        // Handle double-click for edit (left button only)
+        var point = e.GetCurrentPoint((Visual?)sender);
+        if (point.Properties.IsLeftButtonPressed && e.ClickCount == 2)
         {
             _ = vm.EditAssetCommand.ExecuteAsync(assetVm);
             e.Handled = true;

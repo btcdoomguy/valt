@@ -70,3 +70,30 @@ internal class BitcoinHodlGoalTypeDto
     [JsonPropertyName("calculatedSoldSats")]
     public long CalculatedSoldSats { get; set; }
 }
+
+internal class SaveFiatGoalTypeDto
+{
+    [JsonPropertyName("targetAmount")]
+    public decimal TargetAmount { get; set; }
+
+    [JsonPropertyName("calculatedSavings")]
+    public decimal CalculatedSavings { get; set; }
+}
+
+internal class SavingsRateGoalTypeDto
+{
+    [JsonPropertyName("targetPercentage")]
+    public decimal TargetPercentage { get; set; }
+
+    [JsonPropertyName("calculatedPercentage")]
+    public decimal CalculatedPercentage { get; set; }
+}
+
+internal class NetWorthBtcGoalTypeDto
+{
+    [JsonPropertyName("targetSats")]
+    public long TargetSats { get; set; }
+
+    [JsonPropertyName("calculatedSats")]
+    public long CalculatedSats { get; set; }
+}

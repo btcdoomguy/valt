@@ -24,5 +24,6 @@ public enum ApplicationModalNames
     ConversionCalculator = 20,
     ManageAccountGroup = 21,
     StatisticsConfig = 22,
-    ManageAsset = 23
+    ManageAsset = 23,
+    LeverageSimulator = 24
 }

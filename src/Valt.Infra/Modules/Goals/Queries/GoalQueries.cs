@@ -116,6 +116,9 @@ internal class GoalQueries : IGoalQueries
             GoalTypeNames.IncomeBtc => MapIncomeBtcGoalType(json),
             GoalTypeNames.ReduceExpenseCategory => MapReduceExpenseCategoryGoalType(json),
             GoalTypeNames.BitcoinHodl => MapBitcoinHodlGoalType(json),
+            GoalTypeNames.SaveFiat => MapSaveFiatGoalType(json),
+            GoalTypeNames.SavingsRate => MapSavingsRateGoalType(json),
+            GoalTypeNames.NetWorthBtc => MapNetWorthBtcGoalType(json),
             _ => throw new NotSupportedException($"Goal type {typeName} is not supported")
         };
     }
@@ -196,6 +199,39 @@ internal class GoalQueries : IGoalQueries
         {
             MaxSellableSats = dto.MaxSellableSats,
             CalculatedSoldSats = dto.CalculatedSoldSats
+        };
+    }
+
+    private static SaveFiatGoalTypeOutputDTO MapSaveFiatGoalType(string json)
+    {
+        var dto = JsonSerializer.Deserialize<SaveFiatGoalTypeDto>(json)
+            ?? throw new InvalidOperationException("Failed to deserialize SaveFiatGoalType");
+        return new SaveFiatGoalTypeOutputDTO
+        {
+            TargetAmount = dto.TargetAmount,
+            CalculatedSavings = dto.CalculatedSavings
+        };
+    }
+
+    private static SavingsRateGoalTypeOutputDTO MapSavingsRateGoalType(string json)
+    {
+        var dto = JsonSerializer.Deserialize<SavingsRateGoalTypeDto>(json)
+            ?? throw new InvalidOperationException("Failed to deserialize SavingsRateGoalType");
+        return new SavingsRateGoalTypeOutputDTO
+        {
+            TargetPercentage = dto.TargetPercentage,
+            CalculatedPercentage = dto.CalculatedPercentage
+        };
+    }
+
+    private static NetWorthBtcGoalTypeOutputDTO MapNetWorthBtcGoalType(string json)
+    {
+        var dto = JsonSerializer.Deserialize<NetWorthBtcGoalTypeDto>(json)
+            ?? throw new InvalidOperationException("Failed to deserialize NetWorthBtcGoalType");
+        return new NetWorthBtcGoalTypeOutputDTO
+        {
+            TargetSats = dto.TargetSats,
+            CalculatedSats = dto.CalculatedSats
         };
     }
 

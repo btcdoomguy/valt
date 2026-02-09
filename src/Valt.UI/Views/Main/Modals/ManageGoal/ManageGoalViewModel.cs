@@ -65,7 +65,10 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
         new(language.GoalType_IncomeFiat, GoalTypeNames.IncomeFiat.ToString()),
         new(language.GoalType_IncomeBtc, GoalTypeNames.IncomeBtc.ToString()),
         new(language.GoalType_ReduceExpenseCategory, GoalTypeNames.ReduceExpenseCategory.ToString()),
-        new(language.GoalType_BitcoinHodl, GoalTypeNames.BitcoinHodl.ToString())
+        new(language.GoalType_BitcoinHodl, GoalTypeNames.BitcoinHodl.ToString()),
+        new(language.GoalType_SaveFiat, GoalTypeNames.SaveFiat.ToString()),
+        new(language.GoalType_SavingsRate, GoalTypeNames.SavingsRate.ToString()),
+        new(language.GoalType_NetWorthBtc, GoalTypeNames.NetWorthBtc.ToString())
     ];
 
     public static List<ComboBoxValue> AvailableMonths =>
@@ -128,6 +131,11 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
                 ? new ReduceExpenseCategoryGoalTypeEditorViewModel(_currencySettings, _queryDispatcher)
                 : new ReduceExpenseCategoryGoalTypeEditorViewModel(),
             GoalTypeNames.BitcoinHodl => new BitcoinHodlGoalTypeEditorViewModel(),
+            GoalTypeNames.SaveFiat => _currencySettings != null
+                ? new SaveFiatGoalTypeEditorViewModel(_currencySettings)
+                : new SaveFiatGoalTypeEditorViewModel(),
+            GoalTypeNames.SavingsRate => new SavingsRateGoalTypeEditorViewModel(),
+            GoalTypeNames.NetWorthBtc => new NetWorthBtcGoalTypeEditorViewModel(),
             _ => throw new ArgumentOutOfRangeException(nameof(goalTypeName))
         };
     }

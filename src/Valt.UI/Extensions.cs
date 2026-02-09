@@ -40,6 +40,7 @@ using Valt.UI.Views.Main.Modals.ConversionCalculator;
 using Valt.UI.Views.Main.Modals.ManageAccountGroup;
 using Valt.UI.Views.Main.Modals.StatisticsConfig;
 using Valt.UI.Views.Main.Modals.ManageAsset;
+using Valt.UI.Views.Main.Modals.LeverageSimulator;
 using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Tabs.Transactions;
 
@@ -116,6 +117,7 @@ public static class Extensions
         services.AddTransient<ManageAccountGroupViewModel>();
         services.AddTransient<StatisticsConfigViewModel>();
         services.AddTransient<ManageAssetViewModel>();
+        services.AddTransient<LeverageSimulatorViewModel>();
 
         //other
         services.AddSingleton<IInitialCategoryNameLanguageProvider, InitialCategoryNameLanguageProvider>();
@@ -217,6 +219,10 @@ public static class Extensions
                 ApplicationModalNames.ManageAsset => new ManageAssetView()
                 {
                     DataContext = services.GetRequiredService<ManageAssetViewModel>(),
+                },
+                ApplicationModalNames.LeverageSimulator => new LeverageSimulatorView()
+                {
+                    DataContext = services.GetRequiredService<LeverageSimulatorViewModel>(),
                 },
                 _ => throw new ArgumentOutOfRangeException(nameof(modalNames), modalNames, null)
             };

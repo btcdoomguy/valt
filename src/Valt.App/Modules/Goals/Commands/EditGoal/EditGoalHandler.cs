@@ -78,6 +78,15 @@ internal sealed class EditGoalHandler : ICommandHandler<EditGoalCommand, EditGoa
             BitcoinHodlGoalTypeDTO hodl =>
                 Result<IGoalType>.Success(new BitcoinHodlGoalType(hodl.MaxSellableSats)),
 
+            SaveFiatGoalTypeDTO saveFiat =>
+                Result<IGoalType>.Success(new SaveFiatGoalType(saveFiat.TargetAmount)),
+
+            SavingsRateGoalTypeDTO savingsRate =>
+                Result<IGoalType>.Success(new SavingsRateGoalType(savingsRate.TargetPercentage)),
+
+            NetWorthBtcGoalTypeDTO netWorthBtc =>
+                Result<IGoalType>.Success(new NetWorthBtcGoalType(netWorthBtc.TargetSats)),
+
             _ => Result<IGoalType>.Failure("UNKNOWN_GOAL_TYPE", "Unknown goal type")
         };
     }

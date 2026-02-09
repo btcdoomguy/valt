@@ -47,6 +47,9 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
                 IncomeFiatGoalTypeOutputDTO => language.GoalType_IncomeFiat,
                 IncomeBtcGoalTypeOutputDTO => language.GoalType_IncomeBtc,
                 BitcoinHodlGoalTypeOutputDTO => language.GoalType_BitcoinHodl,
+                SaveFiatGoalTypeOutputDTO => language.GoalType_SaveFiat,
+                SavingsRateGoalTypeOutputDTO => language.GoalType_SavingsRate,
+                NetWorthBtcGoalTypeOutputDTO => language.GoalType_NetWorthBtc,
                 _ => "Unknown"
             };
         }
@@ -91,6 +94,12 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
                 BitcoinHodlGoalTypeOutputDTO bitcoinHodl => bitcoinHodl.MaxSellableSats == 0
                     ? language.GoalTarget_NoSales
                     : CurrencyDisplay.FormatSatsAsBitcoin(bitcoinHodl.MaxSellableSats),
+                SaveFiatGoalTypeOutputDTO saveFiat =>
+                    CurrencyDisplay.FormatFiat(saveFiat.TargetAmount, _mainFiatCurrency),
+                SavingsRateGoalTypeOutputDTO savingsRate =>
+                    $"{savingsRate.TargetPercentage:F0}%",
+                NetWorthBtcGoalTypeOutputDTO netWorthBtc =>
+                    CurrencyDisplay.FormatSatsAsBitcoin(netWorthBtc.TargetSats),
                 _ => string.Empty
             };
         }
@@ -127,6 +136,18 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
                     CurrencyDisplay.FormatFiat(Math.Min(reduceExpense.CalculatedSpending, reduceExpense.TargetAmount), _mainFiatCurrency),
                     CurrencyDisplay.FormatFiat(reduceExpense.TargetAmount, _mainFiatCurrency)),
                 BitcoinHodlGoalTypeOutputDTO bitcoinHodl => GetBitcoinHodlDescription(bitcoinHodl),
+                SaveFiatGoalTypeOutputDTO saveFiat => string.Format(
+                    language.GoalDescription_SaveFiat,
+                    CurrencyDisplay.FormatFiat(saveFiat.CalculatedSavings, _mainFiatCurrency),
+                    CurrencyDisplay.FormatFiat(saveFiat.TargetAmount, _mainFiatCurrency)),
+                SavingsRateGoalTypeOutputDTO savingsRate => string.Format(
+                    language.GoalDescription_SavingsRate,
+                    savingsRate.CalculatedPercentage.ToString("F1"),
+                    savingsRate.TargetPercentage.ToString("F0")),
+                NetWorthBtcGoalTypeOutputDTO netWorthBtc => string.Format(
+                    language.GoalDescription_NetWorthBtc,
+                    CurrencyDisplay.FormatSatsAsNumber(netWorthBtc.CalculatedSats),
+                    CurrencyDisplay.FormatSatsAsNumber(netWorthBtc.TargetSats)),
                 _ => string.Empty
             };
         }

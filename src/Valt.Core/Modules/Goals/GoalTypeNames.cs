@@ -8,5 +8,8 @@ public enum GoalTypeNames
     IncomeFiat = 3,
     IncomeBtc = 4,
     ReduceExpenseCategory = 5,
-    BitcoinHodl = 6
+    BitcoinHodl = 6,
+    SaveFiat = 7,
+    SavingsRate = 8,
+    NetWorthBtc = 9
 }

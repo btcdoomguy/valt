@@ -38,6 +38,9 @@ All types are sealed classes in `GoalTypes/`:
 | SpendingLimitGoalType | DecreasingSuccess | `TargetAmount` | `CalculatedSpending` | **`true`** | Cap fiat spending (multi-currency) |
 | ReduceExpenseCategoryGoalType | DecreasingSuccess | `TargetAmount`, `CategoryId` | `CalculatedSpending` | **`true`** | Reduce category spending |
 | BitcoinHodlGoalType | DecreasingSuccess | `MaxSellableSats` | `CalculatedSoldSats` | `false` | Limit bitcoin sales |
+| SaveFiatGoalType | ZeroToSuccess | `TargetAmount` | `CalculatedSavings` | **`true`** | Save fiat (income - expenses) |
+| SavingsRateGoalType | ZeroToSuccess | `TargetPercentage` | `CalculatedPercentage` | **`true`** | Save target % of income |
+| NetWorthBtcGoalType | ZeroToSuccess | `TargetSats` | `CalculatedSats` | **`true`** | Reach net worth in sats |
 
 **IGoalType Interface:**
 ```csharp
@@ -60,7 +63,7 @@ var updated = goalType.WithCalculatedSats(newValue);
 
 **GoalStates:** `Open`, `Completed`, `Failed`
 
-**GoalTypeNames:** `StackBitcoin`, `SpendingLimit`, `Dca`, `IncomeFiat`, `IncomeBtc`, `ReduceExpenseCategory`, `BitcoinHodl`
+**GoalTypeNames:** `StackBitcoin`, `SpendingLimit`, `Dca`, `IncomeFiat`, `IncomeBtc`, `ReduceExpenseCategory`, `BitcoinHodl`, `SaveFiat`, `SavingsRate`, `NetWorthBtc`
 
 **ProgressionMode:** `ZeroToSuccess`, `DecreasingSuccess`
 
@@ -126,6 +129,9 @@ Task<GoalProgressResult> CalculateProgressAsync(GoalProgressInput input);
 | SpendingLimitProgressCalculator | DecreasingSuccess | `(spent / limit) * 100` - can exceed 100% |
 | ReduceExpenseCategoryProgressCalculator | DecreasingSuccess | Category expenses converted to main currency |
 | BitcoinHodlProgressCalculator | DecreasingSuccess | `(soldSats / maxSellable) * 100` - if max=0, any sale = 100% |
+| SaveFiatProgressCalculator | ZeroToSuccess | `(income - expenses) / target * 100` - savings in main currency |
+| SavingsRateProgressCalculator | ZeroToSuccess | `savingsRate / targetRate * 100` - where rate = (income-expenses)/income |
+| NetWorthBtcProgressCalculator | ZeroToSuccess | Sum all account balances converted to sats / target * 100 |
 
 **GoalProgressCalculatorFactory** - Resolves calculator by `GoalTypeNames`
 
@@ -284,6 +290,9 @@ public interface IGoalTypeEditorViewModel {
 - `IncomeBtcGoalTypeEditorViewModel` - BtcValue input
 - `BitcoinHodlGoalTypeEditorViewModel` - BtcValue (0 = full HODL)
 - `ReduceExpenseCategoryGoalTypeEditorViewModel` - FiatValue + Category dropdown
+- `SaveFiatGoalTypeEditorViewModel` - FiatValue + Currency
+- `SavingsRateGoalTypeEditorViewModel` - Decimal percentage (1-100)
+- `NetWorthBtcGoalTypeEditorViewModel` - BtcValue input
 
 ## Key Patterns
 
@@ -321,6 +330,9 @@ GoalBuilder.AMonthlyGoal().Build();
 GoalBuilder.AYearlyGoal().Build();
 GoalBuilder.AGoal().WithState(GoalStates.Failed).Build();
 GoalBuilder.AGoal().WithGoalType(new SpendingLimitGoalType(1000m)).Build();
+GoalBuilder.ASaveFiatGoal(targetAmount: 1000m).Build();
+GoalBuilder.ASavingsRateGoal(targetPercentage: 20m).Build();
+GoalBuilder.ANetWorthBtcGoal(targetSats: 10_000_000).Build();
 ```
 
 ## Data Flow Example
@@ -400,7 +412,7 @@ src/Valt.Infra/Modules/Goals/
 │   ├── GoalTransactionReader.cs
 │   ├── IGoalProgressCalculator.cs
 │   ├── GoalProgressCalculatorFactory.cs
-│   └── *ProgressCalculator.cs (7 implementations)
+│   └── *ProgressCalculator.cs (10 implementations)
 ├── Handlers/
 │   ├── GoalEventHandler.cs
 │   ├── MarkGoalsStaleEventHandler.cs
@@ -417,5 +429,5 @@ src/Valt.UI/Views/Main/
     ├── ManageGoalViewModel.cs, ManageGoalView.axaml
     ├── IGoalTypeEditorViewModel.cs
     └── GoalTypeEditors/
-        └── *GoalTypeEditorViewModel.cs (7 editors + views)
+        └── *GoalTypeEditorViewModel.cs (10 editors + views)
 ```

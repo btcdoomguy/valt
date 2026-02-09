@@ -96,6 +96,15 @@
                             <DataTemplate DataType="editors:BitcoinHodlGoalTypeEditorViewModel">
                                 <editors:BitcoinHodlGoalTypeEditor />
                             </DataTemplate>
+                            <DataTemplate DataType="editors:SaveFiatGoalTypeEditorViewModel">
+                                <editors:SaveFiatGoalTypeEditor />
+                            </DataTemplate>
+                            <DataTemplate DataType="editors:SavingsRateGoalTypeEditorViewModel">
+                                <editors:SavingsRateGoalTypeEditor />
+                            </DataTemplate>
+                            <DataTemplate DataType="editors:NetWorthBtcGoalTypeEditorViewModel">
+                                <editors:NetWorthBtcGoalTypeEditor />
+                            </DataTemplate>
                         </ContentControl.DataTemplates>
                     </ContentControl>
                 </StackPanel>
