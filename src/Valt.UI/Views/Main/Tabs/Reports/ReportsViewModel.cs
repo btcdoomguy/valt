@@ -212,10 +212,11 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             _ready = true;
         }
 
-        LoadDataAndFetchAllReportsAsync().SafeFireAndForget(logger: _logger, callerName: nameof(LoadDataAndFetchAllReportsAsync));
+        LoadDataAndFetchAllReportsAsync()
+            .ContinueWith(_ => UpdateLeveragePositionsDataAsync(), TaskScheduler.Default)
+            .SafeFireAndForget(logger: _logger, callerName: nameof(LoadDataAndFetchAllReportsAsync));
         UpdateWealthData();
         UpdateBtcStackData();
-        UpdateLeveragePositionsDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateLeveragePositionsDataAsync));
     }
 
     /// <summary>
