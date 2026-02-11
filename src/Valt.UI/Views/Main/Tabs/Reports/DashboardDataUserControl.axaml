@@ -25,13 +25,20 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <Label Grid.Column="0"
-                           HorizontalContentAlignment="Left"
-                           Content="{Binding Title}"
-                           Foreground="{DynamicResource Accent200Brush}"
-                           FontSize="{DynamicResource FontSizeNormal}"
-                           FontWeight="SemiBold"
-                           Padding="0" />
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="4">
+                        <TextBlock FontFamily="{DynamicResource MaterialDesign}"
+                                   Text="{Binding Icon}"
+                                   FontSize="13"
+                                   Foreground="{DynamicResource Accent200Brush}"
+                                   VerticalAlignment="Center"
+                                   IsVisible="{Binding Icon, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                        <Label HorizontalContentAlignment="Left"
+                               Content="{Binding Title}"
+                               Foreground="{DynamicResource Accent200Brush}"
+                               FontSize="{DynamicResource FontSizeNormal}"
+                               FontWeight="SemiBold"
+                               Padding="0" />
+                    </StackPanel>
 
                     <!-- Settings gear icon - only visible when HasConfiguration is true -->
                     <Button Grid.Column="1"

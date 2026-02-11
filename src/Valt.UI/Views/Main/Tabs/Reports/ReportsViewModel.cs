@@ -68,6 +68,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     // Cached provider for the lifetime of the tab being active
     private IReportDataProvider? _cachedProvider;
 
+    // Cached ATH fiat value for reuse by leverage positions panel
+    private decimal? _allTimeHighFiatValue;
+
     [ObservableProperty] private DashboardData _wealthData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _allTimeHighData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _btcStackData = DashboardData.Empty;
@@ -445,6 +448,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             if (currentBtcInBtc > 0)
             {
                 var targetAthValue = allTimeHighData.Value.Value;
+                _allTimeHighFiatValue = targetAthValue;
                 var requiredBtcPriceValue = targetAthValue - currentFiat;
 
                 if (requiredBtcPriceValue > 0)
@@ -455,7 +459,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 }
             }
 
-            AllTimeHighData = new DashboardData(language.Reports_AllTimeHigh_Title, rows);
+            AllTimeHighData = new DashboardData(language.Reports_AllTimeHigh_Title, rows, Icon: "\uE8E5");
 
             IsAllTimeHighLoading = false;
         }
@@ -466,7 +470,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 new ObservableCollection<RowItem>
                 {
                     new(language.Error, ex.Message)
-                });
+                },
+                Icon: "\uE8E5");
         }
         finally
         {
@@ -535,7 +540,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
             rows.Add(new RowItem(language.Reports_Statistics_WealthCoverage, statisticsData.WealthCoverageFormatted, language.Reports_Statistics_WealthCoverage_Tooltip));
 
-            StatisticsData = new DashboardData(language.Reports_Statistics_Title, rows, OpenStatisticsConfigCommand);
+            StatisticsData = new DashboardData(language.Reports_Statistics_Title, rows, OpenStatisticsConfigCommand, "\uE4FC");
 
             IsStatisticsLoading = false;
         }
@@ -547,7 +552,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     {
                         new(language.Error, ex.Message)
                     },
-                OpenStatisticsConfigCommand);
+                OpenStatisticsConfigCommand,
+                "\uE4FC");
         }
         finally
         {
@@ -607,7 +613,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
             rows.Add(new RowItem(language.Transactions_Ratio, btcRatio));
 
-            WealthData = new DashboardData(language.Reports_Wealth_Title, rows);
+            WealthData = new DashboardData(language.Reports_Wealth_Title, rows, Icon: "\uE84F");
             IsWealthLoading = false;
         }
         catch (Exception ex)
@@ -629,7 +635,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     new(language.Reports_BtcStack_CurrentStack, "0 BTC"),
                     new(language.Reports_BtcStack_PercentOfSupply, "0%"),
                     new(language.Reports_BtcStack_PeopleWithSameStack, "∞", language.Reports_BtcStack_PeopleWithSameStack_Tooltip)
-                });
+                }, Icon: "\uEBC5");
                 IsBtcStackLoading = false;
                 return;
             }
@@ -647,7 +653,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 new(language.Reports_BtcStack_PeopleWithSameStack, peopleFormatted, language.Reports_BtcStack_PeopleWithSameStack_Tooltip)
             };
 
-            BtcStackData = new DashboardData(language.Reports_BtcStack_Title, rows);
+            BtcStackData = new DashboardData(language.Reports_BtcStack_Title, rows, Icon: "\uEBC5");
             IsBtcStackLoading = false;
         }
         catch (Exception ex)
@@ -715,10 +721,62 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 leveragePercentage = Math.Abs(totalBtcExposure) / Math.Abs(leveragedStackSats / 100_000_000m) * 100m;
             }
 
+            // Calculate total P&L in main fiat currency
+            var fiatRates = _ratesState.FiatRates;
+            var btcPrice = _ratesState.BitcoinPrice;
+            var mainCurrency = _currencySettings.MainFiatCurrency;
+            decimal totalPnlInMainFiat = 0;
+
+            if (fiatRates != null && btcPrice.HasValue)
+            {
+                foreach (var position in leveragedPositions)
+                {
+                    if (!position.PnL.HasValue) continue;
+                    var pnl = position.PnL.Value;
+                    var currency = position.CurrencyCode;
+
+                    if (currency == mainCurrency)
+                        totalPnlInMainFiat += pnl;
+                    else if (currency == FiatCurrency.Usd.Code)
+                        totalPnlInMainFiat += pnl * fiatRates[mainCurrency];
+                    else if (fiatRates.ContainsKey(currency))
+                        totalPnlInMainFiat += (pnl / fiatRates[currency]) * fiatRates[mainCurrency];
+                }
+            }
+            totalPnlInMainFiat = Math.Round(totalPnlInMainFiat, 2);
+
+            // Calculate P&L in BTC (sats)
+            long pnlInSats = 0;
+            if (fiatRates != null && btcPrice.HasValue && fiatRates.ContainsKey(mainCurrency))
+            {
+                var mainFiatRate = fiatRates[mainCurrency];
+                pnlInSats = BtcPriceCalculator.CalculateBtcAmountOfFiat(
+                    totalPnlInMainFiat, mainFiatRate, btcPrice.Value);
+            }
+
+            // Calculate BTC price to hit ATH using leveraged stack
+            decimal? requiredBtcPriceLeveraged = null;
+            if (_allTimeHighFiatValue.HasValue)
+            {
+                var currentFiat = wealth.WealthInMainFiatCurrency;
+                var leveragedStackBtc = leveragedStackSats / 100_000_000m;
+                if (leveragedStackBtc > 0)
+                {
+                    var requiredFiatDiff = _allTimeHighFiatValue.Value - currentFiat;
+                    if (requiredFiatDiff > 0)
+                        requiredBtcPriceLeveraged = requiredFiatDiff / leveragedStackBtc;
+                }
+            }
+
+            var fiatCurrency = FiatCurrency.GetFromCode(mainCurrency);
             var leveragedStackFormatted = CurrencyDisplay.FormatSatsAsBitcoin(leveragedStackSats) + " BTC";
             var exposureFormatted = (totalBtcExposure >= 0 ? "+" : "") + totalBtcExposure.ToString("0.########") + " BTC";
             var leveragePercentFormatted = leveragePercentage.ToString("0.##") + "%";
             var positionCountFormatted = leveragedPositions.Count.ToString();
+            var pnlFiatFormatted = (totalPnlInMainFiat >= 0 ? "+" : "")
+                + CurrencyDisplay.FormatFiat(totalPnlInMainFiat, fiatCurrency.Code);
+            var pnlBtcFormatted = (pnlInSats >= 0 ? "+" : "")
+                + CurrencyDisplay.FormatSatsAsBitcoin(pnlInSats) + " BTC";
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
@@ -727,10 +785,16 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     new(language.Reports_LeveragePositions_LeveragedStack, leveragedStackFormatted, language.Reports_LeveragePositions_LeveragedStack_Tooltip),
                     new(language.Reports_LeveragePositions_LeverageExposure, exposureFormatted),
                     new(language.Reports_LeveragePositions_LeveragePercentage, leveragePercentFormatted, language.Reports_LeveragePositions_LeveragePercentage_Tooltip),
-                    new(language.Reports_LeveragePositions_PositionCount, positionCountFormatted)
+                    new(language.Reports_LeveragePositions_PositionCount, positionCountFormatted),
+                    new(language.Reports_LeveragePositions_CurrentResult, pnlFiatFormatted),
+                    new(language.Reports_LeveragePositions_CurrentResultBtc, pnlBtcFormatted)
                 };
 
-                LeveragePositionsData = new DashboardData(language.Reports_LeveragePositions_Title, rows);
+                if (requiredBtcPriceLeveraged.HasValue)
+                    rows.Add(new RowItem(language.Reports_LeveragePositions_BtcPriceToHitAth,
+                        CurrencyDisplay.FormatFiat(requiredBtcPriceLeveraged.Value, fiatCurrency.Code)));
+
+                LeveragePositionsData = new DashboardData(language.Reports_LeveragePositions_Title, rows, Icon: "\uEA0B");
                 IsLeveragePositionsVisible = true;
                 IsLeveragePositionsLoading = false;
             });

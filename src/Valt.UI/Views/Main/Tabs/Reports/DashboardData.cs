@@ -4,7 +4,7 @@ using LiveChartsCore.Kernel;
 
 namespace Valt.UI.Views.Main.Tabs.Reports;
 
-public record DashboardData(string Title, ObservableCollection<RowItem> Rows, ICommand? ConfigureCommand = null)
+public record DashboardData(string Title, ObservableCollection<RowItem> Rows, ICommand? ConfigureCommand = null, string? Icon = null)
 {
     public bool HasConfiguration => ConfigureCommand is not null;
 
@@ -19,7 +19,8 @@ public record DashboardData(string Title, ObservableCollection<RowItem> Rows, IC
             new("Current difference", "-12.5%"),
             new("Max drawdown date", "Nov 03, 2024"),
             new("Max drawdown", "-35.2%")
-        });
+        },
+        Icon: "\uE8E5");
 
     public static DashboardData BtcStackDesignTimeSample => new(
         "Your BTC Stack",
@@ -28,5 +29,6 @@ public record DashboardData(string Title, ObservableCollection<RowItem> Rows, IC
             new("Current stack", "1.23456789 BTC"),
             new("% of total supply", "0.00000588%"),
             new("People with same stack", "17,010,309")
-        });
+        },
+        Icon: "\uEBC5");
 }

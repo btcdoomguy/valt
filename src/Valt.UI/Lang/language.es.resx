@@ -849,6 +849,15 @@
     <data name="Reports.LeveragePositions.PositionCount" xml:space="preserve">
         <value>Posiciones Activas</value>
     </data>
+    <data name="Reports.LeveragePositions.CurrentResult" xml:space="preserve">
+        <value>Resultado actual</value>
+    </data>
+    <data name="Reports.LeveragePositions.CurrentResultBtc" xml:space="preserve">
+        <value>Resultado actual (BTC)</value>
+    </data>
+    <data name="Reports.LeveragePositions.BtcPriceToHitAth" xml:space="preserve">
+        <value>Precio BTC para alcanzar ATH</value>
+    </data>
     <data name="Reports.Statistics.Title" xml:space="preserve">
         <value>Estadísticas</value>
     </data>
@@ -1179,6 +1188,15 @@
     </data>
     <data name="Reports.WealthOverview.Period.Yearly" xml:space="preserve">
         <value>Anual</value>
+    </data>
+    <data name="Reports.WealthOverview.Chart.TotalWealth" xml:space="preserve">
+        <value>Patrimonio Total</value>
+    </data>
+    <data name="Reports.WealthOverview.Chart.Bitcoin" xml:space="preserve">
+        <value>Bitcoin</value>
+    </data>
+    <data name="Reports.WealthOverview.Chart.Fiat" xml:space="preserve">
+        <value>Fiat</value>
     </data>
     <data name="AvgPriceLineEditor.AddTitle" xml:space="preserve">
         <value>Agregar línea</value>
@@ -2114,5 +2132,35 @@
     </data>
     <data name="LeverageSimulator_Currency" xml:space="preserve">
         <value>Moneda</value>
+    </data>
+    <data name="Main.PriceHistory" xml:space="preserve">
+        <value>Historial de Precios</value>
+    </data>
+    <data name="PriceHistory.Title" xml:space="preserve">
+        <value>Historial de Precios</value>
+    </data>
+    <data name="PriceHistory.Column.Date" xml:space="preserve">
+        <value>Fecha</value>
+    </data>
+    <data name="PriceHistory.Column.Price" xml:space="preserve">
+        <value>Precio (USD)</value>
+    </data>
+    <data name="PriceHistory.Column.Rate" xml:space="preserve">
+        <value>Tasa (USD)</value>
+    </data>
+    <data name="PriceHistory.Previous" xml:space="preserve">
+        <value>Anterior</value>
+    </data>
+    <data name="PriceHistory.Next" xml:space="preserve">
+        <value>Siguiente</value>
+    </data>
+    <data name="PriceHistory.PageInfo" xml:space="preserve">
+        <value>Página {0} de {1}</value>
+    </data>
+    <data name="PriceHistory.NoData" xml:space="preserve">
+        <value>Sin datos disponibles</value>
+    </data>
+    <data name="PriceHistory.TotalRecords" xml:space="preserve">
+        <value>{0} registros</value>
     </data>
 </root>
