@@ -58,9 +58,13 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
     [NotifyPropertyChangedFor(nameof(TotalSatsColor))]
     [NotifyPropertyChangedFor(nameof(TotalValueFormatted))]
     private AssetSummaryDTO? _summary;
-    [ObservableProperty] private AssetViewModel? _selectedAsset;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsSelectedAssetDetailsVisible))]
+    private AssetViewModel? _selectedAsset;
 
     public bool IsSecureModeEnabled => _secureModeState?.IsEnabled ?? false;
+
+    public bool IsSelectedAssetDetailsVisible => SelectedAsset is not null && !IsSecureModeEnabled;
 
     public string MainCurrencyCode => _currencySettings?.MainFiatCurrency ?? "USD";
 
@@ -261,6 +265,8 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
     [RelayCommand]
     private async Task AddAsset()
     {
+        if (IsSecureModeEnabled) return;
+
         var ownerWindow = GetUserControlOwnerWindow?.Invoke();
         if (ownerWindow is null)
             return;
@@ -281,6 +287,7 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
     [RelayCommand]
     private async Task EditAsset(AssetViewModel? asset)
     {
+        if (IsSecureModeEnabled) return;
         if (asset is null)
             return;
 
@@ -305,6 +312,7 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
     [RelayCommand]
     private async Task DeleteAsset(AssetViewModel? asset)
     {
+        if (IsSecureModeEnabled) return;
         if (asset is null)
             return;
 
@@ -338,6 +346,7 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
     [RelayCommand]
     private async Task SellAsset(AssetViewModel? asset)
     {
+        if (IsSecureModeEnabled) return;
         if (asset is null)
             return;
 
@@ -441,6 +450,7 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
     [RelayCommand]
     private async Task ToggleVisibility(AssetViewModel? asset)
     {
+        if (IsSecureModeEnabled) return;
         if (asset is null)
             return;
 
@@ -467,6 +477,7 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
     [RelayCommand]
     private async Task ToggleIncludeInNetWorth(AssetViewModel? asset)
     {
+        if (IsSecureModeEnabled) return;
         if (asset is null)
             return;
 
@@ -525,6 +536,7 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
     private void OnSecureModeStatePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         OnPropertyChanged(nameof(IsSecureModeEnabled));
+        OnPropertyChanged(nameof(IsSelectedAssetDetailsVisible));
     }
 
     private void OnRatesStatePropertyChanged(object? sender, PropertyChangedEventArgs e)

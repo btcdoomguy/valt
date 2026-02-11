@@ -64,7 +64,8 @@
                             </StackPanel>
                         </userControls:ModuleHelperText.HelpContent>
                     </userControls:ModuleHelperText>
-                    <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                IsVisible="{Binding !IsSecureModeEnabled}">
                         <Button Command="{Binding RefreshPricesCommand}"
                                 Classes="transparent"
                                 IsEnabled="{Binding !IsRefreshingPrices}"
@@ -124,7 +125,8 @@
                                         ClipToBounds="True"
                                         Cursor="Hand"
                                         Opacity="{Binding Visible, Converter={StaticResource BoolToOpacityConverter}}"
-                                        PointerPressed="AssetCard_PointerPressed">
+                                        PointerPressed="AssetCard_PointerPressed"
+                                        ContextRequested="AssetCard_ContextRequested">
                                     <Border.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Header="{x:Static lang:language.Assets_Edit}"
@@ -164,8 +166,19 @@
                                             </StackPanel>
                                         </Border>
 
+                                        <!-- Secure Mode Placeholder -->
+                                        <Border Grid.Row="1" Padding="12,8" Background="{DynamicResource Background900Brush}"
+                                                IsVisible="{Binding $parent[UserControl].((assets:AssetsViewModel)DataContext).IsSecureModeEnabled}">
+                                            <TextBlock Text="---"
+                                                       FontSize="{DynamicResource FontSizeLarge}"
+                                                       Foreground="{DynamicResource Text400Brush}"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center" />
+                                        </Border>
+
                                         <!-- Main Content -->
-                                        <Border Grid.Row="1" Padding="12,8" Background="{DynamicResource Background900Brush}">
+                                        <Border Grid.Row="1" Padding="12,8" Background="{DynamicResource Background900Brush}"
+                                                IsVisible="{Binding !$parent[UserControl].((assets:AssetsViewModel)DataContext).IsSecureModeEnabled}">
                                             <Grid RowDefinitions="*, Auto, Auto">
                                                 <!-- Type-specific content -->
                                                 <StackPanel Grid.Row="0" Spacing="4">
@@ -480,7 +493,7 @@
                             BorderThickness="1"
                             CornerRadius="8"
                             Padding="16"
-                            IsVisible="{Binding SelectedAsset, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            IsVisible="{Binding IsSelectedAssetDetailsVisible}">
                         <StackPanel Spacing="12">
                             <TextBlock Text="{x:Static lang:language.Assets_Details_Title}"
                                        FontSize="{DynamicResource FontSizeLarge}"
