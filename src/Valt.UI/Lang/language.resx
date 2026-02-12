@@ -2168,4 +2168,19 @@
     <data name="PriceHistory.TotalRecords" xml:space="preserve">
         <value>{0} records</value>
     </data>
+    <data name="Reports.CategoryFilter.SaveAsDefault" xml:space="preserve">
+        <value>Save as default</value>
+    </data>
+    <data name="Reports.CategoryFilter.LoadDefault" xml:space="preserve">
+        <value>Load default</value>
+    </data>
+    <data name="Reports.CategoryFilter.SaveConfirmTitle" xml:space="preserve">
+        <value>Save filter</value>
+    </data>
+    <data name="Reports.CategoryFilter.SaveConfirmMessage" xml:space="preserve">
+        <value>Save current category filter as default? This will override the previous default.</value>
+    </data>
+    <data name="Reports.CategoryFilter.SaveSuccess" xml:space="preserve">
+        <value>Default filter saved</value>
+    </data>
 </root>

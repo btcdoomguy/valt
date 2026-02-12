@@ -35,6 +35,7 @@ using Valt.UI.Base;
 using static Valt.UI.Base.TaskExtensions;
 using Valt.UI.Lang;
 using Valt.UI.Services;
+using Valt.UI.Services.MessageBoxes;
 using Valt.UI.State;
 using Valt.UI.State.Events;
 using Valt.UI.UserControls;
@@ -321,6 +322,24 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         AvailableCategories.AddRange(parsedCategories.OrderBy(x => x.Name));
         SelectedCategories.AddRange(AvailableCategories);
         IncomeSelectedCategories.AddRange(AvailableCategories);
+
+        // Apply saved expense category filter
+        var expenseExcluded = _configurationManager.GetExpensesCategoryFilterExcludedIds().ToHashSet();
+        if (expenseExcluded.Count > 0)
+        {
+            var toRemove = SelectedCategories.Where(c => expenseExcluded.Contains(c.Id)).ToList();
+            foreach (var item in toRemove)
+                SelectedCategories.Remove(item);
+        }
+
+        // Apply saved income category filter
+        var incomeExcluded = _configurationManager.GetIncomeCategoryFilterExcludedIds().ToHashSet();
+        if (incomeExcluded.Count > 0)
+        {
+            var toRemove = IncomeSelectedCategories.Where(c => incomeExcluded.Contains(c.Id)).ToList();
+            foreach (var item in toRemove)
+                IncomeSelectedCategories.Remove(item);
+        }
     }
 
     partial void OnFilterRangeChanged(DateRange value)
@@ -415,6 +434,86 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         {
             // Debounce cancelled, ignore
         }
+    }
+
+    [RelayCommand]
+    private async Task SaveExpensesCategoryFilter()
+    {
+        var ownerWindow = GetUserControlOwnerWindow?.Invoke();
+        if (ownerWindow is null) return;
+
+        var confirmed = await MessageBoxHelper.ShowQuestionAsync(
+            language.Reports_CategoryFilter_SaveConfirmTitle,
+            language.Reports_CategoryFilter_SaveConfirmMessage,
+            ownerWindow);
+
+        if (!confirmed) return;
+
+        var selectedIds = SelectedCategories.Select(c => c.Id).ToHashSet();
+        var excludedIds = AvailableCategories.Where(c => !selectedIds.Contains(c.Id)).Select(c => c.Id);
+        _configurationManager.SetExpensesCategoryFilterExcludedIds(excludedIds);
+
+        await MessageBoxHelper.ShowAlertAsync(
+            language.Reports_CategoryFilter_SaveConfirmTitle,
+            language.Reports_CategoryFilter_SaveSuccess,
+            ownerWindow);
+    }
+
+    [RelayCommand]
+    private void LoadExpensesCategoryFilter()
+    {
+        var excludedIds = _configurationManager.GetExpensesCategoryFilterExcludedIds().ToHashSet();
+        if (excludedIds.Count == 0)
+        {
+            // No saved filter — select all
+            SelectedCategories.Clear();
+            SelectedCategories.AddRange(AvailableCategories);
+            return;
+        }
+
+        var newSelection = AvailableCategories.Where(c => !excludedIds.Contains(c.Id)).ToList();
+        SelectedCategories.Clear();
+        SelectedCategories.AddRange(newSelection);
+    }
+
+    [RelayCommand]
+    private async Task SaveIncomeCategoryFilter()
+    {
+        var ownerWindow = GetUserControlOwnerWindow?.Invoke();
+        if (ownerWindow is null) return;
+
+        var confirmed = await MessageBoxHelper.ShowQuestionAsync(
+            language.Reports_CategoryFilter_SaveConfirmTitle,
+            language.Reports_CategoryFilter_SaveConfirmMessage,
+            ownerWindow);
+
+        if (!confirmed) return;
+
+        var selectedIds = IncomeSelectedCategories.Select(c => c.Id).ToHashSet();
+        var excludedIds = AvailableCategories.Where(c => !selectedIds.Contains(c.Id)).Select(c => c.Id);
+        _configurationManager.SetIncomeCategoryFilterExcludedIds(excludedIds);
+
+        await MessageBoxHelper.ShowAlertAsync(
+            language.Reports_CategoryFilter_SaveConfirmTitle,
+            language.Reports_CategoryFilter_SaveSuccess,
+            ownerWindow);
+    }
+
+    [RelayCommand]
+    private void LoadIncomeCategoryFilter()
+    {
+        var excludedIds = _configurationManager.GetIncomeCategoryFilterExcludedIds().ToHashSet();
+        if (excludedIds.Count == 0)
+        {
+            // No saved filter — select all
+            IncomeSelectedCategories.Clear();
+            IncomeSelectedCategories.AddRange(AvailableCategories);
+            return;
+        }
+
+        var newSelection = AvailableCategories.Where(c => !excludedIds.Contains(c.Id)).ToList();
+        IncomeSelectedCategories.Clear();
+        IncomeSelectedCategories.AddRange(newSelection);
     }
 
     private async Task FetchAllTimeHighDataAsync(IReportDataProvider provider)

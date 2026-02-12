@@ -4298,5 +4298,35 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("PriceHistory.TotalRecords", resourceCulture);
             }
         }
+
+        public static string Reports_CategoryFilter_SaveAsDefault {
+            get {
+                return ResourceManager.GetString("Reports.CategoryFilter.SaveAsDefault", resourceCulture);
+            }
+        }
+
+        public static string Reports_CategoryFilter_LoadDefault {
+            get {
+                return ResourceManager.GetString("Reports.CategoryFilter.LoadDefault", resourceCulture);
+            }
+        }
+
+        public static string Reports_CategoryFilter_SaveConfirmTitle {
+            get {
+                return ResourceManager.GetString("Reports.CategoryFilter.SaveConfirmTitle", resourceCulture);
+            }
+        }
+
+        public static string Reports_CategoryFilter_SaveConfirmMessage {
+            get {
+                return ResourceManager.GetString("Reports.CategoryFilter.SaveConfirmMessage", resourceCulture);
+            }
+        }
+
+        public static string Reports_CategoryFilter_SaveSuccess {
+            get {
+                return ResourceManager.GetString("Reports.CategoryFilter.SaveSuccess", resourceCulture);
+            }
+        }
     }
 }

@@ -2163,4 +2163,19 @@
     <data name="PriceHistory.TotalRecords" xml:space="preserve">
         <value>{0} registros</value>
     </data>
+    <data name="Reports.CategoryFilter.SaveAsDefault" xml:space="preserve">
+        <value>Salvar como padrão</value>
+    </data>
+    <data name="Reports.CategoryFilter.LoadDefault" xml:space="preserve">
+        <value>Carregar padrão</value>
+    </data>
+    <data name="Reports.CategoryFilter.SaveConfirmTitle" xml:space="preserve">
+        <value>Salvar filtro</value>
+    </data>
+    <data name="Reports.CategoryFilter.SaveConfirmMessage" xml:space="preserve">
+        <value>Salvar o filtro de categorias atual como padrão? Isso substituirá o padrão anterior.</value>
+    </data>
+    <data name="Reports.CategoryFilter.SaveSuccess" xml:space="preserve">
+        <value>Filtro padrão salvo</value>
+    </data>
 </root>

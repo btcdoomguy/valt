@@ -314,7 +314,21 @@
                         </userControls:DateCalendarSelector.AllowedSelectorModes>
                     </userControls:DateCalendarSelector>
                     <Grid ColumnDefinitions="300, *" MinHeight="600">
-                        <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="10" Margin="0, 10, 10, 0">
+                        <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="10" Margin="0, -36, 10, 0">
+                            <Button x:Name="ExpensesCategoryFilterButton"
+                                    Classes="transparent" Padding="2" HorizontalAlignment="Left"
+                                    Click="OnFilterSettingsButtonClick">
+                                <Button.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="{x:Static lang:language.Reports_CategoryFilter_SaveAsDefault}"
+                                                  Command="{Binding SaveExpensesCategoryFilterCommand}" />
+                                        <MenuItem Header="{x:Static lang:language.Reports_CategoryFilter_LoadDefault}"
+                                                  Command="{Binding LoadExpensesCategoryFilterCommand}" />
+                                    </ContextMenu>
+                                </Button.ContextMenu>
+                                <TextBlock FontFamily="{DynamicResource MaterialDesign}" Text="&#xE8B8;" FontSize="16"
+                                           Foreground="{DynamicResource Text300Brush}" />
+                            </Button>
                             <userControls:CheckboxListSelector
                                 Title="{x:Static lang:language.Reports_SpendingByCategories_Accounts}"
                                 DisplayMemberPath="Name"
@@ -377,7 +391,21 @@
                         </userControls:DateCalendarSelector.AllowedSelectorModes>
                     </userControls:DateCalendarSelector>
                     <Grid ColumnDefinitions="300, *" MinHeight="600">
-                        <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="10" Margin="0, 10, 10, 0">
+                        <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="10" Margin="0, -36, 10, 0">
+                            <Button x:Name="IncomeCategoryFilterButton"
+                                    Classes="transparent" Padding="2" HorizontalAlignment="Left"
+                                    Click="OnFilterSettingsButtonClick">
+                                <Button.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="{x:Static lang:language.Reports_CategoryFilter_SaveAsDefault}"
+                                                  Command="{Binding SaveIncomeCategoryFilterCommand}" />
+                                        <MenuItem Header="{x:Static lang:language.Reports_CategoryFilter_LoadDefault}"
+                                                  Command="{Binding LoadIncomeCategoryFilterCommand}" />
+                                    </ContextMenu>
+                                </Button.ContextMenu>
+                                <TextBlock FontFamily="{DynamicResource MaterialDesign}" Text="&#xE8B8;" FontSize="16"
+                                           Foreground="{DynamicResource Text300Brush}" />
+                            </Button>
                             <userControls:CheckboxListSelector
                                 Title="{x:Static lang:language.Reports_IncomeByCategories_Accounts}"
                                 DisplayMemberPath="Name"

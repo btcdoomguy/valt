@@ -64,4 +64,24 @@ public interface IConfigurationManager
     /// Sets the list of category IDs to exclude from statistics calculations.
     /// </summary>
     void SetStatisticsExcludedCategoryIds(IEnumerable<string> categoryIds);
+
+    /// <summary>
+    /// Gets the list of category IDs excluded from the expenses by category report filter.
+    /// </summary>
+    List<string> GetExpensesCategoryFilterExcludedIds();
+
+    /// <summary>
+    /// Sets the list of category IDs to exclude from the expenses by category report filter.
+    /// </summary>
+    void SetExpensesCategoryFilterExcludedIds(IEnumerable<string> categoryIds);
+
+    /// <summary>
+    /// Gets the list of category IDs excluded from the income by category report filter.
+    /// </summary>
+    List<string> GetIncomeCategoryFilterExcludedIds();
+
+    /// <summary>
+    /// Sets the list of category IDs to exclude from the income by category report filter.
+    /// </summary>
+    void SetIncomeCategoryFilterExcludedIds(IEnumerable<string> categoryIds);
 }
