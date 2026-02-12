@@ -9,6 +9,7 @@ using SkiaSharp;
 using Valt.Core.Common;
 using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Reports.WealthOverview;
+using Valt.UI.Lang;
 
 namespace Valt.UI.Views.Main.Tabs.Reports;
 
@@ -62,7 +63,7 @@ public class WealthOverviewChartData : IDisposable
 
         YAxes[0] = new Axis
         {
-            Name = "Fiat",
+            Name = language.Reports_WealthOverview_Chart_Fiat,
             NamePaint = new SolidColorPaint(FiatPrimary),
             NameTextSize = 13,
             NamePadding = new LiveChartsCore.Drawing.Padding(0, 10),
@@ -76,7 +77,7 @@ public class WealthOverviewChartData : IDisposable
 
         YAxes[1] = new Axis
         {
-            Name = "Bitcoin",
+            Name = language.Reports_WealthOverview_Chart_Bitcoin,
             NamePaint = new SolidColorPaint(BtcPrimary),
             NameTextSize = 13,
             NamePadding = new LiveChartsCore.Drawing.Padding(0, 10),
@@ -96,7 +97,7 @@ public class WealthOverviewChartData : IDisposable
 
     private LineSeries<ObservablePoint> CreateFiatSeries() => new()
     {
-        Name = "Total Wealth",
+        Name = language.Reports_WealthOverview_Chart_TotalWealth,
         Values = FiatValues,
         Stroke = new SolidColorPaint(FiatPrimary) { StrokeThickness = 2.5f },
         GeometryStroke = new SolidColorPaint(FiatDark) { StrokeThickness = 2 },
@@ -108,7 +109,7 @@ public class WealthOverviewChartData : IDisposable
 
     private LineSeries<ObservablePoint> CreateBtcSeries() => new()
     {
-        Name = "Bitcoin",
+        Name = language.Reports_WealthOverview_Chart_Bitcoin,
         Values = BtcValues,
         Stroke = new SolidColorPaint(BtcPrimary) { StrokeThickness = 2.5f },
         GeometryStroke = new SolidColorPaint(BtcDark) { StrokeThickness = 2 },

@@ -13,6 +13,7 @@
              xmlns:lang="clr-namespace:Valt.UI.Lang"
              xmlns:painting="clr-namespace:LiveChartsCore.SkiaSharpView.Painting;assembly=LiveChartsCore.SkiaSharpView"
              xmlns:wealthOverview="clr-namespace:Valt.Infra.Modules.Reports.WealthOverview;assembly=Valt.Infra"
+             xmlns:converters="clr-namespace:Valt.UI.Converters"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="1200"
              MinWidth="900"
              x:Class="Valt.UI.Views.Main.Tabs.Reports.ReportsView"
@@ -20,6 +21,9 @@
     <Design.DataContext>
         <reports1:ReportsViewModel />
     </Design.DataContext>
+    <UserControl.Resources>
+        <converters:WealthOverviewPeriodConverter x:Key="WealthOverviewPeriodConverter" />
+    </UserControl.Resources>
     <Grid>
         <ScrollViewer IsVisible="{Binding !IsSecureModeEnabled}">
         <StackPanel Margin="16">
@@ -31,9 +35,9 @@
                         <TextBlock Classes="section-header" Text="{x:Static lang:language.Reports_Summary}" />
                     </StackPanel>
                 </Expander.Header>
-                <StackPanel Orientation="Horizontal" Spacing="10">
+                <WrapPanel Orientation="Horizontal">
                     <!-- Wealth Dashboard -->
-                    <Grid MinHeight="150">
+                    <Grid MinHeight="150" Margin="0,0,10,10">
                         <Panel IsVisible="{Binding !IsWealthLoading}">
                             <reports1:DashboardDataUserControl DataContext="{Binding WealthData}" />
                         </Panel>
@@ -42,7 +46,7 @@
                                    IsVisible="{Binding IsWealthLoading}" />
                     </Grid>
                     <!-- All Time High Dashboard -->
-                    <Grid MinHeight="150">
+                    <Grid MinHeight="150" Margin="0,0,10,10">
                         <Panel IsVisible="{Binding !IsAllTimeHighLoading}">
                             <reports1:DashboardDataUserControl DataContext="{Binding AllTimeHighData}" />
                         </Panel>
@@ -51,7 +55,7 @@
                                    IsVisible="{Binding IsAllTimeHighLoading}" />
                     </Grid>
                     <!-- BTC Stack Dashboard -->
-                    <Grid MinHeight="150">
+                    <Grid MinHeight="150" Margin="0,0,10,10">
                         <Panel IsVisible="{Binding !IsBtcStackLoading}">
                             <reports1:DashboardDataUserControl DataContext="{Binding BtcStackData}" />
                         </Panel>
@@ -60,7 +64,7 @@
                                    IsVisible="{Binding IsBtcStackLoading}" />
                     </Grid>
                     <!-- Leverage Positions Dashboard -->
-                    <Grid MinHeight="150" IsVisible="{Binding IsLeveragePositionsVisible}">
+                    <Grid MinHeight="150" Margin="0,0,10,10" IsVisible="{Binding IsLeveragePositionsVisible}">
                         <Panel IsVisible="{Binding !IsLeveragePositionsLoading}">
                             <reports1:DashboardDataUserControl DataContext="{Binding LeveragePositionsData}" />
                         </Panel>
@@ -69,7 +73,7 @@
                                    IsVisible="{Binding IsLeveragePositionsLoading}" />
                     </Grid>
                     <!-- Statistics Dashboard -->
-                    <Grid MinHeight="150">
+                    <Grid MinHeight="150" Margin="0,0,10,10">
                         <Panel IsVisible="{Binding !IsStatisticsLoading}">
                             <reports1:DashboardDataUserControl DataContext="{Binding StatisticsData}" />
                         </Panel>
@@ -77,7 +81,7 @@
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    IsVisible="{Binding IsStatisticsLoading}" />
                     </Grid>
-                </StackPanel>
+                </WrapPanel>
             </Expander>
             <!--Wealth Overview-->
             <Expander Classes="section" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsExpanded="True">
@@ -92,13 +96,7 @@
                         <ComboBox SelectedItem="{Binding SelectedWealthOverviewPeriod}" MinWidth="150">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock>
-                                        <TextBlock.Text>
-                                            <MultiBinding StringFormat="{}{0}">
-                                                <Binding />
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
+                                    <TextBlock Text="{Binding Converter={StaticResource WealthOverviewPeriodConverter}}" />
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                             <wealthOverview:WealthOverviewPeriod>Daily</wealthOverview:WealthOverviewPeriod>
@@ -316,7 +314,21 @@
                         </userControls:DateCalendarSelector.AllowedSelectorModes>
                     </userControls:DateCalendarSelector>
                     <Grid ColumnDefinitions="300, *" MinHeight="600">
-                        <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="10" Margin="0, 10, 10, 0">
+                        <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="10" Margin="0, -36, 10, 0">
+                            <Button x:Name="ExpensesCategoryFilterButton"
+                                    Classes="transparent" Padding="2" HorizontalAlignment="Left"
+                                    Click="OnFilterSettingsButtonClick">
+                                <Button.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="{x:Static lang:language.Reports_CategoryFilter_SaveAsDefault}"
+                                                  Command="{Binding SaveExpensesCategoryFilterCommand}" />
+                                        <MenuItem Header="{x:Static lang:language.Reports_CategoryFilter_LoadDefault}"
+                                                  Command="{Binding LoadExpensesCategoryFilterCommand}" />
+                                    </ContextMenu>
+                                </Button.ContextMenu>
+                                <TextBlock FontFamily="{DynamicResource MaterialDesign}" Text="&#xE8B8;" FontSize="16"
+                                           Foreground="{DynamicResource Text300Brush}" />
+                            </Button>
                             <userControls:CheckboxListSelector
                                 Title="{x:Static lang:language.Reports_SpendingByCategories_Accounts}"
                                 DisplayMemberPath="Name"
@@ -379,7 +391,21 @@
                         </userControls:DateCalendarSelector.AllowedSelectorModes>
                     </userControls:DateCalendarSelector>
                     <Grid ColumnDefinitions="300, *" MinHeight="600">
-                        <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="10" Margin="0, 10, 10, 0">
+                        <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="10" Margin="0, -36, 10, 0">
+                            <Button x:Name="IncomeCategoryFilterButton"
+                                    Classes="transparent" Padding="2" HorizontalAlignment="Left"
+                                    Click="OnFilterSettingsButtonClick">
+                                <Button.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="{x:Static lang:language.Reports_CategoryFilter_SaveAsDefault}"
+                                                  Command="{Binding SaveIncomeCategoryFilterCommand}" />
+                                        <MenuItem Header="{x:Static lang:language.Reports_CategoryFilter_LoadDefault}"
+                                                  Command="{Binding LoadIncomeCategoryFilterCommand}" />
+                                    </ContextMenu>
+                                </Button.ContextMenu>
+                                <TextBlock FontFamily="{DynamicResource MaterialDesign}" Text="&#xE8B8;" FontSize="16"
+                                           Foreground="{DynamicResource Text300Brush}" />
+                            </Button>
                             <userControls:CheckboxListSelector
                                 Title="{x:Static lang:language.Reports_IncomeByCategories_Accounts}"
                                 DisplayMemberPath="Name"

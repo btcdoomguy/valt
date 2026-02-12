@@ -38,6 +38,7 @@ public partial class AssetsView : ValtBaseUserControl
     {
         var vm = DataContext as AssetsViewModel;
         if (vm is null) return;
+        if (vm.IsSecureModeEnabled) return;
 
         // F2 to add new asset
         if (e.Key == Key.F2)
@@ -74,10 +75,21 @@ public partial class AssetsView : ValtBaseUserControl
         vm.SelectedAsset = assetVm;
 
         // Handle double-click for edit (left button only)
+        if (vm.IsSecureModeEnabled) return;
+
         var point = e.GetCurrentPoint((Visual?)sender);
         if (point.Properties.IsLeftButtonPressed && e.ClickCount == 2)
         {
             _ = vm.EditAssetCommand.ExecuteAsync(assetVm);
+            e.Handled = true;
+        }
+    }
+
+    private void AssetCard_ContextRequested(object? sender, ContextRequestedEventArgs e)
+    {
+        var vm = DataContext as AssetsViewModel;
+        if (vm?.IsSecureModeEnabled == true)
+        {
             e.Handled = true;
         }
     }

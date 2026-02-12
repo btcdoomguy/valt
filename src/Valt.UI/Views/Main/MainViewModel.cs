@@ -318,6 +318,15 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     }
 
     [RelayCommand]
+    private async Task OpenPriceHistory()
+    {
+        var modal =
+            (Views.Main.Modals.PriceHistory.PriceHistoryView)await _modalFactory.CreateAsync(ApplicationModalNames.PriceHistory, Window)!;
+
+        await modal.ShowDialog(Window!);
+    }
+
+    [RelayCommand]
     private async Task ToggleSecureMode()
     {
         // If leaving secure mode, require password verification

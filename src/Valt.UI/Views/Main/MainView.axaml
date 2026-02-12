@@ -64,6 +64,9 @@
                                     <MenuItem Header="{x:Static local:language.Menu_LeverageSimulator}"
                                               Command="{Binding OpenLeverageSimulatorCommand}">
                                     </MenuItem>
+                                    <MenuItem Header="{x:Static local:language.Main_PriceHistory}"
+                                              Command="{Binding OpenPriceHistoryCommand}">
+                                    </MenuItem>
                                 </MenuItem>
                                 <Separator />
                                 <MenuItem Header="{x:Static local:language.Menu_ImportTransactions}"

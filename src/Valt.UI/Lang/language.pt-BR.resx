@@ -816,6 +816,15 @@
     <data name="Reports.LeveragePositions.PositionCount" xml:space="preserve">
         <value>Posições Ativas</value>
     </data>
+    <data name="Reports.LeveragePositions.CurrentResult" xml:space="preserve">
+        <value>Resultado atual</value>
+    </data>
+    <data name="Reports.LeveragePositions.CurrentResultBtc" xml:space="preserve">
+        <value>Resultado atual (BTC)</value>
+    </data>
+    <data name="Reports.LeveragePositions.BtcPriceToHitAth" xml:space="preserve">
+        <value>Preço BTC para atingir ATH</value>
+    </data>
     <data name="Reports.Statistics.Title" xml:space="preserve">
         <value>Estatísticas</value>
     </data>
@@ -1149,6 +1158,15 @@
     </data>
     <data name="Reports.WealthOverview.Period.Yearly" xml:space="preserve">
         <value>Anual</value>
+    </data>
+    <data name="Reports.WealthOverview.Chart.TotalWealth" xml:space="preserve">
+        <value>Patrimônio Total</value>
+    </data>
+    <data name="Reports.WealthOverview.Chart.Bitcoin" xml:space="preserve">
+        <value>Bitcoin</value>
+    </data>
+    <data name="Reports.WealthOverview.Chart.Fiat" xml:space="preserve">
+        <value>Fiat</value>
     </data>
     <data name="AvgPriceLineEditor.AddTitle" xml:space="preserve">
         <value>Adicionar Linha</value>
@@ -2114,5 +2132,50 @@
     </data>
     <data name="LeverageSimulator_Currency" xml:space="preserve">
         <value>Moeda</value>
+    </data>
+    <data name="Main.PriceHistory" xml:space="preserve">
+        <value>Histórico de Preços</value>
+    </data>
+    <data name="PriceHistory.Title" xml:space="preserve">
+        <value>Histórico de Preços</value>
+    </data>
+    <data name="PriceHistory.Column.Date" xml:space="preserve">
+        <value>Data</value>
+    </data>
+    <data name="PriceHistory.Column.Price" xml:space="preserve">
+        <value>Preço (USD)</value>
+    </data>
+    <data name="PriceHistory.Column.Rate" xml:space="preserve">
+        <value>Taxa (USD)</value>
+    </data>
+    <data name="PriceHistory.Previous" xml:space="preserve">
+        <value>Anterior</value>
+    </data>
+    <data name="PriceHistory.Next" xml:space="preserve">
+        <value>Próximo</value>
+    </data>
+    <data name="PriceHistory.PageInfo" xml:space="preserve">
+        <value>Página {0} de {1}</value>
+    </data>
+    <data name="PriceHistory.NoData" xml:space="preserve">
+        <value>Sem dados disponíveis</value>
+    </data>
+    <data name="PriceHistory.TotalRecords" xml:space="preserve">
+        <value>{0} registros</value>
+    </data>
+    <data name="Reports.CategoryFilter.SaveAsDefault" xml:space="preserve">
+        <value>Salvar como padrão</value>
+    </data>
+    <data name="Reports.CategoryFilter.LoadDefault" xml:space="preserve">
+        <value>Carregar padrão</value>
+    </data>
+    <data name="Reports.CategoryFilter.SaveConfirmTitle" xml:space="preserve">
+        <value>Salvar filtro</value>
+    </data>
+    <data name="Reports.CategoryFilter.SaveConfirmMessage" xml:space="preserve">
+        <value>Salvar o filtro de categorias atual como padrão? Isso substituirá o padrão anterior.</value>
+    </data>
+    <data name="Reports.CategoryFilter.SaveSuccess" xml:space="preserve">
+        <value>Filtro padrão salvo</value>
     </data>
 </root>

@@ -1712,7 +1712,25 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.LeveragePositions.PositionCount", resourceCulture);
             }
         }
-        
+
+        public static string Reports_LeveragePositions_CurrentResult {
+            get {
+                return ResourceManager.GetString("Reports.LeveragePositions.CurrentResult", resourceCulture);
+            }
+        }
+
+        public static string Reports_LeveragePositions_CurrentResultBtc {
+            get {
+                return ResourceManager.GetString("Reports.LeveragePositions.CurrentResultBtc", resourceCulture);
+            }
+        }
+
+        public static string Reports_LeveragePositions_BtcPriceToHitAth {
+            get {
+                return ResourceManager.GetString("Reports.LeveragePositions.BtcPriceToHitAth", resourceCulture);
+            }
+        }
+
         public static string Reports_Statistics_Title {
             get {
                 return ResourceManager.GetString("Reports.Statistics.Title", resourceCulture);
@@ -2366,7 +2384,25 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.WealthOverview.Period.Yearly", resourceCulture);
             }
         }
-        
+
+        public static string Reports_WealthOverview_Chart_TotalWealth {
+            get {
+                return ResourceManager.GetString("Reports.WealthOverview.Chart.TotalWealth", resourceCulture);
+            }
+        }
+
+        public static string Reports_WealthOverview_Chart_Bitcoin {
+            get {
+                return ResourceManager.GetString("Reports.WealthOverview.Chart.Bitcoin", resourceCulture);
+            }
+        }
+
+        public static string Reports_WealthOverview_Chart_Fiat {
+            get {
+                return ResourceManager.GetString("Reports.WealthOverview.Chart.Fiat", resourceCulture);
+            }
+        }
+
         public static string AvgPriceLineEditor_AddTitle {
             get {
                 return ResourceManager.GetString("AvgPriceLineEditor.AddTitle", resourceCulture);
@@ -4200,6 +4236,96 @@ namespace Valt.UI.Lang {
         public static string LeverageSimulator_Currency {
             get {
                 return ResourceManager.GetString("LeverageSimulator_Currency", resourceCulture);
+            }
+        }
+
+        public static string Main_PriceHistory {
+            get {
+                return ResourceManager.GetString("Main.PriceHistory", resourceCulture);
+            }
+        }
+
+        public static string PriceHistory_Title {
+            get {
+                return ResourceManager.GetString("PriceHistory.Title", resourceCulture);
+            }
+        }
+
+        public static string PriceHistory_Column_Date {
+            get {
+                return ResourceManager.GetString("PriceHistory.Column.Date", resourceCulture);
+            }
+        }
+
+        public static string PriceHistory_Column_Price {
+            get {
+                return ResourceManager.GetString("PriceHistory.Column.Price", resourceCulture);
+            }
+        }
+
+        public static string PriceHistory_Column_Rate {
+            get {
+                return ResourceManager.GetString("PriceHistory.Column.Rate", resourceCulture);
+            }
+        }
+
+        public static string PriceHistory_Previous {
+            get {
+                return ResourceManager.GetString("PriceHistory.Previous", resourceCulture);
+            }
+        }
+
+        public static string PriceHistory_Next {
+            get {
+                return ResourceManager.GetString("PriceHistory.Next", resourceCulture);
+            }
+        }
+
+        public static string PriceHistory_PageInfo {
+            get {
+                return ResourceManager.GetString("PriceHistory.PageInfo", resourceCulture);
+            }
+        }
+
+        public static string PriceHistory_NoData {
+            get {
+                return ResourceManager.GetString("PriceHistory.NoData", resourceCulture);
+            }
+        }
+
+        public static string PriceHistory_TotalRecords {
+            get {
+                return ResourceManager.GetString("PriceHistory.TotalRecords", resourceCulture);
+            }
+        }
+
+        public static string Reports_CategoryFilter_SaveAsDefault {
+            get {
+                return ResourceManager.GetString("Reports.CategoryFilter.SaveAsDefault", resourceCulture);
+            }
+        }
+
+        public static string Reports_CategoryFilter_LoadDefault {
+            get {
+                return ResourceManager.GetString("Reports.CategoryFilter.LoadDefault", resourceCulture);
+            }
+        }
+
+        public static string Reports_CategoryFilter_SaveConfirmTitle {
+            get {
+                return ResourceManager.GetString("Reports.CategoryFilter.SaveConfirmTitle", resourceCulture);
+            }
+        }
+
+        public static string Reports_CategoryFilter_SaveConfirmMessage {
+            get {
+                return ResourceManager.GetString("Reports.CategoryFilter.SaveConfirmMessage", resourceCulture);
+            }
+        }
+
+        public static string Reports_CategoryFilter_SaveSuccess {
+            get {
+                return ResourceManager.GetString("Reports.CategoryFilter.SaveSuccess", resourceCulture);
             }
         }
     }

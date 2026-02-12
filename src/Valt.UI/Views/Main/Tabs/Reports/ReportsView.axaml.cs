@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -91,6 +92,14 @@ public partial class ReportsView : ValtBaseUserControl
                 Throttling = false
             });
         });
+    }
+
+    private void OnFilterSettingsButtonClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.ContextMenu is not null)
+        {
+            button.ContextMenu.Open(button);
+        }
     }
 
     private void ForceCategoryBarRedraw()
