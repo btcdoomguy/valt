@@ -44,7 +44,8 @@
             <StackPanel Spacing="2" IsVisible="{Binding HasDatabaseOpen}">
 
                 <!-- BTC/USD Row (always visible) -->
-                <Grid ColumnDefinitions="Auto, *, Auto" Height="20">
+                <Grid ColumnDefinitions="Auto, *, Auto" Height="20"
+                      Opacity="{Binding IsLive, Converter={StaticResource BoolToOpacityConverter}}">
                     <TextBlock Grid.Column="0"
                                Classes="pair-label"
                                Text="BTC/USD"
@@ -73,7 +74,8 @@
                 </Grid>
 
                 <!-- USD/Fiat Row -->
-                <Grid ColumnDefinitions="Auto, *, Auto" Height="20" IsVisible="{Binding ShowUsdFiatLabels}">
+                <Grid ColumnDefinitions="Auto, *, Auto" Height="20" IsVisible="{Binding ShowUsdFiatLabels}"
+                      Opacity="{Binding IsLive, Converter={StaticResource BoolToOpacityConverter}}">
                     <TextBlock Grid.Column="0"
                                Classes="pair-label"
                                Text="{Binding UsdWithPairText}"
@@ -102,7 +104,8 @@
                 </Grid>
 
                 <!-- BTC/Fiat Row -->
-                <Grid ColumnDefinitions="Auto, *, Auto" Height="20" IsVisible="{Binding ShowUsdFiatLabels}">
+                <Grid ColumnDefinitions="Auto, *, Auto" Height="20" IsVisible="{Binding ShowUsdFiatLabels}"
+                      Opacity="{Binding IsLive, Converter={StaticResource BoolToOpacityConverter}}">
                     <TextBlock Grid.Column="0"
                                Classes="pair-label"
                                Text="{Binding BtcFiatPairText}"

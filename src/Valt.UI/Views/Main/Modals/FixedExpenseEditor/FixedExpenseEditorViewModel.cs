@@ -109,7 +109,6 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
 
     [Required(ErrorMessage = "Start date is required")]
     [ObservableProperty]
-    [ValidPeriodStartForExistingExpense]
     [NotifyPropertyChangedFor(nameof(PeriodStartDisplayText))]
     private DateTime? _periodStart = DateTime.Today;
 
@@ -292,6 +291,8 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
             PeriodStart = latestRange.PeriodStart.ToDateTime(TimeOnly.MinValue);
             Enabled = fixedExpense.Enabled;
 
+            LastFixedExpenseRecordReferenceDate = fixedExpense.LastFixedExpenseRecordDate;
+
             IsFixedAmount = latestRange.FixedAmount is not null;
             IsVariableAmount = latestRange.RangedAmountMin is not null;
             if (latestRange.RangedAmountMin is not null)
@@ -316,6 +317,22 @@ public partial class FixedExpenseEditorViewModel : ValtModalValidatorViewModel
 
         var periodId = (int)Enum.Parse<FixedExpensePeriods>(Period);
         var periodStart = DateOnly.FromDateTime(PeriodStart!.Value);
+
+        if (FixedExpenseId != null && LastFixedExpenseRecordReferenceDate.HasValue
+                                   && periodStart <= LastFixedExpenseRecordReferenceDate.Value)
+        {
+            var minDate = LastFixedExpenseRecordReferenceDate.Value.AddDays(1);
+            var response = await MessageBoxHelper.ShowQuestionAsync(
+                language.FixedExpenseEditor_ChangePrice_Title,
+                string.Format(language.FixedExpenseEditor_ChangePrice_Message,
+                    minDate.ToShortDateString()),
+                GetWindow!());
+
+            if (!response)
+                return;
+
+            periodStart = minDate;
+        }
 
         if (FixedExpenseId != null)
         {

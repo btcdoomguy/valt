@@ -561,6 +561,12 @@
     <data name="FixedExpenseEditor.Validation.InvalidRangePeriodStart" xml:space="preserve">
         <value>A data de início de um novo período não pode ser menor do que o último lançamento registrado</value>
     </data>
+    <data name="FixedExpenseEditor.ChangePrice.Title" xml:space="preserve">
+        <value>Alterar Preço</value>
+    </data>
+    <data name="FixedExpenseEditor.ChangePrice.Message" xml:space="preserve">
+        <value>Para alterar o preço desta despesa fixa, a data mínima deve ser {0} (um dia após a última transação relacionada). Deseja continuar?</value>
+    </data>
     <data name="FixedExpenseEditor.ChangeRecurrence" xml:space="preserve">
         <value>Alterar...</value>
     </data>

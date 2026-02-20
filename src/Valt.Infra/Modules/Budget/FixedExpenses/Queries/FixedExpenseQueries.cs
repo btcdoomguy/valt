@@ -17,12 +17,21 @@ public class FixedExpenseQueries(ILocalDatabase localDatabase) : IFixedExpenseQu
 
         if (fixedExpense is null)
             return Task.FromResult<FixedExpenseDTO?>(null);
-        
+
         var account = fixedExpense!.DefaultAccountId is not null ? localDatabase.GetAccounts().FindById(fixedExpense?.DefaultAccountId) : null;
         var category = localDatabase.GetCategories().FindById(fixedExpense?.CategoryId);
 
-        var dto = ConvertToDto(fixedExpense!, account, category);
-        
+        var lastRecord = localDatabase.GetFixedExpenseRecords()
+            .Find(x => x.FixedExpense != null && x.FixedExpense.Id == fixedExpense!.Id)
+            .OrderByDescending(x => x.ReferenceDate)
+            .FirstOrDefault();
+
+        var lastRecordDate = lastRecord is not null
+            ? DateOnly.FromDateTime(lastRecord.ReferenceDate)
+            : (DateOnly?)null;
+
+        var dto = ConvertToDto(fixedExpense!, account, category, lastRecordDate);
+
         return Task.FromResult(dto)!;
     }
 
@@ -138,7 +147,7 @@ public class FixedExpenseQueries(ILocalDatabase localDatabase) : IFixedExpenseQu
     }
 
     private static FixedExpenseDTO ConvertToDto(FixedExpenseEntity fixedExpense, AccountEntity? account,
-        CategoryEntity? category)
+        CategoryEntity? category, DateOnly? lastFixedExpenseRecordDate = null)
     {
         var displayCurrency = fixedExpense.Currency ??
                               account?.Currency;
@@ -152,6 +161,7 @@ public class FixedExpenseQueries(ILocalDatabase localDatabase) : IFixedExpenseQu
             CategoryId = fixedExpense.CategoryId?.ToString(),
             DefaultAccountId = fixedExpense.DefaultAccountId?.ToString(),
             Enabled = fixedExpense.Enabled,
+            LastFixedExpenseRecordDate = lastFixedExpenseRecordDate,
             Ranges = fixedExpense.Ranges.Select(range => new FixedExpenseRangeDTO()
             {
                 Day = range.Day,

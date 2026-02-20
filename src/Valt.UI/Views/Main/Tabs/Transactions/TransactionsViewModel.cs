@@ -108,6 +108,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayAllWealthInFiat))]
     private string _allWealthInFiat = "R$ 13.000.000,00";
 
+    [ObservableProperty] private bool _isRatesLive = true;
     [ObservableProperty] private FiatCurrency _mainFiatCurrency = FiatCurrency.Brl;
 
     [ObservableProperty] private ValtViewModel? _subContent;
@@ -237,6 +238,8 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
                 _accountsTotalState.CurrentWealth.NetWorthInMainFiatCurrency,
                 _accountsTotalState.CurrentWealth.WealthInBtcRatio,
                 _accountsTotalState.CurrentWealth.AssetsWealthInMainFiatCurrency);
+
+            IsRatesLive = _ratesState.IsUpToDate;
 
             OnPropertyChanged(nameof(HasAssets));
         });

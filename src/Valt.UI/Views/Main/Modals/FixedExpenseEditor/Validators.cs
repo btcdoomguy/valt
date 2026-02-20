@@ -1,7 +1,5 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using Valt.Core.Common;
-using Valt.Core.Modules.Budget.FixedExpenses;
 using Valt.UI.Lang;
 
 namespace Valt.UI.Views.Main.Modals.FixedExpenseEditor;
@@ -73,43 +71,3 @@ internal sealed class RangedAmountMinLessThanMaxAttribute : ValidationAttribute
     }
 }
 
-internal sealed class ValidPeriodStartForExistingExpenseAttribute : ValidationAttribute
-{
-    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
-    {
-        if (validationContext.ObjectInstance is FixedExpenseEditorViewModel vm && vm.FixedExpenseId != null && vm.PeriodStart.HasValue)
-        {
-            try
-            {
-                var date = DateOnly.FromDateTime(vm.PeriodStart.Value);
-                FixedExpenseRange newRange;
-                
-                if (vm.IsFixedSelectorVisible)
-                {
-                    if (vm.FixedAmount is null) return ValidationResult.Success;
-                    newRange = FixedExpenseRange.CreateFixedAmount(vm.FixedAmount,
-                        Enum.Parse<FixedExpensePeriods>(vm.Period), date, vm.Day);
-                }
-                else
-                {
-                    if (vm.RangedAmountMin is null || vm.RangedAmountMax is null) return ValidationResult.Success;
-                    newRange = FixedExpenseRange.CreateRangedAmount(
-                        new RangedFiatValue(vm.RangedAmountMin, vm.RangedAmountMax),
-                        Enum.Parse<FixedExpensePeriods>(vm.Period), date, vm.Day);
-                }
-
-                if (vm.CurrentFixedExpenseRange != newRange && 
-                    vm.LastFixedExpenseRecordReferenceDate >= newRange.PeriodStart)
-                {
-                    return new ValidationResult(
-                        $"{language.FixedExpenseEditor_Validation_InvalidRangePeriodStart} ({vm.LastFixedExpenseRecordReferenceDate.Value.ToShortDateString()})");
-                }
-            }
-            catch
-            {
-                // Ignore parsing errors during validation
-            }
-        }
-        return ValidationResult.Success;
-    }
-}

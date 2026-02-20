@@ -13,6 +13,7 @@ public record FixedExpenseDTO
     public string? Currency { get; init; }
     public required string DisplayCurrency { get; init; }
     public required bool Enabled { get; init; }
+    public DateOnly? LastFixedExpenseRecordDate { get; init; }
     public required IReadOnlyList<FixedExpenseRangeDTO> Ranges { get; init; }
     public FixedExpenseRangeDTO LatestRange => Ranges[^1];
 }
@@ -30,3 +31,4 @@ public record FixedExpenseRangeDTO
     public required string PeriodDescription { get; init; }
     public required int Day { get; init; }
 }
+
