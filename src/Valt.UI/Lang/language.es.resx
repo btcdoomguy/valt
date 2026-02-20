@@ -555,6 +555,12 @@
     <data name="FixedExpenseEditor.Validation.InvalidRangePeriodStart" xml:space="preserve">
         <value>No se puede establecer el inicio del nuevo período antes del último registro</value>
     </data>
+    <data name="FixedExpenseEditor.ChangePrice.Title" xml:space="preserve">
+        <value>Cambiar Precio</value>
+    </data>
+    <data name="FixedExpenseEditor.ChangePrice.Message" xml:space="preserve">
+        <value>Para cambiar el precio de este gasto fijo, la fecha mínima debe ser {0} (un día después de la última transacción relacionada). ¿Desea continuar?</value>
+    </data>
     <data name="FixedExpenseEditor.ChangeRecurrence" xml:space="preserve">
         <value>Cambiar...</value>
     </data>

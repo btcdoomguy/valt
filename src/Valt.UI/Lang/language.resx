@@ -560,6 +560,12 @@
     <data name="FixedExpenseEditor.Validation.InvalidRangePeriodStart" xml:space="preserve">
         <value>Cannot set the new range period start below the last record</value>
     </data>
+    <data name="FixedExpenseEditor.ChangePrice.Title" xml:space="preserve">
+        <value>Change Price</value>
+    </data>
+    <data name="FixedExpenseEditor.ChangePrice.Message" xml:space="preserve">
+        <value>To change the price for this fixed expense, the minimum date should be {0} (one day after the last related transaction). Do you want to continue?</value>
+    </data>
     <data name="FixedExpenseEditor.ChangeRecurrence" xml:space="preserve">
         <value>Change...</value>
     </data>

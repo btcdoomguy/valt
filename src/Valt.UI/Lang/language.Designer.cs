@@ -1124,7 +1124,19 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("FixedExpenseEditor.Validation.InvalidRangePeriodStart", resourceCulture);
             }
         }
-        
+
+        public static string FixedExpenseEditor_ChangePrice_Title {
+            get {
+                return ResourceManager.GetString("FixedExpenseEditor.ChangePrice.Title", resourceCulture);
+            }
+        }
+
+        public static string FixedExpenseEditor_ChangePrice_Message {
+            get {
+                return ResourceManager.GetString("FixedExpenseEditor.ChangePrice.Message", resourceCulture);
+            }
+        }
+
         public static string FixedExpenseEditor_ChangeRecurrence {
             get {
                 return ResourceManager.GetString("FixedExpenseEditor.ChangeRecurrence", resourceCulture);

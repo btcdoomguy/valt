@@ -74,7 +74,8 @@
                         </Grid>
 
                         <!-- My Other (Fiat) -->
-                        <Grid ColumnDefinitions="Auto, *" Height="22">
+                        <Grid ColumnDefinitions="Auto, *" Height="22"
+                              Opacity="{Binding IsRatesLive, Converter={StaticResource BoolToOpacityConverter}}">
                             <TextBlock Grid.Column="0"
                                        Classes="wealth-label"
                                        Foreground="{DynamicResource Text400Brush}"
@@ -85,7 +86,8 @@
                         </Grid>
 
                         <!-- My Assets -->
-                        <Grid ColumnDefinitions="Auto, *" Height="22" IsVisible="{Binding HasAssets}">
+                        <Grid ColumnDefinitions="Auto, *" Height="22" IsVisible="{Binding HasAssets}"
+                              Opacity="{Binding IsRatesLive, Converter={StaticResource BoolToOpacityConverter}}">
                             <TextBlock Grid.Column="0"
                                        Classes="wealth-label"
                                        Foreground="{DynamicResource Text400Brush}"
@@ -96,7 +98,8 @@
                         </Grid>
 
                         <!-- Total in Fiat -->
-                        <Grid ColumnDefinitions="Auto, *" Height="22">
+                        <Grid ColumnDefinitions="Auto, *" Height="22"
+                              Opacity="{Binding IsRatesLive, Converter={StaticResource BoolToOpacityConverter}}">
                             <TextBlock Grid.Column="0"
                                        Classes="wealth-label"
                                        Foreground="{DynamicResource Text300Brush}"

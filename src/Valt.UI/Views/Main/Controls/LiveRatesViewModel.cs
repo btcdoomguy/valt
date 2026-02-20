@@ -59,6 +59,7 @@ public partial class LiveRatesViewModel : ObservableObject, IDisposable
     [NotifyPropertyChangedFor(nameof(BtcFiatVariationBrush))]
     private decimal? _previousBtcFiatPrice;
     [ObservableProperty] private bool _hasDatabaseOpen;
+    [ObservableProperty] private bool _isLive = true;
     public string BtcUsdText => $"{CurrencyDisplay.FormatFiat(BtcUsdPrice, FiatCurrency.Usd.Code)}";
     public bool ShowUsdFiatLabels => _currencySettings.MainFiatCurrency != FiatCurrency.Usd.Code;
 
@@ -186,6 +187,7 @@ public partial class LiveRatesViewModel : ObservableObject, IDisposable
         
         WeakReferenceMessenger.Default.Register<LivePriceUpdated>(this, (recipient, message) =>
         {
+            IsLive = !_liveRateState.IsOffline;
             BtcUsdPrice = _liveRateState.BitcoinPrice;
             if (_liveRateState.PreviousBitcoinPrice is not null)
                 PreviousBtcUsdPrice = _liveRateState.PreviousBitcoinPrice.GetValueOrDefault();
@@ -204,6 +206,7 @@ public partial class LiveRatesViewModel : ObservableObject, IDisposable
     private void LocalDatabaseOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         HasDatabaseOpen = _localDatabase!.HasDatabaseOpen;
+        IsLive = !_liveRateState.IsOffline;
         Dispatcher.UIThread.Post(() => { BtcUsdPrice = _liveRateState.BitcoinPrice; });
     }
 
