@@ -1682,7 +1682,25 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.BtcStack.PeopleWithSameStack.Tooltip", resourceCulture);
             }
         }
-        
+
+        public static string Reports_BtcStack_MaxStack {
+            get {
+                return ResourceManager.GetString("Reports.BtcStack.MaxStack", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcStack_MaxStackDate {
+            get {
+                return ResourceManager.GetString("Reports.BtcStack.MaxStackDate", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcStack_DeclineFromMax {
+            get {
+                return ResourceManager.GetString("Reports.BtcStack.DeclineFromMax", resourceCulture);
+            }
+        }
+
         public static string Reports_LeveragePositions_Title {
             get {
                 return ResourceManager.GetString("Reports.LeveragePositions.Title", resourceCulture);

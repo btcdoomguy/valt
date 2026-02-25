@@ -25,6 +25,7 @@ using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
+using Valt.Infra.Modules.Reports.MaxBtcStack;
 using Valt.Infra.Modules.Reports.ExpensesByCategory;
 using Valt.Infra.Modules.Reports.IncomeByCategory;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
@@ -47,6 +48,7 @@ namespace Valt.UI.Views.Main.Tabs.Reports;
 public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 {
     private readonly IAllTimeHighReport _allTimeHighReport = null!;
+    private readonly IMaxBtcStackReport _maxBtcStackReport = null!;
     private readonly IMonthlyTotalsReport _monthlyTotalsReport = null!;
     private readonly IExpensesByCategoryReport _expensesByCategoryReport = null!;
     private readonly IIncomeByCategoryReport _incomeByCategoryReport = null!;
@@ -71,6 +73,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
     // Cached ATH fiat value for reuse by leverage positions panel
     private decimal? _allTimeHighFiatValue;
+
+    // Cached max BTC stack data for reuse by BTC stack card
+    private MaxBtcStackData? _maxBtcStackData;
 
     [ObservableProperty] private DashboardData _wealthData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _allTimeHighData = DashboardData.Empty;
@@ -120,6 +125,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private bool _ready;
 
     public ReportsViewModel(IAllTimeHighReport allTimeHighReport,
+        IMaxBtcStackReport maxBtcStackReport,
         IMonthlyTotalsReport monthlyTotalsReport,
         IExpensesByCategoryReport expensesByCategoryReport,
         IIncomeByCategoryReport incomeByCategoryReport,
@@ -138,6 +144,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         IQueryDispatcher queryDispatcher)
     {
         _allTimeHighReport = allTimeHighReport;
+        _maxBtcStackReport = maxBtcStackReport;
         _monthlyTotalsReport = monthlyTotalsReport;
         _expensesByCategoryReport = expensesByCategoryReport;
         _incomeByCategoryReport = incomeByCategoryReport;
@@ -226,6 +233,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     public void UnloadData()
     {
         _cachedProvider = null;
+        _maxBtcStackData = null;
         _logger.LogDebug("Report data provider unloaded");
     }
 
@@ -287,6 +295,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             FetchExpensesByCategoryAsync(provider),
             FetchIncomeByCategoryAsync(provider),
             FetchAllTimeHighDataAsync(provider),
+            FetchMaxBtcStackDataAsync(provider),
             FetchStatisticsDataAsync(provider),
             FetchWealthOverviewAsync(provider));
     }
@@ -753,6 +762,14 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 new(language.Reports_BtcStack_PeopleWithSameStack, peopleFormatted, language.Reports_BtcStack_PeopleWithSameStack_Tooltip)
             };
 
+            if (_maxBtcStackData is not null)
+            {
+                var maxBtcFormatted = CurrencyDisplay.FormatSatsAsBitcoin(_maxBtcStackData.MaxStackInSats);
+                rows.Add(new RowItem(language.Reports_BtcStack_MaxStack, maxBtcFormatted + " BTC"));
+                rows.Add(new RowItem(language.Reports_BtcStack_MaxStackDate, _maxBtcStackData.Date.ToString()));
+                rows.Add(new RowItem(language.Reports_BtcStack_DeclineFromMax, $"{_maxBtcStackData.DeclineFromMaxPercent}%"));
+            }
+
             BtcStackData = new DashboardData(language.Reports_BtcStack_Title, rows, Icon: "\uEBC5");
             IsBtcStackLoading = false;
         }
@@ -760,6 +777,24 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         {
             _logger.LogError(ex, "Error updating BTC stack data");
             IsBtcStackLoading = false;
+        }
+    }
+
+    private async Task FetchMaxBtcStackDataAsync(IReportDataProvider provider)
+    {
+        try
+        {
+            var wealth = _accountsTotalState.CurrentWealth;
+            if (wealth.WealthInSats == 0)
+                return;
+
+            var data = await _maxBtcStackReport.GetAsync(wealth.WealthInSats, provider);
+            _maxBtcStackData = data;
+            Dispatcher.UIThread.Post(UpdateBtcStackData);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching max BTC stack data");
         }
     }
 

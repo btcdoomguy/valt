@@ -834,6 +834,15 @@
     <data name="Reports.BtcStack.PeopleWithSameStack.Tooltip" xml:space="preserve">
         <value>Número máximo de personas que pueden tener el mismo stack que tú</value>
     </data>
+    <data name="Reports.BtcStack.MaxStack" xml:space="preserve">
+        <value>Stack máximo</value>
+    </data>
+    <data name="Reports.BtcStack.MaxStackDate" xml:space="preserve">
+        <value>Fecha del stack máximo</value>
+    </data>
+    <data name="Reports.BtcStack.DeclineFromMax" xml:space="preserve">
+        <value>Caída desde el máximo</value>
+    </data>
     <data name="Reports.LeveragePositions.Title" xml:space="preserve">
         <value>Posiciones Apalancadas</value>
     </data>

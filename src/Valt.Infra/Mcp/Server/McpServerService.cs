@@ -13,6 +13,7 @@ using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Modules.Currency.Services;
 using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
+using Valt.Infra.Modules.Reports.MaxBtcStack;
 using Valt.Infra.Modules.Reports.ExpensesByCategory;
 using Valt.Infra.Modules.Reports.IncomeByCategory;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
@@ -256,6 +257,7 @@ public class McpServerService
         // Report services (needed by ReportTools)
         services.AddSingleton(_appServices.GetRequiredService<IReportDataProviderFactory>());
         services.AddSingleton(_appServices.GetRequiredService<IAllTimeHighReport>());
+        services.AddSingleton(_appServices.GetRequiredService<IMaxBtcStackReport>());
         services.AddSingleton(_appServices.GetRequiredService<IExpensesByCategoryReport>());
         services.AddSingleton(_appServices.GetRequiredService<IIncomeByCategoryReport>());
         services.AddSingleton(_appServices.GetRequiredService<IMonthlyTotalsReport>());
