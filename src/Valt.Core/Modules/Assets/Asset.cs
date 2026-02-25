@@ -130,6 +130,8 @@ public sealed class Asset : AggregateRoot<AssetId>
         Details.BasicAssetDetails basic => basic.CurrentPrice,
         Details.RealEstateAssetDetails realEstate => realEstate.CurrentValue,
         Details.LeveragedPositionDetails leveraged => leveraged.CurrentPrice,
+        Details.BtcLoanDetails btcLoan => btcLoan.CurrentBtcPriceInLoanCurrency,
+        Details.BtcLendingDetails _ => 0,
         _ => 0
     };
 
@@ -140,6 +142,8 @@ public sealed class Asset : AggregateRoot<AssetId>
         Details.BasicAssetDetails basic => basic.CurrencyCode,
         Details.RealEstateAssetDetails realEstate => realEstate.CurrencyCode,
         Details.LeveragedPositionDetails leveraged => leveraged.CurrencyCode,
+        Details.BtcLoanDetails btcLoan => btcLoan.CurrencyCode,
+        Details.BtcLendingDetails btcLending => btcLending.CurrencyCode,
         _ => "USD"
     };
 }

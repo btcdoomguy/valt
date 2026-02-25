@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Assets.Commands.CreateBasicAsset;
+using Valt.App.Modules.Assets.Commands.CreateBtcLending;
+using Valt.App.Modules.Assets.Commands.CreateBtcLoan;
 using Valt.App.Modules.Assets.Commands.CreateLeveragedPosition;
 using Valt.App.Modules.Assets.Commands.CreateRealEstateAsset;
 using Valt.App.Modules.Assets.Commands.EditAsset;
@@ -48,6 +50,8 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     [NotifyPropertyChangedFor(nameof(ShowBasicFields))]
     [NotifyPropertyChangedFor(nameof(ShowRealEstateFields))]
     [NotifyPropertyChangedFor(nameof(ShowLeveragedFields))]
+    [NotifyPropertyChangedFor(nameof(ShowBtcLoanFields))]
+    [NotifyPropertyChangedFor(nameof(ShowBtcLendingFields))]
     [NotifyPropertyChangedFor(nameof(IsBitcoinLeveraged))]
     [NotifyPropertyChangedFor(nameof(IsCustomLeveraged))]
     [NotifyPropertyChangedFor(nameof(ShowLeveragedSymbolRow))]
@@ -130,6 +134,53 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     [ObservableProperty]
     private bool _isLong = true;
 
+    // BTC Loan fields
+    [ObservableProperty]
+    private string _platformName = string.Empty;
+
+    [ObservableProperty]
+    private long _collateralSats;
+
+    [ObservableProperty]
+    private FiatValue _loanAmountFiat = FiatValue.Empty;
+
+    [ObservableProperty]
+    private decimal _aprPercentage;
+
+    [ObservableProperty]
+    private decimal _initialLtvPercentage;
+
+    [ObservableProperty]
+    private decimal _marginCallLtvPercentage;
+
+    [ObservableProperty]
+    private decimal _liquidationLtvPercentage;
+
+    [ObservableProperty]
+    private FiatValue _feesFiat = FiatValue.Empty;
+
+    [ObservableProperty]
+    private DateTime? _loanStartDate;
+
+    [ObservableProperty]
+    private DateTime? _repaymentDateOffset;
+
+    // BTC Lending fields
+    [ObservableProperty]
+    private string _borrowerOrPlatformName = string.Empty;
+
+    [ObservableProperty]
+    private FiatValue _amountLentFiat = FiatValue.Empty;
+
+    [ObservableProperty]
+    private decimal _lendingAprPercentage;
+
+    [ObservableProperty]
+    private DateTime? _lendingStartDateOffset;
+
+    [ObservableProperty]
+    private DateTime? _expectedRepaymentDateOffset;
+
     // Common fields
     [ObservableProperty]
     private bool _includeInNetWorth = true;
@@ -158,6 +209,8 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     public bool ShowBasicFields => SelectedAssetType is "Stock" or "Etf" or "Crypto" or "Commodity" or "Custom";
     public bool ShowRealEstateFields => SelectedAssetType == "RealEstate";
     public bool ShowLeveragedFields => SelectedAssetType == "LeveragedPosition";
+    public bool ShowBtcLoanFields => SelectedAssetType == "BtcLoan";
+    public bool ShowBtcLendingFields => SelectedAssetType == "BtcLending";
 
     // Leveraged position Bitcoin/Custom toggle helpers
     public bool IsBitcoinLeveraged => ShowLeveragedFields && IsBitcoinUnderlyingAsset;
@@ -172,7 +225,9 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
         new(language.Assets_Type_Commodity, AssetTypes.Commodity.ToString()),
         new(language.Assets_Type_RealEstate, AssetTypes.RealEstate.ToString()),
         new(language.Assets_Type_LeveragedPosition, AssetTypes.LeveragedPosition.ToString()),
-        new(language.Assets_Type_Custom, AssetTypes.Custom.ToString())
+        new(language.Assets_Type_Custom, AssetTypes.Custom.ToString()),
+        new(language.Assets_Type_BtcLoan, AssetTypes.BtcLoan.ToString()),
+        new(language.Assets_Type_BtcLending, AssetTypes.BtcLending.ToString())
     ];
 
     public static List<ComboBoxValue> AvailablePriceSources =>
@@ -228,14 +283,14 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
             _assetId = assetDto.Id;
             IsEditMode = true;
 
-            // Load common fields
+            // Load common fields (set SelectedAssetType LAST so date pickers
+            // are populated before their section becomes visible)
             Name = assetDto.Name;
-            SelectedAssetType = ((AssetTypes)assetDto.AssetTypeId).ToString();
             SelectedCurrency = assetDto.CurrencyCode;
             IncludeInNetWorth = assetDto.IncludeInNetWorth;
             Visible = assetDto.Visible;
 
-            // Load type-specific fields
+            // Load type-specific fields BEFORE setting SelectedAssetType
             switch ((AssetTypes)assetDto.AssetTypeId)
             {
                 case AssetTypes.Stock:
@@ -274,7 +329,36 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                     IsBitcoinUnderlyingAsset = (AssetPriceSource)(assetDto.PriceSourceId ?? 0) == AssetPriceSource.LivePrice &&
                                                 Symbol.StartsWith("BTC", StringComparison.OrdinalIgnoreCase);
                     break;
+
+                case AssetTypes.BtcLoan:
+                    PlatformName = assetDto.PlatformName ?? string.Empty;
+                    CollateralSats = assetDto.CollateralSats ?? 0;
+                    LoanAmountFiat = FiatValue.New(assetDto.LoanAmount ?? 0);
+                    AprPercentage = (assetDto.Apr ?? 0) * 100m;
+                    InitialLtvPercentage = assetDto.InitialLtv ?? 0;
+                    LiquidationLtvPercentage = assetDto.LiquidationLtv ?? 0;
+                    MarginCallLtvPercentage = assetDto.MarginCallLtv ?? 0;
+                    FeesFiat = FiatValue.New(assetDto.Fees ?? 0);
+                    if (assetDto.LoanStartDate.HasValue)
+                        LoanStartDate = assetDto.LoanStartDate.Value.ToDateTime(TimeOnly.MinValue);
+                    if (assetDto.RepaymentDate.HasValue)
+                        RepaymentDateOffset = assetDto.RepaymentDate.Value.ToDateTime(TimeOnly.MinValue);
+                    break;
+
+                case AssetTypes.BtcLending:
+                    BorrowerOrPlatformName = assetDto.BorrowerOrPlatformName ?? string.Empty;
+                    AmountLentFiat = FiatValue.New(assetDto.AmountLent ?? 0);
+                    LendingAprPercentage = (assetDto.Apr ?? 0) * 100m;
+                    if (assetDto.LendingStartDate.HasValue)
+                        LendingStartDateOffset = assetDto.LendingStartDate.Value.ToDateTime(TimeOnly.MinValue);
+                    if (assetDto.RepaymentDate.HasValue)
+                        ExpectedRepaymentDateOffset = assetDto.RepaymentDate.Value.ToDateTime(TimeOnly.MinValue);
+                    break;
             }
+
+            // Set asset type LAST — this makes the type-specific section visible,
+            // and by this point all field values (including dates) are already set
+            SelectedAssetType = ((AssetTypes)assetDto.AssetTypeId).ToString();
         }
     }
 
@@ -479,6 +563,68 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                 CloseDialog?.Invoke(new Response(true, leveragedResult.Value!.AssetId));
                 break;
 
+            case AssetTypes.BtcLoan:
+                // Fetch current BTC price for initial LTV calculation
+                decimal btcLoanCurrentPrice = 0;
+                if (_priceProviderSelector is not null)
+                {
+                    var btcPriceResult = await _priceProviderSelector.GetPriceAsync(
+                        AssetPriceSource.LivePrice, "BTC", SelectedCurrency);
+                    if (btcPriceResult is not null)
+                        btcLoanCurrentPrice = btcPriceResult.Price;
+                }
+
+                var btcLoanResult = await _commandDispatcher!.DispatchAsync(new CreateBtcLoanCommand
+                {
+                    Name = Name,
+                    CurrencyCode = SelectedCurrency,
+                    PlatformName = PlatformName,
+                    CollateralSats = CollateralSats,
+                    LoanAmount = LoanAmountFiat.Value,
+                    Apr = AprPercentage / 100m,
+                    InitialLtv = InitialLtvPercentage,
+                    LiquidationLtv = LiquidationLtvPercentage,
+                    MarginCallLtv = MarginCallLtvPercentage,
+                    Fees = FeesFiat.Value,
+                    LoanStartDate = LoanStartDate.HasValue ? DateOnly.FromDateTime(LoanStartDate.Value) : DateOnly.FromDateTime(DateTime.UtcNow),
+                    RepaymentDate = RepaymentDateOffset.HasValue ? DateOnly.FromDateTime(RepaymentDateOffset.Value) : null,
+                    CurrentBtcPrice = btcLoanCurrentPrice,
+                    IncludeInNetWorth = IncludeInNetWorth,
+                    Visible = Visible
+                });
+
+                if (btcLoanResult.IsFailure)
+                {
+                    await MessageBoxHelper.ShowErrorAsync(language.Error, btcLoanResult.Error!.Message, GetWindow!());
+                    return;
+                }
+
+                CloseDialog?.Invoke(new Response(true, btcLoanResult.Value!.AssetId));
+                break;
+
+            case AssetTypes.BtcLending:
+                var btcLendingResult = await _commandDispatcher!.DispatchAsync(new CreateBtcLendingCommand
+                {
+                    Name = Name,
+                    CurrencyCode = SelectedCurrency,
+                    AmountLent = AmountLentFiat.Value,
+                    Apr = LendingAprPercentage / 100m,
+                    BorrowerOrPlatformName = BorrowerOrPlatformName,
+                    LendingStartDate = LendingStartDateOffset.HasValue ? DateOnly.FromDateTime(LendingStartDateOffset.Value) : DateOnly.FromDateTime(DateTime.UtcNow),
+                    ExpectedRepaymentDate = ExpectedRepaymentDateOffset.HasValue ? DateOnly.FromDateTime(ExpectedRepaymentDateOffset.Value) : null,
+                    IncludeInNetWorth = IncludeInNetWorth,
+                    Visible = Visible
+                });
+
+                if (btcLendingResult.IsFailure)
+                {
+                    await MessageBoxHelper.ShowErrorAsync(language.Error, btcLendingResult.Error!.Message, GetWindow!());
+                    return;
+                }
+
+                CloseDialog?.Invoke(new Response(true, btcLendingResult.Value!.AssetId));
+                break;
+
             default:
                 await MessageBoxHelper.ShowErrorAsync(language.Error, "Unsupported asset type", GetWindow!());
                 return;
@@ -559,6 +705,46 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                     LiquidationPrice = LiquidationPriceFiat.Value,
                     IsLong = IsLong,
                     PriceSource = (int)leveragedPriceSource
+                };
+                break;
+
+            case AssetTypes.BtcLoan:
+                // Fetch current BTC price for LTV calculation (same as creation)
+                decimal editBtcPrice = 0;
+                if (_priceProviderSelector is not null)
+                {
+                    var btcPriceResult = await _priceProviderSelector.GetPriceAsync(
+                        AssetPriceSource.LivePrice, "BTC", SelectedCurrency);
+                    if (btcPriceResult is not null)
+                        editBtcPrice = btcPriceResult.Price;
+                }
+
+                details = new BtcLoanDetailsInputDTO
+                {
+                    CurrencyCode = SelectedCurrency,
+                    PlatformName = PlatformName,
+                    CollateralSats = CollateralSats,
+                    LoanAmount = LoanAmountFiat.Value,
+                    Apr = AprPercentage / 100m,
+                    InitialLtv = InitialLtvPercentage,
+                    LiquidationLtv = LiquidationLtvPercentage,
+                    MarginCallLtv = MarginCallLtvPercentage,
+                    Fees = FeesFiat.Value,
+                    LoanStartDate = LoanStartDate.HasValue ? DateOnly.FromDateTime(LoanStartDate.Value) : DateOnly.FromDateTime(DateTime.UtcNow),
+                    RepaymentDate = RepaymentDateOffset.HasValue ? DateOnly.FromDateTime(RepaymentDateOffset.Value) : null,
+                    CurrentBtcPrice = editBtcPrice
+                };
+                break;
+
+            case AssetTypes.BtcLending:
+                details = new BtcLendingDetailsInputDTO
+                {
+                    CurrencyCode = SelectedCurrency,
+                    AmountLent = AmountLentFiat.Value,
+                    Apr = LendingAprPercentage / 100m,
+                    BorrowerOrPlatformName = BorrowerOrPlatformName,
+                    LendingStartDate = LendingStartDateOffset.HasValue ? DateOnly.FromDateTime(LendingStartDateOffset.Value) : DateOnly.FromDateTime(DateTime.UtcNow),
+                    ExpectedRepaymentDate = ExpectedRepaymentDateOffset.HasValue ? DateOnly.FromDateTime(ExpectedRepaymentDateOffset.Value) : null
                 };
                 break;
 

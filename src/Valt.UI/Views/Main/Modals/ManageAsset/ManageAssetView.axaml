@@ -9,9 +9,9 @@
         d:DesignWidth="650"
         d:DesignHeight="700"
         MinWidth="650"
-        MinHeight="700"
+        MinHeight="750"
         MaxWidth="650"
-        MaxHeight="700"
+        MaxHeight="750"
         x:Class="Valt.UI.Views.Main.Modals.ManageAsset.ManageAssetView"
         x:DataType="manageAsset:ManageAssetViewModel"
         Title="{x:Static local:language.ManageAsset_Title}"
@@ -30,7 +30,7 @@
             <userControls:CustomTitleBar Title="{x:Static local:language.ManageAsset_Title}"
                                          TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
-            <Border Classes="form-fields-area" Height="620">
+            <Border Classes="form-fields-area" Height="670">
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                     <StackPanel>
                         <!-- Section 1: Basic Information -->
@@ -311,6 +311,110 @@
                                     <CheckBox Content="{x:Static local:language.ManageAsset_IsLong}"
                                               IsChecked="{Binding IsLong}" />
                                 </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Section 2d: BTC Loan Details -->
+                        <Border Classes="form-section" IsVisible="{Binding ShowBtcLoanFields}">
+                            <StackPanel>
+                                <TextBlock Classes="form-section-header" Text="{x:Static local:language.ManageAsset_Section_BtcLoan}" />
+
+                                <StackPanel Classes="form-field" HorizontalAlignment="Left">
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_Platform}" />
+                                    <TextBox Text="{Binding PlatformName}" Width="250" />
+                                </StackPanel>
+
+                                <Grid ColumnDefinitions="250, 20, 250">
+                                    <StackPanel Grid.Column="0" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_CollateralSats}" />
+                                        <TextBox Text="{Binding CollateralSats}" Width="250" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_LoanAmount}" />
+                                        <userControls:FiatInput FiatValue="{Binding LoanAmountFiat, Mode=TwoWay}"
+                                                                CurrencySymbol="{Binding CurrencySymbol}"
+                                                                SymbolOnRight="{Binding SymbolOnRight}"
+                                                                Width="250" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="250, 20, 250">
+                                    <StackPanel Grid.Column="0" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_APR}" />
+                                        <TextBox Text="{Binding AprPercentage}" Width="250" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_Fees}" />
+                                        <userControls:FiatInput FiatValue="{Binding FeesFiat, Mode=TwoWay}"
+                                                                CurrencySymbol="{Binding CurrencySymbol}"
+                                                                SymbolOnRight="{Binding SymbolOnRight}"
+                                                                Width="250" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="250, 20, 250">
+                                    <StackPanel Grid.Column="0" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_InitialLTV}" />
+                                        <TextBox Text="{Binding InitialLtvPercentage}" Width="250" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_MarginCallLTV}" />
+                                        <TextBox Text="{Binding MarginCallLtvPercentage}" Width="250" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <StackPanel Classes="form-field" HorizontalAlignment="Left">
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_LiquidationLTV}" />
+                                    <TextBox Text="{Binding LiquidationLtvPercentage}" Width="250" />
+                                </StackPanel>
+
+                                <Grid ColumnDefinitions="250, 20, 250">
+                                    <StackPanel Grid.Column="0" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_LoanStartDate}" />
+                                        <CalendarDatePicker SelectedDate="{Binding LoanStartDate}" Width="250" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_RepaymentDate}" />
+                                        <CalendarDatePicker SelectedDate="{Binding RepaymentDateOffset}" Width="250" />
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Section 2e: BTC Lending Details -->
+                        <Border Classes="form-section" IsVisible="{Binding ShowBtcLendingFields}">
+                            <StackPanel>
+                                <TextBlock Classes="form-section-header" Text="{x:Static local:language.ManageAsset_Section_BtcLending}" />
+
+                                <StackPanel Classes="form-field" HorizontalAlignment="Left">
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_BorrowerPlatform}" />
+                                    <TextBox Text="{Binding BorrowerOrPlatformName}" Width="250" />
+                                </StackPanel>
+
+                                <Grid ColumnDefinitions="250, 20, 250">
+                                    <StackPanel Grid.Column="0" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_AmountLent}" />
+                                        <userControls:FiatInput FiatValue="{Binding AmountLentFiat, Mode=TwoWay}"
+                                                                CurrencySymbol="{Binding CurrencySymbol}"
+                                                                SymbolOnRight="{Binding SymbolOnRight}"
+                                                                Width="250" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_LendingAPR}" />
+                                        <TextBox Text="{Binding LendingAprPercentage}" Width="250" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="250, 20, 250">
+                                    <StackPanel Grid.Column="0" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_LendingStartDate}" />
+                                        <CalendarDatePicker SelectedDate="{Binding LendingStartDateOffset}" Width="250" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_ExpectedRepaymentDate}" />
+                                        <CalendarDatePicker SelectedDate="{Binding ExpectedRepaymentDateOffset}" Width="250" />
+                                    </StackPanel>
+                                </Grid>
                             </StackPanel>
                         </Border>
 

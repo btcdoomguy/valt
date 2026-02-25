@@ -146,6 +146,7 @@ internal sealed class AssetPriceUpdaterJob : IBackgroundJob
         {
             BasicAssetDetails basic => (basic.PriceSource, basic.Symbol, basic.CurrencyCode),
             LeveragedPositionDetails leveraged => (leveraged.PriceSource, leveraged.Symbol, leveraged.CurrencyCode),
+            BtcLoanDetails btcLoan => (AssetPriceSource.LivePrice, "BTC", btcLoan.CurrencyCode),
             _ => (AssetPriceSource.Manual, null, "USD")
         };
     }

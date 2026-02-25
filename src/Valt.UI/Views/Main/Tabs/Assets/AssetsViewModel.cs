@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Assets.Commands.DeleteAsset;
+using Valt.App.Modules.Assets.Commands.RepayLoan;
 using Valt.App.Modules.Assets.Commands.SetAssetIncludeInNetWorth;
 using Valt.App.Modules.Assets.Commands.SetAssetVisibility;
 using Valt.App.Modules.Assets.DTOs;
@@ -445,6 +446,40 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
         var identifier = !string.IsNullOrEmpty(asset.Symbol) ? asset.Symbol : asset.Name;
         return string.Format(language.Assets_Sell_Notes_Basic,
             identifier, asset.AcquisitionPriceFormatted);
+    }
+
+    [RelayCommand]
+    private async Task RepayLoan(AssetViewModel? asset)
+    {
+        if (IsSecureModeEnabled) return;
+        if (asset is null || !asset.IsLoanOrLending)
+            return;
+
+        var ownerWindow = GetUserControlOwnerWindow?.Invoke();
+        if (ownerWindow is null)
+            return;
+
+        var confirmed = await MessageBoxHelper.ShowQuestionAsync(
+            language.Assets_RepayLoan_Alert,
+            language.Assets_RepayLoan_Message,
+            ownerWindow);
+
+        if (!confirmed)
+            return;
+
+        var result = await _commandDispatcher.DispatchAsync(new RepayLoanCommand
+        {
+            AssetId = asset.Id
+        });
+
+        if (result.IsFailure)
+        {
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, ownerWindow);
+            return;
+        }
+
+        await LoadAssetsAsync();
+        NotifyAssetSummaryUpdated();
     }
 
     [RelayCommand]

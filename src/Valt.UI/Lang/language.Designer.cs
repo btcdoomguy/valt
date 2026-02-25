@@ -1682,7 +1682,25 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.BtcStack.PeopleWithSameStack.Tooltip", resourceCulture);
             }
         }
-        
+
+        public static string Reports_BtcStack_MaxStack {
+            get {
+                return ResourceManager.GetString("Reports.BtcStack.MaxStack", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcStack_MaxStackDate {
+            get {
+                return ResourceManager.GetString("Reports.BtcStack.MaxStackDate", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcStack_DeclineFromMax {
+            get {
+                return ResourceManager.GetString("Reports.BtcStack.DeclineFromMax", resourceCulture);
+            }
+        }
+
         public static string Reports_LeveragePositions_Title {
             get {
                 return ResourceManager.GetString("Reports.LeveragePositions.Title", resourceCulture);
@@ -2288,7 +2306,19 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Assets.Type.Custom", resourceCulture);
             }
         }
-        
+
+        public static string Assets_Type_BtcLoan {
+            get {
+                return ResourceManager.GetString("Assets_Type_BtcLoan", resourceCulture);
+            }
+        }
+
+        public static string Assets_Type_BtcLending {
+            get {
+                return ResourceManager.GetString("Assets_Type_BtcLending", resourceCulture);
+            }
+        }
+
         public static string Assets_PriceSource_Manual {
             get {
                 return ResourceManager.GetString("Assets.PriceSource.Manual", resourceCulture);
@@ -2346,6 +2376,108 @@ namespace Valt.UI.Lang {
         public static string ManageAsset_Section_Display {
             get {
                 return ResourceManager.GetString("ManageAsset_Section_Display", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_Section_BtcLoan {
+            get {
+                return ResourceManager.GetString("ManageAsset_Section_BtcLoan", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_Section_BtcLending {
+            get {
+                return ResourceManager.GetString("ManageAsset_Section_BtcLending", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_Platform {
+            get {
+                return ResourceManager.GetString("ManageAsset_Platform", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_CollateralSats {
+            get {
+                return ResourceManager.GetString("ManageAsset_CollateralSats", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_LoanAmount {
+            get {
+                return ResourceManager.GetString("ManageAsset_LoanAmount", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_APR {
+            get {
+                return ResourceManager.GetString("ManageAsset_APR", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_Fees {
+            get {
+                return ResourceManager.GetString("ManageAsset_Fees", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_InitialLTV {
+            get {
+                return ResourceManager.GetString("ManageAsset_InitialLTV", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_MarginCallLTV {
+            get {
+                return ResourceManager.GetString("ManageAsset_MarginCallLTV", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_LiquidationLTV {
+            get {
+                return ResourceManager.GetString("ManageAsset_LiquidationLTV", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_LoanStartDate {
+            get {
+                return ResourceManager.GetString("ManageAsset_LoanStartDate", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_RepaymentDate {
+            get {
+                return ResourceManager.GetString("ManageAsset_RepaymentDate", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_BorrowerPlatform {
+            get {
+                return ResourceManager.GetString("ManageAsset_BorrowerPlatform", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_AmountLent {
+            get {
+                return ResourceManager.GetString("ManageAsset_AmountLent", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_LendingAPR {
+            get {
+                return ResourceManager.GetString("ManageAsset_LendingAPR", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_LendingStartDate {
+            get {
+                return ResourceManager.GetString("ManageAsset_LendingStartDate", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_ExpectedRepaymentDate {
+            get {
+                return ResourceManager.GetString("ManageAsset_ExpectedRepaymentDate", resourceCulture);
             }
         }
 
@@ -4034,7 +4166,127 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Assets_Card_PnL", resourceCulture);
             }
         }
-        
+
+        public static string Assets_Card_Platform {
+            get {
+                return ResourceManager.GetString("Assets_Card_Platform", resourceCulture);
+            }
+        }
+
+        public static string Assets_Card_Collateral {
+            get {
+                return ResourceManager.GetString("Assets_Card_Collateral", resourceCulture);
+            }
+        }
+
+        public static string Assets_Card_LoanAmount {
+            get {
+                return ResourceManager.GetString("Assets_Card_LoanAmount", resourceCulture);
+            }
+        }
+
+        public static string Assets_Card_LTV {
+            get {
+                return ResourceManager.GetString("Assets_Card_LTV", resourceCulture);
+            }
+        }
+
+        public static string Assets_Card_BorrowerPlatform {
+            get {
+                return ResourceManager.GetString("Assets_Card_BorrowerPlatform", resourceCulture);
+            }
+        }
+
+        public static string Assets_Card_AmountLent {
+            get {
+                return ResourceManager.GetString("Assets_Card_AmountLent", resourceCulture);
+            }
+        }
+
+        public static string Assets_Card_EarnedInterest {
+            get {
+                return ResourceManager.GetString("Assets_Card_EarnedInterest", resourceCulture);
+            }
+        }
+
+        public static string Assets_Card_DaysUntilRepayment {
+            get {
+                return ResourceManager.GetString("Assets_Card_DaysUntilRepayment", resourceCulture);
+            }
+        }
+
+        public static string Assets_Platform {
+            get {
+                return ResourceManager.GetString("Assets_Platform", resourceCulture);
+            }
+        }
+
+        public static string Assets_CollateralSats {
+            get {
+                return ResourceManager.GetString("Assets_CollateralSats", resourceCulture);
+            }
+        }
+
+        public static string Assets_LoanAmount {
+            get {
+                return ResourceManager.GetString("Assets_LoanAmount", resourceCulture);
+            }
+        }
+
+        public static string Assets_APR {
+            get {
+                return ResourceManager.GetString("Assets_APR", resourceCulture);
+            }
+        }
+
+        public static string Assets_CurrentLTV {
+            get {
+                return ResourceManager.GetString("Assets_CurrentLTV", resourceCulture);
+            }
+        }
+
+        public static string Assets_DistToLiqLTV {
+            get {
+                return ResourceManager.GetString("Assets_DistToLiqLTV", resourceCulture);
+            }
+        }
+
+        public static string Assets_AccruedInterest {
+            get {
+                return ResourceManager.GetString("Assets_AccruedInterest", resourceCulture);
+            }
+        }
+
+        public static string Assets_Fees {
+            get {
+                return ResourceManager.GetString("Assets_Fees", resourceCulture);
+            }
+        }
+
+        public static string Assets_BorrowerPlatform {
+            get {
+                return ResourceManager.GetString("Assets_BorrowerPlatform", resourceCulture);
+            }
+        }
+
+        public static string Assets_AmountLent {
+            get {
+                return ResourceManager.GetString("Assets_AmountLent", resourceCulture);
+            }
+        }
+
+        public static string Assets_EarnedInterest {
+            get {
+                return ResourceManager.GetString("Assets_EarnedInterest", resourceCulture);
+            }
+        }
+
+        public static string Assets_DaysUntilRepayment {
+            get {
+                return ResourceManager.GetString("Assets_DaysUntilRepayment", resourceCulture);
+            }
+        }
+
         public static string Assets_Sell {
             get {
                 return ResourceManager.GetString("Assets.Sell", resourceCulture);
@@ -4094,7 +4346,61 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Assets.Sell.Notes.Basic", resourceCulture);
             }
         }
-        
+
+        public static string Assets_RepayLoan {
+            get {
+                return ResourceManager.GetString("Assets_RepayLoan", resourceCulture);
+            }
+        }
+
+        public static string Assets_RepayLoan_Alert {
+            get {
+                return ResourceManager.GetString("Assets_RepayLoan_Alert", resourceCulture);
+            }
+        }
+
+        public static string Assets_RepayLoan_Message {
+            get {
+                return ResourceManager.GetString("Assets_RepayLoan_Message", resourceCulture);
+            }
+        }
+
+        public static string Assets_Card_APR {
+            get {
+                return ResourceManager.GetString("Assets_Card_APR", resourceCulture);
+            }
+        }
+
+        public static string Assets_Health_Healthy {
+            get {
+                return ResourceManager.GetString("Assets_Health_Healthy", resourceCulture);
+            }
+        }
+
+        public static string Assets_Health_Warning {
+            get {
+                return ResourceManager.GetString("Assets_Health_Warning", resourceCulture);
+            }
+        }
+
+        public static string Assets_Health_Danger {
+            get {
+                return ResourceManager.GetString("Assets_Health_Danger", resourceCulture);
+            }
+        }
+
+        public static string Assets_Status_Active {
+            get {
+                return ResourceManager.GetString("Assets_Status_Active", resourceCulture);
+            }
+        }
+
+        public static string Assets_Status_Repaid {
+            get {
+                return ResourceManager.GetString("Assets_Status_Repaid", resourceCulture);
+            }
+        }
+
         public static string Assets_RefreshPrices {
             get {
                 return ResourceManager.GetString("Assets.RefreshPrices", resourceCulture);

@@ -5,6 +5,7 @@ using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Categories;
 using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
+using Valt.Infra.Modules.Reports.MaxBtcStack;
 using Valt.Infra.Modules.Reports.ExpensesByCategory;
 using Valt.Infra.Modules.Reports.IncomeByCategory;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
@@ -203,6 +204,31 @@ public class ReportTools
     }
 
     /// <summary>
+    /// Gets maximum BTC stack ever held and decline from that peak.
+    /// </summary>
+    [McpServerTool, Description("Get the maximum BTC stack ever held (lifetime high), the date it occurred, and decline from that peak")]
+    public static async Task<MaxBtcStackResultDto> GetMaxBtcStack(
+        IReportDataProviderFactory providerFactory,
+        IMaxBtcStackReport report,
+        [Description("Current BTC stack in satoshis")] long currentStackInSats)
+    {
+        var provider = await providerFactory.CreateAsync();
+
+        var data = await report.GetAsync(currentStackInSats, provider);
+
+        return new MaxBtcStackResultDto
+        {
+            MaxStackInSats = data.MaxStackInSats,
+            MaxStackInBtc = data.MaxStackInSats / 100_000_000m,
+            MaxStackDate = data.Date.ToString("yyyy-MM-dd"),
+            CurrentStackInSats = data.CurrentStackInSats,
+            CurrentStackInBtc = data.CurrentStackInSats / 100_000_000m,
+            DeclineFromMaxPercent = data.DeclineFromMaxPercent,
+            HasAccountsWithoutTransactions = data.HasAccountsWithoutTransactions
+        };
+    }
+
+    /// <summary>
     /// Gets financial statistics including median expenses and wealth coverage.
     /// </summary>
     [McpServerTool, Description("Get financial statistics including median monthly expenses and wealth coverage in months")]
@@ -323,6 +349,17 @@ public class AllTimeHighResultDto
     public required decimal DeclineFromAthPercent { get; init; }
     public string? MaxDrawdownDate { get; init; }
     public decimal? MaxDrawdownPercent { get; init; }
+    public required bool HasAccountsWithoutTransactions { get; init; }
+}
+
+public class MaxBtcStackResultDto
+{
+    public required long MaxStackInSats { get; init; }
+    public required decimal MaxStackInBtc { get; init; }
+    public required string MaxStackDate { get; init; }
+    public required long CurrentStackInSats { get; init; }
+    public required decimal CurrentStackInBtc { get; init; }
+    public required decimal DeclineFromMaxPercent { get; init; }
     public required bool HasAccountsWithoutTransactions { get; init; }
 }
 

@@ -57,6 +57,7 @@ using Valt.Infra.Modules.Goals.Queries;
 using Valt.Infra.Modules.Goals.Services;
 using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
+using Valt.Infra.Modules.Reports.MaxBtcStack;
 using Valt.Infra.Modules.Reports.ExpensesByCategory;
 using Valt.Infra.Modules.Reports.IncomeByCategory;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
@@ -137,6 +138,7 @@ public static class Extensions
         
         //reports
         services.AddSingleton<IAllTimeHighReport, AllTimeHighReport>();
+        services.AddSingleton<IMaxBtcStackReport, MaxBtcStackReport>();
         services.AddSingleton<IExpensesByCategoryReport, ExpensesByCategoryReport>();
         services.AddSingleton<IIncomeByCategoryReport, IncomeByCategoryReport>();
         services.AddSingleton<IMonthlyTotalsReport, MonthlyTotalsReport>();

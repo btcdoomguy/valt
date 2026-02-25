@@ -74,11 +74,53 @@ public partial class AssetViewModel : ObservableObject
     public string LiquidationPriceFormatted { get; }
     public string CollateralFormatted { get; }
 
+    // BTC loan specific
+    public string? PlatformName { get; }
+    public long? CollateralSats { get; }
+    public decimal? LoanAmount { get; }
+    public decimal? Apr { get; }
+    public decimal? CurrentLtv { get; }
+    public decimal? InitialLtv { get; }
+    public decimal? LiquidationLtv { get; }
+    public decimal? MarginCallLtv { get; }
+    public decimal? Fees { get; }
+    public DateOnly? LoanStartDate { get; }
+    public DateOnly? RepaymentDate { get; }
+    public int? LoanStatusId { get; }
+    public string? LoanStatusName { get; }
+    public int? LoanHealthStatusId { get; }
+    public string? LoanHealthStatusName { get; }
+    public decimal? AccruedInterest { get; }
+    public decimal? DistanceToLiquidationLtv { get; }
+    public int? DaysUntilRepayment { get; }
+
+    // BTC lending specific
+    public decimal? AmountLent { get; }
+    public string? BorrowerOrPlatformName { get; }
+    public DateOnly? LendingStartDate { get; }
+    public decimal? EarnedInterest { get; }
+
+    // Formatted loan/lending fields
+    public string CollateralSatsFormatted { get; }
+    public string LoanAmountFormatted { get; }
+    public string AprFormatted { get; }
+    public string CurrentLtvFormatted { get; }
+    public string AccruedInterestFormatted { get; }
+    public string DistanceToLiquidationLtvFormatted { get; }
+    public string DaysUntilRepaymentFormatted { get; }
+    public string AmountLentFormatted { get; }
+    public string EarnedInterestFormatted { get; }
+    public string FeesFormatted { get; }
+    public string LoanHealthColor { get; }
+
     // Display helpers
     public bool IsBasicAsset => AssetType is AssetTypes.Stock or AssetTypes.Etf or AssetTypes.Crypto
         or AssetTypes.Commodity or AssetTypes.Custom;
     public bool IsRealEstate => AssetType == AssetTypes.RealEstate;
     public bool IsLeveragedPosition => AssetType == AssetTypes.LeveragedPosition;
+    public bool IsBtcLoan => AssetType == AssetTypes.BtcLoan;
+    public bool IsBtcLending => AssetType == AssetTypes.BtcLending;
+    public bool IsLoanOrLending => IsBtcLoan || IsBtcLending;
 
     // Returns P&L for leveraged positions, Value for others
     public string DisplayValueFormatted => IsLeveragedPosition ? PnLFormatted : CurrentValueFormatted;
@@ -98,6 +140,8 @@ public partial class AssetViewModel : ObservableObject
         AssetTypes.Commodity => "#7A6B4E",    // Dark bronze
         AssetTypes.LeveragedPosition => "#6B238E", // Dark purple
         AssetTypes.Custom => "#3A3A3A",       // Dark gray
+        AssetTypes.BtcLoan => "#1A237E",      // Dark indigo
+        AssetTypes.BtcLending => "#004D40",   // Dark teal
         _ => "#3A3A3A"
     };
     public string TitleBarTextColor => "#FFFFFF";
@@ -138,6 +182,32 @@ public partial class AssetViewModel : ObservableObject
         // Only show at risk if reported AND PnL is not significantly positive
         // A position with > 50% profit cannot logically be close to liquidation
         IsAtRisk = dto.IsAtRisk == true && (dto.PnLPercentage == null || dto.PnLPercentage <= 50);
+
+        // BTC loan
+        PlatformName = dto.PlatformName;
+        CollateralSats = dto.CollateralSats;
+        LoanAmount = dto.LoanAmount;
+        Apr = dto.Apr;
+        CurrentLtv = dto.CurrentLtv;
+        InitialLtv = dto.InitialLtv;
+        LiquidationLtv = dto.LiquidationLtv;
+        MarginCallLtv = dto.MarginCallLtv;
+        Fees = dto.Fees;
+        LoanStartDate = dto.LoanStartDate;
+        RepaymentDate = dto.RepaymentDate;
+        LoanStatusId = dto.LoanStatusId;
+        LoanStatusName = GetLocalizedLoanStatusName(dto.LoanStatusId);
+        LoanHealthStatusId = dto.LoanHealthStatusId;
+        LoanHealthStatusName = GetLocalizedHealthStatusName(dto.LoanHealthStatusId);
+        AccruedInterest = dto.AccruedInterest;
+        DistanceToLiquidationLtv = dto.DistanceToLiquidationLtv;
+        DaysUntilRepayment = dto.DaysUntilRepayment;
+
+        // BTC lending
+        AmountLent = dto.AmountLent;
+        BorrowerOrPlatformName = dto.BorrowerOrPlatformName;
+        LendingStartDate = dto.LendingStartDate;
+        EarnedInterest = dto.EarnedInterest;
 
         // Common acquisition and P&L fields
         AcquisitionDate = dto.AcquisitionDate;
@@ -190,7 +260,71 @@ public partial class AssetViewModel : ObservableObject
         AcquisitionPriceFormatted = AcquisitionPrice.HasValue
             ? CurrencyDisplay.FormatFiat(AcquisitionPrice.Value, CurrencyCode)
             : "-";
+
+        // BTC loan/lending formatted fields
+        CollateralSatsFormatted = CollateralSats.HasValue
+            ? $"{CollateralSats.Value:N0} sats"
+            : "-";
+
+        LoanAmountFormatted = LoanAmount.HasValue
+            ? CurrencyDisplay.FormatFiat(LoanAmount.Value, CurrencyCode)
+            : "-";
+
+        AprFormatted = Apr.HasValue
+            ? $"{Apr.Value * 100:N2}%"
+            : "-";
+
+        CurrentLtvFormatted = CurrentLtv.HasValue
+            ? $"{CurrentLtv.Value:N2}%"
+            : "-";
+
+        AccruedInterestFormatted = AccruedInterest.HasValue
+            ? CurrencyDisplay.FormatFiat(AccruedInterest.Value, CurrencyCode)
+            : "-";
+
+        DistanceToLiquidationLtvFormatted = DistanceToLiquidationLtv.HasValue
+            ? $"{DistanceToLiquidationLtv.Value:N2}pp"
+            : "-";
+
+        DaysUntilRepaymentFormatted = DaysUntilRepayment.HasValue
+            ? $"{DaysUntilRepayment.Value}d"
+            : "-";
+
+        AmountLentFormatted = AmountLent.HasValue
+            ? CurrencyDisplay.FormatFiat(AmountLent.Value, CurrencyCode)
+            : "-";
+
+        EarnedInterestFormatted = EarnedInterest.HasValue
+            ? CurrencyDisplay.FormatFiat(EarnedInterest.Value, CurrencyCode)
+            : "-";
+
+        FeesFormatted = Fees.HasValue
+            ? CurrencyDisplay.FormatFiat(Fees.Value, CurrencyCode)
+            : "-";
+
+        LoanHealthColor = LoanHealthStatusId switch
+        {
+            0 => "#4CAF50", // Healthy - green
+            1 => "#FFC107", // Warning - amber
+            2 => "#F44336", // Danger - red
+            _ => "#757575"  // Unknown - gray
+        };
     }
+
+    private static string? GetLocalizedLoanStatusName(int? statusId) => statusId switch
+    {
+        0 => language.Assets_Status_Active,
+        1 => language.Assets_Status_Repaid,
+        _ => null
+    };
+
+    private static string? GetLocalizedHealthStatusName(int? healthStatusId) => healthStatusId switch
+    {
+        0 => language.Assets_Health_Healthy,
+        1 => language.Assets_Health_Warning,
+        2 => language.Assets_Health_Danger,
+        _ => null
+    };
 
     private static string GetLocalizedAssetTypeName(AssetTypes assetType) => assetType switch
     {
@@ -201,6 +335,8 @@ public partial class AssetViewModel : ObservableObject
         AssetTypes.RealEstate => language.Assets_Type_RealEstate,
         AssetTypes.LeveragedPosition => language.Assets_Type_LeveragedPosition,
         AssetTypes.Custom => language.Assets_Type_Custom,
+        AssetTypes.BtcLoan => language.Assets_Type_BtcLoan,
+        AssetTypes.BtcLending => language.Assets_Type_BtcLending,
         _ => assetType.ToString()
     };
 }
