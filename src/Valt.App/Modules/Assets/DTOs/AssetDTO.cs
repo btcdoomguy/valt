@@ -39,6 +39,32 @@ public record AssetDTO
     public decimal? DistanceToLiquidation { get; init; }
     public bool? IsAtRisk { get; init; }
 
+    // BTC loan specific
+    public string? PlatformName { get; init; }
+    public long? CollateralSats { get; init; }
+    public decimal? LoanAmount { get; init; }
+    public decimal? Apr { get; init; }
+    public decimal? CurrentLtv { get; init; }
+    public decimal? InitialLtv { get; init; }
+    public decimal? LiquidationLtv { get; init; }
+    public decimal? MarginCallLtv { get; init; }
+    public decimal? Fees { get; init; }
+    public DateOnly? LoanStartDate { get; init; }
+    public DateOnly? RepaymentDate { get; init; }
+    public int? LoanStatusId { get; init; }
+    public string? LoanStatusName { get; init; }
+    public int? LoanHealthStatusId { get; init; }
+    public string? LoanHealthStatusName { get; init; }
+    public decimal? AccruedInterest { get; init; }
+    public decimal? DistanceToLiquidationLtv { get; init; }
+    public int? DaysUntilRepayment { get; init; }
+
+    // BTC lending specific
+    public decimal? AmountLent { get; init; }
+    public string? BorrowerOrPlatformName { get; init; }
+    public DateOnly? LendingStartDate { get; init; }
+    public decimal? EarnedInterest { get; init; }
+
     // Common acquisition and P&L fields (for all asset types)
     public DateOnly? AcquisitionDate { get; init; }
     public decimal? AcquisitionPrice { get; init; }

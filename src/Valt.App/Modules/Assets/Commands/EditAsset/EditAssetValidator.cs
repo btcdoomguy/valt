@@ -41,6 +41,14 @@ internal sealed class EditAssetValidator : IValidator<EditAssetCommand>
                 ValidateLeveragedDetails(leveraged, builder);
                 break;
 
+            case BtcLoanDetailsInputDTO btcLoan:
+                ValidateBtcLoanDetails(btcLoan, builder);
+                break;
+
+            case BtcLendingDetailsInputDTO btcLending:
+                ValidateBtcLendingDetails(btcLending, builder);
+                break;
+
             default:
                 builder.AddError(nameof(instance.Details), "Unknown asset details type.");
                 break;
@@ -100,5 +108,42 @@ internal sealed class EditAssetValidator : IValidator<EditAssetCommand>
         var validPriceSources = new[] { (int)AssetPriceSource.Manual, (int)AssetPriceSource.YahooFinance, (int)AssetPriceSource.LivePrice };
         if (!validPriceSources.Contains(details.PriceSource))
             builder.AddError("Details.PriceSource", "Price source must be Manual (0), YahooFinance (1), or LivePrice (2).");
+    }
+
+    private static void ValidateBtcLoanDetails(BtcLoanDetailsInputDTO details, ValidationResultBuilder builder)
+    {
+        builder.AddErrorIfNullOrWhiteSpace(details.PlatformName, "Details.PlatformName", "Platform name is required.");
+
+        if (details.CollateralSats <= 0)
+            builder.AddError("Details.CollateralSats", "Collateral must be greater than zero.");
+
+        if (details.LoanAmount <= 0)
+            builder.AddError("Details.LoanAmount", "Loan amount must be greater than zero.");
+
+        if (details.Apr < 0)
+            builder.AddError("Details.Apr", "APR cannot be negative.");
+
+        if (details.MarginCallLtv <= 0)
+            builder.AddError("Details.MarginCallLtv", "Margin call LTV must be greater than zero.");
+
+        if (details.LiquidationLtv <= 0)
+            builder.AddError("Details.LiquidationLtv", "Liquidation LTV must be greater than zero.");
+
+        if (details.LiquidationLtv <= details.MarginCallLtv)
+            builder.AddError("Details.LiquidationLtv", "Liquidation LTV must be greater than margin call LTV.");
+
+        if (details.Fees < 0)
+            builder.AddError("Details.Fees", "Fees cannot be negative.");
+    }
+
+    private static void ValidateBtcLendingDetails(BtcLendingDetailsInputDTO details, ValidationResultBuilder builder)
+    {
+        builder.AddErrorIfNullOrWhiteSpace(details.BorrowerOrPlatformName, "Details.BorrowerOrPlatformName", "Borrower or platform name is required.");
+
+        if (details.AmountLent <= 0)
+            builder.AddError("Details.AmountLent", "Amount lent must be greater than zero.");
+
+        if (details.Apr < 0)
+            builder.AddError("Details.Apr", "APR cannot be negative.");
     }
 }

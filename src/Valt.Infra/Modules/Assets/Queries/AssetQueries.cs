@@ -118,16 +118,19 @@ internal sealed class AssetQueries : IAssetQueries
     /// <summary>
     /// Gets the value to use for portfolio summary calculations.
     /// For leveraged positions, returns only the P&amp;L (not the full position value).
+    /// For BTC loans, returns collateral value - loan - accrued interest - fees.
+    /// For BTC lending, returns amount lent + earned interest.
     /// For other assets, returns the current value.
     /// </summary>
     private static decimal GetValueForSummary(Asset asset)
     {
-        if (asset.Details is LeveragedPositionDetails leveraged)
+        return asset.Details switch
         {
-            // For leveraged positions, use P&L only (not full position value)
-            return leveraged.CalculatePnL(leveraged.CurrentPrice);
-        }
-        return asset.GetCurrentValue();
+            LeveragedPositionDetails leveraged => leveraged.CalculatePnL(leveraged.CurrentPrice),
+            BtcLoanDetails btcLoan => btcLoan.CalculateCurrentValue(btcLoan.CurrentBtcPriceInLoanCurrency),
+            BtcLendingDetails btcLending => btcLending.CalculateCurrentValue(0),
+            _ => asset.GetCurrentValue()
+        };
     }
 
     private static AssetDTO MapToDto(AssetEntity entity)
@@ -151,6 +154,32 @@ internal sealed class AssetQueries : IAssetQueries
         bool? isAtRisk = null;
         DateOnly? acquisitionDate = null;
         decimal? acquisitionPrice = null;
+
+        // BTC loan fields
+        string? platformName = null;
+        long? collateralSats = null;
+        decimal? loanAmount = null;
+        decimal? apr = null;
+        decimal? currentLtv = null;
+        decimal? initialLtv = null;
+        decimal? liquidationLtv = null;
+        decimal? marginCallLtv = null;
+        decimal? fees = null;
+        DateOnly? loanStartDate = null;
+        DateOnly? repaymentDate = null;
+        int? loanStatusId = null;
+        string? loanStatusName = null;
+        int? loanHealthStatusId = null;
+        string? loanHealthStatusName = null;
+        decimal? accruedInterest = null;
+        decimal? distanceToLiquidationLtv = null;
+        int? daysUntilRepayment = null;
+
+        // BTC lending fields
+        decimal? amountLent = null;
+        string? borrowerOrPlatformName = null;
+        DateOnly? lendingStartDate = null;
+        decimal? earnedInterest = null;
 
         switch (asset.Details)
         {
@@ -192,6 +221,43 @@ internal sealed class AssetQueries : IAssetQueries
                 distanceToLiquidation = leveraged.CalculateDistanceToLiquidation(leveraged.CurrentPrice);
                 isAtRisk = leveraged.IsAtRisk(leveraged.CurrentPrice);
                 break;
+
+            case BtcLoanDetails btcLoan:
+                platformName = btcLoan.PlatformName;
+                collateralSats = btcLoan.CollateralSats;
+                loanAmount = btcLoan.LoanAmount;
+                apr = btcLoan.Apr;
+                initialLtv = btcLoan.InitialLtv;
+                liquidationLtv = btcLoan.LiquidationLtv;
+                marginCallLtv = btcLoan.MarginCallLtv;
+                fees = btcLoan.Fees;
+                loanStartDate = btcLoan.LoanStartDate;
+                repaymentDate = btcLoan.RepaymentDate;
+                loanStatusId = (int)btcLoan.Status;
+                loanStatusName = btcLoan.Status.ToString();
+                accruedInterest = btcLoan.CalculateAccruedInterest();
+                daysUntilRepayment = btcLoan.CalculateDaysUntilRepayment();
+                if (btcLoan.CurrentBtcPriceInLoanCurrency > 0)
+                {
+                    currentLtv = btcLoan.CalculateCurrentLtv(btcLoan.CurrentBtcPriceInLoanCurrency);
+                    var healthStatus = btcLoan.CalculateHealthStatus(btcLoan.CurrentBtcPriceInLoanCurrency);
+                    loanHealthStatusId = (int)healthStatus;
+                    loanHealthStatusName = healthStatus.ToString();
+                    distanceToLiquidationLtv = btcLoan.CalculateDistanceToLiquidation(btcLoan.CurrentBtcPriceInLoanCurrency);
+                }
+                break;
+
+            case BtcLendingDetails btcLending:
+                amountLent = btcLending.AmountLent;
+                borrowerOrPlatformName = btcLending.BorrowerOrPlatformName;
+                lendingStartDate = btcLending.LendingStartDate;
+                apr = btcLending.Apr;
+                earnedInterest = btcLending.CalculateEarnedInterest();
+                loanStatusId = (int)btcLending.Status;
+                loanStatusName = btcLending.Status.ToString();
+                daysUntilRepayment = btcLending.CalculateDaysUntilRepayment();
+                repaymentDate = btcLending.ExpectedRepaymentDate;
+                break;
         }
 
         return new AssetDTO
@@ -222,6 +288,30 @@ internal sealed class AssetQueries : IAssetQueries
             IsLong = isLong,
             DistanceToLiquidation = distanceToLiquidation,
             IsAtRisk = isAtRisk,
+            // BTC loan fields
+            PlatformName = platformName,
+            CollateralSats = collateralSats,
+            LoanAmount = loanAmount,
+            Apr = apr,
+            CurrentLtv = currentLtv,
+            InitialLtv = initialLtv,
+            LiquidationLtv = liquidationLtv,
+            MarginCallLtv = marginCallLtv,
+            Fees = fees,
+            LoanStartDate = loanStartDate,
+            RepaymentDate = repaymentDate,
+            LoanStatusId = loanStatusId,
+            LoanStatusName = loanStatusName,
+            LoanHealthStatusId = loanHealthStatusId,
+            LoanHealthStatusName = loanHealthStatusName,
+            AccruedInterest = accruedInterest,
+            DistanceToLiquidationLtv = distanceToLiquidationLtv,
+            DaysUntilRepayment = daysUntilRepayment,
+            // BTC lending fields
+            AmountLent = amountLent,
+            BorrowerOrPlatformName = borrowerOrPlatformName,
+            LendingStartDate = lendingStartDate,
+            EarnedInterest = earnedInterest,
             // Common acquisition and P&L fields
             AcquisitionDate = acquisitionDate,
             AcquisitionPrice = acquisitionPrice,

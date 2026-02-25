@@ -1155,6 +1155,12 @@
     <data name="Assets.Type.Custom" xml:space="preserve">
         <value>Custom</value>
     </data>
+    <data name="Assets_Type_BtcLoan" xml:space="preserve">
+        <value>BTC Loan</value>
+    </data>
+    <data name="Assets_Type_BtcLending" xml:space="preserve">
+        <value>BTC Lending</value>
+    </data>
     <data name="Assets.PriceSource.Manual" xml:space="preserve">
         <value>Manual</value>
     </data>
@@ -1184,6 +1190,57 @@
     </data>
     <data name="ManageAsset_Section_Display" xml:space="preserve">
         <value>Display Settings</value>
+    </data>
+    <data name="ManageAsset_Section_BtcLoan" xml:space="preserve">
+        <value>BTC Loan Details</value>
+    </data>
+    <data name="ManageAsset_Section_BtcLending" xml:space="preserve">
+        <value>BTC Lending Details</value>
+    </data>
+    <data name="ManageAsset_Platform" xml:space="preserve">
+        <value>Platform</value>
+    </data>
+    <data name="ManageAsset_CollateralSats" xml:space="preserve">
+        <value>Collateral (sats)</value>
+    </data>
+    <data name="ManageAsset_LoanAmount" xml:space="preserve">
+        <value>Loan Amount</value>
+    </data>
+    <data name="ManageAsset_APR" xml:space="preserve">
+        <value>APR (%)</value>
+    </data>
+    <data name="ManageAsset_Fees" xml:space="preserve">
+        <value>Fees</value>
+    </data>
+    <data name="ManageAsset_InitialLTV" xml:space="preserve">
+        <value>Initial LTV (%)</value>
+    </data>
+    <data name="ManageAsset_MarginCallLTV" xml:space="preserve">
+        <value>Margin Call LTV (%)</value>
+    </data>
+    <data name="ManageAsset_LiquidationLTV" xml:space="preserve">
+        <value>Liquidation LTV (%)</value>
+    </data>
+    <data name="ManageAsset_LoanStartDate" xml:space="preserve">
+        <value>Loan Start Date</value>
+    </data>
+    <data name="ManageAsset_RepaymentDate" xml:space="preserve">
+        <value>Repayment Date</value>
+    </data>
+    <data name="ManageAsset_BorrowerPlatform" xml:space="preserve">
+        <value>Borrower / Platform</value>
+    </data>
+    <data name="ManageAsset_AmountLent" xml:space="preserve">
+        <value>Amount Lent</value>
+    </data>
+    <data name="ManageAsset_LendingAPR" xml:space="preserve">
+        <value>APR (%)</value>
+    </data>
+    <data name="ManageAsset_LendingStartDate" xml:space="preserve">
+        <value>Lending Start Date</value>
+    </data>
+    <data name="ManageAsset_ExpectedRepaymentDate" xml:space="preserve">
+        <value>Expected Repayment Date</value>
     </data>
     <data name="Error.AssetNotFound" xml:space="preserve">
         <value>Asset not found</value>
@@ -2045,6 +2102,66 @@
     <data name="Assets_Card_PnL" xml:space="preserve">
         <value>P&amp;L:</value>
     </data>
+    <data name="Assets_Card_Platform" xml:space="preserve">
+        <value>Platform: </value>
+    </data>
+    <data name="Assets_Card_Collateral" xml:space="preserve">
+        <value>Collateral: </value>
+    </data>
+    <data name="Assets_Card_LoanAmount" xml:space="preserve">
+        <value>Loan: </value>
+    </data>
+    <data name="Assets_Card_LTV" xml:space="preserve">
+        <value>LTV: </value>
+    </data>
+    <data name="Assets_Card_BorrowerPlatform" xml:space="preserve">
+        <value>Borrower: </value>
+    </data>
+    <data name="Assets_Card_AmountLent" xml:space="preserve">
+        <value>Lent: </value>
+    </data>
+    <data name="Assets_Card_EarnedInterest" xml:space="preserve">
+        <value>Interest: </value>
+    </data>
+    <data name="Assets_Card_DaysUntilRepayment" xml:space="preserve">
+        <value>Repayment: </value>
+    </data>
+    <data name="Assets_Platform" xml:space="preserve">
+        <value>Platform</value>
+    </data>
+    <data name="Assets_CollateralSats" xml:space="preserve">
+        <value>Collateral (sats)</value>
+    </data>
+    <data name="Assets_LoanAmount" xml:space="preserve">
+        <value>Loan Amount</value>
+    </data>
+    <data name="Assets_APR" xml:space="preserve">
+        <value>APR</value>
+    </data>
+    <data name="Assets_CurrentLTV" xml:space="preserve">
+        <value>Current LTV</value>
+    </data>
+    <data name="Assets_DistToLiqLTV" xml:space="preserve">
+        <value>Dist. to Liquidation</value>
+    </data>
+    <data name="Assets_AccruedInterest" xml:space="preserve">
+        <value>Accrued Interest</value>
+    </data>
+    <data name="Assets_Fees" xml:space="preserve">
+        <value>Fees</value>
+    </data>
+    <data name="Assets_BorrowerPlatform" xml:space="preserve">
+        <value>Borrower / Platform</value>
+    </data>
+    <data name="Assets_AmountLent" xml:space="preserve">
+        <value>Amount Lent</value>
+    </data>
+    <data name="Assets_EarnedInterest" xml:space="preserve">
+        <value>Earned Interest</value>
+    </data>
+    <data name="Assets_DaysUntilRepayment" xml:space="preserve">
+        <value>Days Until Repayment</value>
+    </data>
     <data name="Assets.Sell" xml:space="preserve">
         <value>Sell</value>
     </data>
@@ -2074,6 +2191,33 @@
     </data>
     <data name="Assets.Sell.Notes.Basic" xml:space="preserve">
         <value>Sell of {0} - acquisition price {1}</value>
+    </data>
+    <data name="Assets_RepayLoan" xml:space="preserve">
+        <value>Mark as Repaid</value>
+    </data>
+    <data name="Assets_RepayLoan_Alert" xml:space="preserve">
+        <value>Mark as Repaid</value>
+    </data>
+    <data name="Assets_RepayLoan_Message" xml:space="preserve">
+        <value>Mark this loan as repaid?</value>
+    </data>
+    <data name="Assets_Card_APR" xml:space="preserve">
+        <value>APR: </value>
+    </data>
+    <data name="Assets_Health_Healthy" xml:space="preserve">
+        <value>Healthy</value>
+    </data>
+    <data name="Assets_Health_Warning" xml:space="preserve">
+        <value>Warning</value>
+    </data>
+    <data name="Assets_Health_Danger" xml:space="preserve">
+        <value>Danger</value>
+    </data>
+    <data name="Assets_Status_Active" xml:space="preserve">
+        <value>Active</value>
+    </data>
+    <data name="Assets_Status_Repaid" xml:space="preserve">
+        <value>Repaid</value>
     </data>
     <data name="Assets.RefreshPrices" xml:space="preserve">
         <value>Refresh Prices</value>

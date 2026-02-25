@@ -8,5 +8,7 @@ public enum AssetTypes
     RealEstate = 3,
     Commodity = 4,
     LeveragedPosition = 5,
-    Custom = 6
+    Custom = 6,
+    BtcLoan = 7,
+    BtcLending = 8
 }

@@ -173,4 +173,63 @@ public class AssetBuilder
                 collateral, entryPrice, leverage,
                 liquidationPrice: isLong ? 45000m : 55000m,
                 currentPrice, "USD", "BTC", AssetPriceSource.LivePrice, isLong);
+
+    public AssetBuilder WithBtcLoanDetails(
+        string platformName = "HodlHodl",
+        long collateralSats = 100_000_000,
+        decimal loanAmount = 25_000m,
+        string currencyCode = "USD",
+        decimal apr = 0.12m,
+        decimal initialLtv = 50m,
+        decimal liquidationLtv = 80m,
+        decimal marginCallLtv = 70m,
+        decimal fees = 100m,
+        LoanStatus status = LoanStatus.Active,
+        decimal currentBtcPrice = 50_000m)
+    {
+        _details = new BtcLoanDetails(
+            platformName, collateralSats, loanAmount, currencyCode, apr,
+            initialLtv, liquidationLtv, marginCallLtv, fees,
+            new DateOnly(2025, 1, 1), new DateOnly(2026, 1, 1),
+            status, currentBtcPrice);
+        return this;
+    }
+
+    public AssetBuilder WithBtcLendingDetails(
+        decimal amountLent = 10_000m,
+        string currencyCode = "USD",
+        decimal apr = 0.05m,
+        string borrowerOrPlatformName = "Ledn",
+        LoanStatus status = LoanStatus.Active)
+    {
+        _details = new BtcLendingDetails(
+            amountLent, currencyCode, apr,
+            new DateOnly(2026, 1, 1),
+            borrowerOrPlatformName,
+            new DateOnly(2025, 1, 1),
+            status);
+        return this;
+    }
+
+    public static AssetBuilder ABtcLoan(
+        string platformName = "HodlHodl",
+        long collateralSats = 100_000_000,
+        decimal loanAmount = 25_000m,
+        decimal currentBtcPrice = 50_000m) =>
+        new AssetBuilder()
+            .WithName("BTC Loan")
+            .WithBtcLoanDetails(
+                platformName: platformName,
+                collateralSats: collateralSats,
+                loanAmount: loanAmount,
+                currentBtcPrice: currentBtcPrice);
+
+    public static AssetBuilder ABtcLending(
+        decimal amountLent = 10_000m,
+        string borrowerOrPlatformName = "Ledn") =>
+        new AssetBuilder()
+            .WithName("BTC Lending")
+            .WithBtcLendingDetails(
+                amountLent: amountLent,
+                borrowerOrPlatformName: borrowerOrPlatformName);
 }

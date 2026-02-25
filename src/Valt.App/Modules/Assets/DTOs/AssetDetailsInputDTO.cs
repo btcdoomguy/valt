@@ -128,3 +128,105 @@ public record LeveragedPositionDetailsInputDTO : AssetDetailsInputDTO
     /// </summary>
     public required int PriceSource { get; init; }
 }
+
+/// <summary>
+/// Input DTO for BTC loan assets.
+/// </summary>
+public record BtcLoanDetailsInputDTO : AssetDetailsInputDTO
+{
+    /// <summary>
+    /// Platform name (e.g., "HodlHodl", "Ledn").
+    /// </summary>
+    public required string PlatformName { get; init; }
+
+    /// <summary>
+    /// BTC collateral in satoshis.
+    /// </summary>
+    public required long CollateralSats { get; init; }
+
+    /// <summary>
+    /// Borrowed fiat amount.
+    /// </summary>
+    public required decimal LoanAmount { get; init; }
+
+    /// <summary>
+    /// Annual percentage rate (e.g., 0.12 for 12%).
+    /// </summary>
+    public required decimal Apr { get; init; }
+
+    /// <summary>
+    /// Initial LTV ratio (percentage).
+    /// </summary>
+    public required decimal InitialLtv { get; init; }
+
+    /// <summary>
+    /// Liquidation LTV ratio (percentage).
+    /// </summary>
+    public required decimal LiquidationLtv { get; init; }
+
+    /// <summary>
+    /// Margin call LTV ratio (percentage).
+    /// </summary>
+    public required decimal MarginCallLtv { get; init; }
+
+    /// <summary>
+    /// Fees paid.
+    /// </summary>
+    public decimal Fees { get; init; }
+
+    /// <summary>
+    /// Loan start date.
+    /// </summary>
+    public required DateOnly LoanStartDate { get; init; }
+
+    /// <summary>
+    /// Repayment date (null = indefinite).
+    /// </summary>
+    public DateOnly? RepaymentDate { get; init; }
+
+    /// <summary>
+    /// Current BTC price in loan currency.
+    /// </summary>
+    public decimal CurrentBtcPrice { get; init; }
+
+    /// <summary>
+    /// Loan status: 0=Active, 1=Repaid
+    /// </summary>
+    public int Status { get; init; }
+}
+
+/// <summary>
+/// Input DTO for BTC lending assets.
+/// </summary>
+public record BtcLendingDetailsInputDTO : AssetDetailsInputDTO
+{
+    /// <summary>
+    /// Amount lent.
+    /// </summary>
+    public required decimal AmountLent { get; init; }
+
+    /// <summary>
+    /// Annual percentage rate earned (e.g., 0.05 for 5%).
+    /// </summary>
+    public required decimal Apr { get; init; }
+
+    /// <summary>
+    /// Borrower or platform name.
+    /// </summary>
+    public required string BorrowerOrPlatformName { get; init; }
+
+    /// <summary>
+    /// Lending start date.
+    /// </summary>
+    public required DateOnly LendingStartDate { get; init; }
+
+    /// <summary>
+    /// Expected repayment date (null = indefinite).
+    /// </summary>
+    public DateOnly? ExpectedRepaymentDate { get; init; }
+
+    /// <summary>
+    /// Lending status: 0=Active, 1=Repaid
+    /// </summary>
+    public int Status { get; init; }
+}

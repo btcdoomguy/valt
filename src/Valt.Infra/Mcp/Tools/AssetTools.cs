@@ -3,9 +3,12 @@ using ModelContextProtocol.Server;
 using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Assets.Commands.CreateBasicAsset;
+using Valt.App.Modules.Assets.Commands.CreateBtcLending;
+using Valt.App.Modules.Assets.Commands.CreateBtcLoan;
 using Valt.App.Modules.Assets.Commands.CreateLeveragedPosition;
 using Valt.App.Modules.Assets.Commands.CreateRealEstateAsset;
 using Valt.App.Modules.Assets.Commands.DeleteAsset;
+using Valt.App.Modules.Assets.Commands.RepayLoan;
 using Valt.App.Modules.Assets.Commands.SetAssetIncludeInNetWorth;
 using Valt.App.Modules.Assets.Commands.SetAssetVisibility;
 using Valt.App.Modules.Assets.Commands.UpdateAssetPrice;
@@ -18,6 +21,7 @@ using Valt.App.Modules.Assets.Queries.GetVisibleAssets;
 using Valt.Core.Modules.Assets;
 using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Mcp.Notifications;
+using Valt.Infra.Modules.Assets.PriceProviders;
 using Valt.Infra.Settings;
 
 namespace Valt.Infra.Mcp.Tools;
@@ -309,6 +313,129 @@ public class AssetTools
 
         await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Asset {assetId} include in net worth set to {!asset.IncludeInNetWorth}";
+    }
+
+    /// <summary>
+    /// Creates a BTC-collateralized loan asset.
+    /// </summary>
+    [McpServerTool, Description("Create a BTC-collateralized loan (borrowing fiat against BTC collateral). Tracks LTV, health status, and accrued interest.")]
+    public static async Task<string> CreateBtcLoan(
+        ICommandDispatcher commandDispatcher,
+        INotificationPublisher publisher,
+        IAssetPriceProviderSelector priceProviderSelector,
+        [Description("Loan name")] string name,
+        [Description("Currency code for the loan (e.g., USD, BRL)")] string currencyCode,
+        [Description("Lending platform name (e.g., HodlHodl, Ledn)")] string platformName,
+        [Description("BTC collateral in satoshis")] long collateralSats,
+        [Description("Borrowed fiat amount")] decimal loanAmount,
+        [Description("Annual percentage rate as decimal (e.g., 0.12 for 12%)")] decimal apr,
+        [Description("Initial LTV ratio at loan origination (percentage, e.g., 50)")] decimal initialLtv,
+        [Description("LTV ratio that triggers liquidation (percentage, e.g., 80)")] decimal liquidationLtv,
+        [Description("LTV ratio that triggers margin call (percentage, e.g., 70)")] decimal marginCallLtv,
+        [Description("Loan start date (yyyy-MM-dd)")] string loanStartDate,
+        [Description("Fees paid for the loan")] decimal fees = 0,
+        [Description("Repayment date (yyyy-MM-dd, optional)")] string? repaymentDate = null,
+        [Description("Include in net worth calculation")] bool includeInNetWorth = true,
+        [Description("Visible in list")] bool visible = true,
+        [Description("Icon identifier (optional)")] string? icon = null)
+    {
+        // Fetch current BTC price for LTV calculations
+        decimal currentBtcPrice = 0;
+        var priceResult = await priceProviderSelector.GetPriceAsync(AssetPriceSource.LivePrice, "BTC", currencyCode);
+        if (priceResult is not null)
+            currentBtcPrice = priceResult.Price;
+
+        var result = await commandDispatcher.DispatchAsync(new CreateBtcLoanCommand
+        {
+            Name = name,
+            CurrencyCode = currencyCode,
+            PlatformName = platformName,
+            CollateralSats = collateralSats,
+            LoanAmount = loanAmount,
+            Apr = apr,
+            InitialLtv = initialLtv,
+            LiquidationLtv = liquidationLtv,
+            MarginCallLtv = marginCallLtv,
+            Fees = fees,
+            LoanStartDate = DateOnly.Parse(loanStartDate),
+            RepaymentDate = string.IsNullOrWhiteSpace(repaymentDate) ? null : DateOnly.Parse(repaymentDate),
+            CurrentBtcPrice = currentBtcPrice,
+            IncludeInNetWorth = includeInNetWorth,
+            Visible = visible,
+            Icon = icon
+        });
+
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error!.Message}";
+        }
+
+        await publisher.PublishAsync(new McpDataChangedNotification());
+        return $"BTC loan created with ID: {result.Value}";
+    }
+
+    /// <summary>
+    /// Creates a BTC/fiat lending position asset.
+    /// </summary>
+    [McpServerTool, Description("Create a lending position (lending fiat/BTC to a borrower or platform). Tracks earned interest.")]
+    public static async Task<string> CreateBtcLending(
+        ICommandDispatcher commandDispatcher,
+        INotificationPublisher publisher,
+        [Description("Lending position name")] string name,
+        [Description("Currency code (e.g., USD, BRL)")] string currencyCode,
+        [Description("Amount lent")] decimal amountLent,
+        [Description("Annual percentage rate earned as decimal (e.g., 0.05 for 5%)")] decimal apr,
+        [Description("Borrower or platform name")] string borrowerOrPlatformName,
+        [Description("Lending start date (yyyy-MM-dd)")] string lendingStartDate,
+        [Description("Expected repayment date (yyyy-MM-dd, optional)")] string? expectedRepaymentDate = null,
+        [Description("Include in net worth calculation")] bool includeInNetWorth = true,
+        [Description("Visible in list")] bool visible = true,
+        [Description("Icon identifier (optional)")] string? icon = null)
+    {
+        var result = await commandDispatcher.DispatchAsync(new CreateBtcLendingCommand
+        {
+            Name = name,
+            CurrencyCode = currencyCode,
+            AmountLent = amountLent,
+            Apr = apr,
+            BorrowerOrPlatformName = borrowerOrPlatformName,
+            LendingStartDate = DateOnly.Parse(lendingStartDate),
+            ExpectedRepaymentDate = string.IsNullOrWhiteSpace(expectedRepaymentDate) ? null : DateOnly.Parse(expectedRepaymentDate),
+            IncludeInNetWorth = includeInNetWorth,
+            Visible = visible,
+            Icon = icon
+        });
+
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error!.Message}";
+        }
+
+        await publisher.PublishAsync(new McpDataChangedNotification());
+        return $"Lending position created with ID: {result.Value}";
+    }
+
+    /// <summary>
+    /// Marks a BTC loan or lending position as repaid.
+    /// </summary>
+    [McpServerTool, Description("Mark a BTC loan or lending position as repaid")]
+    public static async Task<string> RepayLoan(
+        ICommandDispatcher commandDispatcher,
+        INotificationPublisher publisher,
+        [Description("The asset ID to mark as repaid")] string assetId)
+    {
+        var result = await commandDispatcher.DispatchAsync(new RepayLoanCommand
+        {
+            AssetId = assetId
+        });
+
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error!.Message}";
+        }
+
+        await publisher.PublishAsync(new McpDataChangedNotification());
+        return $"Asset {assetId} marked as repaid";
     }
 
     /// <summary>

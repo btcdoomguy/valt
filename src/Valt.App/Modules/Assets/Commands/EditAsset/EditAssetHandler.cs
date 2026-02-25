@@ -48,7 +48,7 @@ internal sealed class EditAssetHandler : ICommandHandler<EditAssetCommand, Unit>
                 $"Invalid currency code: {command.Details.CurrencyCode}");
         }
 
-        var detailsResult = BuildDetails(command.Details);
+        var detailsResult = BuildDetails(command.Details, asset);
         if (detailsResult.IsFailure)
             return Result<Unit>.Failure(detailsResult.Error!);
 
@@ -63,7 +63,7 @@ internal sealed class EditAssetHandler : ICommandHandler<EditAssetCommand, Unit>
         return Result<Unit>.Success(Unit.Value);
     }
 
-    private static Result<IAssetDetails> BuildDetails(AssetDetailsInputDTO dto)
+    private static Result<IAssetDetails> BuildDetails(AssetDetailsInputDTO dto, Asset existingAsset)
     {
         return dto switch
         {
@@ -96,7 +96,41 @@ internal sealed class EditAssetHandler : ICommandHandler<EditAssetCommand, Unit>
                 priceSource: (AssetPriceSource)leveraged.PriceSource,
                 isLong: leveraged.IsLong)),
 
+            BtcLoanDetailsInputDTO btcLoan => BuildBtcLoanDetails(btcLoan, existingAsset),
+
+            BtcLendingDetailsInputDTO btcLending => Result<IAssetDetails>.Success(new BtcLendingDetails(
+                amountLent: btcLending.AmountLent,
+                currencyCode: btcLending.CurrencyCode,
+                apr: btcLending.Apr,
+                expectedRepaymentDate: btcLending.ExpectedRepaymentDate,
+                borrowerOrPlatformName: btcLending.BorrowerOrPlatformName,
+                lendingStartDate: btcLending.LendingStartDate,
+                status: (LoanStatus)btcLending.Status)),
+
             _ => Result<IAssetDetails>.Failure("UNKNOWN_DETAILS_TYPE", "Unknown asset details type")
         };
+    }
+
+    private static Result<IAssetDetails> BuildBtcLoanDetails(BtcLoanDetailsInputDTO btcLoan, Asset existingAsset)
+    {
+        // Preserve existing BTC price if new price is 0 (fetch failed)
+        var btcPrice = btcLoan.CurrentBtcPrice;
+        if (btcPrice <= 0 && existingAsset.Details is BtcLoanDetails existingLoan)
+            btcPrice = existingLoan.CurrentBtcPriceInLoanCurrency;
+
+        return Result<IAssetDetails>.Success(new BtcLoanDetails(
+            platformName: btcLoan.PlatformName,
+            collateralSats: btcLoan.CollateralSats,
+            loanAmount: btcLoan.LoanAmount,
+            currencyCode: btcLoan.CurrencyCode,
+            apr: btcLoan.Apr,
+            initialLtv: btcLoan.InitialLtv,
+            liquidationLtv: btcLoan.LiquidationLtv,
+            marginCallLtv: btcLoan.MarginCallLtv,
+            fees: btcLoan.Fees,
+            loanStartDate: btcLoan.LoanStartDate,
+            repaymentDate: btcLoan.RepaymentDate,
+            status: (LoanStatus)btcLoan.Status,
+            currentBtcPriceInLoanCurrency: btcPrice));
     }
 }
