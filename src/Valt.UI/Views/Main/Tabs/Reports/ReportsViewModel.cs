@@ -40,6 +40,7 @@ using Valt.UI.Services.MessageBoxes;
 using Valt.UI.State;
 using Valt.UI.State.Events;
 using Valt.UI.UserControls;
+using Valt.UI.Views.Main.Modals.SimulatedPricesConfig;
 using Valt.UI.Views.Main.Modals.StatisticsConfig;
 using Valt.UI.Views.Main.Tabs.Reports.Models;
 
@@ -82,6 +83,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private DashboardData _btcStackData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _leveragePositionsData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _statisticsData = DashboardData.Empty;
+    [ObservableProperty] private DashboardData _simulatedPricesData = DashboardData.Empty;
     [ObservableProperty] private AvaloniaList<MonthlyReportItemViewModel> _monthlyReportItems = new();
     [ObservableProperty] private MonthlyTotalsChartData _monthlyTotalsChartData = new();
     [ObservableProperty] private ExpensesByCategoryChartData _expensesByCategoryChartData = new();
@@ -98,6 +100,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private bool _isLeveragePositionsLoading = true;
     [ObservableProperty] private bool _isLeveragePositionsVisible;
     [ObservableProperty] private bool _isStatisticsLoading = true;
+    [ObservableProperty] private bool _isSimulatedPricesLoading = true;
     [ObservableProperty] private bool _isMonthlyTotalsLoading = true;
     [ObservableProperty] private bool _isSpendingByCategoriesLoading = true;
     [ObservableProperty] private bool _isIncomeByCategoriesLoading = true;
@@ -184,12 +187,14 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 case nameof(CurrencySettings.MainFiatCurrency):
                     IsAllTimeHighLoading = true;
                     IsStatisticsLoading = true;
+                    IsSimulatedPricesLoading = true;
                     IsMonthlyTotalsLoading = true;
                     IsSpendingByCategoriesLoading = true;
                     IsIncomeByCategoriesLoading = true;
                     IsWealthOverviewLoading = true;
                     // Reload data when currency changes
                     ReloadDataAndFetchAllReportsAsync().SafeFireAndForget(logger: _logger, callerName: nameof(ReloadDataAndFetchAllReportsAsync));
+                    UpdateSimulatedPricesData();
                     break;
             }
         });
@@ -225,6 +230,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             .SafeFireAndForget(logger: _logger, callerName: nameof(LoadDataAndFetchAllReportsAsync));
         UpdateWealthData();
         UpdateBtcStackData();
+        UpdateSimulatedPricesData();
     }
 
     /// <summary>
@@ -780,6 +786,82 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
     }
 
+    private void UpdateSimulatedPricesData()
+    {
+        try
+        {
+            var lines = _configurationManager.GetSimulatedPriceLines();
+            var currentBtcPriceUsd = _ratesState.BitcoinPrice;
+            var fiatRates = _ratesState.FiatRates;
+            var mainCurrency = FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency);
+            var wealth = _accountsTotalState.CurrentWealth;
+
+            if (currentBtcPriceUsd is null || fiatRates is null || !fiatRates.ContainsKey(mainCurrency.Code) || lines.Count == 0)
+            {
+                SimulatedPricesData = new DashboardData(language.Reports_SimulatedPrices_Title,
+                    new ObservableCollection<RowItem>(), OpenSimulatedPricesConfigCommand, "\uF04A");
+                IsSimulatedPricesLoading = false;
+                return;
+            }
+
+            var mainFiatRate = fiatRates[mainCurrency.Code];
+            var wealthInSats = wealth.WealthInSats;
+            var wealthInMainFiat = wealth.WealthInMainFiatCurrency;
+
+            var rows = new ObservableCollection<RowItem>();
+
+            foreach (var line in lines)
+            {
+                decimal simulatedPriceUsd;
+                string leftLabel;
+
+                if (line.Type == Infra.Modules.Configuration.SimulatedPriceType.Percentage)
+                {
+                    simulatedPriceUsd = (line.Value / 100m) * currentBtcPriceUsd.Value;
+                    leftLabel = $"{CurrencyDisplay.FormatFiat(simulatedPriceUsd, FiatCurrency.Usd.Code)} ({line.Value:G0}%)";
+                }
+                else
+                {
+                    simulatedPriceUsd = line.Value;
+                    leftLabel = $"{CurrencyDisplay.FormatFiat(simulatedPriceUsd, FiatCurrency.Usd.Code)} ({language.Reports_SimulatedPrices_Fixed})";
+                }
+
+                var btcPortionInFiat = (wealthInSats / 100_000_000m) * simulatedPriceUsd * mainFiatRate;
+                var simulatedTotalFiat = btcPortionInFiat + wealthInMainFiat;
+
+                var rightText = CurrencyDisplay.FormatFiat(simulatedTotalFiat, mainCurrency.Code);
+                rows.Add(new RowItem(leftLabel, rightText));
+            }
+
+            SimulatedPricesData = new DashboardData(language.Reports_SimulatedPrices_Title, rows, OpenSimulatedPricesConfigCommand, "\uF04A");
+            IsSimulatedPricesLoading = false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating simulated prices data");
+            IsSimulatedPricesLoading = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task OpenSimulatedPricesConfig()
+    {
+        var ownerWindow = GetUserControlOwnerWindow?.Invoke();
+        if (ownerWindow is null)
+            return;
+
+        var modal = (SimulatedPricesConfigView)await _modalFactory.CreateAsync(
+            ApplicationModalNames.SimulatedPricesConfig,
+            ownerWindow);
+
+        var result = await modal.ShowDialog<SimulatedPricesConfigViewModel.Response?>(ownerWindow);
+
+        if (result?.Ok == true)
+        {
+            UpdateSimulatedPricesData();
+        }
+    }
+
     private async Task FetchMaxBtcStackDataAsync(IReportDataProvider provider)
     {
         try
@@ -1090,6 +1172,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         {
             Dispatcher.UIThread.Post(UpdateWealthData);
             Dispatcher.UIThread.Post(UpdateBtcStackData);
+            Dispatcher.UIThread.Post(UpdateSimulatedPricesData);
             UpdateLeveragePositionsDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateLeveragePositionsDataAsync));
         }
     }

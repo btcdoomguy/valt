@@ -84,4 +84,7 @@ public interface IConfigurationManager
     /// Sets the list of category IDs to exclude from the income by category report filter.
     /// </summary>
     void SetIncomeCategoryFilterExcludedIds(IEnumerable<string> categoryIds);
+
+    List<SimulatedPriceLineConfig> GetSimulatedPriceLines();
+    void SetSimulatedPriceLines(IEnumerable<SimulatedPriceLineConfig> lines);
 }

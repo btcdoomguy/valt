@@ -1320,11 +1320,11 @@
         <Setter Property="BorderBrush" Value="{DynamicResource Background800Brush}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="HeaderBackground" Value="{DynamicResource Background800Brush}" />
-        <Setter Property="Padding" Value="4" />
+        <Setter Property="Padding" Value="6" />
         <Setter Property="DayTitleTemplate">
             <Template x:DataType="x:String">
                 <TextBlock Text="{Binding}"
-                           FontSize="{DynamicResource FontSizeXSmall}"
+                           FontSize="{DynamicResource FontSizeSmall}"
                            Foreground="{DynamicResource Text300Brush}"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
@@ -1354,9 +1354,9 @@
 
     <!-- Header button (shows month/year) - override template to remove grey background -->
     <Style Selector="CalendarItem /template/ Button#PART_HeaderButton">
-        <Setter Property="FontSize" Value="{DynamicResource FontSizeNormal}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeMedium}" />
         <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Height" Value="28" />
+        <Setter Property="Height" Value="32" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource Text100Brush}" />
         <Setter Property="Padding" Value="4, 0" />
@@ -1370,8 +1370,8 @@
 
     <!-- Navigation buttons - transparent background -->
     <Style Selector="CalendarItem /template/ Button#PART_PreviousButton">
-        <Setter Property="Width" Value="24" />
-        <Setter Property="Height" Value="24" />
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
         <Setter Property="Background" Value="Transparent" />
     </Style>
     <Style Selector="CalendarItem /template/ Button#PART_PreviousButton /template/ ContentPresenter">
@@ -1382,8 +1382,8 @@
     </Style>
 
     <Style Selector="CalendarItem /template/ Button#PART_NextButton">
-        <Setter Property="Width" Value="24" />
-        <Setter Property="Height" Value="24" />
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
         <Setter Property="Background" Value="Transparent" />
     </Style>
     <Style Selector="CalendarItem /template/ Button#PART_NextButton /template/ ContentPresenter">
@@ -1395,9 +1395,9 @@
 
     <!-- Day buttons (the actual day numbers) -->
     <Style Selector="CalendarDayButton">
-        <Setter Property="FontSize" Value="{DynamicResource FontSizeSmall}" />
-        <Setter Property="MinWidth" Value="26" />
-        <Setter Property="MinHeight" Value="26" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeNormal}" />
+        <Setter Property="MinWidth" Value="32" />
+        <Setter Property="MinHeight" Value="32" />
         <Setter Property="Margin" Value="1" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="Background" Value="Transparent" />
@@ -1430,9 +1430,9 @@
 
     <!-- Month/Year buttons in year/decade view -->
     <Style Selector="CalendarButton">
-        <Setter Property="FontSize" Value="{DynamicResource FontSizeSmall}" />
-        <Setter Property="MinWidth" Value="44" />
-        <Setter Property="MinHeight" Value="26" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeNormal}" />
+        <Setter Property="MinWidth" Value="52" />
+        <Setter Property="MinHeight" Value="32" />
         <Setter Property="Margin" Value="2" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="Background" Value="Transparent" />
