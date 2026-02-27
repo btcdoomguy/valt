@@ -9,6 +9,7 @@ namespace Valt.UI.Base;
 public abstract class ValtBaseWindow : Window
 {
     private IInputElement? _lastFocusedElement;
+    private bool _hasBeenDeactivated;
 
     protected ValtBaseWindow()
     {
@@ -36,6 +37,7 @@ public abstract class ValtBaseWindow : Window
 
     private void OnWindowDeactivated(object? sender, EventArgs e)
     {
+        _hasBeenDeactivated = true;
         _lastFocusedElement = FocusManager?.GetFocusedElement();
         if (_lastFocusedElement is Window)
             _lastFocusedElement = null;
@@ -43,6 +45,8 @@ public abstract class ValtBaseWindow : Window
 
     private void OnWindowActivated(object? sender, EventArgs e)
     {
+        if (!_hasBeenDeactivated) return;
+
         // When a window with SystemDecorations="None" regains focus (e.g. via Alt+Tab),
         // Avalonia's internal focus state may still reference the previously focused element,
         // causing Focus() to be a no-op even though keyboard routing is disconnected.
@@ -53,14 +57,14 @@ public abstract class ValtBaseWindow : Window
 
             if (_lastFocusedElement is Control { IsEffectivelyVisible: true, Focusable: true })
             {
-                _lastFocusedElement.Focus(NavigationMethod.Tab);
+                _lastFocusedElement.Focus();
             }
             else
             {
                 var firstFocusable = KeyboardNavigationHandler.GetNext(this, NavigationDirection.Next);
-                firstFocusable?.Focus(NavigationMethod.Tab);
+                firstFocusable?.Focus();
             }
-        }, DispatcherPriority.Input);
+        }, DispatcherPriority.Render);
     }
     
     protected void CustomTitleBarButtonPressed(object? sender, PointerPressedEventArgs e)
