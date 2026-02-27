@@ -8,4 +8,5 @@ internal static class ConfigurationKeys
     public static string StatisticsExcludedCategories => "StatisticsExcludedCategories";
     public static string ExpensesCategoryFilterExcluded => "ExpensesCategoryFilterExcluded";
     public static string IncomeCategoryFilterExcluded => "IncomeCategoryFilterExcluded";
+    public static string SimulatedPrices => "SimulatedPrices";
 }

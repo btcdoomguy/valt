@@ -2342,4 +2342,34 @@
     <data name="Reports.CategoryFilter.SaveSuccess" xml:space="preserve">
         <value>Default filter saved</value>
     </data>
+    <data name="Reports.SimulatedPrices.Title" xml:space="preserve">
+        <value>Simulated Prices</value>
+    </data>
+    <data name="Reports.SimulatedPrices.Fixed" xml:space="preserve">
+        <value>fixed</value>
+    </data>
+    <data name="SimulatedPrices.Config.Title" xml:space="preserve">
+        <value>Simulated Prices Configuration</value>
+    </data>
+    <data name="SimulatedPrices.Config.Description" xml:space="preserve">
+        <value>Configure simulated BTC/USD prices to project your total wealth. Each line can be a percentage of the current price or a fixed USD price. Maximum 6 lines.</value>
+    </data>
+    <data name="SimulatedPrices.Config.Type.Percentage" xml:space="preserve">
+        <value>Percentage</value>
+    </data>
+    <data name="SimulatedPrices.Config.Type.Fixed" xml:space="preserve">
+        <value>Fixed Price</value>
+    </data>
+    <data name="SimulatedPrices.Config.Value" xml:space="preserve">
+        <value>Value</value>
+    </data>
+    <data name="SimulatedPrices.Config.AddLine" xml:space="preserve">
+        <value>Add Line</value>
+    </data>
+    <data name="SimulatedPrices.Config.MaxLines" xml:space="preserve">
+        <value>Maximum of 6 lines reached</value>
+    </data>
+    <data name="SimulatedPrices.Config.MinPercentage" xml:space="preserve">
+        <value>Minimum percentage is 5%</value>
+    </data>
 </root>

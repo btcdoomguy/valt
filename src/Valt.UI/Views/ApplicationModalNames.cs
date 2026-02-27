@@ -26,5 +26,6 @@ public enum ApplicationModalNames
     StatisticsConfig = 22,
     ManageAsset = 23,
     LeverageSimulator = 24,
-    PriceHistory = 25
+    PriceHistory = 25,
+    SimulatedPricesConfig = 26
 }

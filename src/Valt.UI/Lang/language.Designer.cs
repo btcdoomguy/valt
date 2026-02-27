@@ -4646,5 +4646,65 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.CategoryFilter.SaveSuccess", resourceCulture);
             }
         }
+
+        public static string Reports_SimulatedPrices_Title {
+            get {
+                return ResourceManager.GetString("Reports.SimulatedPrices.Title", resourceCulture);
+            }
+        }
+
+        public static string Reports_SimulatedPrices_Fixed {
+            get {
+                return ResourceManager.GetString("Reports.SimulatedPrices.Fixed", resourceCulture);
+            }
+        }
+
+        public static string SimulatedPrices_Config_Title {
+            get {
+                return ResourceManager.GetString("SimulatedPrices.Config.Title", resourceCulture);
+            }
+        }
+
+        public static string SimulatedPrices_Config_Description {
+            get {
+                return ResourceManager.GetString("SimulatedPrices.Config.Description", resourceCulture);
+            }
+        }
+
+        public static string SimulatedPrices_Config_Type_Percentage {
+            get {
+                return ResourceManager.GetString("SimulatedPrices.Config.Type.Percentage", resourceCulture);
+            }
+        }
+
+        public static string SimulatedPrices_Config_Type_Fixed {
+            get {
+                return ResourceManager.GetString("SimulatedPrices.Config.Type.Fixed", resourceCulture);
+            }
+        }
+
+        public static string SimulatedPrices_Config_Value {
+            get {
+                return ResourceManager.GetString("SimulatedPrices.Config.Value", resourceCulture);
+            }
+        }
+
+        public static string SimulatedPrices_Config_AddLine {
+            get {
+                return ResourceManager.GetString("SimulatedPrices.Config.AddLine", resourceCulture);
+            }
+        }
+
+        public static string SimulatedPrices_Config_MaxLines {
+            get {
+                return ResourceManager.GetString("SimulatedPrices.Config.MaxLines", resourceCulture);
+            }
+        }
+
+        public static string SimulatedPrices_Config_MinPercentage {
+            get {
+                return ResourceManager.GetString("SimulatedPrices.Config.MinPercentage", resourceCulture);
+            }
+        }
     }
 }

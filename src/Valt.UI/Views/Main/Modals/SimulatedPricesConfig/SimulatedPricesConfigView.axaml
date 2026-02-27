@@ -1,0 +1,118 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        xmlns:simulatedPricesConfig="clr-namespace:Valt.UI.Views.Main.Modals.SimulatedPricesConfig"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Views.Main.Modals.SimulatedPricesConfig.SimulatedPricesConfigView"
+        x:DataType="simulatedPricesConfig:SimulatedPricesConfigViewModel"
+        Title="{x:Static local:language.SimulatedPrices_Config_Title}"
+        WindowStartupLocation="CenterOwner"
+        d:DesignWidth="500"
+        d:DesignHeight="450"
+        MinWidth="500"
+        MinHeight="450"
+        MaxWidth="500"
+        MaxHeight="450"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <simulatedPricesConfig:SimulatedPricesConfigViewModel />
+    </Design.DataContext>
+    <Border>
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="{x:Static local:language.SimulatedPrices_Config_Title}"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+            <Border Classes="form-fields-area" Height="360">
+                <StackPanel Orientation="Vertical" Spacing="10" Margin="15">
+                    <!-- Description -->
+                    <TextBlock TextWrapping="Wrap"
+                               FontSize="{DynamicResource FontSizeSmall}"
+                               Foreground="{DynamicResource Text300Brush}"
+                               Text="{x:Static local:language.SimulatedPrices_Config_Description}" />
+
+                    <!-- Lines list -->
+                    <ScrollViewer MaxHeight="230" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding Lines}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="simulatedPricesConfig:SimulatedPriceLineViewModel">
+                                    <Border Margin="0,0,0,6">
+                                        <Grid ColumnDefinitions="140,*,Auto">
+                                            <ComboBox Grid.Column="0"
+                                                      ItemsSource="{x:Static simulatedPricesConfig:SimulatedPriceLineViewModel.TypeOptions}"
+                                                      SelectedItem="{Binding SelectedTypeOption}"
+                                                      Margin="0,0,8,0"
+                                                      MinHeight="32" />
+                                            <TextBox Grid.Column="1"
+                                                     Text="{Binding ValueText}"
+                                                     Margin="0,0,8,0"
+                                                     MinHeight="32" />
+                                            <Button Grid.Column="2"
+                                                    Classes="transparent"
+                                                    Command="{Binding $parent[ItemsControl].((simulatedPricesConfig:SimulatedPricesConfigViewModel)DataContext).RemoveLineCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    ToolTip.Tip="Remove"
+                                                    Padding="4"
+                                                    MinWidth="28"
+                                                    MinHeight="28"
+                                                    VerticalAlignment="Center">
+                                                <TextBlock FontFamily="{DynamicResource MaterialDesign}"
+                                                           Text="&#xE5CD;"
+                                                           FontSize="16"
+                                                           Foreground="{DynamicResource Text300Brush}" />
+                                            </Button>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <!-- Add line button -->
+                    <Button Classes="transparent"
+                            Command="{Binding AddLineCommand}"
+                            IsVisible="{Binding CanAddLine}"
+                            HorizontalAlignment="Left"
+                            Padding="4">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBlock FontFamily="{DynamicResource MaterialDesign}"
+                                       Text="&#xE145;"
+                                       FontSize="16"
+                                       Foreground="{DynamicResource Accent200Brush}"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Text="{x:Static local:language.SimulatedPrices_Config_AddLine}"
+                                       Foreground="{DynamicResource Accent200Brush}"
+                                       FontSize="{DynamicResource FontSizeSmall}"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Max lines message -->
+                    <TextBlock Text="{x:Static local:language.SimulatedPrices_Config_MaxLines}"
+                               FontSize="{DynamicResource FontSizeXSmall}"
+                               Foreground="{DynamicResource Text500Brush}"
+                               IsVisible="{Binding !CanAddLine}" />
+
+                    <!-- Error message -->
+                    <TextBlock Text="{Binding ErrorMessage}"
+                               FontSize="{DynamicResource FontSizeSmall}"
+                               Foreground="IndianRed"
+                               IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                </StackPanel>
+            </Border>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                <Button Width="100" Content="{x:Static local:language.SaveButton}" HorizontalContentAlignment="Center"
+                        Command="{Binding SaveCommand}"
+                        IsDefault="True" />
+                <Button Width="100" Content="{x:Static local:language.CancelButton}"
+                        HorizontalContentAlignment="Center"
+                        Command="{Binding CancelCommand}"
+                        IsCancel="True" />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

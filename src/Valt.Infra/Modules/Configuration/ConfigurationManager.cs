@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Modules.Budget.Accounts;
 
@@ -314,6 +315,50 @@ public class ConfigurationManager : IConfigurationManager
 
         config.Value = string.Join(",", distinctIds);
 
+        _localDatabase.GetConfiguration().Upsert(config);
+    }
+
+    private static readonly List<SimulatedPriceLineConfig> DefaultSimulatedPriceLines =
+    [
+        new(SimulatedPriceType.Percentage, 50),
+        new(SimulatedPriceType.Percentage, 75),
+        new(SimulatedPriceType.Percentage, 150),
+        new(SimulatedPriceType.Percentage, 200)
+    ];
+
+    public List<SimulatedPriceLineConfig> GetSimulatedPriceLines()
+    {
+        var config = _localDatabase.GetConfiguration()
+            .FindOne(x => x.Key == ConfigurationKeys.SimulatedPrices);
+
+        if (config is null || string.IsNullOrWhiteSpace(config.Value))
+            return new List<SimulatedPriceLineConfig>(DefaultSimulatedPriceLines);
+
+        try
+        {
+            var lines = JsonSerializer.Deserialize<List<SimulatedPriceLineConfig>>(config.Value);
+            return lines ?? new List<SimulatedPriceLineConfig>(DefaultSimulatedPriceLines);
+        }
+        catch
+        {
+            return new List<SimulatedPriceLineConfig>(DefaultSimulatedPriceLines);
+        }
+    }
+
+    public void SetSimulatedPriceLines(IEnumerable<SimulatedPriceLineConfig> lines)
+    {
+        var linesList = lines
+            .Where(l => l.Value > 0)
+            .Take(6)
+            .ToList();
+
+        var config = _localDatabase.GetConfiguration()
+            .FindOne(x => x.Key == ConfigurationKeys.SimulatedPrices);
+
+        if (config is null)
+            config = new ConfigurationEntity { Key = ConfigurationKeys.SimulatedPrices };
+
+        config.Value = JsonSerializer.Serialize(linesList);
         _localDatabase.GetConfiguration().Upsert(config);
     }
 }
