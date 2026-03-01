@@ -81,6 +81,15 @@
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    IsVisible="{Binding IsSimulatedPricesLoading}" />
                     </Grid>
+                    <!-- Indicators Dashboard -->
+                    <Grid MinHeight="150" Margin="0,0,10,10">
+                        <Panel IsVisible="{Binding !IsIndicatorsLoading}">
+                            <reports1:DashboardDataUserControl DataContext="{Binding IndicatorsData}" />
+                        </Panel>
+                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   IsVisible="{Binding IsIndicatorsLoading}" />
+                    </Grid>
                     <!-- Leverage Positions Dashboard -->
                     <Grid MinHeight="150" Margin="0,0,10,10" IsVisible="{Binding IsLeveragePositionsVisible}">
                         <Panel IsVisible="{Binding !IsLeveragePositionsLoading}">

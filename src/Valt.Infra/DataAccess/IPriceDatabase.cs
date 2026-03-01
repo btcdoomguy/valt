@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using LiteDB;
+using Valt.Infra.Crawlers.Indicators;
 using Valt.Infra.Modules.DataSources.Bitcoin;
 using Valt.Infra.Modules.DataSources.Fiat;
 
@@ -24,6 +25,7 @@ public interface IPriceDatabase : INotifyPropertyChanged, IDisposable
 
     ILiteCollection<BitcoinDataEntity> GetBitcoinData();
     ILiteCollection<FiatDataEntity> GetFiatData();
+    ILiteCollection<IndicatorSnapshotEntity> GetIndicators();
 
     int GetVersion();
     void SetVersion(int version);

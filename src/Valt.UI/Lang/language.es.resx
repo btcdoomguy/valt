@@ -2367,4 +2367,34 @@
     <data name="SimulatedPrices.Config.MinPercentage" xml:space="preserve">
         <value>Porcentaje mínimo es 5%</value>
     </data>
+    <data name="Reports.Indicators.Title" xml:space="preserve">
+        <value>Indicadores</value>
+    </data>
+    <data name="Reports.Indicators.MayerMultiple" xml:space="preserve">
+        <value>Mayer Multiple</value>
+    </data>
+    <data name="Reports.Indicators.RainbowChart" xml:space="preserve">
+        <value>Rainbow Chart</value>
+    </data>
+    <data name="Reports.Indicators.FearAndGreed" xml:space="preserve">
+        <value>Miedo &amp; Codicia</value>
+    </data>
+    <data name="Reports.Indicators.BtcDominance" xml:space="preserve">
+        <value>Dominancia BTC</value>
+    </data>
+    <data name="Reports.Indicators.PiCycleTop" xml:space="preserve">
+        <value>Pi Cycle Top</value>
+    </data>
+    <data name="Reports.Indicators.StockToFlow" xml:space="preserve">
+        <value>Stock-to-Flow</value>
+    </data>
+    <data name="Reports.Indicators.NoSignal" xml:space="preserve">
+        <value>Sin señal</value>
+    </data>
+    <data name="Reports.Indicators.MAsConverging" xml:space="preserve">
+        <value>MAs convergiendo!</value>
+    </data>
+    <data name="Reports.Indicators.StaleTooltip" xml:space="preserve">
+        <value>Los datos pueden estar desactualizados</value>
+    </data>
 </root>

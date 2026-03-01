@@ -20,6 +20,7 @@ using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Categories;
+using Valt.Infra.Crawlers.Indicators;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Configuration;
@@ -66,6 +67,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly IConfigurationManager _configurationManager = null!;
     private readonly IModalFactory _modalFactory = null!;
     private readonly IQueryDispatcher _queryDispatcher = null!;
+    private readonly IIndicatorCache _indicatorCache = null!;
 
     private const long TotalBtcSupplySats = 21_000_000_00_000_000L; // 21 million BTC in sats
 
@@ -84,6 +86,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private DashboardData _leveragePositionsData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _statisticsData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _simulatedPricesData = DashboardData.Empty;
+    [ObservableProperty] private DashboardData _indicatorsData = DashboardData.Empty;
     [ObservableProperty] private AvaloniaList<MonthlyReportItemViewModel> _monthlyReportItems = new();
     [ObservableProperty] private MonthlyTotalsChartData _monthlyTotalsChartData = new();
     [ObservableProperty] private ExpensesByCategoryChartData _expensesByCategoryChartData = new();
@@ -101,6 +104,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private bool _isLeveragePositionsVisible;
     [ObservableProperty] private bool _isStatisticsLoading = true;
     [ObservableProperty] private bool _isSimulatedPricesLoading = true;
+    [ObservableProperty] private bool _isIndicatorsLoading = true;
     [ObservableProperty] private bool _isMonthlyTotalsLoading = true;
     [ObservableProperty] private bool _isSpendingByCategoriesLoading = true;
     [ObservableProperty] private bool _isIncomeByCategoriesLoading = true;
@@ -144,7 +148,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         SecureModeState secureModeState,
         IConfigurationManager configurationManager,
         IModalFactory modalFactory,
-        IQueryDispatcher queryDispatcher)
+        IQueryDispatcher queryDispatcher,
+        IIndicatorCache indicatorCache)
     {
         _allTimeHighReport = allTimeHighReport;
         _maxBtcStackReport = maxBtcStackReport;
@@ -164,6 +169,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _configurationManager = configurationManager;
         _modalFactory = modalFactory;
         _queryDispatcher = queryDispatcher;
+        _indicatorCache = indicatorCache;
 
         _secureModeState.PropertyChanged += OnSecureModeStatePropertyChanged;
 
@@ -206,6 +212,11 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             UpdateLeveragePositionsDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateLeveragePositionsDataAsync));
         });
 
+        WeakReferenceMessenger.Default.Register<IndicatorsUpdatedMessage>(this, (recipient, message) =>
+        {
+            Dispatcher.UIThread.Post(() => UpdateIndicatorsData(message.Snapshot));
+        });
+
         _ready = true;
     }
 
@@ -231,6 +242,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         UpdateWealthData();
         UpdateBtcStackData();
         UpdateSimulatedPricesData();
+        LoadCachedIndicatorsData();
     }
 
     /// <summary>
@@ -1179,6 +1191,65 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
     #endregion
 
+    private void LoadCachedIndicatorsData()
+    {
+        var cached = _indicatorCache.GetLatest();
+        if (cached is not null)
+        {
+            UpdateIndicatorsData(cached);
+        }
+        else
+        {
+            IsIndicatorsLoading = false;
+        }
+    }
+
+    private void UpdateIndicatorsData(IndicatorSnapshot snapshot)
+    {
+        var rows = new ObservableCollection<RowItem>();
+
+        if (snapshot.MayerMultiple is not null)
+            rows.Add(new RowItem(language.Reports_Indicators_MayerMultiple,
+                snapshot.MayerMultiple.Multiple.ToString("F2"),
+                Url: "https://charts.bitcoin.com/mayer.html"));
+
+        if (snapshot.RainbowChart is not null)
+            rows.Add(new RowItem(language.Reports_Indicators_RainbowChart,
+                snapshot.RainbowChart.CurrentZone,
+                Url: "https://charts.bitcoin.com/rainbow.html"));
+
+        if (snapshot.FearAndGreed is not null)
+            rows.Add(new RowItem(language.Reports_Indicators_FearAndGreed,
+                $"{snapshot.FearAndGreed.Value} - {snapshot.FearAndGreed.Classification}",
+                Url: "https://alternative.me/crypto/fear-and-greed-index/"));
+
+        if (snapshot.BitcoinDominance is not null)
+            rows.Add(new RowItem(language.Reports_Indicators_BtcDominance,
+                $"{snapshot.BitcoinDominance.DominancePercent:F1}%",
+                Url: "https://www.coingecko.com/en/global-charts"));
+
+        if (snapshot.PiCycleTop is not null)
+            rows.Add(new RowItem(language.Reports_Indicators_PiCycleTop,
+                snapshot.PiCycleTop.IsConverging
+                    ? language.Reports_Indicators_MAsConverging
+                    : language.Reports_Indicators_NoSignal,
+                Url: "https://charts.bitcoin.com/pi-cycle-top.html"));
+
+        if (snapshot.StockToFlow is not null)
+            rows.Add(new RowItem(language.Reports_Indicators_StockToFlow,
+                $"{snapshot.StockToFlow.Ratio:F2}x model",
+                Url: "https://charts.bitcoin.com/s2f.html"));
+
+        var isStale = !snapshot.IsUpToDate;
+        IndicatorsData = new DashboardData(
+            language.Reports_Indicators_Title,
+            rows,
+            Icon: "\uE6C4",
+            IsStale: isStale);
+
+        IsIndicatorsLoading = false;
+    }
+
     public void Dispose()
     {
         _filterDebounceTokenSource?.Cancel();
@@ -1197,6 +1268,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
         WeakReferenceMessenger.Default.Unregister<AssetSummaryUpdatedMessage>(this);
+        WeakReferenceMessenger.Default.Unregister<IndicatorsUpdatedMessage>(this);
 
         MonthlyTotalsChartData.Dispose();
         ExpensesByCategoryChartData.Dispose();

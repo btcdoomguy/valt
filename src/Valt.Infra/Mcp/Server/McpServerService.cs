@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Queries;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers;
+using Valt.Infra.Crawlers.Indicators;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Bitcoin.Providers;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Fiat.Providers;
 using Valt.Infra.DataAccess;
@@ -266,6 +267,9 @@ public class McpServerService
 
         // Notification publisher (needed for MCP tools to notify UI of changes)
         services.AddSingleton(_appServices.GetRequiredService<INotificationPublisher>());
+
+        // Indicator cache (needed by IndicatorTools)
+        services.AddSingleton(_appServices.GetRequiredService<IIndicatorCache>());
 
         // Currency services (needed by CurrencyTools)
         services.AddSingleton(_appServices.GetRequiredService<IConfigurationManager>());

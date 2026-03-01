@@ -4706,5 +4706,65 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("SimulatedPrices.Config.MinPercentage", resourceCulture);
             }
         }
+
+        public static string Reports_Indicators_Title {
+            get {
+                return ResourceManager.GetString("Reports.Indicators.Title", resourceCulture);
+            }
+        }
+
+        public static string Reports_Indicators_MayerMultiple {
+            get {
+                return ResourceManager.GetString("Reports.Indicators.MayerMultiple", resourceCulture);
+            }
+        }
+
+        public static string Reports_Indicators_RainbowChart {
+            get {
+                return ResourceManager.GetString("Reports.Indicators.RainbowChart", resourceCulture);
+            }
+        }
+
+        public static string Reports_Indicators_FearAndGreed {
+            get {
+                return ResourceManager.GetString("Reports.Indicators.FearAndGreed", resourceCulture);
+            }
+        }
+
+        public static string Reports_Indicators_BtcDominance {
+            get {
+                return ResourceManager.GetString("Reports.Indicators.BtcDominance", resourceCulture);
+            }
+        }
+
+        public static string Reports_Indicators_PiCycleTop {
+            get {
+                return ResourceManager.GetString("Reports.Indicators.PiCycleTop", resourceCulture);
+            }
+        }
+
+        public static string Reports_Indicators_StockToFlow {
+            get {
+                return ResourceManager.GetString("Reports.Indicators.StockToFlow", resourceCulture);
+            }
+        }
+
+        public static string Reports_Indicators_NoSignal {
+            get {
+                return ResourceManager.GetString("Reports.Indicators.NoSignal", resourceCulture);
+            }
+        }
+
+        public static string Reports_Indicators_MAsConverging {
+            get {
+                return ResourceManager.GetString("Reports.Indicators.MAsConverging", resourceCulture);
+            }
+        }
+
+        public static string Reports_Indicators_StaleTooltip {
+            get {
+                return ResourceManager.GetString("Reports.Indicators.StaleTooltip", resourceCulture);
+            }
+        }
     }
 }
