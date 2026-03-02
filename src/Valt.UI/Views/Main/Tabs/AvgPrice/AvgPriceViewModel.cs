@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Collections;
@@ -21,6 +22,7 @@ using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Modules.AvgPrice;
 using Valt.Core.Modules.AvgPrice.Calculations;
 using Valt.Infra.Modules.AvgPrice.Queries;
+using Avalonia.Platform.Storage;
 using Valt.UI.Base;
 using static Valt.UI.Base.TaskExtensions;
 using Valt.UI.Services;
@@ -32,6 +34,7 @@ using Valt.UI.Views.Main.Modals.AvgPriceLineEditor;
 using Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles;
 using Valt.UI.State;
 using Valt.UI.Views.Main.Tabs.AvgPrice.Models;
+using Valt.Infra.Services.CsvExport;
 
 namespace Valt.UI.Views.Main.Tabs.AvgPrice;
 
@@ -42,6 +45,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
     private readonly IAvgPriceTotalizer _avgPriceTotalizer = null!;
     private readonly IModalFactory _modalFactory = null!;
     private readonly IClock _clock = null!;
+    private readonly ICsvExportService _csvExportService = null!;
     private readonly SecureModeState? _secureModeState;
     private readonly ILogger<AvgPriceViewModel>? _logger;
 
@@ -108,6 +112,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
         IAvgPriceTotalizer avgPriceTotalizer,
         IModalFactory modalFactory,
         IClock clock,
+        ICsvExportService csvExportService,
         SecureModeState secureModeState,
         ILogger<AvgPriceViewModel> logger)
     {
@@ -116,6 +121,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
         _avgPriceTotalizer = avgPriceTotalizer;
         _modalFactory = modalFactory;
         _clock = clock;
+        _csvExportService = csvExportService;
         _secureModeState = secureModeState;
         _logger = logger;
 
@@ -156,6 +162,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
     partial void OnSelectedProfileChanged(AvgPriceProfileDTO? oldValue, AvgPriceProfileDTO? newValue)
     {
         AddOperationCommand.NotifyCanExecuteChanged();
+        ExportToCsvCommand.NotifyCanExecuteChanged();
         FetchAvgPriceLines().SafeFireAndForget(logger: _logger, callerName: nameof(FetchAvgPriceLines));
         FetchTotals().SafeFireAndForget(logger: _logger, callerName: nameof(FetchTotals));
     }
@@ -263,6 +270,34 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
         await FetchAvgPriceProfiles();
         await FetchAvgPriceLines();
         await FetchTotals();
+    }
+
+    public bool CanExportToCsv => SelectedProfile is not null;
+
+    [RelayCommand(CanExecute = nameof(CanExportToCsv))]
+    private async Task ExportToCsv()
+    {
+        if (SelectedProfile is null)
+            return;
+
+        var ownerWindow = GetUserControlOwnerWindow()!;
+
+        var sanitizedAssetName = string.Concat(SelectedProfile.AssetName.Where(c => !Path.GetInvalidFileNameChars().Contains(c)));
+        var options = new FilePickerSaveOptions
+        {
+            Title = language.AvgPrice_ExportToCsv,
+            SuggestedFileName = $"valt-avgprice-{sanitizedAssetName}.csv",
+            FileTypeChoices =
+            [
+                new FilePickerFileType("CSV Files") { Patterns = ["*.csv"] }
+            ]
+        };
+
+        var result = await ownerWindow.StorageProvider.SaveFilePickerAsync(options);
+        if (result is null) return;
+
+        var csv = await _csvExportService.ExportAvgPriceLinesAsync(SelectedProfile.Id);
+        await File.WriteAllTextAsync(result.Path.LocalPath, csv);
     }
 
     [RelayCommand(CanExecute = nameof(CanAddOperation))]

@@ -731,6 +731,13 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 new(language.Transactions_MyOther, fiatWealth)
             };
 
+            // Add USD total row when main currency is not USD
+            if (fiatCurrency.Code != FiatCurrency.Usd.Code)
+            {
+                var totalInUsd = CurrencyDisplay.FormatFiat(wealth.NetWorthInUsd, FiatCurrency.Usd.Code);
+                rows.Insert(2, new RowItem(language.Reports_Wealth_TotalInUsd, totalInUsd));
+            }
+
             // Add assets line if there are any assets (positive or negative)
             if (wealth.AssetsWealthInMainFiatCurrency != 0 || wealth.AssetsWealthInSats != 0)
             {

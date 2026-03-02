@@ -818,6 +818,9 @@
     <data name="Reports.Wealth.MyAssets" xml:space="preserve">
         <value>My Assets</value>
     </data>
+    <data name="Reports.Wealth.TotalInUsd" xml:space="preserve">
+        <value>Total (in USD)</value>
+    </data>
     <data name="Reports.Wealth.NetWorth" xml:space="preserve">
         <value>Net Worth</value>
     </data>
@@ -1310,6 +1313,9 @@
     </data>
     <data name="AvgPrice.ManageProfiles" xml:space="preserve">
         <value>Manage</value>
+    </data>
+    <data name="AvgPrice.ExportToCsv" xml:space="preserve">
+        <value>Export to CSV</value>
     </data>
     <data name="AvgPrice.AddOperation" xml:space="preserve">
         <value>+ Add Operation</value>

@@ -1640,7 +1640,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.Wealth.MyAssets", resourceCulture);
             }
         }
-        
+
+        public static string Reports_Wealth_TotalInUsd {
+            get {
+                return ResourceManager.GetString("Reports.Wealth.TotalInUsd", resourceCulture);
+            }
+        }
+
         public static string Reports_Wealth_NetWorth {
             get {
                 return ResourceManager.GetString("Reports.Wealth.NetWorth", resourceCulture);
@@ -2618,7 +2624,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("AvgPrice.ManageProfiles", resourceCulture);
             }
         }
-        
+
+        public static string AvgPrice_ExportToCsv {
+            get {
+                return ResourceManager.GetString("AvgPrice.ExportToCsv", resourceCulture);
+            }
+        }
+
         public static string AvgPrice_AddOperation {
             get {
                 return ResourceManager.GetString("AvgPrice.AddOperation", resourceCulture);
