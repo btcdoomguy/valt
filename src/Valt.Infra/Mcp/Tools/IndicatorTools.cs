@@ -7,7 +7,7 @@ namespace Valt.Infra.Mcp.Tools;
 [McpServerToolType]
 public class IndicatorTools
 {
-    [McpServerTool, Description("Get current Bitcoin macro indicators including Mayer Multiple, Rainbow Chart, Fear & Greed Index, Bitcoin Dominance, Pi Cycle Top, and Stock-to-Flow. Returns cached data if available.")]
+    [McpServerTool, Description("Get current Bitcoin macro indicators including Mayer Multiple, Rainbow Chart, Fear & Greed Index, and Bitcoin Dominance. Returns cached data if available.")]
     public static IndicatorResultDto GetBitcoinIndicators(IIndicatorCache indicatorCache)
     {
         var snapshot = indicatorCache.GetLatest();
@@ -40,23 +40,6 @@ public class IndicatorTools
                     Price = snapshot.RainbowChart.Price
                 }
                 : null,
-            PiCycleTop = snapshot.PiCycleTop is not null
-                ? new PiCycleTopDto
-                {
-                    Ma111 = snapshot.PiCycleTop.Ma111,
-                    Ma350x2 = snapshot.PiCycleTop.Ma350x2,
-                    Price = snapshot.PiCycleTop.Price,
-                    IsConverging = snapshot.PiCycleTop.IsConverging
-                }
-                : null,
-            StockToFlow = snapshot.StockToFlow is not null
-                ? new StockToFlowDto
-                {
-                    ModelPrice = snapshot.StockToFlow.ModelPrice,
-                    ActualPrice = snapshot.StockToFlow.ActualPrice,
-                    Ratio = snapshot.StockToFlow.Ratio
-                }
-                : null,
             FearAndGreed = snapshot.FearAndGreed is not null
                 ? new FearAndGreedDto
                 {
@@ -83,8 +66,6 @@ public class IndicatorTools
         public string? LastUpdatedUtc { get; init; }
         public MayerMultipleDto? MayerMultiple { get; init; }
         public RainbowChartDto? RainbowChart { get; init; }
-        public PiCycleTopDto? PiCycleTop { get; init; }
-        public StockToFlowDto? StockToFlow { get; init; }
         public FearAndGreedDto? FearAndGreed { get; init; }
         public BitcoinDominanceDto? BitcoinDominance { get; init; }
     }
@@ -100,21 +81,6 @@ public class IndicatorTools
     {
         public required string CurrentZone { get; init; }
         public required decimal Price { get; init; }
-    }
-
-    public class PiCycleTopDto
-    {
-        public required decimal Ma111 { get; init; }
-        public required decimal Ma350x2 { get; init; }
-        public required decimal Price { get; init; }
-        public required bool IsConverging { get; init; }
-    }
-
-    public class StockToFlowDto
-    {
-        public required decimal ModelPrice { get; init; }
-        public required decimal ActualPrice { get; init; }
-        public required decimal Ratio { get; init; }
     }
 
     public class FearAndGreedDto

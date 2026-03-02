@@ -4737,30 +4737,6 @@ namespace Valt.UI.Lang {
             }
         }
 
-        public static string Reports_Indicators_PiCycleTop {
-            get {
-                return ResourceManager.GetString("Reports.Indicators.PiCycleTop", resourceCulture);
-            }
-        }
-
-        public static string Reports_Indicators_StockToFlow {
-            get {
-                return ResourceManager.GetString("Reports.Indicators.StockToFlow", resourceCulture);
-            }
-        }
-
-        public static string Reports_Indicators_NoSignal {
-            get {
-                return ResourceManager.GetString("Reports.Indicators.NoSignal", resourceCulture);
-            }
-        }
-
-        public static string Reports_Indicators_MAsConverging {
-            get {
-                return ResourceManager.GetString("Reports.Indicators.MAsConverging", resourceCulture);
-            }
-        }
-
         public static string Reports_Indicators_StaleTooltip {
             get {
                 return ResourceManager.GetString("Reports.Indicators.StaleTooltip", resourceCulture);

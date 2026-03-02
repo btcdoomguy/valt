@@ -75,8 +75,6 @@ public class IndicatorsUpdaterJobTests
         _indicatorCache.Received(1).Save(Arg.Is<IndicatorSnapshot>(s =>
             s.MayerMultiple != null &&
             s.RainbowChart != null &&
-            s.PiCycleTop != null &&
-            s.StockToFlow != null &&
             s.FearAndGreed != null &&
             s.BitcoinDominance != null &&
             s.IsUpToDate));
@@ -114,8 +112,6 @@ public class IndicatorsUpdaterJobTests
     {
         _bitcoinComProvider.GetMayerMultipleAsync().ThrowsAsync(new HttpRequestException("offline"));
         _bitcoinComProvider.GetRainbowChartAsync().ThrowsAsync(new HttpRequestException("offline"));
-        _bitcoinComProvider.GetPiCycleTopAsync().ThrowsAsync(new HttpRequestException("offline"));
-        _bitcoinComProvider.GetStockToFlowAsync().ThrowsAsync(new HttpRequestException("offline"));
         _fearAndGreedProvider.GetAsync().ThrowsAsync(new HttpRequestException("offline"));
         _dominanceProvider.GetAsync().ThrowsAsync(new HttpRequestException("offline"));
 
@@ -180,8 +176,6 @@ public class IndicatorsUpdaterJobTests
         _bitcoinComProvider.GetMayerMultipleAsync()
             .Returns(Task.FromResult(new MayerMultipleData(1.42m, 65000m, 45000m)));
         _bitcoinComProvider.GetRainbowChartAsync().ThrowsAsync(new Exception("fail"));
-        _bitcoinComProvider.GetPiCycleTopAsync().ThrowsAsync(new Exception("fail"));
-        _bitcoinComProvider.GetStockToFlowAsync().ThrowsAsync(new Exception("fail"));
         _fearAndGreedProvider.GetAsync().ThrowsAsync(new Exception("fail"));
         _dominanceProvider.GetAsync().ThrowsAsync(new Exception("fail"));
 
@@ -192,8 +186,7 @@ public class IndicatorsUpdaterJobTests
         _indicatorCache.Received(1).Save(Arg.Is<IndicatorSnapshot>(s =>
             s.MayerMultiple != null &&
             s.MayerMultiple.Multiple == 1.42m &&
-            s.RainbowChart == null &&
-            s.PiCycleTop == null));
+            s.RainbowChart == null));
     }
 
     private void SetupAllProvidersSuccess()
@@ -202,10 +195,6 @@ public class IndicatorsUpdaterJobTests
             .Returns(Task.FromResult(new MayerMultipleData(1.42m, 65000m, 45000m)));
         _bitcoinComProvider.GetRainbowChartAsync()
             .Returns(Task.FromResult(new RainbowChartData("Accumulate", 65000m)));
-        _bitcoinComProvider.GetPiCycleTopAsync()
-            .Returns(Task.FromResult(new PiCycleTopData(55000m, 80000m, 65000m, false)));
-        _bitcoinComProvider.GetStockToFlowAsync()
-            .Returns(Task.FromResult(new StockToFlowData(50000m, 65000m, 1.30m)));
         _fearAndGreedProvider.GetAsync()
             .Returns(Task.FromResult(new FearAndGreedData(72, "Greed")));
         _dominanceProvider.GetAsync()

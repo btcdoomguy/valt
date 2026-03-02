@@ -108,7 +108,7 @@
 
                                     <TextBlock x:Name="RightTextBlock"
                                                Text="{Binding RightText}"
-                                               FontSize="{DynamicResource FontSizeNormal}"
+                                               FontSize="{DynamicResource FontSizeSmall}"
                                                FontWeight="Medium"
                                                Foreground="{DynamicResource Text100Brush}"
                                                DockPanel.Dock="Right"

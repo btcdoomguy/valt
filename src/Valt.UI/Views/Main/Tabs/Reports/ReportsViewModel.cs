@@ -641,7 +641,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 {
                     var evolutionSign = statisticsData.MedianMonthlyExpensesEvolution.Value >= 0 ? "+" : "";
                     var evolutionFormatted = $"{evolutionSign}{statisticsData.MedianMonthlyExpensesEvolution.Value}%";
-                    rows.Add(new RowItem(language.Reports_Statistics_MedianExpensesEvolution, evolutionFormatted, language.Reports_Statistics_MedianExpensesEvolution_Tooltip));
+                    rows.Add(new RowItem(language.Reports_Statistics_MedianExpensesEvolution, evolutionFormatted, TooltipContent.Text(language.Reports_Statistics_MedianExpensesEvolution_Tooltip)));
                 }
             }
 
@@ -660,12 +660,12 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     {
                         var satEvolutionSign = statisticsData.MedianMonthlyExpensesSatsEvolution.Value >= 0 ? "+" : "";
                         var satEvolutionFormatted = $"{satEvolutionSign}{statisticsData.MedianMonthlyExpensesSatsEvolution.Value}%";
-                        rows.Add(new RowItem(language.Reports_Statistics_MedianExpensesSatsEvolution, satEvolutionFormatted, language.Reports_Statistics_MedianExpensesSatsEvolution_Tooltip));
+                        rows.Add(new RowItem(language.Reports_Statistics_MedianExpensesSatsEvolution, satEvolutionFormatted, TooltipContent.Text(language.Reports_Statistics_MedianExpensesSatsEvolution_Tooltip)));
                     }
                 }
             }
 
-            rows.Add(new RowItem(language.Reports_Statistics_WealthCoverage, statisticsData.WealthCoverageFormatted, language.Reports_Statistics_WealthCoverage_Tooltip));
+            rows.Add(new RowItem(language.Reports_Statistics_WealthCoverage, statisticsData.WealthCoverageFormatted, TooltipContent.Text(language.Reports_Statistics_WealthCoverage_Tooltip)));
 
             StatisticsData = new DashboardData(language.Reports_Statistics_Title, rows, OpenStatisticsConfigCommand, "\uE4FC");
 
@@ -725,7 +725,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
             var rows = new ObservableCollection<RowItem>
             {
-                new(language.Transactions_Total, totalInBtc + " BTC", language.Reports_Wealth_TotalInBtc_Tooltip),
+                new(language.Transactions_Total, totalInBtc + " BTC", TooltipContent.Text(language.Reports_Wealth_TotalInBtc_Tooltip)),
                 new(language.Transactions_TotalInFiat, totalInFiat),
                 new(language.Transactions_MyStack, btcWealth + " BTC"),
                 new(language.Transactions_MyOther, fiatWealth)
@@ -761,7 +761,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 {
                     new(language.Reports_BtcStack_CurrentStack, "0 BTC"),
                     new(language.Reports_BtcStack_PercentOfSupply, "0%"),
-                    new(language.Reports_BtcStack_PeopleWithSameStack, "∞", language.Reports_BtcStack_PeopleWithSameStack_Tooltip)
+                    new(language.Reports_BtcStack_PeopleWithSameStack, "∞", TooltipContent.Text(language.Reports_BtcStack_PeopleWithSameStack_Tooltip))
                 }, Icon: "\uEBC5");
                 IsBtcStackLoading = false;
                 return;
@@ -777,7 +777,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             {
                 new(language.Reports_BtcStack_CurrentStack, btcFormatted + " BTC"),
                 new(language.Reports_BtcStack_PercentOfSupply, percentFormatted),
-                new(language.Reports_BtcStack_PeopleWithSameStack, peopleFormatted, language.Reports_BtcStack_PeopleWithSameStack_Tooltip)
+                new(language.Reports_BtcStack_PeopleWithSameStack, peopleFormatted, TooltipContent.Text(language.Reports_BtcStack_PeopleWithSameStack_Tooltip))
             };
 
             if (_maxBtcStackData is not null)
@@ -1011,9 +1011,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             {
                 var rows = new ObservableCollection<RowItem>
                 {
-                    new(language.Reports_LeveragePositions_LeveragedStack, leveragedStackFormatted, language.Reports_LeveragePositions_LeveragedStack_Tooltip),
+                    new(language.Reports_LeveragePositions_LeveragedStack, leveragedStackFormatted, TooltipContent.Text(language.Reports_LeveragePositions_LeveragedStack_Tooltip)),
                     new(language.Reports_LeveragePositions_LeverageExposure, exposureFormatted),
-                    new(language.Reports_LeveragePositions_LeveragePercentage, leveragePercentFormatted, language.Reports_LeveragePositions_LeveragePercentage_Tooltip),
+                    new(language.Reports_LeveragePositions_LeveragePercentage, leveragePercentFormatted, TooltipContent.Text(language.Reports_LeveragePositions_LeveragePercentage_Tooltip)),
                     new(language.Reports_LeveragePositions_PositionCount, positionCountFormatted),
                     new(language.Reports_LeveragePositions_CurrentResult, pnlFiatFormatted),
                     new(language.Reports_LeveragePositions_CurrentResultBtc, pnlBtcFormatted)
@@ -1211,34 +1211,41 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         if (snapshot.MayerMultiple is not null)
             rows.Add(new RowItem(language.Reports_Indicators_MayerMultiple,
                 snapshot.MayerMultiple.Multiple.ToString("F2"),
+                Tooltip: new TooltipContent([
+                    new TooltipLine([new TooltipRun("> 2.4", Bold: true), new TooltipRun(": overvalued")]),
+                    new TooltipLine([new TooltipRun("1.0", Bold: true), new TooltipRun(": fair value")]),
+                    new TooltipLine([new TooltipRun("< 0.8", Bold: true), new TooltipRun(": buying opportunity")]),
+                ]),
                 Url: "https://charts.bitcoin.com/mayer.html"));
 
         if (snapshot.RainbowChart is not null)
             rows.Add(new RowItem(language.Reports_Indicators_RainbowChart,
                 snapshot.RainbowChart.CurrentZone,
+                Tooltip: new TooltipContent([
+                    new TooltipLine([new TooltipRun("Zones (low\u2192high):", Bold: true)]),
+                    new TooltipLine([new TooltipRun("Fire Sale \u2192 Basically a Fire Sale \u2192 Buy! \u2192 Accumulate \u2192 Still Cheap \u2192 HODL! \u2192 Is this a bubble? \u2192 FOMO Intensifies \u2192 Sell. Seriously, SELL! \u2192 Maximum Bubble Territory")]),
+                ]),
                 Url: "https://charts.bitcoin.com/rainbow.html"));
 
         if (snapshot.FearAndGreed is not null)
             rows.Add(new RowItem(language.Reports_Indicators_FearAndGreed,
                 $"{snapshot.FearAndGreed.Value} - {snapshot.FearAndGreed.Classification}",
+                Tooltip: new TooltipContent([
+                    new TooltipLine([new TooltipRun("0\u201325", Bold: true), new TooltipRun(": Extreme Fear (buy)")]),
+                    new TooltipLine([new TooltipRun("26\u201350", Bold: true), new TooltipRun(": Fear")]),
+                    new TooltipLine([new TooltipRun("51\u201375", Bold: true), new TooltipRun(": Greed")]),
+                    new TooltipLine([new TooltipRun("76\u2013100", Bold: true), new TooltipRun(": Extreme Greed (sell)")]),
+                ]),
                 Url: "https://alternative.me/crypto/fear-and-greed-index/"));
 
         if (snapshot.BitcoinDominance is not null)
             rows.Add(new RowItem(language.Reports_Indicators_BtcDominance,
                 $"{snapshot.BitcoinDominance.DominancePercent:F1}%",
+                Tooltip: new TooltipContent([
+                    new TooltipLine([new TooltipRun("> 60%", Bold: true), new TooltipRun(": Bitcoin season")]),
+                    new TooltipLine([new TooltipRun("< 40%", Bold: true), new TooltipRun(": Altcoin season")]),
+                ]),
                 Url: "https://www.coingecko.com/en/global-charts"));
-
-        if (snapshot.PiCycleTop is not null)
-            rows.Add(new RowItem(language.Reports_Indicators_PiCycleTop,
-                snapshot.PiCycleTop.IsConverging
-                    ? language.Reports_Indicators_MAsConverging
-                    : language.Reports_Indicators_NoSignal,
-                Url: "https://charts.bitcoin.com/pi-cycle-top.html"));
-
-        if (snapshot.StockToFlow is not null)
-            rows.Add(new RowItem(language.Reports_Indicators_StockToFlow,
-                $"{snapshot.StockToFlow.Ratio:F2}x model",
-                Url: "https://charts.bitcoin.com/s2f.html"));
 
         var isStale = !snapshot.IsUpToDate;
         IndicatorsData = new DashboardData(

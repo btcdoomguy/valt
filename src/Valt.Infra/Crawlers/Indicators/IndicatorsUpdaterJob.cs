@@ -71,12 +71,10 @@ internal class IndicatorsUpdaterJob : IBackgroundJob
         // Fetch all indicators in parallel - each wrapped in try/catch
         var mayerTask = SafeFetchAsync(() => _bitcoinComProvider.GetMayerMultipleAsync(), "Mayer Multiple");
         var rainbowTask = SafeFetchAsync(() => _bitcoinComProvider.GetRainbowChartAsync(), "Rainbow Chart");
-        var piCycleTask = SafeFetchAsync(() => _bitcoinComProvider.GetPiCycleTopAsync(), "Pi Cycle Top");
-        var stockToFlowTask = SafeFetchAsync(() => _bitcoinComProvider.GetStockToFlowAsync(), "Stock-to-Flow");
         var fearGreedTask = SafeFetchAsync(() => _fearAndGreedProvider.GetAsync(), "Fear & Greed");
         var dominanceTask = SafeFetchAsync(() => _dominanceProvider.GetAsync(), "BTC Dominance");
 
-        await Task.WhenAll(mayerTask, rainbowTask, piCycleTask, stockToFlowTask, fearGreedTask, dominanceTask);
+        await Task.WhenAll(mayerTask, rainbowTask, fearGreedTask, dominanceTask);
 
         var snapshot = new IndicatorSnapshot
         {
@@ -84,8 +82,6 @@ internal class IndicatorsUpdaterJob : IBackgroundJob
             IsUpToDate = true,
             MayerMultiple = await mayerTask ?? previousSnapshot?.MayerMultiple,
             RainbowChart = await rainbowTask ?? previousSnapshot?.RainbowChart,
-            PiCycleTop = await piCycleTask ?? previousSnapshot?.PiCycleTop,
-            StockToFlow = await stockToFlowTask ?? previousSnapshot?.StockToFlow,
             FearAndGreed = await fearGreedTask ?? previousSnapshot?.FearAndGreed,
             BitcoinDominance = await dominanceTask ?? previousSnapshot?.BitcoinDominance
         };

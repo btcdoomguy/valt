@@ -2387,18 +2387,6 @@
     <data name="Reports.Indicators.BtcDominance" xml:space="preserve">
         <value>BTC Dominance</value>
     </data>
-    <data name="Reports.Indicators.PiCycleTop" xml:space="preserve">
-        <value>Pi Cycle Top</value>
-    </data>
-    <data name="Reports.Indicators.StockToFlow" xml:space="preserve">
-        <value>Stock-to-Flow</value>
-    </data>
-    <data name="Reports.Indicators.NoSignal" xml:space="preserve">
-        <value>No signal</value>
-    </data>
-    <data name="Reports.Indicators.MAsConverging" xml:space="preserve">
-        <value>MAs converging!</value>
-    </data>
     <data name="Reports.Indicators.StaleTooltip" xml:space="preserve">
         <value>Data may be outdated</value>
     </data>
