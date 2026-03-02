@@ -641,6 +641,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             // Trigger history updater jobs to run in the background
             _backgroundJobManager.TriggerJobManually(BackgroundJobSystemNames.BitcoinHistoryUpdater);
             _backgroundJobManager.TriggerJobManually(BackgroundJobSystemNames.FiatHistoryUpdater);
+            _backgroundJobManager.TriggerJobManually(BackgroundJobSystemNames.IndicatorsUpdater);
 
             return true;
         }

@@ -13,6 +13,7 @@ using Valt.Core.Modules.Goals.Contracts;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Bitcoin;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Bitcoin.Providers;
+using Valt.Infra.Crawlers.Indicators;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Fiat;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Fiat.Providers;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Bitcoin.Providers;
@@ -104,6 +105,12 @@ public static class Extensions
         //mcp server
         services.AddSingleton<McpServerState>();
         services.AddSingleton<McpServerService>();
+
+        //indicator providers
+        services.AddSingleton<IBitcoinComIndicatorsProvider, BitcoinComIndicatorsProvider>();
+        services.AddSingleton<IFearAndGreedProvider, FearAndGreedProvider>();
+        services.AddSingleton<IBitcoinDominanceProvider, BitcoinDominanceProvider>();
+        services.AddSingleton<IIndicatorCache, IndicatorCache>();
 
         //price crawlers bitcoin
         services.AddSingleton<IBitcoinPriceProvider, CoinbaseProvider>();

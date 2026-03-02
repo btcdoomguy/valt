@@ -6,6 +6,21 @@
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="250"
              x:Class="Valt.UI.Views.Main.Tabs.Reports.DashboardDataUserControl"
              x:DataType="vm:DashboardData">
+    <UserControl.Styles>
+        <!-- Stale state styles: gray out text when data is outdated -->
+        <Style Selector="vm|DashboardDataUserControl.stale /template/ TextBlock#IconText">
+            <Setter Property="Foreground" Value="{DynamicResource Text500Brush}" />
+        </Style>
+        <Style Selector="vm|DashboardDataUserControl.stale /template/ Label#TitleLabel">
+            <Setter Property="Foreground" Value="{DynamicResource Text500Brush}" />
+        </Style>
+        <Style Selector="vm|DashboardDataUserControl.stale TextBlock#LeftTextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Text500Brush}" />
+        </Style>
+        <Style Selector="vm|DashboardDataUserControl.stale TextBlock#RightTextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Text400Brush}" />
+        </Style>
+    </UserControl.Styles>
     <Design.DataContext>
         <x:Static Member="vm:DashboardData.DesignTimeSample" />
     </Design.DataContext>
@@ -26,13 +41,15 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="4">
-                        <TextBlock FontFamily="{DynamicResource MaterialDesign}"
+                        <TextBlock x:Name="IconText"
+                                   FontFamily="{DynamicResource MaterialDesign}"
                                    Text="{Binding Icon}"
                                    FontSize="13"
                                    Foreground="{DynamicResource Accent200Brush}"
                                    VerticalAlignment="Center"
                                    IsVisible="{Binding Icon, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-                        <Label HorizontalContentAlignment="Left"
+                        <Label x:Name="TitleLabel"
+                               HorizontalContentAlignment="Left"
                                Content="{Binding Title}"
                                Foreground="{DynamicResource Accent200Brush}"
                                FontSize="{DynamicResource FontSizeNormal}"
@@ -75,18 +92,23 @@
                                 BorderBrush="{DynamicResource Background700Brush}"
                                 BorderThickness="0,0,0,1"
                                 ToolTip.Tip="{Binding Tooltip}"
-                                ToolTip.ShowDelay="300">
+                                ToolTip.ShowDelay="300"
+                                Cursor="{Binding HasUrl, Converter={x:Static vm:DashboardDataConverters.CursorConverter}}"
+                                PointerPressed="OnRowPointerPressed">
 
                                 <DockPanel LastChildFill="True" MinWidth="280">
-                                    <TextBlock Text="{Binding LeftText}"
+                                    <TextBlock x:Name="LeftTextBlock"
+                                               Text="{Binding LeftText}"
                                                FontSize="{DynamicResource FontSizeXSmall}"
                                                Foreground="{DynamicResource Text300Brush}"
                                                DockPanel.Dock="Left"
                                                Padding="0, 6, 15, 0"
-                                               VerticalAlignment="Center"/>
+                                               VerticalAlignment="Center"
+                                               TextDecorations="{Binding HasUrl, Converter={x:Static vm:DashboardDataConverters.UnderlineConverter}}"/>
 
-                                    <TextBlock Text="{Binding RightText}"
-                                               FontSize="{DynamicResource FontSizeNormal}"
+                                    <TextBlock x:Name="RightTextBlock"
+                                               Text="{Binding RightText}"
+                                               FontSize="{DynamicResource FontSizeSmall}"
                                                FontWeight="Medium"
                                                Foreground="{DynamicResource Text100Brush}"
                                                DockPanel.Dock="Right"

@@ -813,6 +813,9 @@
     <data name="Reports.Wealth.MyAssets" xml:space="preserve">
         <value>Mis Activos</value>
     </data>
+    <data name="Reports.Wealth.TotalInUsd" xml:space="preserve">
+        <value>Total (en USD)</value>
+    </data>
     <data name="Reports.Wealth.NetWorth" xml:space="preserve">
         <value>Patrimonio Neto</value>
     </data>
@@ -1305,6 +1308,9 @@
     </data>
     <data name="AvgPrice.ManageProfiles" xml:space="preserve">
         <value>Administrar</value>
+    </data>
+    <data name="AvgPrice.ExportToCsv" xml:space="preserve">
+        <value>Exportar a CSV</value>
     </data>
     <data name="AvgPrice.AddOperation" xml:space="preserve">
         <value>+ Agregar operación</value>
@@ -2366,5 +2372,23 @@
     </data>
     <data name="SimulatedPrices.Config.MinPercentage" xml:space="preserve">
         <value>Porcentaje mínimo es 5%</value>
+    </data>
+    <data name="Reports.Indicators.Title" xml:space="preserve">
+        <value>Indicadores</value>
+    </data>
+    <data name="Reports.Indicators.MayerMultiple" xml:space="preserve">
+        <value>Mayer Multiple</value>
+    </data>
+    <data name="Reports.Indicators.RainbowChart" xml:space="preserve">
+        <value>Rainbow Chart</value>
+    </data>
+    <data name="Reports.Indicators.FearAndGreed" xml:space="preserve">
+        <value>Miedo &amp; Codicia</value>
+    </data>
+    <data name="Reports.Indicators.BtcDominance" xml:space="preserve">
+        <value>Dominancia BTC</value>
+    </data>
+    <data name="Reports.Indicators.StaleTooltip" xml:space="preserve">
+        <value>Los datos pueden estar desactualizados</value>
     </data>
 </root>

@@ -4,7 +4,7 @@ using LiveChartsCore.Kernel;
 
 namespace Valt.UI.Views.Main.Tabs.Reports;
 
-public record DashboardData(string Title, ObservableCollection<RowItem> Rows, ICommand? ConfigureCommand = null, string? Icon = null)
+public record DashboardData(string Title, ObservableCollection<RowItem> Rows, ICommand? ConfigureCommand = null, string? Icon = null, bool IsStale = false)
 {
     public bool HasConfiguration => ConfigureCommand is not null;
 

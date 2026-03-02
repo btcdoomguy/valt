@@ -117,12 +117,8 @@
                                 <Border Width="230"
                                         Height="299"
                                         Margin="0,0,12,12"
-                                        CornerRadius="4"
-                                        BorderThickness="3"
-                                        Classes="AssetCard"
-                                        Classes.selected="{Binding IsSelected}"
-                                        Background="{DynamicResource AssetCardBackgroundBrush}"
-                                        ClipToBounds="True"
+                                        CornerRadius="8"
+                                        BoxShadow="0 4 16 0 #AA000000, 0 1 4 0 #66000000"
                                         Cursor="Hand"
                                         Opacity="{Binding Visible, Converter={StaticResource BoolToOpacityConverter}}"
                                         PointerPressed="AssetCard_PointerPressed"
@@ -151,23 +147,38 @@
                                                       CommandParameter="{Binding}" />
                                         </ContextMenu>
                                     </Border.ContextMenu>
+                                    <Border CornerRadius="8"
+                                            BorderThickness="1"
+                                            Classes="AssetCard"
+                                            Classes.selected="{Binding IsSelected}"
+                                            Background="{DynamicResource AssetCardBackgroundBrush}"
+                                            ClipToBounds="True">
                                     <!-- Card Content -->
                                     <Grid RowDefinitions="50, *">
                                         <!-- Title Bar -->
                                         <Border Grid.Row="0"
-                                                Background="{Binding TitleBarColor, Converter={StaticResource StringToColorBrushConverter}}"
-                                                Padding="12, 4">
-                                            <StackPanel Spacing="2">
-                                                <TextBlock Text="{Binding Name}"
-                                                           FontSize="{DynamicResource FontSizeMedium}"
-                                                           FontWeight="SemiBold"
-                                                           Foreground="{Binding TitleBarTextColor, Converter={StaticResource StringToColorBrushConverter}}"
-                                                           TextTrimming="CharacterEllipsis" />
-                                                <TextBlock Text="{Binding AssetTypeName}"
-                                                           FontSize="{DynamicResource FontSizeSmall}"
-                                                           Foreground="{Binding TitleBarTextColor, Converter={StaticResource StringToColorBrushConverter}}"
-                                                           Opacity="0.8" />
-                                            </StackPanel>
+                                                Background="{Binding TitleBarColor, Converter={StaticResource StringToColorBrushConverter}}">
+                                            <Panel>
+                                                <!-- Depth gradient overlay -->
+                                                <Border>
+                                                    <Border.Background>
+                                                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                                                            <GradientStop Color="#22FFFFFF" Offset="0" />
+                                                            <GradientStop Color="#00FFFFFF" Offset="1" />
+                                                        </LinearGradientBrush>
+                                                    </Border.Background>
+                                                </Border>
+                                                <StackPanel Spacing="1" Margin="12,6">
+                                                    <TextBlock Text="{Binding Name}"
+                                                               FontSize="{DynamicResource FontSizeMedium}"
+                                                               Foreground="{Binding TitleBarTextColor, Converter={StaticResource StringToColorBrushConverter}}"
+                                                               TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock Text="{Binding AssetTypeName}"
+                                                               FontSize="{DynamicResource FontSizeXSmall}"
+                                                               Foreground="{Binding TitleBarTextColor, Converter={StaticResource StringToColorBrushConverter}}"
+                                                               Opacity="0.7" />
+                                                </StackPanel>
+                                            </Panel>
                                         </Border>
 
                                         <!-- Secure Mode Placeholder -->
@@ -197,7 +208,6 @@
                                                         <TextBlock Grid.Column="1"
                                                                    Text="{Binding Symbol}"
                                                                    FontSize="{DynamicResource FontSizeSmall}"
-                                                                   FontWeight="SemiBold"
                                                                    Foreground="{DynamicResource AssetCardTextBrush}" />
                                                     </Grid>
                                                     <Grid ColumnDefinitions="Auto, *">
@@ -209,7 +219,6 @@
                                                         <TextBlock Grid.Column="1"
                                                                    Text="{Binding QuantityFormatted}"
                                                                    FontSize="{DynamicResource FontSizeSmall}"
-                                                                   FontWeight="SemiBold"
                                                                    Foreground="{DynamicResource AssetCardTextBrush}" />
                                                     </Grid>
                                                     <Grid ColumnDefinitions="Auto, *">
@@ -221,7 +230,6 @@
                                                         <TextBlock Grid.Column="1"
                                                                    Text="{Binding CurrentPriceFormatted}"
                                                                    FontSize="{DynamicResource FontSizeSmall}"
-                                                                   FontWeight="SemiBold"
                                                                    Foreground="{DynamicResource AssetCardTextBrush}" />
                                                     </Grid>
                                                     <StackPanel Spacing="2" IsVisible="{Binding HasAcquisitionData}">
@@ -234,12 +242,10 @@
                                                             <TextBlock Grid.Column="1"
                                                                        Text="{Binding PnLFormatted}"
                                                                        FontSize="{DynamicResource FontSizeSmall}"
-                                                                       FontWeight="SemiBold"
                                                                        Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}" />
                                                         </Grid>
                                                         <TextBlock Text="{Binding PnLPercentageFormatted}"
                                                                    FontSize="{DynamicResource FontSizeSmall}"
-                                                                   FontWeight="SemiBold"
                                                                    Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}"
                                                                    HorizontalAlignment="Right" />
                                                     </StackPanel>
@@ -262,7 +268,6 @@
                                                         <TextBlock Grid.Column="1"
                                                                    Text="{Binding MonthlyRentalIncomeFormatted}"
                                                                    FontSize="{DynamicResource FontSizeSmall}"
-                                                                   FontWeight="SemiBold"
                                                                    Foreground="{DynamicResource AssetCardTextBrush}" />
                                                     </Grid>
                                                     <StackPanel Spacing="2" IsVisible="{Binding HasAcquisitionData}">
@@ -275,12 +280,10 @@
                                                             <TextBlock Grid.Column="1"
                                                                        Text="{Binding PnLFormatted}"
                                                                        FontSize="{DynamicResource FontSizeSmall}"
-                                                                       FontWeight="SemiBold"
                                                                        Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}" />
                                                         </Grid>
                                                         <TextBlock Text="{Binding PnLPercentageFormatted}"
                                                                    FontSize="{DynamicResource FontSizeSmall}"
-                                                                   FontWeight="SemiBold"
                                                                    Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}"
                                                                    HorizontalAlignment="Right" />
                                                     </StackPanel>
@@ -291,13 +294,11 @@
                                                     <Grid ColumnDefinitions="*, *">
                                                         <TextBlock Grid.Column="0"
                                                                    Text="{Binding PositionDirection}"
-                                                                   FontSize="{DynamicResource FontSizeSmall}"
-                                                                   FontWeight="SemiBold"
+                                                                   FontSize="{DynamicResource FontSizeMedium}"
                                                                    Foreground="{DynamicResource AssetCardTextBrush}" />
                                                         <TextBlock Grid.Column="1"
                                                                    Text="{Binding LeverageFormatted}"
-                                                                   FontSize="{DynamicResource FontSizeSmall}"
-                                                                   FontWeight="SemiBold"
+                                                                   FontSize="{DynamicResource FontSizeMedium}"
                                                                    Foreground="{DynamicResource AssetCardTextBrush}"
                                                                    HorizontalAlignment="Right" />
                                                     </Grid>
@@ -336,7 +337,6 @@
                                                     </Grid>
                                                     <TextBlock Text="{Binding PnLPercentageFormatted}"
                                                                FontSize="{DynamicResource FontSizeSmall}"
-                                                               FontWeight="SemiBold"
                                                                Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}"
                                                                HorizontalAlignment="Right"
                                                                Margin="0,4,0,0" />
@@ -363,7 +363,6 @@
                                                         <TextBlock Grid.Column="1"
                                                                    Text="{Binding CollateralSatsFormatted}"
                                                                    FontSize="{DynamicResource FontSizeXSmall}"
-                                                                   FontWeight="SemiBold"
                                                                    Foreground="{DynamicResource AssetCardTextBrush}" />
                                                     </Grid>
                                                     <Grid ColumnDefinitions="Auto, *">
@@ -375,7 +374,6 @@
                                                         <TextBlock Grid.Column="1"
                                                                    Text="{Binding LoanAmountFormatted}"
                                                                    FontSize="{DynamicResource FontSizeXSmall}"
-                                                                   FontWeight="SemiBold"
                                                                    Foreground="{DynamicResource AssetCardTextBrush}" />
                                                     </Grid>
                                                     <Grid ColumnDefinitions="Auto, *">
@@ -387,7 +385,6 @@
                                                         <TextBlock Grid.Column="1"
                                                                    Text="{Binding AprFormatted}"
                                                                    FontSize="{DynamicResource FontSizeXSmall}"
-                                                                   FontWeight="SemiBold"
                                                                    Foreground="{DynamicResource AssetCardTextBrush}" />
                                                     </Grid>
                                                     <Grid ColumnDefinitions="Auto, *">
@@ -399,7 +396,6 @@
                                                         <TextBlock Grid.Column="1"
                                                                    Text="{Binding CurrentLtvFormatted}"
                                                                    FontSize="{DynamicResource FontSizeXSmall}"
-                                                                   FontWeight="SemiBold"
                                                                    Foreground="{Binding LoanHealthColor, Converter={StaticResource StringToColorBrushConverter}}" />
                                                     </Grid>
                                                     <Grid ColumnDefinitions="Auto, *">
@@ -411,7 +407,6 @@
                                                         <TextBlock Grid.Column="1"
                                                                    Text="{Binding DaysUntilRepaymentFormatted}"
                                                                    FontSize="{DynamicResource FontSizeXSmall}"
-                                                                   FontWeight="SemiBold"
                                                                    Foreground="{DynamicResource AssetCardTextBrush}" />
                                                     </Grid>
                                                     <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
@@ -446,7 +441,6 @@
                                                         <TextBlock Grid.Column="1"
                                                                    Text="{Binding BorrowerOrPlatformName}"
                                                                    FontSize="{DynamicResource FontSizeXSmall}"
-                                                                   FontWeight="SemiBold"
                                                                    Foreground="{DynamicResource AssetCardTextBrush}" />
                                                     </Grid>
                                                     <Grid ColumnDefinitions="Auto, *">
@@ -458,7 +452,6 @@
                                                         <TextBlock Grid.Column="1"
                                                                    Text="{Binding AmountLentFormatted}"
                                                                    FontSize="{DynamicResource FontSizeXSmall}"
-                                                                   FontWeight="SemiBold"
                                                                    Foreground="{DynamicResource AssetCardTextBrush}" />
                                                     </Grid>
                                                     <Grid ColumnDefinitions="Auto, *">
@@ -470,7 +463,6 @@
                                                         <TextBlock Grid.Column="1"
                                                                    Text="{Binding EarnedInterestFormatted}"
                                                                    FontSize="{DynamicResource FontSizeXSmall}"
-                                                                   FontWeight="SemiBold"
                                                                    Foreground="#4CAF50" />
                                                     </Grid>
                                                     <Grid ColumnDefinitions="Auto, *">
@@ -482,7 +474,6 @@
                                                         <TextBlock Grid.Column="1"
                                                                    Text="{Binding DaysUntilRepaymentFormatted}"
                                                                    FontSize="{DynamicResource FontSizeXSmall}"
-                                                                   FontWeight="SemiBold"
                                                                    Foreground="{DynamicResource AssetCardTextBrush}" />
                                                     </Grid>
                                                     <Border Background="#757575"
@@ -502,8 +493,7 @@
                                                 <StackPanel Grid.Row="1" Margin="0,8,0,0">
                                                     <Border Height="1" Background="{DynamicResource AssetCardSeparatorBrush}" Margin="0,0,0,8" />
                                                     <TextBlock Text="{Binding DisplayValueFormatted}"
-                                                               FontSize="{DynamicResource FontSizeLarge}"
-                                                               FontWeight="Bold"
+                                                               FontSize="{DynamicResource FontSizeXLarge}"
                                                                Foreground="{Binding ValueColor, Converter={StaticResource StringToColorBrushConverter}}"
                                                                HorizontalAlignment="Center" />
                                                 </StackPanel>
@@ -531,6 +521,7 @@
                                             </Grid>
                                         </Border>
                                     </Grid>
+                                    </Border>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

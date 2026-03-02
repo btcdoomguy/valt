@@ -50,6 +50,10 @@
                                 Content="{x:Static lang:language.AvgPrice_ManageProfiles}"
                                 Height="36"
                                 VerticalAlignment="Center" />
+                        <Button Command="{Binding ExportToCsvCommand}"
+                                Content="{x:Static lang:language.AvgPrice_ExportToCsv}"
+                                Height="36"
+                                VerticalAlignment="Center" />
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                         <Button Command="{Binding AddOperationCommand}"

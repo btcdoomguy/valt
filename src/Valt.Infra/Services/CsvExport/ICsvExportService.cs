@@ -11,4 +11,11 @@ public interface ICsvExportService
     /// </summary>
     /// <returns>CSV content as a string with headers and transaction data</returns>
     Task<string> ExportTransactionsAsync();
+
+    /// <summary>
+    /// Exports all avg price lines for a given profile to CSV format.
+    /// </summary>
+    /// <param name="profileId">The profile ID to export lines for</param>
+    /// <returns>CSV content as a string with headers and line data</returns>
+    Task<string> ExportAvgPriceLinesAsync(string profileId);
 }

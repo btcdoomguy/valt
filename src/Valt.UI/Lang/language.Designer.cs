@@ -1640,7 +1640,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.Wealth.MyAssets", resourceCulture);
             }
         }
-        
+
+        public static string Reports_Wealth_TotalInUsd {
+            get {
+                return ResourceManager.GetString("Reports.Wealth.TotalInUsd", resourceCulture);
+            }
+        }
+
         public static string Reports_Wealth_NetWorth {
             get {
                 return ResourceManager.GetString("Reports.Wealth.NetWorth", resourceCulture);
@@ -2618,7 +2624,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("AvgPrice.ManageProfiles", resourceCulture);
             }
         }
-        
+
+        public static string AvgPrice_ExportToCsv {
+            get {
+                return ResourceManager.GetString("AvgPrice.ExportToCsv", resourceCulture);
+            }
+        }
+
         public static string AvgPrice_AddOperation {
             get {
                 return ResourceManager.GetString("AvgPrice.AddOperation", resourceCulture);
@@ -4704,6 +4716,42 @@ namespace Valt.UI.Lang {
         public static string SimulatedPrices_Config_MinPercentage {
             get {
                 return ResourceManager.GetString("SimulatedPrices.Config.MinPercentage", resourceCulture);
+            }
+        }
+
+        public static string Reports_Indicators_Title {
+            get {
+                return ResourceManager.GetString("Reports.Indicators.Title", resourceCulture);
+            }
+        }
+
+        public static string Reports_Indicators_MayerMultiple {
+            get {
+                return ResourceManager.GetString("Reports.Indicators.MayerMultiple", resourceCulture);
+            }
+        }
+
+        public static string Reports_Indicators_RainbowChart {
+            get {
+                return ResourceManager.GetString("Reports.Indicators.RainbowChart", resourceCulture);
+            }
+        }
+
+        public static string Reports_Indicators_FearAndGreed {
+            get {
+                return ResourceManager.GetString("Reports.Indicators.FearAndGreed", resourceCulture);
+            }
+        }
+
+        public static string Reports_Indicators_BtcDominance {
+            get {
+                return ResourceManager.GetString("Reports.Indicators.BtcDominance", resourceCulture);
+            }
+        }
+
+        public static string Reports_Indicators_StaleTooltip {
+            get {
+                return ResourceManager.GetString("Reports.Indicators.StaleTooltip", resourceCulture);
             }
         }
     }

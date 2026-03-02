@@ -173,6 +173,15 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
                 var netWorthInMainFiatCurrency = currentWealthInFiat + assetsWealthInMainFiatCurrency;
                 var netWorthInSats = allWealthPricedInSats + assetsWealthInSats;
 
+                // USD equivalent (0 when main currency is already USD)
+                var netWorthInUsd = 0m;
+                if (_currencySettings.MainFiatCurrency != FiatCurrency.Usd.Code
+                    && _ratesState.FiatRates.TryGetValue(_currencySettings.MainFiatCurrency, out var mainRate)
+                    && mainRate != 0)
+                {
+                    netWorthInUsd = Math.Round(netWorthInMainFiatCurrency / mainRate, 2);
+                }
+
                 return new Wealth(
                     currentWealthInFiat,
                     wealthInMainFiatCurrency,
@@ -182,7 +191,8 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
                     assetsWealthInMainFiatCurrency,
                     assetsWealthInSats,
                     netWorthInMainFiatCurrency,
-                    netWorthInSats);
+                    netWorthInSats,
+                    netWorthInUsd);
             }
             catch (Exception ex)
             {
@@ -201,9 +211,10 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
         decimal AssetsWealthInMainFiatCurrency,
         long AssetsWealthInSats,
         decimal NetWorthInMainFiatCurrency,
-        long NetWorthInSats)
+        long NetWorthInSats,
+        decimal NetWorthInUsd)
     {
-        public static Wealth Empty => new(0, 0, 0, 0, 0, 0, 0, 0, 0);
+        public static Wealth Empty => new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
     public void Reset()

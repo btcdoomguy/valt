@@ -1,12 +1,14 @@
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Valt.App.Modules.AvgPrice.Contracts;
 using Valt.App.Modules.Budget.Accounts.Contracts;
 using Valt.App.Modules.Budget.Accounts.DTOs;
 using Valt.App.Modules.Budget.Categories.Contracts;
 using Valt.App.Modules.Budget.Categories.DTOs;
 using Valt.App.Modules.Budget.Transactions.Contracts;
 using Valt.App.Modules.Budget.Transactions.DTOs;
+using Valt.Core.Modules.AvgPrice;
 
 namespace Valt.Infra.Services.CsvExport;
 
@@ -25,15 +27,18 @@ internal class CsvExportService : ICsvExportService
     private readonly ITransactionQueries _transactionQueries;
     private readonly IAccountQueries _accountQueries;
     private readonly ICategoryQueries _categoryQueries;
+    private readonly IAvgPriceQueries _avgPriceQueries;
 
     public CsvExportService(
         ITransactionQueries transactionQueries,
         IAccountQueries accountQueries,
-        ICategoryQueries categoryQueries)
+        ICategoryQueries categoryQueries,
+        IAvgPriceQueries avgPriceQueries)
     {
         _transactionQueries = transactionQueries;
         _accountQueries = accountQueries;
         _categoryQueries = categoryQueries;
+        _avgPriceQueries = avgPriceQueries;
     }
 
     public async Task<string> ExportTransactionsAsync()
@@ -270,4 +275,54 @@ internal class CsvExportService : ICsvExportService
         string ToAccount,
         string ToAmount,
         string Category);
+
+    public async Task<string> ExportAvgPriceLinesAsync(string profileId)
+    {
+        var profileIdValue = new AvgPriceProfileId(profileId);
+        var lines = (await _avgPriceQueries.GetLinesOfProfileAsync(profileIdValue)).ToList();
+
+        var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            HasHeaderRecord = true
+        };
+
+        using var stringWriter = new StringWriter();
+        using var csv = new CsvWriter(stringWriter, config);
+
+        // Write header
+        csv.WriteField("date");
+        csv.WriteField("type");
+        csv.WriteField("quantity");
+        csv.WriteField("unit_price");
+        csv.WriteField("amount");
+        csv.WriteField("total_quantity");
+        csv.WriteField("total_cost");
+        csv.WriteField("avg_cost");
+        csv.WriteField("comment");
+        csv.NextRecord();
+
+        foreach (var line in lines)
+        {
+            var typeName = (AvgPriceLineTypes)line.AvgPriceLineTypeId switch
+            {
+                AvgPriceLineTypes.Buy => "Buy",
+                AvgPriceLineTypes.Sell => "Sell",
+                AvgPriceLineTypes.Setup => "Setup",
+                _ => line.AvgPriceLineTypeId.ToString()
+            };
+
+            csv.WriteField(line.Date.ToString("yyyy-MM-dd"));
+            csv.WriteField(typeName);
+            csv.WriteField(line.Quantity.ToString("F8", CultureInfo.InvariantCulture));
+            csv.WriteField(line.UnitPrice.ToString("F2", CultureInfo.InvariantCulture));
+            csv.WriteField(line.Amount.ToString("F2", CultureInfo.InvariantCulture));
+            csv.WriteField(line.TotalQuantity.ToString("F8", CultureInfo.InvariantCulture));
+            csv.WriteField(line.TotalCost.ToString("F2", CultureInfo.InvariantCulture));
+            csv.WriteField(line.AvgCostOfAcquisition.ToString("F2", CultureInfo.InvariantCulture));
+            csv.WriteField(line.Comment);
+            csv.NextRecord();
+        }
+
+        return stringWriter.ToString();
+    }
 }
