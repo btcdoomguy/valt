@@ -35,6 +35,7 @@ public class CategoryQueries : ICategoryQueries
                 Id = category.Id.ToString(),
                 Name = name,
                 SimpleName = category.Name,
+                ParentId = category.ParentId?.ToString(),
                 IconId = category.Icon,
                 Unicode = icon.Unicode,
                 Color = icon.Color
