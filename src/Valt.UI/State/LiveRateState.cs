@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -39,6 +40,8 @@ public partial class LiveRateState : ObservableObject, IRecipient<RatesUpdated>,
     [ObservableProperty] private decimal _previousFiatBtcPrice;
 
     [ObservableProperty] private bool _isOffline;
+
+    public IReadOnlyDictionary<string, decimal>? FiatRates => _ratesState.FiatRates;
 
     public LiveRateState(CurrencySettings currencySettings,
         ILocalDatabase localDatabase,
