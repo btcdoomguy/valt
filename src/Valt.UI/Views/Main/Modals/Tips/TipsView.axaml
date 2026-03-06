@@ -21,6 +21,9 @@
     <Design.DataContext>
         <tips:TipsViewModel />
     </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" />
+    </Window.KeyBindings>
     <Panel>
         <Image Source="avares://Valt/Assets/Pepe/pepe_tips.jpg"
                Stretch="UniformToFill"
