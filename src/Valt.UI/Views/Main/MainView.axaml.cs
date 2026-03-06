@@ -43,7 +43,14 @@ public partial class MainView : ValtBaseWindow
         RestoreWindowSettings();
 
         ((DataContext as MainViewModel)!).Window = this;
-        _ = ((DataContext as MainViewModel)!).OpenInitialSelectionModal();
+        _ = StartupSequenceAsync();
+    }
+
+    private async System.Threading.Tasks.Task StartupSequenceAsync()
+    {
+        var vm = (DataContext as MainViewModel)!;
+        await vm.OpenInitialSelectionModal();
+        await vm.OpenTipsModalIfNeededAsync();
     }
 
     private void RestoreWindowSettings()

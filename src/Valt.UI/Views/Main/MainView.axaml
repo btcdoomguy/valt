@@ -86,6 +86,9 @@
                                 <MenuItem Header="{x:Static local:language.Main_Menu_HowToUse}"
                                           Command="{Binding HowToUseCommand}">
                                 </MenuItem>
+                                <MenuItem Header="{x:Static local:language.Main_Menu_ShowTips}"
+                                          Command="{Binding ShowTipsCommand}">
+                                </MenuItem>
                                 <MenuItem Header="{x:Static local:language.Main_Menu_About}"
                                           Command="{Binding AboutCommand}">
                                 </MenuItem>

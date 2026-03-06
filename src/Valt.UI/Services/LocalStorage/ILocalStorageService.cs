@@ -22,6 +22,8 @@ public interface ILocalStorageService
     Task SaveWindowSettingsAsync(WindowSettings settings);
     bool LoadMcpServerEnabled();
     Task ChangeMcpServerEnabledAsync(bool enabled);
+    bool LoadShowTipsOnStartup();
+    Task ChangeShowTipsOnStartupAsync(bool show);
 }
 
 public class DataGridSettings

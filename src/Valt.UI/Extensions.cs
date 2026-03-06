@@ -44,6 +44,7 @@ using Valt.UI.Views.Main.Modals.LeverageSimulator;
 using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Modals.PriceHistory;
 using Valt.UI.Views.Main.Modals.SimulatedPricesConfig;
+using Valt.UI.Views.Main.Modals.Tips;
 using Valt.UI.Views.Main.Tabs.Transactions;
 
 namespace Valt.UI;
@@ -122,6 +123,7 @@ public static class Extensions
         services.AddTransient<LeverageSimulatorViewModel>();
         services.AddTransient<PriceHistoryViewModel>();
         services.AddTransient<SimulatedPricesConfigViewModel>();
+        services.AddTransient<TipsViewModel>();
 
         //other
         services.AddSingleton<IInitialCategoryNameLanguageProvider, InitialCategoryNameLanguageProvider>();
@@ -235,6 +237,10 @@ public static class Extensions
                 ApplicationModalNames.SimulatedPricesConfig => new SimulatedPricesConfigView()
                 {
                     DataContext = services.GetRequiredService<SimulatedPricesConfigViewModel>(),
+                },
+                ApplicationModalNames.Tips => new TipsView()
+                {
+                    DataContext = services.GetRequiredService<TipsViewModel>(),
                 },
                 _ => throw new ArgumentOutOfRangeException(nameof(modalNames), modalNames, null)
             };
