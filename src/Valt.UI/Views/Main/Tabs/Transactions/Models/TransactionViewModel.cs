@@ -46,9 +46,12 @@ public partial class TransactionViewModel : ObservableObject
 
     private decimal _currentBtcRate;
     private readonly bool _futureTransaction;
+    private bool _isProvisionalSats;
 
     [NotifyPropertyChangedFor(nameof(AutoSatAmountCurrentPrice))] [ObservableProperty]
     private long? _autoSatAmount;
+
+    [ObservableProperty] private long? _displaySatAmount;
 
     [ObservableProperty] private string _autoSatAmountCurrentPrice = string.Empty;
 
@@ -59,6 +62,7 @@ public partial class TransactionViewModel : ObservableObject
     public string? Notes { get; set; }
 
     public SolidColorBrush AutoSatLineColor { get; private set; } = TransactionGridResources.RegularLine;
+    public SolidColorBrush SatAmountLineColor { get; private set; } = TransactionGridResources.RegularLine;
 
     public TransactionViewModel(string id, DateOnly date, string name, string categoryId, string categoryName,
         Icon categoryIcon, string fromAccountId, string fromAccountName, Icon fromAccountIcon, string? toAccountId,
@@ -121,24 +125,52 @@ public partial class TransactionViewModel : ObservableObject
         AutoSatAmount = transactionMessageAutoSatAmount.Sats;
     }
 
-    public void RefreshCurrentAutoSatValue(decimal currentUsdFiatRate, decimal currentBtcRate, string mainFiatCurrency)
+    public void RefreshCurrentAutoSatValue(decimal currentUsdFiatRate, decimal currentBtcRate, string mainFiatCurrency,
+        IReadOnlyDictionary<string, decimal>? fiatRates = null)
     {
         if (AutoSatAmount is null && FromAmountFiat is null && ToAmountFiat is null)
         {
             AutoSatAmountCurrentPrice = string.Empty;
+            DisplaySatAmount = null;
             return;
         }
 
         var satTotalToUse = (AutoSatAmount ?? FromAmountSats ?? ToAmountSats).GetValueOrDefault();
+
+        // If no actual sats, try provisional calculation
+        if (satTotalToUse == 0 && AutoSatAmount is null)
+        {
+            var provisionalSats = CalculateProvisionalSats(currentBtcRate, fiatRates);
+            if (provisionalSats is not null)
+            {
+                _isProvisionalSats = true;
+                DisplaySatAmount = provisionalSats.Value;
+                SatAmountLineColor = TransactionGridResources.FutureLine;
+                satTotalToUse = Math.Abs(provisionalSats.Value);
+            }
+            else
+            {
+                _isProvisionalSats = false;
+                DisplaySatAmount = null;
+                AutoSatAmountCurrentPrice = string.Empty;
+                return;
+            }
+        }
+        else
+        {
+            _isProvisionalSats = false;
+            DisplaySatAmount = AutoSatAmount ?? FromAmountSats ?? ToAmountSats;
+            SatAmountLineColor = TransactionGridResources.RegularLine;
+        }
+
+        if (satTotalToUse < 0)
+            satTotalToUse *= -1;
 
         if (satTotalToUse == 0)
         {
             AutoSatAmountCurrentPrice = string.Empty;
             return;
         }
-
-        if (satTotalToUse < 0)
-            satTotalToUse *= -1;
 
         _currentUsdFiatRate = currentUsdFiatRate;
         _currentBtcRate = currentBtcRate;
@@ -154,18 +186,49 @@ public partial class TransactionViewModel : ObservableObject
         var autoSatAmountParsed = BtcValue.New(satTotalToUse);
 
         var newTotal = FiatValue.New(btcPrice * autoSatAmountParsed.Btc);
-        
-        var fiatTotalToUse = FromAmountFiat ?? ToAmountFiat ?? 0;
-        if (fiatTotalToUse < 0)
-            fiatTotalToUse *= -1;
 
-        if (FromAmountFiat is null)
-            AutoSatLineColor = TransactionGridResources.RegularLine;
+        if (_isProvisionalSats)
+        {
+            AutoSatLineColor = TransactionGridResources.FutureLine;
+        }
         else
-            AutoSatLineColor = newTotal > fiatTotalToUse
-                ? TransactionGridResources.Credit
-                : TransactionGridResources.Debt;
+        {
+            var fiatTotalToUse = FromAmountFiat ?? ToAmountFiat ?? 0;
+            if (fiatTotalToUse < 0)
+                fiatTotalToUse *= -1;
+
+            if (FromAmountFiat is null)
+                AutoSatLineColor = TransactionGridResources.RegularLine;
+            else
+                AutoSatLineColor = newTotal > fiatTotalToUse
+                    ? TransactionGridResources.Credit
+                    : TransactionGridResources.Debt;
+        }
+
         AutoSatAmountCurrentPrice = CurrencyDisplay.FormatFiat(newTotal, mainFiatCurrency);
+    }
+
+    private long? CalculateProvisionalSats(decimal currentBtcRate, IReadOnlyDictionary<string, decimal>? fiatRates)
+    {
+        if (TransferType is not (TransactionTransferTypes.Fiat or TransactionTransferTypes.FiatToFiat))
+            return null;
+
+        if (currentBtcRate <= 0 || fiatRates is null || FromCurrency is null)
+            return null;
+
+        if (!fiatRates.TryGetValue(FromCurrency, out var currencyToUsdRate) || currencyToUsdRate <= 0)
+            return null;
+
+        var fiatAmount = FromAmountFiat ?? 0;
+        if (fiatAmount == 0)
+            return null;
+
+        fiatAmount = Math.Abs(fiatAmount);
+
+        var btcAmount = fiatAmount / (currentBtcRate * currencyToUsdRate);
+        var btcValue = BtcValue.ParseBitcoin(btcAmount);
+
+        return btcValue.Sats;
     }
 
     public SolidColorBrush AmountColor

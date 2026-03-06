@@ -4754,5 +4754,41 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.Indicators.StaleTooltip", resourceCulture);
             }
         }
+
+        public static string Main_Menu_ShowTips {
+            get {
+                return ResourceManager.GetString("Main_Menu_ShowTips", resourceCulture);
+            }
+        }
+
+        public static string Tips_Title {
+            get {
+                return ResourceManager.GetString("Tips.Title", resourceCulture);
+            }
+        }
+
+        public static string Tips_DontShowOnStartup {
+            get {
+                return ResourceManager.GetString("Tips.DontShowOnStartup", resourceCulture);
+            }
+        }
+
+        public static string Tips_Counter {
+            get {
+                return ResourceManager.GetString("Tips.Counter", resourceCulture);
+            }
+        }
+
+        public static string Tips_PreviousButton {
+            get {
+                return ResourceManager.GetString("Tips.PreviousButton", resourceCulture);
+            }
+        }
+
+        public static string Tips_NextButton {
+            get {
+                return ResourceManager.GetString("Tips.NextButton", resourceCulture);
+            }
+        }
     }
 }

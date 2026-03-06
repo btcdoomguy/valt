@@ -1,0 +1,86 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        xmlns:tips="clr-namespace:Valt.UI.Views.Main.Modals.Tips"
+        mc:Ignorable="d"
+        d:DesignWidth="500" d:DesignHeight="340"
+        MinWidth="500"
+        MinHeight="340"
+        MaxWidth="500"
+        MaxHeight="340"
+        x:Class="Valt.UI.Views.Main.Modals.Tips.TipsView"
+        x:DataType="tips:TipsViewModel"
+        Title="{x:Static local:language.Tips_Title}"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <tips:TipsViewModel />
+    </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" />
+    </Window.KeyBindings>
+    <Panel>
+        <Image Source="avares://Valt/Assets/Pepe/pepe_tips.jpg"
+               Stretch="UniformToFill"
+               Opacity="0.08" />
+        <Border>
+        <Grid RowDefinitions="Auto, *">
+            <userControls:CustomTitleBar Grid.Row="0"
+                                         Title="{x:Static local:language.Tips_Title}"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+            <Grid Grid.Row="1" Margin="20" RowDefinitions="Auto, *, Auto, Auto">
+                <!-- Counter -->
+                <TextBlock Grid.Row="0"
+                           Text="{Binding Counter}"
+                           HorizontalAlignment="Right"
+                           Opacity="0.6"
+                           FontSize="{DynamicResource FontSizeSmall}"
+                           Margin="0,0,0,8" />
+
+                <!-- Tip text (set from code-behind for bold parsing) -->
+                <Border Grid.Row="1"
+                        Background="{DynamicResource Background900Brush}"
+                        CornerRadius="8"
+                        Opacity="0.6"
+                        Padding="16">
+                    <TextBlock x:Name="TipTextBlock"
+                               TextWrapping="Wrap"
+                               VerticalAlignment="Center"
+                               FontSize="{DynamicResource FontSizeMedium}" />
+                </Border>
+
+                <!-- Don't show checkbox -->
+                <CheckBox Grid.Row="2"
+                          IsChecked="{Binding DontShowOnStartup}"
+                          Content="{x:Static local:language.Tips_DontShowOnStartup}"
+                          Margin="0,12,0,12"
+                          FontSize="{DynamicResource FontSizeSmall}" />
+
+                <!-- Navigation buttons -->
+                <StackPanel Grid.Row="3"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Spacing="8">
+                    <Button Width="110"
+                            Content="{x:Static local:language.Tips_PreviousButton}"
+                            Command="{Binding PreviousCommand}" />
+                    <Button Width="110"
+                            x:Name="CloseButton"
+                            Content="{x:Static local:language.OkButton}"
+                            Command="{Binding CloseCommand}"
+                            Classes="primary" />
+                    <Button Width="110"
+                            Content="{x:Static local:language.Tips_NextButton}"
+                            Command="{Binding NextCommand}" />
+                </StackPanel>
+            </Grid>
+        </Grid>
+        </Border>
+    </Panel>
+</Window>

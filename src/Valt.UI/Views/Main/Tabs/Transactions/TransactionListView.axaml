@@ -136,7 +136,8 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="models1:TransactionViewModel">
                             <StackPanel Orientation="Horizontal" >
-                                <TextBlock Classes="only-text" Text="{Binding AutoSatAmount}">
+                                <TextBlock Classes="only-text" Text="{Binding DisplaySatAmount}"
+                                           Foreground="{Binding SatAmountLineColor}">
                                 </TextBlock>
                             </StackPanel>
                         </DataTemplate>

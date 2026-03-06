@@ -2391,4 +2391,62 @@
     <data name="Reports.Indicators.StaleTooltip" xml:space="preserve">
         <value>Dados podem estar desatualizados</value>
     </data>
+    <data name="Main_Menu_ShowTips" xml:space="preserve">
+        <value>Mostrar Dicas</value>
+    </data>
+    <!-- Tips -->
+    <data name="Tips.Title" xml:space="preserve">
+        <value>Dicas</value>
+    </data>
+    <data name="Tips.DontShowOnStartup" xml:space="preserve">
+        <value>Não mostrar ao iniciar</value>
+    </data>
+    <data name="Tips.Counter" xml:space="preserve">
+        <value>Dica {0} de {1}</value>
+    </data>
+    <data name="Tips.PreviousButton" xml:space="preserve">
+        <value>Anterior</value>
+    </data>
+    <data name="Tips.NextButton" xml:space="preserve">
+        <value>Próxima</value>
+    </data>
+    <data name="Tips.Message.Assets" xml:space="preserve">
+        <value>Você pode usar a **aba Ativos** para acompanhar quaisquer outros bens do seu patrimônio. Dependendo do ativo você consegue obter o preço através da integração com **Yahoo Finance**.</value>
+    </data>
+    <data name="Tips.Message.AvgPrice" xml:space="preserve">
+        <value>Utilize a **aba de preço-médio** para facilitar o seu controle contábil. Você pode utilizar para controlar outros ativos além de bitcoin e também calcular diferentes perfis para outros membros da família ou calcular somente a sua parte declarada.</value>
+    </data>
+    <data name="Tips.Message.BulkEdit" xml:space="preserve">
+        <value>Você pode selecionar **várias transações** de uma vez e **renomear ou alterar a categoria em lote**.</value>
+    </data>
+    <data name="Tips.Message.DateNavigation" xml:space="preserve">
+        <value>Ao adicionar ou editar uma transação, utilize **Ctrl+Seta pra esquerda/direita** para voltar ou avançar a data.</value>
+    </data>
+    <data name="Tips.Message.FixedExpenseHistory" xml:space="preserve">
+        <value>Ao abrir a lista de Despesas Fixas, você pode clicar com o **botão direito** e **Ver Histórico** para encontrar todas as transações relacionadas e também o histórico de preços.</value>
+    </data>
+    <data name="Tips.Message.FixedExpensePriceHistory" xml:space="preserve">
+        <value>Você pode modificar os valores das **Despesas Fixas** quando quiser. O **histórico de preços** será preservado para você poder conferir a evolução dos seus gastos.</value>
+    </data>
+    <data name="Tips.Message.FixedExpenses" xml:space="preserve">
+        <value>Use as **Despesas Fixas** para controlar seus gastos em diferentes períodos. Você pode definir gastos **semanais, quinzenais, mensais** e muito mais.</value>
+    </data>
+    <data name="Tips.Message.Goals" xml:space="preserve">
+        <value>Use o sistema de **Metas** para acompanhar seu orçamento limitando os gastos por categoria.</value>
+    </data>
+    <data name="Tips.Message.Leverage" xml:space="preserve">
+        <value>Se você estiver **alavancado em bitcoin** (long ou short) a **aba relatórios** irá mostrar um novo painel mostrando a sua posição em bitcoin considerando a alavancagem.</value>
+    </data>
+    <data name="Tips.Message.LinkTransaction" xml:space="preserve">
+        <value>Você também pode **vincular uma transação com uma despesa fixa** manualmente. Basta selecionar a despesa fixa na barra lateral e clicar com o **botão direito** na transação desejada. Isso também pode ser usado para **desvincular** uma transação.</value>
+    </data>
+    <data name="Tips.Message.McpIntegration" xml:space="preserve">
+        <value>Use a **integração MCP** para usar o Valt com sua IA favorita.</value>
+    </data>
+    <data name="Tips.Message.Reports" xml:space="preserve">
+        <value>Personalize a **aba de Relatórios**. Vários indicadores podem ser modificados para refletir corretamente os dados mais relevantes para a sua situação.</value>
+    </data>
+    <data name="Tips.Message.ReportsLongTerm" xml:space="preserve">
+        <value>Ao utilizar o Valt por vários meses, a **aba de relatórios** vai mostrar informações mais relevantes, como a sua **média de despesas dos últimos 12 meses** e comparar com os outros 12 meses anteriores.</value>
+    </data>
 </root>

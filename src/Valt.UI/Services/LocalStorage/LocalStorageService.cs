@@ -138,6 +138,20 @@ public class LocalStorageService : ILocalStorageService
         return Task.CompletedTask;
     }
 
+    public bool LoadShowTipsOnStartup()
+    {
+        EnsureLoaded();
+        return _valtSettings!.ShowTipsOnStartup;
+    }
+
+    public Task ChangeShowTipsOnStartupAsync(bool show)
+    {
+        EnsureLoaded();
+        _valtSettings!.ShowTipsOnStartup = show;
+        Save();
+        return Task.CompletedTask;
+    }
+
     private void EnsureLoaded()
     {
         if (_valtSettings is not null) return;
@@ -169,6 +183,7 @@ public class LocalStorageService : ILocalStorageService
         public WindowSettings WindowSettings { get; set; } = new();
         public List<string> RecentFiles { get; set; } = new();
         public bool McpServerEnabled { get; set; } = false;
+        public bool ShowTipsOnStartup { get; set; } = true;
 
         private static string GetDefaultCulture()
         {

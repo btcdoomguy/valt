@@ -2396,4 +2396,62 @@
     <data name="Reports.Indicators.StaleTooltip" xml:space="preserve">
         <value>Data may be outdated</value>
     </data>
+    <data name="Main_Menu_ShowTips" xml:space="preserve">
+        <value>Show Tips</value>
+    </data>
+    <!-- Tips -->
+    <data name="Tips.Title" xml:space="preserve">
+        <value>Tips</value>
+    </data>
+    <data name="Tips.DontShowOnStartup" xml:space="preserve">
+        <value>Don't show on startup</value>
+    </data>
+    <data name="Tips.Counter" xml:space="preserve">
+        <value>Tip {0} of {1}</value>
+    </data>
+    <data name="Tips.PreviousButton" xml:space="preserve">
+        <value>Previous</value>
+    </data>
+    <data name="Tips.NextButton" xml:space="preserve">
+        <value>Next</value>
+    </data>
+    <data name="Tips.Message.Assets" xml:space="preserve">
+        <value>Use the **Assets** tab to track any other holdings in your portfolio. Depending on the asset, you can fetch prices via **Yahoo Finance** integration.</value>
+    </data>
+    <data name="Tips.Message.AvgPrice" xml:space="preserve">
+        <value>Use the **Average Price** tab to simplify your accounting. You can track assets beyond Bitcoin and calculate different profiles for family members or just your declared portion.</value>
+    </data>
+    <data name="Tips.Message.BulkEdit" xml:space="preserve">
+        <value>You can select **multiple transactions** at once to **rename or change the category in bulk**.</value>
+    </data>
+    <data name="Tips.Message.DateNavigation" xml:space="preserve">
+        <value>When adding or editing a transaction, use **Ctrl+Left/Right Arrow** to go back or forward in date.</value>
+    </data>
+    <data name="Tips.Message.FixedExpenseHistory" xml:space="preserve">
+        <value>In the Fixed Expenses list, you can **right-click** and select **View History** to find all related transactions and their price history.</value>
+    </data>
+    <data name="Tips.Message.FixedExpensePriceHistory" xml:space="preserve">
+        <value>You can modify **Fixed Expense** amounts at any time. The **price history** is preserved so you can track the evolution of your spending.</value>
+    </data>
+    <data name="Tips.Message.FixedExpenses" xml:space="preserve">
+        <value>Use **Fixed Expenses** to track your spending across different periods. You can set **weekly, bi-weekly, monthly** expenses and much more.</value>
+    </data>
+    <data name="Tips.Message.Goals" xml:space="preserve">
+        <value>Use the **Goals** system to manage your budget by limiting spending per category.</value>
+    </data>
+    <data name="Tips.Message.Leverage" xml:space="preserve">
+        <value>If you are **leveraged in Bitcoin** (long or short), the **Reports** tab will show a new panel displaying your Bitcoin position accounting for leverage.</value>
+    </data>
+    <data name="Tips.Message.LinkTransaction" xml:space="preserve">
+        <value>You can also **manually link a transaction to a fixed expense**. Select the fixed expense in the sidebar and **right-click** the desired transaction. This can also be used to **unlink** a transaction.</value>
+    </data>
+    <data name="Tips.Message.McpIntegration" xml:space="preserve">
+        <value>Use the **MCP integration** to use Valt with your favorite AI assistant.</value>
+    </data>
+    <data name="Tips.Message.Reports" xml:space="preserve">
+        <value>Customize the **Reports** tab. Several indicators can be adjusted to correctly reflect the most relevant data for your situation.</value>
+    </data>
+    <data name="Tips.Message.ReportsLongTerm" xml:space="preserve">
+        <value>After using Valt for several months, the **Reports** tab will show more relevant insights, such as your **average expenses over the last 12 months** compared to the previous 12 months.</value>
+    </data>
 </root>

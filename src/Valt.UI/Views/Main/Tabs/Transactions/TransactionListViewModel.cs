@@ -623,7 +623,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
         foreach (var transactionViewModel in transactionViewModels)
         {
             transactionViewModel.RefreshCurrentAutoSatValue(_liveRateState.UsdPrice, _liveRateState.BitcoinPrice,
-                _currencySettings.MainFiatCurrency);
+                _currencySettings.MainFiatCurrency, _liveRateState.FiatRates);
         }
 
         Transactions.AddRange(transactionViewModels);
@@ -716,7 +716,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
         foreach (var transaction in Transactions)
         {
             transaction.RefreshCurrentAutoSatValue(_liveRateState.UsdPrice, _liveRateState.BitcoinPrice,
-                _currencySettings.MainFiatCurrency);
+                _currencySettings.MainFiatCurrency, _liveRateState.FiatRates);
         }
     }
 
@@ -734,7 +734,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
 
                 transaction.SetupAutoSatAmount(transactionMessage.AutoSatAmount);
                 transaction.RefreshCurrentAutoSatValue(_liveRateState.UsdPrice, _liveRateState.BitcoinPrice,
-                    _currencySettings.MainFiatCurrency);
+                    _currencySettings.MainFiatCurrency, _liveRateState.FiatRates);
             }
         });
     }

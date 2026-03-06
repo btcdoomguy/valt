@@ -38,6 +38,7 @@ using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Controls;
 using Valt.UI.Views.Main.Modals.About;
 using Valt.UI.Views.Main.Modals.InitialSelection;
+using Valt.UI.Views.Main.Modals.Tips;
 using Valt.UI.Views.Main.Modals.ManageCategories;
 using Valt.UI.Views.Main.Modals.Settings;
 using Valt.UI.Views.Main.Modals.StatusDisplay;
@@ -502,6 +503,26 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             WeakReferenceMessenger.Default.Send(new AddAssetRequested());
 
         return Task.CompletedTask;
+    }
+
+    public async Task OpenTipsModalIfNeededAsync()
+    {
+        if (!_localStorageService.LoadShowTipsOnStartup())
+            return;
+
+        await ShowTipsAsync();
+    }
+
+    [RelayCommand]
+    private async Task ShowTips()
+    {
+        await ShowTipsAsync();
+    }
+
+    private async Task ShowTipsAsync()
+    {
+        var modal = (TipsView)await _modalFactory.CreateAsync(ApplicationModalNames.Tips, Window)!;
+        await modal.ShowDialog(Window!);
     }
 
     public async Task OpenInitialSelectionModal()
