@@ -101,6 +101,11 @@
                                     CommandParameter="{Binding .}"
                                     IsEnabled="{Binding !$parent[UserControl].((vm:FixedExpensesPanelViewModel)DataContext).IsSecureModeEnabled}">
                                 </MenuItem>
+                                <MenuItem
+                                    Header="{x:Static local:language.FixedExpenseHistory_ViewHistory}"
+                                    Command="{Binding $parent[UserControl].((vm:FixedExpensesPanelViewModel)DataContext).ViewHistoryCommand}"
+                                    CommandParameter="{Binding .}">
+                                </MenuItem>
                                 <Separator />
                                 <MenuItem
                                     Header="{x:Static local:language.TransactionFixedExpenses_IgnoreForThisMonth}"

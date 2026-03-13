@@ -615,6 +615,14 @@ public partial class MainViewModel : ValtViewModel, IDisposable
                 await _backgroundJobManager!.StartAllJobsAsync(jobType: BackgroundJobTypes.ValtDatabase);
             });
 
+            // Schedule an early asset price refresh to update stale prices from the previous session.
+            // The regular interval is 5 minutes, so this ensures totals are up-to-date shortly after startup.
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(TimeSpan.FromSeconds(5));
+                _backgroundJobManager!.TriggerJobManually(BackgroundJobSystemNames.AssetPriceUpdater);
+            });
+
             // Check for updates (fire and forget - don't block startup)
             _ = CheckForUpdatesAsync();
         }

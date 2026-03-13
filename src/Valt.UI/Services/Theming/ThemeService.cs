@@ -30,7 +30,8 @@ public class ThemeService : IThemeService
         new ThemeDefinition("RoseQuartz", "Rose Quartz", "Dark", () => RoseQuartzTheme.Create()),
         new ThemeDefinition("SunsetBlaze", "Sunset Blaze", "Dark", () => SunsetBlazeTheme.Create()),
         new ThemeDefinition("MochaBrew", "Mocha Brew", "Dark", () => MochaBrewTheme.Create()),
-        new ThemeDefinition("CopperForge", "Copper Forge", "Dark", () => CopperForgeTheme.Create())
+        new ThemeDefinition("CopperForge", "Copper Forge", "Dark", () => CopperForgeTheme.Create()),
+        new ThemeDefinition("Pepe", "Pepe", "Dark", () => PepeTheme.Create())
     ];
 
     private readonly ILocalStorageService _localStorageService;
