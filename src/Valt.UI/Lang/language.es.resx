@@ -1471,6 +1471,9 @@
     <data name="TransactionEditor.Help.NextDay" xml:space="preserve">
         <value>Ir al día siguiente</value>
     </data>
+    <data name="TransactionEditor.Help.ResetDate" xml:space="preserve">
+        <value>Restablecer a la fecha actual</value>
+    </data>
     <data name="TransactionEditor.Help.Tip1" xml:space="preserve">
         <value>Comienza a escribir en el campo Nombre para ver sugerencias basadas en tu historial de transacciones.</value>
     </data>
