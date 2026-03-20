@@ -288,6 +288,10 @@
                                             <TextBlock FontWeight="Bold" Width="110" Text="Ctrl + →" />
                                             <TextBlock Text="{x:Static local:language.TransactionEditor_Help_NextDay}" />
                                         </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock FontWeight="Bold" Width="110" Text="Ctrl + R" />
+                                            <TextBlock Text="{x:Static local:language.TransactionEditor_Help_ResetDate}" />
+                                        </StackPanel>
                                     </StackPanel>
                                     <TextBlock FontWeight="Bold" FontSize="{DynamicResource FontSizeMedium}"
                                                Text="{x:Static local:language.Help_Tips}" Margin="0, 8, 0, 0" />

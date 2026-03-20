@@ -2949,6 +2949,12 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string TransactionEditor_Help_ResetDate {
+            get {
+                return ResourceManager.GetString("TransactionEditor.Help.ResetDate", resourceCulture);
+            }
+        }
+
         public static string TransactionEditor_Help_Tip1 {
             get {
                 return ResourceManager.GetString("TransactionEditor.Help.Tip1", resourceCulture);

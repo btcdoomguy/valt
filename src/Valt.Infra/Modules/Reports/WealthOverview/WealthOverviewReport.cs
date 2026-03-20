@@ -19,7 +19,7 @@ internal class WealthOverviewReport : IWealthOverviewReport
         _logger = logger;
     }
 
-    public Task<WealthOverviewData> GetAsync(WealthOverviewPeriod period, FiatCurrency currency, IReportDataProvider provider)
+    public Task<WealthOverviewData> GetAsync(WealthOverviewPeriod period, FiatCurrency currency, IReportDataProvider provider, int maxDataPoints = MaxDataPoints)
     {
         if (provider.AllTransactions.Count == 0)
         {
@@ -31,7 +31,7 @@ internal class WealthOverviewReport : IWealthOverviewReport
             });
         }
 
-        var calculator = new Calculator(currency, provider, _clock.GetCurrentLocalDate(), period);
+        var calculator = new Calculator(currency, provider, _clock.GetCurrentLocalDate(), period, maxDataPoints);
 
         try
         {
@@ -52,17 +52,20 @@ internal class WealthOverviewReport : IWealthOverviewReport
         private readonly IReportDataProvider _provider;
         private readonly DateOnly _today;
         private readonly WealthOverviewPeriod _period;
+        private readonly int _maxDataPoints;
 
         public Calculator(
             FiatCurrency currency,
             IReportDataProvider provider,
             DateOnly today,
-            WealthOverviewPeriod period)
+            WealthOverviewPeriod period,
+            int maxDataPoints)
         {
             _currency = currency;
             _provider = provider;
             _today = today;
             _period = period;
+            _maxDataPoints = maxDataPoints;
         }
 
         public WealthOverviewData Calculate()
@@ -94,7 +97,7 @@ internal class WealthOverviewReport : IWealthOverviewReport
         {
             var dates = new List<DateOnly>();
 
-            for (var i = MaxDataPoints - 1; i >= 0; i--)
+            for (var i = _maxDataPoints - 1; i >= 0; i--)
             {
                 var periodEnd = _period switch
                 {

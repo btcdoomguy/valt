@@ -110,7 +110,7 @@
                     </StackPanel>
                 </Expander.Header>
                 <StackPanel Orientation="Vertical">
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10" HorizontalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10" HorizontalAlignment="Center" Spacing="10">
                         <ComboBox SelectedItem="{Binding SelectedWealthOverviewPeriod}" MinWidth="150">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
@@ -121,6 +121,11 @@
                             <wealthOverview:WealthOverviewPeriod>Weekly</wealthOverview:WealthOverviewPeriod>
                             <wealthOverview:WealthOverviewPeriod>Monthly</wealthOverview:WealthOverviewPeriod>
                             <wealthOverview:WealthOverviewPeriod>Yearly</wealthOverview:WealthOverviewPeriod>
+                        </ComboBox>
+                        <ComboBox SelectedItem="{Binding SelectedWealthOverviewMaxElements}" MinWidth="80">
+                            <system:Int32>12</system:Int32>
+                            <system:Int32>18</system:Int32>
+                            <system:Int32>24</system:Int32>
                         </ComboBox>
                     </StackPanel>
                     <Grid MinHeight="500">

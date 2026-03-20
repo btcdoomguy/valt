@@ -92,6 +92,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private ExpensesByCategoryChartData _expensesByCategoryChartData = new();
     [ObservableProperty] private WealthOverviewChartData _wealthOverviewChartData = new();
     [ObservableProperty] private WealthOverviewPeriod _selectedWealthOverviewPeriod = WealthOverviewPeriod.Monthly;
+    [ObservableProperty] private int _selectedWealthOverviewMaxElements = 12;
     [ObservableProperty] private DateTime _filterMainDate;
     [ObservableProperty] private DateRange _filterRange = new(DateTime.MinValue, DateTime.MinValue);
     [ObservableProperty] private DateTime _categoryFilterMainDate;
@@ -1143,7 +1144,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             var wealthOverviewData = await _wealthOverviewReport.GetAsync(
                 SelectedWealthOverviewPeriod,
                 FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency),
-                provider);
+                provider,
+                SelectedWealthOverviewMaxElements);
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
@@ -1159,6 +1161,14 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     }
 
     partial void OnSelectedWealthOverviewPeriodChanged(WealthOverviewPeriod value)
+    {
+        if (!_ready) return;
+
+        IsWealthOverviewLoading = true;
+        FetchWealthOverviewWithProviderAsync().SafeFireAndForget(logger: _logger, callerName: nameof(FetchWealthOverviewWithProviderAsync));
+    }
+
+    partial void OnSelectedWealthOverviewMaxElementsChanged(int value)
     {
         if (!_ready) return;
 
