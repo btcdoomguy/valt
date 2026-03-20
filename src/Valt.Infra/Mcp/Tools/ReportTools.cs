@@ -79,13 +79,14 @@ public class ReportTools
         IReportDataProviderFactory providerFactory,
         IWealthOverviewReport report,
         [Description("Period type: 0=Daily, 1=Weekly, 2=Monthly, 3=Yearly")] int period,
-        [Description("Currency code (e.g., 'USD', 'BRL')")] string currencyCode)
+        [Description("Currency code (e.g., 'USD', 'BRL')")] string currencyCode,
+        [Description("Maximum number of data points to show (default: 12)")] int maxDataPoints = 12)
     {
         var provider = await providerFactory.CreateAsync();
         var currency = FiatCurrency.GetFromCode(currencyCode);
         var wealthPeriod = (WealthOverviewPeriod)period;
 
-        var data = await report.GetAsync(wealthPeriod, currency, provider);
+        var data = await report.GetAsync(wealthPeriod, currency, provider, maxDataPoints);
 
         return new WealthOverviewResultDto
         {

@@ -11,6 +11,7 @@ using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Assets.DTOs;
 using Valt.App.Modules.Assets.Queries.GetAssetSummary;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Messages;
+using Valt.Infra.Modules.Assets.Services;
 using Valt.App.Modules.Budget.Accounts.DTOs;
 using Valt.Infra.Settings;
 using Valt.UI.State.Events;
@@ -18,7 +19,7 @@ using Valt.UI.State.Events;
 namespace Valt.UI.State;
 
 public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpdated>,
-    IRecipient<AccountSummariesDTO>, IRecipient<AssetSummaryUpdatedMessage>, IDisposable
+    IRecipient<AccountSummariesDTO>, IRecipient<AssetSummaryUpdatedMessage>, IRecipient<AssetPricesUpdated>, IDisposable
 {
     private readonly Lock _calculationLock = new();
 
@@ -44,6 +45,7 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
         WeakReferenceMessenger.Default.Register<RatesUpdated>(this);
         WeakReferenceMessenger.Default.Register<AccountSummariesDTO>(this);
         WeakReferenceMessenger.Default.Register<AssetSummaryUpdatedMessage>(this);
+        WeakReferenceMessenger.Default.Register<AssetPricesUpdated>(this);
     }
 
     public void Receive(AccountSummariesDTO message)
@@ -57,6 +59,11 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
     }
 
     public void Receive(AssetSummaryUpdatedMessage message)
+    {
+        _ = RefreshAndNotifyAsync();
+    }
+
+    public void Receive(AssetPricesUpdated message)
     {
         _ = RefreshAndNotifyAsync();
     }
@@ -228,5 +235,6 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
         WeakReferenceMessenger.Default.Unregister<RatesUpdated>(this);
         WeakReferenceMessenger.Default.Unregister<AccountSummariesDTO>(this);
         WeakReferenceMessenger.Default.Unregister<AssetSummaryUpdatedMessage>(this);
+        WeakReferenceMessenger.Default.Unregister<AssetPricesUpdated>(this);
     }
 }

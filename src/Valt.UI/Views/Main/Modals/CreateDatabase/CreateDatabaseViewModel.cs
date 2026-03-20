@@ -44,7 +44,7 @@ public partial class CreateDatabaseViewModel : ValtModalValidatorViewModel
     /// <summary>
     /// Selected fiat currencies (excluding USD which is mandatory)
     /// </summary>
-    public AvaloniaList<FiatCurrencyItem> SelectedFiatCurrencies { get; } = new();
+    public AvaloniaList<FiatCurrencyItem> SelectedFiatCurrencies { get; } = new(GetDefaultSelectedCurrencies());
 
     #endregion
 
@@ -54,6 +54,15 @@ public partial class CreateDatabaseViewModel : ValtModalValidatorViewModel
         new("Español (es)", "es"),
         new("Português (pt-BR)", "pt-BR"),
     ];
+
+    private static List<FiatCurrencyItem> GetDefaultSelectedCurrencies()
+    {
+        return new List<FiatCurrencyItem>
+        {
+            FiatCurrencyItem.FromCode("BRL"),
+            FiatCurrencyItem.FromCode("EUR"),
+        };
+    }
 
     private static string GetDefaultLanguage()
     {

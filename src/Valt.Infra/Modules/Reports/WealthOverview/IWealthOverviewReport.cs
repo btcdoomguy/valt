@@ -4,5 +4,5 @@ namespace Valt.Infra.Modules.Reports.WealthOverview;
 
 public interface IWealthOverviewReport
 {
-    Task<WealthOverviewData> GetAsync(WealthOverviewPeriod period, FiatCurrency currency, IReportDataProvider provider);
+    Task<WealthOverviewData> GetAsync(WealthOverviewPeriod period, FiatCurrency currency, IReportDataProvider provider, int maxDataPoints = 12);
 }
