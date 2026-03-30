@@ -328,8 +328,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         IncomeSelectedAccounts.Clear();
         IncomeSelectedCategories.Clear();
 
-        var accounts = _localDatabase.GetAccounts().FindAll().OrderByDescending(x => x.Visible).ThenBy(x => x.DisplayOrder)
-            .Select(x => new SelectItem(x.Id.ToString(), x.Name));
+        var accounts = GetFilterableAccounts();
 
         AvailableAccounts.AddRange(accounts);
         SelectedAccounts.AddRange(AvailableAccounts);
@@ -370,6 +369,71 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
     }
 
+    private IEnumerable<SelectItem> GetFilterableAccounts()
+    {
+        var allAccounts = _localDatabase.GetAccounts().FindAll().ToList();
+
+        var hiddenAccountIds = allAccounts
+            .Where(x => !x.Visible)
+            .Select(x => x.Id)
+            .ToHashSet();
+
+        var hiddenAccountIdsWithTransactions = new HashSet<LiteDB.ObjectId>();
+        if (hiddenAccountIds.Count > 0)
+        {
+            var minDate = CategoryFilterRange.Start < IncomeCategoryFilterRange.Start
+                ? CategoryFilterRange.Start
+                : IncomeCategoryFilterRange.Start;
+            var maxDate = CategoryFilterRange.End > IncomeCategoryFilterRange.End
+                ? CategoryFilterRange.End
+                : IncomeCategoryFilterRange.End;
+
+            var transactions = _localDatabase.GetTransactions()
+                .Find(t => t.Date >= minDate && t.Date <= maxDate);
+
+            foreach (var t in transactions)
+            {
+                if (hiddenAccountIds.Contains(t.FromAccountId))
+                    hiddenAccountIdsWithTransactions.Add(t.FromAccountId);
+                if (t.ToAccountId is not null && hiddenAccountIds.Contains(t.ToAccountId))
+                    hiddenAccountIdsWithTransactions.Add(t.ToAccountId);
+            }
+        }
+
+        return allAccounts
+            .Where(x => x.Visible || hiddenAccountIdsWithTransactions.Contains(x.Id))
+            .OrderByDescending(x => x.Visible)
+            .ThenBy(x => x.DisplayOrder)
+            .Select(x => new SelectItem(x.Id.ToString(), x.Name));
+    }
+
+    private void RefreshAvailableAccounts()
+    {
+        var previousSelectedIds = SelectedAccounts.Select(x => x.Id).ToHashSet();
+        var previousIncomeSelectedIds = IncomeSelectedAccounts.Select(x => x.Id).ToHashSet();
+
+        SelectedAccounts.CollectionChanged -= OnSelectedFiltersChanged;
+        IncomeSelectedAccounts.CollectionChanged -= OnIncomeSelectedFiltersChanged;
+
+        try
+        {
+            var accounts = GetFilterableAccounts().ToList();
+
+            AvailableAccounts.Clear();
+            SelectedAccounts.Clear();
+            IncomeSelectedAccounts.Clear();
+
+            AvailableAccounts.AddRange(accounts);
+            SelectedAccounts.AddRange(accounts.Where(a => previousSelectedIds.Contains(a.Id)));
+            IncomeSelectedAccounts.AddRange(accounts.Where(a => previousIncomeSelectedIds.Contains(a.Id)));
+        }
+        finally
+        {
+            SelectedAccounts.CollectionChanged += OnSelectedFiltersChanged;
+            IncomeSelectedAccounts.CollectionChanged += OnIncomeSelectedFiltersChanged;
+        }
+    }
+
     partial void OnFilterRangeChanged(DateRange value)
     {
         if (!_ready) return;
@@ -388,6 +452,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     {
         if (!_ready) return;
 
+        RefreshAvailableAccounts();
         IsSpendingByCategoriesLoading = true;
         FetchExpensesByCategoryWithProviderAsync().SafeFireAndForget(logger: _logger, callerName: nameof(FetchExpensesByCategoryWithProviderAsync));
     }
@@ -402,6 +467,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     {
         if (!_ready) return;
 
+        RefreshAvailableAccounts();
         IsIncomeByCategoriesLoading = true;
         FetchIncomeByCategoryWithProviderAsync().SafeFireAndForget(logger: _logger, callerName: nameof(FetchIncomeByCategoryWithProviderAsync));
     }
