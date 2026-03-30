@@ -945,14 +945,14 @@
     <data name="Reports.SpendingByCategories.Categories" xml:space="preserve">
         <value>Categorías</value>
     </data>
-    <data name="Reports.IncomeByCategories.Title" xml:space="preserve">
-        <value>Ingresos por categorías</value>
+    <data name="Reports.ByCategories.Title" xml:space="preserve">
+        <value>Por categorías</value>
     </data>
-    <data name="Reports.IncomeByCategories.Accounts" xml:space="preserve">
-        <value>Cuentas</value>
+    <data name="Reports.ByCategories.Expenses" xml:space="preserve">
+        <value>Gastos</value>
     </data>
-    <data name="Reports.IncomeByCategories.Categories" xml:space="preserve">
-        <value>Categorías</value>
+    <data name="Reports.ByCategories.Income" xml:space="preserve">
+        <value>Ingresos</value>
     </data>
     <data name="Total" xml:space="preserve">
         <value>Total</value>
