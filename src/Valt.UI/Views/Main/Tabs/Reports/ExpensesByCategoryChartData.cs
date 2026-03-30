@@ -104,7 +104,7 @@ public class ExpensesByCategoryChartData : IDisposable, INotifyPropertyChanged
 
     private string FiatLabeler(double arg)
     {
-        return CurrencyDisplay.FormatFiat((decimal)arg, FiatCurrency.Code);
+        return CurrencyDisplay.FormatFiat(-(decimal)arg, FiatCurrency.Code);
     }
 
     public void RefreshChart(ExpensesByCategoryData expensesByCategoryData)
@@ -134,7 +134,7 @@ public class ExpensesByCategoryChartData : IDisposable, INotifyPropertyChanged
         // Create a single RowSeries with all values
         var values = sortedItems.Select(x => Convert.ToDouble(x.FiatTotal)).ToList();
         var total = values.Sum();
-        TotalText = CurrencyDisplay.FormatFiat((decimal)total, FiatCurrency.Code);
+        TotalText = CurrencyDisplay.FormatFiat(-(decimal)total, FiatCurrency.Code);
         var colors = sortedItems.Select(x =>
         {
             var iconColor = x.Icon.Color;
@@ -150,7 +150,7 @@ public class ExpensesByCategoryChartData : IDisposable, INotifyPropertyChanged
             DataLabelsFormatter = point =>
             {
                 var value = (decimal)point.Model;
-                return CurrencyDisplay.FormatFiat(value, FiatCurrency.Code);
+                return CurrencyDisplay.FormatFiat(-value, FiatCurrency.Code);
             },
             XToolTipLabelFormatter = point =>
             {
