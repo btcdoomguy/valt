@@ -372,20 +372,27 @@
                                     CornerRadius="4"
                                     Padding="10"
                                     IsVisible="{Binding !IsSpendingByCategoriesLoading}">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto"
-                                              HorizontalScrollBarVisibility="Disabled"
-                                              MaxHeight="600">
-                                    <avalonia:CartesianChart x:Name="CategoryBarChart"
-                                                             Background="{DynamicResource Background900Brush}"
-                                                             Height="{Binding ExpensesByCategoryChartData.ChartHeight}"
-                                                             Series="{Binding ExpensesByCategoryChartData.Series}"
-                                                             XAxes="{Binding ExpensesByCategoryChartData.XAxes}"
-                                                             YAxes="{Binding ExpensesByCategoryChartData.YAxes}"
-                                                             TooltipTextSize="12"
-                                                             ZoomMode="None"
-                                                             Margin="20, 10, 20, 10">
-                                    </avalonia:CartesianChart>
-                                </ScrollViewer>
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock Text="{Binding ExpensesByCategoryChartData.TotalText}"
+                                               FontSize="{DynamicResource FontSizeMedium}"
+                                               Foreground="{DynamicResource Text200Brush}"
+                                               HorizontalAlignment="Right"
+                                               Margin="0,0,20,0" />
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                                  HorizontalScrollBarVisibility="Disabled"
+                                                  MaxHeight="600">
+                                        <avalonia:CartesianChart x:Name="CategoryBarChart"
+                                                                 Background="{DynamicResource Background900Brush}"
+                                                                 Height="{Binding ExpensesByCategoryChartData.ChartHeight}"
+                                                                 Series="{Binding ExpensesByCategoryChartData.Series}"
+                                                                 XAxes="{Binding ExpensesByCategoryChartData.XAxes}"
+                                                                 YAxes="{Binding ExpensesByCategoryChartData.YAxes}"
+                                                                 TooltipTextSize="12"
+                                                                 ZoomMode="None"
+                                                                 Margin="20, 10, 20, 10">
+                                        </avalonia:CartesianChart>
+                                    </ScrollViewer>
+                                </StackPanel>
                             </Border>
                             <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -449,20 +456,27 @@
                                     CornerRadius="4"
                                     Padding="10"
                                     IsVisible="{Binding !IsIncomeByCategoriesLoading}">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto"
-                                              HorizontalScrollBarVisibility="Disabled"
-                                              MaxHeight="600">
-                                    <avalonia:CartesianChart x:Name="IncomeCategoryBarChart"
-                                                             Background="{DynamicResource Background900Brush}"
-                                                             Height="{Binding IncomeByCategoryChartData.ChartHeight}"
-                                                             Series="{Binding IncomeByCategoryChartData.Series}"
-                                                             XAxes="{Binding IncomeByCategoryChartData.XAxes}"
-                                                             YAxes="{Binding IncomeByCategoryChartData.YAxes}"
-                                                             TooltipTextSize="12"
-                                                             ZoomMode="None"
-                                                             Margin="20, 10, 20, 10">
-                                    </avalonia:CartesianChart>
-                                </ScrollViewer>
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock Text="{Binding IncomeByCategoryChartData.TotalText}"
+                                               FontSize="{DynamicResource FontSizeMedium}"
+                                               Foreground="{DynamicResource Text200Brush}"
+                                               HorizontalAlignment="Right"
+                                               Margin="0,0,20,0" />
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                                  HorizontalScrollBarVisibility="Disabled"
+                                                  MaxHeight="600">
+                                        <avalonia:CartesianChart x:Name="IncomeCategoryBarChart"
+                                                                 Background="{DynamicResource Background900Brush}"
+                                                                 Height="{Binding IncomeByCategoryChartData.ChartHeight}"
+                                                                 Series="{Binding IncomeByCategoryChartData.Series}"
+                                                                 XAxes="{Binding IncomeByCategoryChartData.XAxes}"
+                                                                 YAxes="{Binding IncomeByCategoryChartData.YAxes}"
+                                                                 TooltipTextSize="12"
+                                                                 ZoomMode="None"
+                                                                 Margin="20, 10, 20, 10">
+                                        </avalonia:CartesianChart>
+                                    </ScrollViewer>
+                                </StackPanel>
                             </Border>
                             <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"

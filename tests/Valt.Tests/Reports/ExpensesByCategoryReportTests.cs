@@ -197,10 +197,10 @@ public class ExpensesByCategoryReportTests : DatabaseTest
         Assert.That(result.MainCurrency, Is.EqualTo(FiatCurrency.Usd));
         Assert.That(result.Items.Count, Is.EqualTo(3));
 
-        // Food: $100 + $50 = $150 (the $20 income should be ignored)
+        // Food: $100 + $50 - $20 (refund) = $130 net expense
         var foodItem = result.Items.Single(x => x.CategoryId == _foodCategoryId);
         Assert.That(foodItem.CategoryName, Is.EqualTo("Food"));
-        Assert.That(foodItem.FiatTotal, Is.EqualTo(150m));
+        Assert.That(foodItem.FiatTotal, Is.EqualTo(130m));
 
         // Transport: 250 BRL / 5 (rate) = $50
         var transportItem = result.Items.Single(x => x.CategoryId == _transportCategoryId);
@@ -235,9 +235,9 @@ public class ExpensesByCategoryReportTests : DatabaseTest
 
         Assert.That(result.MainCurrency, Is.EqualTo(FiatCurrency.Brl));
 
-        // Food: $150 USD * 5 (BRL rate) = 750 BRL
+        // Food: $130 USD * 5 (BRL rate) = 650 BRL
         var foodItem = result.Items.Single(x => x.CategoryId == _foodCategoryId);
-        Assert.That(foodItem.FiatTotal, Is.EqualTo(750m));
+        Assert.That(foodItem.FiatTotal, Is.EqualTo(650m));
 
         // Transport: 250 BRL (account currency matches target, kept as-is)
         var transportItem = result.Items.Single(x => x.CategoryId == _transportCategoryId);
@@ -272,7 +272,7 @@ public class ExpensesByCategoryReportTests : DatabaseTest
         // Should only have Food category (USD account transactions)
         Assert.That(result.Items.Count, Is.EqualTo(1));
         var foodItem = result.Items.Single(x => x.CategoryId == _foodCategoryId);
-        Assert.That(foodItem.FiatTotal, Is.EqualTo(150m));
+        Assert.That(foodItem.FiatTotal, Is.EqualTo(130m));
     }
 
     [Test]
@@ -299,7 +299,7 @@ public class ExpensesByCategoryReportTests : DatabaseTest
         // Should only have Food category
         Assert.That(result.Items.Count, Is.EqualTo(1));
         var foodItem = result.Items.Single(x => x.CategoryId == _foodCategoryId);
-        Assert.That(foodItem.FiatTotal, Is.EqualTo(150m));
+        Assert.That(foodItem.FiatTotal, Is.EqualTo(130m));
     }
 
     [Test]
@@ -322,9 +322,9 @@ public class ExpensesByCategoryReportTests : DatabaseTest
             filter,
             provider);
 
-        // Food: $150 (Jan) + $200 (Feb) = $350
+        // Food: $130 (Jan net) + $200 (Feb) = $330
         var foodItem = result.Items.Single(x => x.CategoryId == _foodCategoryId);
-        Assert.That(foodItem.FiatTotal, Is.EqualTo(350m));
+        Assert.That(foodItem.FiatTotal, Is.EqualTo(330m));
 
         // Transport: $50 (Jan) + $20 (Feb from 100 BRL) = $70
         var transportItem = result.Items.Single(x => x.CategoryId == _transportCategoryId);
@@ -361,7 +361,7 @@ public class ExpensesByCategoryReportTests : DatabaseTest
     }
 
     [Test]
-    public async Task Should_Only_Include_Expenses_Not_Income()
+    public async Task Should_Show_Net_Expense_After_Offsetting_Income()
     {
         var baseDate = new DateOnly(2025, 01, 31);
         var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
@@ -380,9 +380,9 @@ public class ExpensesByCategoryReportTests : DatabaseTest
             filter,
             provider);
 
-        // Food: $100 + $50 = $150 (the $20 refund/income is NOT included)
+        // Food: $100 + $50 - $20 (refund) = $130 net expense
         var foodItem = result.Items.Single(x => x.CategoryId == _foodCategoryId);
-        Assert.That(foodItem.FiatTotal, Is.EqualTo(150m));
+        Assert.That(foodItem.FiatTotal, Is.EqualTo(130m));
     }
 
     [Test]
@@ -453,7 +453,7 @@ public class ExpensesByCategoryReportTests : DatabaseTest
         var emptyFoodItem = resultWithEmptyFilter.Items.Single(x => x.CategoryId == _foodCategoryId);
         var fullFoodItem = resultWithFullFilter.Items.Single(x => x.CategoryId == _foodCategoryId);
         Assert.That(emptyFoodItem.FiatTotal, Is.EqualTo(fullFoodItem.FiatTotal));
-        Assert.That(emptyFoodItem.FiatTotal, Is.EqualTo(150m));
+        Assert.That(emptyFoodItem.FiatTotal, Is.EqualTo(130m));
 
         var emptyTransportItem = resultWithEmptyFilter.Items.Single(x => x.CategoryId == _transportCategoryId);
         var fullTransportItem = resultWithFullFilter.Items.Single(x => x.CategoryId == _transportCategoryId);

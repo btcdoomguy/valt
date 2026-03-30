@@ -36,6 +36,20 @@ public class ExpensesByCategoryChartData : IDisposable, INotifyPropertyChanged
         }
     }
 
+    private string _totalText = string.Empty;
+    public string TotalText
+    {
+        get => _totalText;
+        private set
+        {
+            if (_totalText != value)
+            {
+                _totalText = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -99,6 +113,7 @@ public class ExpensesByCategoryChartData : IDisposable, INotifyPropertyChanged
         DisposeSeries();
         Series.Clear();
         CategoryLabels.Clear();
+        TotalText = string.Empty;
 
         FiatCurrency = expensesByCategoryData.MainCurrency;
 
@@ -119,6 +134,7 @@ public class ExpensesByCategoryChartData : IDisposable, INotifyPropertyChanged
         // Create a single RowSeries with all values
         var values = sortedItems.Select(x => Convert.ToDouble(x.FiatTotal)).ToList();
         var total = values.Sum();
+        TotalText = CurrencyDisplay.FormatFiat((decimal)total, FiatCurrency.Code);
         var colors = sortedItems.Select(x =>
         {
             var iconColor = x.Icon.Color;
