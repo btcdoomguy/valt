@@ -953,6 +953,9 @@
     <data name="Reports.ByCategories.Title" xml:space="preserve">
         <value>By categories</value>
     </data>
+    <data name="Reports.ByCategories.Filters" xml:space="preserve">
+        <value>Filters</value>
+    </data>
     <data name="Reports.ByCategories.Expenses" xml:space="preserve">
         <value>Expenses</value>
     </data>

@@ -1905,6 +1905,12 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string Reports_ByCategories_Filters {
+            get {
+                return ResourceManager.GetString("Reports.ByCategories.Filters", resourceCulture);
+            }
+        }
+
         public static string Reports_ByCategories_Expenses {
             get {
                 return ResourceManager.GetString("Reports.ByCategories.Expenses", resourceCulture);
