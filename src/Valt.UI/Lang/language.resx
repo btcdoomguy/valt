@@ -950,14 +950,17 @@
     <data name="Reports.SpendingByCategories.Categories" xml:space="preserve">
         <value>Categories</value>
     </data>
-    <data name="Reports.IncomeByCategories.Title" xml:space="preserve">
-        <value>Income by categories</value>
+    <data name="Reports.ByCategories.Title" xml:space="preserve">
+        <value>By categories</value>
     </data>
-    <data name="Reports.IncomeByCategories.Accounts" xml:space="preserve">
-        <value>Accounts</value>
+    <data name="Reports.ByCategories.Filters" xml:space="preserve">
+        <value>Filters</value>
     </data>
-    <data name="Reports.IncomeByCategories.Categories" xml:space="preserve">
-        <value>Categories</value>
+    <data name="Reports.ByCategories.Expenses" xml:space="preserve">
+        <value>Expenses</value>
+    </data>
+    <data name="Reports.ByCategories.Income" xml:space="preserve">
+        <value>Income</value>
     </data>
     <data name="Total" xml:space="preserve">
         <value>Total</value>

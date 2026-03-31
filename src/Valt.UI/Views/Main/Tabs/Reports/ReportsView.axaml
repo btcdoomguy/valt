@@ -25,7 +25,7 @@
         <converters:WealthOverviewPeriodConverter x:Key="WealthOverviewPeriodConverter" />
     </UserControl.Resources>
     <Grid>
-        <ScrollViewer IsVisible="{Binding !IsSecureModeEnabled}">
+        <ScrollViewer IsVisible="{Binding !IsSecureModeEnabled}" Margin="0, 8, 0, 0">
         <StackPanel Margin="16">
             <!--Summary-->
             <Expander Classes="section" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsExpanded="True">
@@ -322,7 +322,7 @@
                 <Expander.Header>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Classes="section-header-icon" Text="&#xE24B;" />
-                        <TextBlock Classes="section-header" Text="{x:Static lang:language.Reports_SpendingByCategories_Title}" />
+                        <TextBlock Classes="section-header" Text="{x:Static lang:language.Reports_ByCategories_Title}" />
                     </StackPanel>
                 </Expander.Header>
                 <StackPanel Orientation="Vertical">
@@ -337,137 +337,132 @@
                         </userControls:DateCalendarSelector.AllowedSelectorModes>
                     </userControls:DateCalendarSelector>
                     <Grid ColumnDefinitions="300, *" MinHeight="600">
-                        <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="10" Margin="0, -36, 10, 0">
-                            <Button x:Name="ExpensesCategoryFilterButton"
-                                    Classes="transparent" Padding="2" HorizontalAlignment="Left"
-                                    Click="OnFilterSettingsButtonClick">
-                                <Button.ContextMenu>
-                                    <ContextMenu>
-                                        <MenuItem Header="{x:Static lang:language.Reports_CategoryFilter_SaveAsDefault}"
-                                                  Command="{Binding SaveExpensesCategoryFilterCommand}" />
-                                        <MenuItem Header="{x:Static lang:language.Reports_CategoryFilter_LoadDefault}"
-                                                  Command="{Binding LoadExpensesCategoryFilterCommand}" />
-                                    </ContextMenu>
-                                </Button.ContextMenu>
-                                <TextBlock FontFamily="{DynamicResource MaterialDesign}" Text="&#xE8B8;" FontSize="16"
-                                           Foreground="{DynamicResource Text300Brush}" />
-                            </Button>
-                            <userControls:CheckboxListSelector
-                                Title="{x:Static lang:language.Reports_SpendingByCategories_Accounts}"
-                                DisplayMemberPath="Name"
-                                MaxListHeight="200"
-                                ItemsSource="{Binding AvailableAccounts}"
-                                SelectedItems="{Binding SelectedAccounts}" />
-                            <userControls:CheckboxListSelector
-                                Title="{x:Static lang:language.Reports_SpendingByCategories_Categories}"
-                                DisplayMemberPath="Name"
-                                MaxListHeight="300"
-                                ItemsSource="{Binding AvailableCategories}"
-                                SelectedItems="{Binding SelectedCategories}" />
+                        <Border Grid.Column="0"
+                                Background="{DynamicResource Background900Brush}"
+                                BorderBrush="{DynamicResource Background700Brush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="10"
+                                Margin="0, 0, 10, 0">
+                            <StackPanel Orientation="Vertical" Spacing="10">
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <TextBlock Grid.Column="0"
+                                               Text="{x:Static lang:language.Reports_ByCategories_Filters}"
+                                               FontSize="{DynamicResource FontSizeMedium}"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center" />
+                                    <Button x:Name="ExpensesCategoryFilterButton"
+                                            Grid.Column="1"
+                                            Classes="transparent" Padding="2" HorizontalAlignment="Right"
+                                            Click="OnFilterSettingsButtonClick">
+                                        <Button.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="{x:Static lang:language.Reports_CategoryFilter_SaveAsDefault}"
+                                                          Command="{Binding SaveExpensesCategoryFilterCommand}" />
+                                                <MenuItem Header="{x:Static lang:language.Reports_CategoryFilter_LoadDefault}"
+                                                          Command="{Binding LoadExpensesCategoryFilterCommand}" />
+                                            </ContextMenu>
+                                        </Button.ContextMenu>
+                                        <TextBlock FontFamily="{DynamicResource MaterialDesign}" Text="&#xE8B8;" FontSize="16"
+                                                   Foreground="{DynamicResource Text300Brush}" />
+                                    </Button>
+                                </Grid>
+                                <userControls:CheckboxListSelector
+                                    Title="{x:Static lang:language.Reports_SpendingByCategories_Accounts}"
+                                    DisplayMemberPath="Name"
+                                    MaxListHeight="280"
+                                    ItemsSource="{Binding AvailableAccounts}"
+                                    SelectedItems="{Binding SelectedAccounts}" />
+                                <userControls:CheckboxListSelector
+                                    Title="{x:Static lang:language.Reports_SpendingByCategories_Categories}"
+                                    DisplayMemberPath="Name"
+                                    MaxListHeight="300"
+                                    ItemsSource="{Binding AvailableCategories}"
+                                    SelectedItems="{Binding SelectedCategories}" />
+                            </StackPanel>
+                        </Border>
+                        <StackPanel Grid.Column="1" Orientation="Vertical" Spacing="20">
+                            <!--Expenses chart-->
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="{x:Static lang:language.Reports_ByCategories_Expenses}"
+                                           FontSize="{DynamicResource FontSizeLarge}"
+                                           Foreground="{DynamicResource Text200Brush}"
+                                           Margin="0,0,0,8" />
+                                <Panel>
+                                    <Border Background="{DynamicResource Background900Brush}"
+                                            BorderBrush="{DynamicResource Background700Brush}"
+                                            BorderThickness="1"
+                                            CornerRadius="4"
+                                            Padding="10"
+                                            IsVisible="{Binding !IsSpendingByCategoriesLoading}">
+                                        <StackPanel Orientation="Vertical">
+                                            <TextBlock Text="{Binding ExpensesByCategoryChartData.TotalText}"
+                                                       FontSize="{DynamicResource FontSizeMedium}"
+                                                       Foreground="{DynamicResource Text200Brush}"
+                                                       HorizontalAlignment="Right"
+                                                       Margin="0,0,20,0" />
+                                            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                                          HorizontalScrollBarVisibility="Disabled"
+                                                          MaxHeight="600">
+                                                <avalonia:CartesianChart x:Name="CategoryBarChart"
+                                                                         Background="{DynamicResource Background900Brush}"
+                                                                         Height="{Binding ExpensesByCategoryChartData.ChartHeight}"
+                                                                         Series="{Binding ExpensesByCategoryChartData.Series}"
+                                                                         XAxes="{Binding ExpensesByCategoryChartData.XAxes}"
+                                                                         YAxes="{Binding ExpensesByCategoryChartData.YAxes}"
+                                                                         TooltipTextSize="12"
+                                                                         ZoomMode="None"
+                                                                         Margin="20, 10, 20, 10">
+                                                </avalonia:CartesianChart>
+                                            </ScrollViewer>
+                                        </StackPanel>
+                                    </Border>
+                                    <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                                               IsVisible="{Binding IsSpendingByCategoriesLoading}" />
+                                </Panel>
+                            </StackPanel>
+                            <!--Income chart-->
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="{x:Static lang:language.Reports_ByCategories_Income}"
+                                           FontSize="{DynamicResource FontSizeLarge}"
+                                           Foreground="{DynamicResource Text200Brush}"
+                                           Margin="0,0,0,8" />
+                                <Panel>
+                                    <Border Background="{DynamicResource Background900Brush}"
+                                            BorderBrush="{DynamicResource Background700Brush}"
+                                            BorderThickness="1"
+                                            CornerRadius="4"
+                                            Padding="10"
+                                            IsVisible="{Binding !IsIncomeByCategoriesLoading}">
+                                        <StackPanel Orientation="Vertical">
+                                            <TextBlock Text="{Binding IncomeByCategoryChartData.TotalText}"
+                                                       FontSize="{DynamicResource FontSizeMedium}"
+                                                       Foreground="{DynamicResource Text200Brush}"
+                                                       HorizontalAlignment="Right"
+                                                       Margin="0,0,20,0" />
+                                            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                                          HorizontalScrollBarVisibility="Disabled"
+                                                          MaxHeight="600">
+                                                <avalonia:CartesianChart x:Name="IncomeCategoryBarChart"
+                                                                         Background="{DynamicResource Background900Brush}"
+                                                                         Height="{Binding IncomeByCategoryChartData.ChartHeight}"
+                                                                         Series="{Binding IncomeByCategoryChartData.Series}"
+                                                                         XAxes="{Binding IncomeByCategoryChartData.XAxes}"
+                                                                         YAxes="{Binding IncomeByCategoryChartData.YAxes}"
+                                                                         TooltipTextSize="12"
+                                                                         ZoomMode="None"
+                                                                         Margin="20, 10, 20, 10">
+                                                </avalonia:CartesianChart>
+                                            </ScrollViewer>
+                                        </StackPanel>
+                                    </Border>
+                                    <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                                               IsVisible="{Binding IsIncomeByCategoriesLoading}" />
+                                </Panel>
+                            </StackPanel>
                         </StackPanel>
-                        <Panel Grid.Column="1">
-                            <Border Background="{DynamicResource Background900Brush}"
-                                    BorderBrush="{DynamicResource Background700Brush}"
-                                    BorderThickness="1"
-                                    CornerRadius="4"
-                                    Padding="10"
-                                    IsVisible="{Binding !IsSpendingByCategoriesLoading}">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto"
-                                              HorizontalScrollBarVisibility="Disabled"
-                                              MaxHeight="600">
-                                    <avalonia:CartesianChart x:Name="CategoryBarChart"
-                                                             Background="{DynamicResource Background900Brush}"
-                                                             Height="{Binding ExpensesByCategoryChartData.ChartHeight}"
-                                                             Series="{Binding ExpensesByCategoryChartData.Series}"
-                                                             XAxes="{Binding ExpensesByCategoryChartData.XAxes}"
-                                                             YAxes="{Binding ExpensesByCategoryChartData.YAxes}"
-                                                             TooltipTextSize="12"
-                                                             ZoomMode="None"
-                                                             Margin="20, 10, 20, 10">
-                                    </avalonia:CartesianChart>
-                                </ScrollViewer>
-                            </Border>
-                            <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center"
-                                       IsVisible="{Binding IsSpendingByCategoriesLoading}" />
-                        </Panel>
-                    </Grid>
-                </StackPanel>
-            </Expander>
-            <!--Income by Categories-->
-            <Expander Classes="section" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsExpanded="True">
-                <Expander.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Classes="section-header-icon" Text="&#xE24B;" />
-                        <TextBlock Classes="section-header" Text="{x:Static lang:language.Reports_IncomeByCategories_Title}" />
-                    </StackPanel>
-                </Expander.Header>
-                <StackPanel Orientation="Vertical">
-                    <userControls:DateCalendarSelector HorizontalContentAlignment="Center"
-                                                       Height="60"
-                                                       Date="{Binding IncomeCategoryFilterMainDate}"
-                                                       Range="{Binding IncomeCategoryFilterRange}">
-                        <userControls:DateCalendarSelector.AllowedSelectorModes>
-                            <userControls:DateCalendarSelectorMode>Month</userControls:DateCalendarSelectorMode>
-                            <userControls:DateCalendarSelectorMode>Year</userControls:DateCalendarSelectorMode>
-                            <userControls:DateCalendarSelectorMode>All</userControls:DateCalendarSelectorMode>
-                        </userControls:DateCalendarSelector.AllowedSelectorModes>
-                    </userControls:DateCalendarSelector>
-                    <Grid ColumnDefinitions="300, *" MinHeight="600">
-                        <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="10" Margin="0, -36, 10, 0">
-                            <Button x:Name="IncomeCategoryFilterButton"
-                                    Classes="transparent" Padding="2" HorizontalAlignment="Left"
-                                    Click="OnFilterSettingsButtonClick">
-                                <Button.ContextMenu>
-                                    <ContextMenu>
-                                        <MenuItem Header="{x:Static lang:language.Reports_CategoryFilter_SaveAsDefault}"
-                                                  Command="{Binding SaveIncomeCategoryFilterCommand}" />
-                                        <MenuItem Header="{x:Static lang:language.Reports_CategoryFilter_LoadDefault}"
-                                                  Command="{Binding LoadIncomeCategoryFilterCommand}" />
-                                    </ContextMenu>
-                                </Button.ContextMenu>
-                                <TextBlock FontFamily="{DynamicResource MaterialDesign}" Text="&#xE8B8;" FontSize="16"
-                                           Foreground="{DynamicResource Text300Brush}" />
-                            </Button>
-                            <userControls:CheckboxListSelector
-                                Title="{x:Static lang:language.Reports_IncomeByCategories_Accounts}"
-                                DisplayMemberPath="Name"
-                                MaxListHeight="200"
-                                ItemsSource="{Binding AvailableAccounts}"
-                                SelectedItems="{Binding IncomeSelectedAccounts}" />
-                            <userControls:CheckboxListSelector
-                                Title="{x:Static lang:language.Reports_IncomeByCategories_Categories}"
-                                DisplayMemberPath="Name"
-                                MaxListHeight="300"
-                                ItemsSource="{Binding AvailableCategories}"
-                                SelectedItems="{Binding IncomeSelectedCategories}" />
-                        </StackPanel>
-                        <Panel Grid.Column="1">
-                            <Border Background="{DynamicResource Background900Brush}"
-                                    BorderBrush="{DynamicResource Background700Brush}"
-                                    BorderThickness="1"
-                                    CornerRadius="4"
-                                    Padding="10"
-                                    IsVisible="{Binding !IsIncomeByCategoriesLoading}">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto"
-                                              HorizontalScrollBarVisibility="Disabled"
-                                              MaxHeight="600">
-                                    <avalonia:CartesianChart x:Name="IncomeCategoryBarChart"
-                                                             Background="{DynamicResource Background900Brush}"
-                                                             Height="{Binding IncomeByCategoryChartData.ChartHeight}"
-                                                             Series="{Binding IncomeByCategoryChartData.Series}"
-                                                             XAxes="{Binding IncomeByCategoryChartData.XAxes}"
-                                                             YAxes="{Binding IncomeByCategoryChartData.YAxes}"
-                                                             TooltipTextSize="12"
-                                                             ZoomMode="None"
-                                                             Margin="20, 10, 20, 10">
-                                    </avalonia:CartesianChart>
-                                </ScrollViewer>
-                            </Border>
-                            <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center"
-                                       IsVisible="{Binding IsIncomeByCategoriesLoading}" />
-                        </Panel>
                     </Grid>
                 </StackPanel>
             </Expander>

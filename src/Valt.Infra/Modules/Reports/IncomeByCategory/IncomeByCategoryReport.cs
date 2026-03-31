@@ -103,10 +103,6 @@ internal class IncomeByCategoryReport : IIncomeByCategoryReport
 
                         if (account.AccountEntityType == AccountEntityType.Bitcoin)
                         {
-                            //only income (positive amounts)
-                            if (transaction.FromSatAmount < 0)
-                                continue;
-
                             if (!categoryFiatTotals.ContainsKey(transaction.CategoryId))
                                 categoryFiatTotals[transaction.CategoryId] = 0;
 
@@ -118,10 +114,6 @@ internal class IncomeByCategoryReport : IIncomeByCategoryReport
                         }
                         else
                         {
-                            //only income (positive amounts)
-                            if (transaction.FromFiatAmount < 0)
-                                continue;
-
                             if (!categoryFiatTotals.ContainsKey(transaction.CategoryId))
                                 categoryFiatTotals[transaction.CategoryId] = 0;
 
@@ -150,7 +142,7 @@ internal class IncomeByCategoryReport : IIncomeByCategoryReport
             return new IncomeByCategoryData()
             {
                 MainCurrency = _currency,
-                Items = categoryFiatTotals.Select(x => new IncomeByCategoryData.Item()
+                Items = categoryFiatTotals.Where(x => x.Value > 0).Select(x => new IncomeByCategoryData.Item()
                 {
                     CategoryId = new CategoryId(x.Key.ToString()),
                     Icon = Icon.RestoreFromId(_provider.Categories[x.Key].Icon!),

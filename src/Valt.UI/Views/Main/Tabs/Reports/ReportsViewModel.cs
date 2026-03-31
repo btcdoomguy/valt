@@ -121,13 +121,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
     // Income by category
     [ObservableProperty] private IncomeByCategoryChartData _incomeByCategoryChartData = new();
-    [ObservableProperty] private DateTime _incomeCategoryFilterMainDate;
-    [ObservableProperty] private DateRange _incomeCategoryFilterRange = new(DateTime.MinValue, DateTime.MinValue);
-    [ObservableProperty] private AvaloniaList<SelectItem> _incomeSelectedAccounts = new();
-    [ObservableProperty] private AvaloniaList<SelectItem> _incomeSelectedCategories = new();
 
     private CancellationTokenSource? _filterDebounceTokenSource;
-    private CancellationTokenSource? _incomeFilterDebounceTokenSource;
     private const int FilterDebounceDelayMs = 300;
 
     private bool _ready;
@@ -174,18 +169,15 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         _secureModeState.PropertyChanged += OnSecureModeStatePropertyChanged;
 
-        FilterMainDate = CategoryFilterMainDate = IncomeCategoryFilterMainDate = _clock.GetCurrentDateTimeUtc();
+        FilterMainDate = CategoryFilterMainDate = _clock.GetCurrentDateTimeUtc();
         FilterRange = new DateRange(new DateTime(FilterMainDate.Year, 1, 1), new DateTime(FilterMainDate.Year, 12, 31));
         var currentMonth = new DateTime(CategoryFilterMainDate.Year, CategoryFilterMainDate.Month, 1);
         CategoryFilterRange = new DateRange(currentMonth, currentMonth.AddMonths(1).AddDays(-1));
-        IncomeCategoryFilterRange = new DateRange(currentMonth, currentMonth.AddMonths(1).AddDays(-1));
 
         PrepareAccountsAndCategoriesList();
 
         SelectedAccounts.CollectionChanged += OnSelectedFiltersChanged;
         SelectedCategories.CollectionChanged += OnSelectedFiltersChanged;
-        IncomeSelectedAccounts.CollectionChanged += OnIncomeSelectedFiltersChanged;
-        IncomeSelectedCategories.CollectionChanged += OnIncomeSelectedFiltersChanged;
 
         WeakReferenceMessenger.Default.Register<SettingsChangedMessage>(this, (recipient, message) =>
         {
@@ -325,15 +317,11 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         SelectedAccounts.Clear();
         AvailableCategories.Clear();
         SelectedCategories.Clear();
-        IncomeSelectedAccounts.Clear();
-        IncomeSelectedCategories.Clear();
 
-        var accounts = _localDatabase.GetAccounts().FindAll().OrderByDescending(x => x.Visible).ThenBy(x => x.DisplayOrder)
-            .Select(x => new SelectItem(x.Id.ToString(), x.Name));
+        var accounts = GetFilterableAccounts();
 
         AvailableAccounts.AddRange(accounts);
         SelectedAccounts.AddRange(AvailableAccounts);
-        IncomeSelectedAccounts.AddRange(AvailableAccounts);
 
         var categories = _localDatabase.GetCategories().FindAll().ToDictionary(x => x.Id.ToString());
 
@@ -349,7 +337,6 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         AvailableCategories.AddRange(parsedCategories.OrderBy(x => x.Name));
         SelectedCategories.AddRange(AvailableCategories);
-        IncomeSelectedCategories.AddRange(AvailableCategories);
 
         // Apply saved expense category filter
         var expenseExcluded = _configurationManager.GetExpensesCategoryFilterExcludedIds().ToHashSet();
@@ -359,14 +346,58 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             foreach (var item in toRemove)
                 SelectedCategories.Remove(item);
         }
+    }
 
-        // Apply saved income category filter
-        var incomeExcluded = _configurationManager.GetIncomeCategoryFilterExcludedIds().ToHashSet();
-        if (incomeExcluded.Count > 0)
+    private IEnumerable<SelectItem> GetFilterableAccounts()
+    {
+        var allAccounts = _localDatabase.GetAccounts().FindAll().ToList();
+
+        var hiddenAccountIds = allAccounts
+            .Where(x => !x.Visible)
+            .Select(x => x.Id)
+            .ToHashSet();
+
+        var hiddenAccountIdsWithTransactions = new HashSet<LiteDB.ObjectId>();
+        if (hiddenAccountIds.Count > 0)
         {
-            var toRemove = IncomeSelectedCategories.Where(c => incomeExcluded.Contains(c.Id)).ToList();
-            foreach (var item in toRemove)
-                IncomeSelectedCategories.Remove(item);
+            var transactions = _localDatabase.GetTransactions()
+                .Find(t => t.Date >= CategoryFilterRange.Start && t.Date <= CategoryFilterRange.End);
+
+            foreach (var t in transactions)
+            {
+                if (hiddenAccountIds.Contains(t.FromAccountId))
+                    hiddenAccountIdsWithTransactions.Add(t.FromAccountId);
+                if (t.ToAccountId is not null && hiddenAccountIds.Contains(t.ToAccountId))
+                    hiddenAccountIdsWithTransactions.Add(t.ToAccountId);
+            }
+        }
+
+        return allAccounts
+            .Where(x => x.Visible || hiddenAccountIdsWithTransactions.Contains(x.Id))
+            .OrderByDescending(x => x.Visible)
+            .ThenBy(x => x.DisplayOrder)
+            .Select(x => new SelectItem(x.Id.ToString(), x.Name));
+    }
+
+    private void RefreshAvailableAccounts()
+    {
+        var previousSelectedIds = SelectedAccounts.Select(x => x.Id).ToHashSet();
+
+        SelectedAccounts.CollectionChanged -= OnSelectedFiltersChanged;
+
+        try
+        {
+            var accounts = GetFilterableAccounts().ToList();
+
+            AvailableAccounts.Clear();
+            SelectedAccounts.Clear();
+
+            AvailableAccounts.AddRange(accounts);
+            SelectedAccounts.AddRange(accounts.Where(a => previousSelectedIds.Contains(a.Id)));
+        }
+        finally
+        {
+            SelectedAccounts.CollectionChanged += OnSelectedFiltersChanged;
         }
     }
 
@@ -388,28 +419,18 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     {
         if (!_ready) return;
 
+        RefreshAvailableAccounts();
         IsSpendingByCategoriesLoading = true;
-        FetchExpensesByCategoryWithProviderAsync().SafeFireAndForget(logger: _logger, callerName: nameof(FetchExpensesByCategoryWithProviderAsync));
-    }
-
-    private async Task FetchExpensesByCategoryWithProviderAsync()
-    {
-        var provider = await GetOrCreateProviderAsync();
-        await FetchExpensesByCategoryAsync(provider);
-    }
-
-    partial void OnIncomeCategoryFilterRangeChanged(DateRange value)
-    {
-        if (!_ready) return;
-
         IsIncomeByCategoriesLoading = true;
-        FetchIncomeByCategoryWithProviderAsync().SafeFireAndForget(logger: _logger, callerName: nameof(FetchIncomeByCategoryWithProviderAsync));
+        FetchCategoriesWithProviderAsync().SafeFireAndForget(logger: _logger, callerName: nameof(FetchCategoriesWithProviderAsync));
     }
 
-    private async Task FetchIncomeByCategoryWithProviderAsync()
+    private async Task FetchCategoriesWithProviderAsync()
     {
         var provider = await GetOrCreateProviderAsync();
-        await FetchIncomeByCategoryAsync(provider);
+        await Task.WhenAll(
+            FetchExpensesByCategoryAsync(provider),
+            FetchIncomeByCategoryAsync(provider));
     }
 
     private void OnSelectedFiltersChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -421,42 +442,19 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _filterDebounceTokenSource = new CancellationTokenSource();
 
         IsSpendingByCategoriesLoading = true;
-        DebouncedFetchExpensesByCategoryAsync(_filterDebounceTokenSource.Token).SafeFireAndForget(logger: _logger, callerName: nameof(DebouncedFetchExpensesByCategoryAsync));
-    }
-
-    private async Task DebouncedFetchExpensesByCategoryAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            await Task.Delay(FilterDebounceDelayMs, cancellationToken);
-            var provider = await GetOrCreateProviderAsync();
-            await FetchExpensesByCategoryAsync(provider);
-        }
-        catch (TaskCanceledException)
-        {
-            // Debounce cancelled, ignore
-        }
-    }
-
-    private void OnIncomeSelectedFiltersChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        if (!_ready) return;
-
-        // Cancel any pending debounced fetch
-        _incomeFilterDebounceTokenSource?.Cancel();
-        _incomeFilterDebounceTokenSource = new CancellationTokenSource();
-
         IsIncomeByCategoriesLoading = true;
-        DebouncedFetchIncomeByCategoryAsync(_incomeFilterDebounceTokenSource.Token).SafeFireAndForget(logger: _logger, callerName: nameof(DebouncedFetchIncomeByCategoryAsync));
+        DebouncedFetchCategoriesAsync(_filterDebounceTokenSource.Token).SafeFireAndForget(logger: _logger, callerName: nameof(DebouncedFetchCategoriesAsync));
     }
 
-    private async Task DebouncedFetchIncomeByCategoryAsync(CancellationToken cancellationToken)
+    private async Task DebouncedFetchCategoriesAsync(CancellationToken cancellationToken)
     {
         try
         {
             await Task.Delay(FilterDebounceDelayMs, cancellationToken);
             var provider = await GetOrCreateProviderAsync();
-            await FetchIncomeByCategoryAsync(provider);
+            await Task.WhenAll(
+                FetchExpensesByCategoryAsync(provider),
+                FetchIncomeByCategoryAsync(provider));
         }
         catch (TaskCanceledException)
         {
@@ -502,46 +500,6 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         var newSelection = AvailableCategories.Where(c => !excludedIds.Contains(c.Id)).ToList();
         SelectedCategories.Clear();
         SelectedCategories.AddRange(newSelection);
-    }
-
-    [RelayCommand]
-    private async Task SaveIncomeCategoryFilter()
-    {
-        var ownerWindow = GetUserControlOwnerWindow?.Invoke();
-        if (ownerWindow is null) return;
-
-        var confirmed = await MessageBoxHelper.ShowQuestionAsync(
-            language.Reports_CategoryFilter_SaveConfirmTitle,
-            language.Reports_CategoryFilter_SaveConfirmMessage,
-            ownerWindow);
-
-        if (!confirmed) return;
-
-        var selectedIds = IncomeSelectedCategories.Select(c => c.Id).ToHashSet();
-        var excludedIds = AvailableCategories.Where(c => !selectedIds.Contains(c.Id)).Select(c => c.Id);
-        _configurationManager.SetIncomeCategoryFilterExcludedIds(excludedIds);
-
-        await MessageBoxHelper.ShowAlertAsync(
-            language.Reports_CategoryFilter_SaveConfirmTitle,
-            language.Reports_CategoryFilter_SaveSuccess,
-            ownerWindow);
-    }
-
-    [RelayCommand]
-    private void LoadIncomeCategoryFilter()
-    {
-        var excludedIds = _configurationManager.GetIncomeCategoryFilterExcludedIds().ToHashSet();
-        if (excludedIds.Count == 0)
-        {
-            // No saved filter — select all
-            IncomeSelectedCategories.Clear();
-            IncomeSelectedCategories.AddRange(AvailableCategories);
-            return;
-        }
-
-        var newSelection = AvailableCategories.Where(c => !excludedIds.Contains(c.Id)).ToList();
-        IncomeSelectedCategories.Clear();
-        IncomeSelectedCategories.AddRange(newSelection);
     }
 
     private async Task FetchAllTimeHighDataAsync(IReportDataProvider provider)
@@ -1081,13 +1039,13 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         try
         {
             var filter = new IIncomeByCategoryReport.Filter(
-                IncomeSelectedAccounts.Select(x => new AccountId(x.Id.ToString())).ToList(),
-                IncomeSelectedCategories.Select(x => new CategoryId(x.Id.ToString())).ToList());
+                SelectedAccounts.Select(x => new AccountId(x.Id.ToString())).ToList(),
+                SelectedCategories.Select(x => new CategoryId(x.Id.ToString())).ToList());
 
             var incomeByCategoryData = await _incomeByCategoryReport.GetAsync(
-                DateOnly.FromDateTime(IncomeCategoryFilterMainDate),
-                new DateOnlyRange(DateOnly.FromDateTime(IncomeCategoryFilterRange.Start),
-                    DateOnly.FromDateTime(IncomeCategoryFilterRange.End)),
+                DateOnly.FromDateTime(CategoryFilterMainDate),
+                new DateOnlyRange(DateOnly.FromDateTime(CategoryFilterRange.Start),
+                    DateOnly.FromDateTime(CategoryFilterRange.End)),
                 FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency),
                 filter,
                 provider);
@@ -1278,13 +1236,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     {
         _filterDebounceTokenSource?.Cancel();
         _filterDebounceTokenSource?.Dispose();
-        _incomeFilterDebounceTokenSource?.Cancel();
-        _incomeFilterDebounceTokenSource?.Dispose();
 
         SelectedAccounts.CollectionChanged -= OnSelectedFiltersChanged;
         SelectedCategories.CollectionChanged -= OnSelectedFiltersChanged;
-        IncomeSelectedAccounts.CollectionChanged -= OnIncomeSelectedFiltersChanged;
-        IncomeSelectedCategories.CollectionChanged -= OnIncomeSelectedFiltersChanged;
 
         // Unsubscribe from PropertyChanged events
         _secureModeState.PropertyChanged -= OnSecureModeStatePropertyChanged;

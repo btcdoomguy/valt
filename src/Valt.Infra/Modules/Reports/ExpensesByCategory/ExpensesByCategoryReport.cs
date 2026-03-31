@@ -103,10 +103,6 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
 
                         if (account.AccountEntityType == AccountEntityType.Bitcoin)
                         {
-                            //only spending
-                            if (transaction.FromSatAmount > 0)
-                                continue;
-
                             if (!categoryFiatTotals.ContainsKey(transaction.CategoryId))
                                 categoryFiatTotals[transaction.CategoryId] = 0;
 
@@ -118,10 +114,6 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
                         }
                         else
                         {
-                            //only spending
-                            if (transaction.FromFiatAmount > 0)
-                                continue;
-
                             if (!categoryFiatTotals.ContainsKey(transaction.CategoryId))
                                 categoryFiatTotals[transaction.CategoryId] = 0;
 
@@ -150,7 +142,7 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
             return new ExpensesByCategoryData()
             {
                 MainCurrency = _currency,
-                Items = categoryFiatTotals.Select(x => new ExpensesByCategoryData.Item()
+                Items = categoryFiatTotals.Where(x => x.Value < 0).Select(x => new ExpensesByCategoryData.Item()
                 {
                     CategoryId = new CategoryId(x.Key.ToString()),
                     Icon = Icon.RestoreFromId(_provider.Categories[x.Key].Icon!),

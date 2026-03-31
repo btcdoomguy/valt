@@ -1899,21 +1899,27 @@ namespace Valt.UI.Lang {
             }
         }
         
-        public static string Reports_IncomeByCategories_Title {
+        public static string Reports_ByCategories_Title {
             get {
-                return ResourceManager.GetString("Reports.IncomeByCategories.Title", resourceCulture);
+                return ResourceManager.GetString("Reports.ByCategories.Title", resourceCulture);
             }
         }
-        
-        public static string Reports_IncomeByCategories_Accounts {
+
+        public static string Reports_ByCategories_Filters {
             get {
-                return ResourceManager.GetString("Reports.IncomeByCategories.Accounts", resourceCulture);
+                return ResourceManager.GetString("Reports.ByCategories.Filters", resourceCulture);
             }
         }
-        
-        public static string Reports_IncomeByCategories_Categories {
+
+        public static string Reports_ByCategories_Expenses {
             get {
-                return ResourceManager.GetString("Reports.IncomeByCategories.Categories", resourceCulture);
+                return ResourceManager.GetString("Reports.ByCategories.Expenses", resourceCulture);
+            }
+        }
+
+        public static string Reports_ByCategories_Income {
+            get {
+                return ResourceManager.GetString("Reports.ByCategories.Income", resourceCulture);
             }
         }
         
