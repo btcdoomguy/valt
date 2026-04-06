@@ -49,6 +49,7 @@ public partial class AssetViewModel : ObservableObject
     public decimal? LiquidationPrice { get; }
     public bool? IsLong { get; }
     public decimal? DistanceToLiquidation { get; }
+    public decimal? PositionSize { get; }
 
     /// <summary>
     /// Indicates if the leveraged position is at risk of liquidation.
@@ -73,6 +74,7 @@ public partial class AssetViewModel : ObservableObject
     public string EntryPriceFormatted { get; }
     public string LiquidationPriceFormatted { get; }
     public string CollateralFormatted { get; }
+    public string PositionSizeFormatted { get; }
 
     // BTC loan specific
     public string? PlatformName { get; }
@@ -179,6 +181,7 @@ public partial class AssetViewModel : ObservableObject
         LiquidationPrice = dto.LiquidationPrice;
         IsLong = dto.IsLong;
         DistanceToLiquidation = dto.DistanceToLiquidation;
+        PositionSize = dto.PositionSize;
         // Only show at risk if reported AND PnL is not significantly positive
         // A position with > 50% profit cannot logically be close to liquidation
         IsAtRisk = dto.IsAtRisk == true && (dto.PnLPercentage == null || dto.PnLPercentage <= 50);
@@ -255,6 +258,10 @@ public partial class AssetViewModel : ObservableObject
 
         CollateralFormatted = Collateral.HasValue
             ? CurrencyDisplay.FormatFiat(Collateral.Value, CurrencyCode)
+            : "-";
+
+        PositionSizeFormatted = PositionSize.HasValue
+            ? $"{PositionSize.Value:G} {Symbol ?? ""}"
             : "-";
 
         AcquisitionPriceFormatted = AcquisitionPrice.HasValue

@@ -304,6 +304,28 @@
                                                     </Grid>
                                                     <Grid ColumnDefinitions="Auto, *">
                                                         <TextBlock Grid.Column="0"
+                                                                   Text="{x:Static lang:language.Assets_Card_Collateral_Leveraged}"
+                                                                   FontSize="{DynamicResource FontSizeXSmall}"
+                                                                   Foreground="{DynamicResource AssetCardLabelBrush}"
+                                                                   Margin="0,0,4,0" />
+                                                        <TextBlock Grid.Column="1"
+                                                                   Text="{Binding CollateralFormatted}"
+                                                                   FontSize="{DynamicResource FontSizeXSmall}"
+                                                                   Foreground="{DynamicResource AssetCardTextBrush}" />
+                                                    </Grid>
+                                                    <Grid ColumnDefinitions="Auto, *">
+                                                        <TextBlock Grid.Column="0"
+                                                                   Text="{x:Static lang:language.Assets_Card_Position}"
+                                                                   FontSize="{DynamicResource FontSizeXSmall}"
+                                                                   Foreground="{DynamicResource AssetCardLabelBrush}"
+                                                                   Margin="0,0,4,0" />
+                                                        <TextBlock Grid.Column="1"
+                                                                   Text="{Binding PositionSizeFormatted}"
+                                                                   FontSize="{DynamicResource FontSizeXSmall}"
+                                                                   Foreground="{DynamicResource AssetCardTextBrush}" />
+                                                    </Grid>
+                                                    <Grid ColumnDefinitions="Auto, *">
+                                                        <TextBlock Grid.Column="0"
                                                                    Text="{x:Static lang:language.Assets_Card_Entry}"
                                                                    FontSize="{DynamicResource FontSizeXSmall}"
                                                                    Foreground="{DynamicResource AssetCardLabelBrush}"

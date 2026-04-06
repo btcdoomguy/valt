@@ -127,6 +127,16 @@ public record LeveragedPositionDetailsInputDTO : AssetDetailsInputDTO
     /// Price source: 0=Manual, 1=YahooFinance
     /// </summary>
     public required int PriceSource { get; init; }
+
+    /// <summary>
+    /// Input mode: 0=Collateral (default), 1=ExactPosition.
+    /// </summary>
+    public int InputMode { get; init; } = 0;
+
+    /// <summary>
+    /// Position size in underlying units (e.g., 0.2 BTC). Used when InputMode=1.
+    /// </summary>
+    public decimal? PositionSize { get; init; }
 }
 
 /// <summary>

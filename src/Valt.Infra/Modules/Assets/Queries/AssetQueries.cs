@@ -152,6 +152,8 @@ internal sealed class AssetQueries : IAssetQueries
         decimal? pnlPercentage = null;
         decimal? distanceToLiquidation = null;
         bool? isAtRisk = null;
+        decimal? positionSize = null;
+        int? inputModeId = null;
         DateOnly? acquisitionDate = null;
         decimal? acquisitionPrice = null;
 
@@ -220,6 +222,8 @@ internal sealed class AssetQueries : IAssetQueries
                 pnlPercentage = leveraged.CalculatePnLPercentage(leveraged.CurrentPrice);
                 distanceToLiquidation = leveraged.CalculateDistanceToLiquidation(leveraged.CurrentPrice);
                 isAtRisk = leveraged.IsAtRisk(leveraged.CurrentPrice);
+                positionSize = leveraged.PositionSize;
+                inputModeId = (int)leveraged.InputMode;
                 break;
 
             case BtcLoanDetails btcLoan:
@@ -288,6 +292,8 @@ internal sealed class AssetQueries : IAssetQueries
             IsLong = isLong,
             DistanceToLiquidation = distanceToLiquidation,
             IsAtRisk = isAtRisk,
+            PositionSize = positionSize,
+            InputModeId = inputModeId,
             // BTC loan fields
             PlatformName = platformName,
             CollateralSats = collateralSats,

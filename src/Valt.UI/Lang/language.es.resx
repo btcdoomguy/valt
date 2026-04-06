@@ -1108,6 +1108,12 @@
     <data name="ManageAsset_IsLong" xml:space="preserve">
         <value>Posición Larga</value>
     </data>
+    <data name="ManageAsset_InputMode" xml:space="preserve">
+        <value>Modo de Entrada</value>
+    </data>
+    <data name="ManageAsset_ExactPosition" xml:space="preserve">
+        <value>Posición Exacta</value>
+    </data>
     <data name="ManageAsset_IncludeInNetWorth" xml:space="preserve">
         <value>Incluir en Patrimonio Neto</value>
     </data>
@@ -2096,6 +2102,12 @@
     </data>
     <data name="Assets_Card_AtRisk" xml:space="preserve">
         <value>EN RIESGO</value>
+    </data>
+    <data name="Assets_Card_Collateral_Leveraged" xml:space="preserve">
+        <value>Colateral:</value>
+    </data>
+    <data name="Assets_Card_Position" xml:space="preserve">
+        <value>Posición:</value>
     </data>
     <data name="Assets_Card_NetWorth" xml:space="preserve">
         <value>Patrimonio</value>

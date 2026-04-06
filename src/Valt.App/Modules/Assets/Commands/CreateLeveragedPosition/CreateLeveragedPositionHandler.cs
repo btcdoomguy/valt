@@ -45,9 +45,18 @@ internal sealed class CreateLeveragedPositionHandler : ICommandHandler<CreateLev
 
         var assetName = new AssetName(command.Name);
         var priceSource = (AssetPriceSource)command.PriceSource;
+        var inputMode = (LeveragedPositionInputMode)command.InputMode;
+
+        var collateral = command.Collateral;
+        if (inputMode == LeveragedPositionInputMode.ExactPosition
+            && command.PositionSize.HasValue && command.PositionSize.Value > 0
+            && command.Leverage > 0)
+        {
+            collateral = command.PositionSize.Value * command.EntryPrice / command.Leverage;
+        }
 
         var details = new LeveragedPositionDetails(
-            collateral: command.Collateral,
+            collateral: collateral,
             entryPrice: command.EntryPrice,
             leverage: command.Leverage,
             liquidationPrice: command.LiquidationPrice,
@@ -55,7 +64,8 @@ internal sealed class CreateLeveragedPositionHandler : ICommandHandler<CreateLev
             currencyCode: command.CurrencyCode,
             symbol: command.Symbol,
             priceSource: priceSource,
-            isLong: command.IsLong);
+            isLong: command.IsLong,
+            inputMode: inputMode);
 
         var icon = string.IsNullOrWhiteSpace(command.Icon)
             ? Icon.Empty

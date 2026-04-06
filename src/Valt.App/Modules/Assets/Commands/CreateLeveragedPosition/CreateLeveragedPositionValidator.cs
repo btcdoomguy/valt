@@ -20,8 +20,16 @@ internal sealed class CreateLeveragedPositionValidator : IValidator<CreateLevera
 
         builder.AddErrorIfNullOrWhiteSpace(instance.Symbol, nameof(instance.Symbol), "Symbol is required.");
 
-        if (instance.Collateral <= 0)
-            builder.AddError(nameof(instance.Collateral), "Collateral must be greater than zero.");
+        if (instance.InputMode == 1)
+        {
+            if (!instance.PositionSize.HasValue || instance.PositionSize.Value <= 0)
+                builder.AddError(nameof(instance.PositionSize), "Position size must be greater than zero.");
+        }
+        else
+        {
+            if (instance.Collateral <= 0)
+                builder.AddError(nameof(instance.Collateral), "Collateral must be greater than zero.");
+        }
 
         if (instance.EntryPrice <= 0)
             builder.AddError(nameof(instance.EntryPrice), "Entry price must be greater than zero.");

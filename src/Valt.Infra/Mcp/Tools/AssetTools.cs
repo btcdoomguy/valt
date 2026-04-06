@@ -175,7 +175,9 @@ public class AssetTools
         [Description("Price source: 0=Manual, 1=YahooFinance, 2=LivePrice (for BTC only)")] int priceSource = 0,
         [Description("Include in net worth calculation")] bool includeInNetWorth = true,
         [Description("Visible in list")] bool visible = true,
-        [Description("Icon identifier (optional)")] string? icon = null)
+        [Description("Icon identifier (optional)")] string? icon = null,
+        [Description("Input mode: 0=Collateral (default), 1=ExactPosition (specify positionSize instead)")] int inputMode = 0,
+        [Description("Position size in underlying units (e.g., 0.2 BTC). Only used when inputMode=1")] decimal? positionSize = null)
     {
         var result = await commandDispatcher.DispatchAsync(new CreateLeveragedPositionCommand
         {
@@ -191,7 +193,9 @@ public class AssetTools
             PriceSource = priceSource,
             IncludeInNetWorth = includeInNetWorth,
             Visible = visible,
-            Icon = icon
+            Icon = icon,
+            InputMode = inputMode,
+            PositionSize = positionSize
         });
 
         if (result.IsFailure)

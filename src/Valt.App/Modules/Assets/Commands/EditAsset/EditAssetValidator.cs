@@ -90,8 +90,16 @@ internal sealed class EditAssetValidator : IValidator<EditAssetCommand>
     {
         builder.AddErrorIfNullOrWhiteSpace(details.Symbol, "Details.Symbol", "Symbol is required.");
 
-        if (details.Collateral <= 0)
-            builder.AddError("Details.Collateral", "Collateral must be greater than zero.");
+        if (details.InputMode == 1)
+        {
+            if (!details.PositionSize.HasValue || details.PositionSize.Value <= 0)
+                builder.AddError("Details.PositionSize", "Position size must be greater than zero.");
+        }
+        else
+        {
+            if (details.Collateral <= 0)
+                builder.AddError("Details.Collateral", "Collateral must be greater than zero.");
+        }
 
         if (details.EntryPrice <= 0)
             builder.AddError("Details.EntryPrice", "Entry price must be greater than zero.");
