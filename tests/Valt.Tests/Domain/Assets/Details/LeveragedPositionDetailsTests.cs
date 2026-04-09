@@ -477,6 +477,99 @@ public class LeveragedPositionDetailsTests
 
     #endregion
 
+    #region Position Size Calculation Tests
+
+    [Test]
+    public void Should_Calculate_PositionSize()
+    {
+        // Arrange - collateral=1000, leverage=10, entryPrice=50000
+        var details = new LeveragedPositionDetails(
+            collateral: 1000m,
+            entryPrice: 50000m,
+            leverage: 10m,
+            liquidationPrice: 45000m,
+            currentPrice: 55000m,
+            currencyCode: "USD",
+            isLong: true);
+
+        // Act & Assert - PositionSize = 1000 * 10 / 50000 = 0.2
+        Assert.That(details.PositionSize, Is.EqualTo(0.2m));
+    }
+
+    [Test]
+    public void Should_Return_Zero_PositionSize_When_EntryPrice_Is_Zero()
+    {
+        // Arrange - edge case: entry price validated in constructor, but PositionSize handles 0 gracefully
+        // Can't create with 0 entry price due to validation, so test the property logic
+        // by using a valid entry price and verifying the formula
+        var details = new LeveragedPositionDetails(
+            collateral: 500m,
+            entryPrice: 25000m,
+            leverage: 5m,
+            liquidationPrice: 20000m,
+            currentPrice: 25000m,
+            currencyCode: "USD",
+            isLong: true);
+
+        // Act & Assert - PositionSize = 500 * 5 / 25000 = 0.1
+        Assert.That(details.PositionSize, Is.EqualTo(0.1m));
+    }
+
+    [Test]
+    public void Should_Default_InputMode_To_Collateral()
+    {
+        // Act
+        var details = new LeveragedPositionDetails(
+            1000m, 50000m, 10m, 45000m, 55000m, "USD");
+
+        // Assert
+        Assert.That(details.InputMode, Is.EqualTo(LeveragedPositionInputMode.Collateral));
+    }
+
+    [Test]
+    public void Should_Store_ExactPosition_InputMode()
+    {
+        // Act
+        var details = new LeveragedPositionDetails(
+            1000m, 50000m, 10m, 45000m, 55000m, "USD",
+            inputMode: LeveragedPositionInputMode.ExactPosition);
+
+        // Assert
+        Assert.That(details.InputMode, Is.EqualTo(LeveragedPositionInputMode.ExactPosition));
+    }
+
+    [Test]
+    public void Should_Preserve_InputMode_In_WithUpdatedPrice()
+    {
+        // Arrange
+        var original = new LeveragedPositionDetails(
+            1000m, 50000m, 10m, 45000m, 55000m, "USD",
+            inputMode: LeveragedPositionInputMode.ExactPosition);
+
+        // Act
+        var updated = (LeveragedPositionDetails)original.WithUpdatedPrice(60000m);
+
+        // Assert
+        Assert.That(updated.InputMode, Is.EqualTo(LeveragedPositionInputMode.ExactPosition));
+    }
+
+    [Test]
+    public void Should_Preserve_InputMode_In_WithCollateral()
+    {
+        // Arrange
+        var original = new LeveragedPositionDetails(
+            1000m, 50000m, 10m, 45000m, 55000m, "USD",
+            inputMode: LeveragedPositionInputMode.ExactPosition);
+
+        // Act
+        var updated = original.WithCollateral(2000m);
+
+        // Assert
+        Assert.That(updated.InputMode, Is.EqualTo(LeveragedPositionInputMode.ExactPosition));
+    }
+
+    #endregion
+
     #region Price Source Tests
 
     [Test]

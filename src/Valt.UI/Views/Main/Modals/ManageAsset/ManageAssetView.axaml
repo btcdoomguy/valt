@@ -267,13 +267,33 @@
                                     </StackPanel>
                                 </StackPanel>
 
+                                <StackPanel Classes="form-field">
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_InputMode}" />
+                                    <StackPanel Orientation="Horizontal" Spacing="20">
+                                        <RadioButton Content="{x:Static local:language.ManageAsset_Collateral}"
+                                                     IsChecked="{Binding IsCollateralMode}"
+                                                     Command="{Binding SetCollateralModeCommand}"
+                                                     GroupName="LeveragedInputMode" />
+                                        <RadioButton Content="{x:Static local:language.ManageAsset_ExactPosition}"
+                                                     IsChecked="{Binding IsExactPositionMode}"
+                                                     Command="{Binding SetExactPositionModeCommand}"
+                                                     GroupName="LeveragedInputMode" />
+                                    </StackPanel>
+                                </StackPanel>
+
                                 <Grid ColumnDefinitions="250, 20, 250">
-                                    <StackPanel Grid.Column="0" Classes="form-field">
+                                    <StackPanel Grid.Column="0" Classes="form-field"
+                                                IsVisible="{Binding IsCollateralMode}">
                                         <TextBlock Text="{x:Static local:language.ManageAsset_Collateral}" />
                                         <userControls:FiatInput FiatValue="{Binding CollateralFiat, Mode=TwoWay}"
                                                                 CurrencySymbol="{Binding CurrencySymbol}"
                                                                 SymbolOnRight="{Binding SymbolOnRight}"
                                                                 Width="250" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="0" Classes="form-field"
+                                                IsVisible="{Binding IsExactPositionMode}">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_ExactPosition}" />
+                                        <TextBox Text="{Binding PositionSize}" Width="250" />
                                     </StackPanel>
                                     <StackPanel Grid.Column="2" Classes="form-field">
                                         <TextBlock Text="{x:Static local:language.ManageAsset_Leverage}" />

@@ -38,6 +38,8 @@ public record AssetDTO
     public bool? IsLong { get; init; }
     public decimal? DistanceToLiquidation { get; init; }
     public bool? IsAtRisk { get; init; }
+    public decimal? PositionSize { get; init; }
+    public int? InputModeId { get; init; }
 
     // BTC loan specific
     public string? PlatformName { get; init; }

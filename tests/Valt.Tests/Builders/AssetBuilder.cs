@@ -60,10 +60,11 @@ public class AssetBuilder
         string currencyCode = "USD",
         string? symbol = "BTC",
         AssetPriceSource priceSource = AssetPriceSource.Manual,
-        bool isLong = true)
+        bool isLong = true,
+        LeveragedPositionInputMode inputMode = LeveragedPositionInputMode.Collateral)
     {
         _details = new LeveragedPositionDetails(
-            collateral, entryPrice, leverage, liquidationPrice, currentPrice, currencyCode, symbol, priceSource, isLong);
+            collateral, entryPrice, leverage, liquidationPrice, currentPrice, currencyCode, symbol, priceSource, isLong, inputMode);
         return this;
     }
 

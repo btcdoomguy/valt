@@ -2222,7 +2222,19 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("ManageAsset_IsLong", resourceCulture);
             }
         }
-        
+
+        public static string ManageAsset_InputMode {
+            get {
+                return ResourceManager.GetString("ManageAsset_InputMode", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_ExactPosition {
+            get {
+                return ResourceManager.GetString("ManageAsset_ExactPosition", resourceCulture);
+            }
+        }
+
         public static string ManageAsset_IncludeInNetWorth {
             get {
                 return ResourceManager.GetString("ManageAsset_IncludeInNetWorth", resourceCulture);
@@ -4166,7 +4178,19 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Assets_Card_AtRisk", resourceCulture);
             }
         }
-        
+
+        public static string Assets_Card_Collateral_Leveraged {
+            get {
+                return ResourceManager.GetString("Assets_Card_Collateral_Leveraged", resourceCulture);
+            }
+        }
+
+        public static string Assets_Card_Position {
+            get {
+                return ResourceManager.GetString("Assets_Card_Position", resourceCulture);
+            }
+        }
+
         public static string Assets_Card_NetWorth {
             get {
                 return ResourceManager.GetString("Assets_Card_NetWorth", resourceCulture);

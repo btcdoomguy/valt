@@ -127,6 +127,16 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     [ObservableProperty]
     private FiatValue _liquidationPriceFiat = FiatValue.Empty;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsCollateralMode))]
+    [NotifyPropertyChangedFor(nameof(IsExactPositionMode))]
+    private bool _useExactPosition;
+
+    [ObservableProperty]
+    private decimal _positionSize;
+
+    private bool _isAutoCalculating;
+
     // Currency symbol helpers
     public string CurrencySymbol => FiatCurrency.GetFromCode(SelectedCurrency).Symbol;
     public bool SymbolOnRight => FiatCurrency.GetFromCode(SelectedCurrency).SymbolOnRight;
@@ -216,6 +226,10 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     public bool IsBitcoinLeveraged => ShowLeveragedFields && IsBitcoinUnderlyingAsset;
     public bool IsCustomLeveraged => ShowLeveragedFields && !IsBitcoinUnderlyingAsset;
     public bool ShowLeveragedSymbolRow => ShowLeveragedFields && !IsBitcoinUnderlyingAsset;
+
+    // Leveraged position input mode helpers
+    public bool IsCollateralMode => !UseExactPosition;
+    public bool IsExactPositionMode => UseExactPosition;
 
     public static List<ComboBoxValue> AvailableAssetTypes =>
     [
@@ -325,6 +339,9 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                     LiquidationPriceFiat = FiatValue.New(assetDto.LiquidationPrice ?? 0);
                     IsLong = assetDto.IsLong ?? true;
                     SelectedPriceSource = ((AssetPriceSource)(assetDto.PriceSourceId ?? 0)).ToString();
+                    UseExactPosition = (assetDto.InputModeId ?? 0) == 1;
+                    if (assetDto.PositionSize.HasValue)
+                        PositionSize = assetDto.PositionSize.Value;
                     // Detect if this is a Bitcoin leveraged position
                     IsBitcoinUnderlyingAsset = (AssetPriceSource)(assetDto.PriceSourceId ?? 0) == AssetPriceSource.LivePrice &&
                                                 Symbol.StartsWith("BTC", StringComparison.OrdinalIgnoreCase);
@@ -423,6 +440,74 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
         SelectedPriceSource = AssetPriceSource.Manual.ToString();
         SymbolValidationMessage = null;
         IsSymbolValid = false;
+    }
+
+    [RelayCommand]
+    private void SetCollateralMode()
+    {
+        UseExactPosition = false;
+        RecalculateCollateralOrPosition();
+    }
+
+    [RelayCommand]
+    private void SetExactPositionMode()
+    {
+        UseExactPosition = true;
+        RecalculateCollateralOrPosition();
+    }
+
+    partial void OnPositionSizeChanged(decimal value)
+    {
+        if (_isAutoCalculating) return;
+        if (!UseExactPosition) return;
+        if (value <= 0 || Leverage <= 0 || EntryPriceFiat.Value <= 0) return;
+
+        _isAutoCalculating = true;
+        CollateralFiat = FiatValue.New(value * EntryPriceFiat.Value / Leverage);
+        _isAutoCalculating = false;
+    }
+
+    partial void OnCollateralFiatChanged(FiatValue value)
+    {
+        if (_isAutoCalculating) return;
+        if (UseExactPosition) return;
+        RecalculatePositionSize();
+    }
+
+    partial void OnLeverageChanged(decimal value)
+    {
+        RecalculateCollateralOrPosition();
+    }
+
+    partial void OnEntryPriceFiatChanged(FiatValue value)
+    {
+        RecalculateCollateralOrPosition();
+    }
+
+    private void RecalculateCollateralOrPosition()
+    {
+        if (_isAutoCalculating) return;
+        _isAutoCalculating = true;
+
+        if (UseExactPosition)
+        {
+            // Recalculate collateral from position size
+            if (PositionSize > 0 && Leverage > 0 && EntryPriceFiat.Value > 0)
+                CollateralFiat = FiatValue.New(PositionSize * EntryPriceFiat.Value / Leverage);
+        }
+        else
+        {
+            // Recalculate position size from collateral
+            RecalculatePositionSize();
+        }
+
+        _isAutoCalculating = false;
+    }
+
+    private void RecalculatePositionSize()
+    {
+        if (CollateralFiat.Value > 0 && Leverage > 0 && EntryPriceFiat.Value > 0)
+            PositionSize = CollateralFiat.Value * Leverage / EntryPriceFiat.Value;
     }
 
     [RelayCommand]
@@ -551,7 +636,9 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                     IsLong = IsLong,
                     PriceSource = (int)leveragedPriceSource,
                     IncludeInNetWorth = IncludeInNetWorth,
-                    Visible = Visible
+                    Visible = Visible,
+                    InputMode = UseExactPosition ? 1 : 0,
+                    PositionSize = UseExactPosition ? PositionSize : null
                 });
 
                 if (leveragedResult.IsFailure)
@@ -704,7 +791,9 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                     Leverage = Leverage,
                     LiquidationPrice = LiquidationPriceFiat.Value,
                     IsLong = IsLong,
-                    PriceSource = (int)leveragedPriceSource
+                    PriceSource = (int)leveragedPriceSource,
+                    InputMode = UseExactPosition ? 1 : 0,
+                    PositionSize = UseExactPosition ? PositionSize : null
                 };
                 break;
 

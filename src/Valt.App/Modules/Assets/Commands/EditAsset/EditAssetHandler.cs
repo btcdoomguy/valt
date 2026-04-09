@@ -85,16 +85,7 @@ internal sealed class EditAssetHandler : ICommandHandler<EditAssetCommand, Unit>
                 acquisitionDate: realEstate.AcquisitionDate,
                 acquisitionPrice: realEstate.AcquisitionPrice)),
 
-            LeveragedPositionDetailsInputDTO leveraged => Result<IAssetDetails>.Success(new LeveragedPositionDetails(
-                collateral: leveraged.Collateral,
-                entryPrice: leveraged.EntryPrice,
-                leverage: leveraged.Leverage,
-                liquidationPrice: leveraged.LiquidationPrice,
-                currentPrice: leveraged.CurrentPrice,
-                currencyCode: leveraged.CurrencyCode,
-                symbol: leveraged.Symbol,
-                priceSource: (AssetPriceSource)leveraged.PriceSource,
-                isLong: leveraged.IsLong)),
+            LeveragedPositionDetailsInputDTO leveraged => BuildLeveragedDetails(leveraged),
 
             BtcLoanDetailsInputDTO btcLoan => BuildBtcLoanDetails(btcLoan, existingAsset),
 
@@ -109,6 +100,31 @@ internal sealed class EditAssetHandler : ICommandHandler<EditAssetCommand, Unit>
 
             _ => Result<IAssetDetails>.Failure("UNKNOWN_DETAILS_TYPE", "Unknown asset details type")
         };
+    }
+
+    private static Result<IAssetDetails> BuildLeveragedDetails(LeveragedPositionDetailsInputDTO leveraged)
+    {
+        var inputMode = (LeveragedPositionInputMode)leveraged.InputMode;
+
+        var collateral = leveraged.Collateral;
+        if (inputMode == LeveragedPositionInputMode.ExactPosition
+            && leveraged.PositionSize.HasValue && leveraged.PositionSize.Value > 0
+            && leveraged.Leverage > 0)
+        {
+            collateral = leveraged.PositionSize.Value * leveraged.EntryPrice / leveraged.Leverage;
+        }
+
+        return Result<IAssetDetails>.Success(new LeveragedPositionDetails(
+            collateral: collateral,
+            entryPrice: leveraged.EntryPrice,
+            leverage: leveraged.Leverage,
+            liquidationPrice: leveraged.LiquidationPrice,
+            currentPrice: leveraged.CurrentPrice,
+            currencyCode: leveraged.CurrencyCode,
+            symbol: leveraged.Symbol,
+            priceSource: (AssetPriceSource)leveraged.PriceSource,
+            isLong: leveraged.IsLong,
+            inputMode: inputMode));
     }
 
     private static Result<IAssetDetails> BuildBtcLoanDetails(BtcLoanDetailsInputDTO btcLoan, Asset existingAsset)

@@ -71,6 +71,16 @@ public record CreateLeveragedPositionCommand : ICommand<CreateLeveragedPositionR
     /// Icon identifier (optional).
     /// </summary>
     public string? Icon { get; init; }
+
+    /// <summary>
+    /// Input mode: 0=Collateral (default), 1=ExactPosition.
+    /// </summary>
+    public int InputMode { get; init; } = 0;
+
+    /// <summary>
+    /// Position size in underlying units (e.g., 0.2 BTC). Used when InputMode=1.
+    /// </summary>
+    public decimal? PositionSize { get; init; }
 }
 
 public record CreateLeveragedPositionResult(string AssetId);

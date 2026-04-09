@@ -52,6 +52,17 @@ public sealed class LeveragedPositionDetails : IAssetDetails
     /// </summary>
     public bool IsLong { get; }
 
+    /// <summary>
+    /// The input mode used to define the position (Collateral or ExactPosition).
+    /// </summary>
+    public LeveragedPositionInputMode InputMode { get; }
+
+    /// <summary>
+    /// The position size in units of the underlying asset (e.g., 10 BTC).
+    /// Calculated as Collateral * Leverage / EntryPrice.
+    /// </summary>
+    public decimal PositionSize => EntryPrice > 0 ? Collateral * Leverage / EntryPrice : 0;
+
     public LeveragedPositionDetails(
         decimal collateral,
         decimal entryPrice,
@@ -61,7 +72,8 @@ public sealed class LeveragedPositionDetails : IAssetDetails
         string currencyCode,
         string? symbol = null,
         AssetPriceSource priceSource = AssetPriceSource.Manual,
-        bool isLong = true)
+        bool isLong = true,
+        LeveragedPositionInputMode inputMode = LeveragedPositionInputMode.Collateral)
     {
         if (collateral <= 0)
             throw new ArgumentException("Collateral must be positive", nameof(collateral));
@@ -84,6 +96,7 @@ public sealed class LeveragedPositionDetails : IAssetDetails
         Symbol = symbol;
         PriceSource = priceSource;
         IsLong = isLong;
+        InputMode = inputMode;
     }
 
     /// <summary>
@@ -158,7 +171,8 @@ public sealed class LeveragedPositionDetails : IAssetDetails
             CurrencyCode,
             Symbol,
             PriceSource,
-            IsLong);
+            IsLong,
+            InputMode);
     }
 
     public LeveragedPositionDetails WithCollateral(decimal newCollateral)
@@ -172,6 +186,7 @@ public sealed class LeveragedPositionDetails : IAssetDetails
             CurrencyCode,
             Symbol,
             PriceSource,
-            IsLong);
+            IsLong,
+            InputMode);
     }
 }

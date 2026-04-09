@@ -67,7 +67,8 @@ internal static class AssetDetailsSerializer
             dto.CurrencyCode,
             dto.Symbol,
             (AssetPriceSource)dto.PriceSourceId,
-            dto.IsLong);
+            dto.IsLong,
+            (LeveragedPositionInputMode)dto.InputMode);
     }
 
     public static BtcLoanDetails DeserializeBtcLoan(string json)
@@ -156,7 +157,8 @@ internal static class AssetDetailsSerializer
             CurrencyCode = details.CurrencyCode,
             Symbol = details.Symbol,
             PriceSourceId = (int)details.PriceSource,
-            IsLong = details.IsLong
+            IsLong = details.IsLong,
+            InputMode = (int)details.InputMode
         };
         return JsonSerializer.Serialize(dto);
     }
@@ -231,6 +233,7 @@ internal class LeveragedPositionDetailsDto
     public string? Symbol { get; set; }
     public int PriceSourceId { get; set; }
     public bool IsLong { get; set; }
+    public int InputMode { get; set; }
 }
 
 internal class BtcLoanDetailsDto
