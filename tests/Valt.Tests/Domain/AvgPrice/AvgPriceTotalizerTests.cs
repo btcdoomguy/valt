@@ -724,7 +724,7 @@ public class AvgPriceTotalizerTests : DatabaseTest
     #region Setup Line Operations
 
     [Test]
-    public async Task GetTotals_Should_Treat_Setup_As_Buy_For_AmountBought()
+    public async Task GetTotals_Should_Exclude_Setup_From_AmountBought_And_Volume()
     {
         // Arrange
         var profile = AvgPriceProfile.New(
@@ -735,12 +735,13 @@ public class AvgPriceTotalizerTests : DatabaseTest
             FiatCurrency.Usd,
             AvgPriceCalculationMethod.BrazilianRule);
 
+        // Setup 2 BTC at avg $40k each (Amount = unit price for Setup)
         profile.AddLine(
             new DateOnly(2024, 1, 1),
             displayOrder: 0,
             AvgPriceLineTypes.Setup,
             2m,
-            FiatValue.New(80000m),
+            FiatValue.New(40000m),
             "Initial setup");
 
         await _repository.SaveAvgPriceProfileAsync(profile);
@@ -748,9 +749,9 @@ public class AvgPriceTotalizerTests : DatabaseTest
         // Act
         var result = await _totalizer.GetTotalsAsync(2024, new[] { profile.Id });
 
-        // Assert
-        Assert.That(result.YearlyTotals.AmountBought, Is.EqualTo(80000m));
-        Assert.That(result.YearlyTotals.Volume, Is.EqualTo(80000m));
+        // Assert - Setup is just an initial position, not an actual buy
+        Assert.That(result.YearlyTotals.AmountBought, Is.EqualTo(0m));
+        Assert.That(result.YearlyTotals.Volume, Is.EqualTo(0m));
     }
 
     [Test]
@@ -765,13 +766,13 @@ public class AvgPriceTotalizerTests : DatabaseTest
             FiatCurrency.Usd,
             AvgPriceCalculationMethod.BrazilianRule);
 
-        // Setup 2 BTC at avg $40k each (total $80k / 2 = $40k avg)
+        // Setup 2 BTC at avg $40k each (Amount = unit price for Setup)
         profile.AddLine(
             new DateOnly(2024, 1, 1),
             displayOrder: 0,
             AvgPriceLineTypes.Setup,
             2m,
-            FiatValue.New(80000m),
+            FiatValue.New(40000m),
             "Setup");
 
         // Sell 1 BTC at $50k (profit = $50k - $40k = $10k)

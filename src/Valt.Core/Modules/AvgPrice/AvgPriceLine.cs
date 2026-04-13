@@ -10,7 +10,9 @@ public class AvgPriceLine : Entity<AvgPriceLineId>
     public AvgPriceLineTypes Type { get; protected set; }
     public decimal Quantity { get; protected set; }
     public FiatValue Amount { get; protected set; }
-    public FiatValue UnitPrice => Quantity != 0 ? Amount.Value / Quantity : FiatValue.Empty;
+    public FiatValue UnitPrice => Type == AvgPriceLineTypes.Setup
+        ? Amount
+        : (Quantity != 0 ? Amount.Value / Quantity : FiatValue.Empty);
     public string Comment { get; protected set; }
     public LineTotals Totals { get; protected set; }
 

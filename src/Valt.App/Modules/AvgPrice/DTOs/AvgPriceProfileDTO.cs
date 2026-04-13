@@ -29,5 +29,7 @@ public record AvgPriceLineDTO(
     decimal TotalCost,
     decimal TotalQuantity)
 {
-    public decimal UnitPrice => Quantity != 0 ? Amount / Quantity : 0;
+    public decimal UnitPrice => AvgPriceLineTypeId == 2 // Setup
+        ? Amount
+        : (Quantity != 0 ? Amount / Quantity : 0);
 }
