@@ -110,7 +110,7 @@ internal sealed class AvgPriceTotalizer : IAvgPriceTotalizer
 
                 case AvgPriceLineTypes.Setup:
                     profileQuantities[profileId] = line.Quantity;
-                    profileAvgCosts[profileId] = line.Quantity > 0 ? line.Amount / line.Quantity : 0m;
+                    profileAvgCosts[profileId] = line.Amount;
                     break;
             }
 
@@ -147,7 +147,7 @@ internal sealed class AvgPriceTotalizer : IAvgPriceTotalizer
     private static IAvgPriceTotalizer.ValuesDTO CalculateValues(List<CalculatedLine> lines)
     {
         var amountBought = lines
-            .Where(l => l.Type == AvgPriceLineTypes.Buy || l.Type == AvgPriceLineTypes.Setup)
+            .Where(l => l.Type == AvgPriceLineTypes.Buy)
             .Sum(l => l.Amount);
 
         var amountSold = lines
@@ -156,7 +156,9 @@ internal sealed class AvgPriceTotalizer : IAvgPriceTotalizer
 
         var totalProfitLoss = lines.Sum(l => l.ProfitLoss);
 
-        var volume = lines.Sum(l => l.Amount);
+        var volume = lines
+            .Where(l => l.Type != AvgPriceLineTypes.Setup)
+            .Sum(l => l.Amount);
 
         return new IAvgPriceTotalizer.ValuesDTO(amountBought, amountSold, totalProfitLoss, volume);
     }

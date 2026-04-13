@@ -255,6 +255,8 @@ public class BrazilianRuleCalculationStrategyTests
         Assert.That(setup.Totals.AvgCostOfAcquisition.Value, Is.EqualTo(45000m));
         Assert.That(setup.Totals.Quantity, Is.EqualTo(2m));
         Assert.That(setup.Totals.TotalCost, Is.EqualTo(90000m));
+        // For Setup, UnitPrice should equal Amount (the avg price entered by user)
+        Assert.That(setup.UnitPrice.Value, Is.EqualTo(45000m));
     }
 
     [Test]
@@ -285,6 +287,7 @@ public class BrazilianRuleCalculationStrategyTests
         Assert.That(setup.Totals.TotalCost, Is.EqualTo(40000m));
         Assert.That(setup.Totals.Quantity, Is.EqualTo(1m));
         Assert.That(setup.Totals.AvgCostOfAcquisition.Value, Is.EqualTo(40000m));
+        Assert.That(setup.UnitPrice.Value, Is.EqualTo(40000m));
 
         // After buy: Total = 40000 + 30000 = 70000, BTC = 1.5, Avg = 70000/1.5 = 46666.67
         Assert.That(buy.Totals.TotalCost, Is.EqualTo(70000m));

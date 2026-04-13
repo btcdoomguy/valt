@@ -457,6 +457,8 @@ public class FifoCalculationStrategyTests
         Assert.That(setup.Totals.AvgCostOfAcquisition.Value, Is.EqualTo(45000m));
         Assert.That(setup.Totals.Quantity, Is.EqualTo(2m));
         Assert.That(setup.Totals.TotalCost, Is.EqualTo(90000m));
+        // For Setup, UnitPrice should equal Amount (the avg price entered by user)
+        Assert.That(setup.UnitPrice.Value, Is.EqualTo(45000m));
     }
 
     [Test]
@@ -487,6 +489,7 @@ public class FifoCalculationStrategyTests
         Assert.That(setup.Totals.TotalCost, Is.EqualTo(40000m));
         Assert.That(setup.Totals.Quantity, Is.EqualTo(1m));
         Assert.That(setup.Totals.AvgCostOfAcquisition.Value, Is.EqualTo(40000m));
+        Assert.That(setup.UnitPrice.Value, Is.EqualTo(40000m));
 
         // After buy:
         // - Setup lot: 1 BTC at $40,000 (cost = 40000)
@@ -935,6 +938,7 @@ public class FifoCalculationStrategyTests
         Assert.That(setup.Totals.TotalCost, Is.EqualTo(35100m));
         Assert.That(setup.Totals.Quantity, Is.EqualTo(200m));
         Assert.That(setup.Totals.AvgCostOfAcquisition.Value, Is.EqualTo(175.50m));
+        Assert.That(setup.UnitPrice.Value, Is.EqualTo(175.50m));
 
         // After buy:
         // - Setup lot: 200 shares at $175.50 (cost = 35100)
