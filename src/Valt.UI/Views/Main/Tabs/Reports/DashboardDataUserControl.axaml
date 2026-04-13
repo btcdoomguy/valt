@@ -88,36 +88,45 @@
                 </ItemsControl.Styles>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="vm:RowItem">
-                        <Border Padding="12, 6"
-                                BorderBrush="{DynamicResource Background700Brush}"
-                                BorderThickness="0,0,0,1"
-                                ToolTip.Tip="{Binding Tooltip}"
-                                ToolTip.ShowDelay="300"
-                                Cursor="{Binding HasUrl, Converter={x:Static vm:DashboardDataConverters.CursorConverter}}"
-                                PointerPressed="OnRowPointerPressed">
+                        <Panel>
+                            <!-- Separator row -->
+                            <Border Height="2"
+                                    Background="{DynamicResource Background600Brush}"
+                                    IsVisible="{Binding IsSeparator}" />
 
-                                <DockPanel LastChildFill="True" MinWidth="280">
-                                    <TextBlock x:Name="LeftTextBlock"
-                                               Text="{Binding LeftText}"
-                                               FontSize="{DynamicResource FontSizeXSmall}"
-                                               Foreground="{DynamicResource Text300Brush}"
-                                               DockPanel.Dock="Left"
-                                               Padding="0, 6, 15, 0"
-                                               VerticalAlignment="Center"
-                                               TextDecorations="{Binding HasUrl, Converter={x:Static vm:DashboardDataConverters.UnderlineConverter}}"/>
+                            <!-- Normal data row -->
+                            <Border Padding="12, 6"
+                                    BorderBrush="{DynamicResource Background700Brush}"
+                                    BorderThickness="0,0,0,1"
+                                    ToolTip.Tip="{Binding Tooltip}"
+                                    ToolTip.ShowDelay="300"
+                                    Cursor="{Binding HasUrl, Converter={x:Static vm:DashboardDataConverters.CursorConverter}}"
+                                    PointerPressed="OnRowPointerPressed"
+                                    IsVisible="{Binding !IsSeparator}">
 
-                                    <TextBlock x:Name="RightTextBlock"
-                                               Text="{Binding RightText}"
-                                               FontSize="{DynamicResource FontSizeSmall}"
-                                               FontWeight="Medium"
-                                               Foreground="{DynamicResource Text100Brush}"
-                                               DockPanel.Dock="Right"
-                                               Padding="0, 4, 10, 0"
-                                               HorizontalAlignment="Right"
-                                               VerticalAlignment="Center"
-                                               TextWrapping="NoWrap"/>
-                                </DockPanel>
-                        </Border>
+                                    <DockPanel LastChildFill="True" MinWidth="280">
+                                        <TextBlock x:Name="LeftTextBlock"
+                                                   Text="{Binding LeftText}"
+                                                   FontSize="{DynamicResource FontSizeXSmall}"
+                                                   Foreground="{DynamicResource Text300Brush}"
+                                                   DockPanel.Dock="Left"
+                                                   Padding="0, 6, 15, 0"
+                                                   VerticalAlignment="Center"
+                                                   TextDecorations="{Binding HasUrl, Converter={x:Static vm:DashboardDataConverters.UnderlineConverter}}"/>
+
+                                        <TextBlock x:Name="RightTextBlock"
+                                                   Text="{Binding RightText}"
+                                                   FontSize="{DynamicResource FontSizeSmall}"
+                                                   FontWeight="Medium"
+                                                   Foreground="{DynamicResource Text100Brush}"
+                                                   DockPanel.Dock="Right"
+                                                   Padding="0, 4, 10, 0"
+                                                   HorizontalAlignment="Right"
+                                                   VerticalAlignment="Center"
+                                                   TextWrapping="NoWrap"/>
+                                    </DockPanel>
+                            </Border>
+                        </Panel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

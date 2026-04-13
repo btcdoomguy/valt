@@ -96,9 +96,16 @@ internal class BitcoinHistoryUpdaterJob : IBackgroundJob
 
             var entries = new List<BitcoinDataEntity>();
             var endDateOnly = DateOnly.FromDateTime(endDate);
+
+            // Load existing dates in range to prevent duplicate entries
+            var existingDates = _priceDatabase.GetBitcoinData()
+                .Find(x => x.Date >= lastStoredDate && x.Date <= endDate)
+                .Select(x => DateOnly.FromDateTime(x.Date.ToUniversalTime()))
+                .ToHashSet();
+
             foreach (var price in prices)
             {
-                if (price.Date <= endDateOnly)
+                if (price.Date <= endDateOnly && !existingDates.Contains(price.Date))
                 {
                     var dateToStore = price.Date.ToValtDateTime();
                     _logger.LogInformation("[BitcoinHistoryUpdater] Adding BTC price ${Price:N2} for {Date}",

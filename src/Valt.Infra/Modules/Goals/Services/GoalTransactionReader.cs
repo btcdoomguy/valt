@@ -141,7 +141,8 @@ internal class GoalTransactionReader : IGoalTransactionReader
 
         var btcRates = _priceDatabase.GetBitcoinData()
             .Find(x => x.Date >= priceFromDate && x.Date <= priceToDate)
-            .ToDictionary(x => DateOnly.FromDateTime(x.Date.ToUniversalTime()));
+            .GroupBy(x => DateOnly.FromDateTime(x.Date.ToUniversalTime()))
+            .ToDictionary(g => g.Key, g => g.Last());
         var sortedBtcDates = btcRates.Keys.Order().ToList();
 
         var fiatRatesInRange = _priceDatabase.GetFiatData()

@@ -520,6 +520,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
             if (allTimeHighData.MaxDrawdownDate.HasValue && allTimeHighData.MaxDrawdownPercent.HasValue)
             {
+                rows.Add(RowItem.Separator());
                 rows.Add(new RowItem(language.Reports_AllTimeHigh_MaxDrawdownPercent,
                     $"{allTimeHighData.MaxDrawdownPercent.Value}%"));
                 rows.Add(new RowItem(language.Reports_AllTimeHigh_MaxDrawdownDate,
@@ -607,6 +608,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             // Add sat-based median data if available (from AutoSatAmount calculations)
             if (statisticsData.HasMedianMonthlyExpensesSats && statisticsData.MedianMonthlyExpensesSats.HasValue)
             {
+                rows.Add(RowItem.Separator());
                 var satMedianFormatted = statisticsData.MedianMonthlyExpensesSats.Value.ToString("N0", CultureInfo.CurrentCulture) + " sats";
                 rows.Add(new RowItem(language.Reports_Statistics_MedianExpensesSatsLabel, satMedianFormatted));
 
@@ -696,6 +698,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 var totalInUsd = CurrencyDisplay.FormatFiat(wealth.NetWorthInUsd, FiatCurrency.Usd.Code);
                 rows.Insert(2, new RowItem(language.Reports_Wealth_TotalInUsd, totalInUsd));
             }
+
+            // Separate totals from breakdown
+            rows.Insert(fiatCurrency.Code != FiatCurrency.Usd.Code ? 3 : 2, RowItem.Separator());
 
             // Add assets line if there are any assets (positive or negative)
             if (wealth.AssetsWealthInMainFiatCurrency != 0 || wealth.AssetsWealthInSats != 0)
