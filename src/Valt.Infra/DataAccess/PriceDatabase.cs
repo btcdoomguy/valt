@@ -162,6 +162,46 @@ internal sealed class PriceDatabase : IPriceDatabase
         GetOpenDatabase().Rollback();
     }
 
+    public int RemoveDuplicateEntries()
+    {
+        var totalRemoved = 0;
+
+        // Remove duplicate bitcoin entries (keep one per date)
+        var btcCollection = GetBitcoinData();
+        var btcDuplicates = btcCollection.FindAll()
+            .GroupBy(x => DateOnly.FromDateTime(x.Date.ToUniversalTime()))
+            .Where(g => g.Count() > 1)
+            .SelectMany(g => g.OrderByDescending(e => e.Id).Skip(1))
+            .Select(e => e.Id)
+            .ToList();
+
+        foreach (var id in btcDuplicates)
+        {
+            btcCollection.Delete(id);
+            totalRemoved++;
+        }
+
+        // Remove duplicate fiat entries (keep one per date+currency)
+        var fiatCollection = GetFiatData();
+        var fiatDuplicates = fiatCollection.FindAll()
+            .GroupBy(x => (DateOnly.FromDateTime(x.Date.ToUniversalTime()), x.Currency))
+            .Where(g => g.Count() > 1)
+            .SelectMany(g => g.OrderByDescending(e => e.Id).Skip(1))
+            .Select(e => e.Id)
+            .ToList();
+
+        foreach (var id in fiatDuplicates)
+        {
+            fiatCollection.Delete(id);
+            totalRemoved++;
+        }
+
+        if (totalRemoved > 0)
+            Checkpoint();
+
+        return totalRemoved;
+    }
+
     public bool HasPriceData()
     {
         var db = GetOpenDatabase();

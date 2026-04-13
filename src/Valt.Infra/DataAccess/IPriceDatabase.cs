@@ -30,6 +30,12 @@ public interface IPriceDatabase : INotifyPropertyChanged, IDisposable
     int GetVersion();
     void SetVersion(int version);
 
+    /// <summary>
+    /// Removes duplicate price entries from the database, keeping only one entry per date (bitcoin)
+    /// and one entry per date+currency (fiat).
+    /// </summary>
+    int RemoveDuplicateEntries();
+
     void BeginTransaction();
     void CommitTransaction();
     void RollbackTransaction();

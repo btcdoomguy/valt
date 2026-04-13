@@ -661,6 +661,11 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             if (!_priceDatabase.HasDatabaseOpen)
                 _priceDatabase!.OpenDatabase();
 
+            // Sanitize any duplicate price entries that may exist from previous versions
+            var duplicatesRemoved = _priceDatabase.RemoveDuplicateEntries();
+            if (duplicatesRemoved > 0)
+                _logger.LogInformation("Removed {Count} duplicate entries from price database", duplicatesRemoved);
+
             if (!jobsAlreadyStarted)
                 await _backgroundJobManager!.StartAllJobsAsync(jobType: BackgroundJobTypes.PriceDatabase, triggerInitialRun: false);
 
