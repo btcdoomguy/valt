@@ -1,0 +1,264 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:lang="clr-namespace:Valt.UI.Lang"
+        xmlns:local="clr-namespace:Valt.UI.Views.Main.Modals.FixedExpenseOverview"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Views.Main.Modals.FixedExpenseOverview.FixedExpenseOverviewView"
+        Title="{x:Static lang:language.FixedExpenseOverview_Title}"
+        x:DataType="local:FixedExpenseOverviewViewModel"
+        d:DesignWidth="1000"
+        d:DesignHeight="700"
+        MinWidth="800"
+        MinHeight="500"
+        MaxWidth="1000"
+        MaxHeight="700"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <local:FixedExpenseOverviewViewModel />
+    </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" />
+    </Window.KeyBindings>
+    <Border>
+        <Grid RowDefinitions="Auto, Auto, *, Auto">
+            <!-- Title Bar -->
+            <userControls:CustomTitleBar Grid.Row="0"
+                                         Title="{x:Static lang:language.FixedExpenseOverview_Title}"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+
+            <!-- Year Selector -->
+            <Border Grid.Row="1" Padding="15, 8">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <TextBlock Text="{x:Static lang:language.ManageFixedExpenses_PeriodRange_Yearly}"
+                               VerticalAlignment="Center"
+                               FontWeight="SemiBold"
+                               Margin="0, 0, 10, 0" />
+                    <ComboBox ItemsSource="{Binding AvailableYears}"
+                              SelectedItem="{Binding SelectedYear}"
+                              MinWidth="100" />
+                </StackPanel>
+            </Border>
+
+            <!-- Month Grids -->
+            <ScrollViewer Grid.Row="2" Padding="15, 0">
+                <ItemsControl ItemsSource="{Binding MonthGroups}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="local:FixedExpenseOverviewViewModel+MonthGroupViewModel">
+                            <Border Margin="0, 0, 0, 12">
+                                <!-- Month Header -->
+                                <StackPanel>
+                                    <Border Background="{DynamicResource Background800Brush}"
+                                            BorderBrush="{DynamicResource Background500Brush}"
+                                            BorderThickness="1, 1, 1, 0"
+                                            CornerRadius="5, 5, 0, 0"
+                                            Padding="10, 6">
+                                        <TextBlock Text="{Binding MonthName}"
+                                                   FontWeight="Bold"
+                                                   FontSize="{DynamicResource FontSizeNormal}" />
+                                    </Border>
+
+                                    <!-- Entries Grid -->
+                                    <Border BorderBrush="{DynamicResource Background500Brush}"
+                                            BorderThickness="1, 0, 1, 1"
+                                            CornerRadius="0, 0, 5, 5"
+                                            IsVisible="{Binding HasEntries}">
+                                        <StackPanel>
+                                            <!-- Column Headers -->
+                                            <Border Background="{DynamicResource Background700Brush}"
+                                                    Padding="8, 4">
+                                                <Grid ColumnDefinitions="40, *, 120, 190, 140">
+                                                    <TextBlock Grid.Column="0"
+                                                               FontSize="{DynamicResource FontSizeXSmall}"
+                                                               FontWeight="SemiBold"
+                                                               Opacity="0.7" />
+                                                    <TextBlock Grid.Column="1"
+                                                               Text="{x:Static lang:language.FixedExpenseOverview_Column_Name}"
+                                                               FontSize="{DynamicResource FontSizeXSmall}"
+                                                               FontWeight="SemiBold"
+                                                               Opacity="0.7" />
+                                                    <TextBlock Grid.Column="2"
+                                                               Text="{x:Static lang:language.FixedExpenseOverview_Column_Status}"
+                                                               FontSize="{DynamicResource FontSizeXSmall}"
+                                                               FontWeight="SemiBold"
+                                                               Opacity="0.7"
+                                                               HorizontalAlignment="Left"
+                                                               Margin="8,0,0,0" />
+                                                    <TextBlock Grid.Column="3"
+                                                               Text="{x:Static lang:language.FixedExpenseOverview_Column_Expected}"
+                                                               FontSize="{DynamicResource FontSizeXSmall}"
+                                                               FontWeight="SemiBold"
+                                                               Opacity="0.7"
+                                                               HorizontalAlignment="Right"
+                                                               Margin="0,0,8,0" />
+                                                    <TextBlock Grid.Column="4"
+                                                               Text="{x:Static lang:language.FixedExpenseOverview_Column_Actual}"
+                                                               FontSize="{DynamicResource FontSizeXSmall}"
+                                                               FontWeight="SemiBold"
+                                                               Opacity="0.7"
+                                                               HorizontalAlignment="Right"
+                                                               Margin="0,0,8,0" />
+                                                </Grid>
+                                            </Border>
+
+                                            <!-- Entry Rows -->
+                                            <ItemsControl ItemsSource="{Binding Entries}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate DataType="local:FixedExpenseOverviewViewModel+OverviewEntryViewModel">
+                                                        <Border Padding="8, 4"
+                                                                BorderBrush="{DynamicResource Background600Brush}"
+                                                                BorderThickness="0, 1, 0, 0">
+                                                            <Grid ColumnDefinitions="40, *, 120, 190, 140">
+                                                                <!-- Day -->
+                                                                <Border Grid.Column="0"
+                                                                        Width="28"
+                                                                        Height="28"
+                                                                        BorderBrush="{Binding StatusColor}"
+                                                                        BorderThickness="1.5"
+                                                                        CornerRadius="4"
+                                                                        HorizontalAlignment="Center"
+                                                                        VerticalAlignment="Center">
+                                                                    <TextBlock Text="{Binding DayFormatted}"
+                                                                               FontSize="{DynamicResource FontSizeSmall}"
+                                                                               FontWeight="SemiBold"
+                                                                               FontFamily="{DynamicResource GeistMono}"
+                                                                               Foreground="{Binding StatusColor}"
+                                                                               HorizontalAlignment="Center"
+                                                                               VerticalAlignment="Center" />
+                                                                </Border>
+                                                                <!-- Name -->
+                                                                <TextBlock Grid.Column="1"
+                                                                           Text="{Binding Name}"
+                                                                           VerticalAlignment="Center"
+                                                                           TextTrimming="CharacterEllipsis"
+                                                                           Margin="4, 0, 0, 0" />
+                                                                <!-- Status -->
+                                                                <TextBlock Grid.Column="2"
+                                                                           Text="{Binding StatusText}"
+                                                                           Foreground="{Binding StatusColor}"
+                                                                           FontSize="{DynamicResource FontSizeSmall}"
+                                                                           VerticalAlignment="Center"
+                                                                           HorizontalAlignment="Left"
+                                                                           Margin="8,0,0,0" />
+                                                                <!-- Expected Amount -->
+                                                                <TextBlock Grid.Column="3"
+                                                                           Text="{Binding ExpectedAmount}"
+                                                                           FontFamily="{DynamicResource GeistMono}"
+                                                                           FontSize="{DynamicResource FontSizeSmall}"
+                                                                           VerticalAlignment="Center"
+                                                                           HorizontalAlignment="Right"
+                                                                           Opacity="0.7"
+                                                                           Margin="0,0,8,0" />
+                                                                <!-- Actual Amount -->
+                                                                <TextBlock Grid.Column="4"
+                                                                           Text="{Binding ActualAmount}"
+                                                                           Foreground="{Binding ActualAmountColor}"
+                                                                           FontFamily="{DynamicResource GeistMono}"
+                                                                           FontSize="{DynamicResource FontSizeSmall}"
+                                                                           FontWeight="SemiBold"
+                                                                           VerticalAlignment="Center"
+                                                                           HorizontalAlignment="Right"
+                                                                           Margin="0,0,8,0" />
+                                                            </Grid>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+
+                                            <!-- Month Totalizer -->
+                                            <Border Background="{DynamicResource Background700Brush}"
+                                                    Padding="10, 6"
+                                                    BorderBrush="{DynamicResource Background600Brush}"
+                                                    BorderThickness="0, 1, 0, 0">
+                                                <StackPanel Orientation="Horizontal"
+                                                            HorizontalAlignment="Right"
+                                                            Spacing="24">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{x:Static lang:language.FixedExpenseOverview_Column_Expected}"
+                                                                   FontSize="{DynamicResource FontSizeXSmall}"
+                                                                   Foreground="{DynamicResource Accent200Brush}"
+                                                                   VerticalAlignment="Center"
+                                                                   Margin="0,0,6,0" />
+                                                        <TextBlock Text="{Binding MonthExpectedRange}"
+                                                                   FontFamily="{DynamicResource GeistMono}"
+                                                                   FontSize="{DynamicResource FontSizeSmall}"
+                                                                   FontWeight="SemiBold"
+                                                                   VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{x:Static lang:language.FixedExpenseOverview_PaidTotal}"
+                                                                   FontSize="{DynamicResource FontSizeXSmall}"
+                                                                   Foreground="{DynamicResource Accent200Brush}"
+                                                                   VerticalAlignment="Center"
+                                                                   Margin="0,0,6,0" />
+                                                        <TextBlock Text="{Binding MonthPaidTotal}"
+                                                                   FontFamily="{DynamicResource GeistMono}"
+                                                                   FontSize="{DynamicResource FontSizeSmall}"
+                                                                   FontWeight="SemiBold"
+                                                                   VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </Border>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- No Expenses Placeholder -->
+                                    <Border BorderBrush="{DynamicResource Background500Brush}"
+                                            BorderThickness="1, 0, 1, 1"
+                                            CornerRadius="0, 0, 5, 5"
+                                            Padding="10, 12"
+                                            IsVisible="{Binding !HasEntries}">
+                                        <TextBlock Text="{x:Static lang:language.FixedExpenseOverview_NoExpenses}"
+                                                   Opacity="0.5"
+                                                   FontStyle="Italic"
+                                                   HorizontalAlignment="Center" />
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- Footer Totals -->
+            <Border Grid.Row="3"
+                    Classes="form-fields-area"
+                    VerticalAlignment="Stretch"
+                    Margin="15, 0, 15, 10"
+                    Padding="12, 8">
+                <Grid ColumnDefinitions="*, *">
+                    <!-- Paid Total -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBlock Text="{x:Static lang:language.FixedExpenseOverview_PaidTotal}"
+                                   Foreground="{DynamicResource Accent200Brush}"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"
+                                   Margin="0, 0, 8, 0" />
+                        <TextBlock Text="{Binding PaidTotal}"
+                                   FontFamily="{DynamicResource GeistMono}"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                    <!-- Future Expenses -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBlock Text="{x:Static lang:language.FixedExpenseOverview_FutureExpensesTotal}"
+                                   Foreground="{DynamicResource Accent200Brush}"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"
+                                   Margin="0, 0, 8, 0" />
+                        <TextBlock Text="{Binding FutureExpensesTotal}"
+                                   FontFamily="{DynamicResource GeistMono}"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

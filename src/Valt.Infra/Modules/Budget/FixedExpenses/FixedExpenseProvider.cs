@@ -102,6 +102,7 @@ public class FixedExpenseProvider : IFixedExpenseProvider
         var rangeMax = rangeMin.AddMonths(1);
         //scan all fixed expense records from this month
         var fixedExpenseRecords = _localDatabase.GetFixedExpenseRecords().Query()
+            .Include(x => x.Transaction)
             .Where(x => x.ReferenceDate >= rangeMin && x.ReferenceDate < rangeMax).ToList();
         foreach (var entry in entries)
         {
@@ -118,7 +119,7 @@ public class FixedExpenseProvider : IFixedExpenseProvider
             switch (match.FixedExpenseRecordStateId)
             {
                 case (int)FixedExpenseRecordState.Paid when match.Transaction is not null:
-                    entry.Pay(match.Transaction.Id.ToString());
+                    entry.Pay(match.Transaction.Id.ToString(), match.Transaction.FromFiatAmount);
                     break;
                 case (int)FixedExpenseRecordState.Ignored:
                     entry.Ignore();

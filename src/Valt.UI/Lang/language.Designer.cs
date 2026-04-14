@@ -4826,5 +4826,77 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Tips.NextButton", resourceCulture);
             }
         }
+
+        public static string FixedExpenseOverview_Title {
+            get {
+                return ResourceManager.GetString("FixedExpenseOverview.Title", resourceCulture);
+            }
+        }
+
+        public static string FixedExpenseOverview_PaidTotal {
+            get {
+                return ResourceManager.GetString("FixedExpenseOverview.PaidTotal", resourceCulture);
+            }
+        }
+
+        public static string FixedExpenseOverview_FutureExpensesTotal {
+            get {
+                return ResourceManager.GetString("FixedExpenseOverview.FutureExpensesTotal", resourceCulture);
+            }
+        }
+
+        public static string FixedExpenseOverview_Column_Name {
+            get {
+                return ResourceManager.GetString("FixedExpenseOverview.Column.Name", resourceCulture);
+            }
+        }
+
+        public static string FixedExpenseOverview_Column_Status {
+            get {
+                return ResourceManager.GetString("FixedExpenseOverview.Column.Status", resourceCulture);
+            }
+        }
+
+        public static string FixedExpenseOverview_Column_Expected {
+            get {
+                return ResourceManager.GetString("FixedExpenseOverview.Column.Expected", resourceCulture);
+            }
+        }
+
+        public static string FixedExpenseOverview_Column_Actual {
+            get {
+                return ResourceManager.GetString("FixedExpenseOverview.Column.Actual", resourceCulture);
+            }
+        }
+
+        public static string FixedExpenseOverview_Status_Paid {
+            get {
+                return ResourceManager.GetString("FixedExpenseOverview.Status.Paid", resourceCulture);
+            }
+        }
+
+        public static string FixedExpenseOverview_Status_Ignored {
+            get {
+                return ResourceManager.GetString("FixedExpenseOverview.Status.Ignored", resourceCulture);
+            }
+        }
+
+        public static string FixedExpenseOverview_Status_ManuallyPaid {
+            get {
+                return ResourceManager.GetString("FixedExpenseOverview.Status.ManuallyPaid", resourceCulture);
+            }
+        }
+
+        public static string FixedExpenseOverview_Status_Pending {
+            get {
+                return ResourceManager.GetString("FixedExpenseOverview.Status.Pending", resourceCulture);
+            }
+        }
+
+        public static string FixedExpenseOverview_NoExpenses {
+            get {
+                return ResourceManager.GetString("FixedExpenseOverview.NoExpenses", resourceCulture);
+            }
+        }
     }
 }

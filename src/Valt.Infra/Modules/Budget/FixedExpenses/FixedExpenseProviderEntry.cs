@@ -18,6 +18,7 @@ public record FixedExpenseProviderEntry
     public decimal MaximumAmount => FixedAmount ?? RangedAmountMax ?? 0;
     
     public string? TransactionId { get; private set; }
+    public decimal? ActualAmount { get; private set; }
     public FixedExpenseRecordState State { get; private set; }
 
     public bool Paid => State == FixedExpenseRecordState.Paid && TransactionId != null;
@@ -53,6 +54,13 @@ public record FixedExpenseProviderEntry
     public void Pay(string transactionId)
     {
         TransactionId = transactionId;
+        State = FixedExpenseRecordState.Paid;
+    }
+
+    public void Pay(string transactionId, decimal? actualAmount)
+    {
+        TransactionId = transactionId;
+        ActualAmount = actualAmount;
         State = FixedExpenseRecordState.Paid;
     }
 

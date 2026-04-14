@@ -2467,4 +2467,40 @@
     <data name="Tips.Message.ReportsLongTerm" xml:space="preserve">
         <value>Después de usar Valt durante varios meses, la **pestaña de Informes** mostrará información más relevante, como tu **promedio de gastos de los últimos 12 meses** comparado con los 12 meses anteriores.</value>
     </data>
+    <data name="FixedExpenseOverview.Title" xml:space="preserve">
+        <value>Resumen de Gastos Fijos</value>
+    </data>
+    <data name="FixedExpenseOverview.PaidTotal" xml:space="preserve">
+        <value>Total Pagado</value>
+    </data>
+    <data name="FixedExpenseOverview.FutureExpensesTotal" xml:space="preserve">
+        <value>Gastos Futuros</value>
+    </data>
+    <data name="FixedExpenseOverview.Column.Name" xml:space="preserve">
+        <value>Nombre</value>
+    </data>
+    <data name="FixedExpenseOverview.Column.Status" xml:space="preserve">
+        <value>Estado</value>
+    </data>
+    <data name="FixedExpenseOverview.Column.Expected" xml:space="preserve">
+        <value>Esperado</value>
+    </data>
+    <data name="FixedExpenseOverview.Column.Actual" xml:space="preserve">
+        <value>Real</value>
+    </data>
+    <data name="FixedExpenseOverview.Status.Paid" xml:space="preserve">
+        <value>Pagado</value>
+    </data>
+    <data name="FixedExpenseOverview.Status.Ignored" xml:space="preserve">
+        <value>Ignorado</value>
+    </data>
+    <data name="FixedExpenseOverview.Status.ManuallyPaid" xml:space="preserve">
+        <value>Pagado Manualmente</value>
+    </data>
+    <data name="FixedExpenseOverview.Status.Pending" xml:space="preserve">
+        <value>Pendiente</value>
+    </data>
+    <data name="FixedExpenseOverview.NoExpenses" xml:space="preserve">
+        <value>Sin gastos fijos para este mes</value>
+    </data>
 </root>

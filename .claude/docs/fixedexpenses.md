@@ -120,6 +120,7 @@ public record FixedExpenseProviderEntry {
     decimal? FixedAmount, RangedAmountMin, RangedAmountMax
     string Currency
     decimal MinimumAmount, MaximumAmount  // Calculated
+    decimal? ActualAmount  // Transaction's FromFiatAmount (negative for expenses)
 
     // State
     string? TransactionId
@@ -127,6 +128,8 @@ public record FixedExpenseProviderEntry {
     bool Paid, Ignored, MarkedAsPaid, Empty  // Convenience
 }
 ```
+
+**Note:** `ActualAmount` is populated from the linked transaction's `FromFiatAmount` when the expense is paid. It is stored as a negative value (expense convention). Use `Math.Abs()` when displaying or comparing against expected ranges.
 
 ### Query Service
 
@@ -204,6 +207,31 @@ Main CRUD interface.
 Displays expense history:
 - Transaction history (date, name, amount, account)
 - Price history (period, amount, day)
+
+### FixedExpenseOverviewViewModel
+
+**File:** `FixedExpenseOverview/FixedExpenseOverviewViewModel.cs`
+
+Yearly overview modal showing all 12 months with per-entry status, expected vs actual amounts, and out-of-range highlighting.
+
+**Dependencies:** `IFixedExpenseProvider`, `RatesState`, `CurrencySettings`, `IClock`, `SecureModeState`
+
+**Properties:**
+- `SelectedYear` - Year selector (defaults to current year, range: current-2 to current+1)
+- `MonthGroups` - 12 `MonthGroupViewModel` items (MonthName, Entries, HasEntries, MonthPaidTotal, MonthExpectedRange)
+- `PaidTotal` - Sum of all paid/manually-paid amounts (converted to main currency)
+- `FutureExpensesTotal` - Approximate total of empty+future entries (excludes ignored)
+
+**Inner Types:**
+- `MonthGroupViewModel` - Month header with entries list and per-month totals
+- `OverviewEntryViewModel` - Entry with Day, Name, StatusText/Color, ExpectedAmount, ActualAmount, IsOutOfRange
+
+**Out-of-Range Detection:**
+- Fixed amount: `|ActualAmount| != FixedAmount`
+- Ranged: `|ActualAmount| < Min || |ActualAmount| > Max`
+- Highlighted with `FixedExpenseListResources.WarningForeground`
+
+**Accessible via:** Calendar icon button on FixedExpensesPanelView header (left of manage button)
 
 ### FixedExpensesEntryViewModel (Tab Display)
 
@@ -294,5 +322,6 @@ src/Valt.Infra/Modules/Budget/FixedExpenses/
 src/Valt.UI/Views/Main/Modals/
 ├── FixedExpenseEditor/
 ├── FixedExpenseHistory/
+├── FixedExpenseOverview/
 └── ManageFixedExpenses/
 ```
