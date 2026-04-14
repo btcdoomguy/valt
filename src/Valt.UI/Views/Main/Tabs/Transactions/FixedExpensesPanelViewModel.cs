@@ -26,6 +26,7 @@ using Valt.UI.Services;
 using Valt.UI.State;
 using Valt.UI.Views.Main.Modals.FixedExpenseEditor;
 using Valt.UI.Views.Main.Modals.FixedExpenseHistory;
+using Valt.UI.Views.Main.Modals.FixedExpenseOverview;
 using Valt.UI.Views.Main.Modals.ManageFixedExpenses;
 using Valt.UI.Views.Main.Modals.TransactionEditor;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
@@ -174,6 +175,20 @@ public partial class FixedExpensesPanelViewModel : ValtViewModel, IDisposable
     }
 
     #region Commands
+
+    [RelayCommand]
+    private async Task OpenFixedExpenseOverview()
+    {
+        var ownerWindow = GetUserControlOwnerWindow();
+
+        var window = (FixedExpenseOverviewView)await _modalFactory.CreateAsync(
+            ApplicationModalNames.FixedExpenseOverview,
+            ownerWindow, null)!;
+
+        _ = await window.ShowDialog<FixedExpenseOverviewViewModel.Response?>(ownerWindow!);
+
+        await FetchFixedExpenses();
+    }
 
     [RelayCommand]
     private async Task ManageFixedExpenses()

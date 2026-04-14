@@ -19,6 +19,7 @@ using Valt.UI.Views.Main.Modals.ChangePassword;
 using Valt.UI.Views.Main.Modals.CreateDatabase;
 using Valt.UI.Views.Main.Modals.FixedExpenseEditor;
 using Valt.UI.Views.Main.Modals.FixedExpenseHistory;
+using Valt.UI.Views.Main.Modals.FixedExpenseOverview;
 using Valt.UI.Views.Main.Modals.IconSelector;
 using Valt.UI.Views.Main.Modals.InitialSelection;
 using Valt.UI.Views.Main.Modals.InputPassword;
@@ -124,6 +125,7 @@ public static class Extensions
         services.AddTransient<PriceHistoryViewModel>();
         services.AddTransient<SimulatedPricesConfigViewModel>();
         services.AddTransient<TipsViewModel>();
+        services.AddTransient<FixedExpenseOverviewViewModel>();
 
         //other
         services.AddSingleton<IInitialCategoryNameLanguageProvider, InitialCategoryNameLanguageProvider>();
@@ -241,6 +243,10 @@ public static class Extensions
                 ApplicationModalNames.Tips => new TipsView()
                 {
                     DataContext = services.GetRequiredService<TipsViewModel>(),
+                },
+                ApplicationModalNames.FixedExpenseOverview => new FixedExpenseOverviewView()
+                {
+                    DataContext = services.GetRequiredService<FixedExpenseOverviewViewModel>(),
                 },
                 _ => throw new ArgumentOutOfRangeException(nameof(modalNames), modalNames, null)
             };
