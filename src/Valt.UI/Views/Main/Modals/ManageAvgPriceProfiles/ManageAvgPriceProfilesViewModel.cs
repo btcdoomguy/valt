@@ -219,6 +219,7 @@ public partial class ManageAvgPriceProfilesViewModel : ValtModalValidatorViewMod
                     IconName = Icon != Icon.Empty ? Icon.Name : null,
                     IconUnicode = Icon.Unicode,
                     IconColor = Icon.Color.ToArgb(),
+                    CurrencyCode = Currency,
                     CalculationMethodId = (int)SelectedStrategy.Value
                 });
 

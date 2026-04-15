@@ -13,6 +13,8 @@ public record EditProfileCommand : ICommand<EditProfileResult>
     public char IconUnicode { get; init; }
     public int IconColor { get; init; }
 
+    public required string CurrencyCode { get; init; }
+
     /// <summary>
     /// Calculation method: 0=BrazilianRule, 1=Fifo
     /// </summary>

@@ -233,4 +233,14 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
 
         AddEvent(new AvgPriceProfileUpdatedEvent(this));
     }
+
+    public void ChangeCurrency(FiatCurrency currency)
+    {
+        if (Currency == currency)
+            return;
+
+        Currency = currency;
+
+        AddEvent(new AvgPriceProfileUpdatedEvent(this));
+    }
 }

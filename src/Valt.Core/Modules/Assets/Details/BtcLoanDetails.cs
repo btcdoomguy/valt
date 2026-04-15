@@ -165,6 +165,15 @@ public sealed class BtcLoanDetails : IAssetDetails
     }
 
     /// <summary>
+    /// Calculates the total debt obligation: LoanAmount + AccruedInterest + Fees.
+    /// This is the total amount the borrower needs to repay.
+    /// </summary>
+    public decimal CalculateTotalDebt()
+    {
+        return LoanAmount + CalculateAccruedInterest() + Fees;
+    }
+
+    /// <summary>
     /// Calculates the number of days until the repayment date.
     /// Returns null if no repayment date is set.
     /// </summary>
@@ -178,16 +187,14 @@ public sealed class BtcLoanDetails : IAssetDetails
     }
 
     /// <summary>
-    /// Calculates the net worth impact: CollateralValue - LoanAmount - AccruedInterest - Fees.
-    /// Returns 0 if BTC price is unavailable (prevents bogus negative values).
+    /// Calculates the net worth impact as a pure liability: -TotalDebt.
+    /// The BTC collateral is expected to be tracked separately in a BTC account,
+    /// so the loan only represents the debt obligation to avoid double-counting.
+    /// The btcPrice parameter is accepted for interface compatibility but not used.
     /// </summary>
     public decimal CalculateCurrentValue(decimal btcPrice)
     {
-        if (btcPrice <= 0)
-            return 0;
-
-        var collateralValue = CollateralSats / 100_000_000m * btcPrice;
-        return collateralValue - LoanAmount - CalculateAccruedInterest() - Fees;
+        return -CalculateTotalDebt();
     }
 
     public IAssetDetails WithUpdatedPrice(decimal newPrice)

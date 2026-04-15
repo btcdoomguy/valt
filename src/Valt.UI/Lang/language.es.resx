@@ -1029,6 +1029,12 @@
     <data name="Assets.Summary.TotalSats" xml:space="preserve">
         <value>Valor en Sats</value>
     </data>
+    <data name="Assets.Summary.TotalAssetsValue" xml:space="preserve">
+        <value>Total de Activos</value>
+    </data>
+    <data name="Assets.Summary.TotalLiabilities" xml:space="preserve">
+        <value>Total de Pasivos</value>
+    </data>
     <data name="Assets.Details.Title" xml:space="preserve">
         <value>Detalles del Activo</value>
     </data>
@@ -2168,6 +2174,18 @@
     </data>
     <data name="Assets_Fees" xml:space="preserve">
         <value>Comisiones</value>
+    </data>
+    <data name="Assets_TotalDebt" xml:space="preserve">
+        <value>Deuda Total</value>
+    </data>
+    <data name="Assets_NetEquity" xml:space="preserve">
+        <value>Patrimonio Neto</value>
+    </data>
+    <data name="Assets_Card_TotalDebt" xml:space="preserve">
+        <value>Deuda Total: </value>
+    </data>
+    <data name="Assets_Card_AccruedInterest" xml:space="preserve">
+        <value>Intereses: </value>
     </data>
     <data name="Assets_BorrowerPlatform" xml:space="preserve">
         <value>Prestatario / Plataforma</value>

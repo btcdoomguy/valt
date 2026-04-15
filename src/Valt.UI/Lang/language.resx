@@ -1034,6 +1034,12 @@
     <data name="Assets.Summary.TotalSats" xml:space="preserve">
         <value>Value in Sats</value>
     </data>
+    <data name="Assets.Summary.TotalAssetsValue" xml:space="preserve">
+        <value>Total Assets</value>
+    </data>
+    <data name="Assets.Summary.TotalLiabilities" xml:space="preserve">
+        <value>Total Liabilities</value>
+    </data>
     <data name="Assets.Details.Title" xml:space="preserve">
         <value>Asset Details</value>
     </data>
@@ -2173,6 +2179,18 @@
     </data>
     <data name="Assets_Fees" xml:space="preserve">
         <value>Fees</value>
+    </data>
+    <data name="Assets_TotalDebt" xml:space="preserve">
+        <value>Total Debt</value>
+    </data>
+    <data name="Assets_NetEquity" xml:space="preserve">
+        <value>Net Equity</value>
+    </data>
+    <data name="Assets_Card_TotalDebt" xml:space="preserve">
+        <value>Total Debt: </value>
+    </data>
+    <data name="Assets_Card_AccruedInterest" xml:space="preserve">
+        <value>Interest: </value>
     </data>
     <data name="Assets_BorrowerPlatform" xml:space="preserve">
         <value>Borrower / Platform</value>

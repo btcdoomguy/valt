@@ -115,7 +115,7 @@
                             <DataTemplate DataType="models:AssetViewModel">
                                 <!-- Asset Card -->
                                 <Border Width="230"
-                                        Height="299"
+                                        Height="340"
                                         Margin="0,0,12,12"
                                         CornerRadius="8"
                                         BoxShadow="0 4 16 0 #AA000000, 0 1 4 0 #66000000"
@@ -400,6 +400,30 @@
                                                     </Grid>
                                                     <Grid ColumnDefinitions="Auto, *">
                                                         <TextBlock Grid.Column="0"
+                                                                   Text="{x:Static lang:language.Assets_Card_TotalDebt}"
+                                                                   FontSize="{DynamicResource FontSizeXSmall}"
+                                                                   Foreground="{DynamicResource AssetCardLabelBrush}"
+                                                                   FontWeight="SemiBold"
+                                                                   Margin="0,0,4,0" />
+                                                        <TextBlock Grid.Column="1"
+                                                                   Text="{Binding TotalDebtFormatted}"
+                                                                   FontSize="{DynamicResource FontSizeXSmall}"
+                                                                   Foreground="#F44336"
+                                                                   FontWeight="SemiBold" />
+                                                    </Grid>
+                                                    <Grid ColumnDefinitions="Auto, *">
+                                                        <TextBlock Grid.Column="0"
+                                                                   Text="{x:Static lang:language.Assets_Card_AccruedInterest}"
+                                                                   FontSize="{DynamicResource FontSizeXSmall}"
+                                                                   Foreground="{DynamicResource AssetCardLabelBrush}"
+                                                                   Margin="0,0,4,0" />
+                                                        <TextBlock Grid.Column="1"
+                                                                   Text="{Binding AccruedInterestFormatted}"
+                                                                   FontSize="{DynamicResource FontSizeXSmall}"
+                                                                   Foreground="{DynamicResource AssetCardTextBrush}" />
+                                                    </Grid>
+                                                    <Grid ColumnDefinitions="Auto, *">
+                                                        <TextBlock Grid.Column="0"
                                                                    Text="{x:Static lang:language.Assets_Card_APR}"
                                                                    FontSize="{DynamicResource FontSizeXSmall}"
                                                                    Foreground="{DynamicResource AssetCardLabelBrush}"
@@ -514,6 +538,11 @@
                                                 <!-- Value display -->
                                                 <StackPanel Grid.Row="1" Margin="0,8,0,0">
                                                     <Border Height="1" Background="{DynamicResource AssetCardSeparatorBrush}" Margin="0,0,0,8" />
+                                                    <TextBlock Text="{Binding ValueLabel}"
+                                                               FontSize="{DynamicResource FontSizeXSmall}"
+                                                               Foreground="{DynamicResource AssetCardMutedBrush}"
+                                                               HorizontalAlignment="Center"
+                                                               IsVisible="{Binding HasValueLabel}" />
                                                     <TextBlock Text="{Binding DisplayValueFormatted}"
                                                                FontSize="{DynamicResource FontSizeXLarge}"
                                                                Foreground="{Binding ValueColor, Converter={StaticResource StringToColorBrushConverter}}"
@@ -604,6 +633,43 @@
                                            HorizontalAlignment="Right"
                                            VerticalAlignment="Center" />
                             </Grid>
+
+                            <!-- Assets vs Liabilities breakdown -->
+                            <StackPanel Spacing="8" IsVisible="{Binding HasLiabilities}">
+                                <Separator Margin="0,4" />
+
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <TextBlock Grid.Column="0"
+                                               Text="{x:Static lang:language.Assets_Summary_TotalAssetsValue}"
+                                               FontSize="{DynamicResource FontSizeMedium}"
+                                               Foreground="{DynamicResource Text400Brush}"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding TotalAssetsFormatted}"
+                                               FontSize="{DynamicResource FontSizeLarge}"
+                                               FontWeight="SemiBold"
+                                               Foreground="#4CAF50"
+                                               FontFamily="{StaticResource GeistMono}"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <TextBlock Grid.Column="0"
+                                               Text="{x:Static lang:language.Assets_Summary_TotalLiabilities}"
+                                               FontSize="{DynamicResource FontSizeMedium}"
+                                               Foreground="{DynamicResource Text400Brush}"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding TotalLiabilitiesFormatted}"
+                                               FontSize="{DynamicResource FontSizeLarge}"
+                                               FontWeight="SemiBold"
+                                               Foreground="#F44336"
+                                               FontFamily="{StaticResource GeistMono}"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+                            </StackPanel>
 
                             <Separator Margin="0,8" />
 
@@ -778,6 +844,24 @@
                                 <Grid ColumnDefinitions="*, Auto">
                                     <TextBlock Grid.Column="0" Text="{x:Static lang:language.Assets_Fees}" />
                                     <TextBlock Grid.Column="1" Text="{Binding SelectedAsset.FeesFormatted}" FontWeight="SemiBold" />
+                                </Grid>
+
+                                <Separator Margin="0,4" />
+
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <TextBlock Grid.Column="0" Text="{x:Static lang:language.Assets_TotalDebt}" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding SelectedAsset.TotalDebtFormatted}"
+                                               Foreground="#F44336"
+                                               FontWeight="Bold" />
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <TextBlock Grid.Column="0" Text="{x:Static lang:language.Assets_NetEquity}" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding SelectedAsset.CurrentValueFormatted}"
+                                               Foreground="{Binding SelectedAsset.ValueColor, Converter={StaticResource StringToColorBrushConverter}}"
+                                               FontWeight="SemiBold" />
                                 </Grid>
 
                                 <Border Background="{Binding SelectedAsset.LoanHealthColor, Converter={StaticResource StringToColorBrushConverter}}"

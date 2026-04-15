@@ -58,6 +58,9 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
     [NotifyPropertyChangedFor(nameof(TotalValueColor))]
     [NotifyPropertyChangedFor(nameof(TotalSatsColor))]
     [NotifyPropertyChangedFor(nameof(TotalValueFormatted))]
+    [NotifyPropertyChangedFor(nameof(TotalAssetsFormatted))]
+    [NotifyPropertyChangedFor(nameof(TotalLiabilitiesFormatted))]
+    [NotifyPropertyChangedFor(nameof(HasLiabilities))]
     private AssetSummaryDTO? _summary;
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsSelectedAssetDetailsVisible))]
@@ -75,6 +78,16 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
     public string TotalValueFormatted => Summary != null
         ? CurrencyDisplay.FormatFiat(Summary.TotalValueInMainCurrency, MainCurrencyCode)
         : "-";
+
+    public string TotalAssetsFormatted => Summary != null
+        ? CurrencyDisplay.FormatFiat(Summary.TotalAssetsValueInMainCurrency, MainCurrencyCode)
+        : "-";
+
+    public string TotalLiabilitiesFormatted => Summary != null
+        ? CurrencyDisplay.FormatFiat(Summary.TotalLiabilitiesInMainCurrency, MainCurrencyCode)
+        : "-";
+
+    public bool HasLiabilities => Summary?.LiabilitiesCount > 0;
 
     /// <summary>
     /// Design-time sample data for XAML previewer.
@@ -96,6 +109,9 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
                         new() { CurrencyCode = "USD", TotalValue = 125432.50m, AssetCount = 3 },
                         new() { CurrencyCode = "BRL", TotalValue = 50000m, AssetCount = 2 }
                     },
+                    TotalAssetsValueInMainCurrency = 160432.50m,
+                    TotalLiabilitiesInMainCurrency = 25000m,
+                    LiabilitiesCount = 1,
                     TotalValueInMainCurrency = 135432.50m,
                     TotalValueInSats = 1_350_000_000
                 },
