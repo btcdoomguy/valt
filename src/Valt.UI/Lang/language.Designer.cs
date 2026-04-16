@@ -2487,6 +2487,12 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string ManageAsset_IndefinitePeriod {
+            get {
+                return ResourceManager.GetString("ManageAsset_IndefinitePeriod", resourceCulture);
+            }
+        }
+
         public static string ManageAsset_BorrowerPlatform {
             get {
                 return ResourceManager.GetString("ManageAsset_BorrowerPlatform", resourceCulture);
@@ -4368,6 +4374,12 @@ namespace Valt.UI.Lang {
         public static string Assets_DaysUntilRepayment {
             get {
                 return ResourceManager.GetString("Assets_DaysUntilRepayment", resourceCulture);
+            }
+        }
+
+        public static string Assets_IndefinitePeriod {
+            get {
+                return ResourceManager.GetString("Assets_IndefinitePeriod", resourceCulture);
             }
         }
 

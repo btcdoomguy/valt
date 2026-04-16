@@ -1245,6 +1245,9 @@
     <data name="ManageAsset_RepaymentDate" xml:space="preserve">
         <value>Repayment Date</value>
     </data>
+    <data name="ManageAsset_IndefinitePeriod" xml:space="preserve">
+        <value>Indefinite period (no end date)</value>
+    </data>
     <data name="ManageAsset_BorrowerPlatform" xml:space="preserve">
         <value>Borrower / Platform</value>
     </data>
@@ -2203,6 +2206,9 @@
     </data>
     <data name="Assets_DaysUntilRepayment" xml:space="preserve">
         <value>Days Until Repayment</value>
+    </data>
+    <data name="Assets_IndefinitePeriod" xml:space="preserve">
+        <value>Indefinite</value>
     </data>
     <data name="Assets.Sell" xml:space="preserve">
         <value>Sell</value>

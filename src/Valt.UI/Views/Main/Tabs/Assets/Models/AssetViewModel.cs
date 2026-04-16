@@ -312,7 +312,7 @@ public partial class AssetViewModel : ObservableObject
 
         DaysUntilRepaymentFormatted = DaysUntilRepayment.HasValue
             ? $"{DaysUntilRepayment.Value}d"
-            : "-";
+            : (IsBtcLoan || IsBtcLending) ? language.Assets_IndefinitePeriod : "-";
 
         AmountLentFormatted = AmountLent.HasValue
             ? CurrencyDisplay.FormatFiat(AmountLent.Value, CurrencyCode)
