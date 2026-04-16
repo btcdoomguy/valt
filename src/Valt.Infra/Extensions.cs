@@ -113,7 +113,7 @@ public static class Extensions
         services.AddSingleton<IIndicatorCache, IndicatorCache>();
 
         //price crawlers bitcoin
-        services.AddSingleton<IBitcoinPriceProvider, CoinbaseProvider>();
+        services.AddSingleton<IBitcoinPriceProvider, CoinGeckoProvider>();
 
         //price crawlers fiat
         services.AddSingleton<IFiatPriceProvider, FrankfurterFiatRateProvider>();
