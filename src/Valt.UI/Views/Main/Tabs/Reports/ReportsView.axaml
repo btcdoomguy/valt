@@ -35,9 +35,10 @@
                         <TextBlock Classes="section-header" Text="{x:Static lang:language.Reports_Summary}" />
                     </StackPanel>
                 </Expander.Header>
-                <WrapPanel Orientation="Horizontal">
+                <reports1:DashboardGridPanel>
                     <!-- Wealth Dashboard -->
-                    <Grid MinHeight="150" Margin="0,0,10,10">
+                    <Grid MinHeight="150"
+                          reports1:DashboardGridPanel.RowSpan="{Binding WealthData.IsLarge, Converter={x:Static reports1:DashboardGridPanel.IsLargeToRowSpanConverter}}">
                         <Panel IsVisible="{Binding !IsWealthLoading}">
                             <reports1:DashboardDataUserControl DataContext="{Binding WealthData}" />
                         </Panel>
@@ -46,7 +47,8 @@
                                    IsVisible="{Binding IsWealthLoading}" />
                     </Grid>
                     <!-- All Time High Dashboard -->
-                    <Grid MinHeight="150" Margin="0,0,10,10">
+                    <Grid MinHeight="150"
+                          reports1:DashboardGridPanel.RowSpan="{Binding AllTimeHighData.IsLarge, Converter={x:Static reports1:DashboardGridPanel.IsLargeToRowSpanConverter}}">
                         <Panel IsVisible="{Binding !IsAllTimeHighLoading}">
                             <reports1:DashboardDataUserControl DataContext="{Binding AllTimeHighData}" />
                         </Panel>
@@ -55,7 +57,8 @@
                                    IsVisible="{Binding IsAllTimeHighLoading}" />
                     </Grid>
                     <!-- BTC Stack Dashboard -->
-                    <Grid MinHeight="150" Margin="0,0,10,10">
+                    <Grid MinHeight="150"
+                          reports1:DashboardGridPanel.RowSpan="{Binding BtcStackData.IsLarge, Converter={x:Static reports1:DashboardGridPanel.IsLargeToRowSpanConverter}}">
                         <Panel IsVisible="{Binding !IsBtcStackLoading}">
                             <reports1:DashboardDataUserControl DataContext="{Binding BtcStackData}" />
                         </Panel>
@@ -64,7 +67,8 @@
                                    IsVisible="{Binding IsBtcStackLoading}" />
                     </Grid>
                     <!-- Statistics Dashboard -->
-                    <Grid MinHeight="150" Margin="0,0,10,10">
+                    <Grid MinHeight="150"
+                          reports1:DashboardGridPanel.RowSpan="{Binding StatisticsData.IsLarge, Converter={x:Static reports1:DashboardGridPanel.IsLargeToRowSpanConverter}}">
                         <Panel IsVisible="{Binding !IsStatisticsLoading}">
                             <reports1:DashboardDataUserControl DataContext="{Binding StatisticsData}" />
                         </Panel>
@@ -73,7 +77,8 @@
                                    IsVisible="{Binding IsStatisticsLoading}" />
                     </Grid>
                     <!-- Simulated Prices Dashboard -->
-                    <Grid MinHeight="150" Margin="0,0,10,10">
+                    <Grid MinHeight="150"
+                          reports1:DashboardGridPanel.RowSpan="{Binding SimulatedPricesData.IsLarge, Converter={x:Static reports1:DashboardGridPanel.IsLargeToRowSpanConverter}}">
                         <Panel IsVisible="{Binding !IsSimulatedPricesLoading}">
                             <reports1:DashboardDataUserControl DataContext="{Binding SimulatedPricesData}" />
                         </Panel>
@@ -82,7 +87,8 @@
                                    IsVisible="{Binding IsSimulatedPricesLoading}" />
                     </Grid>
                     <!-- Indicators Dashboard -->
-                    <Grid MinHeight="150" Margin="0,0,10,10">
+                    <Grid MinHeight="150"
+                          reports1:DashboardGridPanel.RowSpan="{Binding IndicatorsData.IsLarge, Converter={x:Static reports1:DashboardGridPanel.IsLargeToRowSpanConverter}}">
                         <Panel IsVisible="{Binding !IsIndicatorsLoading}">
                             <reports1:DashboardDataUserControl DataContext="{Binding IndicatorsData}" />
                         </Panel>
@@ -91,7 +97,9 @@
                                    IsVisible="{Binding IsIndicatorsLoading}" />
                     </Grid>
                     <!-- Leverage Positions Dashboard -->
-                    <Grid MinHeight="150" Margin="0,0,10,10" IsVisible="{Binding IsLeveragePositionsVisible}">
+                    <Grid MinHeight="150"
+                          IsVisible="{Binding IsLeveragePositionsVisible}"
+                          reports1:DashboardGridPanel.RowSpan="{Binding LeveragePositionsData.IsLarge, Converter={x:Static reports1:DashboardGridPanel.IsLargeToRowSpanConverter}}">
                         <Panel IsVisible="{Binding !IsLeveragePositionsLoading}">
                             <reports1:DashboardDataUserControl DataContext="{Binding LeveragePositionsData}" />
                         </Panel>
@@ -100,7 +108,9 @@
                                    IsVisible="{Binding IsLeveragePositionsLoading}" />
                     </Grid>
                     <!-- BTC Loans Dashboard -->
-                    <Grid MinHeight="150" Margin="0,0,10,10" IsVisible="{Binding IsBtcLoansVisible}">
+                    <Grid MinHeight="150"
+                          IsVisible="{Binding IsBtcLoansVisible}"
+                          reports1:DashboardGridPanel.RowSpan="{Binding BtcLoansData.IsLarge, Converter={x:Static reports1:DashboardGridPanel.IsLargeToRowSpanConverter}}">
                         <Panel IsVisible="{Binding !IsBtcLoansLoading}">
                             <reports1:DashboardDataUserControl DataContext="{Binding BtcLoansData}" />
                         </Panel>
@@ -108,7 +118,7 @@
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    IsVisible="{Binding IsBtcLoansLoading}" />
                     </Grid>
-                </WrapPanel>
+                </reports1:DashboardGridPanel>
             </Expander>
             <!--Wealth Overview-->
             <Expander Classes="section" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsExpanded="True">

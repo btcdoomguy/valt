@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 using LiveChartsCore.Kernel;
 
@@ -7,6 +8,8 @@ namespace Valt.UI.Views.Main.Tabs.Reports;
 public record DashboardData(string Title, ObservableCollection<RowItem> Rows, ICommand? ConfigureCommand = null, string? Icon = null, bool IsStale = false)
 {
     public bool HasConfiguration => ConfigureCommand is not null;
+
+    public bool IsLarge => Rows.Count(r => !r.IsSeparator) > 8;
 
     public static DashboardData Empty => new(string.Empty, new ObservableCollection<RowItem>());
 
