@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Valt.Core.Kernel.Abstractions.EventSystem;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Kernel.Factories;
@@ -113,7 +114,11 @@ public static class Extensions
         services.AddSingleton<IIndicatorCache, IndicatorCache>();
 
         //price crawlers bitcoin
-        services.AddSingleton<IBitcoinPriceProvider, CoinbaseProvider>();
+        services.AddSingleton<CoinGeckoProvider>();
+        services.AddSingleton<IBitcoinPriceProvider>(sp =>
+            new ThrottledBitcoinPriceProvider(
+                sp.GetRequiredService<CoinGeckoProvider>(),
+                sp.GetRequiredService<ILogger<ThrottledBitcoinPriceProvider>>()));
 
         //price crawlers fiat
         services.AddSingleton<IFiatPriceProvider, FrankfurterFiatRateProvider>();

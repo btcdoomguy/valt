@@ -881,6 +881,81 @@
     <data name="Reports.LeveragePositions.BtcPriceToHitAth" xml:space="preserve">
         <value>BTC price to hit ATH</value>
     </data>
+    <data name="Reports.BtcLoans.Title" xml:space="preserve">
+        <value>BTC Loans</value>
+    </data>
+    <data name="Reports.BtcLoans.ActiveLoans" xml:space="preserve">
+        <value>Active loans</value>
+    </data>
+    <data name="Reports.BtcLoans.TotalDebt" xml:space="preserve">
+        <value>Total debt</value>
+    </data>
+    <data name="Reports.BtcLoans.AvgLtv" xml:space="preserve">
+        <value>Avg LTV</value>
+    </data>
+    <data name="Reports.BtcLoans.AvgLtv.Tooltip" xml:space="preserve">
+        <value>Debt-weighted average LTV across all active loans</value>
+    </data>
+    <data name="Reports.BtcLoans.AvgApr" xml:space="preserve">
+        <value>Avg APR</value>
+    </data>
+    <data name="Reports.BtcLoans.AvgApr.Tooltip" xml:space="preserve">
+        <value>Debt-weighted average APR across all active loans</value>
+    </data>
+    <data name="Reports.BtcLoans.CollateralSats" xml:space="preserve">
+        <value>Total collateral</value>
+    </data>
+    <data name="Reports.BtcLoans.CollateralFiat" xml:space="preserve">
+        <value>Collateral (fiat)</value>
+    </data>
+    <data name="Reports.BtcLoans.CollateralPercent" xml:space="preserve">
+        <value>% of stack pledged</value>
+    </data>
+    <data name="Reports.BtcLoans.CollateralPercent.Tooltip" xml:space="preserve">
+        <value>Sum of collateral across BTC loans divided by your total BTC stack</value>
+    </data>
+    <data name="Reports.BtcLoans.FreeBtc" xml:space="preserve">
+        <value>Free BTC</value>
+    </data>
+    <data name="Reports.BtcLoans.HealthBreakdown" xml:space="preserve">
+        <value>Loan health</value>
+    </data>
+    <data name="Reports.BtcLoans.HealthBreakdown.Format" xml:space="preserve">
+        <value>{0} ok / {1} warn / {2} risk</value>
+    </data>
+    <data name="Reports.BtcLoans.HighestLtv" xml:space="preserve">
+        <value>Highest LTV</value>
+    </data>
+    <data name="Reports.BtcLoans.ClosestDistance" xml:space="preserve">
+        <value>Closest to liq.</value>
+    </data>
+    <data name="Reports.BtcLoans.ClosestDistance.Tooltip" xml:space="preserve">
+        <value>LTV gap to liquidation for "{0}"</value>
+    </data>
+    <data name="Reports.BtcLoans.WorstCaseLiquidationPrice" xml:space="preserve">
+        <value>Worst-case liq. price</value>
+    </data>
+    <data name="Reports.BtcLoans.WorstCaseLiquidationPrice.Tooltip" xml:space="preserve">
+        <value>Highest BTC price at which any of your loans would still be at risk</value>
+    </data>
+    <data name="Reports.BtcLoans.AccruedInterest" xml:space="preserve">
+        <value>Accrued interest</value>
+    </data>
+    <data name="Reports.BtcLoans.FeesPaid" xml:space="preserve">
+        <value>Fees paid</value>
+    </data>
+    <data name="Reports.BtcLoans.AvgLoanAge" xml:space="preserve">
+        <value>Avg loan age</value>
+    </data>
+    <data name="Reports.BtcLoans.NextRepayment" xml:space="preserve">
+        <value>Next repayment</value>
+    </data>
+    <data name="Reports.BtcLoans.NextRepayment.Tooltip" xml:space="preserve">
+        <value>Earliest repayment date — loan "{0}"</value>
+    </data>
+    <data name="Reports.BtcLoans.DaysFormat" xml:space="preserve">
+        <value>{0} days</value>
+    </data>
     <data name="Reports.Statistics.Title" xml:space="preserve">
         <value>Statistics</value>
     </data>

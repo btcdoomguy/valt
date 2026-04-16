@@ -1767,6 +1767,156 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string Reports_BtcLoans_Title {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.Title", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_ActiveLoans {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.ActiveLoans", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_TotalDebt {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.TotalDebt", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_AvgLtv {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.AvgLtv", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_AvgLtv_Tooltip {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.AvgLtv.Tooltip", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_AvgApr {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.AvgApr", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_AvgApr_Tooltip {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.AvgApr.Tooltip", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_CollateralSats {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.CollateralSats", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_CollateralFiat {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.CollateralFiat", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_CollateralPercent {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.CollateralPercent", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_CollateralPercent_Tooltip {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.CollateralPercent.Tooltip", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_FreeBtc {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.FreeBtc", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_HealthBreakdown {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.HealthBreakdown", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_HealthBreakdown_Format {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.HealthBreakdown.Format", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_HighestLtv {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.HighestLtv", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_ClosestDistance {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.ClosestDistance", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_ClosestDistance_Tooltip {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.ClosestDistance.Tooltip", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_WorstCaseLiquidationPrice {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.WorstCaseLiquidationPrice", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_WorstCaseLiquidationPrice_Tooltip {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.WorstCaseLiquidationPrice.Tooltip", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_AccruedInterest {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.AccruedInterest", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_FeesPaid {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.FeesPaid", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_AvgLoanAge {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.AvgLoanAge", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_NextRepayment {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.NextRepayment", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_NextRepayment_Tooltip {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.NextRepayment.Tooltip", resourceCulture);
+            }
+        }
+
+        public static string Reports_BtcLoans_DaysFormat {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.DaysFormat", resourceCulture);
+            }
+        }
+
         public static string Reports_Statistics_Title {
             get {
                 return ResourceManager.GetString("Reports.Statistics.Title", resourceCulture);
