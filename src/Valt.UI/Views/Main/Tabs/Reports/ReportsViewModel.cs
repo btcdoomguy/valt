@@ -15,6 +15,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Assets.Queries.GetBtcLoansDashboard;
 using Valt.App.Modules.Assets.Queries.GetVisibleAssets;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
@@ -84,6 +85,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private DashboardData _allTimeHighData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _btcStackData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _leveragePositionsData = DashboardData.Empty;
+    [ObservableProperty] private DashboardData _btcLoansData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _statisticsData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _simulatedPricesData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _indicatorsData = DashboardData.Empty;
@@ -103,6 +105,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private bool _isBtcStackLoading = true;
     [ObservableProperty] private bool _isLeveragePositionsLoading = true;
     [ObservableProperty] private bool _isLeveragePositionsVisible;
+    [ObservableProperty] private bool _isBtcLoansLoading = true;
+    [ObservableProperty] private bool _isBtcLoansVisible;
     [ObservableProperty] private bool _isStatisticsLoading = true;
     [ObservableProperty] private bool _isSimulatedPricesLoading = true;
     [ObservableProperty] private bool _isIndicatorsLoading = true;
@@ -191,9 +195,11 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     IsSpendingByCategoriesLoading = true;
                     IsIncomeByCategoriesLoading = true;
                     IsWealthOverviewLoading = true;
+                    IsBtcLoansLoading = true;
                     // Reload data when currency changes
                     ReloadDataAndFetchAllReportsAsync().SafeFireAndForget(logger: _logger, callerName: nameof(ReloadDataAndFetchAllReportsAsync));
                     UpdateSimulatedPricesData();
+                    UpdateBtcLoansDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateBtcLoansDataAsync));
                     break;
             }
         });
@@ -203,6 +209,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         WeakReferenceMessenger.Default.Register<AssetSummaryUpdatedMessage>(this, (recipient, message) =>
         {
             UpdateLeveragePositionsDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateLeveragePositionsDataAsync));
+            UpdateBtcLoansDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateBtcLoansDataAsync));
         });
 
         WeakReferenceMessenger.Default.Register<IndicatorsUpdatedMessage>(this, (recipient, message) =>
@@ -231,6 +238,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         LoadDataAndFetchAllReportsAsync()
             .ContinueWith(_ => UpdateLeveragePositionsDataAsync(), TaskScheduler.Default)
+            .ContinueWith(_ => UpdateBtcLoansDataAsync(), TaskScheduler.Default)
             .SafeFireAndForget(logger: _logger, callerName: nameof(LoadDataAndFetchAllReportsAsync));
         UpdateWealthData();
         UpdateBtcStackData();
@@ -1010,6 +1018,107 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
     }
 
+    private async Task UpdateBtcLoansDataAsync()
+    {
+        try
+        {
+            IsBtcLoansLoading = true;
+
+            var fiatRates = _ratesState.FiatRates;
+            var btcPrice = _ratesState.BitcoinPrice;
+            var mainCurrency = _currencySettings.MainFiatCurrency;
+            var stackSats = _accountsTotalState.CurrentWealth.WealthInSats;
+
+            if (fiatRates is null || !btcPrice.HasValue)
+            {
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    IsBtcLoansVisible = false;
+                    IsBtcLoansLoading = false;
+                });
+                return;
+            }
+
+            var dto = await _queryDispatcher.DispatchAsync(new GetBtcLoansDashboardQuery
+            {
+                MainCurrencyCode = mainCurrency,
+                BtcPriceUsd = btcPrice,
+                FiatRates = fiatRates,
+                TotalBtcStackSats = stackSats
+            });
+
+            if (!dto.HasActiveLoans)
+            {
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    IsBtcLoansVisible = false;
+                    IsBtcLoansLoading = false;
+                });
+                return;
+            }
+
+            var fiatCurrency = FiatCurrency.GetFromCode(mainCurrency);
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                var rows = new ObservableCollection<RowItem>
+                {
+                    new(language.Reports_BtcLoans_ActiveLoans, dto.ActiveLoansCount.ToString(CultureInfo.InvariantCulture)),
+                    new(language.Reports_BtcLoans_TotalDebt, CurrencyDisplay.FormatFiat(dto.TotalDebtInMainCurrency, fiatCurrency.Code)),
+                    new(language.Reports_BtcLoans_AvgLtv, dto.DebtWeightedAvgLtv.ToString("0.##", CultureInfo.InvariantCulture) + "%",
+                        TooltipContent.Text(language.Reports_BtcLoans_AvgLtv_Tooltip)),
+                    new(language.Reports_BtcLoans_AvgApr, dto.DebtWeightedAvgApr.ToString("0.##", CultureInfo.InvariantCulture) + "%",
+                        TooltipContent.Text(language.Reports_BtcLoans_AvgApr_Tooltip)),
+                    RowItem.Separator(),
+                    new(language.Reports_BtcLoans_CollateralSats, CurrencyDisplay.FormatSatsAsBitcoin(dto.TotalCollateralSats) + " BTC"),
+                    new(language.Reports_BtcLoans_CollateralFiat, CurrencyDisplay.FormatFiat(dto.TotalCollateralFiatInMainCurrency, fiatCurrency.Code)),
+                    new(language.Reports_BtcLoans_CollateralPercent,
+                        dto.CollateralPercentOfStack.ToString("0.##", CultureInfo.InvariantCulture) + "%",
+                        TooltipContent.Text(language.Reports_BtcLoans_CollateralPercent_Tooltip)),
+                    new(language.Reports_BtcLoans_FreeBtc, CurrencyDisplay.FormatSatsAsBitcoin(dto.FreeBtcSats) + " BTC"),
+                    RowItem.Separator(),
+                    new(language.Reports_BtcLoans_HealthBreakdown,
+                        string.Format(CultureInfo.InvariantCulture, language.Reports_BtcLoans_HealthBreakdown_Format,
+                            dto.HealthyCount, dto.WarningCount, dto.DangerCount)),
+                    new(language.Reports_BtcLoans_HighestLtv, dto.HighestLtv.ToString("0.##", CultureInfo.InvariantCulture) + "%"),
+                    new(language.Reports_BtcLoans_ClosestDistance,
+                        dto.ClosestDistanceToLiquidationLtv.ToString("0.##", CultureInfo.InvariantCulture) + "%",
+                        TooltipContent.Text(string.Format(CultureInfo.InvariantCulture, language.Reports_BtcLoans_ClosestDistance_Tooltip, dto.ClosestLoanName))),
+                    new(language.Reports_BtcLoans_WorstCaseLiquidationPrice,
+                        CurrencyDisplay.FormatFiat(dto.WorstCaseLiquidationBtcPriceUsd, FiatCurrency.Usd.Code),
+                        TooltipContent.Text(language.Reports_BtcLoans_WorstCaseLiquidationPrice_Tooltip)),
+                    RowItem.Separator(),
+                    new(language.Reports_BtcLoans_AccruedInterest, CurrencyDisplay.FormatFiat(dto.TotalAccruedInterestInMainCurrency, fiatCurrency.Code)),
+                    new(language.Reports_BtcLoans_FeesPaid, CurrencyDisplay.FormatFiat(dto.TotalFeesPaidInMainCurrency, fiatCurrency.Code)),
+                    RowItem.Separator(),
+                    new(language.Reports_BtcLoans_AvgLoanAge,
+                        string.Format(CultureInfo.InvariantCulture, language.Reports_BtcLoans_DaysFormat, (int)Math.Round(dto.AverageLoanAgeDays)))
+                };
+
+                if (dto.NextRepaymentDate.HasValue)
+                {
+                    var daysText = string.Format(CultureInfo.InvariantCulture, language.Reports_BtcLoans_DaysFormat, dto.DaysUntilNextRepayment ?? 0);
+                    rows.Add(new RowItem(language.Reports_BtcLoans_NextRepayment,
+                        $"{dto.NextRepaymentDate.Value} ({daysText})",
+                        TooltipContent.Text(string.Format(CultureInfo.InvariantCulture, language.Reports_BtcLoans_NextRepayment_Tooltip, dto.NextRepaymentLoanName))));
+                }
+
+                BtcLoansData = new DashboardData(language.Reports_BtcLoans_Title, rows, Icon: "\uE227");
+                IsBtcLoansVisible = true;
+                IsBtcLoansLoading = false;
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating BTC loans data");
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                IsBtcLoansVisible = false;
+                IsBtcLoansLoading = false;
+            });
+        }
+    }
+
     private async Task FetchExpensesByCategoryAsync(IReportDataProvider provider)
     {
         try
@@ -1166,6 +1275,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             Dispatcher.UIThread.Post(UpdateBtcStackData);
             Dispatcher.UIThread.Post(UpdateSimulatedPricesData);
             UpdateLeveragePositionsDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateLeveragePositionsDataAsync));
+            UpdateBtcLoansDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateBtcLoansDataAsync));
         }
     }
 
