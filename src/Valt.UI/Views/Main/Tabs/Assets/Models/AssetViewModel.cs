@@ -93,6 +93,7 @@ public partial class AssetViewModel : ObservableObject
     public int? LoanHealthStatusId { get; }
     public string? LoanHealthStatusName { get; }
     public decimal? AccruedInterest { get; }
+    public decimal? TotalDebt { get; }
     public decimal? DistanceToLiquidationLtv { get; }
     public int? DaysUntilRepayment { get; }
 
@@ -108,6 +109,7 @@ public partial class AssetViewModel : ObservableObject
     public string AprFormatted { get; }
     public string CurrentLtvFormatted { get; }
     public string AccruedInterestFormatted { get; }
+    public string TotalDebtFormatted { get; }
     public string DistanceToLiquidationLtvFormatted { get; }
     public string DaysUntilRepaymentFormatted { get; }
     public string AmountLentFormatted { get; }
@@ -124,8 +126,18 @@ public partial class AssetViewModel : ObservableObject
     public bool IsBtcLending => AssetType == AssetTypes.BtcLending;
     public bool IsLoanOrLending => IsBtcLoan || IsBtcLending;
 
-    // Returns P&L for leveraged positions, Value for others
-    public string DisplayValueFormatted => IsLeveragedPosition ? PnLFormatted : CurrentValueFormatted;
+    // Returns P&L for leveraged positions, Total Debt for loans, Value for others
+    public string DisplayValueFormatted => IsLeveragedPosition
+        ? PnLFormatted
+        : IsBtcLoan
+            ? TotalDebtFormatted
+            : CurrentValueFormatted;
+    public string ValueLabel => IsLeveragedPosition
+        ? language.Assets_PnL
+        : IsBtcLoan
+            ? language.Assets_TotalDebt
+            : string.Empty;
+    public bool HasValueLabel => !string.IsNullOrEmpty(ValueLabel);
     public string PositionDirection => IsLong == true ? "Long" : "Short";
     public string PnLColor => PnL >= 0 ? "#4CAF50" : "#F44336";
     public string AtRiskIndicator => IsAtRisk ? "!" : "";
@@ -203,6 +215,7 @@ public partial class AssetViewModel : ObservableObject
         LoanHealthStatusId = dto.LoanHealthStatusId;
         LoanHealthStatusName = GetLocalizedHealthStatusName(dto.LoanHealthStatusId);
         AccruedInterest = dto.AccruedInterest;
+        TotalDebt = dto.TotalDebt;
         DistanceToLiquidationLtv = dto.DistanceToLiquidationLtv;
         DaysUntilRepayment = dto.DaysUntilRepayment;
 
@@ -289,13 +302,17 @@ public partial class AssetViewModel : ObservableObject
             ? CurrencyDisplay.FormatFiat(AccruedInterest.Value, CurrencyCode)
             : "-";
 
+        TotalDebtFormatted = TotalDebt.HasValue
+            ? CurrencyDisplay.FormatFiat(TotalDebt.Value, CurrencyCode)
+            : "-";
+
         DistanceToLiquidationLtvFormatted = DistanceToLiquidationLtv.HasValue
             ? $"{DistanceToLiquidationLtv.Value:N2}pp"
             : "-";
 
         DaysUntilRepaymentFormatted = DaysUntilRepayment.HasValue
             ? $"{DaysUntilRepayment.Value}d"
-            : "-";
+            : (IsBtcLoan || IsBtcLending) ? language.Assets_IndefinitePeriod : "-";
 
         AmountLentFormatted = AmountLent.HasValue
             ? CurrencyDisplay.FormatFiat(AmountLent.Value, CurrencyCode)

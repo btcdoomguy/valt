@@ -144,6 +144,7 @@ public class AvgPriceTools
         [Description("Asset name")] string assetName,
         [Description("Decimal precision")] int precision,
         [Description("Calculation method: 0=BrazilianRule, 1=FIFO")] int calculationMethodId,
+        [Description("Fiat currency code (e.g. USD, BRL, EUR)")] string currencyCode,
         [Description("Whether the profile is visible")] bool visible = true,
         [Description("Icon name (optional)")] string? iconName = null,
         [Description("Icon unicode character (optional)")] char iconUnicode = '\0',
@@ -159,6 +160,7 @@ public class AvgPriceTools
             IconName = iconName,
             IconUnicode = iconUnicode,
             IconColor = iconColor,
+            CurrencyCode = currencyCode,
             CalculationMethodId = calculationMethodId
         });
 

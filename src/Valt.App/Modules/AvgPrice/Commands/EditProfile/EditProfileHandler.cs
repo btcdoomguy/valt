@@ -45,6 +45,7 @@ internal sealed class EditProfileHandler : ICommandHandler<EditProfileCommand, E
         profile.ChangeAsset(command.AssetName, command.Precision);
         profile.ChangeVisibility(command.Visible);
         profile.ChangeCalculationMethod((AvgPriceCalculationMethod)command.CalculationMethodId);
+        profile.ChangeCurrency(FiatCurrency.GetFromCode(command.CurrencyCode));
 
         var icon = string.IsNullOrWhiteSpace(command.IconName)
             ? Icon.Empty

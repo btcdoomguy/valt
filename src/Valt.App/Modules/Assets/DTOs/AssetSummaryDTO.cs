@@ -15,7 +15,23 @@ public record AssetSummaryDTO
     public required IReadOnlyList<AssetValueByCurrencyDTO> ValuesByCurrency { get; init; }
 
     /// <summary>
-    /// Total value converted to the main fiat currency.
+    /// Total value of positive assets (non-liability) included in net worth, in main currency.
+    /// </summary>
+    public required decimal TotalAssetsValueInMainCurrency { get; init; }
+
+    /// <summary>
+    /// Total debt from liabilities (BTC loans) included in net worth, in main currency.
+    /// Displayed as a positive number representing the debt amount.
+    /// </summary>
+    public required decimal TotalLiabilitiesInMainCurrency { get; init; }
+
+    /// <summary>
+    /// Number of liability assets (BTC loans) included in net worth.
+    /// </summary>
+    public required int LiabilitiesCount { get; init; }
+
+    /// <summary>
+    /// Net total value converted to the main fiat currency (assets - liabilities).
     /// </summary>
     public required decimal TotalValueInMainCurrency { get; init; }
 

@@ -2066,7 +2066,19 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Assets.Summary.TotalSats", resourceCulture);
             }
         }
-        
+
+        public static string Assets_Summary_TotalAssetsValue {
+            get {
+                return ResourceManager.GetString("Assets.Summary.TotalAssetsValue", resourceCulture);
+            }
+        }
+
+        public static string Assets_Summary_TotalLiabilities {
+            get {
+                return ResourceManager.GetString("Assets.Summary.TotalLiabilities", resourceCulture);
+            }
+        }
+
         public static string Assets_Details_Title {
             get {
                 return ResourceManager.GetString("Assets.Details.Title", resourceCulture);
@@ -2472,6 +2484,12 @@ namespace Valt.UI.Lang {
         public static string ManageAsset_RepaymentDate {
             get {
                 return ResourceManager.GetString("ManageAsset_RepaymentDate", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_IndefinitePeriod {
+            get {
+                return ResourceManager.GetString("ManageAsset_IndefinitePeriod", resourceCulture);
             }
         }
 
@@ -4311,6 +4329,30 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string Assets_TotalDebt {
+            get {
+                return ResourceManager.GetString("Assets_TotalDebt", resourceCulture);
+            }
+        }
+
+        public static string Assets_NetEquity {
+            get {
+                return ResourceManager.GetString("Assets_NetEquity", resourceCulture);
+            }
+        }
+
+        public static string Assets_Card_TotalDebt {
+            get {
+                return ResourceManager.GetString("Assets_Card_TotalDebt", resourceCulture);
+            }
+        }
+
+        public static string Assets_Card_AccruedInterest {
+            get {
+                return ResourceManager.GetString("Assets_Card_AccruedInterest", resourceCulture);
+            }
+        }
+
         public static string Assets_BorrowerPlatform {
             get {
                 return ResourceManager.GetString("Assets_BorrowerPlatform", resourceCulture);
@@ -4332,6 +4374,12 @@ namespace Valt.UI.Lang {
         public static string Assets_DaysUntilRepayment {
             get {
                 return ResourceManager.GetString("Assets_DaysUntilRepayment", resourceCulture);
+            }
+        }
+
+        public static string Assets_IndefinitePeriod {
+            get {
+                return ResourceManager.GetString("Assets_IndefinitePeriod", resourceCulture);
             }
         }
 

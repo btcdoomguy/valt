@@ -67,6 +67,9 @@ internal sealed class AssetQueries : IAssetQueries
             .ToList<AssetValueByCurrencyDTO>();
 
         var totalValueInMainCurrency = 0m;
+        var totalAssetsValueInMainCurrency = 0m;
+        var totalLiabilitiesInMainCurrency = 0m;
+        var liabilitiesCount = 0;
         long totalValueInSats = 0;
 
         if (btcPriceUsd.HasValue && fiatRates != null)
@@ -75,6 +78,7 @@ internal sealed class AssetQueries : IAssetQueries
             {
                 var value = GetValueForSummary(asset);
                 var currency = asset.GetCurrencyCode();
+                var isLiability = asset.Details is BtcLoanDetails;
 
                 // Convert to USD first
                 var valueInUsd = currency == FiatCurrency.Usd.Code
@@ -84,13 +88,43 @@ internal sealed class AssetQueries : IAssetQueries
                         : 0m;
 
                 // Convert to main currency
+                decimal valueInMainCurrency;
                 if (currency == mainCurrencyCode)
                 {
-                    totalValueInMainCurrency += value;
+                    valueInMainCurrency = value;
                 }
                 else if (fiatRates.TryGetValue(mainCurrencyCode, out var mainRate))
                 {
-                    totalValueInMainCurrency += valueInUsd * mainRate;
+                    valueInMainCurrency = valueInUsd * mainRate;
+                }
+                else
+                {
+                    valueInMainCurrency = 0m;
+                }
+
+                totalValueInMainCurrency += valueInMainCurrency;
+
+                // Track assets vs liabilities separately
+                if (isLiability)
+                {
+                    var btcLoan = (BtcLoanDetails)asset.Details;
+                    var debtValue = btcLoan.CalculateTotalDebt();
+                    var debtInUsd = currency == FiatCurrency.Usd.Code
+                        ? debtValue
+                        : fiatRates.TryGetValue(currency, out var debtRate) && debtRate > 0
+                            ? debtValue / debtRate
+                            : 0m;
+                    var debtInMainCurrency = currency == mainCurrencyCode
+                        ? debtValue
+                        : fiatRates.TryGetValue(mainCurrencyCode, out var debtMainRate)
+                            ? debtInUsd * debtMainRate
+                            : 0m;
+                    totalLiabilitiesInMainCurrency += debtInMainCurrency;
+                    liabilitiesCount++;
+                }
+                else
+                {
+                    totalAssetsValueInMainCurrency += valueInMainCurrency;
                 }
 
                 // Convert to sats
@@ -108,6 +142,9 @@ internal sealed class AssetQueries : IAssetQueries
             VisibleAssets = entities.Count(x => x.Visible),
             AssetsIncludedInNetWorth = includedAssets.Count,
             ValuesByCurrency = valuesByCurrency,
+            TotalAssetsValueInMainCurrency = Math.Round(totalAssetsValueInMainCurrency, 2),
+            TotalLiabilitiesInMainCurrency = Math.Round(totalLiabilitiesInMainCurrency, 2),
+            LiabilitiesCount = liabilitiesCount,
             TotalValueInMainCurrency = Math.Round(totalValueInMainCurrency, 2),
             TotalValueInSats = totalValueInSats
         };
@@ -118,7 +155,7 @@ internal sealed class AssetQueries : IAssetQueries
     /// <summary>
     /// Gets the value to use for portfolio summary calculations.
     /// For leveraged positions, returns only the P&amp;L (not the full position value).
-    /// For BTC loans, returns collateral value - loan - accrued interest - fees.
+    /// For BTC loans, returns -TotalDebt (pure liability, collateral tracked separately).
     /// For BTC lending, returns amount lent + earned interest.
     /// For other assets, returns the current value.
     /// </summary>
@@ -156,6 +193,8 @@ internal sealed class AssetQueries : IAssetQueries
         int? inputModeId = null;
         DateOnly? acquisitionDate = null;
         decimal? acquisitionPrice = null;
+
+        decimal? totalDebt = null;
 
         // BTC loan fields
         string? platformName = null;
@@ -240,6 +279,7 @@ internal sealed class AssetQueries : IAssetQueries
                 loanStatusId = (int)btcLoan.Status;
                 loanStatusName = btcLoan.Status.ToString();
                 accruedInterest = btcLoan.CalculateAccruedInterest();
+                totalDebt = btcLoan.CalculateTotalDebt();
                 daysUntilRepayment = btcLoan.CalculateDaysUntilRepayment();
                 if (btcLoan.CurrentBtcPriceInLoanCurrency > 0)
                 {
@@ -311,6 +351,7 @@ internal sealed class AssetQueries : IAssetQueries
             LoanHealthStatusId = loanHealthStatusId,
             LoanHealthStatusName = loanHealthStatusName,
             AccruedInterest = accruedInterest,
+            TotalDebt = totalDebt,
             DistanceToLiquidationLtv = distanceToLiquidationLtv,
             DaysUntilRepayment = daysUntilRepayment,
             // BTC lending fields

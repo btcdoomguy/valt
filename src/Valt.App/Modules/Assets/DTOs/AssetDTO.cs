@@ -58,6 +58,7 @@ public record AssetDTO
     public int? LoanHealthStatusId { get; init; }
     public string? LoanHealthStatusName { get; init; }
     public decimal? AccruedInterest { get; init; }
+    public decimal? TotalDebt { get; init; }
     public decimal? DistanceToLiquidationLtv { get; init; }
     public int? DaysUntilRepayment { get; init; }
 

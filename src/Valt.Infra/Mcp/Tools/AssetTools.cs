@@ -67,7 +67,7 @@ public class AssetTools
     /// <summary>
     /// Gets the asset summary (totals for net worth calculation).
     /// </summary>
-    [McpServerTool, Description("Get asset summary with totals in main currency and sats")]
+    [McpServerTool, Description("Get asset summary with totals in main currency and sats, including assets vs liabilities breakdown")]
     public static async Task<AssetSummaryDTO> GetAssetsSummary(
         IQueryDispatcher queryDispatcher,
         CurrencySettings currencySettings)

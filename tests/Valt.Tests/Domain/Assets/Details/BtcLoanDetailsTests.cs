@@ -352,34 +352,110 @@ public class BtcLoanDetailsTests
 
     #endregion
 
-    #region Current Value Tests
+    #region Total Debt Tests
 
     [Test]
-    public void Should_Calculate_Current_Value_As_Collateral_Minus_Loan_Minus_Interest_Minus_Fees()
+    public void Should_Calculate_Total_Debt_As_Loan_Plus_Interest_Plus_Fees()
     {
-        // Start date = today, so no accrued interest
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
-        var details = CreateDefaultDetails(loanStartDate: today, fees: 100m);
+        // Loan of $25,000 at 12% APR started 365 days ago, fees = 100
+        // Interest = 25000 * 0.12 / 365 * 365 = 3000
+        // TotalDebt = 25000 + 3000 + 100 = 28100
+        var startDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-365);
+        var details = CreateDefaultDetails(loanStartDate: startDate, fees: 100m);
 
-        // CollateralValue = 1 BTC * 50000 = 50000
-        // Value = 50000 - 25000 - 0 (interest) - 100 (fees) = 24900
-        var value = details.CalculateCurrentValue(50_000m);
+        var totalDebt = details.CalculateTotalDebt();
 
-        Assert.That(value, Is.EqualTo(24_900m));
+        Assert.That(totalDebt, Is.EqualTo(28_100m));
     }
 
     [Test]
-    public void Should_Calculate_Negative_Value_When_Underwater()
+    public void Should_Calculate_Total_Debt_With_Zero_Fees()
+    {
+        // Loan of $25,000 at 12% APR started 365 days ago, no fees
+        // TotalDebt = 25000 + 3000 + 0 = 28000
+        var startDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-365);
+        var details = CreateDefaultDetails(loanStartDate: startDate, fees: 0m);
+
+        var totalDebt = details.CalculateTotalDebt();
+
+        Assert.That(totalDebt, Is.EqualTo(28_000m));
+    }
+
+    [Test]
+    public void Should_Calculate_Total_Debt_With_No_Accrued_Interest_When_Just_Started()
+    {
+        // Loan just started today, no interest yet
+        // TotalDebt = 25000 + 0 + 100 = 25100
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var details = CreateDefaultDetails(loanStartDate: today, fees: 100m);
+
+        var totalDebt = details.CalculateTotalDebt();
+
+        Assert.That(totalDebt, Is.EqualTo(25_100m));
+    }
+
+    [Test]
+    public void Should_Calculate_Total_Debt_With_Future_Start_Date()
+    {
+        // Loan hasn't started yet, no interest accrued
+        // TotalDebt = 25000 + 0 + 100 = 25100
+        var futureDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(30);
+        var details = CreateDefaultDetails(loanStartDate: futureDate, fees: 100m);
+
+        var totalDebt = details.CalculateTotalDebt();
+
+        Assert.That(totalDebt, Is.EqualTo(25_100m));
+    }
+
+    #endregion
+
+    #region Current Value Tests
+
+    [Test]
+    public void Should_Calculate_Current_Value_As_Negative_Total_Debt()
     {
         // Start date = today, so no accrued interest
+        // TotalDebt = 25000 + 0 + 100 = 25100
+        // CurrentValue = -25100 (pure liability)
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var details = CreateDefaultDetails(loanStartDate: today, fees: 100m);
+
+        var value = details.CalculateCurrentValue(50_000m);
+
+        Assert.That(value, Is.EqualTo(-25_100m));
+    }
+
+    [Test]
+    public void Should_Calculate_Current_Value_With_Accrued_Interest()
+    {
+        // Loan of $25,000 at 12% APR started 365 days ago, fees = 0
+        // TotalDebt = 25000 + 3000 + 0 = 28000
+        // CurrentValue = -28000
+        var startDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-365);
+        var details = CreateDefaultDetails(loanStartDate: startDate, fees: 0m);
+
+        var value = details.CalculateCurrentValue(50_000m);
+
+        Assert.That(value, Is.EqualTo(-28_000m));
+    }
+
+    [Test]
+    public void Should_Calculate_Current_Value_Regardless_Of_Btc_Price()
+    {
+        // BTC price doesn't affect the debt calculation anymore
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
         var details = CreateDefaultDetails(loanStartDate: today, fees: 0m);
 
-        // CollateralValue = 1 BTC * 20000 = 20000
-        // Value = 20000 - 25000 - 0 - 0 = -5000
-        var value = details.CalculateCurrentValue(20_000m);
+        var valueAtHighPrice = details.CalculateCurrentValue(100_000m);
+        var valueAtLowPrice = details.CalculateCurrentValue(20_000m);
+        var valueAtZeroPrice = details.CalculateCurrentValue(0m);
 
-        Assert.That(value, Is.EqualTo(-5_000m));
+        Assert.Multiple(() =>
+        {
+            Assert.That(valueAtHighPrice, Is.EqualTo(-25_000m));
+            Assert.That(valueAtLowPrice, Is.EqualTo(-25_000m));
+            Assert.That(valueAtZeroPrice, Is.EqualTo(-25_000m));
+        });
     }
 
     #endregion

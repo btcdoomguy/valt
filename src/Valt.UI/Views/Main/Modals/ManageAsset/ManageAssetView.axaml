@@ -388,12 +388,18 @@
                                     <TextBox Text="{Binding LiquidationLtvPercentage}" Width="250" />
                                 </StackPanel>
 
+                                <StackPanel Classes="form-field" HorizontalAlignment="Left">
+                                    <CheckBox Content="{x:Static local:language.ManageAsset_IndefinitePeriod}"
+                                              IsChecked="{Binding IsIndefiniteLoan}" />
+                                </StackPanel>
+
                                 <Grid ColumnDefinitions="250, 20, 250">
                                     <StackPanel Grid.Column="0" Classes="form-field">
                                         <TextBlock Text="{x:Static local:language.ManageAsset_LoanStartDate}" />
                                         <CalendarDatePicker SelectedDate="{Binding LoanStartDate}" Width="250" />
                                     </StackPanel>
-                                    <StackPanel Grid.Column="2" Classes="form-field">
+                                    <StackPanel Grid.Column="2" Classes="form-field"
+                                                IsVisible="{Binding ShowRepaymentDateField}">
                                         <TextBlock Text="{x:Static local:language.ManageAsset_RepaymentDate}" />
                                         <CalendarDatePicker SelectedDate="{Binding RepaymentDateOffset}" Width="250" />
                                     </StackPanel>
@@ -425,12 +431,18 @@
                                     </StackPanel>
                                 </Grid>
 
+                                <StackPanel Classes="form-field" HorizontalAlignment="Left">
+                                    <CheckBox Content="{x:Static local:language.ManageAsset_IndefinitePeriod}"
+                                              IsChecked="{Binding IsIndefiniteLending}" />
+                                </StackPanel>
+
                                 <Grid ColumnDefinitions="250, 20, 250">
                                     <StackPanel Grid.Column="0" Classes="form-field">
                                         <TextBlock Text="{x:Static local:language.ManageAsset_LendingStartDate}" />
                                         <CalendarDatePicker SelectedDate="{Binding LendingStartDateOffset}" Width="250" />
                                     </StackPanel>
-                                    <StackPanel Grid.Column="2" Classes="form-field">
+                                    <StackPanel Grid.Column="2" Classes="form-field"
+                                                IsVisible="{Binding ShowExpectedRepaymentDateField}">
                                         <TextBlock Text="{x:Static local:language.ManageAsset_ExpectedRepaymentDate}" />
                                         <CalendarDatePicker SelectedDate="{Binding ExpectedRepaymentDateOffset}" Width="250" />
                                     </StackPanel>

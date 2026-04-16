@@ -175,6 +175,18 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     [ObservableProperty]
     private DateTime? _repaymentDateOffset;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowRepaymentDateField))]
+    private bool _isIndefiniteLoan;
+
+    public bool ShowRepaymentDateField => !IsIndefiniteLoan;
+
+    partial void OnIsIndefiniteLoanChanged(bool value)
+    {
+        if (value)
+            RepaymentDateOffset = null;
+    }
+
     // BTC Lending fields
     [ObservableProperty]
     private string _borrowerOrPlatformName = string.Empty;
@@ -190,6 +202,18 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
 
     [ObservableProperty]
     private DateTime? _expectedRepaymentDateOffset;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowExpectedRepaymentDateField))]
+    private bool _isIndefiniteLending;
+
+    public bool ShowExpectedRepaymentDateField => !IsIndefiniteLending;
+
+    partial void OnIsIndefiniteLendingChanged(bool value)
+    {
+        if (value)
+            ExpectedRepaymentDateOffset = null;
+    }
 
     // Common fields
     [ObservableProperty]
@@ -360,6 +384,8 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                         LoanStartDate = assetDto.LoanStartDate.Value.ToDateTime(TimeOnly.MinValue);
                     if (assetDto.RepaymentDate.HasValue)
                         RepaymentDateOffset = assetDto.RepaymentDate.Value.ToDateTime(TimeOnly.MinValue);
+                    else
+                        IsIndefiniteLoan = true;
                     break;
 
                 case AssetTypes.BtcLending:
@@ -370,6 +396,8 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                         LendingStartDateOffset = assetDto.LendingStartDate.Value.ToDateTime(TimeOnly.MinValue);
                     if (assetDto.RepaymentDate.HasValue)
                         ExpectedRepaymentDateOffset = assetDto.RepaymentDate.Value.ToDateTime(TimeOnly.MinValue);
+                    else
+                        IsIndefiniteLending = true;
                     break;
             }
 
