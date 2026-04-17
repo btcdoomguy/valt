@@ -45,12 +45,18 @@ internal sealed class CreateBtcLoanHandler : ICommandHandler<CreateBtcLoanComman
 
         var assetName = new AssetName(command.Name);
 
+        var apr = command.FixedTotalDebt.HasValue
+            ? BtcLoanDetails.DeriveAprFromFixedDebt(
+                command.LoanAmount, command.FixedTotalDebt.Value,
+                command.LoanStartDate, command.RepaymentDate)
+            : command.Apr;
+
         var details = new BtcLoanDetails(
             platformName: command.PlatformName,
             collateralSats: command.CollateralSats,
             loanAmount: command.LoanAmount,
             currencyCode: command.CurrencyCode,
-            apr: command.Apr,
+            apr: apr,
             initialLtv: command.InitialLtv,
             liquidationLtv: command.LiquidationLtv,
             marginCallLtv: command.MarginCallLtv,
@@ -58,7 +64,8 @@ internal sealed class CreateBtcLoanHandler : ICommandHandler<CreateBtcLoanComman
             loanStartDate: command.LoanStartDate,
             repaymentDate: command.RepaymentDate,
             status: LoanStatus.Active,
-            currentBtcPriceInLoanCurrency: command.CurrentBtcPrice);
+            currentBtcPriceInLoanCurrency: command.CurrentBtcPrice,
+            fixedTotalDebt: command.FixedTotalDebt);
 
         var icon = string.IsNullOrWhiteSpace(command.Icon)
             ? Icon.Empty

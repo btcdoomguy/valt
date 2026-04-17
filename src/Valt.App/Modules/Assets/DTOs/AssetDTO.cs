@@ -61,6 +61,8 @@ public record AssetDTO
     public decimal? TotalDebt { get; init; }
     public decimal? DistanceToLiquidationLtv { get; init; }
     public int? DaysUntilRepayment { get; init; }
+    public decimal? FixedTotalDebt { get; init; }
+    public bool HasFixedTotalDebt { get; init; }
 
     // BTC lending specific
     public decimal? AmountLent { get; init; }

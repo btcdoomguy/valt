@@ -43,6 +43,20 @@ internal sealed class CreateBtcLoanValidator : IValidator<CreateBtcLoanCommand>
         if (instance.Fees < 0)
             builder.AddError(nameof(instance.Fees), "Fees cannot be negative.");
 
+        if (instance.FixedTotalDebt.HasValue)
+        {
+            if (instance.FixedTotalDebt.Value < instance.LoanAmount + instance.Fees)
+                builder.AddError(nameof(instance.FixedTotalDebt),
+                    "Fixed total debt must be greater than or equal to the loan amount plus fees.");
+
+            if (!instance.RepaymentDate.HasValue)
+                builder.AddError(nameof(instance.RepaymentDate),
+                    "Repayment date is required when using a fixed total debt.");
+            else if (instance.RepaymentDate.Value <= instance.LoanStartDate)
+                builder.AddError(nameof(instance.RepaymentDate),
+                    "Repayment date must be after the loan start date when using a fixed total debt.");
+        }
+
         return builder.Build();
     }
 }

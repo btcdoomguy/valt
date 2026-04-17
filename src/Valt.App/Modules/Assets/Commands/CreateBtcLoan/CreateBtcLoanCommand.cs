@@ -33,9 +33,17 @@ public record CreateBtcLoanCommand : ICommand<CreateBtcLoanResult>
     public required decimal LoanAmount { get; init; }
 
     /// <summary>
-    /// Annual percentage rate (e.g., 0.12 for 12%).
+    /// Annual percentage rate (e.g., 0.12 for 12%). Ignored when <see cref="FixedTotalDebt"/> is set
+    /// (APR is then derived from the loan period and fixed debt).
     /// </summary>
-    public required decimal Apr { get; init; }
+    public decimal Apr { get; init; }
+
+    /// <summary>
+    /// Optional predefined total debt. When set, the loan uses a fixed repayment amount
+    /// (HodlHodl-style) instead of daily APR accrual. <see cref="RepaymentDate"/> must be provided
+    /// so the effective APR can be derived. Must be greater than or equal to LoanAmount + Fees.
+    /// </summary>
+    public decimal? FixedTotalDebt { get; init; }
 
     /// <summary>
     /// Initial LTV ratio at loan origination (percentage, e.g., 50).

@@ -215,6 +215,8 @@ internal sealed class AssetQueries : IAssetQueries
         decimal? accruedInterest = null;
         decimal? distanceToLiquidationLtv = null;
         int? daysUntilRepayment = null;
+        decimal? fixedTotalDebt = null;
+        var hasFixedTotalDebt = false;
 
         // BTC lending fields
         decimal? amountLent = null;
@@ -281,6 +283,8 @@ internal sealed class AssetQueries : IAssetQueries
                 accruedInterest = btcLoan.CalculateAccruedInterest();
                 totalDebt = btcLoan.CalculateTotalDebt();
                 daysUntilRepayment = btcLoan.CalculateDaysUntilRepayment();
+                fixedTotalDebt = btcLoan.FixedTotalDebt;
+                hasFixedTotalDebt = btcLoan.HasFixedTotalDebt;
                 if (btcLoan.CurrentBtcPriceInLoanCurrency > 0)
                 {
                     currentLtv = btcLoan.CalculateCurrentLtv(btcLoan.CurrentBtcPriceInLoanCurrency);
@@ -354,6 +358,8 @@ internal sealed class AssetQueries : IAssetQueries
             TotalDebt = totalDebt,
             DistanceToLiquidationLtv = distanceToLiquidationLtv,
             DaysUntilRepayment = daysUntilRepayment,
+            FixedTotalDebt = fixedTotalDebt,
+            HasFixedTotalDebt = hasFixedTotalDebt,
             // BTC lending fields
             AmountLent = amountLent,
             BorrowerOrPlatformName = borrowerOrPlatformName,

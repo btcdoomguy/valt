@@ -2643,6 +2643,30 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string ManageAsset_UseFixedTotalDebt {
+            get {
+                return ResourceManager.GetString("ManageAsset_UseFixedTotalDebt", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_FixedTotalDebt {
+            get {
+                return ResourceManager.GetString("ManageAsset_FixedTotalDebt", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_DerivedApr {
+            get {
+                return ResourceManager.GetString("ManageAsset_DerivedApr", resourceCulture);
+            }
+        }
+
+        public static string ManageAsset_FixedTotalDebt_Help {
+            get {
+                return ResourceManager.GetString("ManageAsset_FixedTotalDebt_Help", resourceCulture);
+            }
+        }
+
         public static string ManageAsset_BorrowerPlatform {
             get {
                 return ResourceManager.GetString("ManageAsset_BorrowerPlatform", resourceCulture);

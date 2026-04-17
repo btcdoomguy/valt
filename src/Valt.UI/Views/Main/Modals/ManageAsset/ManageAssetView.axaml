@@ -358,10 +358,40 @@
                                     </StackPanel>
                                 </Grid>
 
+                                <StackPanel Classes="form-field" HorizontalAlignment="Left"
+                                            IsVisible="{Binding ShowFixedTotalDebtToggle}">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <CheckBox Content="{x:Static local:language.ManageAsset_UseFixedTotalDebt}"
+                                                  IsChecked="{Binding UseFixedTotalDebt}" />
+                                        <userControls:ModuleHelperText>
+                                            <userControls:ModuleHelperText.HelpContent>
+                                                <StackPanel MaxWidth="320">
+                                                    <TextBlock FontSize="{DynamicResource FontSizeSmall}"
+                                                               Text="{x:Static local:language.ManageAsset_FixedTotalDebt_Help}"
+                                                               TextWrapping="Wrap" />
+                                                </StackPanel>
+                                            </userControls:ModuleHelperText.HelpContent>
+                                        </userControls:ModuleHelperText>
+                                    </StackPanel>
+                                </StackPanel>
+
                                 <Grid ColumnDefinitions="250, 20, 250">
-                                    <StackPanel Grid.Column="0" Classes="form-field">
+                                    <StackPanel Grid.Column="0" Classes="form-field"
+                                                IsVisible="{Binding ShowApr}">
                                         <TextBlock Text="{x:Static local:language.ManageAsset_APR}" />
                                         <TextBox Text="{Binding AprPercentage}" Width="250" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="0" Classes="form-field"
+                                                IsVisible="{Binding ShowFixedTotalDebtField}">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_FixedTotalDebt}" />
+                                        <userControls:FiatInput FiatValue="{Binding FixedTotalDebtFiat, Mode=TwoWay}"
+                                                                CurrencySymbol="{Binding CurrencySymbol}"
+                                                                SymbolOnRight="{Binding SymbolOnRight}"
+                                                                Width="250" />
+                                        <TextBlock Text="{Binding DerivedAprDisplay, StringFormat={}{0}}"
+                                                   FontSize="{DynamicResource FontSizeSmall}"
+                                                   Foreground="{DynamicResource Text400Brush}"
+                                                   Margin="0,4,0,0" />
                                     </StackPanel>
                                     <StackPanel Grid.Column="2" Classes="form-field">
                                         <TextBlock Text="{x:Static local:language.ManageAsset_Fees}" />

@@ -1,4 +1,6 @@
 using Valt.App.Modules.Assets.Commands.CreateBtcLoan;
+using Valt.Core.Modules.Assets;
+using Valt.Core.Modules.Assets.Details;
 
 namespace Valt.Tests.Application.Assets.Commands;
 
@@ -177,5 +179,110 @@ public class CreateBtcLoanHandlerTests : DatabaseTest
         var result = await _handler.HandleAsync(command);
 
         Assert.That(result.IsSuccess, Is.True);
+    }
+
+    [Test]
+    public async Task HandleAsync_WithFixedTotalDebt_CreatesAssetAndDerivesApr()
+    {
+        // 25000 principal, 27500 fixed total over 365 days => 10% APR
+        var command = ValidCommand() with
+        {
+            Apr = 0m,
+            Fees = 0m,
+            FixedTotalDebt = 27_500m,
+            LoanStartDate = new DateOnly(2025, 1, 1),
+            RepaymentDate = new DateOnly(2026, 1, 1)
+        };
+
+        var result = await _handler.HandleAsync(command);
+
+        Assert.That(result.IsSuccess, Is.True);
+
+        var saved = await _assetRepository.GetByIdAsync(new AssetId(result.Value!.AssetId));
+        var details = (BtcLoanDetails)saved!.Details;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(details.HasFixedTotalDebt, Is.True);
+            Assert.That(details.FixedTotalDebt, Is.EqualTo(27_500m));
+            Assert.That(details.Apr, Is.EqualTo(0.1m));
+            Assert.That(details.CalculateTotalDebt(), Is.EqualTo(27_500m));
+        });
+    }
+
+    [Test]
+    public async Task HandleAsync_WithFixedTotalDebt_IgnoresProvidedApr()
+    {
+        // Even if caller supplies a bogus APR, the derived APR must be used.
+        var command = ValidCommand() with
+        {
+            Apr = 0.99m,
+            Fees = 0m,
+            FixedTotalDebt = 27_500m,
+            LoanStartDate = new DateOnly(2025, 1, 1),
+            RepaymentDate = new DateOnly(2026, 1, 1)
+        };
+
+        var result = await _handler.HandleAsync(command);
+        var saved = await _assetRepository.GetByIdAsync(new AssetId(result.Value!.AssetId));
+        var details = (BtcLoanDetails)saved!.Details;
+
+        Assert.That(details.Apr, Is.EqualTo(0.1m));
+    }
+
+    [Test]
+    public async Task HandleAsync_WithFixedTotalDebt_RequiresRepaymentDate()
+    {
+        var command = ValidCommand() with
+        {
+            FixedTotalDebt = 27_500m,
+            RepaymentDate = null
+        };
+
+        var result = await _handler.HandleAsync(command);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailure, Is.True);
+            Assert.That(result.Error!.Code, Is.EqualTo("VALIDATION_FAILED"));
+        });
+    }
+
+    [Test]
+    public async Task HandleAsync_WithFixedTotalDebt_BelowPrincipalPlusFees_Fails()
+    {
+        // Principal 25000 + fees 100 = 25100. Fixed debt 25000 is below.
+        var command = ValidCommand() with
+        {
+            Fees = 100m,
+            FixedTotalDebt = 25_000m
+        };
+
+        var result = await _handler.HandleAsync(command);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailure, Is.True);
+            Assert.That(result.Error!.Code, Is.EqualTo("VALIDATION_FAILED"));
+        });
+    }
+
+    [Test]
+    public async Task HandleAsync_WithFixedTotalDebt_RepaymentBeforeStart_Fails()
+    {
+        var command = ValidCommand() with
+        {
+            FixedTotalDebt = 27_500m,
+            LoanStartDate = new DateOnly(2026, 1, 1),
+            RepaymentDate = new DateOnly(2025, 1, 1)
+        };
+
+        var result = await _handler.HandleAsync(command);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailure, Is.True);
+            Assert.That(result.Error!.Code, Is.EqualTo("VALIDATION_FAILED"));
+        });
     }
 }

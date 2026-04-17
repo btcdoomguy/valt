@@ -503,4 +503,188 @@ public class BtcLoanDetailsTests
     }
 
     #endregion
+
+    #region Fixed Total Debt Tests
+
+    [Test]
+    public void Should_Expose_HasFixedTotalDebt_When_Set()
+    {
+        var details = CreateDefaultDetails();
+        var fixedDetails = new BtcLoanDetails(
+            "HodlHodl", 100_000_000, 25_000m, "USD", 0.12m, 50m, 80m, 70m, 100m,
+            new DateOnly(2025, 1, 1), new DateOnly(2026, 1, 1), LoanStatus.Active, 50_000m,
+            fixedTotalDebt: 27_500m);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(details.HasFixedTotalDebt, Is.False);
+            Assert.That(details.FixedTotalDebt, Is.Null);
+            Assert.That(fixedDetails.HasFixedTotalDebt, Is.True);
+            Assert.That(fixedDetails.FixedTotalDebt, Is.EqualTo(27_500m));
+        });
+    }
+
+    [Test]
+    public void Should_Validate_FixedTotalDebt_Not_Below_Principal_Plus_Fees()
+    {
+        // principal = 25000, fees = 100 => minimum allowed = 25100
+        Assert.Throws<ArgumentException>(() => new BtcLoanDetails(
+            "HodlHodl", 100_000_000, 25_000m, "USD", 0m, 50m, 80m, 70m, 100m,
+            new DateOnly(2025, 1, 1), new DateOnly(2026, 1, 1), LoanStatus.Active, 50_000m,
+            fixedTotalDebt: 25_099m));
+    }
+
+    [Test]
+    public void Should_Allow_FixedTotalDebt_Equal_To_Principal_Plus_Fees()
+    {
+        // Zero-interest fixed loan edge case
+        var details = new BtcLoanDetails(
+            "HodlHodl", 100_000_000, 25_000m, "USD", 0m, 50m, 80m, 70m, 100m,
+            new DateOnly(2025, 1, 1), new DateOnly(2026, 1, 1), LoanStatus.Active, 50_000m,
+            fixedTotalDebt: 25_100m);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(details.CalculateTotalDebt(), Is.EqualTo(25_100m));
+            Assert.That(details.CalculateAccruedInterest(), Is.EqualTo(0m));
+        });
+    }
+
+    [Test]
+    public void Should_Return_FixedTotalDebt_As_TotalDebt_Regardless_Of_Elapsed_Time()
+    {
+        // Fixed debt = 27500. Today is way before repayment. Total debt must still be 27500.
+        var startDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1);
+        var repaymentDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(364);
+        var details = new BtcLoanDetails(
+            "HodlHodl", 100_000_000, 25_000m, "USD", 0m, 50m, 80m, 70m, 0m,
+            startDate, repaymentDate, LoanStatus.Active, 50_000m,
+            fixedTotalDebt: 27_500m);
+
+        Assert.That(details.CalculateTotalDebt(), Is.EqualTo(27_500m));
+    }
+
+    [Test]
+    public void Should_Return_Full_Premium_As_AccruedInterest_For_Fixed_Debt()
+    {
+        // Fixed debt = 27500, principal = 25000, fees = 100 => premium = 2400
+        // Accrued interest for fixed loans is the full premium, not time-prorated.
+        var details = new BtcLoanDetails(
+            "HodlHodl", 100_000_000, 25_000m, "USD", 0m, 50m, 80m, 70m, 100m,
+            new DateOnly(2025, 1, 1), new DateOnly(2026, 1, 1), LoanStatus.Active, 50_000m,
+            fixedTotalDebt: 27_500m);
+
+        Assert.That(details.CalculateAccruedInterest(), Is.EqualTo(2_400m));
+    }
+
+    [Test]
+    public void Should_Calculate_CurrentValue_As_Negative_FixedTotalDebt()
+    {
+        var details = new BtcLoanDetails(
+            "HodlHodl", 100_000_000, 25_000m, "USD", 0m, 50m, 80m, 70m, 0m,
+            new DateOnly(2025, 1, 1), new DateOnly(2026, 1, 1), LoanStatus.Active, 50_000m,
+            fixedTotalDebt: 27_500m);
+
+        Assert.That(details.CalculateCurrentValue(50_000m), Is.EqualTo(-27_500m));
+    }
+
+    [Test]
+    public void Should_Preserve_FixedTotalDebt_When_Updating_Price()
+    {
+        var original = new BtcLoanDetails(
+            "HodlHodl", 100_000_000, 25_000m, "USD", 0m, 50m, 80m, 70m, 100m,
+            new DateOnly(2025, 1, 1), new DateOnly(2026, 1, 1), LoanStatus.Active, 50_000m,
+            fixedTotalDebt: 27_500m);
+
+        var updated = (BtcLoanDetails)original.WithUpdatedPrice(60_000m);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(updated.CurrentBtcPriceInLoanCurrency, Is.EqualTo(60_000m));
+            Assert.That(updated.FixedTotalDebt, Is.EqualTo(27_500m));
+            Assert.That(updated.HasFixedTotalDebt, Is.True);
+        });
+    }
+
+    [Test]
+    public void Should_Preserve_FixedTotalDebt_When_Changing_Status()
+    {
+        var original = new BtcLoanDetails(
+            "HodlHodl", 100_000_000, 25_000m, "USD", 0m, 50m, 80m, 70m, 100m,
+            new DateOnly(2025, 1, 1), new DateOnly(2026, 1, 1), LoanStatus.Active, 50_000m,
+            fixedTotalDebt: 27_500m);
+
+        var updated = original.WithStatus(LoanStatus.Repaid);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(updated.Status, Is.EqualTo(LoanStatus.Repaid));
+            Assert.That(updated.FixedTotalDebt, Is.EqualTo(27_500m));
+        });
+    }
+
+    [Test]
+    public void DeriveAprFromFixedDebt_Should_Compute_Annualized_Rate_For_One_Year_Loan()
+    {
+        // 25000 principal, 27500 total over 365 days => 10% APR
+        var apr = BtcLoanDetails.DeriveAprFromFixedDebt(
+            loanAmount: 25_000m,
+            fixedTotalDebt: 27_500m,
+            loanStartDate: new DateOnly(2025, 1, 1),
+            repaymentDate: new DateOnly(2026, 1, 1));
+
+        Assert.That(apr, Is.EqualTo(0.1m));
+    }
+
+    [Test]
+    public void DeriveAprFromFixedDebt_Should_Annualize_Sub_Year_Loans()
+    {
+        // 10000 principal, 10500 total over ~73 days => interest rate over period = 5%
+        // Annualized = 0.05 * 365 / 73 = 0.25 => 25% APR
+        var apr = BtcLoanDetails.DeriveAprFromFixedDebt(
+            loanAmount: 10_000m,
+            fixedTotalDebt: 10_500m,
+            loanStartDate: new DateOnly(2025, 1, 1),
+            repaymentDate: new DateOnly(2025, 3, 15));
+
+        Assert.That(apr, Is.EqualTo(0.25m));
+    }
+
+    [Test]
+    public void DeriveAprFromFixedDebt_Should_Return_Zero_When_RepaymentDate_Missing()
+    {
+        var apr = BtcLoanDetails.DeriveAprFromFixedDebt(
+            loanAmount: 25_000m,
+            fixedTotalDebt: 27_500m,
+            loanStartDate: new DateOnly(2025, 1, 1),
+            repaymentDate: null);
+
+        Assert.That(apr, Is.EqualTo(0m));
+    }
+
+    [Test]
+    public void DeriveAprFromFixedDebt_Should_Return_Zero_When_RepaymentDate_Not_After_Start()
+    {
+        var apr = BtcLoanDetails.DeriveAprFromFixedDebt(
+            loanAmount: 25_000m,
+            fixedTotalDebt: 27_500m,
+            loanStartDate: new DateOnly(2025, 1, 1),
+            repaymentDate: new DateOnly(2025, 1, 1));
+
+        Assert.That(apr, Is.EqualTo(0m));
+    }
+
+    [Test]
+    public void DeriveAprFromFixedDebt_Should_Return_Zero_When_No_Premium()
+    {
+        var apr = BtcLoanDetails.DeriveAprFromFixedDebt(
+            loanAmount: 25_000m,
+            fixedTotalDebt: 25_000m,
+            loanStartDate: new DateOnly(2025, 1, 1),
+            repaymentDate: new DateOnly(2026, 1, 1));
+
+        Assert.That(apr, Is.EqualTo(0m));
+    }
+
+    #endregion
 }
