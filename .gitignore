@@ -2,6 +2,9 @@
 *.suo
 *.user
 *.sln.docstates
+.DS_Store
+Valt.app/
+publish/
 
 # Build results
 
