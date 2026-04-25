@@ -41,3 +41,6 @@ ClientBin/
 *.iml
 *.iws
 *.ipr
+
+# macOS packaging artifacts
+*.dmg

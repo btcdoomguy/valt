@@ -19,22 +19,11 @@ rm -f Valt-macos-arm64.dmg
 echo "Removed old Valt-macos-arm64.dmg"
 echo ""
 
-# 3. Check if create-dmg is available
-if ! command -v create-dmg &> /dev/null; then
-    echo "Warning: create-dmg not found. Installing via brew..."
-    brew install create-dmg || {
-        echo "Failed to install create-dmg. Please install manually:"
-        echo "  brew install create-dmg"
-        exit 1
-    }
-fi
-
-# 4. Use create-dmg to generate DMG
+# 3. Use create-dmg to generate DMG
 echo "[3/4] Creating DMG..."
 create-dmg \
   --volname "Valt macOS Apple Silicon" \
   --volicon "src/Valt.UI/Assets/valt-logo.ico" \
-  --background "src/Valt.UI/Assets/valt-logo.png" \
   --window-pos 200 120 \
   --window-size 800 400 \
   --icon-size 100 \
