@@ -64,6 +64,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     private readonly IClock _clock = null!;
     private readonly ILocalStorageService _localStorageService = null!;
     private readonly ILogger<TransactionListViewModel> _logger = null!;
+    private readonly DisplaySettings _displaySettings = null!;
 
     private DateTime _dateForTransaction = DateTime.Now;
 
@@ -104,7 +105,8 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
         FilterState filterState,
         IClock clock,
         ILocalStorageService localStorageService,
-        ILogger<TransactionListViewModel> logger)
+        ILogger<TransactionListViewModel> logger,
+        DisplaySettings displaySettings)
     {
         _modalFactory = modalFactory;
         _commandDispatcher = commandDispatcher;
@@ -117,6 +119,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
         _clock = clock;
         _localStorageService = localStorageService;
         _logger = logger;
+        _displaySettings = displaySettings;
 
         _liveRateState.PropertyChanged += LiveRateStateOnPropertyChanged;
         _localDatabase.PropertyChanged += LocalDatabaseOnPropertyChanged;
@@ -614,7 +617,8 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
             AccountIds = SelectedAccount == null ? null : [SelectedAccount.Id],
             SearchTerm = AppliedSearchTerm,
             From = DateOnly.FromDateTime(_filterState.Range.Start),
-            To = DateOnly.FromDateTime(_filterState.Range.End)
+            To = DateOnly.FromDateTime(_filterState.Range.End),
+            ShowHiddenAccounts = _displaySettings?.ShowHiddenAccounts ?? true
         });
 
         Transactions.Clear();

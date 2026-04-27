@@ -21,7 +21,8 @@ internal sealed class GetTransactionsHandler : IQueryHandler<GetTransactionsQuer
             CategoryIds = query.CategoryIds,
             From = query.From,
             To = query.To,
-            SearchTerm = query.SearchTerm
+            SearchTerm = query.SearchTerm,
+            ShowHiddenAccounts = query.ShowHiddenAccounts
         };
 
         return _transactionQueries.GetTransactionsAsync(filter);

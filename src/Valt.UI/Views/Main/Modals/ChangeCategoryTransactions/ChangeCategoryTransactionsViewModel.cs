@@ -44,9 +44,12 @@ public partial class ChangeCategoryTransactionsViewModel : ValtModalValidatorVie
     {
         var instance = (ChangeCategoryTransactionsViewModel)context.ObjectInstance;
 
-        if (instance.RenameEnabled && string.IsNullOrWhiteSpace(name))
+        var hasValidRename = instance.RenameEnabled && !string.IsNullOrWhiteSpace(name);
+        var hasValidCategory = instance.ChangeCategoryEnabled && instance.SelectedCategory is not null;
+
+        if (!hasValidRename && !hasValidCategory)
         {
-            return new ValidationResult("New name is required when renaming.");
+            return new ValidationResult("Please enter a new name or select a category to change.");
         }
 
         return ValidationResult.Success!;
@@ -56,9 +59,12 @@ public partial class ChangeCategoryTransactionsViewModel : ValtModalValidatorVie
     {
         var instance = (ChangeCategoryTransactionsViewModel)context.ObjectInstance;
 
-        if (instance.ChangeCategoryEnabled && category is null)
+        var hasValidRename = instance.RenameEnabled && !string.IsNullOrWhiteSpace(instance.Name);
+        var hasValidCategory = instance.ChangeCategoryEnabled && category is not null;
+
+        if (!hasValidRename && !hasValidCategory)
         {
-            return new ValidationResult("Category is required when changing category.");
+            return new ValidationResult("Please enter a new name or select a category to change.");
         }
 
         return ValidationResult.Success!;
