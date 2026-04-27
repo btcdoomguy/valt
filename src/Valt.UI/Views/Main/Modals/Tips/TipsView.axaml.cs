@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Media;
@@ -8,6 +9,8 @@ namespace Valt.UI.Views.Main.Modals.Tips;
 
 public partial class TipsView : ValtBaseWindow
 {
+    private PropertyChangedEventHandler? _propertyChangedHandler;
+
     public TipsView()
     {
         InitializeComponent();
@@ -22,11 +25,24 @@ public partial class TipsView : ValtBaseWindow
         var vm = (TipsViewModel)DataContext!;
         RenderTipText(vm.CurrentTipText);
 
-        vm.PropertyChanged += (_, args) =>
+        _propertyChangedHandler = (sender, args) =>
         {
             if (args.PropertyName == nameof(TipsViewModel.CurrentTipText))
                 RenderTipText(vm.CurrentTipText);
         };
+
+        vm.PropertyChanged += _propertyChangedHandler;
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        base.OnClosed(e);
+
+        if (DataContext is TipsViewModel vm && _propertyChangedHandler is not null)
+        {
+            vm.PropertyChanged -= _propertyChangedHandler;
+            _propertyChangedHandler = null;
+        }
     }
 
     private void RenderTipText(string? rawText)

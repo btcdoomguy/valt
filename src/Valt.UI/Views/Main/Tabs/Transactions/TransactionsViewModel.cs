@@ -41,7 +41,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 {
     // Animation settings - adjust these to change the wealth counter animation speed
     private const int WealthAnimationDurationMs = 1500; // 1.5 seconds
-    private const int WealthAnimationIntervalMs = 16;   // ~60fps
+    private const int WealthAnimationIntervalMs = 33;   // ~30fps, smooth enough for counters with half the UI churn
 
     private readonly IModalFactory? _modalFactory;
     private readonly ICommandDispatcher _commandDispatcher = null!;
@@ -268,6 +268,32 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
             _startWealthInBtcRatio == _targetWealthInBtcRatio &&
             _startAssetsWealth == _targetAssetsWealth)
         {
+            return;
+        }
+
+        // Skip animation if values are very close — just snap to target to reduce UI churn
+        const long satsEpsilon = 100; // 100 sats
+        const decimal fiatEpsilon = 0.01m; // 1 cent
+        if (Math.Abs(_startWealthInSats - _targetWealthInSats) <= satsEpsilon &&
+            Math.Abs(_startWealthInFiat - _targetWealthInFiat) <= fiatEpsilon &&
+            Math.Abs(_startAllWealthInFiat - _targetAllWealthInFiat) <= fiatEpsilon &&
+            Math.Abs(_startWealthInBtcRatio - _targetWealthInBtcRatio) <= 0.01m &&
+            Math.Abs(_startAssetsWealth - _targetAssetsWealth) <= fiatEpsilon)
+        {
+            _animatedWealthInSats = _targetWealthInSats;
+            _animatedWealthInFiat = _targetWealthInFiat;
+            _animatedAllWealthInFiat = _targetAllWealthInFiat;
+            _animatedWealthInBtcRatio = _targetWealthInBtcRatio;
+            _animatedAssetsWealth = _targetAssetsWealth;
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                OnPropertyChanged(nameof(DisplayWealthInSats));
+                OnPropertyChanged(nameof(DisplayWealthInFiat));
+                OnPropertyChanged(nameof(DisplayAllWealthInFiat));
+                OnPropertyChanged(nameof(DisplayAssetsWealth));
+                OnPropertyChanged(nameof(DisplayWealthInBtcRatio));
+            });
             return;
         }
 

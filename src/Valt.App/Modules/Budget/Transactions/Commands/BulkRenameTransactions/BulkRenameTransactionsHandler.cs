@@ -37,17 +37,16 @@ internal sealed class BulkRenameTransactionsHandler : ICommandHandler<BulkRename
         var newName = TransactionName.New(command.NewName);
         var updatedCount = 0;
 
-        foreach (var transactionIdString in command.TransactionIds)
+        // Batch-load all transactions in a single query to avoid N+1 round trips
+        var transactionIds = command.TransactionIds
+            .Where(id => !string.IsNullOrWhiteSpace(id))
+            .Select(id => new TransactionId(id))
+            .ToList();
+
+        var transactions = await _transactionRepository.GetTransactionsByIdsAsync(transactionIds);
+
+        foreach (var transaction in transactions)
         {
-            if (string.IsNullOrWhiteSpace(transactionIdString))
-                continue;
-
-            var transactionId = new TransactionId(transactionIdString);
-            var transaction = await _transactionRepository.GetTransactionByIdAsync(transactionId);
-
-            if (transaction is null)
-                continue;
-
             transaction.Rename(newName);
             await _transactionRepository.SaveTransactionAsync(transaction);
             updatedCount++;

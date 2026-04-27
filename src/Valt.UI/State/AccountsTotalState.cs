@@ -22,6 +22,7 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
     IRecipient<AccountSummariesDTO>, IRecipient<AssetSummaryUpdatedMessage>, IRecipient<AssetPricesUpdated>, IDisposable
 {
     private readonly Lock _calculationLock = new();
+    private CancellationTokenSource? _refreshDebounceCts;
 
     private readonly CurrencySettings _currencySettings;
     private readonly RatesState _ratesState;
@@ -55,7 +56,27 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
 
     public void Receive(RatesUpdated message)
     {
-        _ = RefreshAndNotifyAsync();
+        // Debounce rapid successive rates updates to avoid redundant DB queries.
+        // If multiple messages arrive within 100ms, only the last one triggers a refresh.
+        var previousCts = Interlocked.Exchange(ref _refreshDebounceCts, new CancellationTokenSource());
+        previousCts?.Cancel();
+        previousCts?.Dispose();
+
+        var currentCts = _refreshDebounceCts;
+        _ = DebouncedRefreshAndNotifyAsync(currentCts.Token);
+    }
+
+    private async Task DebouncedRefreshAndNotifyAsync(CancellationToken ct)
+    {
+        try
+        {
+            await Task.Delay(100, ct);
+            await RefreshAndNotifyAsync();
+        }
+        catch (OperationCanceledException)
+        {
+            // Debounce was superseded by a newer message — safe to ignore.
+        }
     }
 
     public void Receive(AssetSummaryUpdatedMessage message)
@@ -236,5 +257,8 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
         WeakReferenceMessenger.Default.Unregister<AccountSummariesDTO>(this);
         WeakReferenceMessenger.Default.Unregister<AssetSummaryUpdatedMessage>(this);
         WeakReferenceMessenger.Default.Unregister<AssetPricesUpdated>(this);
+
+        _refreshDebounceCts?.Cancel();
+        _refreshDebounceCts?.Dispose();
     }
 }

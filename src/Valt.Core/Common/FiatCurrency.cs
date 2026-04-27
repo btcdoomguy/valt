@@ -40,7 +40,14 @@ public record FiatCurrency(string Code, int Decimals, string Symbol, bool Symbol
 
     public static FiatCurrency GetFromCode(string code)
     {
-        return code.ToLowerInvariant() switch
+        return TryGetFromCode(code, out var currency)
+            ? currency
+            : throw new InvalidCurrencyCodeException(code);
+    }
+
+    public static bool TryGetFromCode(string code, out FiatCurrency? currency)
+    {
+        currency = code.ToLowerInvariant() switch
         {
             "brl" => Brl,
             "usd" => Usd,
@@ -75,8 +82,10 @@ public record FiatCurrency(string Code, int Decimals, string Symbol, bool Symbol
             "uyu" => Uyu,
             "pyg" => Pyg,
             "zar" => Zar,
-            _ => throw new InvalidCurrencyCodeException(code)
+            _ => (FiatCurrency?)null
         };
+
+        return currency is not null;
     }
 
     public static IEnumerable<FiatCurrency> GetAll()

@@ -46,33 +46,39 @@ internal sealed class AddTransactionHandler : ICommandHandler<AddTransactionComm
                 new Dictionary<string, string[]>(validation.Errors));
         }
 
-        // Verify category exists
         var categoryId = new CategoryId(command.CategoryId);
-        var category = await _categoryRepository.GetCategoryByIdAsync(categoryId);
+
+        // Run independent existence checks in parallel
+        var categoryTask = _categoryRepository.GetCategoryByIdAsync(categoryId);
+        var accountsTask = ValidateAccountsAsync(command.Details);
+        var fixedExpenseTask = string.IsNullOrEmpty(command.FixedExpenseId)
+            ? Task.FromResult<FixedExpense?>(null)
+            : _fixedExpenseRepository.GetFixedExpenseByIdAsync(new FixedExpenseId(command.FixedExpenseId));
+
+        await Task.WhenAll(categoryTask, accountsTask, fixedExpenseTask);
+
+        var category = await categoryTask;
         if (category is null)
         {
             return Result<AddTransactionResult>.NotFound("Category", command.CategoryId);
         }
 
-        // Verify accounts exist
-        var accountValidation = await ValidateAccountsAsync(command.Details);
+        var accountValidation = await accountsTask;
         if (accountValidation is not null)
         {
             return accountValidation;
         }
 
-        // Verify fixed expense exists if specified
         TransactionFixedExpenseReference? fixedExpenseReference = null;
+        var fixedExpense = await fixedExpenseTask;
         if (!string.IsNullOrEmpty(command.FixedExpenseId))
         {
-            var fixedExpenseId = new FixedExpenseId(command.FixedExpenseId);
-            var fixedExpense = await _fixedExpenseRepository.GetFixedExpenseByIdAsync(fixedExpenseId);
             if (fixedExpense is null)
             {
                 return Result<AddTransactionResult>.NotFound("FixedExpense", command.FixedExpenseId);
             }
             fixedExpenseReference = new TransactionFixedExpenseReference(
-                fixedExpenseId,
+                new FixedExpenseId(command.FixedExpenseId),
                 command.FixedExpenseReferenceDate!.Value);
         }
 
@@ -104,11 +110,6 @@ internal sealed class AddTransactionHandler : ICommandHandler<AddTransactionComm
     private async Task<Result<AddTransactionResult>?> ValidateAccountsAsync(TransactionDetailsDto details)
     {
         var fromAccountId = new AccountId(details.FromAccountId);
-        var fromAccount = await _accountRepository.GetAccountByIdAsync(fromAccountId);
-        if (fromAccount is null)
-        {
-            return Result<AddTransactionResult>.NotFound("Account", details.FromAccountId);
-        }
 
         string? toAccountIdString = details switch
         {
@@ -119,14 +120,25 @@ internal sealed class AddTransactionHandler : ICommandHandler<AddTransactionComm
             _ => null
         };
 
-        if (toAccountIdString is not null)
+        var fromAccountTask = _accountRepository.GetAccountByIdAsync(fromAccountId);
+        Task<Account?>? toAccountTask = toAccountIdString is not null
+            ? _accountRepository.GetAccountByIdAsync(new AccountId(toAccountIdString))
+            : null;
+
+        var tasks = new List<Task> { fromAccountTask };
+        if (toAccountTask is not null)
+            tasks.Add(toAccountTask);
+
+        await Task.WhenAll(tasks);
+
+        if (await fromAccountTask is null)
         {
-            var toAccountId = new AccountId(toAccountIdString);
-            var toAccount = await _accountRepository.GetAccountByIdAsync(toAccountId);
-            if (toAccount is null)
-            {
-                return Result<AddTransactionResult>.NotFound("Account", toAccountIdString);
-            }
+            return Result<AddTransactionResult>.NotFound("Account", details.FromAccountId);
+        }
+
+        if (toAccountIdString is not null && toAccountTask is not null && await toAccountTask is null)
+        {
+            return Result<AddTransactionResult>.NotFound("Account", toAccountIdString);
         }
 
         return null;
