@@ -78,6 +78,64 @@ public class AssetDetailsSerializerTests
     }
 
     [Test]
+    public void Should_RoundTrip_BtcLoanDetails_WithFixedTotalDebt()
+    {
+        var original = new BtcLoanDetails(
+            platformName: "HodlHodl",
+            collateralSats: 100_000_000,
+            loanAmount: 25_000m,
+            currencyCode: "USD",
+            apr: 0.10m,
+            initialLtv: 50m,
+            liquidationLtv: 80m,
+            marginCallLtv: 70m,
+            fees: 100m,
+            loanStartDate: new DateOnly(2025, 1, 1),
+            repaymentDate: new DateOnly(2026, 1, 1),
+            status: LoanStatus.Active,
+            currentBtcPriceInLoanCurrency: 50_000m,
+            fixedTotalDebt: 27_500m);
+
+        var json = AssetDetailsSerializer.Serialize(original);
+        var deserialized = (BtcLoanDetails)AssetDetailsSerializer.DeserializeDetails(AssetTypes.BtcLoan, json);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(deserialized.FixedTotalDebt, Is.EqualTo(27_500m));
+            Assert.That(deserialized.HasFixedTotalDebt, Is.True);
+            Assert.That(deserialized.CalculateTotalDebt(), Is.EqualTo(27_500m));
+        });
+    }
+
+    [Test]
+    public void Should_RoundTrip_BtcLoanDetails_WithoutFixedTotalDebt()
+    {
+        var original = new BtcLoanDetails(
+            platformName: "Ledn",
+            collateralSats: 100_000_000,
+            loanAmount: 25_000m,
+            currencyCode: "USD",
+            apr: 0.10m,
+            initialLtv: 50m,
+            liquidationLtv: 80m,
+            marginCallLtv: 70m,
+            fees: 100m,
+            loanStartDate: new DateOnly(2025, 1, 1),
+            repaymentDate: new DateOnly(2026, 1, 1),
+            status: LoanStatus.Active,
+            currentBtcPriceInLoanCurrency: 50_000m);
+
+        var json = AssetDetailsSerializer.Serialize(original);
+        var deserialized = (BtcLoanDetails)AssetDetailsSerializer.DeserializeDetails(AssetTypes.BtcLoan, json);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(deserialized.FixedTotalDebt, Is.Null);
+            Assert.That(deserialized.HasFixedTotalDebt, Is.False);
+        });
+    }
+
+    [Test]
     public void Should_RoundTrip_BtcLoanDetails_WithRepaidStatus()
     {
         var original = new BtcLoanDetails(

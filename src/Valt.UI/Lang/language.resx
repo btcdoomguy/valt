@@ -1323,6 +1323,18 @@
     <data name="ManageAsset_IndefinitePeriod" xml:space="preserve">
         <value>Indefinite period (no end date)</value>
     </data>
+    <data name="ManageAsset_UseFixedTotalDebt" xml:space="preserve">
+        <value>Use predefined total debt (fixed repayment amount)</value>
+    </data>
+    <data name="ManageAsset_FixedTotalDebt" xml:space="preserve">
+        <value>Total Debt</value>
+    </data>
+    <data name="ManageAsset_DerivedApr" xml:space="preserve">
+        <value>Derived APR</value>
+    </data>
+    <data name="ManageAsset_FixedTotalDebt_Help" xml:space="preserve">
+        <value>Some platforms (like HodlHodl) set a fixed repayment amount at origination, independent of when you repay. When enabled, APR is derived from this value and the loan period.</value>
+    </data>
     <data name="ManageAsset_BorrowerPlatform" xml:space="preserve">
         <value>Borrower / Platform</value>
     </data>

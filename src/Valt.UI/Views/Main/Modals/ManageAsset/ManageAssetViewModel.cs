@@ -52,6 +52,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     [NotifyPropertyChangedFor(nameof(ShowLeveragedFields))]
     [NotifyPropertyChangedFor(nameof(ShowBtcLoanFields))]
     [NotifyPropertyChangedFor(nameof(ShowBtcLendingFields))]
+    [NotifyPropertyChangedFor(nameof(ShowFixedTotalDebtToggle))]
     [NotifyPropertyChangedFor(nameof(IsBitcoinLeveraged))]
     [NotifyPropertyChangedFor(nameof(IsCustomLeveraged))]
     [NotifyPropertyChangedFor(nameof(ShowLeveragedSymbolRow))]
@@ -170,13 +171,16 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     private FiatValue _feesFiat = FiatValue.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DerivedAprDisplay))]
     private DateTime? _loanStartDate;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DerivedAprDisplay))]
     private DateTime? _repaymentDateOffset;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowRepaymentDateField))]
+    [NotifyPropertyChangedFor(nameof(ShowFixedTotalDebtToggle))]
     private bool _isIndefiniteLoan;
 
     public bool ShowRepaymentDateField => !IsIndefiniteLoan;
@@ -184,8 +188,44 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     partial void OnIsIndefiniteLoanChanged(bool value)
     {
         if (value)
+        {
             RepaymentDateOffset = null;
+            // Fixed total debt requires a repayment date — disable when indefinite
+            UseFixedTotalDebt = false;
+        }
     }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowApr))]
+    [NotifyPropertyChangedFor(nameof(ShowFixedTotalDebtField))]
+    [NotifyPropertyChangedFor(nameof(DerivedAprDisplay))]
+    private bool _useFixedTotalDebt;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DerivedAprDisplay))]
+    private FiatValue _fixedTotalDebtFiat = FiatValue.Empty;
+
+    public bool ShowFixedTotalDebtToggle => ShowBtcLoanFields && !IsIndefiniteLoan;
+    public bool ShowFixedTotalDebtField => UseFixedTotalDebt;
+    public bool ShowApr => !UseFixedTotalDebt;
+
+    public string DerivedAprDisplay
+    {
+        get
+        {
+            if (!UseFixedTotalDebt || !LoanStartDate.HasValue || !RepaymentDateOffset.HasValue)
+                return "-";
+
+            var start = DateOnly.FromDateTime(LoanStartDate.Value);
+            var end = DateOnly.FromDateTime(RepaymentDateOffset.Value);
+            var apr = Core.Modules.Assets.Details.BtcLoanDetails.DeriveAprFromFixedDebt(
+                LoanAmountFiat.Value, FixedTotalDebtFiat.Value, start, end);
+            return (apr * 100m).ToString("0.##") + "%";
+        }
+    }
+
+    partial void OnLoanAmountFiatChanged(FiatValue value) => OnPropertyChanged(nameof(DerivedAprDisplay));
+    partial void OnFixedTotalDebtFiatChanged(FiatValue value) => OnPropertyChanged(nameof(DerivedAprDisplay));
 
     // BTC Lending fields
     [ObservableProperty]
@@ -386,6 +426,11 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                         RepaymentDateOffset = assetDto.RepaymentDate.Value.ToDateTime(TimeOnly.MinValue);
                     else
                         IsIndefiniteLoan = true;
+                    if (assetDto.HasFixedTotalDebt && assetDto.FixedTotalDebt.HasValue)
+                    {
+                        UseFixedTotalDebt = true;
+                        FixedTotalDebtFiat = FiatValue.New(assetDto.FixedTotalDebt.Value);
+                    }
                     break;
 
                 case AssetTypes.BtcLending:
@@ -696,7 +741,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                     PlatformName = PlatformName,
                     CollateralSats = CollateralSats,
                     LoanAmount = LoanAmountFiat.Value,
-                    Apr = AprPercentage / 100m,
+                    Apr = UseFixedTotalDebt ? 0m : AprPercentage / 100m,
                     InitialLtv = InitialLtvPercentage,
                     LiquidationLtv = LiquidationLtvPercentage,
                     MarginCallLtv = MarginCallLtvPercentage,
@@ -704,6 +749,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                     LoanStartDate = LoanStartDate.HasValue ? DateOnly.FromDateTime(LoanStartDate.Value) : DateOnly.FromDateTime(DateTime.UtcNow),
                     RepaymentDate = RepaymentDateOffset.HasValue ? DateOnly.FromDateTime(RepaymentDateOffset.Value) : null,
                     CurrentBtcPrice = btcLoanCurrentPrice,
+                    FixedTotalDebt = UseFixedTotalDebt ? FixedTotalDebtFiat.Value : null,
                     IncludeInNetWorth = IncludeInNetWorth,
                     Visible = Visible
                 });
@@ -842,14 +888,15 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                     PlatformName = PlatformName,
                     CollateralSats = CollateralSats,
                     LoanAmount = LoanAmountFiat.Value,
-                    Apr = AprPercentage / 100m,
+                    Apr = UseFixedTotalDebt ? 0m : AprPercentage / 100m,
                     InitialLtv = InitialLtvPercentage,
                     LiquidationLtv = LiquidationLtvPercentage,
                     MarginCallLtv = MarginCallLtvPercentage,
                     Fees = FeesFiat.Value,
                     LoanStartDate = LoanStartDate.HasValue ? DateOnly.FromDateTime(LoanStartDate.Value) : DateOnly.FromDateTime(DateTime.UtcNow),
                     RepaymentDate = RepaymentDateOffset.HasValue ? DateOnly.FromDateTime(RepaymentDateOffset.Value) : null,
-                    CurrentBtcPrice = editBtcPrice
+                    CurrentBtcPrice = editBtcPrice,
+                    FixedTotalDebt = UseFixedTotalDebt ? FixedTotalDebtFiat.Value : null
                 };
                 break;
 

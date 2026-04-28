@@ -25,9 +25,23 @@ public class TransactionQueries : ITransactionQueries
         var allCategoriesList = _localDatabase.GetCategories().FindAll().ToList();
         var allCategories = ConvertToCategoriesDTO(allCategoriesList);
 
+        // Filter accounts by visibility setting
+        var visibleAccountsList = filter.ShowHiddenAccounts
+            ? allAccountsList
+            : allAccountsList.Where(a => a.Visible).ToList();
+
+        // Further restrict by specific account IDs if requested
+        if (filter.AccountIds is not null)
+        {
+            var requestedAccountIds = filter.AccountIds.Select(x => new ObjectId(x)).ToHashSet();
+            visibleAccountsList = visibleAccountsList
+                .Where(a => requestedAccountIds.Contains(a.Id))
+                .ToList();
+        }
+
         // Build dictionaries for O(1) lookups instead of O(n) SingleOrDefault
         var categoryDict = allCategories.Items.ToDictionary(x => x.Id);
-        var accountDict = allAccountsList.ToDictionary(a => a.Id);
+        var accountDict = visibleAccountsList.ToDictionary(a => a.Id);
 
         var query = _localDatabase.GetTransactions().Query();
 
@@ -43,11 +57,13 @@ public class TransactionQueries : ITransactionQueries
             query = query.Where(x => x.Date <= parsedDate);
         }
 
-        if (filter.AccountIds is not null)
+        // Apply account visibility and specific account filters
+        var allowedAccountIds = visibleAccountsList.Select(a => a.Id).ToList();
+        if (allowedAccountIds.Count < allAccountsList.Count)
         {
-            var accountIds = filter.AccountIds.Select(x => new ObjectId(x)).ToList();
             query = query.Where(x =>
-                accountIds.Contains(x.FromAccountId) || (x.ToAccountId != null && accountIds.Contains(x.ToAccountId)));
+                allowedAccountIds.Contains(x.FromAccountId) ||
+                (x.ToAccountId != null && allowedAccountIds.Contains(x.ToAccountId)));
         }
 
         if (filter.CategoryIds is not null)
@@ -67,8 +83,8 @@ public class TransactionQueries : ITransactionQueries
                 .Select(c => c.Id)
                 .ToList();
 
-            // Find accounts that match the search term (reuse already-loaded data)
-            var matchingAccountIds = allAccountsList
+            // Find accounts that match the search term (reuse already-loaded data, respecting visibility)
+            var matchingAccountIds = visibleAccountsList
                 .Where(a => a.Name.Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase))
                 .Select(a => a.Id)
                 .ToList();

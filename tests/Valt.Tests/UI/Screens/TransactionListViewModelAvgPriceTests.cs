@@ -66,6 +66,8 @@ public class TransactionListViewModelAvgPriceTests : DatabaseTest
             ratesState,
             Substitute.For<ILogger<LiveRateState>>());
 
+        var displaySettings = new DisplaySettings(_localDatabase, Substitute.For<Valt.Infra.Kernel.Notifications.INotificationPublisher>());
+
         return new TransactionListViewModel(
             _modalFactory,
             _commandDispatcher,
@@ -77,7 +79,8 @@ public class TransactionListViewModelAvgPriceTests : DatabaseTest
             _filterState,
             _clock,
             _localStorageService,
-            _vmLogger);
+            _vmLogger,
+            displaySettings);
     }
 
     #region CanSendToAvgPrice Tests

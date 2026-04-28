@@ -4,7 +4,7 @@ public sealed class JobLogPool
 {
     private const int MaxLines = 1000;
     private readonly Queue<JobLogEntry> _entries = new();
-    private readonly object _lock = new();
+    private readonly Lock _lock = new();
 
     public void AddEntry(JobLogLevel level, string message)
     {

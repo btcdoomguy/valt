@@ -174,12 +174,35 @@ public class ChangeCategoryTransactionsViewModelTests
     }
 
     [Test]
-    public async Task Should_Require_Category_When_Checkbox_Is_Enabled()
+    public async Task Should_Allow_Proceed_When_At_Least_One_Action_Is_Valid()
     {
-        // Arrange
+        // Arrange - rename is valid, category is invalid
         var viewModel = CreateInstance();
         viewModel.RenameEnabled = true;
         viewModel.Name = "New Name";
+        viewModel.ChangeCategoryEnabled = true;
+        viewModel.SelectedCategory = null;
+
+        ChangeCategoryTransactionsViewModel.Response? response = null;
+        viewModel.CloseDialog = r => response = r as ChangeCategoryTransactionsViewModel.Response;
+
+        // Act
+        await viewModel.OkCommand.ExecuteAsync(null);
+
+        // Assert - should succeed because rename is valid
+        Assert.That(viewModel.HasErrors, Is.False);
+        Assert.That(response, Is.Not.Null);
+        Assert.That(response!.RenameEnabled, Is.True);
+        Assert.That(response.Name, Is.EqualTo("New Name"));
+    }
+
+    [Test]
+    public async Task Should_Fail_When_Both_Actions_Are_Invalid()
+    {
+        // Arrange - rename enabled but empty, category enabled but not selected
+        var viewModel = CreateInstance();
+        viewModel.RenameEnabled = true;
+        viewModel.Name = string.Empty;
         viewModel.ChangeCategoryEnabled = true;
         viewModel.SelectedCategory = null;
 

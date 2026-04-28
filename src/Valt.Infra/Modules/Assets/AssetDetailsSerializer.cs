@@ -87,7 +87,8 @@ internal static class AssetDetailsSerializer
             string.IsNullOrEmpty(dto.LoanStartDate) ? DateOnly.FromDateTime(DateTime.UtcNow) : DateOnly.Parse(dto.LoanStartDate),
             string.IsNullOrEmpty(dto.RepaymentDate) ? null : DateOnly.Parse(dto.RepaymentDate),
             (LoanStatus)dto.StatusId,
-            dto.CurrentBtcPrice);
+            dto.CurrentBtcPrice,
+            dto.FixedTotalDebt);
     }
 
     public static BtcLendingDetails DeserializeBtcLending(string json)
@@ -179,7 +180,8 @@ internal static class AssetDetailsSerializer
             LoanStartDate = details.LoanStartDate.ToString("O"),
             RepaymentDate = details.RepaymentDate?.ToString("O"),
             StatusId = (int)details.Status,
-            CurrentBtcPrice = details.CurrentBtcPriceInLoanCurrency
+            CurrentBtcPrice = details.CurrentBtcPriceInLoanCurrency,
+            FixedTotalDebt = details.FixedTotalDebt
         };
         return JsonSerializer.Serialize(dto);
     }
@@ -251,6 +253,7 @@ internal class BtcLoanDetailsDto
     public string? RepaymentDate { get; set; }
     public int StatusId { get; set; }
     public decimal CurrentBtcPrice { get; set; }
+    public decimal? FixedTotalDebt { get; set; }
 }
 
 internal class BtcLendingDetailsDto

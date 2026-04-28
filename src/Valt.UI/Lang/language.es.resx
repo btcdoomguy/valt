@@ -1318,6 +1318,18 @@
     <data name="ManageAsset_IndefinitePeriod" xml:space="preserve">
         <value>Plazo indefinido (sin fecha de fin)</value>
     </data>
+    <data name="ManageAsset_UseFixedTotalDebt" xml:space="preserve">
+        <value>Usar deuda total predefinida (monto de pago fijo)</value>
+    </data>
+    <data name="ManageAsset_FixedTotalDebt" xml:space="preserve">
+        <value>Deuda Total</value>
+    </data>
+    <data name="ManageAsset_DerivedApr" xml:space="preserve">
+        <value>TAE Calculada</value>
+    </data>
+    <data name="ManageAsset_FixedTotalDebt_Help" xml:space="preserve">
+        <value>Algunas plataformas (como HodlHodl) fijan el monto a pagar al inicio del préstamo, independientemente de cuándo pagues. Cuando está habilitado, la TAE se calcula a partir de ese valor y del período del préstamo.</value>
+    </data>
     <data name="ManageAsset_BorrowerPlatform" xml:space="preserve">
         <value>Prestatario / Plataforma</value>
     </data>

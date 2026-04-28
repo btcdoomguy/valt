@@ -15,6 +15,7 @@ internal sealed class PriceDatabase : IPriceDatabase
 {
     private readonly IClock _clock;
     private readonly INotificationPublisher _publisher;
+    private readonly Lock _writeLock = new();
     private LiteDatabase? _database;
     private bool _inMemoryDb = true;
     private string? _filePath;
@@ -66,7 +67,10 @@ internal sealed class PriceDatabase : IPriceDatabase
         if (_database != null && !_inMemoryDb)
         {
             // Checkpoint to merge -log.db into main .db file before closing
-            _database.Checkpoint();
+            lock (_writeLock)
+            {
+                _database.Checkpoint();
+            }
         }
         _database?.Dispose();
         _database = null;
@@ -79,7 +83,10 @@ internal sealed class PriceDatabase : IPriceDatabase
     {
         if (_database != null && !_inMemoryDb)
         {
-            _database.Checkpoint();
+            lock (_writeLock)
+            {
+                _database.Checkpoint();
+            }
         }
     }
 
@@ -137,67 +144,82 @@ internal sealed class PriceDatabase : IPriceDatabase
 
     public void SetVersion(int version)
     {
-        var db = GetOpenDatabase();
-        var collection = db.GetCollection("_config");
-        var doc = new LiteDB.BsonDocument
+        lock (_writeLock)
         {
-            ["_id"] = "version",
-            ["value"] = version
-        };
-        collection.Upsert(doc);
+            var db = GetOpenDatabase();
+            var collection = db.GetCollection("_config");
+            var doc = new LiteDB.BsonDocument
+            {
+                ["_id"] = "version",
+                ["value"] = version
+            };
+            collection.Upsert(doc);
+        }
     }
 
     public void BeginTransaction()
     {
-        GetOpenDatabase().BeginTrans();
+        lock (_writeLock)
+        {
+            GetOpenDatabase().BeginTrans();
+        }
     }
 
     public void CommitTransaction()
     {
-        GetOpenDatabase().Commit();
+        lock (_writeLock)
+        {
+            GetOpenDatabase().Commit();
+        }
     }
 
     public void RollbackTransaction()
     {
-        GetOpenDatabase().Rollback();
+        lock (_writeLock)
+        {
+            GetOpenDatabase().Rollback();
+        }
     }
 
     public int RemoveDuplicateEntries()
     {
         var totalRemoved = 0;
 
-        // Remove duplicate bitcoin entries (keep one per date)
-        var btcCollection = GetBitcoinData();
-        var btcDuplicates = btcCollection.FindAll()
-            .GroupBy(x => DateOnly.FromDateTime(x.Date.ToUniversalTime()))
-            .Where(g => g.Count() > 1)
-            .SelectMany(g => g.OrderByDescending(e => e.Id).Skip(1))
-            .Select(e => e.Id)
-            .ToList();
-
-        foreach (var id in btcDuplicates)
+        lock (_writeLock)
         {
-            btcCollection.Delete(id);
-            totalRemoved++;
+            // Remove duplicate bitcoin entries (keep one per date)
+            var btcCollection = GetBitcoinData();
+            var btcDuplicates = btcCollection.FindAll()
+                .GroupBy(x => DateOnly.FromDateTime(x.Date.ToUniversalTime()))
+                .Where(g => g.Count() > 1)
+                .SelectMany(g => g.OrderByDescending(e => e.Id).Skip(1))
+                .Select(e => e.Id)
+                .ToList();
+
+            foreach (var id in btcDuplicates)
+            {
+                btcCollection.Delete(id);
+                totalRemoved++;
+            }
+
+            // Remove duplicate fiat entries (keep one per date+currency)
+            var fiatCollection = GetFiatData();
+            var fiatDuplicates = fiatCollection.FindAll()
+                .GroupBy(x => (DateOnly.FromDateTime(x.Date.ToUniversalTime()), x.Currency))
+                .Where(g => g.Count() > 1)
+                .SelectMany(g => g.OrderByDescending(e => e.Id).Skip(1))
+                .Select(e => e.Id)
+                .ToList();
+
+            foreach (var id in fiatDuplicates)
+            {
+                fiatCollection.Delete(id);
+                totalRemoved++;
+            }
+
+            if (totalRemoved > 0)
+                Checkpoint();
         }
-
-        // Remove duplicate fiat entries (keep one per date+currency)
-        var fiatCollection = GetFiatData();
-        var fiatDuplicates = fiatCollection.FindAll()
-            .GroupBy(x => (DateOnly.FromDateTime(x.Date.ToUniversalTime()), x.Currency))
-            .Where(g => g.Count() > 1)
-            .SelectMany(g => g.OrderByDescending(e => e.Id).Skip(1))
-            .Select(e => e.Id)
-            .ToList();
-
-        foreach (var id in fiatDuplicates)
-        {
-            fiatCollection.Delete(id);
-            totalRemoved++;
-        }
-
-        if (totalRemoved > 0)
-            Checkpoint();
 
         return totalRemoved;
     }

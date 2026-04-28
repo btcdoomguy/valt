@@ -142,6 +142,20 @@ internal sealed class EditAssetValidator : IValidator<EditAssetCommand>
 
         if (details.Fees < 0)
             builder.AddError("Details.Fees", "Fees cannot be negative.");
+
+        if (details.FixedTotalDebt.HasValue)
+        {
+            if (details.FixedTotalDebt.Value < details.LoanAmount + details.Fees)
+                builder.AddError("Details.FixedTotalDebt",
+                    "Fixed total debt must be greater than or equal to the loan amount plus fees.");
+
+            if (!details.RepaymentDate.HasValue)
+                builder.AddError("Details.RepaymentDate",
+                    "Repayment date is required when using a fixed total debt.");
+            else if (details.RepaymentDate.Value <= details.LoanStartDate)
+                builder.AddError("Details.RepaymentDate",
+                    "Repayment date must be after the loan start date when using a fixed total debt.");
+        }
     }
 
     private static void ValidateBtcLendingDetails(BtcLendingDetailsInputDTO details, ValidationResultBuilder builder)

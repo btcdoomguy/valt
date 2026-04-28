@@ -134,12 +134,18 @@ internal sealed class EditAssetHandler : ICommandHandler<EditAssetCommand, Unit>
         if (btcPrice <= 0 && existingAsset.Details is BtcLoanDetails existingLoan)
             btcPrice = existingLoan.CurrentBtcPriceInLoanCurrency;
 
+        var apr = btcLoan.FixedTotalDebt.HasValue
+            ? BtcLoanDetails.DeriveAprFromFixedDebt(
+                btcLoan.LoanAmount, btcLoan.FixedTotalDebt.Value,
+                btcLoan.LoanStartDate, btcLoan.RepaymentDate)
+            : btcLoan.Apr;
+
         return Result<IAssetDetails>.Success(new BtcLoanDetails(
             platformName: btcLoan.PlatformName,
             collateralSats: btcLoan.CollateralSats,
             loanAmount: btcLoan.LoanAmount,
             currencyCode: btcLoan.CurrencyCode,
-            apr: btcLoan.Apr,
+            apr: apr,
             initialLtv: btcLoan.InitialLtv,
             liquidationLtv: btcLoan.LiquidationLtv,
             marginCallLtv: btcLoan.MarginCallLtv,
@@ -147,6 +153,7 @@ internal sealed class EditAssetHandler : ICommandHandler<EditAssetCommand, Unit>
             loanStartDate: btcLoan.LoanStartDate,
             repaymentDate: btcLoan.RepaymentDate,
             status: (LoanStatus)btcLoan.Status,
-            currentBtcPriceInLoanCurrency: btcPrice));
+            currentBtcPriceInLoanCurrency: btcPrice,
+            fixedTotalDebt: btcLoan.FixedTotalDebt));
     }
 }

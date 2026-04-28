@@ -29,6 +29,8 @@ public sealed class BtcLoanDetails : IAssetDetails
 
     /// <summary>
     /// Annual percentage rate (e.g., 0.12 for 12%).
+    /// When <see cref="FixedTotalDebt"/> is set, this value is derived from the fixed debt
+    /// and the loan period so existing dashboards/reports keep working uniformly.
     /// </summary>
     public decimal Apr { get; }
 
@@ -72,6 +74,18 @@ public sealed class BtcLoanDetails : IAssetDetails
     /// </summary>
     public decimal CurrentBtcPriceInLoanCurrency { get; }
 
+    /// <summary>
+    /// Optional predefined total debt (e.g., HodlHodl-style loans where the repayment amount
+    /// is fixed up-front and does not accrue daily). When set, <see cref="CalculateTotalDebt"/>
+    /// always returns this value regardless of how much time has passed.
+    /// </summary>
+    public decimal? FixedTotalDebt { get; }
+
+    /// <summary>
+    /// Whether this loan uses a fixed total debt rather than daily APR accrual.
+    /// </summary>
+    public bool HasFixedTotalDebt => FixedTotalDebt.HasValue;
+
     public BtcLoanDetails(
         string platformName,
         long collateralSats,
@@ -85,7 +99,8 @@ public sealed class BtcLoanDetails : IAssetDetails
         DateOnly loanStartDate,
         DateOnly? repaymentDate,
         LoanStatus status,
-        decimal currentBtcPriceInLoanCurrency)
+        decimal currentBtcPriceInLoanCurrency,
+        decimal? fixedTotalDebt = null)
     {
         if (collateralSats <= 0)
             throw new ArgumentException("Collateral must be positive", nameof(collateralSats));
@@ -102,6 +117,11 @@ public sealed class BtcLoanDetails : IAssetDetails
         if (liquidationLtv <= marginCallLtv)
             throw new ArgumentException("Liquidation LTV must be greater than margin call LTV", nameof(liquidationLtv));
 
+        if (fixedTotalDebt.HasValue && fixedTotalDebt.Value < loanAmount + fees)
+            throw new ArgumentException(
+                "Fixed total debt cannot be lower than the principal plus fees",
+                nameof(fixedTotalDebt));
+
         PlatformName = platformName;
         CollateralSats = collateralSats;
         LoanAmount = loanAmount;
@@ -115,6 +135,7 @@ public sealed class BtcLoanDetails : IAssetDetails
         RepaymentDate = repaymentDate;
         Status = status;
         CurrentBtcPriceInLoanCurrency = currentBtcPriceInLoanCurrency;
+        FixedTotalDebt = fixedTotalDebt;
     }
 
     /// <summary>
@@ -153,10 +174,15 @@ public sealed class BtcLoanDetails : IAssetDetails
     }
 
     /// <summary>
-    /// Calculates the accrued interest from loan start to today.
+    /// Calculates the accrued interest from loan start to today. For fixed-debt loans,
+    /// the total interest is known up-front (FixedTotalDebt - LoanAmount - Fees) and
+    /// does not grow over time, so that full amount is returned.
     /// </summary>
     public decimal CalculateAccruedInterest()
     {
+        if (FixedTotalDebt.HasValue)
+            return Math.Max(0, FixedTotalDebt.Value - LoanAmount - Fees);
+
         var daysSinceStart = (DateOnly.FromDateTime(DateTime.UtcNow).DayNumber - LoanStartDate.DayNumber);
         if (daysSinceStart <= 0)
             return 0;
@@ -165,11 +191,15 @@ public sealed class BtcLoanDetails : IAssetDetails
     }
 
     /// <summary>
-    /// Calculates the total debt obligation: LoanAmount + AccruedInterest + Fees.
-    /// This is the total amount the borrower needs to repay.
+    /// Calculates the total debt obligation. For APR-based loans this is
+    /// LoanAmount + AccruedInterest + Fees. For fixed-debt loans the predefined
+    /// total is returned regardless of elapsed time.
     /// </summary>
     public decimal CalculateTotalDebt()
     {
+        if (FixedTotalDebt.HasValue)
+            return FixedTotalDebt.Value;
+
         return LoanAmount + CalculateAccruedInterest() + Fees;
     }
 
@@ -212,7 +242,8 @@ public sealed class BtcLoanDetails : IAssetDetails
             LoanStartDate,
             RepaymentDate,
             Status,
-            newPrice);
+            newPrice,
+            FixedTotalDebt);
     }
 
     public BtcLoanDetails WithStatus(LoanStatus newStatus)
@@ -230,6 +261,31 @@ public sealed class BtcLoanDetails : IAssetDetails
             LoanStartDate,
             RepaymentDate,
             newStatus,
-            CurrentBtcPriceInLoanCurrency);
+            CurrentBtcPriceInLoanCurrency,
+            FixedTotalDebt);
+    }
+
+    /// <summary>
+    /// Derives an annualized percentage rate from a fixed total debt and loan period.
+    /// Returns 0 when the required inputs are missing.
+    /// </summary>
+    public static decimal DeriveAprFromFixedDebt(
+        decimal loanAmount,
+        decimal fixedTotalDebt,
+        DateOnly loanStartDate,
+        DateOnly? repaymentDate)
+    {
+        if (loanAmount <= 0 || !repaymentDate.HasValue)
+            return 0m;
+
+        var days = repaymentDate.Value.DayNumber - loanStartDate.DayNumber;
+        if (days <= 0)
+            return 0m;
+
+        var interest = fixedTotalDebt - loanAmount;
+        if (interest <= 0)
+            return 0m;
+
+        return Math.Round(interest / loanAmount * 365m / days, 6);
     }
 }

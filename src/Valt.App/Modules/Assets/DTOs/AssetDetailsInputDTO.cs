@@ -203,6 +203,13 @@ public record BtcLoanDetailsInputDTO : AssetDetailsInputDTO
     /// Loan status: 0=Active, 1=Repaid
     /// </summary>
     public int Status { get; init; }
+
+    /// <summary>
+    /// When set, the loan uses a fixed predefined total debt instead of daily APR accrual.
+    /// The APR is derived from the difference between this value and the loan amount
+    /// spread over the loan period (RepaymentDate required).
+    /// </summary>
+    public decimal? FixedTotalDebt { get; init; }
 }
 
 /// <summary>

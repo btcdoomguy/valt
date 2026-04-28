@@ -41,13 +41,15 @@ public class MonthlyTotalsChartData : IDisposable
     public SolidColorPaint LegendTextPaint { get; } = new(LegendTextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) };
     public SolidColorPaint TooltipTextPaint { get; } = new(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) };
     public SolidColorPaint TooltipBackgroundPaint { get; } = new(ChartBackground);
-    public ObservableCollection<ObservablePoint> FiatValues { get; private set; } = new();
-    public ObservableCollection<ObservablePoint> BtcValues { get; private set; } = new();
-    public ObservableCollection<string> MonthLabels { get; private set; } = new();
+    public ObservableCollection<ObservablePoint> FiatValues { get; } = new();
+    public ObservableCollection<ObservablePoint> BtcValues { get; } = new();
+    public ObservableCollection<string> MonthLabels { get; } = new();
 
     public Axis[] XAxes { get; } = new Axis[1];
 
     public Axis[] YAxes { get; } = new Axis[2];
+
+    public ObservableCollection<ISeries> Series { get; } = new();
 
     public MonthlyTotalsChartData()
     {
@@ -93,38 +95,36 @@ public class MonthlyTotalsChartData : IDisposable
             MinLimit = 0,
             MinZoomDelta = 1
         };
+
+        // Create series once and reuse them across refreshes
+        var fiatSeries = new LineSeries<ObservablePoint>
+        {
+            Name = "Total Wealth",
+            Values = FiatValues,
+            Stroke = new SolidColorPaint(FiatPrimary) { StrokeThickness = 2.5f },
+            GeometryStroke = new SolidColorPaint(FiatDark) { StrokeThickness = 2 },
+            GeometryFill = new SolidColorPaint(FiatLight),
+            GeometrySize = 8,
+            Fill = new SolidColorPaint(FiatFill),
+            LineSmoothness = 0.3
+        };
+
+        var btcSeries = new LineSeries<ObservablePoint>
+        {
+            Name = "Bitcoin",
+            Values = BtcValues,
+            Stroke = new SolidColorPaint(BtcPrimary) { StrokeThickness = 2.5f },
+            GeometryStroke = new SolidColorPaint(BtcDark) { StrokeThickness = 2 },
+            GeometryFill = new SolidColorPaint(BtcLight),
+            GeometrySize = 8,
+            Fill = new SolidColorPaint(BtcFill),
+            LineSmoothness = 0.3,
+            ScalesYAt = 1
+        };
+
+        Series.Add(fiatSeries);
+        Series.Add(btcSeries);
     }
-
-    // Series definitions with enhanced styling - stored as fields to enable disposal
-    private LineSeries<ObservablePoint>? _fiatSeries;
-    private LineSeries<ObservablePoint>? _btcSeries;
-
-    private LineSeries<ObservablePoint> CreateFiatSeries() => new()
-    {
-        Name = "Total Wealth",
-        Values = FiatValues,
-        Stroke = new SolidColorPaint(FiatPrimary) { StrokeThickness = 2.5f },
-        GeometryStroke = new SolidColorPaint(FiatDark) { StrokeThickness = 2 },
-        GeometryFill = new SolidColorPaint(FiatLight),
-        GeometrySize = 8,
-        Fill = new SolidColorPaint(FiatFill),
-        LineSmoothness = 0.3
-    };
-
-    private LineSeries<ObservablePoint> CreateBtcSeries() => new()
-    {
-        Name = "Bitcoin",
-        Values = BtcValues,
-        Stroke = new SolidColorPaint(BtcPrimary) { StrokeThickness = 2.5f },
-        GeometryStroke = new SolidColorPaint(BtcDark) { StrokeThickness = 2 },
-        GeometryFill = new SolidColorPaint(BtcLight),
-        GeometrySize = 8,
-        Fill = new SolidColorPaint(BtcFill),
-        LineSmoothness = 0.3,
-        ScalesYAt = 1
-    };
-
-    public ObservableCollection<ISeries> Series { get; } = new();
 
     private string BitcoinLabeler(double arg)
     {
@@ -147,10 +147,6 @@ public class MonthlyTotalsChartData : IDisposable
         XAxes[0].MinLimit = null;
         XAxes[0].MaxLimit = null;
 
-        // Dispose old series before clearing
-        DisposeSeries();
-        Series.Clear();
-
         for (var index = 0; index < monthlyTotalsData.Items.Count; index++)
         {
             var item = monthlyTotalsData.Items[index];
@@ -159,38 +155,14 @@ public class MonthlyTotalsChartData : IDisposable
             FiatValues.Add(new ObservablePoint(index, (double)item.FiatTotal));
             BtcValues.Add(new ObservablePoint(index, (double)item.BtcTotal));
         }
-
-        // Create and add new series after data is populated
-        _fiatSeries = CreateFiatSeries();
-        _btcSeries = CreateBtcSeries();
-        Series.Add(_fiatSeries);
-        Series.Add(_btcSeries);
-    }
-
-    private void DisposeSeries()
-    {
-        if (_fiatSeries is not null)
-        {
-            (_fiatSeries.Stroke as IDisposable)?.Dispose();
-            (_fiatSeries.GeometryStroke as IDisposable)?.Dispose();
-            (_fiatSeries.GeometryFill as IDisposable)?.Dispose();
-            (_fiatSeries.Fill as IDisposable)?.Dispose();
-            _fiatSeries = null;
-        }
-
-        if (_btcSeries is not null)
-        {
-            (_btcSeries.Stroke as IDisposable)?.Dispose();
-            (_btcSeries.GeometryStroke as IDisposable)?.Dispose();
-            (_btcSeries.GeometryFill as IDisposable)?.Dispose();
-            (_btcSeries.Fill as IDisposable)?.Dispose();
-            _btcSeries = null;
-        }
     }
 
     public void Dispose()
     {
-        DisposeSeries();
+        foreach (var series in Series.OfType<IDisposable>())
+        {
+            series.Dispose();
+        }
         Series.Clear();
         FiatValues.Clear();
         BtcValues.Clear();

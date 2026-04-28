@@ -7,4 +7,5 @@ public record TransactionQueryFilter
     public DateOnly? From { get; init; }
     public DateOnly? To { get; init; }
     public string? SearchTerm { get; init; }
+    public bool ShowHiddenAccounts { get; init; } = true;
 }

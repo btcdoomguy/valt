@@ -22,6 +22,7 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
     IRecipient<AccountSummariesDTO>, IRecipient<AssetSummaryUpdatedMessage>, IRecipient<AssetPricesUpdated>, IDisposable
 {
     private readonly Lock _calculationLock = new();
+    private CancellationTokenSource? _refreshDebounceCts;
 
     private readonly CurrencySettings _currencySettings;
     private readonly RatesState _ratesState;
@@ -55,7 +56,27 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
 
     public void Receive(RatesUpdated message)
     {
-        _ = RefreshAndNotifyAsync();
+        // Debounce rapid successive rates updates to avoid redundant DB queries.
+        // If multiple messages arrive within 100ms, only the last one triggers a refresh.
+        var previousCts = Interlocked.Exchange(ref _refreshDebounceCts, new CancellationTokenSource());
+        previousCts?.Cancel();
+        previousCts?.Dispose();
+
+        var currentCts = _refreshDebounceCts;
+        _ = DebouncedRefreshAndNotifyAsync(currentCts.Token);
+    }
+
+    private async Task DebouncedRefreshAndNotifyAsync(CancellationToken ct)
+    {
+        try
+        {
+            await Task.Delay(100, ct);
+            await RefreshAndNotifyAsync();
+        }
+        catch (OperationCanceledException)
+        {
+            // Debounce was superseded by a newer message — safe to ignore.
+        }
     }
 
     public void Receive(AssetSummaryUpdatedMessage message)
@@ -138,13 +159,17 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
                     }
                     else
                     {
-                        if (!_ratesState.FiatRates.ContainsKey(fiatAccount.Currency))
-                            throw new ApplicationException(
-                                $"Error calculating total in sats. Fiat rate not found for {fiatAccount.Currency}.");
+                        if (!_ratesState.FiatRates.TryGetValue(fiatAccount.Currency, out var accountCurrencyRate))
+                        {
+                            _logger.LogWarning(
+                                "[AccountsTotalState] Fiat rate not found for {Currency} ({AccountName}), skipping account in wealth calculation",
+                                fiatAccount.Currency, fiatAccount.Name);
+                            continue;
+                        }
 
                         allWealthPricedInSats += BtcPriceCalculator
                             .CalculateBtcAmountOfFiat(fiatAccount.FiatTotal.GetValueOrDefault(),
-                                _ratesState.FiatRates[fiatAccount.Currency], _ratesState.BitcoinPrice.Value);
+                                accountCurrencyRate, _ratesState.BitcoinPrice.Value);
 
                         if (fiatAccount.Currency == _currencySettings.MainFiatCurrency)
                         {
@@ -154,7 +179,7 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
                         {
                             //convert it to dollar, then convert back to main fiat currency
                             var fiatConvertedToUsd =
-                                fiatAccount.FiatTotal.GetValueOrDefault() / _ratesState.FiatRates[fiatAccount.Currency];
+                                fiatAccount.FiatTotal.GetValueOrDefault() / accountCurrencyRate;
                             wealthInMainFiatCurrency +=
                                 _ratesState.FiatRates[_currencySettings.MainFiatCurrency] * fiatConvertedToUsd;
                         }
@@ -236,5 +261,8 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
         WeakReferenceMessenger.Default.Unregister<AccountSummariesDTO>(this);
         WeakReferenceMessenger.Default.Unregister<AssetSummaryUpdatedMessage>(this);
         WeakReferenceMessenger.Default.Unregister<AssetPricesUpdated>(this);
+
+        _refreshDebounceCts?.Cancel();
+        _refreshDebounceCts?.Dispose();
     }
 }

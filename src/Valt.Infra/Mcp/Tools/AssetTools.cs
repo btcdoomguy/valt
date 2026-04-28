@@ -322,7 +322,7 @@ public class AssetTools
     /// <summary>
     /// Creates a BTC-collateralized loan asset.
     /// </summary>
-    [McpServerTool, Description("Create a BTC-collateralized loan (borrowing fiat against BTC collateral). Tracks LTV, health status, and accrued interest.")]
+    [McpServerTool, Description("Create a BTC-collateralized loan (borrowing fiat against BTC collateral). Tracks LTV, health status, and accrued interest. Supports either daily APR accrual or a predefined fixed total debt (HodlHodl-style).")]
     public static async Task<string> CreateBtcLoan(
         ICommandDispatcher commandDispatcher,
         INotificationPublisher publisher,
@@ -332,16 +332,17 @@ public class AssetTools
         [Description("Lending platform name (e.g., HodlHodl, Ledn)")] string platformName,
         [Description("BTC collateral in satoshis")] long collateralSats,
         [Description("Borrowed fiat amount")] decimal loanAmount,
-        [Description("Annual percentage rate as decimal (e.g., 0.12 for 12%)")] decimal apr,
+        [Description("Annual percentage rate as decimal (e.g., 0.12 for 12%). Ignored when fixedTotalDebt is set.")] decimal apr,
         [Description("Initial LTV ratio at loan origination (percentage, e.g., 50)")] decimal initialLtv,
         [Description("LTV ratio that triggers liquidation (percentage, e.g., 80)")] decimal liquidationLtv,
         [Description("LTV ratio that triggers margin call (percentage, e.g., 70)")] decimal marginCallLtv,
         [Description("Loan start date (yyyy-MM-dd)")] string loanStartDate,
         [Description("Fees paid for the loan")] decimal fees = 0,
-        [Description("Repayment date (yyyy-MM-dd, optional)")] string? repaymentDate = null,
+        [Description("Repayment date (yyyy-MM-dd). Required when fixedTotalDebt is set.")] string? repaymentDate = null,
         [Description("Include in net worth calculation")] bool includeInNetWorth = true,
         [Description("Visible in list")] bool visible = true,
-        [Description("Icon identifier (optional)")] string? icon = null)
+        [Description("Icon identifier (optional)")] string? icon = null,
+        [Description("Optional predefined total debt for loans with a fixed repayment amount (e.g., HodlHodl). Must be >= loanAmount + fees. When set, APR is derived from the loan period; the 'apr' parameter is ignored and repaymentDate is required.")] decimal? fixedTotalDebt = null)
     {
         // Fetch current BTC price for LTV calculations
         decimal currentBtcPrice = 0;
@@ -357,6 +358,7 @@ public class AssetTools
             CollateralSats = collateralSats,
             LoanAmount = loanAmount,
             Apr = apr,
+            FixedTotalDebt = fixedTotalDebt,
             InitialLtv = initialLtv,
             LiquidationLtv = liquidationLtv,
             MarginCallLtv = marginCallLtv,

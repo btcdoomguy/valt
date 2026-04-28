@@ -31,10 +31,46 @@ internal class TransactionRepository : ITransactionRepository
     public Task<Transaction?> GetTransactionByIdAsync(TransactionId transactionId)
     {
         var entity = _localDatabase.GetTransactions().FindById(new ObjectId(transactionId));
-        
+        if (entity is null)
+            return Task.FromResult<Transaction?>(null);
+
         var fixedExpenseRelated = _localDatabase.GetFixedExpenseRecords().Find(x => x.Transaction != null && x.Transaction.Id == entity.Id);
 
-        return Task.FromResult(entity?.AsDomainObject(fixedExpenseRelated.FirstOrDefault()));
+        return Task.FromResult<Transaction?>(entity.AsDomainObject(fixedExpenseRelated.FirstOrDefault()));
+    }
+
+    public Task<IReadOnlyList<Transaction>> GetTransactionsByIdsAsync(IReadOnlyList<TransactionId> transactionIds)
+    {
+        if (transactionIds.Count == 0)
+            return Task.FromResult<IReadOnlyList<Transaction>>(Array.Empty<Transaction>());
+
+        if (transactionIds.Count == 1)
+        {
+            var entity = _localDatabase.GetTransactions().FindById(new ObjectId(transactionIds[0]));
+            if (entity is null)
+                return Task.FromResult<IReadOnlyList<Transaction>>(Array.Empty<Transaction>());
+
+            var fixedExpenseRelated = _localDatabase.GetFixedExpenseRecords()
+                .Find(x => x.Transaction != null && x.Transaction.Id == entity.Id)
+                .FirstOrDefault();
+            return Task.FromResult<IReadOnlyList<Transaction>>(new[] { entity.AsDomainObject(fixedExpenseRelated) });
+        }
+
+        var bsonIds = transactionIds.Select(id => new BsonValue(id.Value)).ToArray();
+        var entities = _localDatabase.GetTransactions()
+            .Find(LiteDB.Query.In("_id", bsonIds))
+            .ToList();
+
+        var result = new List<Transaction>(entities.Count);
+        foreach (var entity in entities)
+        {
+            var fixedExpenseRelated = _localDatabase.GetFixedExpenseRecords()
+                .Find(x => x.Transaction != null && x.Transaction.Id == entity.Id)
+                .FirstOrDefault();
+            result.Add(entity.AsDomainObject(fixedExpenseRelated));
+        }
+
+        return Task.FromResult<IReadOnlyList<Transaction>>(result);
     }
 
     public async Task SaveTransactionAsync(Transaction transaction)
@@ -60,15 +96,15 @@ internal class TransactionRepository : ITransactionRepository
 
         try
         {
-            var fiatData = _priceDatabase.GetFiatData().FindAll().ToList();
-            if (fiatData.Count == 0)
+            var fiatCollection = _priceDatabase.GetFiatData();
+            if (fiatCollection.Count() == 0)
             {
                 // No fiat data at all, trigger refresh
                 _ = _notificationPublisher.PublishAsync(new FiatHistoryRefreshRequestedMessage());
                 return;
             }
 
-            var minFiatDate = fiatData.Min(x => x.Date);
+            var minFiatDate = fiatCollection.Min(x => x.Date);
             var transactionDateTime = transactionDate.ToDateTime(TimeOnly.MinValue);
             if (transactionDateTime < minFiatDate)
             {

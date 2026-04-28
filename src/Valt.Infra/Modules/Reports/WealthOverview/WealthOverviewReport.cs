@@ -71,18 +71,78 @@ internal class WealthOverviewReport : IWealthOverviewReport
         public WealthOverviewData Calculate()
         {
             var periodEndDates = GeneratePeriodEndDates();
-            var items = new List<WealthOverviewData.Item>();
 
-            foreach (var periodEnd in periodEndDates)
+            // Single-pass calculation: iterate day by day once, collecting snapshots at each period end.
+            // This avoids replaying the entire transaction history for every data point.
+            var accountBalances = new Dictionary<ObjectId, decimal>();
+            var bitcoinTotal = 0m;
+
+            // Initialize all accounts with their initial balances
+            foreach (var account in _provider.Accounts.Values)
             {
-                // Skip periods that end before the earliest transaction
-                if (periodEnd < _provider.MinTransactionDate)
-                    continue;
+                InitializeAccountIfNeeded(account, accountBalances, ref bitcoinTotal);
+            }
 
-                var (fiatTotal, btcTotal) = CalculateWealthAtDate(periodEnd);
-                var label = GetLabelForPeriod(periodEnd);
+            var items = new List<WealthOverviewData.Item>();
+            var periodIndex = 0;
 
-                items.Add(new WealthOverviewData.Item(periodEnd, label, fiatTotal, btcTotal));
+            var startDate = _provider.MinTransactionDate.AddDays(-1);
+            var currentDate = startDate;
+            var lastPeriodEnd = periodEndDates.LastOrDefault();
+            var maxCalculationDate = lastPeriodEnd > _today ? _today : lastPeriodEnd;
+
+            while (currentDate <= maxCalculationDate)
+            {
+                currentDate = currentDate.AddDays(1);
+
+                _provider.AccountsByDate.TryGetValue(currentDate, out var accountsForDate);
+                _provider.TransactionsByDate.TryGetValue(currentDate, out var transactionsForDate);
+
+                if (accountsForDate is not null && transactionsForDate is not null)
+                {
+                    foreach (var accountId in accountsForDate)
+                    {
+                        var account = _provider.Accounts[accountId];
+
+                        var fromTransactions = transactionsForDate.Where(x => x.FromAccountId == accountId);
+                        var toTransactions = transactionsForDate.Where(x => x.ToAccountId == accountId);
+
+                        if (account.AccountEntityType == AccountEntityType.Bitcoin)
+                        {
+                            UpdateBitcoinAccountBalance(accountBalances, ref bitcoinTotal, accountId, fromTransactions, toTransactions);
+                        }
+                        else
+                        {
+                            UpdateFiatAccountBalance(accountBalances, accountId, fromTransactions, toTransactions);
+                        }
+                    }
+                }
+
+                // Collect snapshots for any period ends that fall on this date
+                while (periodIndex < periodEndDates.Count && periodEndDates[periodIndex] == currentDate)
+                {
+                    var periodEnd = periodEndDates[periodIndex];
+                    if (periodEnd >= _provider.MinTransactionDate)
+                    {
+                        var (fiatTotal, btcTotal) = CalculateTotalsAtDate(currentDate, accountBalances, bitcoinTotal);
+                        var label = GetLabelForPeriod(periodEnd);
+                        items.Add(new WealthOverviewData.Item(periodEnd, label, fiatTotal, btcTotal));
+                    }
+                    periodIndex++;
+                }
+            }
+
+            // Handle any future period ends (use final balance at today)
+            while (periodIndex < periodEndDates.Count)
+            {
+                var periodEnd = periodEndDates[periodIndex];
+                if (periodEnd >= _provider.MinTransactionDate)
+                {
+                    var (fiatTotal, btcTotal) = CalculateTotalsAtDate(_today, accountBalances, bitcoinTotal);
+                    var label = GetLabelForPeriod(periodEnd);
+                    items.Add(new WealthOverviewData.Item(periodEnd, label, fiatTotal, btcTotal));
+                }
+                periodIndex++;
             }
 
             return new WealthOverviewData
@@ -147,58 +207,6 @@ internal class WealthOverviewReport : IWealthOverviewReport
             };
         }
 
-        private (decimal fiatTotal, decimal btcTotal) CalculateWealthAtDate(DateOnly targetDate)
-        {
-            // For incomplete periods (future period end), use today's date for calculation
-            var calculationDate = targetDate > _today ? _today : targetDate;
-
-            var accountBalances = new Dictionary<ObjectId, decimal>();
-            var bitcoinTotal = 0m;
-
-            // Initialize all accounts with their initial balances
-            foreach (var account in _provider.Accounts.Values)
-            {
-                InitializeAccountIfNeeded(account, accountBalances, ref bitcoinTotal);
-            }
-
-            var startDate = _provider.MinTransactionDate.AddDays(-1);
-            var currentDate = startDate;
-
-            while (currentDate <= calculationDate)
-            {
-                currentDate = currentDate.AddDays(1);
-
-                _provider.AccountsByDate.TryGetValue(currentDate, out var accountsForDate);
-                _provider.TransactionsByDate.TryGetValue(currentDate, out var transactionsForDate);
-
-                if (accountsForDate is not null && transactionsForDate is not null)
-                {
-                    foreach (var accountId in accountsForDate)
-                    {
-                        var account = _provider.Accounts[accountId];
-
-                        var fromTransactions = transactionsForDate.Where(x => x.FromAccountId == accountId);
-                        var toTransactions = transactionsForDate.Where(x => x.ToAccountId == accountId);
-
-                        if (account.AccountEntityType == AccountEntityType.Bitcoin)
-                        {
-                            UpdateBitcoinAccountBalance(accountBalances, ref bitcoinTotal, accountId, fromTransactions, toTransactions);
-                        }
-                        else
-                        {
-                            UpdateFiatAccountBalance(accountBalances, accountId, fromTransactions, toTransactions);
-                        }
-                    }
-                }
-            }
-
-            // Calculate totals at calculation date
-            var fiatTotal = CalculateFiatTotalAtDate(calculationDate, accountBalances);
-            var btcTotal = bitcoinTotal;
-
-            return (Math.Round(fiatTotal, 2), btcTotal);
-        }
-
         private void InitializeAccountIfNeeded(
             AccountEntity account,
             Dictionary<ObjectId, decimal> accountBalances,
@@ -221,33 +229,7 @@ internal class WealthOverviewReport : IWealthOverviewReport
             }
         }
 
-        private static void UpdateBitcoinAccountBalance(
-            Dictionary<ObjectId, decimal> accountBalances,
-            ref decimal bitcoinTotal,
-            ObjectId accountId,
-            IEnumerable<Budget.Transactions.TransactionEntity> fromTransactions,
-            IEnumerable<Budget.Transactions.TransactionEntity> toTransactions)
-        {
-            var balanceChange = fromTransactions.Sum(x => x.FromSatAmount.GetValueOrDefault() / SatoshisPerBitcoin) +
-                                toTransactions.Sum(x => x.ToSatAmount.GetValueOrDefault() / SatoshisPerBitcoin);
-
-            accountBalances[accountId] += balanceChange;
-            bitcoinTotal += balanceChange;
-        }
-
-        private static void UpdateFiatAccountBalance(
-            Dictionary<ObjectId, decimal> accountBalances,
-            ObjectId accountId,
-            IEnumerable<Budget.Transactions.TransactionEntity> fromTransactions,
-            IEnumerable<Budget.Transactions.TransactionEntity> toTransactions)
-        {
-            var balanceChange = fromTransactions.Sum(x => x.FromFiatAmount.GetValueOrDefault()) +
-                                toTransactions.Sum(x => x.ToFiatAmount.GetValueOrDefault());
-
-            accountBalances[accountId] += balanceChange;
-        }
-
-        private decimal CalculateFiatTotalAtDate(DateOnly date, Dictionary<ObjectId, decimal> accountBalances)
+        private (decimal fiatTotal, decimal btcTotal) CalculateTotalsAtDate(DateOnly date, Dictionary<ObjectId, decimal> accountBalances, decimal bitcoinTotal)
         {
             var fiatTotal = 0m;
 
@@ -278,7 +260,33 @@ internal class WealthOverviewReport : IWealthOverviewReport
                 }
             }
 
-            return fiatTotal;
+            return (Math.Round(fiatTotal, 2), bitcoinTotal);
+        }
+
+        private static void UpdateBitcoinAccountBalance(
+            Dictionary<ObjectId, decimal> accountBalances,
+            ref decimal bitcoinTotal,
+            ObjectId accountId,
+            IEnumerable<Budget.Transactions.TransactionEntity> fromTransactions,
+            IEnumerable<Budget.Transactions.TransactionEntity> toTransactions)
+        {
+            var balanceChange = fromTransactions.Sum(x => x.FromSatAmount.GetValueOrDefault() / SatoshisPerBitcoin) +
+                                toTransactions.Sum(x => x.ToSatAmount.GetValueOrDefault() / SatoshisPerBitcoin);
+
+            accountBalances[accountId] += balanceChange;
+            bitcoinTotal += balanceChange;
+        }
+
+        private static void UpdateFiatAccountBalance(
+            Dictionary<ObjectId, decimal> accountBalances,
+            ObjectId accountId,
+            IEnumerable<Budget.Transactions.TransactionEntity> fromTransactions,
+            IEnumerable<Budget.Transactions.TransactionEntity> toTransactions)
+        {
+            var balanceChange = fromTransactions.Sum(x => x.FromFiatAmount.GetValueOrDefault()) +
+                                toTransactions.Sum(x => x.ToFiatAmount.GetValueOrDefault());
+
+            accountBalances[accountId] += balanceChange;
         }
     }
 }
