@@ -30,8 +30,30 @@ With Valt, you can easily keep track of your finances and stay in control of you
 
 - 💲 **More Fiat Currencies**: Expand support for additional fiat currencies.
 - 🎨 **Interface & UX Improvements**: Enhance the overall look, feel, and user experience.
-- 🆕 **Latest Changes Window**: A dedicated view for recent updates and changes.
+- 🔕 **Latest Changes Window**: A dedicated view for recent updates and changes.
 - 🌎 **More Languages**: Add support for additional languages.
+
+## macOS Packaging 🍎
+
+Valt can be packaged as a native macOS application for Apple Silicon (arm64). The repository includes scripts to build and package the app:
+
+### Prerequisites
+- .NET 10 SDK
+- Avalonia UI
+- `create-dmg` (install via `brew install create-dmg`)
+
+### Build and Package
+```bash
+# Build the app and create the .app bundle
+./scripts/package-macos.sh
+
+# Create a distributable DMG image
+./scripts/create-dmg.sh
+```
+
+The generated `Valt.app` can be dragged to `/Applications`. The DMG image (`Valt-macos-arm64.dmg`) provides a simple installer with a default Finder background.
+
+**Note:** The app is signed with an ad‑hoc signature for local use. For distribution outside your machine, consider obtaining an Apple Developer ID and performing proper notarization.
 
 ## Disclaimer ⚠️
 
