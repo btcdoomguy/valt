@@ -159,13 +159,17 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
                     }
                     else
                     {
-                        if (!_ratesState.FiatRates.ContainsKey(fiatAccount.Currency))
-                            throw new ApplicationException(
-                                $"Error calculating total in sats. Fiat rate not found for {fiatAccount.Currency}.");
+                        if (!_ratesState.FiatRates.TryGetValue(fiatAccount.Currency, out var accountCurrencyRate))
+                        {
+                            _logger.LogWarning(
+                                "[AccountsTotalState] Fiat rate not found for {Currency} ({AccountName}), skipping account in wealth calculation",
+                                fiatAccount.Currency, fiatAccount.Name);
+                            continue;
+                        }
 
                         allWealthPricedInSats += BtcPriceCalculator
                             .CalculateBtcAmountOfFiat(fiatAccount.FiatTotal.GetValueOrDefault(),
-                                _ratesState.FiatRates[fiatAccount.Currency], _ratesState.BitcoinPrice.Value);
+                                accountCurrencyRate, _ratesState.BitcoinPrice.Value);
 
                         if (fiatAccount.Currency == _currencySettings.MainFiatCurrency)
                         {
@@ -175,7 +179,7 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
                         {
                             //convert it to dollar, then convert back to main fiat currency
                             var fiatConvertedToUsd =
-                                fiatAccount.FiatTotal.GetValueOrDefault() / _ratesState.FiatRates[fiatAccount.Currency];
+                                fiatAccount.FiatTotal.GetValueOrDefault() / accountCurrencyRate;
                             wealthInMainFiatCurrency +=
                                 _ratesState.FiatRates[_currencySettings.MainFiatCurrency] * fiatConvertedToUsd;
                         }
