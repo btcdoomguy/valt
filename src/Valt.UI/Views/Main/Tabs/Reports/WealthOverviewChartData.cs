@@ -48,6 +48,9 @@ public class WealthOverviewChartData : IDisposable
 
     public ObservableCollection<ISeries> Series { get; } = new();
 
+    private LineSeries<ObservablePoint>? _fiatSeries;
+    private LineSeries<ObservablePoint>? _btcSeries;
+
     public WealthOverviewChartData()
     {
         XAxes[0] =
@@ -93,35 +96,32 @@ public class WealthOverviewChartData : IDisposable
             MinZoomDelta = 1
         };
 
-        // Create series once and reuse them across refreshes
-        var fiatSeries = new LineSeries<ObservablePoint>
-        {
-            Name = language.Reports_WealthOverview_Chart_TotalWealth,
-            Values = FiatValues,
-            Stroke = new SolidColorPaint(FiatPrimary) { StrokeThickness = 2.5f },
-            GeometryStroke = new SolidColorPaint(FiatDark) { StrokeThickness = 2 },
-            GeometryFill = new SolidColorPaint(FiatLight),
-            GeometrySize = 8,
-            Fill = new SolidColorPaint(FiatFill),
-            LineSmoothness = 0.3
-        };
-
-        var btcSeries = new LineSeries<ObservablePoint>
-        {
-            Name = language.Reports_WealthOverview_Chart_Bitcoin,
-            Values = BtcValues,
-            Stroke = new SolidColorPaint(BtcPrimary) { StrokeThickness = 2.5f },
-            GeometryStroke = new SolidColorPaint(BtcDark) { StrokeThickness = 2 },
-            GeometryFill = new SolidColorPaint(BtcLight),
-            GeometrySize = 8,
-            Fill = new SolidColorPaint(BtcFill),
-            LineSmoothness = 0.3,
-            ScalesYAt = 1
-        };
-
-        Series.Add(fiatSeries);
-        Series.Add(btcSeries);
     }
+
+    private LineSeries<ObservablePoint> CreateFiatSeries() => new()
+    {
+        Name = language.Reports_WealthOverview_Chart_TotalWealth,
+        Values = FiatValues,
+        Stroke = new SolidColorPaint(FiatPrimary) { StrokeThickness = 2.5f },
+        GeometryStroke = new SolidColorPaint(FiatDark) { StrokeThickness = 2 },
+        GeometryFill = new SolidColorPaint(FiatLight),
+        GeometrySize = 8,
+        Fill = new SolidColorPaint(FiatFill),
+        LineSmoothness = 0.3
+    };
+
+    private LineSeries<ObservablePoint> CreateBtcSeries() => new()
+    {
+        Name = language.Reports_WealthOverview_Chart_Bitcoin,
+        Values = BtcValues,
+        Stroke = new SolidColorPaint(BtcPrimary) { StrokeThickness = 2.5f },
+        GeometryStroke = new SolidColorPaint(BtcDark) { StrokeThickness = 2 },
+        GeometryFill = new SolidColorPaint(BtcLight),
+        GeometrySize = 8,
+        Fill = new SolidColorPaint(BtcFill),
+        LineSmoothness = 0.3,
+        ScalesYAt = 1
+    };
 
     private string BitcoinLabeler(double arg)
     {
@@ -144,6 +144,12 @@ public class WealthOverviewChartData : IDisposable
         XAxes[0].MinLimit = null;
         XAxes[0].MaxLimit = null;
 
+        // Dispose and detach the previous series so LiveCharts rebuilds the line
+        // path from scratch — reusing the same series instance leaves stale geometry
+        // after a window resize combined with a dropdown change.
+        DisposeSeries();
+        Series.Clear();
+
         for (var index = 0; index < wealthOverviewData.Items.Count; index++)
         {
             var item = wealthOverviewData.Items[index];
@@ -152,14 +158,37 @@ public class WealthOverviewChartData : IDisposable
             FiatValues.Add(new ObservablePoint(index, (double)item.FiatTotal));
             BtcValues.Add(new ObservablePoint(index, (double)item.BtcTotal));
         }
+
+        _fiatSeries = CreateFiatSeries();
+        _btcSeries = CreateBtcSeries();
+        Series.Add(_fiatSeries);
+        Series.Add(_btcSeries);
+    }
+
+    private void DisposeSeries()
+    {
+        if (_fiatSeries is not null)
+        {
+            (_fiatSeries.Stroke as IDisposable)?.Dispose();
+            (_fiatSeries.GeometryStroke as IDisposable)?.Dispose();
+            (_fiatSeries.GeometryFill as IDisposable)?.Dispose();
+            (_fiatSeries.Fill as IDisposable)?.Dispose();
+            _fiatSeries = null;
+        }
+
+        if (_btcSeries is not null)
+        {
+            (_btcSeries.Stroke as IDisposable)?.Dispose();
+            (_btcSeries.GeometryStroke as IDisposable)?.Dispose();
+            (_btcSeries.GeometryFill as IDisposable)?.Dispose();
+            (_btcSeries.Fill as IDisposable)?.Dispose();
+            _btcSeries = null;
+        }
     }
 
     public void Dispose()
     {
-        foreach (var series in Series.OfType<IDisposable>())
-        {
-            series.Dispose();
-        }
+        DisposeSeries();
         Series.Clear();
         FiatValues.Clear();
         BtcValues.Clear();

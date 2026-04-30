@@ -34,7 +34,7 @@ public class PriceHistoryChartData : IDisposable
     public Axis[] XAxes { get; }
     public Axis[] YAxes { get; }
 
-    private readonly LineSeries<ObservablePoint> _series;
+    private LineSeries<ObservablePoint>? _series;
 
     public PriceHistoryChartData()
     {
@@ -65,19 +65,6 @@ public class PriceHistoryChartData : IDisposable
             }
         };
 
-        // Create series once and reuse across refreshes
-        _series = new LineSeries<ObservablePoint>
-        {
-            Values = Values,
-            Stroke = new SolidColorPaint(BtcPrimary) { StrokeThickness = 2.5f },
-            GeometryStroke = new SolidColorPaint(BtcDark) { StrokeThickness = 2 },
-            GeometryFill = new SolidColorPaint(BtcLight),
-            GeometrySize = 0,
-            Fill = new SolidColorPaint(BtcFill),
-            LineSmoothness = 0.3
-        };
-
-        Series.Add(_series);
     }
 
     public void RefreshChart(List<(DateTime Date, decimal Price)> data, bool isBtc)
@@ -87,6 +74,12 @@ public class PriceHistoryChartData : IDisposable
 
         XAxes[0].MinLimit = null;
         XAxes[0].MaxLimit = null;
+
+        // Dispose and detach the previous series so LiveCharts rebuilds the line
+        // path from scratch — reusing the same series instance leaves stale geometry
+        // after a window resize combined with a data refresh.
+        DisposeSeries();
+        Series.Clear();
 
         // Limit chart data to last 5 years
         var cutoffDate = DateTime.Now.AddYears(-MaxYears);
@@ -105,18 +98,34 @@ public class PriceHistoryChartData : IDisposable
         var dark = isBtc ? BtcDark : FiatDark;
         var fill = isBtc ? BtcFill : FiatFill;
 
-        _series.Stroke = new SolidColorPaint(primary) { StrokeThickness = 2.5f };
-        _series.GeometryStroke = new SolidColorPaint(dark) { StrokeThickness = 2 };
-        _series.GeometryFill = new SolidColorPaint(light);
-        _series.Fill = new SolidColorPaint(fill);
+        _series = new LineSeries<ObservablePoint>
+        {
+            Values = Values,
+            Stroke = new SolidColorPaint(primary) { StrokeThickness = 2.5f },
+            GeometryStroke = new SolidColorPaint(dark) { StrokeThickness = 2 },
+            GeometryFill = new SolidColorPaint(light),
+            GeometrySize = 0,
+            Fill = new SolidColorPaint(fill),
+            LineSmoothness = 0.3
+        };
+
+        Series.Add(_series);
     }
 
-    public void Dispose()
+    private void DisposeSeries()
     {
+        if (_series is null) return;
+
         (_series.Stroke as IDisposable)?.Dispose();
         (_series.GeometryStroke as IDisposable)?.Dispose();
         (_series.GeometryFill as IDisposable)?.Dispose();
         (_series.Fill as IDisposable)?.Dispose();
+        _series = null;
+    }
+
+    public void Dispose()
+    {
+        DisposeSeries();
         Series.Clear();
         Values.Clear();
         DateLabels.Clear();
