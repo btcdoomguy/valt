@@ -219,4 +219,35 @@ public class GetTransactionsQueryHandlerTests : DatabaseTest
         Assert.That(result.Items.Count, Is.EqualTo(1));
         Assert.That(result.Items.First().FromAccountId, Is.EqualTo(_hiddenAccountId.Value));
     }
+
+    [Test]
+    public async Task Should_Populate_Both_Account_Names_For_Transfers_When_Filtering_By_Single_Account()
+    {
+        var transferTransaction = new TransactionBuilder()
+        {
+            CategoryId = _categoryId,
+            Date = new DateOnly(2023, 2, 1),
+            Name = "Bitcoin Purchase",
+            TransactionDetails = new FiatToBitcoinDetails(_fiatAccountId, _btcAccountId, 200m, 500000)
+        }.BuildDomainObject();
+
+        _localDatabase.GetTransactions().Insert(transferTransaction.AsEntity());
+
+        var filter = new TransactionQueryFilter()
+        {
+            From = new DateOnly(2023, 2, 1),
+            To = new DateOnly(2023, 2, 28),
+            AccountIds = new[] { _fiatAccountId.Value }
+        };
+
+        var query = new TransactionQueries(_localDatabase);
+        var result = await query.GetTransactionsAsync(filter);
+
+        Assert.That(result.Items.Count, Is.EqualTo(1));
+        var transaction = result.Items.First();
+        Assert.That(transaction.FromAccountId, Is.EqualTo(_fiatAccountId.Value));
+        Assert.That(transaction.FromAccountName, Is.EqualTo("Fiat Account"));
+        Assert.That(transaction.ToAccountId, Is.EqualTo(_btcAccountId.Value));
+        Assert.That(transaction.ToAccountName, Is.EqualTo("Btc Account"));
+    }
 }

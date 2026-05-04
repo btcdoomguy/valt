@@ -41,7 +41,7 @@ public class TransactionQueries : ITransactionQueries
 
         // Build dictionaries for O(1) lookups instead of O(n) SingleOrDefault
         var categoryDict = allCategories.Items.ToDictionary(x => x.Id);
-        var accountDict = visibleAccountsList.ToDictionary(a => a.Id);
+        var accountDict = allAccountsList.ToDictionary(a => a.Id);
 
         var query = _localDatabase.GetTransactions().Query();
 
