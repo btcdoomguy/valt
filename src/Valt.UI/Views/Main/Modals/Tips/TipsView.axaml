@@ -16,7 +16,7 @@
         Title="{x:Static local:language.Tips_Title}"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
-        SystemDecorations="None"
+        WindowDecorations="None"
         ExtendClientAreaTitleBarHeightHint="0">
     <Design.DataContext>
         <tips:TipsViewModel />

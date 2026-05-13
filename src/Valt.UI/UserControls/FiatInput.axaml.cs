@@ -270,17 +270,17 @@ public partial class FiatInput : UserControl
         }
     }
     
-    private void InputBox_GotFocus(object? sender, GotFocusEventArgs e)
+    private void InputBox_GotFocus(object? sender, FocusChangedEventArgs e)
     {
         IsInputFocused = true;
     }
 
-    private void InputBox_LostFocus(object? sender, RoutedEventArgs e)
+    private void InputBox_LostFocus(object? sender, FocusChangedEventArgs e)
     {
         IsInputFocused = false;
     }
     
-    protected override void OnGotFocus(GotFocusEventArgs e)
+    protected override void OnGotFocus(FocusChangedEventArgs e)
     {
         base.OnGotFocus(e);
         _textBox?.Focus();
@@ -310,11 +310,5 @@ public partial class FiatInput : UserControl
         UpdateFiatValue();
     }
 
-    protected override void UpdateDataValidation(AvaloniaProperty property, BindingValueType state, Exception? error)
-    {
-        if (property == FiatValueProperty)
-        {
-            DataValidationErrors.SetError(this, error);
-        }
-    }
+
 }

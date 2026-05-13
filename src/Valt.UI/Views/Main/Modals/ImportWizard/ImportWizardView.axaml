@@ -15,7 +15,7 @@
         MinWidth="700"
         MinHeight="550"
         ExtendClientAreaToDecorationsHint="True"
-        SystemDecorations="None"
+        WindowDecorations="None"
         ExtendClientAreaTitleBarHeightHint="0">
     <Design.DataContext>
         <importWizard:ImportWizardViewModel />

@@ -15,7 +15,7 @@
         Title="{x:Static local:language.InitialSelection_Title}"
         x:DataType="initialSelection1:InitialSelectionViewModel"
         WindowStartupLocation="CenterOwner"
-        SystemDecorations="None"
+        WindowDecorations="None"
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaTitleBarHeightHint="0"
         Background="{DynamicResource Background700Brush}">

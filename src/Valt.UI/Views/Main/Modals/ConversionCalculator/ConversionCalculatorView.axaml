@@ -16,7 +16,7 @@
         Title="{x:Static local:language.ConversionCalculator_Title}"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
-        SystemDecorations="None"
+        WindowDecorations="None"
         ExtendClientAreaTitleBarHeightHint="0">
     <Window.Styles>
         <!-- Calculator button styles -->

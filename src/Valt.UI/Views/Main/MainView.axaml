@@ -15,7 +15,7 @@
         Icon="/Assets/valt-logo.ico"
         Closing="Window_OnClosing"
         Title="VALT"
-        SystemDecorations="BorderOnly"
+        WindowDecorations="BorderOnly"
         CanResize="True"
         TransparencyLevelHint="None"
         ExtendClientAreaTitleBarHeightHint="30"

@@ -17,7 +17,7 @@
         MaxHeight="400"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
-        SystemDecorations="None"
+        WindowDecorations="None"
         ExtendClientAreaTitleBarHeightHint="0">
     <Design.DataContext>
         <avgPriceLineEditor:AvgPriceLineEditorViewModel />

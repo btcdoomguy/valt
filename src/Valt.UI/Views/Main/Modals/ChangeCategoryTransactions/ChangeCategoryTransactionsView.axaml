@@ -16,7 +16,7 @@
         Title="{x:Static local:language.ChangeCategoryTransactions_Title}"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
-        SystemDecorations="None"
+        WindowDecorations="None"
         ExtendClientAreaTitleBarHeightHint="0">
     <Window.KeyBindings>
         <KeyBinding Gesture="Escape" Command="{Binding CancelCommand}" />

@@ -154,7 +154,7 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
         // Assert
         var januaryGroup = vm.MonthGroups[0];
         Assert.That(januaryGroup.Entries, Has.Count.EqualTo(1));
-        Assert.That(januaryGroup.Entries[0].StatusColor.Color, Is.EqualTo(FixedExpenseListResources.PaidForeground.Color));
+        Assert.That(januaryGroup.Entries[0].StatusColor, Is.SameAs(FixedExpenseListResources.PaidForeground));
     }
 
     [Test]
@@ -177,7 +177,7 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
         // Assert
         var marchGroup = vm.MonthGroups[2];
         Assert.That(marchGroup.Entries, Has.Count.EqualTo(1));
-        Assert.That(marchGroup.Entries[0].StatusColor.Color, Is.EqualTo(FixedExpenseListResources.IgnoredForeground.Color));
+        Assert.That(marchGroup.Entries[0].StatusColor, Is.SameAs(FixedExpenseListResources.IgnoredForeground));
     }
 
     [Test]
@@ -200,7 +200,7 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
         // Assert
         var julyGroup = vm.MonthGroups[6];
         Assert.That(julyGroup.Entries, Has.Count.EqualTo(1));
-        Assert.That(julyGroup.Entries[0].StatusColor.Color, Is.EqualTo(FixedExpenseListResources.DefaultForeground.Color));
+        Assert.That(julyGroup.Entries[0].StatusColor, Is.SameAs(FixedExpenseListResources.DefaultForeground));
     }
 
     #endregion
@@ -226,7 +226,7 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
         // Assert
         var januaryEntry = vm.MonthGroups[0].Entries[0];
         Assert.That(januaryEntry.IsOutOfRange, Is.True);
-        Assert.That(januaryEntry.ActualAmountColor.Color, Is.EqualTo(FixedExpenseListResources.WarningForeground.Color));
+        Assert.That(januaryEntry.ActualAmountColor, Is.SameAs(FixedExpenseListResources.WarningForeground));
     }
 
     [Test]
@@ -248,7 +248,7 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
         // Assert
         var januaryEntry = vm.MonthGroups[0].Entries[0];
         Assert.That(januaryEntry.IsOutOfRange, Is.False);
-        Assert.That(januaryEntry.ActualAmountColor.Color, Is.EqualTo(FixedExpenseListResources.DefaultForeground.Color));
+        Assert.That(januaryEntry.ActualAmountColor, Is.SameAs(FixedExpenseListResources.DefaultForeground));
     }
 
     [Test]

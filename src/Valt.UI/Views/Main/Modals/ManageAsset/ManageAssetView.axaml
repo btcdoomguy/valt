@@ -17,7 +17,7 @@
         Title="{x:Static local:language.ManageAsset_Title}"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
-        SystemDecorations="None"
+        WindowDecorations="None"
         ExtendClientAreaTitleBarHeightHint="0">
     <Design.DataContext>
         <manageAsset:ManageAssetViewModel />

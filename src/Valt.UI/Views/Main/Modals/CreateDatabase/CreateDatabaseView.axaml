@@ -15,7 +15,7 @@
         x:DataType="createDatabase1:CreateDatabaseViewModel"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
-        SystemDecorations="None"
+        WindowDecorations="None"
         ExtendClientAreaTitleBarHeightHint="0">
     <Window.KeyBindings>
         <KeyBinding Gesture="Escape" Command="{Binding CloseEmptyCommand}" />

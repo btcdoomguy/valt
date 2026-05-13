@@ -11,7 +11,7 @@
         SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
-        SystemDecorations="None"
+        WindowDecorations="None"
         ExtendClientAreaTitleBarHeightHint="0"
         CanResize="False">
     <Border Classes="modal-container">

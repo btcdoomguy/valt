@@ -17,7 +17,7 @@
         MaxHeight="700"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
-        SystemDecorations="None"
+        WindowDecorations="None"
         ExtendClientAreaTitleBarHeightHint="0">
     <Design.DataContext>
         <local:FixedExpenseOverviewViewModel />

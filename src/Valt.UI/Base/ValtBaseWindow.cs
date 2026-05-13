@@ -29,9 +29,9 @@ public abstract class ValtBaseWindow : Window
         }
 
         // Ensure the modal window takes focus when opened.
-        // This is especially important for windows with SystemDecorations="None".
+        // This is especially important for windows with WindowDecorations="None".
         Activate();
-        var firstFocusable = KeyboardNavigationHandler.GetNext(this, NavigationDirection.Next);
+        var firstFocusable = global::Avalonia.Input.FocusManager.FindFirstFocusableElement(this);
         firstFocusable?.Focus();
     }
 
@@ -47,13 +47,13 @@ public abstract class ValtBaseWindow : Window
     {
         if (!_hasBeenDeactivated) return;
 
-        // When a window with SystemDecorations="None" regains focus (e.g. via Alt+Tab),
+        // When a window with WindowDecorations="None" regains focus (e.g. via Alt+Tab),
         // Avalonia's internal focus state may still reference the previously focused element,
         // causing Focus() to be a no-op even though keyboard routing is disconnected.
         // ClearFocus() forces a full re-acquisition of keyboard focus.
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            FocusManager?.ClearFocus();
+            FocusManager?.Focus(null, NavigationMethod.Unspecified, KeyModifiers.None);
 
             if (_lastFocusedElement is Control { IsEffectivelyVisible: true, Focusable: true })
             {
@@ -61,7 +61,7 @@ public abstract class ValtBaseWindow : Window
             }
             else
             {
-                var firstFocusable = KeyboardNavigationHandler.GetNext(this, NavigationDirection.Next);
+                var firstFocusable = global::Avalonia.Input.FocusManager.FindFirstFocusableElement(this);
                 firstFocusable?.Focus();
             }
         }, DispatcherPriority.Render);
