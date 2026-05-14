@@ -28,7 +28,7 @@
     <!-- Price Providers -->
     <PackageVersion Include="YahooFinanceApi" Version="2.3.3" />
     <!-- MCP Server -->
-    <PackageVersion Include="ModelContextProtocol.AspNetCore" Version="0.2.0-preview.1" />
+    <PackageVersion Include="ModelContextProtocol.AspNetCore" Version="1.3.0" />
     <!-- Testing -->
     <PackageVersion Include="coverlet.collector" Version="3.2.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
