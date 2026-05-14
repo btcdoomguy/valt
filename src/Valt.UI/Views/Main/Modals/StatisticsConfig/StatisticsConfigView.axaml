@@ -17,7 +17,7 @@
         MaxWidth="450"
         MaxHeight="500"
         ExtendClientAreaToDecorationsHint="True"
-        SystemDecorations="None"
+        WindowDecorations="None"
         ExtendClientAreaTitleBarHeightHint="0">
     <Design.DataContext>
         <statisticsConfig:StatisticsConfigViewModel />

@@ -16,6 +16,7 @@ public partial class ManageCategoriesView : ValtBaseWindow
     private bool _isPotentialDrag;
     private Point _initialPoint;
     private ScrollViewer? _scrollViewer;
+    private PointerPressedEventArgs? _pointerPressedEventArgs;
     
     public ManageCategoriesView()
     {
@@ -34,6 +35,8 @@ public partial class ManageCategoriesView : ValtBaseWindow
         if (e.GetCurrentPoint(this).Properties.IsRightButtonPressed)
             return;
         
+        _pointerPressedEventArgs = e;
+
         var treeView = sender as TreeView;
         var point = e.GetPosition(treeView);
         var hitTestResult = treeView?.InputHitTest(point);
@@ -57,7 +60,7 @@ public partial class ManageCategoriesView : ValtBaseWindow
         }
     }
     
-    private void TreeView_OnPointerMoved(object? sender, PointerEventArgs e)
+    private async void TreeView_OnPointerMoved(object? sender, PointerEventArgs e)
     {
         if (_isPotentialDrag)
         {
@@ -68,12 +71,11 @@ public partial class ManageCategoriesView : ValtBaseWindow
             if (distance > 5) // Adjust this threshold as needed
             {
                 _isPotentialDrag = false;
-                if (_draggedItem is null) return;
-#pragma warning disable CS0618 // DataObject and DragDrop.DoDragDrop are obsolete
-                var data = new DataObject();
-                data.Set("draggedItem", _draggedItem);
-                DragDrop.DoDragDrop(e, data, DragDropEffects.Move);
-#pragma warning restore CS0618
+                if (_draggedItem is null || _pointerPressedEventArgs is null) return;
+                var item = DataTransferItem.CreateText("draggedItem");
+                var data = new DataTransfer();
+                data.Add(item);
+                await DragDrop.DoDragDropAsync(_pointerPressedEventArgs, data, DragDropEffects.Move);
                 ResetDragState(e.Pointer);
             }
         }
@@ -99,14 +101,13 @@ public partial class ManageCategoriesView : ValtBaseWindow
     {
         _isPotentialDrag = false;
         _draggedItem = null;
+        _pointerPressedEventArgs = null;
         pointer.Capture(null);
     }
     
     private void TreeView_OnDrop(object? sender, DragEventArgs e)
     {
-#pragma warning disable CS0618 // DragEventArgs.Data is obsolete
-        var data = e.Data.Get("draggedItem") as CategoryTreeElement;
-#pragma warning restore CS0618
+        var data = _draggedItem;
 
         if (data is null)
             return;
@@ -125,9 +126,7 @@ public partial class ManageCategoriesView : ValtBaseWindow
 
     private void TreeView_OnDragOver(object? sender, DragEventArgs e)
     {
-#pragma warning disable CS0618 // DragEventArgs.Data is obsolete
-        var data = e.Data.Get("draggedItem") as CategoryTreeElement;
-#pragma warning restore CS0618
+        var data = _draggedItem;
         
         if (data is null)
             return;

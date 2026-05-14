@@ -17,7 +17,7 @@
         MaxWidth="660"
         MaxHeight="470"
         ExtendClientAreaToDecorationsHint="True"
-        SystemDecorations="None"
+        WindowDecorations="None"
         ExtendClientAreaTitleBarHeightHint="0">
     <Design.DataContext>
         <settings1:SettingsViewModel />

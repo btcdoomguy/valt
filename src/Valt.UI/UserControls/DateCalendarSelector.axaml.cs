@@ -114,7 +114,7 @@ public partial class DateCalendarSelector : UserControl
                 Header = mode.ToString(),
                 Command = ChangeSelectorModeCommand,
                 CommandParameter = mode,
-                [!MenuItem.IsCheckedProperty] = new Binding
+                [!MenuItem.IsCheckedProperty] = new ReflectionBinding
                 {
                     Source = this,
                     Path = nameof(SelectorMode),

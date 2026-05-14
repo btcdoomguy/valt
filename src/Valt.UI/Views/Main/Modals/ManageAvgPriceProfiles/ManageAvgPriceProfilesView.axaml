@@ -18,7 +18,7 @@
         MaxWidth="750"
         MaxHeight="600"
         ExtendClientAreaToDecorationsHint="True"
-        SystemDecorations="None"
+        WindowDecorations="None"
         ExtendClientAreaTitleBarHeightHint="0">
     <Design.DataContext>
         <manageAvgPriceProfiles:ManageAvgPriceProfilesViewModel />

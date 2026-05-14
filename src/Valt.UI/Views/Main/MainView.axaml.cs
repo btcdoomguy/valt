@@ -22,7 +22,7 @@ public partial class MainView : ValtBaseWindow
         {
             ExtendClientAreaToDecorationsHint = false;
             ExtendClientAreaTitleBarHeightHint = -1;
-            SystemDecorations = SystemDecorations.Full;
+            WindowDecorations = WindowDecorations.Full;
             CustomTitleBar.IsVisible = false;
             AlternateTitleBar.IsVisible = true;
         }

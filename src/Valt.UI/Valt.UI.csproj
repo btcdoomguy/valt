@@ -11,8 +11,8 @@
         <Product>Valt</Product>
         <AssemblyName>Valt</AssemblyName>
         <Version>0.1.0</Version>
-        <AssemblyVersion>0.2.10.5</AssemblyVersion>
-        <FileVersion>0.2.10.5</FileVersion>
+        <AssemblyVersion>0.2.11.0</AssemblyVersion>
+        <FileVersion>0.2.11.0</FileVersion>
         <ApplicationIcon>Assets/valt-logo.ico</ApplicationIcon>
     </PropertyGroup>
 
@@ -25,18 +25,13 @@
         <PackageReference Include="Avalonia.Controls.ColorPicker" />
         <PackageReference Include="Avalonia.Controls.DataGrid" />
         <PackageReference Include="Avalonia.Desktop" />
-        <PackageReference Include="Avalonia.Svg.Skia" />
         <PackageReference Include="Avalonia.Themes.Fluent" />
         <PackageReference Include="Avalonia.Fonts.Inter" />
-        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" />
         <PackageReference Include="CommunityToolkit.Mvvm" />
         <PackageReference Include="CsvHelper" />
         <PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" />
-        <PackageReference Include="MessageBox.Avalonia" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="SkiaSharp.NativeAssets.Linux" />
-        <PackageReference Include="Svg.Controls.Skia.Avalonia" />
     </ItemGroup>
 
     <ItemGroup>

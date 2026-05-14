@@ -198,17 +198,17 @@ public partial class BtcInput : UserControl
         }
     }
     
-    private void InputBox_GotFocus(object? sender, GotFocusEventArgs e)
+    private void InputBox_GotFocus(object? sender, FocusChangedEventArgs e)
     {
         IsInputFocused = true;
     }
 
-    private void InputBox_LostFocus(object? sender, RoutedEventArgs e)
+    private void InputBox_LostFocus(object? sender, FocusChangedEventArgs e)
     {
         IsInputFocused = false;
     }
     
-    protected override void OnGotFocus(GotFocusEventArgs e)
+    protected override void OnGotFocus(FocusChangedEventArgs e)
     {
         base.OnGotFocus(e);
         _inputBox?.Focus();
@@ -235,11 +235,5 @@ public partial class BtcInput : UserControl
         this.SetAndRaise(DisplayValueProperty, ref _displayValue, newValue);
     }
 
-    protected override void UpdateDataValidation(AvaloniaProperty property, BindingValueType state, Exception? error)
-    {
-        if (property == BtcValueProperty)
-        {
-            DataValidationErrors.SetError(this, error);
-        }
-    }
+
 }

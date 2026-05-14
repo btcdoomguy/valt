@@ -18,7 +18,7 @@
         SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
-        SystemDecorations="None"
+        WindowDecorations="None"
         ExtendClientAreaTitleBarHeightHint="0">
     <Design.DataContext>
         <fixedExpenseEditor:FixedExpenseEditorViewModel />

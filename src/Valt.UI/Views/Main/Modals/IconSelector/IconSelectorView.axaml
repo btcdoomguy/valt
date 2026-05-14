@@ -17,7 +17,7 @@
     x:DataType="iconSelector:IconSelectorViewModel"
     WindowStartupLocation="CenterScreen"
     ExtendClientAreaToDecorationsHint="True"
-    SystemDecorations="None"
+    WindowDecorations="None"
     ExtendClientAreaTitleBarHeightHint="0"
     Title="{x:Static local:language.IconSelector_Title}">
     <Design.DataContext>

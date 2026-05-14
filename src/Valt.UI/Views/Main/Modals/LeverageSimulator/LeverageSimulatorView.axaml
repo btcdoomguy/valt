@@ -16,7 +16,7 @@
         Title="{x:Static local:language.LeverageSimulator_Title}"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
-        SystemDecorations="None"
+        WindowDecorations="None"
         ExtendClientAreaTitleBarHeightHint="0">
     <Window.Styles>
         <Style Selector="TextBox.sim-input">
@@ -108,28 +108,28 @@
                             <Run Text="{x:Static local:language.LeverageSimulator_EntryPrice}" />
                             <Run Text=" (" /><Run Text="{Binding CurrencyCode, Mode=OneWay}" /><Run Text=")" />
                         </TextBlock>
-                        <TextBox Classes="sim-input" Text="{Binding EntryPriceText}" Watermark="0.00" />
+                        <TextBox Classes="sim-input" Text="{Binding EntryPriceText}" PlaceholderText="0.00" />
 
                         <!-- Collateral -->
                         <TextBlock Classes="label">
                             <Run Text="{x:Static local:language.LeverageSimulator_Collateral}" />
                             <Run Text=" (" /><Run Text="{Binding CurrencyCode, Mode=OneWay}" /><Run Text=")" />
                         </TextBlock>
-                        <TextBox Classes="sim-input" Text="{Binding CollateralText}" Watermark="0.00" />
+                        <TextBox Classes="sim-input" Text="{Binding CollateralText}" PlaceholderText="0.00" />
 
                         <!-- Leverage -->
                         <TextBlock Classes="label">
                             <Run Text="{x:Static local:language.LeverageSimulator_Leverage}" />
                             <Run Text=" (x)" />
                         </TextBlock>
-                        <TextBox Classes="sim-input" Text="{Binding LeverageText}" Watermark="1.0" />
+                        <TextBox Classes="sim-input" Text="{Binding LeverageText}" PlaceholderText="1.0" />
 
                         <!-- Liquidation Price -->
                         <TextBlock Classes="label">
                             <Run Text="{x:Static local:language.LeverageSimulator_LiquidationPrice}" />
                             <Run Text=" (" /><Run Text="{Binding CurrencyCode, Mode=OneWay}" /><Run Text=")" />
                         </TextBlock>
-                        <TextBox Classes="sim-input" Text="{Binding LiquidationPriceText}" Watermark="0" />
+                        <TextBox Classes="sim-input" Text="{Binding LiquidationPriceText}" PlaceholderText="0" />
 
                         <!-- Simulated BTC Price (prominent) -->
                         <TextBlock FontSize="13" FontWeight="SemiBold" Margin="0, 14, 0, 3"
@@ -137,7 +137,7 @@
                             <Run Text="{x:Static local:language.LeverageSimulator_SimulatedPrice}" />
                             <Run Text=" (" /><Run Text="{Binding CurrencyCode, Mode=OneWay}" /><Run Text=")" />
                         </TextBlock>
-                        <TextBox Classes="sim-input" Text="{Binding SimulatedPriceText}" Watermark="0.00"
+                        <TextBox Classes="sim-input" Text="{Binding SimulatedPriceText}" PlaceholderText="0.00"
                                  FontSize="15" FontWeight="SemiBold"
                                  BorderBrush="{DynamicResource Accent500Brush}" />
                     </StackPanel>

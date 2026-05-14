@@ -18,7 +18,7 @@
         Title="{Binding WindowTitle}"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
-        SystemDecorations="None"
+        WindowDecorations="None"
         ExtendClientAreaTitleBarHeightHint="0">
     <Design.DataContext>
         <manageTransactions1:TransactionEditorViewModel />
@@ -345,7 +345,7 @@
                                      MaxLength="1000"
                                      Height="160"
                                      TabIndex="10"
-                                     Watermark="{x:Static local:language.ManageTransactions_Notes_Placeholder}" />
+                                     PlaceholderText="{x:Static local:language.ManageTransactions_Notes_Placeholder}" />
                         </StackPanel>
                     </DockPanel>
                 </Border>

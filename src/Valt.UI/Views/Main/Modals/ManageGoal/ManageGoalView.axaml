@@ -18,7 +18,7 @@
         Title="{x:Static local:language.ManageGoal_Title}"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
-        SystemDecorations="None"
+        WindowDecorations="None"
         ExtendClientAreaTitleBarHeightHint="0">
     <Design.DataContext>
         <manageGoal:ManageGoalViewModel />
