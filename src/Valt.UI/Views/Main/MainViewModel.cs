@@ -537,7 +537,6 @@ public partial class MainViewModel : ValtViewModel, IDisposable
                 (InitialSelectionView)await _modalFactory.CreateAsync(ApplicationModalNames.InitialSelection, Window)!;
 
             var result = await window.ShowDialog<InitialSelectionViewModel.Response?>(Window!);
-            Window?.Activate();
 
             if (result is null || string.IsNullOrEmpty(result.File))
             {
