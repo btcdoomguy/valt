@@ -324,6 +324,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         var modal =
             (Views.Main.Modals.PriceHistory.PriceHistoryView)await _modalFactory.CreateAsync(ApplicationModalNames.PriceHistory, Window)!;
 
+        await using var scope = new ValtBaseWindow.ExtendClientAreaScope(Window);
         await modal.ShowDialog(Window!);
     }
 
@@ -340,6 +341,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             var viewModel = (InputPasswordViewModel)inputPasswordModal.DataContext!;
             viewModel.HideSecureModeCheckbox = true;
 
+            await using var scope = new ValtBaseWindow.ExtendClientAreaScope(Window);
             var result = await inputPasswordModal.ShowDialog<InputPasswordViewModel.Response?>(Window!);
 
             if (result?.Password is null)
@@ -369,6 +371,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         var modal =
             (ManageCategoriesView)await _modalFactory.CreateAsync(ApplicationModalNames.ManageCategories, Window)!;
 
+        await using var scope = new ValtBaseWindow.ExtendClientAreaScope(Window);
         await modal.ShowDialog(Window!);
     }
 
@@ -378,6 +381,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         var modal =
             (SettingsView)await _modalFactory.CreateAsync(ApplicationModalNames.Settings, Window)!;
 
+        await using var scope = new ValtBaseWindow.ExtendClientAreaScope(Window);
         await modal.ShowDialog(Window!);
     }
 
@@ -387,6 +391,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         var modal =
             (ImportWizardView)await _modalFactory.CreateAsync(ApplicationModalNames.ImportWizard, Window)!;
 
+        await using var scope = new ValtBaseWindow.ExtendClientAreaScope(Window);
         await modal.ShowDialog(Window!);
     }
 
@@ -454,6 +459,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         var modal =
             (AboutView)await _modalFactory.CreateAsync(ApplicationModalNames.About, Window)!;
 
+        await using var scope = new ValtBaseWindow.ExtendClientAreaScope(Window);
         await modal.ShowDialog(Window!);
     }
 
@@ -463,6 +469,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         var modal =
             (ConversionCalculatorView)await _modalFactory.CreateAsync(ApplicationModalNames.ConversionCalculator, Window)!;
 
+        await using var scope = new ValtBaseWindow.ExtendClientAreaScope(Window);
         await modal.ShowDialog(Window!);
     }
 
@@ -472,6 +479,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         var modal =
             (LeverageSimulatorView)await _modalFactory.CreateAsync(ApplicationModalNames.LeverageSimulator, Window)!;
 
+        await using var scope = new ValtBaseWindow.ExtendClientAreaScope(Window);
         await modal.ShowDialog(Window!);
     }
 
@@ -522,6 +530,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     private async Task ShowTipsAsync()
     {
         var modal = (TipsView)await _modalFactory.CreateAsync(ApplicationModalNames.Tips, Window)!;
+        await using var scope = new ValtBaseWindow.ExtendClientAreaScope(Window);
         await modal.ShowDialog(Window!);
     }
 
@@ -536,6 +545,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             var window =
                 (InitialSelectionView)await _modalFactory.CreateAsync(ApplicationModalNames.InitialSelection, Window)!;
 
+            await using var scope = new ValtBaseWindow.ExtendClientAreaScope(Window);
             var result = await window.ShowDialog<InitialSelectionViewModel.Response?>(Window!);
 
             if (result is null || string.IsNullOrEmpty(result.File))
@@ -763,6 +773,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         var modal =
             (StatusDisplayView)await _modalFactory.CreateAsync(ApplicationModalNames.StatusDisplay, Window)!;
 
+        await using var scope = new ValtBaseWindow.ExtendClientAreaScope(Window);
         await modal.ShowDialog(Window!);
     }
     

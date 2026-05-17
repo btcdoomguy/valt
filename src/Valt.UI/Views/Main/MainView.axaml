@@ -28,7 +28,7 @@
         <KeyBinding Gesture="F10" Command="{Binding OpenConversionCalculatorCommand}" />
         <KeyBinding Gesture="F11" Command="{Binding OpenLeverageSimulatorCommand}" />
     </Window.KeyBindings>
-    <Grid>
+    <Grid Background="{DynamicResource Background900Color}">
         <Grid.RowDefinitions>
             <RowDefinition Height="{Binding LayoutCustomTitleBarRowHeight}"></RowDefinition>
             <RowDefinition Height="90"></RowDefinition>

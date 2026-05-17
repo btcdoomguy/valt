@@ -92,50 +92,33 @@ public abstract class ValtBaseWindow : Window
         Close();
     }
 
-    // Avalonia 12 Windows workaround: ShowDialog can hang when the parent window
-    // has ExtendClientAreaToDecorationsHint enabled. We shadow ShowDialog so the
-    // workaround is applied transparently to all Valt modal windows.
-    public new async Task ShowDialog(Window owner)
+    /// <summary>
+    /// RAII helper that temporarily disables ExtendClientAreaToDecorationsHint on the
+    /// owner window while a modal dialog is shown. This works around an Avalonia 12
+    /// Windows bug where ShowDialog hangs when the parent has extended client area.
+    /// </summary>
+    public readonly struct ExtendClientAreaScope : IAsyncDisposable
     {
-        var saved = false;
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            saved = owner.ExtendClientAreaToDecorationsHint;
-            owner.ExtendClientAreaToDecorationsHint = false;
-        }
+        private readonly Window? _owner;
+        private readonly bool _saved;
 
-        try
+        public ExtendClientAreaScope(Window? owner)
         {
-            await base.ShowDialog(owner);
-        }
-        finally
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            _owner = owner;
+            if (_owner is not null && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                owner.ExtendClientAreaToDecorationsHint = saved;
+                _saved = _owner.ExtendClientAreaToDecorationsHint;
+                _owner.ExtendClientAreaToDecorationsHint = false;
             }
         }
-    }
 
-    public new async Task<T?> ShowDialog<T>(Window owner)
-    {
-        var saved = false;
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        public ValueTask DisposeAsync()
         {
-            saved = owner.ExtendClientAreaToDecorationsHint;
-            owner.ExtendClientAreaToDecorationsHint = false;
-        }
-
-        try
-        {
-            return await base.ShowDialog<T>(owner);
-        }
-        finally
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (_owner is not null && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                owner.ExtendClientAreaToDecorationsHint = saved;
+                _owner.ExtendClientAreaToDecorationsHint = _saved;
             }
+            return ValueTask.CompletedTask;
         }
     }
 }
