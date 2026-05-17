@@ -522,7 +522,27 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     private async Task ShowTipsAsync()
     {
         var modal = (TipsView)await _modalFactory.CreateAsync(ApplicationModalNames.Tips, Window)!;
-        await modal.ShowDialog(Window!);
+
+        // Avalonia 12 Windows workaround: ShowDialog can hang when the parent window
+        // has ExtendClientAreaToDecorationsHint enabled. Temporarily disable it.
+        var savedExtendClientArea = false;
+        if (Window is not null && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            savedExtendClientArea = Window.ExtendClientAreaToDecorationsHint;
+            Window.ExtendClientAreaToDecorationsHint = false;
+        }
+
+        try
+        {
+            await modal.ShowDialog(Window!);
+        }
+        finally
+        {
+            if (Window is not null && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Window.ExtendClientAreaToDecorationsHint = savedExtendClientArea;
+            }
+        }
     }
 
     public async Task OpenInitialSelectionModal()
@@ -536,8 +556,27 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             var window =
                 (InitialSelectionView)await _modalFactory.CreateAsync(ApplicationModalNames.InitialSelection, Window)!;
 
-            var result = await window.ShowDialog<InitialSelectionViewModel.Response?>(Window!);
-            Window?.Activate();
+            // Avalonia 12 Windows workaround: ShowDialog can hang when the parent window
+            // has ExtendClientAreaToDecorationsHint enabled. Temporarily disable it.
+            var savedExtendClientArea = false;
+            if (Window is not null && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                savedExtendClientArea = Window.ExtendClientAreaToDecorationsHint;
+                Window.ExtendClientAreaToDecorationsHint = false;
+            }
+
+            InitialSelectionViewModel.Response? result;
+            try
+            {
+                result = await window.ShowDialog<InitialSelectionViewModel.Response?>(Window!);
+            }
+            finally
+            {
+                if (Window is not null && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    Window.ExtendClientAreaToDecorationsHint = savedExtendClientArea;
+                }
+            }
 
             if (result is null || string.IsNullOrEmpty(result.File))
             {

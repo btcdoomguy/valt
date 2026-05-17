@@ -52,20 +52,6 @@ public partial class MainView : ValtBaseWindow
         var vm = (DataContext as MainViewModel)!;
         await vm.OpenInitialSelectionModal();
         await vm.OpenTipsModalIfNeededAsync();
-
-        // Avalonia 12 Windows workaround: after a modal dialog closes over a parent with
-        // extended client area, the compositor may not invalidate the parent surface.
-        // Nudge the content control to force measure, arrange, and a fresh render pass
-        // once the UI thread has fully processed dialog teardown.
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            Dispatcher.UIThread.Post(() =>
-            {
-                MainContentControl.InvalidateMeasure();
-                MainContentControl.InvalidateArrange();
-                MainContentControl.InvalidateVisual();
-            }, DispatcherPriority.Background);
-        }
     }
 
     private void RestoreWindowSettings()
