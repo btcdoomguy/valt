@@ -1,7 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Valt.UI.Base;
 using Valt.UI.Services.LocalStorage;
@@ -43,7 +45,7 @@ public partial class MainView : ValtBaseWindow
         RestoreWindowSettings();
 
         ((DataContext as MainViewModel)!).Window = this;
-        _ = StartupSequenceAsync();
+        _ = Task.Run(async () => await Dispatcher.UIThread.InvokeAsync(async () => await StartupSequenceAsync()));
     }
 
     private async System.Threading.Tasks.Task StartupSequenceAsync()
