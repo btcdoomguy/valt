@@ -1,4 +1,6 @@
 using System;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -88,5 +90,52 @@ public abstract class ValtBaseWindow : Window
     protected void CustomTitleBarCloseClicked(object? sender, RoutedEventArgs e)
     {
         Close();
+    }
+
+    // Avalonia 12 Windows workaround: ShowDialog can hang when the parent window
+    // has ExtendClientAreaToDecorationsHint enabled. We shadow ShowDialog so the
+    // workaround is applied transparently to all Valt modal windows.
+    public new async Task ShowDialog(Window owner)
+    {
+        var saved = false;
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            saved = owner.ExtendClientAreaToDecorationsHint;
+            owner.ExtendClientAreaToDecorationsHint = false;
+        }
+
+        try
+        {
+            await base.ShowDialog(owner);
+        }
+        finally
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                owner.ExtendClientAreaToDecorationsHint = saved;
+            }
+        }
+    }
+
+    public new async Task<T?> ShowDialog<T>(Window owner)
+    {
+        var saved = false;
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            saved = owner.ExtendClientAreaToDecorationsHint;
+            owner.ExtendClientAreaToDecorationsHint = false;
+        }
+
+        try
+        {
+            return await base.ShowDialog<T>(owner);
+        }
+        finally
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                owner.ExtendClientAreaToDecorationsHint = saved;
+            }
+        }
     }
 }
