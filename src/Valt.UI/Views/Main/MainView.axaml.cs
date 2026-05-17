@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Valt.UI.Base;
 using Valt.UI.Services.LocalStorage;
@@ -51,6 +52,20 @@ public partial class MainView : ValtBaseWindow
         var vm = (DataContext as MainViewModel)!;
         await vm.OpenInitialSelectionModal();
         await vm.OpenTipsModalIfNeededAsync();
+
+        // Avalonia 12 workaround on Windows: modal dialogs can leave the parent window
+        // in a state where input and rendering are frozen. Explicitly re-enable,
+        // activate, and restore focus after the UI thread has processed dialog removal.
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                this.IsEnabled = true;
+                this.Activate();
+                var firstFocusable = global::Avalonia.Input.FocusManager.FindFirstFocusableElement(this);
+                firstFocusable?.Focus();
+            }, DispatcherPriority.Render);
+        }
     }
 
     private void RestoreWindowSettings()
