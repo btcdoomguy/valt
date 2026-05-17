@@ -37,7 +37,15 @@
         </Grid.RowDefinitions>
         <userControls1:CustomTitleBar x:Name="CustomTitleBar" Grid.Row="0" Title="VALT"
                                       TitleBarPressed="Window_OnPointerPressed"
-                                      CloseVisible="False" />
+                                      MinimizeClick="CustomTitleBarMinimizeClicked"
+                                      MaximizeClick="CustomTitleBarMaximizeClicked"
+                                      CloseClick="CustomTitleBarCloseClicked"
+                                      MinimizeEnabled="True"
+                                      MinimizeVisible="True"
+                                      MaximizeEnabled="True"
+                                      MaximizeVisible="True"
+                                      CloseEnabled="True"
+                                      CloseVisible="True" />
         <StackPanel Grid.Row="0" x:Name="AlternateTitleBar" Background="{DynamicResource Background900Color}"
                     IsVisible="False">
         </StackPanel>

@@ -75,6 +75,16 @@ public abstract class ValtBaseWindow : Window
         }
     }
 
+    protected void CustomTitleBarMinimizeClicked(object? sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
+
+    protected void CustomTitleBarMaximizeClicked(object? sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+    }
+
     protected void CustomTitleBarCloseClicked(object? sender, RoutedEventArgs e)
     {
         Close();
