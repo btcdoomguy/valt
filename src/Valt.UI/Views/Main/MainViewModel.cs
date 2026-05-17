@@ -538,6 +538,10 @@ public partial class MainViewModel : ValtViewModel, IDisposable
 
             var result = await window.ShowDialog<InitialSelectionViewModel.Response?>(Window!);
 
+            // Allow Avalonia 12 to finish focus transitions before continuing
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Render);
+            Window?.Activate();
+
             if (result is null || string.IsNullOrEmpty(result.File))
             {
                 appLifetime!.Shutdown();
