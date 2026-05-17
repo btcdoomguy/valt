@@ -53,18 +53,18 @@ public partial class MainView : ValtBaseWindow
         await vm.OpenInitialSelectionModal();
         await vm.OpenTipsModalIfNeededAsync();
 
-        // Avalonia 12 workaround on Windows: modal dialogs can leave the parent window
-        // in a state where input and rendering are frozen. Explicitly re-enable,
-        // activate, and restore focus after the UI thread has processed dialog removal.
+        // Avalonia 12 Windows workaround: after a modal dialog closes over a parent with
+        // extended client area, the compositor may not invalidate the parent surface.
+        // Nudge the content control to force measure, arrange, and a fresh render pass
+        // once the UI thread has fully processed dialog teardown.
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            await Dispatcher.UIThread.InvokeAsync(() =>
+            Dispatcher.UIThread.Post(() =>
             {
-                this.IsEnabled = true;
-                this.Activate();
-                var firstFocusable = global::Avalonia.Input.FocusManager.FindFirstFocusableElement(this);
-                firstFocusable?.Focus();
-            }, DispatcherPriority.Render);
+                MainContentControl.InvalidateMeasure();
+                MainContentControl.InvalidateArrange();
+                MainContentControl.InvalidateVisual();
+            }, DispatcherPriority.Background);
         }
     }
 
