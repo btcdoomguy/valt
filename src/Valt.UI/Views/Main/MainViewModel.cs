@@ -324,7 +324,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         var modal =
             (Views.Main.Modals.PriceHistory.PriceHistoryView)await _modalFactory.CreateAsync(ApplicationModalNames.PriceHistory, Window)!;
 
-        await modal.ShowDialog(Window!);
+        await modal.ShowDialogSafeAsync(Window!);
     }
 
     [RelayCommand]
@@ -340,7 +340,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             var viewModel = (InputPasswordViewModel)inputPasswordModal.DataContext!;
             viewModel.HideSecureModeCheckbox = true;
 
-            var result = await inputPasswordModal.ShowDialog<InputPasswordViewModel.Response?>(Window!);
+            var result = await inputPasswordModal.ShowDialogSafeAsync<InputPasswordViewModel.Response?>(Window!);
 
             if (result?.Password is null)
                 return;
@@ -369,7 +369,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         var modal =
             (ManageCategoriesView)await _modalFactory.CreateAsync(ApplicationModalNames.ManageCategories, Window)!;
 
-        await modal.ShowDialog(Window!);
+        await modal.ShowDialogSafeAsync(Window!);
     }
 
     [RelayCommand]
@@ -378,7 +378,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         var modal =
             (SettingsView)await _modalFactory.CreateAsync(ApplicationModalNames.Settings, Window)!;
 
-        await modal.ShowDialog(Window!);
+        await modal.ShowDialogSafeAsync(Window!);
     }
 
     [RelayCommand]
@@ -387,7 +387,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         var modal =
             (ImportWizardView)await _modalFactory.CreateAsync(ApplicationModalNames.ImportWizard, Window)!;
 
-        await modal.ShowDialog(Window!);
+        await modal.ShowDialogSafeAsync(Window!);
     }
 
     [RelayCommand]
@@ -454,7 +454,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         var modal =
             (AboutView)await _modalFactory.CreateAsync(ApplicationModalNames.About, Window)!;
 
-        await modal.ShowDialog(Window!);
+        await modal.ShowDialogSafeAsync(Window!);
     }
 
     [RelayCommand]
@@ -463,7 +463,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         var modal =
             (ConversionCalculatorView)await _modalFactory.CreateAsync(ApplicationModalNames.ConversionCalculator, Window)!;
 
-        await modal.ShowDialog(Window!);
+        await modal.ShowDialogSafeAsync(Window!);
     }
 
     [RelayCommand]
@@ -472,7 +472,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         var modal =
             (LeverageSimulatorView)await _modalFactory.CreateAsync(ApplicationModalNames.LeverageSimulator, Window)!;
 
-        await modal.ShowDialog(Window!);
+        await modal.ShowDialogSafeAsync(Window!);
     }
 
     [RelayCommand]
@@ -522,7 +522,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     private async Task ShowTipsAsync()
     {
         var modal = (TipsView)await _modalFactory.CreateAsync(ApplicationModalNames.Tips, Window)!;
-        await modal.ShowDialog(Window!);
+        await modal.ShowDialogSafeAsync(Window!);
     }
 
     public async Task OpenInitialSelectionModal()
@@ -536,10 +536,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             var window =
                 (InitialSelectionView)await _modalFactory.CreateAsync(ApplicationModalNames.InitialSelection, Window)!;
 
-            var result = await window.ShowDialog<InitialSelectionViewModel.Response?>(Window!);
-
-            // Allow Avalonia 12 to finish focus transitions before continuing
-            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Render);
+            var result = await window.ShowDialogSafeAsync<InitialSelectionViewModel.Response?>(Window!);
             Window?.Activate();
 
             if (result is null || string.IsNullOrEmpty(result.File))
@@ -767,7 +764,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         var modal =
             (StatusDisplayView)await _modalFactory.CreateAsync(ApplicationModalNames.StatusDisplay, Window)!;
 
-        await modal.ShowDialog(Window!);
+        await modal.ShowDialogSafeAsync(Window!);
     }
     
     private void JobOnPropertyChanged(object? sender, PropertyChangedEventArgs e)

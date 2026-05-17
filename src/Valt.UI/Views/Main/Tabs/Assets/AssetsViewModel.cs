@@ -292,7 +292,7 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
             ApplicationModalNames.ManageAsset,
             ownerWindow);
 
-        var result = await modal.ShowDialog<ManageAssetViewModel.Response?>(ownerWindow);
+        var result = await modal.ShowDialogSafeAsync<ManageAssetViewModel.Response?>(ownerWindow);
 
         if (result?.Ok == true)
         {
@@ -317,7 +317,7 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
             ownerWindow,
             asset.Id);
 
-        var result = await modal.ShowDialog<ManageAssetViewModel.Response?>(ownerWindow);
+        var result = await modal.ShowDialogSafeAsync<ManageAssetViewModel.Response?>(ownerWindow);
 
         if (result?.Ok == true)
         {
@@ -402,7 +402,7 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
             ownerWindow,
             request);
 
-        var result = await modal.ShowDialog<TransactionEditorViewModel.Response?>(ownerWindow);
+        var result = await modal.ShowDialogSafeAsync<TransactionEditorViewModel.Response?>(ownerWindow);
 
         // Only delete if transaction was saved
         if (result?.Ok == true)

@@ -278,7 +278,7 @@ public partial class ManageCategoriesViewModel : ValtModalValidatorViewModel
             (IconSelectorView)await _modalFactory!.CreateAsync(ApplicationModalNames.IconSelector, OwnerWindow,
                 Icon.ToString())!;
 
-        var response = await modal.ShowDialog<IconSelectorViewModel.Response?>(OwnerWindow!);
+        var response = await modal.ShowDialogSafeAsync<IconSelectorViewModel.Response?>(OwnerWindow!);
 
         if (response is null)
             return;

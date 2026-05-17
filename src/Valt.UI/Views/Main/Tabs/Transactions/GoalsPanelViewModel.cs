@@ -188,7 +188,7 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
         var window =
             (ManageGoalView)await _modalFactory.CreateAsync(ApplicationModalNames.ManageGoal, ownerWindow)!;
 
-        var result = await window.ShowDialog<ManageGoalViewModel.Response?>(ownerWindow!);
+        var result = await window.ShowDialogSafeAsync<ManageGoalViewModel.Response?>(ownerWindow!);
 
         if (result is null)
             return;
@@ -209,7 +209,7 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
             ApplicationModalNames.ManageGoal,
             ownerWindow, entry.Id)!;
 
-        _ = await window.ShowDialog<ManageGoalViewModel.Response?>(ownerWindow!);
+        _ = await window.ShowDialogSafeAsync<ManageGoalViewModel.Response?>(ownerWindow!);
 
         await FetchGoals();
         WeakReferenceMessenger.Default.Send(new GoalListChanged());

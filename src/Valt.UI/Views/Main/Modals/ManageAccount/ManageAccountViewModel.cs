@@ -188,7 +188,7 @@ public partial class ManageAccountViewModel : ValtModalValidatorViewModel
             (IconSelectorView)await _modalFactory!.CreateAsync(ApplicationModalNames.IconSelector, GetWindow!(),
                 Icon.ToString())!;
 
-        var response = await modal.ShowDialog<IconSelectorViewModel.Response?>(GetWindow!());
+        var response = await modal.ShowDialogSafeAsync<IconSelectorViewModel.Response?>(GetWindow!());
 
         if (response is null)
             return;
