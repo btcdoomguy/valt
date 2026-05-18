@@ -100,6 +100,9 @@ public partial class InitialSelectionViewModel : ValtModalViewModel
 
         await UpdateRecentFilesAsync(SelectedFile);
 
+        // Allow Avalonia 12 to finish the inner dialog's focus transitions before closing this dialog
+        await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Render);
+
         CloseDialog?.Invoke(new Response() { File = SelectedFile!, Password = inputPasswordResult.Password, StartInSecureMode = inputPasswordResult.StartInSecureMode });
     }
 
@@ -126,6 +129,9 @@ public partial class InitialSelectionViewModel : ValtModalViewModel
             return;
 
         await UpdateRecentFilesAsync(pathResponse);
+
+        // Allow Avalonia 12 to finish the inner dialog's focus transitions before closing this dialog
+        await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Render);
 
         CloseDialog?.Invoke(new Response() { File = pathResponse!, Password = inputPasswordResult.Password, StartInSecureMode = inputPasswordResult.StartInSecureMode });
     }
