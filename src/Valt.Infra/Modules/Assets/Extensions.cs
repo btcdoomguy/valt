@@ -20,6 +20,7 @@ internal static class Extensions
             LastPriceUpdateAt = asset.LastPriceUpdateAt,
             CreatedAt = asset.CreatedAt,
             DisplayOrder = asset.DisplayOrder,
+            GroupId = asset.GroupId is not null ? new ObjectId(asset.GroupId.Value) : null,
             Version = asset.Version
         };
     }
@@ -38,6 +39,29 @@ internal static class Extensions
             entity.Visible,
             entity.LastPriceUpdateAt,
             entity.CreatedAt,
+            entity.DisplayOrder,
+            entity.GroupId is not null ? new AssetGroupId(entity.GroupId.ToString()) : null,
+            entity.Version);
+    }
+
+    public static AssetGroupEntity AsEntity(this AssetGroup group)
+    {
+        return new AssetGroupEntity
+        {
+            Id = new ObjectId(group.Id.Value),
+            Name = group.Name.Value,
+            Description = group.Description,
+            DisplayOrder = group.DisplayOrder,
+            Version = group.Version
+        };
+    }
+
+    public static AssetGroup AsDomainObject(this AssetGroupEntity entity)
+    {
+        return AssetGroup.Create(
+            new AssetGroupId(entity.Id.ToString()),
+            AssetGroupName.New(entity.Name),
+            entity.Description,
             entity.DisplayOrder,
             entity.Version);
     }

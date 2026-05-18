@@ -2373,6 +2373,39 @@
     <data name="Assets.Help.SellingDescription" xml:space="preserve">
         <value>Use a opção Vender (clique direito) para registrar lucro ou prejuízo como transação nas suas contas.</value>
     </data>
+    <data name="Assets_ManageGroups" xml:space="preserve">
+        <value>Gerenciar Grupos</value>
+    </data>
+    <data name="Assets_EditGroup" xml:space="preserve">
+        <value>Editar Grupo</value>
+    </data>
+    <data name="Assets_DeleteGroup" xml:space="preserve">
+        <value>Excluir Grupo</value>
+    </data>
+    <data name="Assets_DeleteGroupConfirmation" xml:space="preserve">
+        <value>Excluir este grupo? Os ativos deste grupo ficarão sem grupo.</value>
+    </data>
+    <data name="Assets_MoveToGroup" xml:space="preserve">
+        <value>Mover para o Grupo</value>
+    </data>
+    <data name="Assets_RemoveFromGroup" xml:space="preserve">
+        <value>Remover do Grupo</value>
+    </data>
+    <data name="ManageAssetGroup_Title" xml:space="preserve">
+        <value>Grupo de Ativos</value>
+    </data>
+    <data name="ManageAssetGroup_Name" xml:space="preserve">
+        <value>Nome</value>
+    </data>
+    <data name="ManageAssetGroup_Description" xml:space="preserve">
+        <value>Descrição</value>
+    </data>
+    <data name="Error_AssetGroupNotFound" xml:space="preserve">
+        <value>Grupo de ativos não encontrado.</value>
+    </data>
+    <data name="ManageAssetGroupsList_Title" xml:space="preserve">
+        <value>Gerenciar Grupos de Ativos</value>
+    </data>
     <data name="Menu_LeverageSimulator" xml:space="preserve">
         <value>Simulador de Alavancagem</value>
     </data>

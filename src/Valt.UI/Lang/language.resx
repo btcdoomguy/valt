@@ -2378,6 +2378,39 @@
     <data name="Assets.Help.SellingDescription" xml:space="preserve">
         <value>Use the Sell option (right-click) to register profit or loss as a transaction in your accounts.</value>
     </data>
+    <data name="Assets_ManageGroups" xml:space="preserve">
+        <value>Manage Groups</value>
+    </data>
+    <data name="Assets_EditGroup" xml:space="preserve">
+        <value>Edit Group</value>
+    </data>
+    <data name="Assets_DeleteGroup" xml:space="preserve">
+        <value>Delete Group</value>
+    </data>
+    <data name="Assets_DeleteGroupConfirmation" xml:space="preserve">
+        <value>Delete this group? Assets in this group will become ungrouped.</value>
+    </data>
+    <data name="Assets_MoveToGroup" xml:space="preserve">
+        <value>Move to Group</value>
+    </data>
+    <data name="Assets_RemoveFromGroup" xml:space="preserve">
+        <value>Remove from Group</value>
+    </data>
+    <data name="ManageAssetGroup_Title" xml:space="preserve">
+        <value>Asset Group</value>
+    </data>
+    <data name="ManageAssetGroup_Name" xml:space="preserve">
+        <value>Name</value>
+    </data>
+    <data name="ManageAssetGroup_Description" xml:space="preserve">
+        <value>Description</value>
+    </data>
+    <data name="Error_AssetGroupNotFound" xml:space="preserve">
+        <value>Asset group not found.</value>
+    </data>
+    <data name="ManageAssetGroupsList_Title" xml:space="preserve">
+        <value>Manage Asset Groups</value>
+    </data>
     <data name="Menu_LeverageSimulator" xml:space="preserve">
         <value>Leverage Simulator</value>
     </data>

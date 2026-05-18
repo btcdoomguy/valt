@@ -225,6 +225,7 @@ public static class Extensions
         services.AddSingleton<ITransactionRepository, TransactionRepository>();
         services.AddSingleton<IGoalRepository, GoalRepository>();
         services.AddSingleton<IAssetRepository, AssetRepository>();
+        services.AddSingleton<IAssetGroupRepository, AssetGroupRepository>();
 
         return services;
     }

@@ -39,6 +39,8 @@ using Valt.UI.Views.Main.Modals.ImportWizard;
 using Valt.UI.Views.Main.Modals.ManageGoal;
 using Valt.UI.Views.Main.Modals.ConversionCalculator;
 using Valt.UI.Views.Main.Modals.ManageAccountGroup;
+using Valt.UI.Views.Main.Modals.ManageAssetGroup;
+using Valt.UI.Views.Main.Modals.ManageAssetGroupsList;
 using Valt.UI.Views.Main.Modals.StatisticsConfig;
 using Valt.UI.Views.Main.Modals.ManageAsset;
 using Valt.UI.Views.Main.Modals.LeverageSimulator;
@@ -119,6 +121,8 @@ public static class Extensions
         services.AddTransient<ManageGoalViewModel>();
         services.AddTransient<ConversionCalculatorViewModel>();
         services.AddTransient<ManageAccountGroupViewModel>();
+        services.AddTransient<ManageAssetGroupViewModel>();
+        services.AddTransient<ManageAssetGroupsListViewModel>();
         services.AddTransient<StatisticsConfigViewModel>();
         services.AddTransient<ManageAssetViewModel>();
         services.AddTransient<LeverageSimulatorViewModel>();
@@ -219,6 +223,14 @@ public static class Extensions
                 ApplicationModalNames.ManageAccountGroup => new ManageAccountGroupView()
                 {
                     DataContext = services.GetRequiredService<ManageAccountGroupViewModel>(),
+                },
+                ApplicationModalNames.ManageAssetGroup => new ManageAssetGroupView()
+                {
+                    DataContext = services.GetRequiredService<ManageAssetGroupViewModel>(),
+                },
+                ApplicationModalNames.ManageAssetGroupsList => new ManageAssetGroupsListView()
+                {
+                    DataContext = services.GetRequiredService<ManageAssetGroupsListViewModel>(),
                 },
                 ApplicationModalNames.StatisticsConfig => new StatisticsConfigView()
                 {

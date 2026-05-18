@@ -12,10 +12,14 @@ using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Assets.Commands.DeleteAsset;
+using Valt.App.Modules.Assets.Commands.DeleteAssetGroup;
+using Valt.App.Modules.Assets.Commands.EditAssetGroup;
+using Valt.App.Modules.Assets.Commands.MoveAssetToGroup;
 using Valt.App.Modules.Assets.Commands.RepayLoan;
 using Valt.App.Modules.Assets.Commands.SetAssetIncludeInNetWorth;
 using Valt.App.Modules.Assets.Commands.SetAssetVisibility;
 using Valt.App.Modules.Assets.DTOs;
+using Valt.App.Modules.Assets.Queries.GetAssetGroups;
 using Valt.App.Modules.Assets.Queries.GetAssets;
 using Valt.App.Modules.Assets.Queries.GetAssetSummary;
 using Valt.Infra.Kernel;
@@ -33,6 +37,8 @@ using Valt.Core.Modules.Assets;
 using Valt.Core.Modules.Budget.Transactions;
 using Valt.UI.Views.Main;
 using Valt.UI.Views.Main.Modals.ManageAsset;
+using Valt.UI.Views.Main.Modals.ManageAssetGroup;
+using Valt.UI.Views.Main.Modals.ManageAssetGroupsList;
 using Valt.UI.Views.Main.Modals.TransactionEditor;
 using Valt.UI.Views.Main.Tabs.Assets.Models;
 using static Valt.UI.Base.TaskExtensions;
@@ -52,6 +58,8 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
     private JobInfo? _assetPriceUpdaterJobInfo;
 
     [ObservableProperty] private AvaloniaList<AssetViewModel> _assets = new();
+    [ObservableProperty] private AvaloniaList<AssetGroupContainerViewModel> _assetGroups = new();
+    [ObservableProperty] private AvaloniaList<AssetGroupMenuItem> _availableGroups = new();
     [ObservableProperty] private bool _isLoading = true;
     [ObservableProperty] private bool _isRefreshingPrices;
     [ObservableProperty]
@@ -159,6 +167,69 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
                         CurrentPrice = 2050m, CurrentValue = 10250m, CurrencyCode = "USD",
                         Quantity = 5, Symbol = "XAU"
                     }, "USD")
+                },
+                AssetGroups = new AvaloniaList<AssetGroupContainerViewModel>
+                {
+                    new AssetGroupContainerViewModel(null, null, null)
+                    {
+                        Assets = new AvaloniaList<AssetViewModel>
+                        {
+                            new(new AssetDTO
+                            {
+                                Id = "1", Name = "Apple Inc.", AssetTypeId = 0, AssetTypeName = "Stock",
+                                Icon = "\xE8F5", IncludeInNetWorth = true, Visible = true,
+                                LastPriceUpdateAt = DateTime.Now, CreatedAt = DateTime.Now, DisplayOrder = 1,
+                                CurrentPrice = 185.50m, CurrentValue = 18550m, CurrencyCode = "USD",
+                                Quantity = 100, Symbol = "AAPL"
+                            }, "USD"),
+                            new(new AssetDTO
+                            {
+                                Id = "2", Name = "Bitcoin ETF", AssetTypeId = 1, AssetTypeName = "ETF",
+                                Icon = "\xE8F5", IncludeInNetWorth = true, Visible = true,
+                                LastPriceUpdateAt = DateTime.Now, CreatedAt = DateTime.Now, DisplayOrder = 2,
+                                CurrentPrice = 52.30m, CurrentValue = 52300m, CurrencyCode = "USD",
+                                Quantity = 1000, Symbol = "IBIT"
+                            }, "USD")
+                        }
+                    },
+                    new AssetGroupContainerViewModel("group-1", "Investments", "Long-term holdings")
+                    {
+                        Assets = new AvaloniaList<AssetViewModel>
+                        {
+                            new(new AssetDTO
+                            {
+                                Id = "3", Name = "Beach House", AssetTypeId = 3, AssetTypeName = "Real Estate",
+                                Icon = "\xE88A", IncludeInNetWorth = true, Visible = true,
+                                LastPriceUpdateAt = DateTime.Now, CreatedAt = DateTime.Now, DisplayOrder = 3,
+                                CurrentPrice = 450000m, CurrentValue = 450000m, CurrencyCode = "USD",
+                                Address = "123 Ocean Drive, Miami FL", MonthlyRentalIncome = 3500m
+                            }, "USD"),
+                            new(new AssetDTO
+                            {
+                                Id = "4", Name = "BTC Long 5x", AssetTypeId = 5, AssetTypeName = "Leveraged Position",
+                                Icon = "\xE8F5", IncludeInNetWorth = true, Visible = true,
+                                LastPriceUpdateAt = DateTime.Now, CreatedAt = DateTime.Now, DisplayOrder = 4,
+                                CurrentPrice = 98500m, CurrentValue = 12500m, CurrencyCode = "USD",
+                                Collateral = 10000m, EntryPrice = 95000m, Leverage = 5m,
+                                LiquidationPrice = 78000m, IsLong = true, PnL = 2500m,
+                                PnLPercentage = 25m, DistanceToLiquidation = 20.8m, IsAtRisk = false
+                            }, "USD")
+                        }
+                    },
+                    new AssetGroupContainerViewModel(null, null, null)
+                    {
+                        Assets = new AvaloniaList<AssetViewModel>
+                        {
+                            new(new AssetDTO
+                            {
+                                Id = "5", Name = "Gold Bars", AssetTypeId = 4, AssetTypeName = "Commodity",
+                                Icon = "\xE8F5", IncludeInNetWorth = false, Visible = true,
+                                LastPriceUpdateAt = DateTime.Now, CreatedAt = DateTime.Now, DisplayOrder = 5,
+                                CurrentPrice = 2050m, CurrentValue = 10250m, CurrencyCode = "USD",
+                                Quantity = 5, Symbol = "XAU"
+                            }, "USD")
+                        }
+                    }
                 }
             };
             return vm;
@@ -237,10 +308,10 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
             IsLoading = true;
 
             var assets = await _queryDispatcher.DispatchAsync(new GetAssetsQuery());
+            var groups = await _queryDispatcher.DispatchAsync(new GetAssetGroupsQuery());
+
             var viewModels = assets
                 .Select(a => new AssetViewModel(a, _currencySettings.MainFiatCurrency))
-                .OrderBy(a => a.AssetType)
-                .ThenBy(a => a.Name)
                 .ToList();
 
             // Save current selection before clearing
@@ -250,6 +321,44 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
             {
                 Assets.Clear();
                 Assets.AddRange(viewModels);
+
+                // Build grouped containers
+                AssetGroups.Clear();
+                AvailableGroups.Clear();
+
+                // Add grouped assets
+                foreach (var group in groups.OrderBy(g => g.DisplayOrder))
+                {
+                    var groupAssets = viewModels
+                        .Where(a => a.GroupId == group.Id)
+                        .OrderBy(a => a.AssetType)
+                        .ThenBy(a => a.Name)
+                        .ToList();
+
+                    if (groupAssets.Count > 0)
+                    {
+                        var container = new AssetGroupContainerViewModel(group.Id, group.Name, group.Description);
+                        container.Assets.AddRange(groupAssets);
+                        AssetGroups.Add(container);
+                    }
+                }
+
+                // Add ungrouped assets as a container with no title
+                var ungrouped = viewModels
+                    .Where(a => string.IsNullOrEmpty(a.GroupId))
+                    .OrderBy(a => a.AssetType)
+                    .ThenBy(a => a.Name)
+                    .ToList();
+
+                if (ungrouped.Count > 0)
+                {
+                    var ungroupedContainer = new AssetGroupContainerViewModel(null, null, null);
+                    ungroupedContainer.Assets.AddRange(ungrouped);
+                    AssetGroups.Add(ungroupedContainer);
+                }
+
+                // Populate available groups for the "Move to Group" context menu
+                AvailableGroups.AddRange(groups.OrderBy(g => g.Name).Select(g => new AssetGroupMenuItem(g.Id, g.Name)));
 
                 // Restore selection after repopulating
                 if (!string.IsNullOrEmpty(currentSelectedAssetId))
@@ -578,6 +687,136 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
     {
         RefreshPricesCommand.NotifyCanExecuteChanged();
     }
+
+    #region Asset Group Management
+
+    [RelayCommand]
+    private async Task AddAssetGroup()
+    {
+        var ownerWindow = GetUserControlOwnerWindow?.Invoke();
+        if (ownerWindow is null)
+            return;
+
+        var window =
+            (ManageAssetGroupsListView)await _modalFactory!.CreateAsync(ApplicationModalNames.ManageAssetGroupsList, ownerWindow)!;
+
+        _ = await window.ShowDialogSafeAsync<ManageAssetGroupsListViewModel.Response?>(ownerWindow);
+
+        await LoadAssetsAsync();
+    }
+
+    [RelayCommand]
+    private async Task EditAssetGroup(AssetGroupContainerViewModel group)
+    {
+        if (group.Id is null) return;
+
+        var ownerWindow = GetUserControlOwnerWindow?.Invoke();
+        if (ownerWindow is null)
+            return;
+
+        var window =
+            (ManageAssetGroupView)await _modalFactory!.CreateAsync(ApplicationModalNames.ManageAssetGroup, ownerWindow, group.Id)!;
+
+        var result = await window.ShowDialogSafeAsync<ManageAssetGroupViewModel.Response?>(ownerWindow);
+
+        if (result is null)
+            return;
+
+        await LoadAssetsAsync();
+    }
+
+    [RelayCommand]
+    private async Task DeleteAssetGroup(AssetGroupContainerViewModel group)
+    {
+        if (group.Id is null) return;
+
+        var ownerWindow = GetUserControlOwnerWindow?.Invoke();
+        if (ownerWindow is null)
+            return;
+
+        var confirmed = await MessageBoxHelper.ShowQuestionAsync(
+            language.Assets_DeleteGroup,
+            language.Assets_DeleteGroupConfirmation,
+            ownerWindow);
+
+        if (!confirmed)
+            return;
+
+        var result = await _commandDispatcher.DispatchAsync(new DeleteAssetGroupCommand { GroupId = group.Id });
+
+        if (result.IsFailure)
+        {
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, ownerWindow);
+            return;
+        }
+
+        await LoadAssetsAsync();
+    }
+
+    /// <summary>
+    /// Stores the asset for which the context menu was opened.
+    /// </summary>
+    private AssetViewModel? _contextMenuAsset;
+
+    [RelayCommand]
+    private void SetContextMenuAsset(AssetViewModel? asset)
+    {
+        _contextMenuAsset = asset;
+    }
+
+    [RelayCommand]
+    private async Task MoveAssetToGroup(AssetGroupMenuItem? group)
+    {
+        if (group is null || _contextMenuAsset is null) return;
+
+        var result = await _commandDispatcher.DispatchAsync(
+            new MoveAssetToGroupCommand
+            {
+                AssetId = _contextMenuAsset.Id,
+                TargetGroupId = group.Id
+            });
+
+        if (result.IsFailure)
+        {
+            var ownerWindow = GetUserControlOwnerWindow?.Invoke();
+            if (ownerWindow is not null)
+            {
+                await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, ownerWindow);
+            }
+            return;
+        }
+
+        await LoadAssetsAsync();
+        NotifyAssetSummaryUpdated();
+    }
+
+    [RelayCommand]
+    private async Task RemoveAssetFromGroup(AssetViewModel? asset)
+    {
+        if (asset is null) return;
+
+        var result = await _commandDispatcher.DispatchAsync(
+            new MoveAssetToGroupCommand
+            {
+                AssetId = asset.Id,
+                TargetGroupId = null
+            });
+
+        if (result.IsFailure)
+        {
+            var ownerWindow = GetUserControlOwnerWindow?.Invoke();
+            if (ownerWindow is not null)
+            {
+                await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, ownerWindow);
+            }
+            return;
+        }
+
+        await LoadAssetsAsync();
+        NotifyAssetSummaryUpdated();
+    }
+
+    #endregion
 
     private void NotifyAssetSummaryUpdated()
     {

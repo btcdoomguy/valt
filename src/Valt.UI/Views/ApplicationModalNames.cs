@@ -25,6 +25,8 @@ public enum ApplicationModalNames
     ManageAccountGroup = 21,
     StatisticsConfig = 22,
     ManageAsset = 23,
+    ManageAssetGroup = 30,
+    ManageAssetGroupsList = 31,
     LeverageSimulator = 24,
     PriceHistory = 25,
     SimulatedPricesConfig = 26,

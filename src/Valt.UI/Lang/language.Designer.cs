@@ -4719,6 +4719,72 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string Assets_ManageGroups {
+            get {
+                return ResourceManager.GetString("Assets_ManageGroups", resourceCulture);
+            }
+        }
+
+        public static string Assets_EditGroup {
+            get {
+                return ResourceManager.GetString("Assets_EditGroup", resourceCulture);
+            }
+        }
+
+        public static string Assets_DeleteGroup {
+            get {
+                return ResourceManager.GetString("Assets_DeleteGroup", resourceCulture);
+            }
+        }
+
+        public static string Assets_DeleteGroupConfirmation {
+            get {
+                return ResourceManager.GetString("Assets_DeleteGroupConfirmation", resourceCulture);
+            }
+        }
+
+        public static string Assets_MoveToGroup {
+            get {
+                return ResourceManager.GetString("Assets_MoveToGroup", resourceCulture);
+            }
+        }
+
+        public static string Assets_RemoveFromGroup {
+            get {
+                return ResourceManager.GetString("Assets_RemoveFromGroup", resourceCulture);
+            }
+        }
+
+        public static string ManageAssetGroup_Title {
+            get {
+                return ResourceManager.GetString("ManageAssetGroup_Title", resourceCulture);
+            }
+        }
+
+        public static string ManageAssetGroup_Name {
+            get {
+                return ResourceManager.GetString("ManageAssetGroup_Name", resourceCulture);
+            }
+        }
+
+        public static string ManageAssetGroup_Description {
+            get {
+                return ResourceManager.GetString("ManageAssetGroup_Description", resourceCulture);
+            }
+        }
+
+        public static string Error_AssetGroupNotFound {
+            get {
+                return ResourceManager.GetString("Error_AssetGroupNotFound", resourceCulture);
+            }
+        }
+
+        public static string ManageAssetGroupsList_Title {
+            get {
+                return ResourceManager.GetString("ManageAssetGroupsList_Title", resourceCulture);
+            }
+        }
+
         public static string Menu_LeverageSimulator {
             get {
                 return ResourceManager.GetString("Menu_LeverageSimulator", resourceCulture);

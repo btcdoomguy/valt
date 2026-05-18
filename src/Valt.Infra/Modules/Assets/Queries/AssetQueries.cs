@@ -320,6 +320,7 @@ internal sealed class AssetQueries : IAssetQueries
             LastPriceUpdateAt = entity.LastPriceUpdateAt,
             CreatedAt = entity.CreatedAt,
             DisplayOrder = entity.DisplayOrder,
+            GroupId = entity.GroupId?.ToString(),
             CurrentPrice = asset.GetCurrentPrice(),
             CurrentValue = asset.GetCurrentValue(),
             CurrencyCode = asset.GetCurrencyCode(),
@@ -371,5 +372,23 @@ internal sealed class AssetQueries : IAssetQueries
             PnL = pnl,
             PnLPercentage = pnlPercentage
         };
+    }
+
+    public Task<IReadOnlyList<AssetGroupDTO>> GetAssetGroupsAsync()
+    {
+        var entities = _localDatabase.GetAssetGroups()
+            .FindAll()
+            .OrderBy(x => x.DisplayOrder)
+            .ToList();
+
+        var dtos = entities.Select(e => new AssetGroupDTO
+        {
+            Id = e.Id.ToString(),
+            Name = e.Name,
+            Description = e.Description,
+            DisplayOrder = e.DisplayOrder
+        }).ToList();
+
+        return Task.FromResult<IReadOnlyList<AssetGroupDTO>>(dtos);
     }
 }
