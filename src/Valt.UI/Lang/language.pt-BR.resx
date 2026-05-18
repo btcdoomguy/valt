@@ -1917,6 +1917,9 @@
     <data name="ManageGoal_Month" xml:space="preserve">
         <value>Mês</value>
     </data>
+    <data name="ManageGoal_StartDate" xml:space="preserve">
+        <value>Data de Início</value>
+    </data>
     <data name="ManageGoal_GoalType" xml:space="preserve">
         <value>Tipo de Meta</value>
     </data>

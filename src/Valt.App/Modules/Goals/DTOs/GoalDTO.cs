@@ -8,6 +8,7 @@ public record GoalDTO
     public required string Id { get; init; }
     public required DateOnly RefDate { get; init; }
     public required int Period { get; init; }
+    public required DateOnly? StartDate { get; init; }
     public required decimal Progress { get; init; }
     public required bool IsUpToDate { get; init; }
     public required DateTime LastUpdatedAt { get; init; }

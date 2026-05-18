@@ -13,6 +13,10 @@ public class CreateGoalValidator : IValidator<CreateGoalCommand>
         if (instance.Period < 0 || instance.Period > 1)
             errors.Add(nameof(instance.Period), ["Period must be 0 (Monthly) or 1 (Yearly)"]);
 
+        // Validate start date for yearly goals
+        if (instance.Period == 1 && instance.StartDate.HasValue && instance.StartDate.Value.Year != instance.RefDate.Year)
+            errors.Add(nameof(instance.StartDate), ["Start date must be in the same year as the reference year"]);
+
         // Validate goal type
         if (instance.GoalType is null)
         {

@@ -1937,6 +1937,9 @@
     <data name="ManageGoal_Month" xml:space="preserve">
         <value>Month</value>
     </data>
+    <data name="ManageGoal_StartDate" xml:space="preserve">
+        <value>Start Date</value>
+    </data>
     <data name="ManageGoal_GoalType" xml:space="preserve">
         <value>Goal Type</value>
     </data>

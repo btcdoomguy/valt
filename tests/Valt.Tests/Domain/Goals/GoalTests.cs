@@ -273,6 +273,24 @@ public class GoalTests
         Assert.That(range.End, Is.EqualTo(new DateOnly(2024, 12, 31)));
     }
 
+    [Test]
+    public void Should_Return_Yearly_Range_With_Custom_StartDate()
+    {
+        // Arrange
+        var goal = GoalBuilder.AGoal()
+            .WithRefDate(new DateOnly(2024, 1, 1))
+            .WithPeriod(GoalPeriods.Yearly)
+            .WithStartDate(new DateOnly(2024, 3, 1))
+            .Build();
+
+        // Act
+        var range = goal.GetPeriodRange();
+
+        // Assert
+        Assert.That(range.Start, Is.EqualTo(new DateOnly(2024, 3, 1)));
+        Assert.That(range.End, Is.EqualTo(new DateOnly(2024, 12, 31)));
+    }
+
     #endregion
 
     #region Recalculate Tests

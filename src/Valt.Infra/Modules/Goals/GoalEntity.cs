@@ -8,6 +8,7 @@ public class GoalEntity
 
     [BsonField("refDate")] public DateTime RefDate { get; set; }
     [BsonField("period")] public int PeriodId { get; set; }
+    [BsonField("startDate")] public DateTime? StartDate { get; set; }
     [BsonField("typeName")] public int GoalTypeNameId { get; set; }
     [BsonField("typeJson")] public string GoalTypeJson { get; set; } = null!;
     [BsonField("progress")] public decimal Progress { get; set; }

@@ -54,12 +54,14 @@ public class GoalTools
         INotificationPublisher publisher,
         [Description("Reference date (format: yyyy-MM-dd)")] string refDate,
         [Description("Period type: 0=Monthly, 1=Yearly")] int period,
-        [Description("Target amount in satoshis")] long targetSats)
+        [Description("Target amount in satoshis")] long targetSats,
+        [Description("Optional start date for yearly goals (format: yyyy-MM-dd). Must be in the same year as refDate.")] string? startDate = null)
     {
         var result = await dispatcher.DispatchAsync(new CreateGoalCommand
         {
             RefDate = DateOnly.Parse(refDate),
             Period = period,
+            StartDate = string.IsNullOrWhiteSpace(startDate) ? null : DateOnly.Parse(startDate),
             GoalType = new StackBitcoinGoalTypeDTO { TargetSats = targetSats }
         });
 
@@ -81,12 +83,14 @@ public class GoalTools
         INotificationPublisher publisher,
         [Description("Reference date (format: yyyy-MM-dd)")] string refDate,
         [Description("Period type: 0=Monthly, 1=Yearly")] int period,
-        [Description("Maximum spending amount")] decimal targetAmount)
+        [Description("Maximum spending amount")] decimal targetAmount,
+        [Description("Optional start date for yearly goals (format: yyyy-MM-dd). Must be in the same year as refDate.")] string? startDate = null)
     {
         var result = await dispatcher.DispatchAsync(new CreateGoalCommand
         {
             RefDate = DateOnly.Parse(refDate),
             Period = period,
+            StartDate = string.IsNullOrWhiteSpace(startDate) ? null : DateOnly.Parse(startDate),
             GoalType = new SpendingLimitGoalTypeDTO { TargetAmount = targetAmount }
         });
 
@@ -108,12 +112,14 @@ public class GoalTools
         INotificationPublisher publisher,
         [Description("Reference date (format: yyyy-MM-dd)")] string refDate,
         [Description("Period type: 0=Monthly, 1=Yearly")] int period,
-        [Description("Target number of purchases")] int targetPurchaseCount)
+        [Description("Target number of purchases")] int targetPurchaseCount,
+        [Description("Optional start date for yearly goals (format: yyyy-MM-dd). Must be in the same year as refDate.")] string? startDate = null)
     {
         var result = await dispatcher.DispatchAsync(new CreateGoalCommand
         {
             RefDate = DateOnly.Parse(refDate),
             Period = period,
+            StartDate = string.IsNullOrWhiteSpace(startDate) ? null : DateOnly.Parse(startDate),
             GoalType = new DcaGoalTypeDTO { TargetPurchaseCount = targetPurchaseCount }
         });
 
@@ -135,12 +141,14 @@ public class GoalTools
         INotificationPublisher publisher,
         [Description("Reference date (format: yyyy-MM-dd)")] string refDate,
         [Description("Period type: 0=Monthly, 1=Yearly")] int period,
-        [Description("Target income amount")] decimal targetAmount)
+        [Description("Target income amount")] decimal targetAmount,
+        [Description("Optional start date for yearly goals (format: yyyy-MM-dd). Must be in the same year as refDate.")] string? startDate = null)
     {
         var result = await dispatcher.DispatchAsync(new CreateGoalCommand
         {
             RefDate = DateOnly.Parse(refDate),
             Period = period,
+            StartDate = string.IsNullOrWhiteSpace(startDate) ? null : DateOnly.Parse(startDate),
             GoalType = new IncomeFiatGoalTypeDTO { TargetAmount = targetAmount }
         });
 
@@ -162,12 +170,14 @@ public class GoalTools
         INotificationPublisher publisher,
         [Description("Reference date (format: yyyy-MM-dd)")] string refDate,
         [Description("Period type: 0=Monthly, 1=Yearly")] int period,
-        [Description("Target income in satoshis")] long targetSats)
+        [Description("Target income in satoshis")] long targetSats,
+        [Description("Optional start date for yearly goals (format: yyyy-MM-dd). Must be in the same year as refDate.")] string? startDate = null)
     {
         var result = await dispatcher.DispatchAsync(new CreateGoalCommand
         {
             RefDate = DateOnly.Parse(refDate),
             Period = period,
+            StartDate = string.IsNullOrWhiteSpace(startDate) ? null : DateOnly.Parse(startDate),
             GoalType = new IncomeBtcGoalTypeDTO { TargetSats = targetSats }
         });
 
@@ -190,12 +200,14 @@ public class GoalTools
         [Description("Reference date (format: yyyy-MM-dd)")] string refDate,
         [Description("Period type: 0=Monthly, 1=Yearly")] int period,
         [Description("Category ID to track")] string categoryId,
-        [Description("Maximum spending amount for the category")] decimal targetAmount)
+        [Description("Maximum spending amount for the category")] decimal targetAmount,
+        [Description("Optional start date for yearly goals (format: yyyy-MM-dd). Must be in the same year as refDate.")] string? startDate = null)
     {
         var result = await dispatcher.DispatchAsync(new CreateGoalCommand
         {
             RefDate = DateOnly.Parse(refDate),
             Period = period,
+            StartDate = string.IsNullOrWhiteSpace(startDate) ? null : DateOnly.Parse(startDate),
             GoalType = new ReduceExpenseCategoryGoalTypeDTO
             {
                 CategoryId = categoryId,
@@ -221,12 +233,14 @@ public class GoalTools
         INotificationPublisher publisher,
         [Description("Reference date (format: yyyy-MM-dd)")] string refDate,
         [Description("Period type: 0=Monthly, 1=Yearly")] int period,
-        [Description("Maximum sats that can be sold (0 = no selling allowed)")] long maxSellableSats)
+        [Description("Maximum sats that can be sold (0 = no selling allowed)")] long maxSellableSats,
+        [Description("Optional start date for yearly goals (format: yyyy-MM-dd). Must be in the same year as refDate.")] string? startDate = null)
     {
         var result = await dispatcher.DispatchAsync(new CreateGoalCommand
         {
             RefDate = DateOnly.Parse(refDate),
             Period = period,
+            StartDate = string.IsNullOrWhiteSpace(startDate) ? null : DateOnly.Parse(startDate),
             GoalType = new BitcoinHodlGoalTypeDTO { MaxSellableSats = maxSellableSats }
         });
 
@@ -248,12 +262,14 @@ public class GoalTools
         INotificationPublisher publisher,
         [Description("Reference date (format: yyyy-MM-dd)")] string refDate,
         [Description("Period type: 0=Monthly, 1=Yearly")] int period,
-        [Description("Target savings amount")] decimal targetAmount)
+        [Description("Target savings amount")] decimal targetAmount,
+        [Description("Optional start date for yearly goals (format: yyyy-MM-dd). Must be in the same year as refDate.")] string? startDate = null)
     {
         var result = await dispatcher.DispatchAsync(new CreateGoalCommand
         {
             RefDate = DateOnly.Parse(refDate),
             Period = period,
+            StartDate = string.IsNullOrWhiteSpace(startDate) ? null : DateOnly.Parse(startDate),
             GoalType = new SaveFiatGoalTypeDTO { TargetAmount = targetAmount }
         });
 
@@ -275,12 +291,14 @@ public class GoalTools
         INotificationPublisher publisher,
         [Description("Reference date (format: yyyy-MM-dd)")] string refDate,
         [Description("Period type: 0=Monthly, 1=Yearly")] int period,
-        [Description("Target savings rate percentage (1-100)")] decimal targetPercentage)
+        [Description("Target savings rate percentage (1-100)")] decimal targetPercentage,
+        [Description("Optional start date for yearly goals (format: yyyy-MM-dd). Must be in the same year as refDate.")] string? startDate = null)
     {
         var result = await dispatcher.DispatchAsync(new CreateGoalCommand
         {
             RefDate = DateOnly.Parse(refDate),
             Period = period,
+            StartDate = string.IsNullOrWhiteSpace(startDate) ? null : DateOnly.Parse(startDate),
             GoalType = new SavingsRateGoalTypeDTO { TargetPercentage = targetPercentage }
         });
 
@@ -302,12 +320,14 @@ public class GoalTools
         INotificationPublisher publisher,
         [Description("Reference date (format: yyyy-MM-dd)")] string refDate,
         [Description("Period type: 0=Monthly, 1=Yearly")] int period,
-        [Description("Target net worth in satoshis")] long targetSats)
+        [Description("Target net worth in satoshis")] long targetSats,
+        [Description("Optional start date for yearly goals (format: yyyy-MM-dd). Must be in the same year as refDate.")] string? startDate = null)
     {
         var result = await dispatcher.DispatchAsync(new CreateGoalCommand
         {
             RefDate = DateOnly.Parse(refDate),
             Period = period,
+            StartDate = string.IsNullOrWhiteSpace(startDate) ? null : DateOnly.Parse(startDate),
             GoalType = new NetWorthBtcGoalTypeDTO { TargetSats = targetSats }
         });
 

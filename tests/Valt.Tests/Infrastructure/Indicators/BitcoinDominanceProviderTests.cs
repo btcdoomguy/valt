@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Valt.Infra.Crawlers.Indicators;
+using Valt.Infra.Crawlers.LivePriceCrawlers.Bitcoin.Providers;
 
 namespace Valt.Tests.Infrastructure.Indicators;
 
@@ -13,7 +14,8 @@ public class BitcoinDominanceProviderTests
     public void OneTimeSetUp()
     {
         _provider = new BitcoinDominanceProvider(
-            Substitute.For<ILogger<BitcoinDominanceProvider>>());
+            Substitute.For<ILogger<BitcoinDominanceProvider>>(),
+            new CoinGeckoRateLimiter(Substitute.For<ILogger<CoinGeckoRateLimiter>>()));
     }
 
     [Test]

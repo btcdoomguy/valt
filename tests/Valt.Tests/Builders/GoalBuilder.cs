@@ -13,6 +13,7 @@ public class GoalBuilder
     private GoalId _id = new();
     private DateOnly _refDate = new DateOnly(2024, 1, 15);
     private GoalPeriods _period = GoalPeriods.Monthly;
+    private DateOnly? _startDate = null;
     private IGoalType _goalType = new StackBitcoinGoalType(BtcValue.ParseSats(1_000_000));
     private decimal _progress = 0m;
     private bool _isUpToDate = false;
@@ -35,6 +36,12 @@ public class GoalBuilder
     public GoalBuilder WithPeriod(GoalPeriods period)
     {
         _period = period;
+        return this;
+    }
+
+    public GoalBuilder WithStartDate(DateOnly? startDate)
+    {
+        _startDate = startDate;
         return this;
     }
 
@@ -76,7 +83,7 @@ public class GoalBuilder
 
     public Goal Build()
     {
-        return Goal.Create(_id, _refDate, _period, _goalType, _progress, _isUpToDate, _lastUpdatedAt, _state, _version);
+        return Goal.Create(_id, _refDate, _period, _startDate, _goalType, _progress, _isUpToDate, _lastUpdatedAt, _state, _version);
     }
 
     public static GoalBuilder AGoal() => new();

@@ -3849,6 +3849,12 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string ManageGoal_StartDate {
+            get {
+                return ResourceManager.GetString("ManageGoal_StartDate", resourceCulture);
+            }
+        }
+        
         public static string ManageGoal_GoalType {
             get {
                 return ResourceManager.GetString("ManageGoal_GoalType", resourceCulture);

@@ -8,18 +8,20 @@ public sealed class Goal : AggregateRoot<GoalId>
 {
     public DateOnly RefDate { get; private set; }
     public GoalPeriods Period { get; private set; }
+    public DateOnly? StartDate { get; private set; }
     public IGoalType GoalType { get; private set; }
     public decimal Progress { get; private set; }
     public bool IsUpToDate { get; private set; }
     public DateTime LastUpdatedAt { get; private set; }
     public GoalStates State { get; private set; }
 
-    private Goal(GoalId id, DateOnly refDate, GoalPeriods period, IGoalType goalType, decimal progress,
+    private Goal(GoalId id, DateOnly refDate, GoalPeriods period, DateOnly? startDate, IGoalType goalType, decimal progress,
         bool isUpToDate, DateTime lastUpdatedAt, GoalStates state, int version)
     {
         Id = id;
         RefDate = refDate;
         Period = period;
+        StartDate = startDate;
         GoalType = goalType;
         Progress = progress;
         IsUpToDate = isUpToDate;
@@ -31,15 +33,22 @@ public sealed class Goal : AggregateRoot<GoalId>
     public static Goal Create(GoalId id, DateOnly refDate, GoalPeriods period, IGoalType goalType,
         decimal progress, bool isUpToDate, DateTime lastUpdatedAt, GoalStates state, int version)
     {
-        return new Goal(id, refDate, period, goalType, progress, isUpToDate, lastUpdatedAt, state, version);
+        return Create(id, refDate, period, null, goalType, progress, isUpToDate, lastUpdatedAt, state, version);
     }
 
-    public static Goal New(DateOnly refDate, GoalPeriods period, IGoalType goalType)
+    public static Goal Create(GoalId id, DateOnly refDate, GoalPeriods period, DateOnly? startDate, IGoalType goalType,
+        decimal progress, bool isUpToDate, DateTime lastUpdatedAt, GoalStates state, int version)
+    {
+        return new Goal(id, refDate, period, startDate, goalType, progress, isUpToDate, lastUpdatedAt, state, version);
+    }
+
+    public static Goal New(DateOnly refDate, GoalPeriods period, IGoalType goalType, DateOnly? startDate = null)
     {
         var goal = new Goal(
             new GoalId(),
             refDate,
             period,
+            startDate,
             goalType,
             0m,
             false,
@@ -91,10 +100,11 @@ public sealed class Goal : AggregateRoot<GoalId>
         AddEvent(new GoalUpdatedEvent(this));
     }
 
-    public void Edit(DateOnly refDate, GoalPeriods period, IGoalType goalType)
+    public void Edit(DateOnly refDate, GoalPeriods period, IGoalType goalType, DateOnly? startDate = null)
     {
         RefDate = refDate;
         Period = period;
+        StartDate = startDate;
         GoalType = goalType;
         IsUpToDate = false;
         AddEvent(new GoalUpdatedEvent(this));
@@ -106,7 +116,7 @@ public sealed class Goal : AggregateRoot<GoalId>
             new DateOnly(RefDate.Year, RefDate.Month, 1),
             new DateOnly(RefDate.Year, RefDate.Month, DateTime.DaysInMonth(RefDate.Year, RefDate.Month))),
         GoalPeriods.Yearly => new DateOnlyRange(
-            new DateOnly(RefDate.Year, 1, 1),
+            StartDate ?? new DateOnly(RefDate.Year, 1, 1),
             new DateOnly(RefDate.Year, 12, 31)),
         _ => throw new ArgumentOutOfRangeException()
     };
