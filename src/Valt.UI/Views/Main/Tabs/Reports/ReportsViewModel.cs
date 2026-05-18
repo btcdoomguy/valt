@@ -668,7 +668,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             ApplicationModalNames.StatisticsConfig,
             ownerWindow);
 
-        var result = await modal.ShowDialog<StatisticsConfigViewModel.Response?>(ownerWindow);
+        var result = await modal.ShowDialogSafeAsync<StatisticsConfigViewModel.Response?>(ownerWindow);
 
         // Refresh statistics after config change
         if (result?.Ok == true)
@@ -845,7 +845,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             ApplicationModalNames.SimulatedPricesConfig,
             ownerWindow);
 
-        var result = await modal.ShowDialog<SimulatedPricesConfigViewModel.Response?>(ownerWindow);
+        var result = await modal.ShowDialogSafeAsync<SimulatedPricesConfigViewModel.Response?>(ownerWindow);
 
         if (result?.Ok == true)
         {

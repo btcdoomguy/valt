@@ -71,6 +71,7 @@ public interface ILocalDatabase : INotifyPropertyChanged, IDisposable
     #region Assets module
 
     ILiteCollection<AssetEntity> GetAssets();
+    ILiteCollection<AssetGroupEntity> GetAssetGroups();
 
     #endregion
 

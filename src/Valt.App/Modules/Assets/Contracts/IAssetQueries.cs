@@ -32,4 +32,9 @@ public interface IAssetQueries
         string mainCurrencyCode,
         decimal? btcPriceUsd = null,
         IReadOnlyDictionary<string, decimal>? fiatRates = null);
+
+    /// <summary>
+    /// Gets all asset groups ordered by display order.
+    /// </summary>
+    Task<IReadOnlyList<AssetGroupDTO>> GetAssetGroupsAsync();
 }

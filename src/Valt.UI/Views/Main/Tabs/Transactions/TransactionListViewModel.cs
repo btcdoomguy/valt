@@ -251,7 +251,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
                     Date = _dateForTransaction
                 })!;
 
-        var result = await modal.ShowDialog<TransactionEditorViewModel.Response?>(ownerWindow);
+        var result = await modal.ShowDialogSafeAsync<TransactionEditorViewModel.Response?>(ownerWindow);
 
         if (result is null)
             return;
@@ -278,7 +278,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
                     TransactionId = new TransactionId(selectedTransaction.Id)
                 })!;
 
-        var result = await modal.ShowDialog<TransactionEditorViewModel.Response?>(ownerWindow);
+        var result = await modal.ShowDialogSafeAsync<TransactionEditorViewModel.Response?>(ownerWindow);
 
         if (result is null)
             return;
@@ -303,7 +303,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
                     CopyTransaction = true
                 })!;
 
-        var result = await modal.ShowDialog<TransactionEditorViewModel.Response?>(ownerWindow);
+        var result = await modal.ShowDialogSafeAsync<TransactionEditorViewModel.Response?>(ownerWindow);
 
         if (result is null)
             return;
@@ -395,7 +395,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
                 ApplicationModalNames.ChangeCategoryTransactions,
                 ownerWindow, null)!;
 
-        var result = await modal.ShowDialog<ChangeCategoryTransactionsViewModel.Response?>(ownerWindow);
+        var result = await modal.ShowDialogSafeAsync<ChangeCategoryTransactionsViewModel.Response?>(ownerWindow);
 
         if (result is null)
             return;
@@ -602,7 +602,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
                 PresetAmount = fiatAmount
             })!;
 
-        await modal.ShowDialog<AvgPriceLineEditorViewModel.Response?>(ownerWindow);
+        await modal.ShowDialogSafeAsync<AvgPriceLineEditorViewModel.Response?>(ownerWindow);
     }
 
     #endregion

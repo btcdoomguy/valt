@@ -14,6 +14,7 @@ public sealed class Asset : AggregateRoot<AssetId>
     public DateTime LastPriceUpdateAt { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public int DisplayOrder { get; private set; }
+    public AssetGroupId? GroupId { get; private set; }
 
     private Asset(
         AssetId id,
@@ -25,6 +26,7 @@ public sealed class Asset : AggregateRoot<AssetId>
         DateTime lastPriceUpdateAt,
         DateTime createdAt,
         int displayOrder,
+        AssetGroupId? groupId,
         int version)
     {
         Id = id;
@@ -36,6 +38,7 @@ public sealed class Asset : AggregateRoot<AssetId>
         LastPriceUpdateAt = lastPriceUpdateAt;
         CreatedAt = createdAt;
         DisplayOrder = displayOrder;
+        GroupId = groupId;
         Version = version;
     }
 
@@ -49,9 +52,10 @@ public sealed class Asset : AggregateRoot<AssetId>
         DateTime lastPriceUpdateAt,
         DateTime createdAt,
         int displayOrder,
+        AssetGroupId? groupId,
         int version)
     {
-        return new Asset(id, name, details, icon, includeInNetWorth, visible, lastPriceUpdateAt, createdAt, displayOrder, version);
+        return new Asset(id, name, details, icon, includeInNetWorth, visible, lastPriceUpdateAt, createdAt, displayOrder, groupId, version);
     }
 
     public static Asset New(
@@ -60,7 +64,8 @@ public sealed class Asset : AggregateRoot<AssetId>
         Icon icon,
         bool includeInNetWorth = true,
         bool visible = true,
-        int displayOrder = 0)
+        int displayOrder = 0,
+        AssetGroupId? groupId = null)
     {
         var now = DateTime.UtcNow;
         var asset = new Asset(
@@ -73,6 +78,7 @@ public sealed class Asset : AggregateRoot<AssetId>
             now,
             now,
             displayOrder,
+            groupId,
             0);
 
         asset.AddEvent(new AssetCreatedEvent(asset));
@@ -122,6 +128,15 @@ public sealed class Asset : AggregateRoot<AssetId>
     public void SetIncludeInNetWorth(bool include)
     {
         IncludeInNetWorth = include;
+        AddEvent(new AssetUpdatedEvent(this));
+    }
+
+    public void AssignToGroup(AssetGroupId? groupId)
+    {
+        if (GroupId == groupId)
+            return;
+
+        GroupId = groupId;
         AddEvent(new AssetUpdatedEvent(this));
     }
 

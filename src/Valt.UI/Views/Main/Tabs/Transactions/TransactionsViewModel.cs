@@ -427,7 +427,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         var window =
             (ManageAccountView)await _modalFactory!.CreateAsync(ApplicationModalNames.ManageAccount, ownerWindow)!;
 
-        var result = await window.ShowDialog<ManageAccountViewModel.Response?>(ownerWindow!);
+        var result = await window.ShowDialogSafeAsync<ManageAccountViewModel.Response?>(ownerWindow!);
 
         if (result is null)
             return;
@@ -444,7 +444,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         var window =
             (ManageAccountGroupView)await _modalFactory!.CreateAsync(ApplicationModalNames.ManageAccountGroup, ownerWindow)!;
 
-        var result = await window.ShowDialog<ManageAccountGroupViewModel.Response?>(ownerWindow!);
+        var result = await window.ShowDialogSafeAsync<ManageAccountGroupViewModel.Response?>(ownerWindow!);
 
         if (result is null)
             return;
@@ -460,7 +460,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         var window =
             (ManageAccountGroupView)await _modalFactory!.CreateAsync(ApplicationModalNames.ManageAccountGroup, ownerWindow, group.Id)!;
 
-        var result = await window.ShowDialog<ManageAccountGroupViewModel.Response?>(ownerWindow!);
+        var result = await window.ShowDialogSafeAsync<ManageAccountGroupViewModel.Response?>(ownerWindow!);
 
         if (result is null)
             return;
@@ -544,7 +544,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         var window = (ManageAccountView)await _modalFactory!.CreateAsync(ApplicationModalNames.ManageAccount,
             ownerWindow, selectedAccount.Id)!;
 
-        var result = await window.ShowDialog<ManageAccountViewModel.Response?>(ownerWindow!);
+        var result = await window.ShowDialogSafeAsync<ManageAccountViewModel.Response?>(ownerWindow!);
 
         if (result is null)
             return;

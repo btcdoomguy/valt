@@ -189,7 +189,7 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
         var window = (FixedExpenseEditorView)await _modalFactory.CreateAsync(ApplicationModalNames.FixedExpenseEditor,
             currentWindow, null)!;
 
-        _ = await window.ShowDialog<FixedExpenseEditorViewModel.Response?>(currentWindow);
+        _ = await window.ShowDialogSafeAsync<FixedExpenseEditorViewModel.Response?>(currentWindow);
 
         await FetchFixedExpensesAsync();
     }
@@ -207,7 +207,7 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
                 FixedExpenseId = SelectedFixedExpense.Id
             })!;
 
-        _ = await window.ShowDialog<FixedExpenseEditorViewModel.Response?>(currentWindow);
+        _ = await window.ShowDialogSafeAsync<FixedExpenseEditorViewModel.Response?>(currentWindow);
 
         await FetchFixedExpensesAsync();
     }
@@ -225,7 +225,7 @@ public partial class ManageFixedExpensesViewModel : ValtModalViewModel
                 FixedExpenseId = SelectedFixedExpense.Id
             })!;
 
-        _ = await window.ShowDialog<object?>(currentWindow);
+        _ = await window.ShowDialogSafeAsync<object?>(currentWindow);
     }
 
     [RelayCommand]

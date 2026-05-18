@@ -265,7 +265,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
                 ownerWindow,
                 SelectedProfile?.Id)!;
 
-        _ = await modal.ShowDialog<ManageAvgPriceProfilesViewModel.Response?>(ownerWindow);
+        _ = await modal.ShowDialogSafeAsync<ManageAvgPriceProfilesViewModel.Response?>(ownerWindow);
 
         await FetchAvgPriceProfiles();
         await FetchAvgPriceLines();
@@ -322,7 +322,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
                     CurrencySymbolOnRight = currency.SymbolOnRight
                 })!;
 
-        var result = await modal.ShowDialog<AvgPriceLineEditorViewModel.Response?>(ownerWindow);
+        var result = await modal.ShowDialogSafeAsync<AvgPriceLineEditorViewModel.Response?>(ownerWindow);
 
         if (result is null || !result.Ok)
             return;
@@ -354,7 +354,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
                     ExistingLine = SelectedLine.ToDto()
                 })!;
 
-        var result = await modal.ShowDialog<AvgPriceLineEditorViewModel.Response?>(ownerWindow);
+        var result = await modal.ShowDialogSafeAsync<AvgPriceLineEditorViewModel.Response?>(ownerWindow);
 
         if (result is null || !result.Ok)
             return;

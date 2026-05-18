@@ -114,6 +114,7 @@ public static class Extensions
         services.AddSingleton<IIndicatorCache, IndicatorCache>();
 
         //price crawlers bitcoin
+        services.AddSingleton<CoinGeckoRateLimiter>();
         services.AddSingleton<CoinGeckoProvider>();
         services.AddSingleton<IBitcoinPriceProvider>(sp =>
             new ThrottledBitcoinPriceProvider(
@@ -224,6 +225,7 @@ public static class Extensions
         services.AddSingleton<ITransactionRepository, TransactionRepository>();
         services.AddSingleton<IGoalRepository, GoalRepository>();
         services.AddSingleton<IAssetRepository, AssetRepository>();
+        services.AddSingleton<IAssetGroupRepository, AssetGroupRepository>();
 
         return services;
     }

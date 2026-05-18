@@ -72,6 +72,7 @@ public class ManageGoalViewModelTests : DatabaseTest
             Id = id,
             RefDate = refDate,
             Period = (int)period,
+            StartDate = null,
             Progress = 0m,
             IsUpToDate = true,
             LastUpdatedAt = DateTime.UtcNow,

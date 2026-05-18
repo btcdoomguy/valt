@@ -36,7 +36,7 @@ public partial class StatusDisplayViewModel : ValtModalViewModel
     }
 
     [RelayCommand]
-    private void OpenItemLog(IStatusItem? item)
+    private async Task OpenItemLog(IStatusItem? item)
     {
         if (item == null)
             return;
@@ -47,7 +47,7 @@ public partial class StatusDisplayViewModel : ValtModalViewModel
         };
 
 #pragma warning disable CS8602 // Dereference of a possibly null reference
-        logViewer.ShowDialog(GetWindow()!);
+        await logViewer.ShowDialogSafeAsync(GetWindow()!);
 #pragma warning restore CS8602
     }
 

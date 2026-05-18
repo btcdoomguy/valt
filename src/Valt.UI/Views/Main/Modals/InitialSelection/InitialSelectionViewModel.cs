@@ -57,7 +57,7 @@ public partial class InitialSelectionViewModel : ValtModalViewModel
         var createDatabaseModal =
             (CreateDatabaseView)await _modalFactory!.CreateAsync(ApplicationModalNames.CreateDatabase, thisWindow)!;
 
-        var result = await createDatabaseModal.ShowDialog<CreateDatabaseViewModel.Response?>(thisWindow);
+        var result = await createDatabaseModal.ShowDialogSafeAsync<CreateDatabaseViewModel.Response?>(thisWindow);
 
         if (result is null)
             return;
@@ -93,7 +93,7 @@ public partial class InitialSelectionViewModel : ValtModalViewModel
         var inputPasswordModal =
             (InputPasswordView)await _modalFactory!.CreateAsync(ApplicationModalNames.InputPassword, thisWindow)!;
 
-        var inputPasswordResult = await inputPasswordModal.ShowDialog<InputPasswordViewModel.Response?>(thisWindow);
+        var inputPasswordResult = await inputPasswordModal.ShowDialogSafeAsync<InputPasswordViewModel.Response?>(thisWindow);
 
         if (inputPasswordResult?.Password is null)
             return;
@@ -123,7 +123,7 @@ public partial class InitialSelectionViewModel : ValtModalViewModel
         var inputPasswordModal =
             (InputPasswordView)await _modalFactory!.CreateAsync(ApplicationModalNames.InputPassword, thisWindow)!;
 
-        var inputPasswordResult = await inputPasswordModal.ShowDialog<InputPasswordViewModel.Response?>(thisWindow);
+        var inputPasswordResult = await inputPasswordModal.ShowDialogSafeAsync<InputPasswordViewModel.Response?>(thisWindow);
 
         if (inputPasswordResult?.Password is null)
             return;

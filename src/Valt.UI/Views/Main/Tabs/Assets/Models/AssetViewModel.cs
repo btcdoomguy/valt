@@ -20,6 +20,7 @@ public partial class AssetViewModel : ObservableObject
     public bool Visible { get; }
     public DateTime LastPriceUpdateAt { get; }
     public string CurrencyCode { get; }
+    public string? GroupId { get; }
 
     // Selection state for card visuals (hover handled via CSS :pointerover)
     [ObservableProperty]
@@ -174,6 +175,7 @@ public partial class AssetViewModel : ObservableObject
         Visible = dto.Visible;
         LastPriceUpdateAt = dto.LastPriceUpdateAt;
         CurrencyCode = dto.CurrencyCode;
+        GroupId = dto.GroupId;
         CurrentPrice = dto.CurrentPrice;
         CurrentValue = dto.CurrentValue;
 

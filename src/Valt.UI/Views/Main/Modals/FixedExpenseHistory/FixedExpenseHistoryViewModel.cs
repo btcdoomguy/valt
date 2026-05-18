@@ -134,7 +134,7 @@ public partial class FixedExpenseHistoryViewModel : ValtModalViewModel
             currentWindow,
             request)!;
 
-        var result = await modal.ShowDialog<TransactionEditorViewModel.Response?>(currentWindow);
+        var result = await modal.ShowDialogSafeAsync<TransactionEditorViewModel.Response?>(currentWindow);
 
         if (result is not null && Parameter is Request originalRequest)
         {

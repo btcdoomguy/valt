@@ -3,17 +3,23 @@ using Microsoft.Extensions.Logging;
 
 namespace Valt.Infra.Crawlers.Indicators;
 
+using Valt.Infra.Crawlers.LivePriceCrawlers.Bitcoin.Providers;
+
 internal class BitcoinDominanceProvider : IBitcoinDominanceProvider
 {
     private readonly ILogger<BitcoinDominanceProvider> _logger;
+    private readonly CoinGeckoRateLimiter _rateLimiter;
 
-    public BitcoinDominanceProvider(ILogger<BitcoinDominanceProvider> logger)
+    public BitcoinDominanceProvider(ILogger<BitcoinDominanceProvider> logger, CoinGeckoRateLimiter rateLimiter)
     {
         _logger = logger;
+        _rateLimiter = rateLimiter;
     }
 
     public async Task<BitcoinDominanceData> GetAsync()
     {
+        await _rateLimiter.WaitAsync();
+
         using var client = new HttpClient();
         client.Timeout = TimeSpan.FromSeconds(5);
         client.DefaultRequestHeaders.UserAgent.ParseAdd("Valt/1.0");

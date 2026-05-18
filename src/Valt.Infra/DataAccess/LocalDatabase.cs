@@ -301,8 +301,14 @@ internal sealed class LocalDatabase : ILocalDatabase
         collection.EnsureIndex(x => x.Visible);
         collection.EnsureIndex(x => x.IncludeInNetWorth);
         collection.EnsureIndex(x => x.DisplayOrder);
+        collection.EnsureIndex(x => x.GroupId);
 
         return collection;
+    }
+
+    public ILiteCollection<AssetGroupEntity> GetAssetGroups()
+    {
+        return GetOpenDatabase().GetCollection<AssetGroupEntity>("asset_groups");
     }
 
     #endregion

@@ -41,7 +41,7 @@ internal sealed class CreateGoalHandler : ICommandHandler<CreateGoalCommand, Cre
             return Result<CreateGoalResult>.Failure(goalTypeResult.Error!);
 
         var period = (GoalPeriods)command.Period;
-        var goal = Goal.New(command.RefDate, period, goalTypeResult.Value!);
+        var goal = Goal.New(command.RefDate, period, goalTypeResult.Value!, command.StartDate);
 
         await _goalRepository.SaveAsync(goal);
 

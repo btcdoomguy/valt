@@ -224,7 +224,7 @@ public partial class SettingsViewModel : ValtModalViewModel
         var modal =
             (ChangePasswordView)await _modalFactory.CreateAsync(ApplicationModalNames.ChangePassword, OwnerWindow)!;
 
-        await modal.ShowDialog(OwnerWindow!);
+        await modal.ShowDialogSafeAsync(OwnerWindow!);
     }
     
     [RelayCommand]

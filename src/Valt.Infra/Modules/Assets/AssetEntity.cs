@@ -15,5 +15,6 @@ public class AssetEntity
     [BsonField("lastPriceUpdate")] public DateTime LastPriceUpdateAt { get; set; }
     [BsonField("created")] public DateTime CreatedAt { get; set; }
     [BsonField("displayOrder")] public int DisplayOrder { get; set; }
+    [BsonField("groupId")] public ObjectId? GroupId { get; set; }
     [BsonField("v")] public int Version { get; set; }
 }

@@ -19,6 +19,7 @@ public class AssetBuilder
     private DateTime _lastPriceUpdateAt = DateTime.UtcNow;
     private DateTime _createdAt = DateTime.UtcNow;
     private int _displayOrder = 0;
+    private AssetGroupId? _groupId = null;
     private int _version = 1;
 
     public AssetBuilder WithId(AssetId id)
@@ -114,6 +115,12 @@ public class AssetBuilder
         return this;
     }
 
+    public AssetBuilder WithGroupId(AssetGroupId? groupId)
+    {
+        _groupId = groupId;
+        return this;
+    }
+
     public AssetBuilder WithVersion(int version)
     {
         _version = version;
@@ -123,7 +130,7 @@ public class AssetBuilder
     public Asset Build()
     {
         return Asset.Create(_id, _name, _details, _icon, _includeInNetWorth, _visible,
-            _lastPriceUpdateAt, _createdAt, _displayOrder, _version);
+            _lastPriceUpdateAt, _createdAt, _displayOrder, _groupId, _version);
     }
 
     // Static factory methods

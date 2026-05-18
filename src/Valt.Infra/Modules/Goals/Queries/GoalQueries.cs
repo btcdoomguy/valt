@@ -24,7 +24,8 @@ internal class GoalQueries : IGoalQueries
             {
                 var period = (GoalPeriods)entity.PeriodId;
                 var refDate = DateOnly.FromDateTime(entity.RefDate);
-                var (from, to) = GetPeriodRange(refDate, period);
+                var startDate = entity.StartDate.HasValue ? DateOnly.FromDateTime(entity.StartDate.Value) : (DateOnly?)null;
+                var (from, to) = GetPeriodRange(refDate, period, startDate);
 
                 return new StaleGoalDTO(
                     entity.Id.ToString(),
@@ -51,7 +52,8 @@ internal class GoalQueries : IGoalQueries
             {
                 var refDate = DateOnly.FromDateTime(g.RefDate);
                 var period = (GoalPeriods)g.PeriodId;
-                var range = GetPeriodRange(refDate, period);
+                var startDate = g.StartDate.HasValue ? DateOnly.FromDateTime(g.StartDate.Value) : (DateOnly?)null;
+                var range = GetPeriodRange(refDate, period, startDate);
                 return date >= range.From && date <= range.To;
             });
         }
@@ -97,6 +99,7 @@ internal class GoalQueries : IGoalQueries
             Id = entity.Id.ToString(),
             RefDate = DateOnly.FromDateTime(entity.RefDate),
             Period = entity.PeriodId,
+            StartDate = entity.StartDate.HasValue ? DateOnly.FromDateTime(entity.StartDate.Value) : null,
             Progress = entity.Progress,
             IsUpToDate = entity.IsUpToDate,
             LastUpdatedAt = entity.LastUpdatedAt,
@@ -235,7 +238,7 @@ internal class GoalQueries : IGoalQueries
         };
     }
 
-    private static (DateOnly From, DateOnly To) GetPeriodRange(DateOnly refDate, GoalPeriods period)
+    private static (DateOnly From, DateOnly To) GetPeriodRange(DateOnly refDate, GoalPeriods period, DateOnly? startDate = null)
     {
         return period switch
         {
@@ -243,7 +246,7 @@ internal class GoalQueries : IGoalQueries
                 new DateOnly(refDate.Year, refDate.Month, 1),
                 new DateOnly(refDate.Year, refDate.Month, DateTime.DaysInMonth(refDate.Year, refDate.Month))),
             GoalPeriods.Yearly => (
-                new DateOnly(refDate.Year, 1, 1),
+                startDate ?? new DateOnly(refDate.Year, 1, 1),
                 new DateOnly(refDate.Year, 12, 31)),
             _ => throw new ArgumentOutOfRangeException(nameof(period))
         };

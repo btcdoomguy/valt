@@ -15,6 +15,7 @@ public record AssetDTO
     public required DateTime LastPriceUpdateAt { get; init; }
     public required DateTime CreatedAt { get; init; }
     public required int DisplayOrder { get; init; }
+    public string? GroupId { get; init; }
 
     // Price and value information
     public required decimal CurrentPrice { get; init; }

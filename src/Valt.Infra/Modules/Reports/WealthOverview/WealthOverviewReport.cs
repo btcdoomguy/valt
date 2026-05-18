@@ -91,6 +91,15 @@ internal class WealthOverviewReport : IWealthOverviewReport
             var lastPeriodEnd = periodEndDates.LastOrDefault();
             var maxCalculationDate = lastPeriodEnd > _today ? _today : lastPeriodEnd;
 
+            // Advance past period ends that occur before the first day the main loop will visit.
+            // Otherwise periodIndex would get stuck on a date we never iterate over,
+            // and all subsequent period ends would be mis-handled by the future-period loop.
+            var firstLoopDate = startDate.AddDays(1);
+            while (periodIndex < periodEndDates.Count && periodEndDates[periodIndex] < firstLoopDate)
+            {
+                periodIndex++;
+            }
+
             while (currentDate <= maxCalculationDate)
             {
                 currentDate = currentDate.AddDays(1);
@@ -136,7 +145,7 @@ internal class WealthOverviewReport : IWealthOverviewReport
             while (periodIndex < periodEndDates.Count)
             {
                 var periodEnd = periodEndDates[periodIndex];
-                if (periodEnd >= _provider.MinTransactionDate)
+                if (periodEnd > maxCalculationDate)
                 {
                     var (fiatTotal, btcTotal) = CalculateTotalsAtDate(_today, accountBalances, bitcoinTotal);
                     var label = GetLabelForPeriod(periodEnd);

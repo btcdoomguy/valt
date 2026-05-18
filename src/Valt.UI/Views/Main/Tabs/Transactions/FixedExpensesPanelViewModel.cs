@@ -185,7 +185,7 @@ public partial class FixedExpensesPanelViewModel : ValtViewModel, IDisposable
             ApplicationModalNames.FixedExpenseOverview,
             ownerWindow, null)!;
 
-        _ = await window.ShowDialog<FixedExpenseOverviewViewModel.Response?>(ownerWindow!);
+        _ = await window.ShowDialogSafeAsync<FixedExpenseOverviewViewModel.Response?>(ownerWindow!);
 
         await FetchFixedExpenses();
     }
@@ -199,7 +199,7 @@ public partial class FixedExpensesPanelViewModel : ValtViewModel, IDisposable
             ApplicationModalNames.ManageFixedExpenses,
             ownerWindow, null)!;
 
-        _ = await window.ShowDialog<ManageFixedExpensesViewModel.Response?>(ownerWindow!);
+        _ = await window.ShowDialogSafeAsync<ManageFixedExpensesViewModel.Response?>(ownerWindow!);
 
         await FetchFixedExpenses();
     }
@@ -219,7 +219,7 @@ public partial class FixedExpensesPanelViewModel : ValtViewModel, IDisposable
                 FixedExpenseId = entry.Id
             })!;
 
-        _ = await window.ShowDialog<FixedExpenseEditorViewModel.Response?>(ownerWindow!);
+        _ = await window.ShowDialogSafeAsync<FixedExpenseEditorViewModel.Response?>(ownerWindow!);
 
         await FetchFixedExpenses();
     }
@@ -238,7 +238,7 @@ public partial class FixedExpensesPanelViewModel : ValtViewModel, IDisposable
                 FixedExpenseId = entry.Id
             })!;
 
-        _ = await window.ShowDialog<object?>(ownerWindow!);
+        _ = await window.ShowDialogSafeAsync<object?>(ownerWindow!);
     }
 
     [RelayCommand]
@@ -281,7 +281,7 @@ public partial class FixedExpensesPanelViewModel : ValtViewModel, IDisposable
                 ownerWindow,
                 request)!;
 
-        var result = await modal.ShowDialog<TransactionEditorViewModel.Response?>(ownerWindow);
+        var result = await modal.ShowDialogSafeAsync<TransactionEditorViewModel.Response?>(ownerWindow);
 
         if (result is null)
             return;

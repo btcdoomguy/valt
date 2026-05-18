@@ -7,7 +7,11 @@ using Valt.App.Modules.Assets.Commands.CreateBtcLending;
 using Valt.App.Modules.Assets.Commands.CreateBtcLoan;
 using Valt.App.Modules.Assets.Commands.CreateLeveragedPosition;
 using Valt.App.Modules.Assets.Commands.CreateRealEstateAsset;
+using Valt.App.Modules.Assets.Commands.CreateAssetGroup;
 using Valt.App.Modules.Assets.Commands.DeleteAsset;
+using Valt.App.Modules.Assets.Commands.DeleteAssetGroup;
+using Valt.App.Modules.Assets.Commands.EditAssetGroup;
+using Valt.App.Modules.Assets.Commands.MoveAssetToGroup;
 using Valt.App.Modules.Assets.Commands.RepayLoan;
 using Valt.App.Modules.Assets.Commands.SetAssetIncludeInNetWorth;
 using Valt.App.Modules.Assets.Commands.SetAssetVisibility;
@@ -15,6 +19,7 @@ using Valt.App.Modules.Assets.Commands.UpdateAssetPrice;
 using Valt.App.Modules.Assets.Commands.UpdateAssetQuantity;
 using Valt.App.Modules.Assets.DTOs;
 using Valt.App.Modules.Assets.Queries.GetAsset;
+using Valt.App.Modules.Assets.Queries.GetAssetGroups;
 using Valt.App.Modules.Assets.Queries.GetAssets;
 using Valt.App.Modules.Assets.Queries.GetAssetSummary;
 using Valt.App.Modules.Assets.Queries.GetVisibleAssets;
@@ -465,5 +470,139 @@ public class AssetTools
 
         await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Asset {assetId} deleted successfully";
+    }
+
+    /// <summary>
+    /// Gets all asset groups.
+    /// </summary>
+    [McpServerTool, Description("Get all asset groups")]
+    public static async Task<IReadOnlyList<AssetGroupDTO>> GetAssetGroups(
+        IQueryDispatcher queryDispatcher)
+    {
+        return await queryDispatcher.DispatchAsync(new GetAssetGroupsQuery());
+    }
+
+    /// <summary>
+    /// Creates an asset group.
+    /// </summary>
+    [McpServerTool, Description("Create an asset group")]
+    public static async Task<string> CreateAssetGroup(
+        ICommandDispatcher commandDispatcher,
+        INotificationPublisher publisher,
+        [Description("Group name")] string name,
+        [Description("Group description")] string description = "")
+    {
+        var result = await commandDispatcher.DispatchAsync(new CreateAssetGroupCommand
+        {
+            Name = name,
+            Description = description
+        });
+
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error!.Message}";
+        }
+
+        await publisher.PublishAsync(new McpDataChangedNotification());
+        return $"Asset group created with ID: {result.Value}";
+    }
+
+    /// <summary>
+    /// Updates an asset group.
+    /// </summary>
+    [McpServerTool, Description("Update an asset group name and description")]
+    public static async Task<string> UpdateAssetGroup(
+        ICommandDispatcher commandDispatcher,
+        INotificationPublisher publisher,
+        [Description("The asset group ID")] string groupId,
+        [Description("New group name")] string name,
+        [Description("New group description")] string description = "")
+    {
+        var result = await commandDispatcher.DispatchAsync(new EditAssetGroupCommand
+        {
+            GroupId = groupId,
+            Name = name,
+            Description = description
+        });
+
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error!.Message}";
+        }
+
+        await publisher.PublishAsync(new McpDataChangedNotification());
+        return $"Asset group {groupId} updated";
+    }
+
+    /// <summary>
+    /// Deletes an asset group. Assets in the group become ungrouped.
+    /// </summary>
+    [McpServerTool, Description("Delete an asset group. Assets in the group will become ungrouped.")]
+    public static async Task<string> DeleteAssetGroup(
+        ICommandDispatcher commandDispatcher,
+        INotificationPublisher publisher,
+        [Description("The asset group ID to delete")] string groupId)
+    {
+        var result = await commandDispatcher.DispatchAsync(new DeleteAssetGroupCommand
+        {
+            GroupId = groupId
+        });
+
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error!.Message}";
+        }
+
+        await publisher.PublishAsync(new McpDataChangedNotification());
+        return $"Asset group {groupId} deleted";
+    }
+
+    /// <summary>
+    /// Moves an asset to a group.
+    /// </summary>
+    [McpServerTool, Description("Move an asset to an asset group")]
+    public static async Task<string> MoveAssetToGroup(
+        ICommandDispatcher commandDispatcher,
+        INotificationPublisher publisher,
+        [Description("The asset ID")] string assetId,
+        [Description("The target group ID")] string groupId)
+    {
+        var result = await commandDispatcher.DispatchAsync(new MoveAssetToGroupCommand
+        {
+            AssetId = assetId,
+            TargetGroupId = groupId
+        });
+
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error!.Message}";
+        }
+
+        await publisher.PublishAsync(new McpDataChangedNotification());
+        return $"Asset {assetId} moved to group {groupId}";
+    }
+
+    /// <summary>
+    /// Removes an asset from its group.
+    /// </summary>
+    [McpServerTool, Description("Remove an asset from its group")]
+    public static async Task<string> RemoveAssetFromGroup(
+        ICommandDispatcher commandDispatcher,
+        INotificationPublisher publisher,
+        [Description("The asset ID")] string assetId)
+    {
+        var result = await commandDispatcher.DispatchAsync(new MoveAssetToGroupCommand
+        {
+            AssetId = assetId,
+            TargetGroupId = null
+        });
+
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error!.Message}";
+        }
+
+        await publisher.PublishAsync(new McpDataChangedNotification());
+        return $"Asset {assetId} removed from group";
     }
 }

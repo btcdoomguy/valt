@@ -46,7 +46,7 @@ internal sealed class EditGoalHandler : ICommandHandler<EditGoalCommand, EditGoa
             return Result<EditGoalResult>.Failure(goalTypeResult.Error!);
 
         var period = (GoalPeriods)command.Period;
-        goal.Edit(command.RefDate, period, goalTypeResult.Value!);
+        goal.Edit(command.RefDate, period, goalTypeResult.Value!, command.StartDate);
 
         await _goalRepository.SaveAsync(goal);
 

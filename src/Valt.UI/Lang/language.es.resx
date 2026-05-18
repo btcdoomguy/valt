@@ -1932,6 +1932,9 @@
     <data name="ManageGoal_Month" xml:space="preserve">
         <value>Mes</value>
     </data>
+    <data name="ManageGoal_StartDate" xml:space="preserve">
+        <value>Fecha de Inicio</value>
+    </data>
     <data name="ManageGoal_GoalType" xml:space="preserve">
         <value>Tipo de Meta</value>
     </data>
@@ -2369,6 +2372,39 @@
     </data>
     <data name="Assets.Help.SellingDescription" xml:space="preserve">
         <value>Usa la opción Vender (clic derecho) para registrar ganancias o pérdidas como transacción en tus cuentas.</value>
+    </data>
+    <data name="Assets_ManageGroups" xml:space="preserve">
+        <value>Gestionar Grupos</value>
+    </data>
+    <data name="Assets_EditGroup" xml:space="preserve">
+        <value>Editar Grupo</value>
+    </data>
+    <data name="Assets_DeleteGroup" xml:space="preserve">
+        <value>Eliminar Grupo</value>
+    </data>
+    <data name="Assets_DeleteGroupConfirmation" xml:space="preserve">
+        <value>¿Eliminar este grupo? Los activos de este grupo quedarán sin grupo.</value>
+    </data>
+    <data name="Assets_MoveToGroup" xml:space="preserve">
+        <value>Mover al Grupo</value>
+    </data>
+    <data name="Assets_RemoveFromGroup" xml:space="preserve">
+        <value>Quitar del Grupo</value>
+    </data>
+    <data name="ManageAssetGroup_Title" xml:space="preserve">
+        <value>Grupo de Activos</value>
+    </data>
+    <data name="ManageAssetGroup_Name" xml:space="preserve">
+        <value>Nombre</value>
+    </data>
+    <data name="ManageAssetGroup_Description" xml:space="preserve">
+        <value>Descripción</value>
+    </data>
+    <data name="Error_AssetGroupNotFound" xml:space="preserve">
+        <value>Grupo de activos no encontrado.</value>
+    </data>
+    <data name="ManageAssetGroupsList_Title" xml:space="preserve">
+        <value>Gestionar Grupos de Activos</value>
     </data>
     <data name="Menu_LeverageSimulator" xml:space="preserve">
         <value>Simulador de Apalancamiento</value>

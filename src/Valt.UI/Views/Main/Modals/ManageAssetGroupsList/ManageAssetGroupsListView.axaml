@@ -1,0 +1,103 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:lang="clr-namespace:Valt.UI.Lang"
+        xmlns:manageAssetGroupsList="clr-namespace:Valt.UI.Views.Main.Modals.ManageAssetGroupsList"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Views.Main.Modals.ManageAssetGroupsList.ManageAssetGroupsListView"
+        x:Name="Root"
+        Title="{x:Static lang:language.ManageAssetGroupsList_Title}"
+        x:DataType="manageAssetGroupsList:ManageAssetGroupsListViewModel"
+        d:DesignWidth="500"
+        d:DesignHeight="400"
+        MinWidth="450"
+        MinHeight="350"
+        MaxWidth="600"
+        MaxHeight="500"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <manageAssetGroupsList:ManageAssetGroupsListViewModel />
+    </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" />
+    </Window.KeyBindings>
+    <Border>
+        <Grid RowDefinitions="Auto, *, Auto">
+            <userControls:CustomTitleBar Grid.Row="0"
+                                         Title="{x:Static lang:language.ManageAssetGroupsList_Title}"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+            <Border Grid.Row="1"
+                    Background="{DynamicResource Background700Brush}"
+                    BorderBrush="{DynamicResource Background500Brush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Margin="10,10,10,0">
+                <ListBox ItemsSource="{Binding AssetGroups}"
+                         SelectedItem="{Binding SelectedAssetGroup, Mode=TwoWay}"
+                         Margin="8">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="manageAssetGroupsList:ManageAssetGroupsListViewModel+AssetGroupListItemViewModel">
+                            <Grid ColumnDefinitions="*, Auto, Auto">
+                                <StackPanel Grid.Column="0" Orientation="Vertical" Margin="4" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Name}"
+                                               FontSize="{DynamicResource FontSizeSmall}"
+                                               Foreground="{DynamicResource Text400Brush}"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding Description}"
+                                               FontSize="{DynamicResource FontSizeSmall}"
+                                               Foreground="{DynamicResource Text500Brush}"
+                                               IsVisible="{Binding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                </StackPanel>
+                                <Button Grid.Column="1"
+                                        Classes="transparent"
+                                        Width="28"
+                                        Height="28"
+                                        Margin="4,0,0,0"
+                                        Command="{Binding #Root.((manageAssetGroupsList:ManageAssetGroupsListViewModel)DataContext).EditAssetGroupCommand}"
+                                        CommandParameter="{Binding .}">
+                                    <TextBlock Classes="icon"
+                                               FontSize="18"
+                                               Text="&#xE3C9;"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                </Button>
+                                <Button Grid.Column="2"
+                                        Classes="transparent"
+                                        Width="28"
+                                        Height="28"
+                                        Margin="4,0,0,0"
+                                        Command="{Binding #Root.((manageAssetGroupsList:ManageAssetGroupsListViewModel)DataContext).DeleteAssetGroupCommand}"
+                                        CommandParameter="{Binding .}">
+                                    <TextBlock Classes="icon"
+                                               FontSize="18"
+                                               Text="&#xE872;"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+            <StackPanel Grid.Row="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        Spacing="10"
+                        Margin="0,10,0,10">
+                <Button Width="120"
+                        Content="{x:Static lang:language.New}"
+                        Command="{Binding AddAssetGroupCommand}" />
+                <Button Width="120"
+                        Content="{x:Static lang:language.CloseButton}"
+                        Command="{Binding CloseCommand}" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

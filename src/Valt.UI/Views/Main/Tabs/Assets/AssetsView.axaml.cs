@@ -93,4 +93,13 @@ public partial class AssetsView : ValtBaseUserControl
             e.Handled = true;
         }
     }
+
+    private void MoveToGroupMenu_OnSubmenuOpened(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuItem menuItem) return;
+        if (menuItem.DataContext is not AssetViewModel asset) return;
+        if (DataContext is not AssetsViewModel vm) return;
+
+        vm.SetContextMenuAssetCommand.Execute(asset);
+    }
 }

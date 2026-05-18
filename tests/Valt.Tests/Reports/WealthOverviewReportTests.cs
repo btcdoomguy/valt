@@ -126,6 +126,27 @@ public class WealthOverviewReportTests : DatabaseTest
     }
 
     [Test]
+    public async Task Should_Not_Duplicate_Values_When_Monthly_Data_Is_Sparse()
+    {
+        // Clock set to January 17, 2025 - only 2 days after first transaction (Jan 15)
+        // Monthly period with 12 max points would generate 12 month-ends, but only
+        // the current month-end (Jan 31) is genuinely in the future. Earlier periods
+        // have no data and should be omitted rather than filled with today's balance.
+        var clock = new FakeClock(new DateTime(2025, 1, 17));
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var report = new WealthOverviewReport(clock, new NullLogger<WealthOverviewReport>());
+
+        var result = await report.GetAsync(WealthOverviewPeriod.Monthly, FiatCurrency.Usd, provider, maxDataPoints: 12);
+
+        // Should not pad with identical values — expect far fewer than 12 items
+        Assert.That(result.Items.Count, Is.LessThan(12));
+        Assert.That(result.Items.Count, Is.GreaterThan(0));
+
+        // The only returned item(s) should be future/current month-ends, not historical
+        Assert.That(result.Items.All(x => x.PeriodEnd >= new DateOnly(2025, 1, 15)), Is.True);
+    }
+
+    [Test]
     public async Task Should_Return_Monthly_Data_For_Last_12_Months()
     {
         var clock = new FakeClock(new DateTime(2025, 1, 25));

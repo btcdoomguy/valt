@@ -32,6 +32,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowMonthSelector))]
+    [NotifyPropertyChangedFor(nameof(ShowStartDateSelector))]
     private string _selectedPeriod = GoalPeriods.Monthly.ToString();
 
     [ObservableProperty]
@@ -39,6 +40,9 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
 
     [ObservableProperty]
     private int _selectedYear = DateTime.Today.Year;
+
+    [ObservableProperty]
+    private DateTime? _selectedStartDate = new DateTime(DateTime.Today.Year, 1, 1);
 
     [ObservableProperty]
     private string _selectedGoalType = GoalTypeNames.StackBitcoin.ToString();
@@ -50,6 +54,8 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     private bool _isEditMode;
 
     public bool ShowMonthSelector => SelectedPeriod == GoalPeriods.Monthly.ToString();
+
+    public bool ShowStartDateSelector => SelectedPeriod == GoalPeriods.Yearly.ToString();
 
     public static List<ComboBoxValue> AvailablePeriods =>
     [
@@ -89,6 +95,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     {
         SelectedPeriod = GoalPeriods.Monthly.ToString();
         SelectedGoalType = GoalTypeNames.StackBitcoin.ToString();
+        SelectedStartDate = new DateTime(DateTime.Today.Year, 1, 1);
         CurrentGoalTypeEditor = new StackBitcoinGoalTypeEditorViewModel();
     }
 
@@ -103,6 +110,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
 
         SelectedPeriod = GoalPeriods.Monthly.ToString();
         SelectedGoalType = GoalTypeNames.StackBitcoin.ToString();
+        SelectedStartDate = new DateTime(DateTime.Today.Year, 1, 1);
         CurrentGoalTypeEditor = CreateEditorForGoalType(GoalTypeNames.StackBitcoin);
     }
 
@@ -157,6 +165,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
             SelectedPeriod = ((GoalPeriods)goal.Period).ToString();
             SelectedYear = goal.RefDate.Year;
             SelectedMonth = goal.RefDate.Month.ToString();
+            SelectedStartDate = goal.StartDate.HasValue ? goal.StartDate.Value.ToDateTime(TimeOnly.MinValue) : new DateTime(goal.RefDate.Year, 1, 1);
             SelectedGoalType = ((GoalTypeNames)goal.GoalType.TypeId).ToString();
 
             CurrentGoalTypeEditor?.LoadFromDTO(goal.GoalType);
@@ -173,6 +182,9 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
             var period = Enum.Parse<GoalPeriods>(SelectedPeriod);
             var month = period == GoalPeriods.Yearly ? 1 : int.Parse(SelectedMonth);
             var refDate = new DateOnly(SelectedYear, month, 1);
+            var startDate = period == GoalPeriods.Yearly && SelectedStartDate.HasValue
+                ? DateOnly.FromDateTime(SelectedStartDate.Value)
+                : (DateOnly?)null;
             var goalTypeDto = CurrentGoalTypeEditor.CreateGoalTypeDTO();
 
             if (_goalId is null)
@@ -181,6 +193,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
                 {
                     RefDate = refDate,
                     Period = (int)period,
+                    StartDate = startDate,
                     GoalType = goalTypeDto
                 });
 
@@ -200,6 +213,7 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
                     GoalId = _goalId,
                     RefDate = refDate,
                     Period = (int)period,
+                    StartDate = startDate,
                     GoalType = goalTypeDto
                 });
 

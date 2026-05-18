@@ -10,16 +10,20 @@ internal class CoinGeckoProvider : IBitcoinPriceProvider
 {
     private readonly IClock _clock;
     private readonly ILogger<CoinGeckoProvider> _logger;
+    private readonly CoinGeckoRateLimiter _rateLimiter;
     public string Name => "coingecko";
 
-    public CoinGeckoProvider(IClock clock, ILogger<CoinGeckoProvider> logger)
+    public CoinGeckoProvider(IClock clock, ILogger<CoinGeckoProvider> logger, CoinGeckoRateLimiter rateLimiter)
     {
         _clock = clock;
         _logger = logger;
+        _rateLimiter = rateLimiter;
     }
 
     public async Task<BtcPrice> GetAsync()
     {
+        await _rateLimiter.WaitAsync();
+
         using var client = new HttpClient();
         client.Timeout = TimeSpan.FromSeconds(15);
         client.DefaultRequestHeaders.UserAgent.ParseAdd("Valt/1.0");

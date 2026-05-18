@@ -48,6 +48,7 @@ public abstract class DatabaseTest
     protected ITransactionRepository _transactionRepository;
     protected IAccountRepository _accountRepository;
     protected IAccountGroupRepository _accountGroupRepository;
+    protected IAssetGroupRepository _assetGroupRepository;
     protected ICategoryRepository _categoryRepository;
     protected IFixedExpenseRepository _fixedExpenseRepository;
     protected IGoalRepository _goalRepository;
@@ -75,6 +76,7 @@ public abstract class DatabaseTest
         _categoryRepository = new CategoryRepository(_localDatabase);
         _accountRepository = new AccountRepository(_localDatabase, _domainEventPublisher);
         _accountGroupRepository = new AccountGroupRepository(_localDatabase);
+        _assetGroupRepository = new AssetGroupRepository(_localDatabase);
         _fixedExpenseRepository = new FixedExpenseRepository(_localDatabase, _domainEventPublisher);
         _goalRepository = new GoalRepository(_localDatabase, _domainEventPublisher);
         _avgPriceRepository = new AvgPriceRepository(_localDatabase, _domainEventPublisher);

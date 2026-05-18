@@ -834,7 +834,7 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         var window =
             (ConversionCalculatorView)await _modalFactory.CreateAsync(ApplicationModalNames.ConversionCalculator, GetWindow!(), request)!;
 
-        var result = await window.ShowDialog<ConversionCalculatorViewModel.Response?>(GetWindow!());
+        var result = await window.ShowDialogSafeAsync<ConversionCalculatorViewModel.Response?>(GetWindow!());
 
         if (result is null)
             return;

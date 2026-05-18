@@ -62,6 +62,14 @@
                         </StackPanel>
                     </StackPanel>
 
+                    <!-- Start Date Field (Yearly only) -->
+                    <StackPanel Classes="form-field" IsVisible="{Binding ShowStartDateSelector}">
+                        <TextBlock Text="{x:Static local:language.ManageGoal_StartDate}"
+                                   Margin="0, 8, 0, 0" />
+                        <CalendarDatePicker SelectedDate="{Binding SelectedStartDate}"
+                                            Width="200" />
+                    </StackPanel>
+
                     <!-- Goal Type Field -->
                     <StackPanel Classes="form-field">
                         <TextBlock Text="{x:Static local:language.ManageGoal_GoalType}" />

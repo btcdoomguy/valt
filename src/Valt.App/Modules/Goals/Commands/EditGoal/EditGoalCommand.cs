@@ -18,6 +18,11 @@ public record EditGoalCommand : ICommand<EditGoalResult>
     public required int Period { get; init; }
 
     /// <summary>
+    /// Start date for the goal period. Only used for Yearly goals.
+    /// </summary>
+    public DateOnly? StartDate { get; init; }
+
+    /// <summary>
     /// The goal type configuration.
     /// </summary>
     public required GoalTypeInputDTO GoalType { get; init; }
