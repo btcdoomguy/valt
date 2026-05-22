@@ -138,6 +138,12 @@
     <data name="ManageAccountGroup.Name" xml:space="preserve">
         <value>Nome</value>
     </data>
+    <data name="ManageAccountGroup.TotalCurrency" xml:space="preserve">
+        <value>Moeda do Total</value>
+    </data>
+    <data name="ManageAccountGroup.DefaultFiatCurrency" xml:space="preserve">
+        <value>Moeda Fiat Padrão</value>
+    </data>
     <data name="ManageCategories.Delete" xml:space="preserve">
         <value>Excluir</value>
     </data>

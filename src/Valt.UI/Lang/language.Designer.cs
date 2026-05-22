@@ -333,6 +333,18 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string ManageAccountGroup_TotalCurrency {
+            get {
+                return ResourceManager.GetString("ManageAccountGroup.TotalCurrency", resourceCulture);
+            }
+        }
+        
+        public static string ManageAccountGroup_DefaultFiatCurrency {
+            get {
+                return ResourceManager.GetString("ManageAccountGroup.DefaultFiatCurrency", resourceCulture);
+            }
+        }
+        
         public static string ManageCategories_Title {
             get {
                 return ResourceManager.GetString("ManageCategories.Title", resourceCulture);

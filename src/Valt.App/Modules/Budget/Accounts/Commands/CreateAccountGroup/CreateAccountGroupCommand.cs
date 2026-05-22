@@ -5,6 +5,7 @@ namespace Valt.App.Modules.Budget.Accounts.Commands.CreateAccountGroup;
 public record CreateAccountGroupCommand : ICommand<CreateAccountGroupResult>
 {
     public required string Name { get; init; }
+    public string? TotalCurrency { get; init; }
 }
 
 public record CreateAccountGroupResult(string GroupId);

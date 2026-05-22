@@ -7,11 +7,11 @@
         xmlns:manageAccountGroup="clr-namespace:Valt.UI.Views.Main.Modals.ManageAccountGroup"
         mc:Ignorable="d"
         d:DesignWidth="400"
-        d:DesignHeight="200"
+        d:DesignHeight="280"
         MinWidth="400"
-        MinHeight="200"
+        MinHeight="280"
         MaxWidth="400"
-        MaxHeight="200"
+        MaxHeight="280"
         x:Class="Valt.UI.Views.Main.Modals.ManageAccountGroup.ManageAccountGroupView"
         x:DataType="manageAccountGroup:ManageAccountGroupViewModel"
         Title="{x:Static local:language.ManageAccountGroup_Title}"
@@ -30,13 +30,23 @@
             <userControls:CustomTitleBar Title="{x:Static local:language.ManageAccountGroup_Title}"
                                          TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
-            <Border Classes="form-fields-area" Height="120">
+            <Border Classes="form-fields-area" Height="200">
                 <StackPanel>
                     <!-- Name Field -->
                     <StackPanel Classes="form-field">
                         <TextBlock Text="{x:Static local:language.ManageAccountGroup_Name}"
                                    Margin="0, 8, 0, 0" />
                         <TextBox Text="{Binding Name}" />
+                    </StackPanel>
+                    <!-- Total Currency Field -->
+                    <StackPanel Classes="form-field">
+                        <TextBlock Text="{x:Static local:language.ManageAccountGroup_TotalCurrency}"
+                                   Margin="0, 8, 0, 0" />
+                        <ComboBox ItemsSource="{Binding AvailableTotalCurrencies}"
+                                  DisplayMemberBinding="{Binding Text}"
+                                  SelectedValueBinding="{Binding Value}"
+                                  SelectedValue="{Binding SelectedTotalCurrency}"
+                                  Width="360" />
                     </StackPanel>
                 </StackPanel>
             </Border>

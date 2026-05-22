@@ -26,6 +26,13 @@ internal sealed class CreateAccountGroupHandler : ICommandHandler<CreateAccountG
                 }));
 
         var group = AccountGroup.New(AccountGroupName.New(command.Name));
+
+        if (!string.IsNullOrWhiteSpace(command.TotalCurrency))
+        {
+            var totalCurrency = AccountGroupTotalCurrency.FromStorageString(command.TotalCurrency);
+            group.ChangeTotalCurrency(totalCurrency);
+        }
+
         await _accountGroupRepository.SaveAsync(group);
 
         return Result<CreateAccountGroupResult>.Success(new CreateAccountGroupResult(group.Id.Value));
