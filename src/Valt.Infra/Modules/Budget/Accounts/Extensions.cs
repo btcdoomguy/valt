@@ -115,7 +115,8 @@ public static class Extensions
             entity.Id.ToString(),
             entity.Name,
             entity.DisplayOrder,
-            entity.Version
+            entity.Version,
+            AccountGroupTotalCurrency.FromStorageString(entity.TotalCurrency)
         );
     }
 
@@ -126,7 +127,8 @@ public static class Extensions
             Id = new ObjectId(group.Id),
             Name = group.Name,
             DisplayOrder = group.DisplayOrder,
-            Version = group.Version
+            Version = group.Version,
+            TotalCurrency = group.TotalCurrency.ToStorageString()
         };
     }
 }

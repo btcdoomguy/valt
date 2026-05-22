@@ -169,10 +169,20 @@
                                                       CommandParameter="{Binding .}" />
                                         </ContextMenu>
                                     </Border.ContextMenu>
-                                    <TextBlock Text="{Binding Name}"
-                                               FontSize="{DynamicResource FontSizeSmall}"
-                                               Foreground="{DynamicResource Text400Brush}"
-                                               VerticalAlignment="Center" />
+                                    <Grid ColumnDefinitions="*, Auto">
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding Name}"
+                                                   FontSize="{DynamicResource FontSizeSmall}"
+                                                   Foreground="{DynamicResource Text400Brush}"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding FormattedTotal}"
+                                                   FontSize="{DynamicResource FontSizeSmall}"
+                                                   Foreground="{DynamicResource Text300Brush}"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Right"
+                                                   IsVisible="{Binding HasTotal}" />
+                                    </Grid>
                                 </Border>
                             </DataTemplate>
                             <!-- Account Item Template -->

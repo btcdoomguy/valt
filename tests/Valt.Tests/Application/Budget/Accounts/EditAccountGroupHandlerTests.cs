@@ -28,7 +28,8 @@ public class EditAccountGroupHandlerTests : DatabaseTest
         var command = new EditAccountGroupCommand
         {
             GroupId = group.Id.Value,
-            Name = "Updated Name"
+            Name = "Updated Name",
+            TotalCurrency = "DEFAULT"
         };
 
         var result = await _handler.HandleAsync(command);
@@ -45,7 +46,8 @@ public class EditAccountGroupHandlerTests : DatabaseTest
         var command = new EditAccountGroupCommand
         {
             GroupId = "",
-            Name = "New Name"
+            Name = "New Name",
+            TotalCurrency = "DEFAULT"
         };
 
         var result = await _handler.HandleAsync(command);
@@ -66,7 +68,8 @@ public class EditAccountGroupHandlerTests : DatabaseTest
         var command = new EditAccountGroupCommand
         {
             GroupId = group.Id.Value,
-            Name = ""
+            Name = "",
+            TotalCurrency = "DEFAULT"
         };
 
         var result = await _handler.HandleAsync(command);
@@ -84,7 +87,8 @@ public class EditAccountGroupHandlerTests : DatabaseTest
         var command = new EditAccountGroupCommand
         {
             GroupId = "000000000000000000000001",
-            Name = "New Name"
+            Name = "New Name",
+            TotalCurrency = "DEFAULT"
         };
 
         var result = await _handler.HandleAsync(command);
@@ -93,6 +97,52 @@ public class EditAccountGroupHandlerTests : DatabaseTest
         {
             Assert.That(result.IsFailure, Is.True);
             Assert.That(result.Error!.Code, Is.EqualTo("GROUP_NOT_FOUND"));
+        });
+    }
+
+    [Test]
+    public async Task HandleAsync_UpdatesTotalCurrency()
+    {
+        var group = AccountGroup.New(AccountGroupName.New("Test"));
+        await _accountGroupRepository.SaveAsync(group);
+
+        var command = new EditAccountGroupCommand
+        {
+            GroupId = group.Id.Value,
+            Name = "Test",
+            TotalCurrency = "BTC"
+        };
+
+        var result = await _handler.HandleAsync(command);
+
+        Assert.That(result.IsSuccess, Is.True);
+
+        var updatedGroup = await _accountGroupRepository.GetByIdAsync(group.Id);
+        Assert.That(updatedGroup!.TotalCurrency.Type, Is.EqualTo(AccountGroupTotalCurrency.TotalCurrencyType.Bitcoin));
+    }
+
+    [Test]
+    public async Task HandleAsync_UpdatesSpecificFiatCurrency()
+    {
+        var group = AccountGroup.New(AccountGroupName.New("Test"));
+        await _accountGroupRepository.SaveAsync(group);
+
+        var command = new EditAccountGroupCommand
+        {
+            GroupId = group.Id.Value,
+            Name = "Test",
+            TotalCurrency = "EUR"
+        };
+
+        var result = await _handler.HandleAsync(command);
+
+        Assert.That(result.IsSuccess, Is.True);
+
+        var updatedGroup = await _accountGroupRepository.GetByIdAsync(group.Id);
+        Assert.Multiple(() =>
+        {
+            Assert.That(updatedGroup!.TotalCurrency.Type, Is.EqualTo(AccountGroupTotalCurrency.TotalCurrencyType.SpecificFiat));
+            Assert.That(updatedGroup.TotalCurrency.CurrencyCode, Is.EqualTo("EUR"));
         });
     }
 }

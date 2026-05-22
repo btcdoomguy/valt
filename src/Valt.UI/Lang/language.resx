@@ -167,6 +167,12 @@
     <data name="ManageAccountGroup.Name" xml:space="preserve">
         <value>Name</value>
     </data>
+    <data name="ManageAccountGroup.TotalCurrency" xml:space="preserve">
+        <value>Total Currency</value>
+    </data>
+    <data name="ManageAccountGroup.DefaultFiatCurrency" xml:space="preserve">
+        <value>Default Fiat Currency</value>
+    </data>
     <data name="ManageCategories.Title" xml:space="preserve">
         <value>Categories</value>
     </data>

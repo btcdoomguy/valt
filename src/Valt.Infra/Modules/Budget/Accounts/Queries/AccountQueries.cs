@@ -93,7 +93,7 @@ public class AccountQueries : IAccountQueries
         var groups = _localDatabase.GetAccountGroups()
             .FindAll()
             .OrderBy(g => g.DisplayOrder)
-            .Select(g => new AccountGroupDTO(g.Id.ToString(), g.Name, g.DisplayOrder));
+            .Select(g => new AccountGroupDTO(g.Id.ToString(), g.Name, g.DisplayOrder, g.TotalCurrency));
 
         return Task.FromResult(groups);
     }

@@ -115,13 +115,69 @@ public class AccountGroupTests
         var version = 2;
 
         // Act
-        var group = AccountGroup.Create(id, name, displayOrder, version);
+        var group = AccountGroup.Create(id, name, displayOrder, version, AccountGroupTotalCurrency.DefaultFiat());
 
         // Assert
         Assert.That(group.Id, Is.EqualTo(id));
         Assert.That(group.Name.Value, Is.EqualTo("Existing Group"));
         Assert.That(group.DisplayOrder, Is.EqualTo(3));
         Assert.That(group.Version, Is.EqualTo(2));
+    }
+
+    [Test]
+    public void New_AccountGroup_Should_Have_DefaultFiat_TotalCurrency()
+    {
+        // Act
+        var group = AccountGroup.New(AccountGroupName.New("Test"));
+
+        // Assert
+        Assert.That(group.TotalCurrency.Type, Is.EqualTo(AccountGroupTotalCurrency.TotalCurrencyType.DefaultFiat));
+    }
+
+    [Test]
+    public void Should_Change_TotalCurrency()
+    {
+        // Arrange
+        var group = AccountGroup.New(AccountGroupName.New("Test"));
+
+        // Act
+        group.ChangeTotalCurrency(AccountGroupTotalCurrency.Bitcoin());
+
+        // Assert
+        Assert.That(group.TotalCurrency.Type, Is.EqualTo(AccountGroupTotalCurrency.TotalCurrencyType.Bitcoin));
+    }
+
+    [Test]
+    public void ChangeTotalCurrency_WithSameValue_Should_Not_Change()
+    {
+        // Arrange
+        var group = AccountGroup.New(AccountGroupName.New("Test"));
+        var original = group.TotalCurrency;
+
+        // Act
+        group.ChangeTotalCurrency(AccountGroupTotalCurrency.DefaultFiat());
+
+        // Assert
+        Assert.That(group.TotalCurrency, Is.EqualTo(original));
+    }
+
+    [Test]
+    public void Create_WithSpecificFiatCurrency_Should_Set_TotalCurrency()
+    {
+        // Arrange
+        var id = new AccountGroupId();
+        var name = AccountGroupName.New("Test");
+        var totalCurrency = AccountGroupTotalCurrency.Fiat("EUR");
+
+        // Act
+        var group = AccountGroup.Create(id, name, 0, 0, totalCurrency);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(group.TotalCurrency.Type, Is.EqualTo(AccountGroupTotalCurrency.TotalCurrencyType.SpecificFiat));
+            Assert.That(group.TotalCurrency.CurrencyCode, Is.EqualTo("EUR"));
+        });
     }
 
     #endregion

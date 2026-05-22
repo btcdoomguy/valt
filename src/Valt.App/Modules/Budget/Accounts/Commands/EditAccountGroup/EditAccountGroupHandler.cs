@@ -39,6 +39,8 @@ internal sealed class EditAccountGroupHandler : ICommandHandler<EditAccountGroup
                 "GROUP_NOT_FOUND", $"Account group with id {command.GroupId} not found");
 
         group.Rename(AccountGroupName.New(command.Name));
+        var totalCurrency = AccountGroupTotalCurrency.FromStorageString(command.TotalCurrency);
+        group.ChangeTotalCurrency(totalCurrency);
         await _accountGroupRepository.SaveAsync(group);
 
         return Result<EditAccountGroupResult>.Success(new EditAccountGroupResult());

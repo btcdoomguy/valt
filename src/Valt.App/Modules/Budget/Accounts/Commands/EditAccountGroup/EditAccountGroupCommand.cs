@@ -6,6 +6,7 @@ public record EditAccountGroupCommand : ICommand<EditAccountGroupResult>
 {
     public required string GroupId { get; init; }
     public required string Name { get; init; }
+    public required string TotalCurrency { get; init; }
 }
 
 public record EditAccountGroupResult;

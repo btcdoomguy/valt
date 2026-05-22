@@ -75,4 +75,55 @@ public class CreateAccountGroupHandlerTests : DatabaseTest
         Assert.That(result2.IsSuccess, Is.True);
         Assert.That(result1.Value!.GroupId, Is.Not.EqualTo(result2.Value!.GroupId));
     }
+
+    [Test]
+    public async Task HandleAsync_WithTotalCurrency_SetsTotalCurrency()
+    {
+        var command = new CreateAccountGroupCommand
+        {
+            Name = "Savings",
+            TotalCurrency = "BTC"
+        };
+
+        var result = await _handler.HandleAsync(command);
+
+        Assert.That(result.IsSuccess, Is.True);
+
+        var createdGroup = await _accountGroupRepository.GetByIdAsync(new AccountGroupId(result.Value!.GroupId));
+        Assert.That(createdGroup!.TotalCurrency.Type, Is.EqualTo(AccountGroupTotalCurrency.TotalCurrencyType.Bitcoin));
+    }
+
+    [Test]
+    public async Task HandleAsync_WithSpecificFiatCurrency_SetsTotalCurrency()
+    {
+        var command = new CreateAccountGroupCommand
+        {
+            Name = "Savings",
+            TotalCurrency = "EUR"
+        };
+
+        var result = await _handler.HandleAsync(command);
+
+        Assert.That(result.IsSuccess, Is.True);
+
+        var createdGroup = await _accountGroupRepository.GetByIdAsync(new AccountGroupId(result.Value!.GroupId));
+        Assert.Multiple(() =>
+        {
+            Assert.That(createdGroup!.TotalCurrency.Type, Is.EqualTo(AccountGroupTotalCurrency.TotalCurrencyType.SpecificFiat));
+            Assert.That(createdGroup.TotalCurrency.CurrencyCode, Is.EqualTo("EUR"));
+        });
+    }
+
+    [Test]
+    public async Task HandleAsync_WithoutTotalCurrency_DefaultsToDefaultFiat()
+    {
+        var command = new CreateAccountGroupCommand { Name = "Savings" };
+
+        var result = await _handler.HandleAsync(command);
+
+        Assert.That(result.IsSuccess, Is.True);
+
+        var createdGroup = await _accountGroupRepository.GetByIdAsync(new AccountGroupId(result.Value!.GroupId));
+        Assert.That(createdGroup!.TotalCurrency.Type, Is.EqualTo(AccountGroupTotalCurrency.TotalCurrencyType.DefaultFiat));
+    }
 }

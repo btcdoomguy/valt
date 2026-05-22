@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
@@ -24,6 +25,8 @@ using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Budget.Accounts;
 using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Budget.Accounts;
+using Valt.Infra.Modules.Configuration;
+using Valt.Infra.Modules.Currency.Services;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
@@ -54,6 +57,8 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     private readonly FilterState? _filterState;
     private readonly ILogger<TransactionsViewModel> _logger = null!;
     private readonly SecureModeState _secureModeState = null!;
+    private readonly ICurrencyConversionService _currencyConversionService = null!;
+    private readonly IConfigurationManager? _configurationManager;
 
     //instances of the sub contents
     private readonly TransactionListViewModel _transactionListViewModel = null!;
@@ -125,7 +130,9 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         FilterState filterState,
         ITransactionTabFactory transactionTabFactory,
         ILogger<TransactionsViewModel> logger,
-        SecureModeState secureModeState)
+        SecureModeState secureModeState,
+        ICurrencyConversionService currencyConversionService,
+        IConfigurationManager configurationManager)
     {
         _commandDispatcher = commandDispatcher;
         _queryDispatcher = queryDispatcher;
@@ -138,6 +145,8 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         _accountDisplayOrderManager = accountDisplayOrderManager;
         _filterState = filterState;
         _logger = logger;
+        _currencyConversionService = currencyConversionService;
+        _configurationManager = configurationManager;
 
         _transactionListViewModel = (TransactionListViewModel)transactionTabFactory.Create(TransactionsTabNames.List);
 
@@ -358,6 +367,76 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
         });
     }
 
+    private (decimal? total, string? currency, bool isBtc) CalculateGroupTotal(List<AccountViewModel> groupAccounts, string groupTotalCurrencyStr)
+    {
+        var totalCurrency = AccountGroupTotalCurrency.FromStorageString(groupTotalCurrencyStr);
+
+        // Validate currency is available; fallback to default if not
+        var availableCurrencies = _configurationManager?.GetAvailableFiatCurrencies();
+        totalCurrency = totalCurrency.FallbackToDefaultIfUnavailable(availableCurrencies);
+
+        string targetCurrency;
+        bool isBtcTotal;
+
+        switch (totalCurrency.Type)
+        {
+            case AccountGroupTotalCurrency.TotalCurrencyType.DefaultFiat:
+                targetCurrency = _currencySettings?.MainFiatCurrency ?? FiatCurrency.Usd.Code;
+                isBtcTotal = false;
+                break;
+            case AccountGroupTotalCurrency.TotalCurrencyType.Bitcoin:
+                targetCurrency = "SATS";
+                isBtcTotal = true;
+                break;
+            case AccountGroupTotalCurrency.TotalCurrencyType.SpecificFiat:
+                targetCurrency = totalCurrency.CurrencyCode!;
+                isBtcTotal = false;
+                break;
+            default:
+                targetCurrency = _currencySettings?.MainFiatCurrency ?? FiatCurrency.Usd.Code;
+                isBtcTotal = false;
+                break;
+        }
+
+        var bitcoinPrice = _ratesState.BitcoinPrice;
+        var fiatRates = _ratesState.FiatRates;
+
+        if (bitcoinPrice is null || fiatRates is null)
+            return (null, targetCurrency, isBtcTotal);
+
+        decimal total = 0;
+
+        foreach (var account in groupAccounts)
+        {
+            if (account.IsBtcAccount)
+            {
+                if (account.SatsTotal.HasValue)
+                {
+                    total += _currencyConversionService.Convert(
+                        account.SatsTotal.Value,
+                        "SATS",
+                        targetCurrency,
+                        bitcoinPrice,
+                        fiatRates);
+                }
+            }
+            else
+            {
+                if (account.FiatTotal.HasValue && account.Currency is not null)
+                {
+                    total += _currencyConversionService.Convert(
+                        account.FiatTotal.Value,
+                        account.Currency,
+                        targetCurrency,
+                        bitcoinPrice,
+                        fiatRates);
+                }
+            }
+        }
+
+        return (total, targetCurrency, isBtcTotal);
+    }
+
     private async Task FetchAccounts()
     {
         if (_displaySettings is null) return;
@@ -387,7 +466,8 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
             // Only add group header if it has accounts
             if (groupAccounts.Count > 0)
             {
-                var header = new AccountGroupHeaderViewModel(group.Id, group.Name);
+                var (groupTotal, targetCurrency, isBtc) = CalculateGroupTotal(groupAccounts, group.TotalCurrency);
+                var header = new AccountGroupHeaderViewModel(group.Id, group.Name, groupTotal, targetCurrency, isBtc, _secureModeState.IsEnabled);
                 AccountListItems.Add(header);
 
                 foreach (var account in groupAccounts)

@@ -8,4 +8,5 @@ public class AccountGroupEntity
     [BsonField("name")] public string Name { get; set; } = null!;
     [BsonField("ord")] public int DisplayOrder { get; set; }
     [BsonField("v")] public int Version { get; set; }
+    [BsonField("tc")] public string TotalCurrency { get; set; } = "DEFAULT";
 }

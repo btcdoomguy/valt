@@ -15,12 +15,14 @@ public class AccountGroupBuilder
     private AccountGroupName _name = "Test Group";
     private int _displayOrder = 0;
     private int _version = 1;
+    private AccountGroupTotalCurrency _totalCurrency = AccountGroupTotalCurrency.DefaultFiat();
 
     // Public properties for backward compatibility with property initializer syntax
     public AccountGroupId Id { get => _id; set => _id = value; }
     public AccountGroupName Name { get => _name; set => _name = value; }
     public int DisplayOrder { get => _displayOrder; set => _displayOrder = value; }
     public int Version { get => _version; set => _version = value; }
+    public AccountGroupTotalCurrency TotalCurrency { get => _totalCurrency; set => _totalCurrency = value; }
 
     public static AccountGroupBuilder AGroup() => new();
 
@@ -48,6 +50,12 @@ public class AccountGroupBuilder
         return this;
     }
 
+    public AccountGroupBuilder WithTotalCurrency(AccountGroupTotalCurrency totalCurrency)
+    {
+        _totalCurrency = totalCurrency;
+        return this;
+    }
+
     public AccountGroupEntity BuildEntity()
     {
         return new AccountGroupEntity
@@ -55,12 +63,13 @@ public class AccountGroupBuilder
             Id = _id.ToObjectId(),
             Name = _name,
             DisplayOrder = _displayOrder,
-            Version = _version
+            Version = _version,
+            TotalCurrency = _totalCurrency.ToStorageString()
         };
     }
 
     public AccountGroup Build()
     {
-        return AccountGroup.Create(_id, _name, _displayOrder, _version);
+        return AccountGroup.Create(_id, _name, _displayOrder, _version, _totalCurrency);
     }
 }
