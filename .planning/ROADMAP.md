@@ -77,8 +77,8 @@
 **Depends on:** Phase 2
 
 **Plans:**
-- [ ] 03-01-PLAN.md — Localization (add .resx strings, update XAML bindings)
-- [ ] 03-02-PLAN.md — Architecture Verification & Code Quality (layer tests, pattern review)
+- [x] 03-01-PLAN.md — Localization (add .resx strings, update XAML bindings)
+- [x] 03-02-PLAN.md — Architecture Verification & Code Quality (layer tests, pattern review)
 
 ---
 
@@ -86,8 +86,8 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| UI-01 | Phase 1 | Pending |
-| UI-02 | Phase 1 | Pending |
+| UI-01 | Phase 1 | Complete |
+| UI-02 | Phase 1 | Complete |
 | UI-03 | Phase 2 | Complete |
 | UI-04 | Phase 2 | Complete |
 | UI-05 | Phase 2 | Complete |
@@ -105,9 +105,9 @@
 | INT-01 | Phase 2 | Complete |
 | INT-02 | Phase 2 | Complete |
 | INT-03 | Phase 2 | Complete |
-| INT-04 | Phase 1 | Pending |
-| INT-05 | Phase 1 | Pending |
-| INT-06 | Phase 3 | Pending |
+| INT-04 | Phase 1 | Complete |
+| INT-05 | Phase 1 | Complete |
+| INT-06 | Phase 3 | Complete |
 
 **Coverage:**
 - v1 requirements: 22 total
@@ -116,4 +116,4 @@
 
 ---
 *Roadmap created: 2026-05-27*
-*Last updated: 2026-05-27 after 02-03 plan execution*
+*Last updated: 2026-05-27 after 03-02 plan execution*
