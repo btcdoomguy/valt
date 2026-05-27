@@ -19,10 +19,10 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 1 — Foundation
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-27 — Project initialized, milestone v1.0 started
+Status: Context gathered, ready for planning
+Last activity: 2026-05-27 — Phase 1 context discussion completed
 
 ## Accumulated Context
 
@@ -32,6 +32,9 @@ Last activity: 2026-05-27 — Project initialized, milestone v1.0 started
 - Mode: YOLO (auto-approve)
 - Parallelization: Enabled
 - Model profile: Inherit
+- Phase 1 modal: 900x600 resizable
+- Phase 1 menu: Tools submenu
+- Phase 1 context menu: Any transaction type
 
 ### Blockers
 
@@ -42,3 +45,8 @@ None
 - [ ] Phase 1: Foundation (menu integration + modal shell)
 - [ ] Phase 2: Core Implementation (query + chart + data)
 - [ ] Phase 3: Polish (localization + testing)
+
+## Session History
+
+- 2026-05-27: Project initialized (v1.0 Spending Evolution)
+- 2026-05-27: Phase 1 context gathered — 3 gray areas discussed and decided
