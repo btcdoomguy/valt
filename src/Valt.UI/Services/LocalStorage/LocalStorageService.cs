@@ -48,8 +48,12 @@ public class LocalStorageService : ILocalStorageService
     {
         EnsureLoaded();
         _valtSettings!.Culture = culture;
-        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(culture);
-        CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo(culture);
+        var cultureInfo = CultureInfo.GetCultureInfo(culture);
+        CultureInfo.CurrentCulture = cultureInfo;
+        CultureInfo.CurrentUICulture = cultureInfo;
+        CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+        CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+        Lang.language.Culture = cultureInfo;
         Save();
         return Task.CompletedTask;
     }
