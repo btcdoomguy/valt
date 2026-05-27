@@ -20,9 +20,9 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 ## Current Position
 
 Phase: 2 — Core Implementation
-Plan: 01 — Complete
-Status: Query layer built and committed
-Last activity: 2026-05-27 — Executed 02-01 plan (CQRS query pipeline for spending evolution)
+Plan: 02 — Complete
+Status: Chart data and ViewModel foundation built and committed
+Last activity: 2026-05-27 — Executed 02-02 plan (chart data class, ViewModel with query dispatching)
 
 ## Accumulated Context
 
@@ -40,6 +40,9 @@ Last activity: 2026-05-27 — Executed 02-01 plan (CQRS query pipeline for spend
 - Phase 2 category selector: TreeView with checkboxes
 - 02-01: ISpendingEvolutionQueries placed in App layer Contracts/ following existing pattern
 - 02-01: Currency conversion uses IPriceDatabase local rates for performance guarantee
+- 02-02: CategorySelectionItem requires partial modifier for CommunityToolkit.Mvvm source generators
+- 02-02: FiatCurrency.GetFromCode is the correct static method (not FromCode)
+- 02-02: BtcValues uses sats-to-BTC conversion (divide by 100M) since CurrencyDisplay.FormatAsBitcoin expects BTC decimal
 
 ### Blockers
 
@@ -59,3 +62,4 @@ None
 - 2026-05-27: Phase 1 executed — modal shell, menu integration, context menu
 - 2026-05-27: Phase 2 context gathered — database-side aggregation decision
 - 2026-05-27: Phase 2 plan 01 executed — CQRS query pipeline for spending evolution aggregation
+- 2026-05-27: Phase 2 plan 02 executed — chart data class and ViewModel foundation
