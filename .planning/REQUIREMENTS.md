@@ -7,8 +7,8 @@
 
 ### User Interface
 
-- [ ] **UI-01**: User can open Spending Evolution modal from Main Menu > Tools > Evolução de gastos
-- [ ] **UI-02**: User can open Spending Evolution modal by right-clicking on a debit transaction and selecting "Analisar evolução"
+- [x] **UI-01**: User can open Spending Evolution modal from Main Menu > Tools > Evolução de gastos
+- [x] **UI-02**: User can open Spending Evolution modal by right-clicking on a debit transaction and selecting "Analisar evolução"
 - [x] **UI-03**: Modal displays category selector on left side with multi-select tree (similar to Reports module)
 - [x] **UI-04**: Modal displays dual-axis line chart on right side with fiat total (left Y-axis) and sats total (right Y-axis)
 - [x] **UI-05**: Modal includes time range dropdown above chart with options: 12, 24, 36, 48, 60 months
@@ -19,22 +19,22 @@
 
 ### Data & Calculations
 
-- [ ] **DATA-01**: System aggregates transactions by month for selected categories and time range
-- [ ] **DATA-02**: System calculates monthly fiat total using transaction amounts converted to user's primary fiat currency
-- [ ] **DATA-03**: System calculates monthly sats total using transaction's PriceInSats field
+- [x] **DATA-01**: System aggregates transactions by month for selected categories and time range
+- [x] **DATA-02**: System calculates monthly fiat total using transaction amounts converted to user's primary fiat currency
+- [x] **DATA-03**: System calculates monthly sats total using transaction's PriceInSats field
 - [x] **DATA-04**: System calculates cost of living increase percentage in fiat terms (first month vs last month)
 - [x] **DATA-05**: System calculates cost of living increase percentage in BTC terms (first month vs last month)
 - [x] **DATA-06**: System handles missing PriceInSats gracefully (show warning, exclude from sats calculation or use available data)
-- [ ] **DATA-07**: Query performance remains acceptable (<500ms) for 5 years of transaction data
+- [x] **DATA-07**: Query performance remains acceptable (<500ms) for 5 years of transaction data
 
 ### Integration
 
-- [ ] **INT-01**: Module follows existing CQRS pattern (Query + Handler in Valt.App)
-- [ ] **INT-02**: Module follows existing layered architecture (Core → App → Infra → UI)
+- [x] **INT-01**: Module follows existing CQRS pattern (Query + Handler in Valt.App)
+- [x] **INT-02**: Module follows existing layered architecture (Core → App → Infra → UI)
 - [x] **INT-03**: Module reuses existing chart components and patterns from Reports module
-- [ ] **INT-04**: Module registers in main menu following existing menu patterns
-- [ ] **INT-05**: Module registers context menu handler for debit transactions
-- [ ] **INT-06**: Module includes localization strings for all three languages (en-US, pt-BR, es)
+- [x] **INT-04**: Module registers in main menu following existing menu patterns
+- [x] **INT-05**: Module registers context menu handler for debit transactions
+- [x] **INT-06**: Module includes localization strings for all three languages (en-US, pt-BR, es)
 
 ## v2 Requirements
 
@@ -63,8 +63,8 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| UI-01 | Phase 1 | Pending |
-| UI-02 | Phase 1 | Pending |
+| UI-01 | Phase 1 | Complete |
+| UI-02 | Phase 1 | Complete |
 | UI-03 | Phase 2 | Complete |
 | UI-04 | Phase 2 | Complete |
 | UI-05 | Phase 2 | Complete |
@@ -82,9 +82,9 @@
 | INT-01 | Phase 2 | Complete |
 | INT-02 | Phase 2 | Complete |
 | INT-03 | Phase 2 | Complete |
-| INT-04 | Phase 1 | Pending |
-| INT-05 | Phase 1 | Pending |
-| INT-06 | Phase 3 | Pending |
+| INT-04 | Phase 1 | Complete |
+| INT-05 | Phase 1 | Complete |
+| INT-06 | Phase 3 | Complete |
 
 **Coverage:**
 - v1 requirements: 22 total
@@ -93,4 +93,4 @@
 
 ---
 *Requirements defined: 2026-05-27*
-*Last updated: 2026-05-27 after 02-03 plan execution*
+*Last updated: 2026-05-27 after 03-02 plan execution*
