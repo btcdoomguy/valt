@@ -19,10 +19,10 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 
 ## Current Position
 
-Phase: 1 — Foundation
-Plan: 01-PLAN.md
-Status: Complete
-Last activity: 2026-05-27 — Phase 1 execution complete (9 files changed, 0 errors)
+Phase: 2 — Core Implementation
+Plan: —
+Status: Context gathered, ready for planning
+Last activity: 2026-05-27 — Phase 2 context discussion completed
 
 ## Accumulated Context
 
@@ -35,6 +35,9 @@ Last activity: 2026-05-27 — Phase 1 execution complete (9 files changed, 0 err
 - Phase 1 modal: 900x600 resizable
 - Phase 1 menu: Tools submenu
 - Phase 1 context menu: Any transaction type
+- Phase 2 aggregation: Database-side (LiteDB)
+- Phase 2 chart: Reuse WealthOverviewChartData pattern
+- Phase 2 category selector: TreeView with checkboxes
 
 ### Blockers
 
@@ -49,6 +52,7 @@ None
 ## Session History
 
 - 2026-05-27: Project initialized (v1.0 Spending Evolution)
-- 2026-05-27: Phase 1 context gathered — 3 gray areas discussed and decided
-- 2026-05-27: Phase 1 plan created — 5 tasks with dependencies mapped
-- 2026-05-27: Phase 1 executed — modal shell, menu integration, context menu, all tests pass
+- 2026-05-27: Phase 1 context gathered
+- 2026-05-27: Phase 1 plan created
+- 2026-05-27: Phase 1 executed — modal shell, menu integration, context menu
+- 2026-05-27: Phase 2 context gathered — database-side aggregation decision
