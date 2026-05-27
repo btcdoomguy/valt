@@ -5,6 +5,7 @@
         xmlns:userControls="clr-namespace:Valt.UI.UserControls"
         xmlns:local="clr-namespace:Valt.UI.Lang"
         xmlns:spendingEvolution="clr-namespace:Valt.UI.Views.Main.Modals.SpendingEvolution"
+        xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
         mc:Ignorable="d"
         x:Class="Valt.UI.Views.Main.Modals.SpendingEvolution.SpendingEvolutionView"
         x:DataType="spendingEvolution:SpendingEvolutionViewModel"
@@ -20,17 +21,130 @@
     <Design.DataContext>
         <spendingEvolution:SpendingEvolutionViewModel />
     </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" />
+    </Window.KeyBindings>
     <Border>
-        <StackPanel Orientation="Vertical">
-            <userControls:CustomTitleBar Title="Spending Evolution"
+        <Grid RowDefinitions="Auto, *, Auto">
+            <!-- Row 0: Title Bar -->
+            <userControls:CustomTitleBar Grid.Row="0"
+                                         Title="Spending Evolution"
                                          TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
-            <Border Classes="form-fields-area">
-                <TextBlock Text="Spending Evolution content will be added in Phase 2"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           FontSize="{DynamicResource FontSizeLarge}" />
+
+            <!-- Row 1: Main Content -->
+            <Grid Grid.Row="1" ColumnDefinitions="280, *">
+
+                <!-- Left: Category Selector -->
+                <Border Grid.Column="0" Classes="form-fields-area" Margin="10">
+                    <StackPanel>
+                        <TextBlock Text="Categories"
+                                   FontSize="{DynamicResource FontSizeLarge}"
+                                   Margin="0,0,0,10" />
+                        <TreeView x:Name="CategoryTree"
+                                  ItemsSource="{Binding CategoryItems}"
+                                  SelectionMode="Single"
+                                  MaxHeight="450">
+                            <TreeView.ItemTemplate>
+                                <TreeDataTemplate ItemsSource="{Binding SubNodes}">
+                                    <StackPanel Orientation="Horizontal"
+                                                Height="24"
+                                                Spacing="8">
+                                        <CheckBox IsChecked="{Binding IsSelected}"
+                                                  VerticalAlignment="Center" />
+                                        <TextBlock FontFamily="{DynamicResource MaterialDesign}"
+                                                   FontSize="{DynamicResource FontSizeLarge}"
+                                                   Text="{Binding Unicode}"
+                                                   Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding Name}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </TreeDataTemplate>
+                            </TreeView.ItemTemplate>
+                        </TreeView>
+                    </StackPanel>
+                </Border>
+
+                <!-- Right: Chart Area -->
+                <Grid Grid.Column="1" RowDefinitions="Auto, *, Auto">
+
+                    <!-- Top: Time Range Dropdown -->
+                    <StackPanel Grid.Row="0"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Margin="10">
+                        <TextBlock Text="Time Range:"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,10,0" />
+                        <ComboBox ItemsSource="{Binding TimeRangeOptions}"
+                                  SelectedItem="{Binding SelectedTimeRangeMonths}"
+                                  Width="120">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding} months" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <!-- Middle: Chart -->
+                    <Border Grid.Row="1" Margin="10,0,10,10">
+                        <lvc:CartesianChart Series="{Binding ChartData.Series}"
+                                            XAxes="{Binding ChartData.XAxes}"
+                                            YAxes="{Binding ChartData.YAxes}"
+                                            LegendTextPaint="{Binding ChartData.LegendTextPaint}"
+                                            TooltipTextPaint="{Binding ChartData.TooltipTextPaint}"
+                                            TooltipBackgroundPaint="{Binding ChartData.TooltipBackgroundPaint}"
+                                            ZoomMode="X"
+                                            ZoomingSpeed="0.5" />
+                    </Border>
+
+                    <!-- Bottom: Indicators -->
+                    <Grid Grid.Row="2"
+                          ColumnDefinitions="*, *"
+                          Margin="10">
+                        <StackPanel Grid.Column="0"
+                                    HorizontalAlignment="Center">
+                            <TextBlock Text="Cost of Living (Fiat)"
+                                       FontSize="{DynamicResource FontSizeSmall}"
+                                       Foreground="{DynamicResource Text400Brush}" />
+                            <TextBlock Text="{Binding FiatIncreasePercentText}"
+                                       FontSize="{DynamicResource FontSizeXLarge}"
+                                       FontWeight="Bold"
+                                       Foreground="{Binding FiatIncreaseBrush}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1"
+                                    HorizontalAlignment="Center">
+                            <TextBlock Text="Cost of Living (BTC)"
+                                       FontSize="{DynamicResource FontSizeSmall}"
+                                       Foreground="{DynamicResource Text400Brush}" />
+                            <TextBlock Text="{Binding BtcIncreasePercentText}"
+                                       FontSize="{DynamicResource FontSizeXLarge}"
+                                       FontWeight="Bold"
+                                       Foreground="{Binding BtcIncreaseBrush}" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Grid>
+
+            <!-- Row 2: Warning Banner -->
+            <Border Grid.Row="2"
+                    Background="{DynamicResource SemanticWarning800Brush}"
+                    IsVisible="{Binding HasMissingPriceInSats}"
+                    Padding="10">
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center">
+                    <TextBlock FontFamily="{DynamicResource MaterialDesign}"
+                               Text="&#xE002;"
+                               Foreground="{DynamicResource SemanticWarning200Brush}"
+                               Margin="0,0,8,0" />
+                    <TextBlock Text="Some transactions are missing BTC price data"
+                               Foreground="{DynamicResource Text100Brush}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
             </Border>
-        </StackPanel>
+        </Grid>
     </Border>
 </Window>
