@@ -3,9 +3,9 @@ milestone: v1.0
 name: Spending Evolution
 status: in_progress
 progress:
-  completed: 2
+  completed: 3
   total: 3
-  percentage: 40
+  percentage: 100
 ---
 
 # STATE.md
@@ -20,9 +20,9 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 ## Current Position
 
 Phase: 2 — Core Implementation
-Plan: 02 — Complete
-Status: Chart data and ViewModel foundation built and committed
-Last activity: 2026-05-27 — Executed 02-02 plan (chart data class, ViewModel with query dispatching)
+Plan: 03 — Complete
+Status: Full modal layout with TreeView, chart, indicators, and warning banner built and committed
+Last activity: 2026-05-27 — Executed 02-03 plan (complete UI layout, cost of living indicators, pre-selection logic)
 
 ## Accumulated Context
 
@@ -43,6 +43,10 @@ Last activity: 2026-05-27 — Executed 02-02 plan (chart data class, ViewModel w
 - 02-02: CategorySelectionItem requires partial modifier for CommunityToolkit.Mvvm source generators
 - 02-02: FiatCurrency.GetFromCode is the correct static method (not FromCode)
 - 02-02: BtcValues uses sats-to-BTC conversion (divide by 100M) since CurrencyDisplay.FormatAsBitcoin expects BTC decimal
+- 02-03: Brush-based color coding computed in ViewModel (FiatIncreaseBrush/BtcIncreaseBrush) instead of value converter
+- 02-03: Warning banner uses SemanticWarning800Brush background with SemanticWarning200Brush icon
+- 02-03: 150ms debounce via CancellationTokenSource for rapid checkbox change events
+- 02-03: Parent-child category tree built from flat CategoryDTO list with two-pass approach
 
 ### Blockers
 
@@ -51,7 +55,7 @@ None
 ### Todos
 
 - [x] Phase 1: Foundation (menu integration + modal shell)
-- [ ] Phase 2: Core Implementation (query + chart + data)
+- [x] Phase 2: Core Implementation (query + chart + data)
 - [ ] Phase 3: Polish (localization + testing)
 
 ## Session History
@@ -63,3 +67,4 @@ None
 - 2026-05-27: Phase 2 context gathered — database-side aggregation decision
 - 2026-05-27: Phase 2 plan 01 executed — CQRS query pipeline for spending evolution aggregation
 - 2026-05-27: Phase 2 plan 02 executed — chart data class and ViewModel foundation
+- 2026-05-27: Phase 2 plan 03 executed — complete modal UI layout, cost of living indicators, pre-selection logic

@@ -57,8 +57,8 @@
 
 **Plans:**
 - [x] 02-01-PLAN.md — Query Layer & DTOs (CQRS pipeline, LiteDB aggregation)
-- [ ] 02-02-PLAN.md — Chart Data & ViewModel (LiveCharts dual-axis, category loading)
-- [ ] 02-03-PLAN.md — View Layout & Integration (TreeView, indicators, pre-selection)
+- [x] 02-02-PLAN.md — Chart Data & ViewModel (LiveCharts dual-axis, category loading)
+- [x] 02-03-PLAN.md — View Layout & Integration (TreeView, indicators, pre-selection)
 
 ---
 
@@ -84,23 +84,23 @@
 |-------------|-------|--------|
 | UI-01 | Phase 1 | Pending |
 | UI-02 | Phase 1 | Pending |
-| UI-03 | Phase 2 | Pending |
-| UI-04 | Phase 2 | Pending |
-| UI-05 | Phase 2 | Pending |
-| UI-06 | Phase 2 | Pending |
-| UI-07 | Phase 2 | Pending |
-| UI-08 | Phase 2 | Pending |
-| UI-09 | Phase 2 | Pending |
+| UI-03 | Phase 2 | Complete |
+| UI-04 | Phase 2 | Complete |
+| UI-05 | Phase 2 | Complete |
+| UI-06 | Phase 2 | Complete |
+| UI-07 | Phase 2 | Complete |
+| UI-08 | Phase 2 | Complete |
+| UI-09 | Phase 2 | Complete |
 | DATA-01 | Phase 2 | Complete |
 | DATA-02 | Phase 2 | Complete |
 | DATA-03 | Phase 2 | Complete |
-| DATA-04 | Phase 2 | Pending |
-| DATA-05 | Phase 2 | Pending |
-| DATA-06 | Phase 2 | Pending |
+| DATA-04 | Phase 2 | Complete |
+| DATA-05 | Phase 2 | Complete |
+| DATA-06 | Phase 2 | Complete |
 | DATA-07 | Phase 2 | Complete |
 | INT-01 | Phase 2 | Complete |
 | INT-02 | Phase 2 | Complete |
-| INT-03 | Phase 2 | Pending |
+| INT-03 | Phase 2 | Complete |
 | INT-04 | Phase 1 | Pending |
 | INT-05 | Phase 1 | Pending |
 | INT-06 | Phase 3 | Pending |
@@ -112,4 +112,4 @@
 
 ---
 *Roadmap created: 2026-05-27*
-*Last updated: 2026-05-27 after initial creation*
+*Last updated: 2026-05-27 after 02-03 plan execution*
