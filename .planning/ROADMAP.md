@@ -56,7 +56,7 @@
 **Depends on:** Phase 1
 
 **Plans:**
-- [ ] 02-01-PLAN.md — Query Layer & DTOs (CQRS pipeline, LiteDB aggregation)
+- [x] 02-01-PLAN.md — Query Layer & DTOs (CQRS pipeline, LiteDB aggregation)
 - [ ] 02-02-PLAN.md — Chart Data & ViewModel (LiveCharts dual-axis, category loading)
 - [ ] 02-03-PLAN.md — View Layout & Integration (TreeView, indicators, pre-selection)
 
@@ -91,15 +91,15 @@
 | UI-07 | Phase 2 | Pending |
 | UI-08 | Phase 2 | Pending |
 | UI-09 | Phase 2 | Pending |
-| DATA-01 | Phase 2 | Pending |
-| DATA-02 | Phase 2 | Pending |
-| DATA-03 | Phase 2 | Pending |
+| DATA-01 | Phase 2 | Complete |
+| DATA-02 | Phase 2 | Complete |
+| DATA-03 | Phase 2 | Complete |
 | DATA-04 | Phase 2 | Pending |
 | DATA-05 | Phase 2 | Pending |
 | DATA-06 | Phase 2 | Pending |
-| DATA-07 | Phase 2 | Pending |
-| INT-01 | Phase 2 | Pending |
-| INT-02 | Phase 2 | Pending |
+| DATA-07 | Phase 2 | Complete |
+| INT-01 | Phase 2 | Complete |
+| INT-02 | Phase 2 | Complete |
 | INT-03 | Phase 2 | Pending |
 | INT-04 | Phase 1 | Pending |
 | INT-05 | Phase 1 | Pending |

@@ -3,9 +3,9 @@ milestone: v1.0
 name: Spending Evolution
 status: in_progress
 progress:
-  completed: 1
+  completed: 2
   total: 3
-  percentage: 33
+  percentage: 40
 ---
 
 # STATE.md
@@ -20,9 +20,9 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 ## Current Position
 
 Phase: 2 — Core Implementation
-Plan: —
-Status: Context gathered, ready for planning
-Last activity: 2026-05-27 — Phase 2 context discussion completed
+Plan: 01 — Complete
+Status: Query layer built and committed
+Last activity: 2026-05-27 — Executed 02-01 plan (CQRS query pipeline for spending evolution)
 
 ## Accumulated Context
 
@@ -38,6 +38,8 @@ Last activity: 2026-05-27 — Phase 2 context discussion completed
 - Phase 2 aggregation: Database-side (LiteDB)
 - Phase 2 chart: Reuse WealthOverviewChartData pattern
 - Phase 2 category selector: TreeView with checkboxes
+- 02-01: ISpendingEvolutionQueries placed in App layer Contracts/ following existing pattern
+- 02-01: Currency conversion uses IPriceDatabase local rates for performance guarantee
 
 ### Blockers
 
@@ -56,3 +58,4 @@ None
 - 2026-05-27: Phase 1 plan created
 - 2026-05-27: Phase 1 executed — modal shell, menu integration, context menu
 - 2026-05-27: Phase 2 context gathered — database-side aggregation decision
+- 2026-05-27: Phase 2 plan 01 executed — CQRS query pipeline for spending evolution aggregation
