@@ -55,6 +55,11 @@
 
 **Depends on:** Phase 1
 
+**Plans:**
+- [ ] 02-01-PLAN.md — Query Layer & DTOs (CQRS pipeline, LiteDB aggregation)
+- [ ] 02-02-PLAN.md — Chart Data & ViewModel (LiveCharts dual-axis, category loading)
+- [ ] 02-03-PLAN.md — View Layout & Integration (TreeView, indicators, pre-selection)
+
 ---
 
 ### Phase 3: Polish
