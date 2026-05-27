@@ -76,6 +76,10 @@
 
 **Depends on:** Phase 2
 
+**Plans:**
+- [ ] 03-01-PLAN.md — Localization (add .resx strings, update XAML bindings)
+- [ ] 03-02-PLAN.md — Architecture Verification & Code Quality (layer tests, pattern review)
+
 ---
 
 ## Requirements Traceability
