@@ -75,6 +75,9 @@
                                     <MenuItem Header="{x:Static local:language.Main_PriceHistory}"
                                               Command="{Binding OpenPriceHistoryCommand}">
                                     </MenuItem>
+                                    <MenuItem Header="Spending Evolution"
+                                              Command="{Binding OpenSpendingEvolutionCommand}">
+                                    </MenuItem>
                                 </MenuItem>
                                 <Separator />
                                 <MenuItem Header="{x:Static local:language.Menu_ImportTransactions}"

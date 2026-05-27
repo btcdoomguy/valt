@@ -46,6 +46,7 @@ using Valt.UI.Views.Main.Modals.ImportWizard;
 using Valt.UI.Views.Main.Modals.InputPassword;
 using Valt.UI.Views.Main.Modals.ConversionCalculator;
 using Valt.UI.Views.Main.Modals.LeverageSimulator;
+using Valt.UI.Views.Main.Modals.SpendingEvolution;
 using Valt.Infra.Mcp.Notifications;
 using Valt.Infra.Mcp.Server;
 
@@ -471,6 +472,15 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     {
         var modal =
             (LeverageSimulatorView)await _modalFactory.CreateAsync(ApplicationModalNames.LeverageSimulator, Window)!;
+
+        await modal.ShowDialogSafeAsync(Window!);
+    }
+
+    [RelayCommand]
+    private async Task OpenSpendingEvolution()
+    {
+        var modal =
+            (SpendingEvolutionView)await _modalFactory.CreateAsync(ApplicationModalNames.SpendingEvolution, Window)!;
 
         await modal.ShowDialogSafeAsync(Window!);
     }

@@ -1,0 +1,36 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        xmlns:spendingEvolution="clr-namespace:Valt.UI.Views.Main.Modals.SpendingEvolution"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Views.Main.Modals.SpendingEvolution.SpendingEvolutionView"
+        x:DataType="spendingEvolution:SpendingEvolutionViewModel"
+        Title="Spending Evolution"
+        WindowStartupLocation="CenterOwner"
+        d:DesignWidth="900"
+        d:DesignHeight="600"
+        MinWidth="900"
+        MinHeight="600"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <spendingEvolution:SpendingEvolutionViewModel />
+    </Design.DataContext>
+    <Border>
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="Spending Evolution"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+            <Border Classes="form-fields-area">
+                <TextBlock Text="Spending Evolution content will be added in Phase 2"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontSize="{DynamicResource FontSizeLarge}" />
+            </Border>
+        </StackPanel>
+    </Border>
+</Window>
