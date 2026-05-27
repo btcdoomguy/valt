@@ -5204,5 +5204,65 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("FixedExpenseOverview.NoExpenses", resourceCulture);
             }
         }
+
+        public static string SpendingEvolution_Title {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.Title", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_Menu {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.Menu", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_ContextMenu {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.ContextMenu", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_Categories {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.Categories", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_TimeRange {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.TimeRange", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_Months {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.Months", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_CostOfLiving_Fiat {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.CostOfLiving.Fiat", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_CostOfLiving_Btc {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.CostOfLiving.Btc", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_Warning_MissingPriceData {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.Warning.MissingPriceData", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_NA {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.NA", resourceCulture);
+            }
+        }
     }
 }

@@ -9,8 +9,8 @@
         mc:Ignorable="d"
         x:Class="Valt.UI.Views.Main.Modals.SpendingEvolution.SpendingEvolutionView"
         x:DataType="spendingEvolution:SpendingEvolutionViewModel"
-        Title="Spending Evolution"
-        WindowStartupLocation="CenterOwner"
+        Title="{x:Static local:language.SpendingEvolution_Title}"
+         WindowStartupLocation="CenterOwner"
         d:DesignWidth="900"
         d:DesignHeight="600"
         MinWidth="900"
@@ -28,7 +28,7 @@
         <Grid RowDefinitions="Auto, *, Auto">
             <!-- Row 0: Title Bar -->
             <userControls:CustomTitleBar Grid.Row="0"
-                                         Title="Spending Evolution"
+                                         Title="{x:Static local:language.SpendingEvolution_Title}"
                                          TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
 
@@ -38,7 +38,7 @@
                 <!-- Left: Category Selector -->
                 <Border Grid.Column="0" Classes="form-fields-area" Margin="10">
                     <StackPanel>
-                        <TextBlock Text="Categories"
+                        <TextBlock Text="{x:Static local:language.SpendingEvolution_Categories}"
                                    FontSize="{DynamicResource FontSizeLarge}"
                                    Margin="0,0,0,10" />
                         <TreeView x:Name="CategoryTree"
@@ -74,15 +74,15 @@
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Right"
                                 Margin="10">
-                        <TextBlock Text="Time Range:"
+                        <TextBlock Text="{x:Static local:language.SpendingEvolution_TimeRange}"
                                    VerticalAlignment="Center"
                                    Margin="0,0,10,0" />
                         <ComboBox ItemsSource="{Binding TimeRangeOptions}"
-                                  SelectedItem="{Binding SelectedTimeRangeMonths}"
+                                  SelectedItem="{Binding SelectedTimeRangeOption}"
                                   Width="120">
                             <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding} months" />
+                                <DataTemplate x:DataType="spendingEvolution:TimeRangeOption">
+                                    <TextBlock Text="{Binding DisplayText}" />
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
@@ -106,7 +106,7 @@
                           Margin="10">
                         <StackPanel Grid.Column="0"
                                     HorizontalAlignment="Center">
-                            <TextBlock Text="Cost of Living (Fiat)"
+                            <TextBlock Text="{x:Static local:language.SpendingEvolution_CostOfLiving_Fiat}"
                                        FontSize="{DynamicResource FontSizeSmall}"
                                        Foreground="{DynamicResource Text400Brush}" />
                             <TextBlock Text="{Binding FiatIncreasePercentText}"
@@ -117,7 +117,7 @@
 
                         <StackPanel Grid.Column="1"
                                     HorizontalAlignment="Center">
-                            <TextBlock Text="Cost of Living (BTC)"
+                            <TextBlock Text="{x:Static local:language.SpendingEvolution_CostOfLiving_Btc}"
                                        FontSize="{DynamicResource FontSizeSmall}"
                                        Foreground="{DynamicResource Text400Brush}" />
                             <TextBlock Text="{Binding BtcIncreasePercentText}"
@@ -140,7 +140,7 @@
                                Text="&#xE002;"
                                Foreground="{DynamicResource SemanticWarning200Brush}"
                                Margin="0,0,8,0" />
-                    <TextBlock Text="Some transactions are missing BTC price data"
+                    <TextBlock Text="{x:Static local:language.SpendingEvolution_Warning_MissingPriceData}"
                                Foreground="{DynamicResource Text100Brush}"
                                VerticalAlignment="Center" />
                 </StackPanel>

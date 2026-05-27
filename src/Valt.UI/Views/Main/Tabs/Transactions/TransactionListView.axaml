@@ -208,7 +208,7 @@
                             </Style>
                         </MenuItem.Styles>
                     </MenuItem>
-                    <MenuItem Header="Analyze Spending Evolution"
+                    <MenuItem Header="{x:Static local:language.SpendingEvolution_ContextMenu}"
                               IsVisible="{Binding IsSingleItemSelected}"
                               Command="{Binding AnalyzeSpendingEvolutionCommand}"
                               CommandParameter="{Binding SelectedTransaction}">

@@ -16,8 +16,11 @@ using Valt.App.Modules.SpendingEvolution.DTOs;
 using Valt.App.Modules.SpendingEvolution.Queries;
 using Valt.UI.Base;
 using Valt.UI.Views.Main.Modals.SpendingEvolution.Models;
+using Valt.UI.Lang;
 
 namespace Valt.UI.Views.Main.Modals.SpendingEvolution;
+
+public record TimeRangeOption(int Months, string DisplayText);
 
 public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposable
 {
@@ -29,6 +32,7 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
     {
         _queryDispatcher = queryDispatcher;
         ChartData = new SpendingEvolutionChartData();
+        SelectedTimeRangeOption = TimeRangeOptions.FirstOrDefault(x => x.Months == 24);
     }
 
     [ObservableProperty]
@@ -38,7 +42,7 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
     private ObservableCollection<CategorySelectionItem> _categoryItems = new();
 
     [ObservableProperty]
-    private int _selectedTimeRangeMonths = 24; // Default: 24 months
+    private TimeRangeOption? _selectedTimeRangeOption;
 
     [ObservableProperty]
     private string? _preSelectedCategoryId;
@@ -56,10 +60,10 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
     private decimal _btcIncreasePercent;
 
     [ObservableProperty]
-    private string _fiatIncreasePercentText = "N/A";
+    private string _fiatIncreasePercentText = language.SpendingEvolution_NA;
 
     [ObservableProperty]
-    private string _btcIncreasePercentText = "N/A";
+    private string _btcIncreasePercentText = language.SpendingEvolution_NA;
 
     [ObservableProperty]
     private bool _hasMissingPriceInSats;
@@ -70,7 +74,14 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
     [ObservableProperty]
     private SolidColorBrush _btcIncreaseBrush = new(Colors.Gray);
 
-    public int[] TimeRangeOptions { get; } = new[] { 12, 24, 36, 48, 60 };
+    public TimeRangeOption[] TimeRangeOptions { get; } = new[]
+    {
+        new TimeRangeOption(12, string.Format(language.SpendingEvolution_Months, 12)),
+        new TimeRangeOption(24, string.Format(language.SpendingEvolution_Months, 24)),
+        new TimeRangeOption(36, string.Format(language.SpendingEvolution_Months, 36)),
+        new TimeRangeOption(48, string.Format(language.SpendingEvolution_Months, 48)),
+        new TimeRangeOption(60, string.Format(language.SpendingEvolution_Months, 60)),
+    };
 
     public override async Task OnBindParameterAsync()
     {
@@ -199,7 +210,8 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
         IsLoading = true;
         try
         {
-            var fromDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(-SelectedTimeRangeMonths));
+            var months = SelectedTimeRangeOption?.Months ?? 24;
+            var fromDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(-months));
             var toDate = DateOnly.FromDateTime(DateTime.Now);
 
             var selectedCategoryIds = GetAllItems(CategoryItems)
@@ -235,8 +247,8 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
         {
             FiatIncreasePercent = 0;
             BtcIncreasePercent = 0;
-            FiatIncreasePercentText = "N/A";
-            BtcIncreasePercentText = "N/A";
+            FiatIncreasePercentText = language.SpendingEvolution_NA;
+            BtcIncreasePercentText = language.SpendingEvolution_NA;
             FiatIncreaseBrush = new SolidColorBrush(Colors.Gray);
             BtcIncreaseBrush = new SolidColorBrush(Colors.Gray);
             return;
@@ -257,7 +269,7 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
         else
         {
             FiatIncreasePercent = 0;
-            FiatIncreasePercentText = "N/A";
+            FiatIncreasePercentText = language.SpendingEvolution_NA;
             FiatIncreaseBrush = new SolidColorBrush(Colors.Gray);
         }
 
@@ -273,14 +285,17 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
         else
         {
             BtcIncreasePercent = 0;
-            BtcIncreasePercentText = "N/A";
+            BtcIncreasePercentText = language.SpendingEvolution_NA;
             BtcIncreaseBrush = new SolidColorBrush(Colors.Gray);
         }
     }
 
-    partial void OnSelectedTimeRangeMonthsChanged(int value)
+    partial void OnSelectedTimeRangeOptionChanged(TimeRangeOption? value)
     {
-        _ = LoadDataAsync();
+        if (value != null)
+        {
+            _ = LoadDataAsync();
+        }
     }
 
     public void Dispose()

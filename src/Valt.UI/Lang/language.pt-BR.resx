@@ -2656,4 +2656,34 @@
     <data name="FixedExpenseOverview.NoExpenses" xml:space="preserve">
         <value>Sem despesas fixas para este mês</value>
     </data>
+    <data name="SpendingEvolution.Title" xml:space="preserve">
+        <value>Evolução de Gastos</value>
+    </data>
+    <data name="SpendingEvolution.Menu" xml:space="preserve">
+        <value>Evolução de Gastos</value>
+    </data>
+    <data name="SpendingEvolution.ContextMenu" xml:space="preserve">
+        <value>Analisar Evolução de Gastos</value>
+    </data>
+    <data name="SpendingEvolution.Categories" xml:space="preserve">
+        <value>Categorias</value>
+    </data>
+    <data name="SpendingEvolution.TimeRange" xml:space="preserve">
+        <value>Período:</value>
+    </data>
+    <data name="SpendingEvolution.Months" xml:space="preserve">
+        <value>{0} meses</value>
+    </data>
+    <data name="SpendingEvolution.CostOfLiving.Fiat" xml:space="preserve">
+        <value>Custo de Vida (Fiat)</value>
+    </data>
+    <data name="SpendingEvolution.CostOfLiving.Btc" xml:space="preserve">
+        <value>Custo de Vida (BTC)</value>
+    </data>
+    <data name="SpendingEvolution.Warning.MissingPriceData" xml:space="preserve">
+        <value>Algumas transações não possuem dados de preço em BTC</value>
+    </data>
+    <data name="SpendingEvolution.NA" xml:space="preserve">
+        <value>N/A</value>
+    </data>
 </root>
