@@ -1,36 +1,52 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia.Collections;
 using Avalonia.Media;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using LiteDB;
 using Valt.App.Kernel.Queries;
-using Valt.App.Modules.Budget.Categories.DTOs;
-using Valt.App.Modules.Budget.Categories.Queries.GetCategories;
 using Valt.App.Modules.SpendingEvolution.DTOs;
 using Valt.App.Modules.SpendingEvolution.Queries;
+using Valt.Core.Kernel.Abstractions.Time;
+using Valt.Infra.DataAccess;
+using Valt.Infra.Modules.Configuration;
 using Valt.UI.Base;
-using Valt.UI.Views.Main.Modals.SpendingEvolution.Models;
 using Valt.UI.Lang;
+using Valt.UI.Services.MessageBoxes;
 
 namespace Valt.UI.Views.Main.Modals.SpendingEvolution;
 
 public record TimeRangeOption(int Months, string DisplayText);
+public record SelectItem(string Id, string Name);
 
 public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposable
 {
     private readonly IQueryDispatcher _queryDispatcher;
+    private readonly ILocalDatabase _localDatabase;
+    private readonly IConfigurationManager _configurationManager;
+    private readonly IClock _clock;
     private bool _isDataLoading;
-    private CancellationTokenSource? _categoryChangeCts;
+    private CancellationTokenSource? _filterChangeCts;
 
-    public SpendingEvolutionViewModel(IQueryDispatcher queryDispatcher)
+    public SpendingEvolutionViewModel(
+        IQueryDispatcher queryDispatcher,
+        ILocalDatabase localDatabase,
+        IConfigurationManager configurationManager,
+        IClock clock)
     {
         _queryDispatcher = queryDispatcher;
+        _localDatabase = localDatabase;
+        _configurationManager = configurationManager;
+        _clock = clock;
         ChartData = new SpendingEvolutionChartData();
         SelectedTimeRangeOption = TimeRangeOptions.FirstOrDefault(x => x.Months == 24);
     }
@@ -39,7 +55,16 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
     private SpendingEvolutionChartData _chartData;
 
     [ObservableProperty]
-    private ObservableCollection<CategorySelectionItem> _categoryItems = new();
+    private AvaloniaList<SelectItem> _availableAccounts = new();
+
+    [ObservableProperty]
+    private AvaloniaList<SelectItem> _selectedAccounts = new();
+
+    [ObservableProperty]
+    private AvaloniaList<SelectItem> _availableCategories = new();
+
+    [ObservableProperty]
+    private AvaloniaList<SelectItem> _selectedCategories = new();
 
     [ObservableProperty]
     private TimeRangeOption? _selectedTimeRangeOption;
@@ -90,7 +115,11 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
             PreSelectedCategoryId = categoryId;
         }
 
-        await LoadCategoriesAsync();
+        PrepareAccountsAndCategoriesList();
+
+        SelectedAccounts.CollectionChanged += OnSelectedFiltersChanged;
+        SelectedCategories.CollectionChanged += OnSelectedFiltersChanged;
+
         await LoadDataAsync();
     }
 
@@ -100,105 +129,150 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
         CloseWindow?.Invoke();
     }
 
-    private async Task LoadCategoriesAsync()
+    private void PrepareAccountsAndCategoriesList()
     {
-        var categories = await _queryDispatcher.DispatchAsync(new GetCategoriesQuery());
+        AvailableAccounts.Clear();
+        SelectedAccounts.Clear();
+        AvailableCategories.Clear();
+        SelectedCategories.Clear();
 
-        // Unsubscribe from old items
-        foreach (var item in GetAllItems(CategoryItems))
-        {
-            item.PropertyChanged -= OnCategoryItemPropertyChanged;
-        }
-
-        CategoryItems.Clear();
-
-        // Build tree structure
-        var allItems = categories.Items
-            .Select(c => new CategorySelectionItem(c.Id, c.ParentId, c.Name, c.Unicode, c.Color))
+        // Load accounts
+        var accounts = _localDatabase.GetAccounts().FindAll()
+            .OrderByDescending(x => x.Visible)
+            .ThenBy(x => x.DisplayOrder)
+            .Select(x => new SelectItem(x.Id.ToString(), x.Name))
             .ToList();
 
-        var itemLookup = allItems.ToDictionary(i => i.Id);
+        AvailableAccounts.AddRange(accounts);
+        SelectedAccounts.AddRange(AvailableAccounts);
 
-        // Wire up parent-child relationships
-        foreach (var item in allItems)
+        // Load categories with parent prefix
+        var categories = _localDatabase.GetCategories().FindAll().ToDictionary(x => x.Id.ToString());
+
+        var parsedCategories = new List<SelectItem>();
+        foreach (var category in categories)
         {
-            if (!string.IsNullOrEmpty(item.ParentId) && itemLookup.TryGetValue(item.ParentId, out var parent))
-            {
-                parent.SubNodes.Add(item);
-            }
+            var name = category.Value.Name;
+            if (category.Value.ParentId is not null)
+                name = categories[category.Value.ParentId.ToString()].Name + " >> " + name;
+
+            parsedCategories.Add(new SelectItem(category.Key, name));
         }
 
-        // Add only root items to the top-level collection
-        var rootItems = allItems.Where(i => string.IsNullOrEmpty(i.ParentId) || !itemLookup.ContainsKey(i.ParentId)).ToList();
-        foreach (var root in rootItems)
-        {
-            CategoryItems.Add(root);
-        }
+        AvailableCategories.AddRange(parsedCategories.OrderBy(x => x.Name));
+        SelectedCategories.AddRange(AvailableCategories);
 
-        // Subscribe to all items' PropertyChanged for IsSelected changes
-        foreach (var item in GetAllItems(CategoryItems))
-        {
-            item.PropertyChanged += OnCategoryItemPropertyChanged;
-        }
+        // Apply saved filter defaults
+        ApplySavedFilterDefaults();
 
-        ApplyPreSelection();
-    }
-
-    private static IEnumerable<CategorySelectionItem> GetAllItems(IEnumerable<CategorySelectionItem> items)
-    {
-        foreach (var item in items)
-        {
-            yield return item;
-            foreach (var child in GetAllItems(item.SubNodes))
-            {
-                yield return child;
-            }
-        }
-    }
-
-    private void OnCategoryItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(CategorySelectionItem.IsSelected))
-        {
-            // Debounce: cancel pending reload and schedule a new one
-            _categoryChangeCts?.Cancel();
-            _categoryChangeCts = new CancellationTokenSource();
-            var token = _categoryChangeCts.Token;
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    await Task.Delay(150, token);
-                    if (!token.IsCancellationRequested)
-                    {
-                        await LoadDataAsync();
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    // Expected when debounce cancels
-                }
-            });
-        }
-    }
-
-    private void ApplyPreSelection()
-    {
+        // Apply pre-selection if opened from context menu
         if (!string.IsNullOrEmpty(PreSelectedCategoryId))
         {
-            // Right-click mode: select only the pre-selected category
-            foreach (var item in GetAllItems(CategoryItems))
+            var preSelected = AvailableCategories.FirstOrDefault(c => c.Id == PreSelectedCategoryId);
+            if (preSelected is not null)
             {
-                item.IsSelected = item.Id == PreSelectedCategoryId;
+                SelectedCategories.Clear();
+                SelectedCategories.Add(preSelected);
             }
+        }
+    }
+
+    private void ApplySavedFilterDefaults()
+    {
+        var excludedCategoryIds = _configurationManager.GetSpendingEvolutionCategoryFilterExcludedIds().ToHashSet();
+        if (excludedCategoryIds.Count > 0)
+        {
+            var toRemove = SelectedCategories.Where(c => excludedCategoryIds.Contains(c.Id)).ToList();
+            foreach (var item in toRemove)
+                SelectedCategories.Remove(item);
+        }
+
+        var excludedAccountIds = _configurationManager.GetSpendingEvolutionAccountFilterExcludedIds().ToHashSet();
+        if (excludedAccountIds.Count > 0)
+        {
+            var toRemove = SelectedAccounts.Where(a => excludedAccountIds.Contains(a.Id)).ToList();
+            foreach (var item in toRemove)
+                SelectedAccounts.Remove(item);
+        }
+    }
+
+    private void OnSelectedFiltersChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        // Debounce: cancel pending reload and schedule a new one
+        _filterChangeCts?.Cancel();
+        _filterChangeCts = new CancellationTokenSource();
+        var token = _filterChangeCts.Token;
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(150, token);
+                if (!token.IsCancellationRequested)
+                {
+                    await Dispatcher.UIThread.InvokeAsync(async () => await LoadDataAsync());
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Expected when debounce cancels
+            }
+        });
+    }
+
+    [RelayCommand]
+    private async Task SaveFilter()
+    {
+        var ownerWindow = GetUserControlOwnerWindow?.Invoke();
+        if (ownerWindow is null) return;
+
+        var confirmed = await MessageBoxHelper.ShowQuestionAsync(
+            language.SpendingEvolution_SaveConfirmTitle,
+            language.SpendingEvolution_SaveConfirmMessage,
+            ownerWindow);
+
+        if (!confirmed) return;
+
+        var selectedCategoryIds = SelectedCategories.Select(c => c.Id).ToHashSet();
+        var excludedCategoryIds = AvailableCategories.Where(c => !selectedCategoryIds.Contains(c.Id)).Select(c => c.Id);
+        _configurationManager.SetSpendingEvolutionCategoryFilterExcludedIds(excludedCategoryIds);
+
+        var selectedAccountIds = SelectedAccounts.Select(a => a.Id).ToHashSet();
+        var excludedAccountIds = AvailableAccounts.Where(a => !selectedAccountIds.Contains(a.Id)).Select(a => a.Id);
+        _configurationManager.SetSpendingEvolutionAccountFilterExcludedIds(excludedAccountIds);
+
+        await MessageBoxHelper.ShowAlertAsync(
+            language.SpendingEvolution_SaveConfirmTitle,
+            language.SpendingEvolution_SaveSuccess,
+            ownerWindow);
+    }
+
+    [RelayCommand]
+    private void LoadFilter()
+    {
+        var excludedCategoryIds = _configurationManager.GetSpendingEvolutionCategoryFilterExcludedIds().ToHashSet();
+        if (excludedCategoryIds.Count == 0)
+        {
+            SelectedCategories.Clear();
+            SelectedCategories.AddRange(AvailableCategories);
         }
         else
         {
-            // Menu mode: select all categories
-            foreach (var item in GetAllItems(CategoryItems))
-            {
-                item.IsSelected = true;
-            }
+            var newSelection = AvailableCategories.Where(c => !excludedCategoryIds.Contains(c.Id)).ToList();
+            SelectedCategories.Clear();
+            SelectedCategories.AddRange(newSelection);
+        }
+
+        var excludedAccountIds = _configurationManager.GetSpendingEvolutionAccountFilterExcludedIds().ToHashSet();
+        if (excludedAccountIds.Count == 0)
+        {
+            SelectedAccounts.Clear();
+            SelectedAccounts.AddRange(AvailableAccounts);
+        }
+        else
+        {
+            var newSelection = AvailableAccounts.Where(a => !excludedAccountIds.Contains(a.Id)).ToList();
+            SelectedAccounts.Clear();
+            SelectedAccounts.AddRange(newSelection);
         }
     }
 
@@ -211,26 +285,24 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
         try
         {
             var months = SelectedTimeRangeOption?.Months ?? 24;
-            var fromDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(-months));
-            var toDate = DateOnly.FromDateTime(DateTime.Now);
+            var today = _clock.GetCurrentLocalDate();
+            var fromDate = DateOnly.FromDateTime(today.ToDateTime(TimeOnly.MinValue).AddMonths(-months));
+            var toDate = today;
 
-            var selectedCategoryIds = GetAllItems(CategoryItems)
-                .Where(c => c.IsSelected)
-                .Select(c => c.Id)
-                .ToArray();
+            var selectedCategoryIds = SelectedCategories.Select(c => c.Id).ToArray();
+            var selectedAccountIds = SelectedAccounts.Select(a => a.Id).ToArray();
 
             var query = new GetSpendingEvolutionQuery
             {
                 From = fromDate,
                 To = toDate,
                 CategoryIds = selectedCategoryIds,
-                ShowHiddenAccounts = false
+                AccountIds = selectedAccountIds
             };
 
             CurrentData = await _queryDispatcher.DispatchAsync(query);
             ChartData.RefreshChart(CurrentData);
 
-            // Update indicators and warnings
             HasMissingPriceInSats = CurrentData.HasMissingPriceInSats;
             CalculateIndicators();
         }
@@ -262,7 +334,6 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
         {
             FiatIncreasePercent = ((lastMonth.FiatTotal - firstMonth.FiatTotal) / firstMonth.FiatTotal) * 100;
             FiatIncreasePercentText = $"{(FiatIncreasePercent >= 0 ? "+" : "")}{FiatIncreasePercent:F1}%";
-            // Green for decrease (good), Red for increase (bad)
             FiatIncreaseBrush = new SolidColorBrush(
                 FiatIncreasePercent <= 0 ? Colors.Green : Colors.Red);
         }
@@ -278,7 +349,6 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
         {
             BtcIncreasePercent = ((lastMonth.SatsTotal - firstMonth.SatsTotal) / (decimal)firstMonth.SatsTotal) * 100;
             BtcIncreasePercentText = $"{(BtcIncreasePercent >= 0 ? "+" : "")}{BtcIncreasePercent:F1}%";
-            // Green for decrease (good), Red for increase (bad)
             BtcIncreaseBrush = new SolidColorBrush(
                 BtcIncreasePercent <= 0 ? Colors.Green : Colors.Red);
         }
@@ -300,13 +370,11 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
 
     public void Dispose()
     {
-        _categoryChangeCts?.Cancel();
-        _categoryChangeCts?.Dispose();
+        _filterChangeCts?.Cancel();
+        _filterChangeCts?.Dispose();
 
-        foreach (var item in GetAllItems(CategoryItems))
-        {
-            item.PropertyChanged -= OnCategoryItemPropertyChanged;
-        }
+        SelectedAccounts.CollectionChanged -= OnSelectedFiltersChanged;
+        SelectedCategories.CollectionChanged -= OnSelectedFiltersChanged;
 
         ChartData?.Dispose();
     }

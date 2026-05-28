@@ -5264,5 +5264,47 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("SpendingEvolution.NA", resourceCulture);
             }
         }
+
+        public static string SpendingEvolution_Filters {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.Filters", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_Accounts {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.Accounts", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_SaveAsDefault {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.SaveAsDefault", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_LoadDefault {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.LoadDefault", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_SaveConfirmTitle {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.SaveConfirmTitle", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_SaveConfirmMessage {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.SaveConfirmMessage", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_SaveSuccess {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.SaveSuccess", resourceCulture);
+            }
+        }
     }
 }

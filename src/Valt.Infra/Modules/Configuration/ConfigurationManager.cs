@@ -318,6 +318,70 @@ public class ConfigurationManager : IConfigurationManager
         _localDatabase.GetConfiguration().Upsert(config);
     }
 
+    public List<string> GetSpendingEvolutionCategoryFilterExcludedIds()
+    {
+        var config = _localDatabase.GetConfiguration()
+            .FindOne(x => x.Key == ConfigurationKeys.SpendingEvolutionCategoryFilterExcluded);
+
+        if (config is null || string.IsNullOrWhiteSpace(config.Value))
+            return new List<string>();
+
+        return config.Value.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(id => id.Trim())
+            .Distinct()
+            .ToList();
+    }
+
+    public void SetSpendingEvolutionCategoryFilterExcludedIds(IEnumerable<string> categoryIds)
+    {
+        var config = _localDatabase.GetConfiguration()
+            .FindOne(x => x.Key == ConfigurationKeys.SpendingEvolutionCategoryFilterExcluded);
+
+        if (config is null)
+            config = new ConfigurationEntity { Key = ConfigurationKeys.SpendingEvolutionCategoryFilterExcluded };
+
+        var distinctIds = categoryIds
+            .Where(id => !string.IsNullOrWhiteSpace(id))
+            .Select(id => id.Trim())
+            .Distinct();
+
+        config.Value = string.Join(",", distinctIds);
+
+        _localDatabase.GetConfiguration().Upsert(config);
+    }
+
+    public List<string> GetSpendingEvolutionAccountFilterExcludedIds()
+    {
+        var config = _localDatabase.GetConfiguration()
+            .FindOne(x => x.Key == ConfigurationKeys.SpendingEvolutionAccountFilterExcluded);
+
+        if (config is null || string.IsNullOrWhiteSpace(config.Value))
+            return new List<string>();
+
+        return config.Value.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(id => id.Trim())
+            .Distinct()
+            .ToList();
+    }
+
+    public void SetSpendingEvolutionAccountFilterExcludedIds(IEnumerable<string> accountIds)
+    {
+        var config = _localDatabase.GetConfiguration()
+            .FindOne(x => x.Key == ConfigurationKeys.SpendingEvolutionAccountFilterExcluded);
+
+        if (config is null)
+            config = new ConfigurationEntity { Key = ConfigurationKeys.SpendingEvolutionAccountFilterExcluded };
+
+        var distinctIds = accountIds
+            .Where(id => !string.IsNullOrWhiteSpace(id))
+            .Select(id => id.Trim())
+            .Distinct();
+
+        config.Value = string.Join(",", distinctIds);
+
+        _localDatabase.GetConfiguration().Upsert(config);
+    }
+
     private static readonly List<SimulatedPriceLineConfig> DefaultSimulatedPriceLines =
     [
         new(SimulatedPriceType.Percentage, 50),

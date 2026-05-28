@@ -35,34 +35,42 @@
             <!-- Row 1: Main Content -->
             <Grid Grid.Row="1" ColumnDefinitions="280, *">
 
-                <!-- Left: Category Selector -->
+                <!-- Left: Filter Panel -->
                 <Border Grid.Column="0" Classes="form-fields-area" Margin="10">
-                    <StackPanel>
-                        <TextBlock Text="{x:Static local:language.SpendingEvolution_Categories}"
-                                   FontSize="{DynamicResource FontSizeLarge}"
-                                   Margin="0,0,0,10" />
-                        <TreeView x:Name="CategoryTree"
-                                  ItemsSource="{Binding CategoryItems}"
-                                  SelectionMode="Single"
-                                  MaxHeight="450">
-                            <TreeView.ItemTemplate>
-                                <TreeDataTemplate ItemsSource="{Binding SubNodes}">
-                                    <StackPanel Orientation="Horizontal"
-                                                Height="24"
-                                                Spacing="8">
-                                        <CheckBox IsChecked="{Binding IsSelected}"
-                                                  VerticalAlignment="Center" />
-                                        <TextBlock FontFamily="{DynamicResource MaterialDesign}"
-                                                   FontSize="{DynamicResource FontSizeLarge}"
-                                                   Text="{Binding Unicode}"
-                                                   Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="{Binding Name}"
-                                                   VerticalAlignment="Center" />
-                                    </StackPanel>
-                                </TreeDataTemplate>
-                            </TreeView.ItemTemplate>
-                        </TreeView>
+                    <StackPanel Spacing="10">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <TextBlock Grid.Column="0"
+                                       Text="{x:Static local:language.SpendingEvolution_Filters}"
+                                       FontSize="{DynamicResource FontSizeLarge}"
+                                       VerticalAlignment="Center" />
+                            <Button x:Name="FilterSettingsButton"
+                                    Grid.Column="1"
+                                    Classes="transparent" Padding="2" HorizontalAlignment="Right"
+                                    Click="OnFilterSettingsButtonClick">
+                                <Button.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="{x:Static local:language.SpendingEvolution_SaveAsDefault}"
+                                                  Command="{Binding SaveFilterCommand}" />
+                                        <MenuItem Header="{x:Static local:language.SpendingEvolution_LoadDefault}"
+                                                  Command="{Binding LoadFilterCommand}" />
+                                    </ContextMenu>
+                                </Button.ContextMenu>
+                                <TextBlock FontFamily="{DynamicResource MaterialDesign}" Text="&#xE8B8;" FontSize="16"
+                                           Foreground="{DynamicResource Text300Brush}" />
+                            </Button>
+                        </Grid>
+                        <userControls:CheckboxListSelector
+                            Title="{x:Static local:language.SpendingEvolution_Accounts}"
+                            DisplayMemberPath="Name"
+                            MaxListHeight="200"
+                            ItemsSource="{Binding AvailableAccounts}"
+                            SelectedItems="{Binding SelectedAccounts}" />
+                        <userControls:CheckboxListSelector
+                            Title="{x:Static local:language.SpendingEvolution_Categories}"
+                            DisplayMemberPath="Name"
+                            MaxListHeight="250"
+                            ItemsSource="{Binding AvailableCategories}"
+                            SelectedItems="{Binding SelectedCategories}" />
                     </StackPanel>
                 </Border>
 

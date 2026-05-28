@@ -2686,4 +2686,25 @@
     <data name="SpendingEvolution.NA" xml:space="preserve">
         <value>N/A</value>
     </data>
+    <data name="SpendingEvolution.Filters" xml:space="preserve">
+        <value>Filtros</value>
+    </data>
+    <data name="SpendingEvolution.Accounts" xml:space="preserve">
+        <value>Cuentas</value>
+    </data>
+    <data name="SpendingEvolution.SaveAsDefault" xml:space="preserve">
+        <value>Guardar como Predeterminado</value>
+    </data>
+    <data name="SpendingEvolution.LoadDefault" xml:space="preserve">
+        <value>Cargar Predeterminado</value>
+    </data>
+    <data name="SpendingEvolution.SaveConfirmTitle" xml:space="preserve">
+        <value>Guardar Filtro</value>
+    </data>
+    <data name="SpendingEvolution.SaveConfirmMessage" xml:space="preserve">
+        <value>¿Desea guardar el filtro actual como predeterminado?</value>
+    </data>
+    <data name="SpendingEvolution.SaveSuccess" xml:space="preserve">
+        <value>Filtro guardado exitosamente.</value>
+    </data>
 </root>

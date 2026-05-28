@@ -35,12 +35,11 @@ public class SpendingEvolutionQueries : ISpendingEvolutionQueries
     {
         // Load accounts
         var allAccountsList = _localDatabase.GetAccounts().FindAll().ToList();
-        var visibleAccountsList = query.ShowHiddenAccounts
-            ? allAccountsList
-            : allAccountsList.Where(a => a.Visible).ToList();
+        var selectedAccountIds = query.AccountIds.Length > 0
+            ? query.AccountIds.Select(id => new ObjectId(id)).ToList()
+            : allAccountsList.Select(a => a.Id).ToList();
 
-        var accountDict = visibleAccountsList.ToDictionary(a => a.Id);
-        var visibleAccountIds = visibleAccountsList.Select(a => a.Id).ToList();
+        var accountDict = allAccountsList.Where(a => selectedAccountIds.Contains(a.Id)).ToDictionary(a => a.Id);
 
         // Get primary currency
         var primaryCurrency = _currencySettings.MainFiatCurrency;
@@ -63,23 +62,22 @@ public class SpendingEvolutionQueries : ISpendingEvolutionQueries
             transactionQuery = transactionQuery.Where(x => categoryObjectIds.Contains(x.CategoryId));
         }
 
-        // Filter by visible accounts
-        if (visibleAccountIds.Count < allAccountsList.Count)
+        // Filter by selected accounts
+        if (selectedAccountIds.Count < allAccountsList.Count)
         {
-            transactionQuery = transactionQuery.Where(x => visibleAccountIds.Contains(x.FromAccountId));
+            transactionQuery = transactionQuery.Where(x => selectedAccountIds.Contains(x.FromAccountId));
         }
 
-        // Only include debit transactions (spending)
+        // Include all debit transactions (spending): fiat expenses OR bitcoin expenses with auto-calculated sats
         transactionQuery = transactionQuery.Where(x =>
             (x.FromFiatAmount.HasValue && x.FromFiatAmount.Value < 0) ||
-            (x.FromSatAmount.HasValue && x.FromSatAmount.Value < 0));
+            (x.SatAmount.HasValue && x.FromSatAmount.HasValue && x.FromSatAmount.Value < 0));
 
         // Execute query - load filtered results into memory
         var transactions = transactionQuery.ToList();
 
         // Aggregate by month
         var monthlyData = new Dictionary<(int Year, int Month), (decimal FiatTotal, long SatsTotal, int TransactionCount)>();
-        var hasMissingPriceInSats = false;
 
         foreach (var transaction in transactions)
         {
@@ -103,16 +101,11 @@ public class SpendingEvolutionQueries : ISpendingEvolutionQueries
                 current.FiatTotal += convertedFiat;
             }
 
-            // Process sats amount
-            if (transaction.FromSatAmount.HasValue && transaction.FromSatAmount.Value < 0)
+            // Process auto-calculated sat amount (from AutoSatAmountDetails) only if available
+            if (transaction.SatAmount.HasValue)
             {
-                var absoluteSats = Math.Abs(transaction.FromSatAmount.Value);
+                var absoluteSats = Math.Abs(transaction.SatAmount.Value);
                 current.SatsTotal += absoluteSats;
-            }
-            else if (transaction.Type == TransactionEntityType.Bitcoin || transaction.Type == TransactionEntityType.BitcoinToBitcoin || transaction.Type == TransactionEntityType.BitcoinToFiat)
-            {
-                // Bitcoin transaction without sat amount means missing price data
-                hasMissingPriceInSats = true;
             }
 
             current.TransactionCount++;
@@ -135,7 +128,7 @@ public class SpendingEvolutionQueries : ISpendingEvolutionQueries
         return Task.FromResult(new SpendingEvolutionDataDto
         {
             Months = sortedMonths,
-            HasMissingPriceInSats = hasMissingPriceInSats,
+            HasMissingPriceInSats = false,
             PrimaryCurrency = primaryCurrency
         });
     }
