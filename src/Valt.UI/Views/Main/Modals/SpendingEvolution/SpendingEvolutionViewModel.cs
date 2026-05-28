@@ -306,6 +306,7 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
             var months = SelectedTimeRangeOption?.Months ?? 24;
             var today = _clock.GetCurrentLocalDate();
             var fromDate = DateOnly.FromDateTime(today.ToDateTime(TimeOnly.MinValue).AddMonths(-months));
+            fromDate = new DateOnly(fromDate.Year, fromDate.Month, 1);
             var toDate = today;
 
             var selectedCategoryIds = SelectedCategories.Select(c => c.Id).ToArray();

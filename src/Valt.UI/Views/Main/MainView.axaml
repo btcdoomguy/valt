@@ -65,20 +65,6 @@
                                 <MenuItem Header="{x:Static local:language.Main_Menu_Categories}"
                                           Command="{Binding ManageCategoriesCommand}">
                                 </MenuItem>
-                                <MenuItem Header="{x:Static local:language.Menu_Tools}">
-                                    <MenuItem Header="{x:Static local:language.Menu_ConversionCalculator}"
-                                              Command="{Binding OpenConversionCalculatorCommand}">
-                                    </MenuItem>
-                                    <MenuItem Header="{x:Static local:language.Menu_LeverageSimulator}"
-                                              Command="{Binding OpenLeverageSimulatorCommand}">
-                                    </MenuItem>
-                                    <MenuItem Header="{x:Static local:language.Main_PriceHistory}"
-                                              Command="{Binding OpenPriceHistoryCommand}">
-                                    </MenuItem>
-                                    <MenuItem Header="{x:Static local:language.SpendingEvolution_Menu}"
-                                              Command="{Binding OpenSpendingEvolutionCommand}">
-                                    </MenuItem>
-                                </MenuItem>
                                 <Separator />
                                 <MenuItem Header="{x:Static local:language.Menu_ImportTransactions}"
                                           Command="{Binding OpenImportWizardCommand}">
@@ -238,8 +224,31 @@
                             </Ellipse>
                         </Grid>
                     </Button>
+                    <!-- Tools button -->
+                    <Button Classes="tab"
+                            Margin="5,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Label Classes="icon" Content="&#xEA3C;"></Label>
+                            <Label Content="{x:Static local:language.Menu_Tools}" />
+                        </StackPanel>
+                        <Button.Flyout>
+                            <MenuFlyout>
+                                <MenuItem Header="{x:Static local:language.Menu_ConversionCalculator}"
+                                          Command="{Binding OpenConversionCalculatorCommand}">
+                                </MenuItem>
+                                <MenuItem Header="{x:Static local:language.Menu_LeverageSimulator}"
+                                          Command="{Binding OpenLeverageSimulatorCommand}">
+                                </MenuItem>
+                                <MenuItem Header="{x:Static local:language.Main_PriceHistory}"
+                                          Command="{Binding OpenPriceHistoryCommand}">
+                                </MenuItem>
+                                <MenuItem Header="{x:Static local:language.SpendingEvolution_Menu}"
+                                          Command="{Binding OpenSpendingEvolutionCommand}">
+                                </MenuItem>
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
                 </StackPanel>
-      
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Classes="icon-only transparent link"

@@ -2675,10 +2675,10 @@
         <value>{0} meses</value>
     </data>
     <data name="SpendingEvolution.CostOfLiving.Fiat" xml:space="preserve">
-        <value>Custo de Vida (Fiat)</value>
+        <value>Variação (Fiat)</value>
     </data>
     <data name="SpendingEvolution.CostOfLiving.Btc" xml:space="preserve">
-        <value>Custo de Vida (BTC)</value>
+        <value>Variação (Sats)</value>
     </data>
     <data name="SpendingEvolution.Warning.MissingPriceData" xml:space="preserve">
         <value>Algumas transações não possuem dados de preço em BTC</value>
