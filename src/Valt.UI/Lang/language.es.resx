@@ -2656,4 +2656,55 @@
     <data name="FixedExpenseOverview.NoExpenses" xml:space="preserve">
         <value>Sin gastos fijos para este mes</value>
     </data>
+    <data name="SpendingEvolution.Title" xml:space="preserve">
+        <value>Evolución de Gastos</value>
+    </data>
+    <data name="SpendingEvolution.Menu" xml:space="preserve">
+        <value>Evolución de Gastos</value>
+    </data>
+    <data name="SpendingEvolution.ContextMenu" xml:space="preserve">
+        <value>Analizar Evolución de Gastos</value>
+    </data>
+    <data name="SpendingEvolution.Categories" xml:space="preserve">
+        <value>Categorías</value>
+    </data>
+    <data name="SpendingEvolution.TimeRange" xml:space="preserve">
+        <value>Período:</value>
+    </data>
+    <data name="SpendingEvolution.Months" xml:space="preserve">
+        <value>{0} meses</value>
+    </data>
+    <data name="SpendingEvolution.CostOfLiving.Fiat" xml:space="preserve">
+        <value>Variación (Fiat)</value>
+    </data>
+    <data name="SpendingEvolution.CostOfLiving.Btc" xml:space="preserve">
+        <value>Variación (Sats)</value>
+    </data>
+    <data name="SpendingEvolution.Warning.MissingPriceData" xml:space="preserve">
+        <value>Algunas transaciones no tienen datos de precio en BTC</value>
+    </data>
+    <data name="SpendingEvolution.NA" xml:space="preserve">
+        <value>N/A</value>
+    </data>
+    <data name="SpendingEvolution.Filters" xml:space="preserve">
+        <value>Filtros</value>
+    </data>
+    <data name="SpendingEvolution.Accounts" xml:space="preserve">
+        <value>Cuentas</value>
+    </data>
+    <data name="SpendingEvolution.SaveAsDefault" xml:space="preserve">
+        <value>Guardar como Predeterminado</value>
+    </data>
+    <data name="SpendingEvolution.LoadDefault" xml:space="preserve">
+        <value>Cargar Predeterminado</value>
+    </data>
+    <data name="SpendingEvolution.SaveConfirmTitle" xml:space="preserve">
+        <value>Guardar Filtro</value>
+    </data>
+    <data name="SpendingEvolution.SaveConfirmMessage" xml:space="preserve">
+        <value>¿Desea guardar el filtro actual como predeterminado?</value>
+    </data>
+    <data name="SpendingEvolution.SaveSuccess" xml:space="preserve">
+        <value>Filtro guardado exitosamente.</value>
+    </data>
 </root>

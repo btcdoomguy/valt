@@ -65,7 +65,9 @@ using Valt.Infra.Modules.Reports.IncomeByCategory;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.Infra.Modules.Reports.Statistics;
 using Valt.Infra.Modules.Reports.WealthOverview;
+using Valt.Infra.Modules.SpendingEvolution.Queries;
 using Valt.Infra.Mcp.Server;
+using Valt.App.Modules.SpendingEvolution.Contracts;
 using Valt.Infra.Services.CsvExport;
 using Valt.Infra.Services.CsvImport;
 using Valt.Infra.Services.Updates;
@@ -239,6 +241,7 @@ public static class Extensions
         services.AddSingleton<ITransactionQueries, TransactionQueries>();
         services.AddSingleton<IGoalQueries, GoalQueries>();
         services.AddSingleton<IAssetQueries, AssetQueries>();
+        services.AddSingleton<ISpendingEvolutionQueries, SpendingEvolutionQueries>();
 
         return services;
     }

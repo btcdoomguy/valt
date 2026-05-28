@@ -2661,4 +2661,55 @@
     <data name="FixedExpenseOverview.NoExpenses" xml:space="preserve">
         <value>No fixed expenses for this month</value>
     </data>
+    <data name="SpendingEvolution.Title" xml:space="preserve">
+        <value>Spending Evolution</value>
+    </data>
+    <data name="SpendingEvolution.Menu" xml:space="preserve">
+        <value>Spending Evolution</value>
+    </data>
+    <data name="SpendingEvolution.ContextMenu" xml:space="preserve">
+        <value>Analyze Spending Evolution</value>
+    </data>
+    <data name="SpendingEvolution.Categories" xml:space="preserve">
+        <value>Categories</value>
+    </data>
+    <data name="SpendingEvolution.TimeRange" xml:space="preserve">
+        <value>Time Range:</value>
+    </data>
+    <data name="SpendingEvolution.Months" xml:space="preserve">
+        <value>{0} months</value>
+    </data>
+    <data name="SpendingEvolution.CostOfLiving.Fiat" xml:space="preserve">
+        <value>Variation (Fiat)</value>
+    </data>
+    <data name="SpendingEvolution.CostOfLiving.Btc" xml:space="preserve">
+        <value>Variation (Sats)</value>
+    </data>
+    <data name="SpendingEvolution.Warning.MissingPriceData" xml:space="preserve">
+        <value>Some transactions are missing BTC price data</value>
+    </data>
+    <data name="SpendingEvolution.NA" xml:space="preserve">
+        <value>N/A</value>
+    </data>
+    <data name="SpendingEvolution.Filters" xml:space="preserve">
+        <value>Filters</value>
+    </data>
+    <data name="SpendingEvolution.Accounts" xml:space="preserve">
+        <value>Accounts</value>
+    </data>
+    <data name="SpendingEvolution.SaveAsDefault" xml:space="preserve">
+        <value>Save as Default</value>
+    </data>
+    <data name="SpendingEvolution.LoadDefault" xml:space="preserve">
+        <value>Load Default</value>
+    </data>
+    <data name="SpendingEvolution.SaveConfirmTitle" xml:space="preserve">
+        <value>Save Filter</value>
+    </data>
+    <data name="SpendingEvolution.SaveConfirmMessage" xml:space="preserve">
+        <value>Do you want to save the current filter as default?</value>
+    </data>
+    <data name="SpendingEvolution.SaveSuccess" xml:space="preserve">
+        <value>Filter saved successfully.</value>
+    </data>
 </root>

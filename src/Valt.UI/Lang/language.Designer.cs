@@ -5204,5 +5204,107 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("FixedExpenseOverview.NoExpenses", resourceCulture);
             }
         }
+
+        public static string SpendingEvolution_Title {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.Title", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_Menu {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.Menu", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_ContextMenu {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.ContextMenu", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_Categories {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.Categories", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_TimeRange {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.TimeRange", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_Months {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.Months", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_CostOfLiving_Fiat {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.CostOfLiving.Fiat", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_CostOfLiving_Btc {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.CostOfLiving.Btc", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_Warning_MissingPriceData {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.Warning.MissingPriceData", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_NA {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.NA", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_Filters {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.Filters", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_Accounts {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.Accounts", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_SaveAsDefault {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.SaveAsDefault", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_LoadDefault {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.LoadDefault", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_SaveConfirmTitle {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.SaveConfirmTitle", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_SaveConfirmMessage {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.SaveConfirmMessage", resourceCulture);
+            }
+        }
+
+        public static string SpendingEvolution_SaveSuccess {
+            get {
+                return ResourceManager.GetString("SpendingEvolution.SaveSuccess", resourceCulture);
+            }
+        }
     }
 }

@@ -35,8 +35,12 @@ public partial class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         var localStorageService = new LocalStorageService();
-        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(localStorageService.LoadCulture());
-        CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo(localStorageService.LoadCulture());
+        var culture = CultureInfo.GetCultureInfo(localStorageService.LoadCulture());
+        CultureInfo.CurrentCulture = culture;
+        CultureInfo.CurrentUICulture = culture;
+        CultureInfo.DefaultThreadCurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
+        Lang.language.Culture = culture;
 
         var collection = new ServiceCollection();
 

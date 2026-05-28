@@ -85,6 +85,26 @@ public interface IConfigurationManager
     /// </summary>
     void SetIncomeCategoryFilterExcludedIds(IEnumerable<string> categoryIds);
 
+    /// <summary>
+    /// Gets the list of category IDs excluded from the spending evolution filter.
+    /// </summary>
+    List<string> GetSpendingEvolutionCategoryFilterExcludedIds();
+
+    /// <summary>
+    /// Sets the list of category IDs to exclude from the spending evolution filter.
+    /// </summary>
+    void SetSpendingEvolutionCategoryFilterExcludedIds(IEnumerable<string> categoryIds);
+
+    /// <summary>
+    /// Gets the list of account IDs excluded from the spending evolution filter.
+    /// </summary>
+    List<string> GetSpendingEvolutionAccountFilterExcludedIds();
+
+    /// <summary>
+    /// Sets the list of account IDs to exclude from the spending evolution filter.
+    /// </summary>
+    void SetSpendingEvolutionAccountFilterExcludedIds(IEnumerable<string> accountIds);
+
     List<SimulatedPriceLineConfig> GetSimulatedPriceLines();
     void SetSimulatedPriceLines(IEnumerable<SimulatedPriceLineConfig> lines);
 }

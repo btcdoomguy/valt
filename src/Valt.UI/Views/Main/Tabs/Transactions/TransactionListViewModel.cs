@@ -46,6 +46,7 @@ using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Modals.AvgPriceLineEditor;
 using Valt.UI.Views.Main.Modals.ChangeCategoryTransactions;
 using Valt.UI.Services.MessageBoxes;
+using Valt.UI.Views.Main.Modals.SpendingEvolution;
 using Valt.UI.Views.Main.Modals.TransactionEditor;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
@@ -603,6 +604,27 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
             })!;
 
         await modal.ShowDialogSafeAsync<AvgPriceLineEditorViewModel.Response?>(ownerWindow);
+    }
+
+    #endregion
+
+    #region Spending Evolution
+
+    [RelayCommand]
+    private async Task AnalyzeSpendingEvolution(TransactionViewModel? selectedTransaction)
+    {
+        if (selectedTransaction is null)
+            return;
+
+        var ownerWindow = GetUserControlOwnerWindow()!;
+
+        var modal =
+            (SpendingEvolutionView)await _modalFactory.CreateAsync(
+                ApplicationModalNames.SpendingEvolution,
+                ownerWindow,
+                selectedTransaction.CategoryId)!;
+
+        await modal.ShowDialogSafeAsync(ownerWindow);
     }
 
     #endregion

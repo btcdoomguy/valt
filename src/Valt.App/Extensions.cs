@@ -28,6 +28,7 @@ public static class Extensions
             .WithTransientLifetime());
 
         // Auto-register query handlers (singleton - stateless reads)
+        // Includes: Budget, Assets, AvgPrice, Goals, and SpendingEvolution query handlers
         services.Scan(scan => scan
             .FromAssemblyOf<AssemblyMarker>()
             .AddClasses(classes => classes.Where(type =>

@@ -1,0 +1,158 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        xmlns:spendingEvolution="clr-namespace:Valt.UI.Views.Main.Modals.SpendingEvolution"
+        xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Views.Main.Modals.SpendingEvolution.SpendingEvolutionView"
+        x:DataType="spendingEvolution:SpendingEvolutionViewModel"
+        Title="{x:Static local:language.SpendingEvolution_Title}"
+         WindowStartupLocation="CenterOwner"
+        d:DesignWidth="700"
+        d:DesignHeight="600"
+        MinWidth="700"
+        MinHeight="600"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <spendingEvolution:SpendingEvolutionViewModel />
+    </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" />
+    </Window.KeyBindings>
+    <Border>
+        <Grid RowDefinitions="Auto, *, Auto">
+            <!-- Row 0: Title Bar -->
+            <userControls:CustomTitleBar Grid.Row="0"
+                                         Title="{x:Static local:language.SpendingEvolution_Title}"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+
+            <!-- Row 1: Main Content -->
+            <Grid Grid.Row="1" ColumnDefinitions="280, *">
+
+                <!-- Left: Filter Panel -->
+                <Border Grid.Column="0" Classes="form-fields-area" Margin="10">
+                    <StackPanel Spacing="10">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <TextBlock Grid.Column="0"
+                                       Text="{x:Static local:language.SpendingEvolution_Filters}"
+                                       FontSize="{DynamicResource FontSizeLarge}"
+                                       VerticalAlignment="Center" />
+                            <Button x:Name="FilterSettingsButton"
+                                    Grid.Column="1"
+                                    Classes="transparent" Padding="2" HorizontalAlignment="Right"
+                                    Click="OnFilterSettingsButtonClick">
+                                <Button.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="{x:Static local:language.SpendingEvolution_SaveAsDefault}"
+                                                  Command="{Binding SaveFilterCommand}" />
+                                        <MenuItem Header="{x:Static local:language.SpendingEvolution_LoadDefault}"
+                                                  Command="{Binding LoadFilterCommand}" />
+                                    </ContextMenu>
+                                </Button.ContextMenu>
+                                <TextBlock FontFamily="{DynamicResource MaterialDesign}" Text="&#xE8B8;" FontSize="16"
+                                           Foreground="{DynamicResource Text300Brush}" />
+                            </Button>
+                        </Grid>
+                        <userControls:CheckboxListSelector
+                            Title="{x:Static local:language.SpendingEvolution_Accounts}"
+                            DisplayMemberPath="Name"
+                            MaxListHeight="200"
+                            ItemsSource="{Binding AvailableAccounts}"
+                            SelectedItems="{Binding SelectedAccounts}" />
+                        <userControls:CheckboxListSelector
+                            Title="{x:Static local:language.SpendingEvolution_Categories}"
+                            DisplayMemberPath="Name"
+                            MaxListHeight="250"
+                            ItemsSource="{Binding AvailableCategories}"
+                            SelectedItems="{Binding SelectedCategories}" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Right: Chart Area -->
+                <Grid Grid.Column="1" RowDefinitions="Auto, *, Auto">
+
+                    <!-- Top: Time Range Dropdown -->
+                    <StackPanel Grid.Row="0"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Margin="10">
+                        <TextBlock Text="{x:Static local:language.SpendingEvolution_TimeRange}"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,10,0" />
+                        <ComboBox ItemsSource="{Binding TimeRangeOptions}"
+                                  SelectedItem="{Binding SelectedTimeRangeOption}"
+                                  Width="120">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="spendingEvolution:TimeRangeOption">
+                                    <TextBlock Text="{Binding DisplayText}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <!-- Middle: Chart -->
+                    <Border Grid.Row="1" Margin="10,0,10,10">
+                        <lvc:CartesianChart Series="{Binding ChartData.Series}"
+                                            XAxes="{Binding ChartData.XAxes}"
+                                            YAxes="{Binding ChartData.YAxes}"
+                                            LegendTextPaint="{Binding ChartData.LegendTextPaint}"
+                                            TooltipTextPaint="{Binding ChartData.TooltipTextPaint}"
+                                            TooltipBackgroundPaint="{Binding ChartData.TooltipBackgroundPaint}"
+                                            ZoomMode="X"
+                                            ZoomingSpeed="0.5" />
+                    </Border>
+
+                    <!-- Bottom: Indicators -->
+                    <Grid Grid.Row="2"
+                          ColumnDefinitions="*, *"
+                          Margin="10">
+                        <StackPanel Grid.Column="0"
+                                    HorizontalAlignment="Center">
+                            <TextBlock Text="{x:Static local:language.SpendingEvolution_CostOfLiving_Fiat}"
+                                       FontSize="{DynamicResource FontSizeSmall}"
+                                       Foreground="{DynamicResource Text400Brush}" />
+                            <TextBlock Text="{Binding FiatIncreasePercentText}"
+                                       FontSize="{DynamicResource FontSizeXLarge}"
+                                       FontWeight="Bold"
+                                       Foreground="{Binding FiatIncreaseBrush}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1"
+                                    HorizontalAlignment="Center">
+                            <TextBlock Text="{x:Static local:language.SpendingEvolution_CostOfLiving_Btc}"
+                                       FontSize="{DynamicResource FontSizeSmall}"
+                                       Foreground="{DynamicResource Text400Brush}" />
+                            <TextBlock Text="{Binding BtcIncreasePercentText}"
+                                       FontSize="{DynamicResource FontSizeXLarge}"
+                                       FontWeight="Bold"
+                                       Foreground="{Binding BtcIncreaseBrush}" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Grid>
+
+            <!-- Row 2: Warning Banner -->
+            <Border Grid.Row="2"
+                    Background="{DynamicResource SemanticWarning800Brush}"
+                    IsVisible="{Binding HasMissingPriceInSats}"
+                    Padding="10">
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center">
+                    <TextBlock FontFamily="{DynamicResource MaterialDesign}"
+                               Text="&#xE002;"
+                               Foreground="{DynamicResource SemanticWarning200Brush}"
+                               Margin="0,0,8,0" />
+                    <TextBlock Text="{x:Static local:language.SpendingEvolution_Warning_MissingPriceData}"
+                               Foreground="{DynamicResource Text100Brush}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

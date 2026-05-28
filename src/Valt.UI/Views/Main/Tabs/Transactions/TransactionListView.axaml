@@ -208,6 +208,11 @@
                             </Style>
                         </MenuItem.Styles>
                     </MenuItem>
+                    <MenuItem Header="{x:Static local:language.SpendingEvolution_ContextMenu}"
+                              IsVisible="{Binding IsSingleItemSelected}"
+                              Command="{Binding AnalyzeSpendingEvolutionCommand}"
+                              CommandParameter="{Binding SelectedTransaction}">
+                    </MenuItem>
 
                 </ContextMenu>
             </DataGrid.ContextMenu>
