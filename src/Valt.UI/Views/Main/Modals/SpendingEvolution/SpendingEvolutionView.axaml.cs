@@ -16,8 +16,7 @@ public partial class SpendingEvolutionView : ValtBaseWindow
     {
         if (sender is Button button && button.ContextMenu is not null)
         {
-            button.ContextMenu.Placement = PlacementMode.BottomEdgeAlignedRight;
-            button.ContextMenu.Open();
+            button.ContextMenu.Open(button);
         }
     }
 }

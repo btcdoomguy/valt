@@ -37,6 +37,11 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
     private bool _isDataLoading;
     private CancellationTokenSource? _filterChangeCts;
 
+    public SpendingEvolutionViewModel()
+    {
+        
+    }
+
     public SpendingEvolutionViewModel(
         IQueryDispatcher queryDispatcher,
         ILocalDatabase localDatabase,
@@ -247,33 +252,47 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
     }
 
     [RelayCommand]
-    private void LoadFilter()
+    private async Task LoadFilter()
     {
-        var excludedCategoryIds = _configurationManager.GetSpendingEvolutionCategoryFilterExcludedIds().ToHashSet();
-        if (excludedCategoryIds.Count == 0)
+        // Temporarily detach event handlers to avoid triggering multiple LoadDataAsync calls
+        SelectedAccounts.CollectionChanged -= OnSelectedFiltersChanged;
+        SelectedCategories.CollectionChanged -= OnSelectedFiltersChanged;
+
+        try
         {
-            SelectedCategories.Clear();
-            SelectedCategories.AddRange(AvailableCategories);
+            var excludedCategoryIds = _configurationManager.GetSpendingEvolutionCategoryFilterExcludedIds().ToHashSet();
+            if (excludedCategoryIds.Count == 0)
+            {
+                SelectedCategories.Clear();
+                SelectedCategories.AddRange(AvailableCategories);
+            }
+            else
+            {
+                var newSelection = AvailableCategories.Where(c => !excludedCategoryIds.Contains(c.Id)).ToList();
+                SelectedCategories.Clear();
+                SelectedCategories.AddRange(newSelection);
+            }
+
+            var excludedAccountIds = _configurationManager.GetSpendingEvolutionAccountFilterExcludedIds().ToHashSet();
+            if (excludedAccountIds.Count == 0)
+            {
+                SelectedAccounts.Clear();
+                SelectedAccounts.AddRange(AvailableAccounts);
+            }
+            else
+            {
+                var newSelection = AvailableAccounts.Where(a => !excludedAccountIds.Contains(a.Id)).ToList();
+                SelectedAccounts.Clear();
+                SelectedAccounts.AddRange(newSelection);
+            }
         }
-        else
+        finally
         {
-            var newSelection = AvailableCategories.Where(c => !excludedCategoryIds.Contains(c.Id)).ToList();
-            SelectedCategories.Clear();
-            SelectedCategories.AddRange(newSelection);
+            SelectedAccounts.CollectionChanged += OnSelectedFiltersChanged;
+            SelectedCategories.CollectionChanged += OnSelectedFiltersChanged;
         }
 
-        var excludedAccountIds = _configurationManager.GetSpendingEvolutionAccountFilterExcludedIds().ToHashSet();
-        if (excludedAccountIds.Count == 0)
-        {
-            SelectedAccounts.Clear();
-            SelectedAccounts.AddRange(AvailableAccounts);
-        }
-        else
-        {
-            var newSelection = AvailableAccounts.Where(a => !excludedAccountIds.Contains(a.Id)).ToList();
-            SelectedAccounts.Clear();
-            SelectedAccounts.AddRange(newSelection);
-        }
+        await LoadDataAsync();
     }
 
     [RelayCommand]

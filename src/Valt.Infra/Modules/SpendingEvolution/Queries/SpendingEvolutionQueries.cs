@@ -77,40 +77,7 @@ public class SpendingEvolutionQueries : ISpendingEvolutionQueries
         var transactions = transactionQuery.ToList();
 
         // Aggregate by month
-        var monthlyData = new Dictionary<(int Year, int Month), (decimal FiatTotal, long SatsTotal, int TransactionCount)>();
-
-        foreach (var transaction in transactions)
-        {
-            if (!accountDict.TryGetValue(transaction.FromAccountId, out var account))
-                continue;
-
-            var yearMonth = (transaction.Date.Year, transaction.Date.Month);
-
-            if (!monthlyData.ContainsKey(yearMonth))
-            {
-                monthlyData[yearMonth] = (0m, 0L, 0);
-            }
-
-            var current = monthlyData[yearMonth];
-
-            // Process fiat amount
-            if (transaction.FromFiatAmount.HasValue && transaction.FromFiatAmount.Value < 0)
-            {
-                var absoluteFiat = Math.Abs(transaction.FromFiatAmount.Value);
-                var convertedFiat = ConvertToPrimaryCurrency(absoluteFiat, account.Currency, primaryCurrency, bitcoinPriceUsd, fiatRates);
-                current.FiatTotal += convertedFiat;
-            }
-
-            // Process auto-calculated sat amount (from AutoSatAmountDetails) only if available
-            if (transaction.SatAmount.HasValue)
-            {
-                var absoluteSats = Math.Abs(transaction.SatAmount.Value);
-                current.SatsTotal += absoluteSats;
-            }
-
-            current.TransactionCount++;
-            monthlyData[yearMonth] = current;
-        }
+        var monthlyData = AggregateBySum(transactions, accountDict, primaryCurrency, bitcoinPriceUsd, fiatRates, this);
 
         // Sort by year and month ascending
         var sortedMonths = monthlyData
@@ -131,6 +98,52 @@ public class SpendingEvolutionQueries : ISpendingEvolutionQueries
             HasMissingPriceInSats = false,
             PrimaryCurrency = primaryCurrency
         });
+    }
+
+    private static Dictionary<(int Year, int Month), (decimal FiatTotal, long SatsTotal, int TransactionCount)> AggregateBySum(
+        List<TransactionEntity> transactions,
+        Dictionary<ObjectId, AccountEntity> accountDict,
+        string primaryCurrency,
+        decimal? bitcoinPriceUsd,
+        IReadOnlyDictionary<string, decimal>? fiatRates,
+        SpendingEvolutionQueries self)
+    {
+        var monthlyData = new Dictionary<(int Year, int Month), (decimal FiatTotal, long SatsTotal, int TransactionCount)>();
+
+        foreach (var transaction in transactions)
+        {
+            if (!accountDict.TryGetValue(transaction.FromAccountId, out var account))
+                continue;
+
+            var yearMonth = (transaction.Date.Year, transaction.Date.Month);
+
+            if (!monthlyData.ContainsKey(yearMonth))
+            {
+                monthlyData[yearMonth] = (0m, 0L, 0);
+            }
+
+            var current = monthlyData[yearMonth];
+
+            // Process fiat amount
+            if (transaction.FromFiatAmount.HasValue && transaction.FromFiatAmount.Value < 0)
+            {
+                var absoluteFiat = Math.Abs(transaction.FromFiatAmount.Value);
+                var convertedFiat = self.ConvertToPrimaryCurrency(absoluteFiat, account.Currency, primaryCurrency, bitcoinPriceUsd, fiatRates);
+                current.FiatTotal += convertedFiat;
+            }
+
+            // Process auto-calculated sat amount (from AutoSatAmountDetails) only if available
+            if (transaction.SatAmount.HasValue)
+            {
+                var absoluteSats = Math.Abs(transaction.SatAmount.Value);
+                current.SatsTotal += absoluteSats;
+            }
+
+            current.TransactionCount++;
+            monthlyData[yearMonth] = current;
+        }
+
+        return monthlyData;
     }
 
     private (decimal? BitcoinPriceUsd, IReadOnlyDictionary<string, decimal>? FiatRates) GetLatestRates()

@@ -28,6 +28,11 @@ public abstract class ValtBaseWindow : Window
             vm.GetWindow = () => this;
         }
 
+        if (DataContext is ValtViewModel vmBase)
+        {
+            vmBase.GetUserControlOwnerWindow = () => this;
+        }
+
         // Ensure the modal window takes focus when opened.
         // This is especially important for windows with WindowDecorations="None".
         Activate();
