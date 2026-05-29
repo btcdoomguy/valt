@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 Phase: 3 — Polish
 Plan: 02 — Complete
 Status: All plans complete — Spending Evolution feature fully delivered
-Last activity: 2026-05-27 — Executed Plan 02 (Architecture verification)
+Last activity: 2026-05-29 — Completed quick task 20260529-001: Fix copy transaction modal slow opening
 
 ## Accumulated Context
 
@@ -53,6 +53,12 @@ Last activity: 2026-05-27 — Executed Plan 02 (Architecture verification)
 - 03-02: Architecture tests confirm SpendingEvolution module has zero layer violations — Core, App, Infra, UI boundaries respected
 - 03-02: QueryHandlerDependencyTests confirm GetSpendingEvolutionHandler uses ISpendingEvolutionQueries (not IRepository)
 - 03-02: Full test suite passes (1426/1426) with no new failures introduced by SpendingEvolution
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 20260529-001 | Fix copy transaction modal slow opening | 2026-05-29 | c334154 | [20260529-001-copy-modal-perf](./quick/20260529-001-copy-modal-perf/) |
 
 ### Blockers
 
