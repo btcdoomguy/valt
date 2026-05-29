@@ -278,6 +278,7 @@ public static class Extensions
         services.AddSingleton<LiveRateState>();
         services.AddSingleton<SecureModeState>();
         services.AddSingleton<TabRefreshState>();
+        services.AddSingleton<LastTransactionDateState>();
 
         //theming
         services.AddSingleton<IThemeService, ThemeService>();

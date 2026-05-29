@@ -21,7 +21,6 @@ using Valt.App.Modules.Budget.Transactions.Commands.AddTransaction;
 using Valt.App.Modules.Budget.Transactions.Commands.EditTransaction;
 using Valt.App.Modules.Budget.Transactions.DTOs;
 using Valt.App.Modules.Budget.Transactions.Queries.GetTransactionById;
-using Valt.App.Modules.Budget.Transactions.Queries.GetTransactions;
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Categories;
@@ -36,6 +35,7 @@ using static Valt.UI.Base.TaskExtensions;
 using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
+using Valt.UI.State;
 using Valt.UI.Views.Main.Modals.ConversionCalculator;
 using Valt.UI.Views.Main.Modals.TransactionEditor.Exceptions;
 
@@ -57,6 +57,7 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
     private readonly IModalFactory _modalFactory = null!;
     private readonly CurrencySettings _currencySettings = null!;
     private readonly DisplaySettings _displaySettings = null!;
+    private readonly LastTransactionDateState _lastTransactionDateState;
 
     public AvaloniaList<CategoryDTO> AvailableCategories { get; set; } = [];
     public AvaloniaList<AccountDTO> AvailableAccounts { get; set; } = [];
@@ -408,7 +409,8 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         ITransactionTermService transactionTermService,
         IModalFactory modalFactory,
         CurrencySettings currencySettings,
-        DisplaySettings displaySettings)
+        DisplaySettings displaySettings,
+        LastTransactionDateState lastTransactionDateState)
     {
         _commandDispatcher = commandDispatcher;
         _queryDispatcher = queryDispatcher;
@@ -416,6 +418,7 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         _modalFactory = modalFactory;
         _currencySettings = currencySettings;
         _displaySettings = displaySettings;
+        _lastTransactionDateState = lastTransactionDateState;
 
         InitializeAsync().SafeFireAndForget(callerName: nameof(InitializeAsync));
     }
@@ -507,12 +510,11 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         if (request.CopyTransaction)
         {
             var today = DateOnly.FromDateTime(DateTime.Now);
-            var allTransactions = await _queryDispatcher!.DispatchAsync(new GetTransactionsQuery());
-            var lastTransactionDate = allTransactions.Items.Count > 0
-                ? allTransactions.Items.MaxBy(t => t.Date)?.Date
-                : null;
-            var copyDate = lastTransactionDate.HasValue && lastTransactionDate.Value < today
-                ? lastTransactionDate.Value
+            var lastDate = _lastTransactionDateState.LastDate.HasValue
+                ? DateOnly.FromDateTime(_lastTransactionDateState.LastDate.Value)
+                : (DateOnly?)null;
+            var copyDate = lastDate.HasValue && lastDate.Value < today
+                ? lastDate.Value
                 : today;
             Date = copyDate.ToDateTime(TimeOnly.MinValue);
             WindowTitle = language.ManageTransactions_CopyTitle;
@@ -813,6 +815,7 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
                 }
             }
 
+            _lastTransactionDateState.LastDate = Date!.Value;
             CloseDialog?.Invoke(new Response(true, newTransactionDate));
         }
     }
