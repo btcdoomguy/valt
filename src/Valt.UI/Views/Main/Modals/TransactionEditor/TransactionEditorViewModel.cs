@@ -21,6 +21,7 @@ using Valt.App.Modules.Budget.Transactions.Commands.AddTransaction;
 using Valt.App.Modules.Budget.Transactions.Commands.EditTransaction;
 using Valt.App.Modules.Budget.Transactions.DTOs;
 using Valt.App.Modules.Budget.Transactions.Queries.GetTransactionById;
+using Valt.App.Modules.Budget.Transactions.Queries.GetTransactions;
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Categories;
@@ -503,9 +504,22 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
             return;
         }
 
-        Date = transaction.Date.ToDateTime(TimeOnly.MinValue);
-        if (!request.CopyTransaction)
+        if (request.CopyTransaction)
         {
+            var today = DateOnly.FromDateTime(DateTime.Now);
+            var allTransactions = await _queryDispatcher!.DispatchAsync(new GetTransactionsQuery());
+            var lastTransactionDate = allTransactions.Items.Count > 0
+                ? allTransactions.Items.MaxBy(t => t.Date)?.Date
+                : null;
+            var copyDate = lastTransactionDate.HasValue && lastTransactionDate.Value < today
+                ? lastTransactionDate.Value
+                : today;
+            Date = copyDate.ToDateTime(TimeOnly.MinValue);
+            WindowTitle = language.ManageTransactions_CopyTitle;
+        }
+        else
+        {
+            Date = transaction.Date.ToDateTime(TimeOnly.MinValue);
             _transactionId = new TransactionId(transaction.Id);
 
             WindowTitle = language.ManageTransactions_EditTitle;
@@ -519,10 +533,6 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
                     FixedExpenseId = TransactionFixedExpenseReference.FixedExpenseId.Value
                 });
             }
-        }
-        else
-        {
-            WindowTitle = language.ManageTransactions_CopyTitle;
         }
 
         Name = transaction.Name;
