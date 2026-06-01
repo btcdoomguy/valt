@@ -66,12 +66,35 @@ internal sealed class GetBtcLoansDashboardHandler : IQueryHandler<GetBtcLoansDas
         var totalAccruedMain = loanData.Sum(x => x.AccruedInMain);
         var totalFeesMain = loanData.Sum(x => x.FeesInMain);
 
+        // Helper to calculate LTV at simulated price
+        decimal? CalculateSimulatedLtv(AssetDTO loan)
+        {
+            if (!btcPriceUsd.HasValue || btcPriceUsd.Value <= 0 || !loan.CollateralSats.HasValue || loan.CollateralSats.Value <= 0)
+                return loan.CurrentLtv;
+
+            var collateralBtc = loan.CollateralSats.Value / SatsPerBtc;
+            var collateralUsd = collateralBtc * btcPriceUsd.Value;
+            decimal collateralInMain;
+            if (mainCurrencyCode == FiatCurrency.Usd.Code)
+                collateralInMain = collateralUsd;
+            else if (fiatRates is not null && fiatRates.TryGetValue(mainCurrencyCode, out var mainRate))
+                collateralInMain = collateralUsd * mainRate;
+            else
+                return loan.CurrentLtv;
+
+            if (collateralInMain == 0)
+                return loan.CurrentLtv;
+
+            var debtInMain = ConvertToMain(loan.TotalDebt ?? 0m, loan.CurrencyCode);
+            return Math.Round(debtInMain / collateralInMain * 100, 2);
+        }
+
         // Debt-weighted averages (skip loans without CurrentLtv when computing LTV avg)
         decimal weightedLtv = 0m;
         var loansWithLtv = loanData.Where(x => x.Loan.CurrentLtv.HasValue && x.DebtInMain > 0).ToList();
         var debtWithLtv = loansWithLtv.Sum(x => x.DebtInMain);
         if (debtWithLtv > 0)
-            weightedLtv = loansWithLtv.Sum(x => x.Loan.CurrentLtv!.Value * x.DebtInMain) / debtWithLtv;
+            weightedLtv = loansWithLtv.Sum(x => (CalculateSimulatedLtv(x.Loan) ?? x.Loan.CurrentLtv!.Value) * x.DebtInMain) / debtWithLtv;
 
         decimal weightedApr = 0m;
         if (totalDebtMain > 0)
@@ -96,19 +119,23 @@ internal sealed class GetBtcLoansDashboardHandler : IQueryHandler<GetBtcLoansDas
                     : 0m;
         }
 
-        // Risk
+        // Risk (use simulated LTV when custom price is active)
         var loansWithLtvForRisk = loans.Where(l => l.CurrentLtv.HasValue && l.LiquidationLtv.HasValue).ToList();
         decimal highestLtv = 0m;
         decimal closestDistance = 0m;
         string closestLoanName = string.Empty;
         if (loansWithLtvForRisk.Count > 0)
         {
-            highestLtv = loansWithLtvForRisk.Max(l => l.CurrentLtv!.Value);
-            var closest = loansWithLtvForRisk
-                .OrderBy(l => l.LiquidationLtv!.Value - l.CurrentLtv!.Value)
+            var simulatedLtvs = loansWithLtvForRisk
+                .Select(l => new { Loan = l, SimulatedLtv = CalculateSimulatedLtv(l) ?? l.CurrentLtv!.Value })
+                .ToList();
+
+            highestLtv = simulatedLtvs.Max(x => x.SimulatedLtv);
+            var closest = simulatedLtvs
+                .OrderBy(x => x.Loan.LiquidationLtv!.Value - x.SimulatedLtv)
                 .First();
-            closestDistance = closest.LiquidationLtv!.Value - closest.CurrentLtv!.Value;
-            closestLoanName = closest.Name;
+            closestDistance = closest.Loan.LiquidationLtv!.Value - closest.SimulatedLtv;
+            closestLoanName = closest.Loan.Name;
         }
 
         // Worst-case liquidation BTC price (USD): per loan = LoanAmount / (LiquidationLtv/100 * CollateralBtc),
@@ -136,10 +163,33 @@ internal sealed class GetBtcLoansDashboardHandler : IQueryHandler<GetBtcLoansDas
             }
         }
 
-        // Health buckets
-        var healthy = loans.Count(l => l.LoanHealthStatusId == (int)LoanHealthStatus.Healthy);
-        var warning = loans.Count(l => l.LoanHealthStatusId == (int)LoanHealthStatus.Warning);
-        var danger = loans.Count(l => l.LoanHealthStatusId == (int)LoanHealthStatus.Danger);
+        // Health buckets (recalculate when custom price is active)
+        int healthy, warning, danger;
+        if (query.CustomBtcPriceUsd.HasValue)
+        {
+            healthy = 0;
+            warning = 0;
+            danger = 0;
+            foreach (var loan in loans)
+            {
+                var simulatedLtv = CalculateSimulatedLtv(loan);
+                if (!simulatedLtv.HasValue || !loan.LiquidationLtv.HasValue)
+                    continue;
+
+                if (simulatedLtv.Value >= loan.LiquidationLtv.Value)
+                    danger++;
+                else if (loan.MarginCallLtv.HasValue && simulatedLtv.Value >= loan.MarginCallLtv.Value)
+                    warning++;
+                else
+                    healthy++;
+            }
+        }
+        else
+        {
+            healthy = loans.Count(l => l.LoanHealthStatusId == (int)LoanHealthStatus.Healthy);
+            warning = loans.Count(l => l.LoanHealthStatusId == (int)LoanHealthStatus.Warning);
+            danger = loans.Count(l => l.LoanHealthStatusId == (int)LoanHealthStatus.Danger);
+        }
 
         // Time
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
