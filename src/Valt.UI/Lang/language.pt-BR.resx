@@ -2707,4 +2707,40 @@
     <data name="SpendingEvolution.SaveSuccess" xml:space="preserve">
         <value>Filtro salvo com sucesso.</value>
     </data>
+    <data name="Reports_FixedPriceBar_Title" xml:space="preserve">
+        <value>Simulação de Preço BTC</value>
+    </data>
+    <data name="Reports_FixedPriceBar_CurrentPrice" xml:space="preserve">
+        <value>Preço Atual</value>
+    </data>
+    <data name="Reports_SimulateButton" xml:space="preserve">
+        <value>Simular</value>
+    </data>
+    <data name="Reports_ChangePriceButton" xml:space="preserve">
+        <value>Alterar Preço</value>
+    </data>
+    <data name="Reports_ResetButton" xml:space="preserve">
+        <value>Resetar</value>
+    </data>
+    <data name="Reports_FixedPriceModal_Title" xml:space="preserve">
+        <value>Preço Customizado de BTC</value>
+    </data>
+    <data name="Reports_FixedPriceModal_Description" xml:space="preserve">
+        <value>Digite um preço customizado de BTC para simular o valor da sua carteira.</value>
+    </data>
+    <data name="Reports_FixedPriceModal_PriceLabel" xml:space="preserve">
+        <value>Preço</value>
+    </data>
+    <data name="Reports_FixedPriceModal_Validation_NonNegative" xml:space="preserve">
+        <value>O preço deve ser não negativo.</value>
+    </data>
+    <data name="Reports_FixedPriceModal_Validation_Required" xml:space="preserve">
+        <value>O preço é obrigatório.</value>
+    </data>
+    <data name="Reports_FixedPriceModal_Save" xml:space="preserve">
+        <value>Simular</value>
+    </data>
+    <data name="Reports_FixedPriceModal_Cancel" xml:space="preserve">
+        <value>Cancelar</value>
+    </data>
 </root>

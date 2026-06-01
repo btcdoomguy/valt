@@ -32,5 +32,6 @@ public enum ApplicationModalNames
     SimulatedPricesConfig = 26,
     Tips = 27,
     FixedExpenseOverview = 28,
-    SpendingEvolution = 35
+    SpendingEvolution = 35,
+    FixedPriceConfig = 36
 }

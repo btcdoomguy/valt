@@ -2712,4 +2712,40 @@
     <data name="SpendingEvolution.SaveSuccess" xml:space="preserve">
         <value>Filter saved successfully.</value>
     </data>
+    <data name="Reports_FixedPriceBar_Title" xml:space="preserve">
+        <value>BTC Price Simulation</value>
+    </data>
+    <data name="Reports_FixedPriceBar_CurrentPrice" xml:space="preserve">
+        <value>Current Price</value>
+    </data>
+    <data name="Reports_SimulateButton" xml:space="preserve">
+        <value>Simulate</value>
+    </data>
+    <data name="Reports_ChangePriceButton" xml:space="preserve">
+        <value>Change Price</value>
+    </data>
+    <data name="Reports_ResetButton" xml:space="preserve">
+        <value>Reset</value>
+    </data>
+    <data name="Reports_FixedPriceModal_Title" xml:space="preserve">
+        <value>Custom BTC Price</value>
+    </data>
+    <data name="Reports_FixedPriceModal_Description" xml:space="preserve">
+        <value>Enter a custom BTC price to simulate your portfolio value.</value>
+    </data>
+    <data name="Reports_FixedPriceModal_PriceLabel" xml:space="preserve">
+        <value>Price</value>
+    </data>
+    <data name="Reports_FixedPriceModal_Validation_NonNegative" xml:space="preserve">
+        <value>Price must be non-negative.</value>
+    </data>
+    <data name="Reports_FixedPriceModal_Validation_Required" xml:space="preserve">
+        <value>Price is required.</value>
+    </data>
+    <data name="Reports_FixedPriceModal_Save" xml:space="preserve">
+        <value>Simulate</value>
+    </data>
+    <data name="Reports_FixedPriceModal_Cancel" xml:space="preserve">
+        <value>Cancel</value>
+    </data>
 </root>

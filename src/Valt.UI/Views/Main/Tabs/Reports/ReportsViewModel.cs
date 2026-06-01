@@ -43,6 +43,7 @@ using Valt.UI.State;
 using Valt.UI.State.Events;
 using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Modals.SimulatedPricesConfig;
+using Valt.UI.Views.Main.Modals.FixedPriceConfig;
 using Valt.UI.Views.Main.Modals.StatisticsConfig;
 using Valt.UI.Views.Main.Tabs.Reports.Models;
 
@@ -114,6 +115,12 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private bool _isSpendingByCategoriesLoading = true;
     [ObservableProperty] private bool _isIncomeByCategoriesLoading = true;
     [ObservableProperty] private bool _isWealthOverviewLoading = true;
+    
+    // Fixed price simulation
+    [ObservableProperty] private decimal? _customBtcPrice;
+    [ObservableProperty] private string _currentBtcPriceFormatted = string.Empty;
+    [ObservableProperty] private bool _isCustomPriceActive;
+    [ObservableProperty] private string _simulateButtonText = string.Empty;
 
     public bool IsSecureModeEnabled => _secureModeState.IsEnabled;
 
@@ -170,6 +177,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _modalFactory = modalFactory;
         _queryDispatcher = queryDispatcher;
         _indicatorCache = indicatorCache;
+
+        SimulateButtonText = language.Reports_SimulateButton;
+        UpdateCurrentBtcPriceFormatted();
 
         _secureModeState.PropertyChanged += OnSecureModeStatePropertyChanged;
 
@@ -851,6 +861,78 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         {
             UpdateSimulatedPricesData();
         }
+    }
+
+    [RelayCommand]
+    private async Task OpenFixedPriceConfig()
+    {
+        var ownerWindow = GetUserControlOwnerWindow?.Invoke();
+        if (ownerWindow is null)
+            return;
+
+        var modal = (FixedPriceConfigView)await _modalFactory.CreateAsync(
+            ApplicationModalNames.FixedPriceConfig,
+            ownerWindow);
+
+        var viewModel = (FixedPriceConfigViewModel)modal.DataContext!;
+        viewModel.OwnerWindow = ownerWindow;
+        viewModel.CurrencySymbol = _currencySettings.MainFiatCurrency;
+        var currentPrice = CustomBtcPrice ?? GetCurrentBtcPriceInMainFiat();
+        viewModel.PriceText = currentPrice.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+
+        var result = await modal.ShowDialogSafeAsync<FixedPriceConfigViewModel.Response?>(ownerWindow);
+
+        if (result?.Ok == true)
+        {
+            CustomBtcPrice = result.Price;
+            IsCustomPriceActive = true;
+            SimulateButtonText = language.Reports_ChangePriceButton;
+            UpdateCurrentBtcPriceFormatted();
+            // Phase 5 will trigger recalculations here
+        }
+    }
+
+    [RelayCommand]
+    private void ResetFixedPrice()
+    {
+        CustomBtcPrice = null;
+        IsCustomPriceActive = false;
+        SimulateButtonText = language.Reports_SimulateButton;
+        UpdateCurrentBtcPriceFormatted();
+        // Phase 5 will trigger recalculations here
+    }
+
+    private decimal GetCurrentBtcPriceInMainFiat()
+    {
+        if (_ratesState.BitcoinPrice.HasValue && _ratesState.FiatRates is not null)
+        {
+            var mainCurrency = _currencySettings.MainFiatCurrency;
+            var fiatRate = _ratesState.FiatRates.GetValueOrDefault(mainCurrency, 1m);
+            return _ratesState.BitcoinPrice.Value * fiatRate;
+        }
+        return 0m;
+    }
+
+    private void UpdateCurrentBtcPriceFormatted()
+    {
+        decimal price;
+        if (CustomBtcPrice.HasValue)
+        {
+            price = CustomBtcPrice.Value;
+        }
+        else if (_ratesState.BitcoinPrice.HasValue && _ratesState.FiatRates is not null)
+        {
+            var mainCurrency = _currencySettings.MainFiatCurrency;
+            var fiatRate = _ratesState.FiatRates.GetValueOrDefault(mainCurrency, 1m);
+            price = _ratesState.BitcoinPrice.Value * fiatRate;
+        }
+        else
+        {
+            price = 0m;
+        }
+        
+        var currencyCode = _currencySettings.MainFiatCurrency;
+        CurrentBtcPriceFormatted = CurrencyDisplay.FormatFiat(price, currencyCode);
     }
 
     private async Task FetchMaxBtcStackDataAsync(IReportDataProvider provider)

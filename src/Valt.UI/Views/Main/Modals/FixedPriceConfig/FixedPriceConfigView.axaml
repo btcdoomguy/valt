@@ -1,0 +1,86 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
+        xmlns:fixedPriceConfig="clr-namespace:Valt.UI.Views.Main.Modals.FixedPriceConfig"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Views.Main.Modals.FixedPriceConfig.FixedPriceConfigView"
+        x:DataType="fixedPriceConfig:FixedPriceConfigViewModel"
+        Title="{x:Static local:language.Reports_FixedPriceModal_Title}"
+        WindowStartupLocation="CenterOwner"
+        d:DesignWidth="500"
+        d:DesignHeight="400"
+        MinWidth="500"
+        MinHeight="400"
+        MaxWidth="500"
+        MaxHeight="400"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <fixedPriceConfig:FixedPriceConfigViewModel />
+    </Design.DataContext>
+    
+    <Border>
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="{x:Static local:language.Reports_FixedPriceModal_Title}"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+            
+            <Border Classes="form-fields-area" Height="360">
+                <StackPanel Orientation="Vertical" Spacing="16" Margin="24">
+                    
+                    <!-- Description -->
+                    <TextBlock TextWrapping="Wrap"
+                               FontSize="{DynamicResource FontSizeSmall}"
+                               Foreground="{DynamicResource Text300Brush}"
+                               Text="{x:Static local:language.Reports_FixedPriceModal_Description}" />
+                    
+                    <!-- Price Input -->
+                    <StackPanel Orientation="Vertical" Spacing="8">
+                        <TextBlock Text="{x:Static local:language.Reports_FixedPriceModal_PriceLabel}"
+                                   FontSize="{DynamicResource FontSizeSmall}"
+                                   Foreground="{DynamicResource Text300Brush}" />
+                        <Grid ColumnDefinitions="Auto,*">
+                            <TextBlock Grid.Column="0"
+                                       Text="{Binding CurrencySymbol}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,8,0"
+                                       FontSize="{DynamicResource FontSizeMedium}"
+                                       Foreground="{DynamicResource Text100Brush}" />
+                            <TextBox Grid.Column="1"
+                                     Text="{Binding PriceText}"
+                                     PlaceholderText="0.00"
+                                     FontSize="{DynamicResource FontSizeMedium}"
+                                     MinHeight="40" />
+                        </Grid>
+                    </StackPanel>
+                    
+                    <!-- Error Message -->
+                    <TextBlock Text="{Binding ErrorMessage}"
+                               Foreground="{DynamicResource ErrorBrush}"
+                               FontSize="{DynamicResource FontSizeSmall}"
+                               TextWrapping="Wrap"
+                               IsVisible="{Binding !!ErrorMessage}" />
+                    
+                    <!-- Buttons -->
+                    <StackPanel Orientation="Horizontal" 
+                               HorizontalAlignment="Right" 
+                               Spacing="12"
+                               Margin="0,16,0,0">
+                        <Button Content="{x:Static local:language.Reports_FixedPriceModal_Cancel}"
+                                Command="{Binding CancelCommand}"
+                                Classes="secondary" />
+                        
+                        <Button Content="{x:Static local:language.Reports_FixedPriceModal_Save}"
+                                Command="{Binding SaveCommand}"
+                                Classes="primary" />
+                    </StackPanel>
+                    
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Border>
+</Window>

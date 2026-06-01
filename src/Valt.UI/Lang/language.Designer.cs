@@ -5306,5 +5306,77 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("SpendingEvolution.SaveSuccess", resourceCulture);
             }
         }
+        
+        public static string Reports_FixedPriceBar_Title {
+            get {
+                return ResourceManager.GetString("Reports_FixedPriceBar_Title", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedPriceBar_CurrentPrice {
+            get {
+                return ResourceManager.GetString("Reports_FixedPriceBar_CurrentPrice", resourceCulture);
+            }
+        }
+        
+        public static string Reports_SimulateButton {
+            get {
+                return ResourceManager.GetString("Reports_SimulateButton", resourceCulture);
+            }
+        }
+        
+        public static string Reports_ChangePriceButton {
+            get {
+                return ResourceManager.GetString("Reports_ChangePriceButton", resourceCulture);
+            }
+        }
+        
+        public static string Reports_ResetButton {
+            get {
+                return ResourceManager.GetString("Reports_ResetButton", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedPriceModal_Title {
+            get {
+                return ResourceManager.GetString("Reports_FixedPriceModal_Title", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedPriceModal_Description {
+            get {
+                return ResourceManager.GetString("Reports_FixedPriceModal_Description", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedPriceModal_PriceLabel {
+            get {
+                return ResourceManager.GetString("Reports_FixedPriceModal_PriceLabel", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedPriceModal_Validation_NonNegative {
+            get {
+                return ResourceManager.GetString("Reports_FixedPriceModal_Validation_NonNegative", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedPriceModal_Validation_Required {
+            get {
+                return ResourceManager.GetString("Reports_FixedPriceModal_Validation_Required", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedPriceModal_Save {
+            get {
+                return ResourceManager.GetString("Reports_FixedPriceModal_Save", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedPriceModal_Cancel {
+            get {
+                return ResourceManager.GetString("Reports_FixedPriceModal_Cancel", resourceCulture);
+            }
+        }
     }
 }
