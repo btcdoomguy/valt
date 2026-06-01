@@ -34,9 +34,12 @@ Last activity: 2026-06-01 — All phases complete
 
 ### Quick Tasks Completed
 
-- Phase 4: UI Foundation (fixed price bar, modal, localization)
-- Phase 5: Core Implementation (CustomBtcPriceState, service refactoring, visual states)
-- Phase 6: Polish (architecture tests pass, 1426/1426 tests pass, no regressions)
+| Date | Slug | Description |
+|------|------|-------------|
+| 2026-06-01 | reports-summary-simulation | Center-aligned simulation bar + recalculated loan LTVs on simulated price |
+| — | — | Phase 4: UI Foundation (fixed price bar, modal, localization) |
+| — | — | Phase 5: Core Implementation (CustomBtcPriceState, service refactoring, visual states) |
+| — | — | Phase 6: Polish (architecture tests pass, 1426/1426 tests pass, no regressions) |
 
 ### Blockers
 
