@@ -15,6 +15,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Assets.DTOs;
 using Valt.App.Modules.Assets.Queries.GetBtcLoansDashboard;
 using Valt.App.Modules.Assets.Queries.GetVisibleAssets;
 using Valt.Core.Common;
@@ -1038,6 +1039,54 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
     }
 
+    /// <summary>
+    /// Calculates the simulated P&L for a leveraged position when BTC price is simulated.
+    /// Only recalculates if the position is a BTC position (Symbol starts with "BTC").
+    /// </summary>
+    private decimal? CalculateSimulatedLeveragedPnl(AssetDTO position, IReadOnlyDictionary<string, decimal> fiatRates)
+    {
+        // If no custom price is active, return the stored P&L
+        if (!_customBtcPriceState.IsActive || !_customBtcPriceState.CustomBtcPriceUsd.HasValue)
+            return position.PnL;
+
+        // Only recalculate for BTC positions
+        if (string.IsNullOrWhiteSpace(position.Symbol) ||
+            !position.Symbol.StartsWith("BTC", StringComparison.OrdinalIgnoreCase))
+            return position.PnL;
+
+        if (!position.Collateral.HasValue || !position.Leverage.HasValue ||
+            !position.EntryPrice.HasValue || position.EntryPrice.Value == 0)
+            return position.PnL;
+
+        // Get simulated BTC price in position's currency
+        var simulatedPriceUsd = _customBtcPriceState.CustomBtcPriceUsd.Value;
+        decimal simulatedPrice;
+        if (position.CurrencyCode == FiatCurrency.Usd.Code)
+        {
+            simulatedPrice = simulatedPriceUsd;
+        }
+        else if (fiatRates.TryGetValue(position.CurrencyCode, out var rate))
+        {
+            simulatedPrice = simulatedPriceUsd * rate;
+        }
+        else
+        {
+            return position.PnL;
+        }
+
+        // Calculate P&L using leveraged position formula
+        var priceChange = (simulatedPrice - position.EntryPrice.Value) / position.EntryPrice.Value;
+        var leveragedChange = priceChange * position.Leverage.Value;
+
+        decimal currentValue;
+        if (position.IsLong.HasValue && position.IsLong.Value)
+            currentValue = position.Collateral.Value * (1 + leveragedChange);
+        else
+            currentValue = position.Collateral.Value * (1 - leveragedChange);
+
+        return currentValue - position.Collateral.Value;
+    }
+
     private async Task UpdateLeveragePositionsDataAsync()
     {
         try
@@ -1106,16 +1155,16 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             {
                 foreach (var position in leveragedPositions)
                 {
-                    if (!position.PnL.HasValue) continue;
-                    var pnl = position.PnL.Value;
+                    var pnl = CalculateSimulatedLeveragedPnl(position, fiatRates);
+                    if (!pnl.HasValue) continue;
                     var currency = position.CurrencyCode;
 
                     if (currency == mainCurrency)
-                        totalPnlInMainFiat += pnl;
+                        totalPnlInMainFiat += pnl.Value;
                     else if (currency == FiatCurrency.Usd.Code)
-                        totalPnlInMainFiat += pnl * fiatRates[mainCurrency];
+                        totalPnlInMainFiat += pnl.Value * fiatRates[mainCurrency];
                     else if (fiatRates.ContainsKey(currency))
-                        totalPnlInMainFiat += (pnl / fiatRates[currency]) * fiatRates[mainCurrency];
+                        totalPnlInMainFiat += (pnl.Value / fiatRates[currency]) * fiatRates[mainCurrency];
                 }
             }
             totalPnlInMainFiat = Math.Round(totalPnlInMainFiat, 2);
