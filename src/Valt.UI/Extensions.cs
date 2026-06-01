@@ -280,6 +280,7 @@ public static class Extensions
         //state objects
         services.AddSingleton<RatesState>();
         services.AddSingleton<AccountsTotalState>();
+        services.AddSingleton<CustomBtcPriceState>();
         services.AddSingleton<FilterState>();
         services.AddSingleton<LiveRateState>();
         services.AddSingleton<SecureModeState>();

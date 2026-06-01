@@ -41,6 +41,7 @@ using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
 using Valt.UI.State;
 using Valt.UI.State.Events;
+using static Valt.UI.State.AccountsTotalState;
 using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Modals.SimulatedPricesConfig;
 using Valt.UI.Views.Main.Modals.FixedPriceConfig;
@@ -65,6 +66,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly ILogger<ReportsViewModel> _logger = null!;
     private readonly AccountsTotalState _accountsTotalState = null!;
     private readonly RatesState _ratesState = null!;
+    private readonly CustomBtcPriceState _customBtcPriceState = null!;
     private readonly SecureModeState _secureModeState = null!;
     private readonly IConfigurationManager _configurationManager = null!;
     private readonly IModalFactory _modalFactory = null!;
@@ -152,6 +154,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         ILogger<ReportsViewModel> logger,
         AccountsTotalState accountsTotalState,
         RatesState ratesState,
+        CustomBtcPriceState customBtcPriceState,
         SecureModeState secureModeState,
         IConfigurationManager configurationManager,
         IModalFactory modalFactory,
@@ -172,6 +175,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _logger = logger;
         _accountsTotalState = accountsTotalState;
         _ratesState = ratesState;
+        _customBtcPriceState = customBtcPriceState;
         _secureModeState = secureModeState;
         _configurationManager = configurationManager;
         _modalFactory = modalFactory;
@@ -693,7 +697,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     {
         try
         {
-            var wealth = _accountsTotalState.CurrentWealth;
+            var wealth = CalculateWealthWithCustomPrice();
             var fiatCurrency = FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency);
 
             var totalInBtc = CurrencyDisplay.FormatSatsAsBitcoin(wealth.NetWorthInSats);
@@ -884,11 +888,16 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         if (result?.Ok == true)
         {
+            var mainCurrency = _currencySettings.MainFiatCurrency;
+            var fiatRate = _ratesState.FiatRates?.GetValueOrDefault(mainCurrency, 1m) ?? 1m;
+            var priceInUsd = result.Price / fiatRate;
+            
             CustomBtcPrice = result.Price;
             IsCustomPriceActive = true;
             SimulateButtonText = language.Reports_ChangePriceButton;
+            _customBtcPriceState.CustomBtcPriceUsd = priceInUsd;
             UpdateCurrentBtcPriceFormatted();
-            // Phase 5 will trigger recalculations here
+            TriggerCustomPriceRecalculations();
         }
     }
 
@@ -898,8 +907,18 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         CustomBtcPrice = null;
         IsCustomPriceActive = false;
         SimulateButtonText = language.Reports_SimulateButton;
+        _customBtcPriceState.CustomBtcPriceUsd = null;
         UpdateCurrentBtcPriceFormatted();
-        // Phase 5 will trigger recalculations here
+        TriggerCustomPriceRecalculations();
+    }
+
+    private void TriggerCustomPriceRecalculations()
+    {
+        UpdateWealthData();
+        UpdateBtcStackData();
+        UpdateSimulatedPricesData();
+        UpdateLeveragePositionsDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateLeveragePositionsDataAsync));
+        UpdateBtcLoansDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateBtcLoansDataAsync));
     }
 
     private decimal GetCurrentBtcPriceInMainFiat()
@@ -909,6 +928,17 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             var mainCurrency = _currencySettings.MainFiatCurrency;
             var fiatRate = _ratesState.FiatRates.GetValueOrDefault(mainCurrency, 1m);
             return _ratesState.BitcoinPrice.Value * fiatRate;
+        }
+        return 0m;
+    }
+
+    private decimal GetCustomBtcPriceInMainFiat()
+    {
+        if (_customBtcPriceState.CustomBtcPriceUsd.HasValue && _ratesState.FiatRates is not null)
+        {
+            var mainCurrency = _currencySettings.MainFiatCurrency;
+            var fiatRate = _ratesState.FiatRates.GetValueOrDefault(mainCurrency, 1m);
+            return _customBtcPriceState.CustomBtcPriceUsd.Value * fiatRate;
         }
         return 0m;
     }
@@ -933,6 +963,61 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         
         var currencyCode = _currencySettings.MainFiatCurrency;
         CurrentBtcPriceFormatted = CurrencyDisplay.FormatFiat(price, currencyCode);
+    }
+
+    private Wealth CalculateWealthWithCustomPrice()
+    {
+        var liveWealth = _accountsTotalState.CurrentWealth;
+        if (!_customBtcPriceState.IsActive)
+            return liveWealth;
+
+        var customBtcPriceInMainFiat = GetCustomBtcPriceInMainFiat();
+        var liveBtcPriceInMainFiat = GetCurrentBtcPriceInMainFiat();
+        
+        if (liveBtcPriceInMainFiat == 0)
+            return liveWealth;
+
+        // Calculate the BTC portion using custom price
+        var btcPortionInMainFiat = liveWealth.WealthInSats / 100_000_000m * customBtcPriceInMainFiat;
+        
+        // Non-BTC wealth stays the same
+        var nonBtcWealth = liveWealth.WealthInMainFiatCurrency;
+        
+        // Recalculate total wealth
+        var currentWealthInFiat = Math.Round(btcPortionInMainFiat + nonBtcWealth, 2);
+        
+        // Recalculate net worth (accounts + assets)
+        var netWorthInMainFiatCurrency = currentWealthInFiat + liveWealth.AssetsWealthInMainFiatCurrency;
+        
+        // Recalculate sats equivalent
+        var allWealthPricedInSats = liveWealth.WealthInSats + (long)Math.Round(nonBtcWealth / customBtcPriceInMainFiat * 100_000_000m);
+        var netWorthInSats = allWealthPricedInSats + liveWealth.AssetsWealthInSats;
+        
+        // Recalculate BTC ratio
+        var wealthInBtcRatio = 0m;
+        if (allWealthPricedInSats > 0)
+            wealthInBtcRatio = Math.Round((liveWealth.WealthInSats / (decimal)allWealthPricedInSats) * 100m, 2);
+        
+        // Recalculate USD equivalent
+        var netWorthInUsd = 0m;
+        if (_currencySettings.MainFiatCurrency != FiatCurrency.Usd.Code
+            && _ratesState.FiatRates?.TryGetValue(_currencySettings.MainFiatCurrency, out var mainRate) == true
+            && mainRate != 0)
+        {
+            netWorthInUsd = Math.Round(netWorthInMainFiatCurrency / mainRate, 2);
+        }
+
+        return new Wealth(
+            currentWealthInFiat,
+            nonBtcWealth,
+            liveWealth.WealthInSats,
+            allWealthPricedInSats,
+            wealthInBtcRatio,
+            liveWealth.AssetsWealthInMainFiatCurrency,
+            liveWealth.AssetsWealthInSats,
+            netWorthInMainFiatCurrency,
+            netWorthInSats,
+            netWorthInUsd);
     }
 
     private async Task FetchMaxBtcStackDataAsync(IReportDataProvider provider)
@@ -1125,6 +1210,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             {
                 MainCurrencyCode = mainCurrency,
                 BtcPriceUsd = btcPrice,
+                CustomBtcPriceUsd = _customBtcPriceState.CustomBtcPriceUsd,
                 FiatRates = fiatRates,
                 TotalBtcStackSats = stackSats
             });

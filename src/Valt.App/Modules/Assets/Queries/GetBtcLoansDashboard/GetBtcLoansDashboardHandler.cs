@@ -32,7 +32,7 @@ internal sealed class GetBtcLoansDashboardHandler : IQueryHandler<GetBtcLoansDas
             return BtcLoansDashboardDTO.Empty(query.TotalBtcStackSats);
 
         var mainCurrencyCode = query.MainCurrencyCode;
-        var btcPriceUsd = query.BtcPriceUsd;
+        var btcPriceUsd = query.CustomBtcPriceUsd ?? query.BtcPriceUsd;
         var fiatRates = query.FiatRates;
 
         decimal ConvertToMain(decimal value, string currency)

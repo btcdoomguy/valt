@@ -7,6 +7,7 @@ public record GetBtcLoansDashboardQuery : IQuery<BtcLoansDashboardDTO>
 {
     public required string MainCurrencyCode { get; init; }
     public required decimal? BtcPriceUsd { get; init; }
+    public decimal? CustomBtcPriceUsd { get; init; }
     public required IReadOnlyDictionary<string, decimal>? FiatRates { get; init; }
     public required long TotalBtcStackSats { get; init; }
 }

@@ -18,6 +18,7 @@ internal sealed class GetAssetSummaryHandler : IQueryHandler<GetAssetSummaryQuer
         return _assetQueries.GetSummaryAsync(
             query.MainCurrencyCode,
             query.BtcPriceUsd,
-            query.FiatRates);
+            query.FiatRates,
+            query.CustomBtcPriceUsd);
     }
 }

@@ -47,7 +47,7 @@ internal sealed class AssetQueries : IAssetQueries
         return Task.FromResult(entity is null ? null : MapToDto(entity));
     }
 
-    public Task<AssetSummaryDTO> GetSummaryAsync(string mainCurrencyCode, decimal? btcPriceUsd = null, IReadOnlyDictionary<string, decimal>? fiatRates = null)
+    public Task<AssetSummaryDTO> GetSummaryAsync(string mainCurrencyCode, decimal? btcPriceUsd = null, IReadOnlyDictionary<string, decimal>? fiatRates = null, decimal? customBtcPriceUsd = null)
     {
         var entities = _localDatabase.GetAssets().FindAll().ToList();
 
@@ -72,7 +72,9 @@ internal sealed class AssetQueries : IAssetQueries
         var liabilitiesCount = 0;
         long totalValueInSats = 0;
 
-        if (btcPriceUsd.HasValue && fiatRates != null)
+        var effectiveBtcPriceUsd = customBtcPriceUsd ?? btcPriceUsd;
+        
+        if (effectiveBtcPriceUsd.HasValue && fiatRates != null)
         {
             foreach (var asset in includedAssets)
             {
@@ -128,9 +130,9 @@ internal sealed class AssetQueries : IAssetQueries
                 }
 
                 // Convert to sats
-                if (btcPriceUsd.Value > 0)
+                if (effectiveBtcPriceUsd.Value > 0)
                 {
-                    var btcAmount = valueInUsd / btcPriceUsd.Value;
+                    var btcAmount = valueInUsd / effectiveBtcPriceUsd.Value;
                     totalValueInSats += (long)(btcAmount * 100_000_000);
                 }
             }
