@@ -36,6 +36,7 @@ Last activity: 2026-06-01 — All phases complete
 
 | Date | Slug | Description |
 |------|------|-------------|
+| 2026-06-01 | leverage-positions-simulated-price | Recalculate leveraged positions P&L when BTC price is simulated |
 | 2026-06-01 | reports-summary-simulation | Center-aligned simulation bar + recalculated loan LTVs on simulated price |
 | — | — | Phase 4: UI Foundation (fixed price bar, modal, localization) |
 | — | — | Phase 5: Core Implementation (CustomBtcPriceState, service refactoring, visual states) |
