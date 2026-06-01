@@ -1,84 +1,72 @@
-# Roadmap: Valt — Spending Evolution Module
+# Roadmap: Valt — Bitcoin Price Simulation
 
-**Milestone:** v1.0 Spending Evolution
-**Created:** 2026-05-27
+**Milestone:** v1.1 Bitcoin Price Simulation
+**Created:** 2026-06-01
 **Granularity:** Coarse
 **Mode:** YOLO
 
 ## Overview
 
-**3 phases** | **22 requirements mapped** | All v1 requirements covered ✓
+**3 phases** | **14 requirements mapped** | All v1 requirements covered ✓
 
 | # | Phase | Goal | Requirements | Success Criteria |
 |---|-------|------|--------------|------------------|
-| 1 | Foundation | Wire up menu integration and modal shell | INT-04, INT-05, UI-01, UI-02 | 4 |
-| 2 | Core Implementation | Build query, chart, and data layer | UI-03, UI-04, UI-05, UI-06, UI-07, UI-08, UI-09, DATA-01, DATA-02, DATA-03, DATA-04, DATA-05, DATA-06, DATA-07, INT-01, INT-02, INT-03 | 17 |
-| 3 | Polish | Localization, performance, and testing | INT-06 | 1 |
+| 4 | UI Foundation | Fixed price bar, buttons, and price input modal | UI-01, UI-02, UI-03 | 4 |
+| 5 | Core Implementation | Service refactoring, custom price logic, visual states | UI-04, UI-05, UI-06, DATA-01, DATA-02, DATA-03, DATA-04, DATA-05 | 7 |
+| 6 | Polish | Architecture tests, regression testing, localization | INT-01, INT-02, INT-03 | 4 |
 
 ---
 
 ## Phase Details
 
-### Phase 1: Foundation
+### Phase 4: UI Foundation
 
-**Goal:** Set up menu entries, context menu handler, and modal window shell.
+**Goal:** Create fixed price bar in Resumo panel with BTC price display, "Simular" button, and price input modal.
 
-**Requirements:** INT-04, INT-05, UI-01, UI-02
+**Requirements:** UI-01, UI-02, UI-03
 
 **Success Criteria:**
-1. "Evolução de gastos" appears in Main Menu > Tools
-2. Right-clicking a debit transaction shows "Analisar evolução" option
-3. Clicking either opens an empty modal window following existing modal patterns
-4. Modal has correct MinWidth/MinHeight and custom title bar
+1. Fixed price bar is visible in Resumo panel showing current BTC price in main fiat currency
+2. "Simular" button in the price bar opens a modal window
+3. Modal allows input of custom BTC price with validation (non-negative, numeric)
+4. Modal follows existing modal patterns (MinWidth/MinHeight, custom title bar, SystemDecorations=None)
 
 **Depends on:** None
 
 ---
 
-### Phase 2: Core Implementation
+### Phase 5: Core Implementation
 
-**Goal:** Build the query layer, chart visualization, category selector, and data calculations.
+**Goal:** Refactor services to accept custom price, implement visual state changes, and ensure calculations use custom price only in Reports tab.
 
-**Requirements:** UI-03, UI-04, UI-05, UI-06, UI-07, UI-08, UI-09, DATA-01, DATA-02, DATA-03, DATA-04, DATA-05, DATA-06, DATA-07, INT-01, INT-02, INT-03
+**Requirements:** UI-04, UI-05, UI-06, DATA-01, DATA-02, DATA-03, DATA-04, DATA-05
 
 **Success Criteria:**
-1. Category selector displays all categories in a tree with checkboxes
-2. Dual-axis line chart shows fiat total (left Y) and sats total (right Y)
-3. Time range dropdown offers 12/24/36/48/60 month options
-4. Cost of living indicators show percentage increase for both fiat and BTC
-5. Chart updates automatically when categories are selected/deselected
-6. Right-click opens modal with only that transaction's category pre-selected
-7. Menu opens modal with all categories pre-selected
-8. Query completes in <500ms for 5 years of data
-9. Data calculations correctly aggregate by month and currency
-10. Missing PriceInSats data is handled gracefully (warning shown)
+1. When custom price is active, "Alterar Preço" button replaces "Simular"
+2. "Resetar" button appears when custom price is active and resets to real-time price
+3. Visual indication clearly shows custom price is active (highlighted state, badge, or color change)
+4. Dashboard calculations (total value, leveraged positions, etc.) use custom price when active
+5. Custom price resets on app close (no persistence across sessions)
+6. Other app areas (transactions, goals, avg price, etc.) remain unaffected by custom price
+7. Service layer refactored with optional custom price parameter without breaking existing consumers
 
-**Depends on:** Phase 1
-
-**Plans:**
-- [x] 02-01-PLAN.md — Query Layer & DTOs (CQRS pipeline, LiteDB aggregation)
-- [x] 02-02-PLAN.md — Chart Data & ViewModel (LiveCharts dual-axis, category loading)
-- [x] 02-03-PLAN.md — View Layout & Integration (TreeView, indicators, pre-selection)
+**Depends on:** Phase 4
 
 ---
 
-### Phase 3: Polish
+### Phase 6: Polish
 
-**Goal:** Add localization, verify performance, and ensure code quality.
+**Goal:** Ensure architecture compliance, no regressions, and full localization.
 
-**Requirements:** INT-06
+**Requirements:** INT-01, INT-02, INT-03
 
 **Success Criteria:**
-1. All UI strings localized in en-US, pt-BR, and es
-2. Architecture tests pass (new module follows layer dependency rules)
-3. Manual testing confirms all requirements from Phase 2
-4. Code review passes (follows existing patterns)
+1. Architecture tests pass with zero layer violations
+2. No regression in other app areas using same services (existing functionality preserved)
+3. All UI strings localized in en-US, pt-BR, and es
+4. Manual testing confirms all requirements from Phases 4 and 5
 
-**Depends on:** Phase 2
-
-**Plans:**
-- [x] 03-01-PLAN.md — Localization (add .resx strings, update XAML bindings)
-- [x] 03-02-PLAN.md — Architecture Verification & Code Quality (layer tests, pattern review)
+**Depends on:** Phase 5
 
 ---
 
@@ -86,34 +74,26 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| UI-01 | Phase 1 | Complete |
-| UI-02 | Phase 1 | Complete |
-| UI-03 | Phase 2 | Complete |
-| UI-04 | Phase 2 | Complete |
-| UI-05 | Phase 2 | Complete |
-| UI-06 | Phase 2 | Complete |
-| UI-07 | Phase 2 | Complete |
-| UI-08 | Phase 2 | Complete |
-| UI-09 | Phase 2 | Complete |
-| DATA-01 | Phase 2 | Complete |
-| DATA-02 | Phase 2 | Complete |
-| DATA-03 | Phase 2 | Complete |
-| DATA-04 | Phase 2 | Complete |
-| DATA-05 | Phase 2 | Complete |
-| DATA-06 | Phase 2 | Complete |
-| DATA-07 | Phase 2 | Complete |
-| INT-01 | Phase 2 | Complete |
-| INT-02 | Phase 2 | Complete |
-| INT-03 | Phase 2 | Complete |
-| INT-04 | Phase 1 | Complete |
-| INT-05 | Phase 1 | Complete |
-| INT-06 | Phase 3 | Complete |
+| UI-01 | Phase 4 | Pending |
+| UI-02 | Phase 4 | Pending |
+| UI-03 | Phase 4 | Pending |
+| UI-04 | Phase 5 | Pending |
+| UI-05 | Phase 5 | Pending |
+| UI-06 | Phase 5 | Pending |
+| DATA-01 | Phase 5 | Pending |
+| DATA-02 | Phase 5 | Pending |
+| DATA-03 | Phase 5 | Pending |
+| DATA-04 | Phase 5 | Pending |
+| DATA-05 | Phase 5 | Pending |
+| INT-01 | Phase 6 | Pending |
+| INT-02 | Phase 6 | Pending |
+| INT-03 | Phase 6 | Pending |
 
 **Coverage:**
-- v1 requirements: 22 total
-- Mapped to phases: 22
+- v1 requirements: 14 total
+- Mapped to phases: 14
 - Unmapped: 0 ✓
 
 ---
-*Roadmap created: 2026-05-27*
-*Last updated: 2026-05-27 after 03-02 plan execution*
+*Roadmap created: 2026-06-01*
+*Last updated: 2026-06-01 after initial creation*

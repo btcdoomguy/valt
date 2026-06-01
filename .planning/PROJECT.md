@@ -1,5 +1,16 @@
 # Valt
 
+## Current Milestone: v1.1 Bitcoin Price Simulation
+
+**Goal:** Allow users to override the current Bitcoin price in the Reports tab to simulate portfolio values at different BTC prices, helping them understand how price changes affect their wealth.
+
+**Target features:**
+- Fixed price bar in Resumo panel with BTC price display and "Simular" button
+- Modal for inputting custom BTC price (non-negative, in main fiat currency)
+- Dashboard calculations refactored to accept custom price without affecting other app areas
+- Visual state changes: "Simular" → "Alterar Preço", add "Resetar" button when custom price is active
+- Custom price resets on app close (no persistence across sessions)
+
 ## What This Is
 
 Valt is a personal budget management desktop application for bitcoiners, built with .NET 10 and Avalonia UI. It tracks fiat and bitcoin accounts, transactions, and displays values in bitcoin terms. Users can manage accounts, categorize transactions, track cost basis, set financial goals, manage fixed expenses, and monitor external investments — all with real-time price data from multiple providers.
@@ -24,16 +35,21 @@ Users can understand their financial life denominated in bitcoin, making it clea
 - ✓ CQRS architecture — Clean separation of commands and queries
 - ✓ Multi-language support — English, Portuguese, Spanish
 - ✓ Multi-platform builds — Windows, Linux, macOS via GitHub Actions
+- ✓ Spending Evolution module — Track spending trends in both fiat and bitcoin (sats) over time (v1.0)
+- ✓ Category selector with multi-select — Left panel with category tree selection (v1.0)
+- ✓ Dual-axis line chart — Fiat total (left Y) and sats total (right Y) over time (v1.0)
+- ✓ Time range selector — Dropdown with 12/24/36/48/60 month options (v1.0)
+- ✓ Cost of living indicators — Percentage increase in fiat and BTC terms (v1.0)
+- ✓ Right-click integration — "Analyze evolution" from debit transaction context menu (v1.0)
+- ✓ Modal window — New modal following existing modal patterns (v1.0)
 
 ### Active
 
-- [ ] Spending Evolution module — Track spending trends in both fiat and bitcoin (sats) over time
-- [ ] Category selector with multi-select — Left panel with category tree selection
-- [ ] Dual-axis line chart — Fiat total (left Y) and sats total (right Y) over time
-- [ ] Time range selector — Dropdown with 12/24/36/48/60 month options
-- [ ] Cost of living indicators — Percentage increase in fiat and BTC terms
-- [ ] Right-click integration — "Analyze evolution" from debit transaction context menu
-- [ ] Modal window — New modal following existing modal patterns
+- [ ] BTC Price Simulation — Override current Bitcoin price in Reports tab to simulate portfolio values
+- [ ] Fixed price bar — BTC price display with "Simular" button in Resumo panel
+- [ ] Price input modal — Non-negative custom BTC price input in main fiat currency
+- [ ] Service refactoring — Allow custom price injection without affecting other app areas
+- [ ] Visual state changes — "Alterar Preço" / "Resetar" buttons when custom price is active
 
 ### Out of Scope
 
@@ -92,4 +108,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-27 after initialization*
+*Last updated: 2026-06-01 after v1.1 milestone start*
