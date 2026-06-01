@@ -71,7 +71,7 @@
                                 <Button Content="{x:Static lang:language.Reports_ResetButton}"
                                         Command="{Binding ResetFixedPriceCommand}"
                                         Classes="secondary"
-                                        IsVisible="{Binding IsCustomPriceActive}" />
+                                        IsEnabled="{Binding IsCustomPriceActive}" />
                                 <Button Content="{Binding SimulateButtonText}"
                                         Command="{Binding OpenFixedPriceConfigCommand}" />
                             </StackPanel>
@@ -118,16 +118,6 @@
                         <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    IsVisible="{Binding IsStatisticsLoading}" />
-                    </Grid>
-                    <!-- Simulated Prices Dashboard -->
-                    <Grid MinHeight="150"
-                          reports1:DashboardGridPanel.RowSpan="{Binding SimulatedPricesData.IsLarge, Converter={x:Static reports1:DashboardGridPanel.IsLargeToRowSpanConverter}}">
-                        <Panel IsVisible="{Binding !IsSimulatedPricesLoading}">
-                            <reports1:DashboardDataUserControl DataContext="{Binding SimulatedPricesData}" />
-                        </Panel>
-                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   IsVisible="{Binding IsSimulatedPricesLoading}" />
                     </Grid>
                     <!-- Indicators Dashboard -->
                     <Grid MinHeight="150"
