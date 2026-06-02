@@ -13,9 +13,9 @@
         d:DesignWidth="500"
         d:DesignHeight="280"
         MinWidth="500"
-        MinHeight="280"
+        MinHeight="295"
         MaxWidth="500"
-        MaxHeight="280"
+        MaxHeight="295"
         ExtendClientAreaToDecorationsHint="True"
         WindowDecorations="None"
         ExtendClientAreaTitleBarHeightHint="0">
