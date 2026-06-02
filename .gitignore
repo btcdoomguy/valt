@@ -38,3 +38,6 @@ ClientBin/
 *.iml
 *.iws
 *.ipr
+
+# Planning
+.planning/
