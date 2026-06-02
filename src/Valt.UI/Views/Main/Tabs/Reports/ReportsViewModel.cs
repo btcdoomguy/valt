@@ -902,7 +902,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsCustomPriceActive))]
     private void ResetFixedPrice()
     {
         CustomBtcPrice = null;

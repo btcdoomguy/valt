@@ -29,7 +29,7 @@
                                          TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
             
-            <Border Classes="form-fields-area" Height="360">
+            <Border Classes="form-fields-area">
                 <StackPanel Orientation="Vertical" Spacing="16" Margin="24">
                     
                     <!-- Description -->
@@ -51,6 +51,7 @@
                                        FontSize="{DynamicResource FontSizeMedium}"
                                        Foreground="{DynamicResource Text100Brush}" />
                             <TextBox Grid.Column="1"
+                                     x:Name="PriceTextBox"
                                      Text="{Binding PriceText}"
                                      PlaceholderText="0.00"
                                      FontSize="{DynamicResource FontSizeMedium}"
