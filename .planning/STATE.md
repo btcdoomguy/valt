@@ -36,6 +36,7 @@ Last activity: 2026-06-01 — All phases complete
 
 | Date | Slug | Description |
 |------|------|-------------|
+| 2026-06-01 | reset-button-rewrite | Rewrite Reset button from scratch using simple IsEnabled binding |
 | 2026-06-01 | fix-reset-button-active | Fix Reset button never becoming active after setting custom price |
 | 2026-06-01 | reports-reset-fix | Fix Reset button CanExecute, modal border overflow, auto-focus input |
 | 2026-06-01 | reports-polish | Remove SimulatedPrices caption, shrink modal, fix Reset button |
