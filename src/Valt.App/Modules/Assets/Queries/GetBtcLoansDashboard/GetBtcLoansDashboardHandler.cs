@@ -191,6 +191,22 @@ internal sealed class GetBtcLoansDashboardHandler : IQueryHandler<GetBtcLoansDas
             danger = loans.Count(l => l.LoanHealthStatusId == (int)LoanHealthStatus.Danger);
         }
 
+        // Total debt in BTC
+        decimal totalDebtInBtc = 0m;
+        if (btcPriceUsd.HasValue && btcPriceUsd.Value > 0 && totalDebtMain > 0)
+        {
+            decimal totalDebtInUsd;
+            if (mainCurrencyCode == FiatCurrency.Usd.Code)
+                totalDebtInUsd = totalDebtMain;
+            else if (fiatRates is not null && fiatRates.TryGetValue(mainCurrencyCode, out var mainRate) && mainRate > 0)
+                totalDebtInUsd = totalDebtMain / mainRate;
+            else
+                totalDebtInUsd = 0m;
+
+            if (totalDebtInUsd > 0)
+                totalDebtInBtc = totalDebtInUsd / btcPriceUsd.Value;
+        }
+
         // Time
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
         var avgLoanAgeDays = loans
@@ -212,6 +228,7 @@ internal sealed class GetBtcLoansDashboardHandler : IQueryHandler<GetBtcLoansDas
             DebtWeightedAvgLtv = Math.Round(weightedLtv, 2),
             DebtWeightedAvgApr = Math.Round(weightedApr, 2),
             TotalDebtInMainCurrency = Math.Round(totalDebtMain, 2),
+            TotalDebtInBtc = Math.Round(totalDebtInBtc, 8),
             HighestLtv = Math.Round(highestLtv, 2),
             ClosestDistanceToLiquidationLtv = Math.Round(closestDistance, 2),
             ClosestLoanName = closestLoanName,

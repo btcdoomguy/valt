@@ -1797,6 +1797,12 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string Reports_BtcLoans_TotalDebtBtc {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.TotalDebtBtc", resourceCulture);
+            }
+        }
+
         public static string Reports_BtcLoans_AvgLtv {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.AvgLtv", resourceCulture);

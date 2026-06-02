@@ -96,20 +96,9 @@ public class DashboardGridPanel : Panel
             if (!child.IsVisible) continue;
             child.Measure(childMeasure);
             var span = Math.Max(1, GetRowSpan(child));
-            if (span == 1 && child.DesiredSize.Height > maxSingleRowHeight)
-                maxSingleRowHeight = child.DesiredSize.Height;
-        }
-
-        if (maxSingleRowHeight <= 0)
-        {
-            foreach (var child in Children)
-            {
-                if (!child.IsVisible) continue;
-                var span = Math.Max(1, GetRowSpan(child));
-                var approx = child.DesiredSize.Height / span;
-                if (approx > maxSingleRowHeight)
-                    maxSingleRowHeight = approx;
-            }
+            var approx = child.DesiredSize.Height / span;
+            if (approx > maxSingleRowHeight)
+                maxSingleRowHeight = approx;
         }
 
         if (maxSingleRowHeight <= 0)

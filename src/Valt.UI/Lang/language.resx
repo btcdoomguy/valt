@@ -896,6 +896,9 @@
     <data name="Reports.BtcLoans.TotalDebt" xml:space="preserve">
         <value>Total debt</value>
     </data>
+    <data name="Reports.BtcLoans.TotalDebtBtc" xml:space="preserve">
+        <value>Total debt (BTC)</value>
+    </data>
     <data name="Reports.BtcLoans.AvgLtv" xml:space="preserve">
         <value>Avg LTV</value>
     </data>
