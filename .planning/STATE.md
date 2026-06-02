@@ -36,6 +36,7 @@ Last activity: 2026-06-01 — All phases complete
 
 | Date | Slug | Description |
 |------|------|-------------|
+| 2026-06-01 | reports-reset-fix | Fix Reset button CanExecute, modal border overflow, auto-focus input |
 | 2026-06-01 | reports-polish | Remove SimulatedPrices caption, shrink modal, fix Reset button |
 | 2026-06-01 | leverage-positions-simulated-price | Recalculate leveraged positions P&L when BTC price is simulated |
 | 2026-06-01 | reports-summary-simulation | Center-aligned simulation bar + recalculated loan LTVs on simulated price |
