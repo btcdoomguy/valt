@@ -73,10 +73,12 @@
                                Margin="0,16,0,0">
                         <Button Content="{x:Static local:language.Reports_FixedPriceModal_Cancel}"
                                 Command="{Binding CancelCommand}"
+                                IsCancel="True"
                                 Classes="secondary" />
                         
                         <Button Content="{x:Static local:language.Reports_FixedPriceModal_Save}"
                                 Command="{Binding SaveCommand}"
+                                IsDefault="True"
                                 Classes="primary" />
                     </StackPanel>
                     

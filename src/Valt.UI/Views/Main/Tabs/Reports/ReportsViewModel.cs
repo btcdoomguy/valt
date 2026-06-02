@@ -220,6 +220,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         });
 
         _accountsTotalState.PropertyChanged += OnAccountsTotalStatePropertyChanged;
+        _ratesState.PropertyChanged += OnRatesStatePropertyChanged;
 
         WeakReferenceMessenger.Default.Register<AssetSummaryUpdatedMessage>(this, (recipient, message) =>
         {
@@ -1497,6 +1498,21 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
     }
 
+    private void OnRatesStatePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(RatesState.BitcoinPrice) or nameof(RatesState.FiatRates))
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (!IsCustomPriceActive)
+                {
+                    UpdateCurrentBtcPriceFormatted();
+                    UpdateSimulatedPricesData();
+                }
+            });
+        }
+    }
+
     #endregion
 
     private void LoadCachedIndicatorsData()
@@ -1576,6 +1592,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         // Unsubscribe from PropertyChanged events
         _secureModeState.PropertyChanged -= OnSecureModeStatePropertyChanged;
         _accountsTotalState.PropertyChanged -= OnAccountsTotalStatePropertyChanged;
+        _ratesState.PropertyChanged -= OnRatesStatePropertyChanged;
 
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
         WeakReferenceMessenger.Default.Unregister<AssetSummaryUpdatedMessage>(this);
