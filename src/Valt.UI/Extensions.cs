@@ -47,6 +47,7 @@ using Valt.UI.Views.Main.Modals.LeverageSimulator;
 using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Modals.PriceHistory;
 using Valt.UI.Views.Main.Modals.SimulatedPricesConfig;
+using Valt.UI.Views.Main.Modals.FixedPriceConfig;
 using Valt.UI.Views.Main.Modals.SpendingEvolution;
 using Valt.UI.Views.Main.Modals.Tips;
 using Valt.UI.Views.Main.Tabs.Transactions;
@@ -129,6 +130,7 @@ public static class Extensions
         services.AddTransient<LeverageSimulatorViewModel>();
         services.AddTransient<PriceHistoryViewModel>();
         services.AddTransient<SimulatedPricesConfigViewModel>();
+        services.AddTransient<FixedPriceConfigViewModel>();
         services.AddTransient<TipsViewModel>();
         services.AddTransient<FixedExpenseOverviewViewModel>();
         services.AddTransient<SpendingEvolutionViewModel>();
@@ -266,6 +268,10 @@ public static class Extensions
                 {
                     DataContext = services.GetRequiredService<SpendingEvolutionViewModel>(),
                 },
+                ApplicationModalNames.FixedPriceConfig => new FixedPriceConfigView()
+                {
+                    DataContext = services.GetRequiredService<FixedPriceConfigViewModel>(),
+                },
                 _ => throw new ArgumentOutOfRangeException(nameof(modalNames), modalNames, null)
             };
         });
@@ -274,10 +280,12 @@ public static class Extensions
         //state objects
         services.AddSingleton<RatesState>();
         services.AddSingleton<AccountsTotalState>();
+        services.AddSingleton<CustomBtcPriceState>();
         services.AddSingleton<FilterState>();
         services.AddSingleton<LiveRateState>();
         services.AddSingleton<SecureModeState>();
         services.AddSingleton<TabRefreshState>();
+        services.AddSingleton<LastTransactionDateState>();
 
         //theming
         services.AddSingleton<IThemeService, ThemeService>();

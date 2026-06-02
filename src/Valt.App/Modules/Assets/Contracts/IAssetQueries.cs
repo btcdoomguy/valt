@@ -28,10 +28,12 @@ public interface IAssetQueries
     /// <param name="mainCurrencyCode">The main currency to convert totals to.</param>
     /// <param name="btcPriceUsd">Current BTC price in USD for sat conversion.</param>
     /// <param name="fiatRates">Fiat exchange rates relative to USD.</param>
+    /// <param name="customBtcPriceUsd">Custom BTC price in USD for simulation. Overrides btcPriceUsd when provided.</param>
     Task<AssetSummaryDTO> GetSummaryAsync(
         string mainCurrencyCode,
         decimal? btcPriceUsd = null,
-        IReadOnlyDictionary<string, decimal>? fiatRates = null);
+        IReadOnlyDictionary<string, decimal>? fiatRates = null,
+        decimal? customBtcPriceUsd = null);
 
     /// <summary>
     /// Gets all asset groups ordered by display order.

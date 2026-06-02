@@ -19,6 +19,11 @@ public record GetAssetSummaryQuery : IQuery<AssetSummaryDTO>
     public decimal? BtcPriceUsd { get; init; }
 
     /// <summary>
+    /// Custom BTC price in USD for simulation (optional). When provided, this overrides BtcPriceUsd.
+    /// </summary>
+    public decimal? CustomBtcPriceUsd { get; init; }
+
+    /// <summary>
     /// Fiat exchange rates relative to USD (optional).
     /// </summary>
     public IReadOnlyDictionary<string, decimal>? FiatRates { get; init; }

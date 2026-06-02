@@ -26,6 +26,7 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
 
     private readonly CurrencySettings _currencySettings;
     private readonly RatesState _ratesState;
+    private readonly CustomBtcPriceState _customBtcPriceState;
     private readonly IQueryDispatcher _queryDispatcher;
     private readonly ILogger<AccountsTotalState> _logger;
 
@@ -37,10 +38,11 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
 
     public Wealth CurrentWealth => CalculateCurrentWealth();
 
-    public AccountsTotalState(CurrencySettings currencySettings, RatesState ratesState, IQueryDispatcher queryDispatcher, ILogger<AccountsTotalState> logger)
+    public AccountsTotalState(CurrencySettings currencySettings, RatesState ratesState, CustomBtcPriceState customBtcPriceState, IQueryDispatcher queryDispatcher, ILogger<AccountsTotalState> logger)
     {
         _currencySettings = currencySettings;
         _ratesState = ratesState;
+        _customBtcPriceState = customBtcPriceState;
         _queryDispatcher = queryDispatcher;
         _logger = logger;
         WeakReferenceMessenger.Default.Register<RatesUpdated>(this);
@@ -117,7 +119,8 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
             {
                 MainCurrencyCode = _currencySettings.MainFiatCurrency,
                 BtcPriceUsd = btcPriceUsd,
-                FiatRates = fiatRates
+                FiatRates = fiatRates,
+                CustomBtcPriceUsd = _customBtcPriceState.CustomBtcPriceUsd
             });
         }
         catch (Exception ex)

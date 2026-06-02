@@ -35,7 +35,45 @@
                         <TextBlock Classes="section-header" Text="{x:Static lang:language.Reports_Summary}" />
                     </StackPanel>
                 </Expander.Header>
-                <reports1:DashboardGridPanel>
+                
+                <StackPanel>
+                    <!-- Fixed Price Bar -->
+                    <Border Classes="card" Margin="0,0,0,12" IsVisible="{Binding !IsSecureModeEnabled}">
+                        <Grid ColumnDefinitions="*,Auto,Auto,Auto,*" Margin="12,8">
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <Border Background="{DynamicResource WarningBrush}" 
+                                        CornerRadius="4" 
+                                        Padding="4,2" 
+                                        IsVisible="{Binding IsCustomPriceActive}">
+                                    <TextBlock Text="SIMULAÇÃO" 
+                                               FontSize="10" 
+                                               FontWeight="Bold"
+                                               Foreground="{DynamicResource BackgroundBrush}" />
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="24,0">
+                                <TextBlock Text="{x:Static lang:language.Reports_FixedPriceBar_CurrentPrice}" 
+                                           VerticalAlignment="Center"
+                                           FontSize="{DynamicResource FontSizeSmall}"
+                                           Foreground="{DynamicResource Text300Brush}" />
+                                <TextBlock Text="{Binding CurrentBtcPriceFormatted}" 
+                                           VerticalAlignment="Center"
+                                           FontSize="{DynamicResource FontSizeMedium}"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource Text100Brush}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="24,0,0,0">
+                                <Button Content="{x:Static lang:language.Reports_ResetButton}"
+                                        Command="{Binding ResetFixedPriceCommand}"
+                                        IsEnabled="{Binding IsCustomPriceActive}"
+                                        Classes="secondary" />
+                                <Button Content="{Binding SimulateButtonText}"
+                                        Command="{Binding OpenFixedPriceConfigCommand}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    
+                    <reports1:DashboardGridPanel>
                     <!-- Wealth Dashboard -->
                     <Grid MinHeight="150"
                           reports1:DashboardGridPanel.RowSpan="{Binding WealthData.IsLarge, Converter={x:Static reports1:DashboardGridPanel.IsLargeToRowSpanConverter}}">
@@ -76,16 +114,6 @@
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    IsVisible="{Binding IsStatisticsLoading}" />
                     </Grid>
-                    <!-- Simulated Prices Dashboard -->
-                    <Grid MinHeight="150"
-                          reports1:DashboardGridPanel.RowSpan="{Binding SimulatedPricesData.IsLarge, Converter={x:Static reports1:DashboardGridPanel.IsLargeToRowSpanConverter}}">
-                        <Panel IsVisible="{Binding !IsSimulatedPricesLoading}">
-                            <reports1:DashboardDataUserControl DataContext="{Binding SimulatedPricesData}" />
-                        </Panel>
-                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   IsVisible="{Binding IsSimulatedPricesLoading}" />
-                    </Grid>
                     <!-- Indicators Dashboard -->
                     <Grid MinHeight="150"
                           reports1:DashboardGridPanel.RowSpan="{Binding IndicatorsData.IsLarge, Converter={x:Static reports1:DashboardGridPanel.IsLargeToRowSpanConverter}}">
@@ -119,6 +147,7 @@
                                    IsVisible="{Binding IsBtcLoansLoading}" />
                     </Grid>
                 </reports1:DashboardGridPanel>
+                </StackPanel>
             </Expander>
             <!--Wealth Overview-->
             <Expander Classes="section" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsExpanded="True">

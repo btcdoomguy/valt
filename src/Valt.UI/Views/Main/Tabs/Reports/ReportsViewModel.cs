@@ -15,6 +15,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Assets.DTOs;
 using Valt.App.Modules.Assets.Queries.GetBtcLoansDashboard;
 using Valt.App.Modules.Assets.Queries.GetVisibleAssets;
 using Valt.Core.Common;
@@ -41,8 +42,10 @@ using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
 using Valt.UI.State;
 using Valt.UI.State.Events;
+using static Valt.UI.State.AccountsTotalState;
 using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Modals.SimulatedPricesConfig;
+using Valt.UI.Views.Main.Modals.FixedPriceConfig;
 using Valt.UI.Views.Main.Modals.StatisticsConfig;
 using Valt.UI.Views.Main.Tabs.Reports.Models;
 
@@ -64,6 +67,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly ILogger<ReportsViewModel> _logger = null!;
     private readonly AccountsTotalState _accountsTotalState = null!;
     private readonly RatesState _ratesState = null!;
+    private readonly CustomBtcPriceState _customBtcPriceState = null!;
     private readonly SecureModeState _secureModeState = null!;
     private readonly IConfigurationManager _configurationManager = null!;
     private readonly IModalFactory _modalFactory = null!;
@@ -114,6 +118,12 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private bool _isSpendingByCategoriesLoading = true;
     [ObservableProperty] private bool _isIncomeByCategoriesLoading = true;
     [ObservableProperty] private bool _isWealthOverviewLoading = true;
+    
+    // Fixed price simulation
+    [ObservableProperty] private decimal? _customBtcPrice;
+    [ObservableProperty] private string _currentBtcPriceFormatted = string.Empty;
+    [ObservableProperty] private bool _isCustomPriceActive;
+    [ObservableProperty] private string _simulateButtonText = string.Empty;
 
     public bool IsSecureModeEnabled => _secureModeState.IsEnabled;
 
@@ -145,6 +155,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         ILogger<ReportsViewModel> logger,
         AccountsTotalState accountsTotalState,
         RatesState ratesState,
+        CustomBtcPriceState customBtcPriceState,
         SecureModeState secureModeState,
         IConfigurationManager configurationManager,
         IModalFactory modalFactory,
@@ -165,11 +176,15 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _logger = logger;
         _accountsTotalState = accountsTotalState;
         _ratesState = ratesState;
+        _customBtcPriceState = customBtcPriceState;
         _secureModeState = secureModeState;
         _configurationManager = configurationManager;
         _modalFactory = modalFactory;
         _queryDispatcher = queryDispatcher;
         _indicatorCache = indicatorCache;
+
+        SimulateButtonText = language.Reports_SimulateButton;
+        UpdateCurrentBtcPriceFormatted();
 
         _secureModeState.PropertyChanged += OnSecureModeStatePropertyChanged;
 
@@ -205,6 +220,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         });
 
         _accountsTotalState.PropertyChanged += OnAccountsTotalStatePropertyChanged;
+        _ratesState.PropertyChanged += OnRatesStatePropertyChanged;
 
         WeakReferenceMessenger.Default.Register<AssetSummaryUpdatedMessage>(this, (recipient, message) =>
         {
@@ -683,7 +699,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     {
         try
         {
-            var wealth = _accountsTotalState.CurrentWealth;
+            var wealth = CalculateWealthWithCustomPrice();
             var fiatCurrency = FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency);
 
             var totalInBtc = CurrencyDisplay.FormatSatsAsBitcoin(wealth.NetWorthInSats);
@@ -853,6 +869,159 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
     }
 
+    [RelayCommand]
+    private async Task OpenFixedPriceConfig()
+    {
+        var ownerWindow = GetUserControlOwnerWindow?.Invoke();
+        if (ownerWindow is null)
+            return;
+
+        var modal = (FixedPriceConfigView)await _modalFactory.CreateAsync(
+            ApplicationModalNames.FixedPriceConfig,
+            ownerWindow);
+
+        var viewModel = (FixedPriceConfigViewModel)modal.DataContext!;
+        viewModel.OwnerWindow = ownerWindow;
+        viewModel.CurrencySymbol = _currencySettings.MainFiatCurrency;
+        var currentPrice = CustomBtcPrice ?? GetCurrentBtcPriceInMainFiat();
+        viewModel.PriceText = currentPrice.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+
+        var result = await modal.ShowDialogSafeAsync<FixedPriceConfigViewModel.Response?>(ownerWindow);
+
+        if (result?.Ok == true)
+        {
+            var mainCurrency = _currencySettings.MainFiatCurrency;
+            var fiatRate = _ratesState.FiatRates?.GetValueOrDefault(mainCurrency, 1m) ?? 1m;
+            var priceInUsd = result.Price / fiatRate;
+            
+            CustomBtcPrice = result.Price;
+            IsCustomPriceActive = true;
+            SimulateButtonText = language.Reports_ChangePriceButton;
+            _customBtcPriceState.CustomBtcPriceUsd = priceInUsd;
+            UpdateCurrentBtcPriceFormatted();
+            TriggerCustomPriceRecalculations();
+        }
+    }
+
+    [RelayCommand]
+    private void ResetFixedPrice()
+    {
+        CustomBtcPrice = null;
+        IsCustomPriceActive = false;
+        SimulateButtonText = language.Reports_SimulateButton;
+        _customBtcPriceState.CustomBtcPriceUsd = null;
+        UpdateCurrentBtcPriceFormatted();
+        TriggerCustomPriceRecalculations();
+    }
+
+    private void TriggerCustomPriceRecalculations()
+    {
+        UpdateWealthData();
+        UpdateBtcStackData();
+        UpdateSimulatedPricesData();
+        UpdateLeveragePositionsDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateLeveragePositionsDataAsync));
+        UpdateBtcLoansDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateBtcLoansDataAsync));
+    }
+
+    private decimal GetCurrentBtcPriceInMainFiat()
+    {
+        if (_ratesState.BitcoinPrice.HasValue && _ratesState.FiatRates is not null)
+        {
+            var mainCurrency = _currencySettings.MainFiatCurrency;
+            var fiatRate = _ratesState.FiatRates.GetValueOrDefault(mainCurrency, 1m);
+            return _ratesState.BitcoinPrice.Value * fiatRate;
+        }
+        return 0m;
+    }
+
+    private decimal GetCustomBtcPriceInMainFiat()
+    {
+        if (_customBtcPriceState.CustomBtcPriceUsd.HasValue && _ratesState.FiatRates is not null)
+        {
+            var mainCurrency = _currencySettings.MainFiatCurrency;
+            var fiatRate = _ratesState.FiatRates.GetValueOrDefault(mainCurrency, 1m);
+            return _customBtcPriceState.CustomBtcPriceUsd.Value * fiatRate;
+        }
+        return 0m;
+    }
+
+    private void UpdateCurrentBtcPriceFormatted()
+    {
+        decimal price;
+        if (CustomBtcPrice.HasValue)
+        {
+            price = CustomBtcPrice.Value;
+        }
+        else if (_ratesState.BitcoinPrice.HasValue && _ratesState.FiatRates is not null)
+        {
+            var mainCurrency = _currencySettings.MainFiatCurrency;
+            var fiatRate = _ratesState.FiatRates.GetValueOrDefault(mainCurrency, 1m);
+            price = _ratesState.BitcoinPrice.Value * fiatRate;
+        }
+        else
+        {
+            price = 0m;
+        }
+        
+        var currencyCode = _currencySettings.MainFiatCurrency;
+        CurrentBtcPriceFormatted = CurrencyDisplay.FormatFiat(price, currencyCode);
+    }
+
+    private Wealth CalculateWealthWithCustomPrice()
+    {
+        var liveWealth = _accountsTotalState.CurrentWealth;
+        if (!_customBtcPriceState.IsActive)
+            return liveWealth;
+
+        var customBtcPriceInMainFiat = GetCustomBtcPriceInMainFiat();
+        var liveBtcPriceInMainFiat = GetCurrentBtcPriceInMainFiat();
+        
+        if (liveBtcPriceInMainFiat == 0)
+            return liveWealth;
+
+        // Calculate the BTC portion using custom price
+        var btcPortionInMainFiat = liveWealth.WealthInSats / 100_000_000m * customBtcPriceInMainFiat;
+        
+        // Non-BTC wealth stays the same
+        var nonBtcWealth = liveWealth.WealthInMainFiatCurrency;
+        
+        // Recalculate total wealth
+        var currentWealthInFiat = Math.Round(btcPortionInMainFiat + nonBtcWealth, 2);
+        
+        // Recalculate net worth (accounts + assets)
+        var netWorthInMainFiatCurrency = currentWealthInFiat + liveWealth.AssetsWealthInMainFiatCurrency;
+        
+        // Recalculate sats equivalent
+        var allWealthPricedInSats = liveWealth.WealthInSats + (long)Math.Round(nonBtcWealth / customBtcPriceInMainFiat * 100_000_000m);
+        var netWorthInSats = allWealthPricedInSats + liveWealth.AssetsWealthInSats;
+        
+        // Recalculate BTC ratio
+        var wealthInBtcRatio = 0m;
+        if (allWealthPricedInSats > 0)
+            wealthInBtcRatio = Math.Round((liveWealth.WealthInSats / (decimal)allWealthPricedInSats) * 100m, 2);
+        
+        // Recalculate USD equivalent
+        var netWorthInUsd = 0m;
+        if (_currencySettings.MainFiatCurrency != FiatCurrency.Usd.Code
+            && _ratesState.FiatRates?.TryGetValue(_currencySettings.MainFiatCurrency, out var mainRate) == true
+            && mainRate != 0)
+        {
+            netWorthInUsd = Math.Round(netWorthInMainFiatCurrency / mainRate, 2);
+        }
+
+        return new Wealth(
+            currentWealthInFiat,
+            nonBtcWealth,
+            liveWealth.WealthInSats,
+            allWealthPricedInSats,
+            wealthInBtcRatio,
+            liveWealth.AssetsWealthInMainFiatCurrency,
+            liveWealth.AssetsWealthInSats,
+            netWorthInMainFiatCurrency,
+            netWorthInSats,
+            netWorthInUsd);
+    }
+
     private async Task FetchMaxBtcStackDataAsync(IReportDataProvider provider)
     {
         try
@@ -869,6 +1038,54 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         {
             _logger.LogError(ex, "Error fetching max BTC stack data");
         }
+    }
+
+    /// <summary>
+    /// Calculates the simulated P&L for a leveraged position when BTC price is simulated.
+    /// Only recalculates if the position is a BTC position (Symbol starts with "BTC").
+    /// </summary>
+    private decimal? CalculateSimulatedLeveragedPnl(AssetDTO position, IReadOnlyDictionary<string, decimal> fiatRates)
+    {
+        // If no custom price is active, return the stored P&L
+        if (!_customBtcPriceState.IsActive || !_customBtcPriceState.CustomBtcPriceUsd.HasValue)
+            return position.PnL;
+
+        // Only recalculate for BTC positions
+        if (string.IsNullOrWhiteSpace(position.Symbol) ||
+            !position.Symbol.StartsWith("BTC", StringComparison.OrdinalIgnoreCase))
+            return position.PnL;
+
+        if (!position.Collateral.HasValue || !position.Leverage.HasValue ||
+            !position.EntryPrice.HasValue || position.EntryPrice.Value == 0)
+            return position.PnL;
+
+        // Get simulated BTC price in position's currency
+        var simulatedPriceUsd = _customBtcPriceState.CustomBtcPriceUsd.Value;
+        decimal simulatedPrice;
+        if (position.CurrencyCode == FiatCurrency.Usd.Code)
+        {
+            simulatedPrice = simulatedPriceUsd;
+        }
+        else if (fiatRates.TryGetValue(position.CurrencyCode, out var rate))
+        {
+            simulatedPrice = simulatedPriceUsd * rate;
+        }
+        else
+        {
+            return position.PnL;
+        }
+
+        // Calculate P&L using leveraged position formula
+        var priceChange = (simulatedPrice - position.EntryPrice.Value) / position.EntryPrice.Value;
+        var leveragedChange = priceChange * position.Leverage.Value;
+
+        decimal currentValue;
+        if (position.IsLong.HasValue && position.IsLong.Value)
+            currentValue = position.Collateral.Value * (1 + leveragedChange);
+        else
+            currentValue = position.Collateral.Value * (1 - leveragedChange);
+
+        return currentValue - position.Collateral.Value;
     }
 
     private async Task UpdateLeveragePositionsDataAsync()
@@ -939,16 +1156,16 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             {
                 foreach (var position in leveragedPositions)
                 {
-                    if (!position.PnL.HasValue) continue;
-                    var pnl = position.PnL.Value;
+                    var pnl = CalculateSimulatedLeveragedPnl(position, fiatRates);
+                    if (!pnl.HasValue) continue;
                     var currency = position.CurrencyCode;
 
                     if (currency == mainCurrency)
-                        totalPnlInMainFiat += pnl;
+                        totalPnlInMainFiat += pnl.Value;
                     else if (currency == FiatCurrency.Usd.Code)
-                        totalPnlInMainFiat += pnl * fiatRates[mainCurrency];
+                        totalPnlInMainFiat += pnl.Value * fiatRates[mainCurrency];
                     else if (fiatRates.ContainsKey(currency))
-                        totalPnlInMainFiat += (pnl / fiatRates[currency]) * fiatRates[mainCurrency];
+                        totalPnlInMainFiat += (pnl.Value / fiatRates[currency]) * fiatRates[mainCurrency];
                 }
             }
             totalPnlInMainFiat = Math.Round(totalPnlInMainFiat, 2);
@@ -1043,6 +1260,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             {
                 MainCurrencyCode = mainCurrency,
                 BtcPriceUsd = btcPrice,
+                CustomBtcPriceUsd = _customBtcPriceState.CustomBtcPriceUsd,
                 FiatRates = fiatRates,
                 TotalBtcStackSats = stackSats
             });
@@ -1065,13 +1283,14 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 {
                     new(language.Reports_BtcLoans_ActiveLoans, dto.ActiveLoansCount.ToString(CultureInfo.InvariantCulture)),
                     new(language.Reports_BtcLoans_TotalDebt, CurrencyDisplay.FormatFiat(dto.TotalDebtInMainCurrency, fiatCurrency.Code)),
+                    new(language.Reports_BtcLoans_TotalDebtBtc, CurrencyDisplay.FormatAsBitcoin(dto.TotalDebtInBtc) + " BTC"),
                     new(language.Reports_BtcLoans_AvgLtv, dto.DebtWeightedAvgLtv.ToString("0.##", CultureInfo.InvariantCulture) + "%",
                         TooltipContent.Text(language.Reports_BtcLoans_AvgLtv_Tooltip)),
                     new(language.Reports_BtcLoans_AvgApr, dto.DebtWeightedAvgApr.ToString("0.##", CultureInfo.InvariantCulture) + "%",
                         TooltipContent.Text(language.Reports_BtcLoans_AvgApr_Tooltip)),
                     RowItem.Separator(),
-                    new(language.Reports_BtcLoans_CollateralSats, CurrencyDisplay.FormatSatsAsBitcoin(dto.TotalCollateralSats) + " BTC"),
                     new(language.Reports_BtcLoans_CollateralFiat, CurrencyDisplay.FormatFiat(dto.TotalCollateralFiatInMainCurrency, fiatCurrency.Code)),
+                    new(language.Reports_BtcLoans_CollateralSats, CurrencyDisplay.FormatSatsAsBitcoin(dto.TotalCollateralSats) + " BTC"),
                     new(language.Reports_BtcLoans_CollateralPercent,
                         dto.CollateralPercentOfStack.ToString("0.##", CultureInfo.InvariantCulture) + "%",
                         TooltipContent.Text(language.Reports_BtcLoans_CollateralPercent_Tooltip)),
@@ -1279,6 +1498,21 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
     }
 
+    private void OnRatesStatePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(RatesState.BitcoinPrice) or nameof(RatesState.FiatRates))
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (!IsCustomPriceActive)
+                {
+                    UpdateCurrentBtcPriceFormatted();
+                    UpdateSimulatedPricesData();
+                }
+            });
+        }
+    }
+
     #endregion
 
     private void LoadCachedIndicatorsData()
@@ -1358,6 +1592,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         // Unsubscribe from PropertyChanged events
         _secureModeState.PropertyChanged -= OnSecureModeStatePropertyChanged;
         _accountsTotalState.PropertyChanged -= OnAccountsTotalStatePropertyChanged;
+        _ratesState.PropertyChanged -= OnRatesStatePropertyChanged;
 
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
         WeakReferenceMessenger.Default.Unregister<AssetSummaryUpdatedMessage>(this);
