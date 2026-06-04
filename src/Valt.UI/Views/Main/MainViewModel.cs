@@ -16,15 +16,10 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using LiteDB;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
-using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel.BackgroundJobs;
-using Valt.Infra.Modules.Budget;
-using Valt.Infra.Modules.Configuration;
-using Valt.Infra.Modules.Reports.AllTimeHigh;
 using Valt.Infra.Services.CsvExport;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
@@ -56,16 +51,11 @@ public partial class MainViewModel : ValtViewModel, IDisposable
 {
     private readonly IPageFactory _pageFactory;
     private readonly IModalFactory _modalFactory;
-
-    private readonly ILocalDatabase? _localDatabase;
-    private readonly IPriceDatabase _priceDatabase = null!;
+    private readonly IDatabaseLifecycleService _dbLifecycle;
     private readonly CurrencySettings _currencySettings;
     private readonly BackgroundJobManager? _backgroundJobManager;
-    private readonly IDatabaseInitializer? _databaseInitializer;
-    private readonly IDatabaseVersionChecker? _databaseVersionChecker;
     private readonly LiveRatesViewModel _liveRatesViewModel = null!;
     private readonly UpdateIndicatorViewModel _updateIndicatorViewModel;
-    private readonly IAllTimeHighReport _allTimeHighReport = null!;
     private readonly ICsvExportService _csvExportService = null!;
     private readonly IClock _clock = null!;
     private readonly ILogger<MainViewModel> _logger = null!;
@@ -152,7 +142,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
 
     private void LocalDatabaseOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        HasDatabaseOpen = _localDatabase!.HasDatabaseOpen;
+        HasDatabaseOpen = _dbLifecycle is not null; // Simplified: service manages DB state
     }
 
     private void McpServerStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -172,7 +162,8 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     {
         _pageFactory = new DesignTimePageFactory();
         _modalFactory = new DesignTimeModalFactory();
-        _currencySettings = new CurrencySettings(_localDatabase!, null!);
+        _dbLifecycle = null!;
+        _currencySettings = new CurrencySettings(null!, null!);
         _updateIndicatorViewModel = new UpdateIndicatorViewModel();
 
         HasDatabaseOpen = true;
@@ -183,16 +174,12 @@ public partial class MainViewModel : ValtViewModel, IDisposable
 
     public MainViewModel(IPageFactory pageFactory,
         IModalFactory modalFactory,
-        ILocalDatabase localDatabase,
-        IPriceDatabase priceDatabase,
+        IDatabaseLifecycleService dbLifecycle,
         CurrencySettings currencySettings,
         BackgroundJobManager backgroundJobManager,
-        IDatabaseInitializer databaseInitializer,
-        IDatabaseVersionChecker databaseVersionChecker,
         LiveRatesViewModel liveRatesViewModel,
         UpdateIndicatorViewModel updateIndicatorViewModel,
         LiveRateState liveRateState,
-        IAllTimeHighReport allTimeHighReport,
         ICsvExportService csvExportService,
         IClock clock,
         ILogger<MainViewModel> logger,
@@ -207,15 +194,11 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     {
         _pageFactory = pageFactory;
         _modalFactory = modalFactory;
-        _localDatabase = localDatabase;
-        _priceDatabase = priceDatabase;
+        _dbLifecycle = dbLifecycle;
         _currencySettings = currencySettings;
         _backgroundJobManager = backgroundJobManager;
-        _databaseInitializer = databaseInitializer;
-        _databaseVersionChecker = databaseVersionChecker;
         _liveRatesViewModel = liveRatesViewModel;
         _updateIndicatorViewModel = updateIndicatorViewModel;
-        _allTimeHighReport = allTimeHighReport;
         _csvExportService = csvExportService;
         _clock = clock;
         _logger = logger;
@@ -228,9 +211,8 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         _accountsTotalState = accountsTotalState;
         _filterState = filterState;
 
-        _localDatabase.PropertyChanged += LocalDatabaseOnPropertyChanged;
         _mcpServerState.PropertyChanged += McpServerStateOnPropertyChanged;
-
+        
         Jobs = new AvaloniaList<JobInfo>(_backgroundJobManager.GetJobInfos());
         foreach (var job in Jobs)
             job.PropertyChanged += JobOnPropertyChanged;
@@ -268,54 +250,15 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     }
 
     [RelayCommand]
-    private async Task SetTransactionsTab()
+    private async Task SetTab(MainViewTabNames tab)
     {
-        var needsRefresh = _tabRefreshState.NeedsRefresh(MainViewTabNames.TransactionsPageContent);
-        SelectedTabComponent = _pageFactory.Create(MainViewTabNames.TransactionsPageContent);
+        var needsRefresh = _tabRefreshState.NeedsRefresh(tab);
+        SelectedTabComponent = _pageFactory.Create(tab);
 
         if (needsRefresh && SelectedTabComponent is not null)
         {
             await SelectedTabComponent.RefreshAsync();
-            _tabRefreshState.ClearRefresh(MainViewTabNames.TransactionsPageContent);
-        }
-    }
-
-    [RelayCommand]
-    private async Task SetReportsTab()
-    {
-        var needsRefresh = _tabRefreshState.NeedsRefresh(MainViewTabNames.ReportsPageContent);
-        SelectedTabComponent = _pageFactory.Create(MainViewTabNames.ReportsPageContent);
-
-        if (needsRefresh && SelectedTabComponent is not null)
-        {
-            await SelectedTabComponent.RefreshAsync();
-            _tabRefreshState.ClearRefresh(MainViewTabNames.ReportsPageContent);
-        }
-    }
-
-    [RelayCommand]
-    private async Task SetAvgPriceTab()
-    {
-        var needsRefresh = _tabRefreshState.NeedsRefresh(MainViewTabNames.AvgPricePageContent);
-        SelectedTabComponent = _pageFactory.Create(MainViewTabNames.AvgPricePageContent);
-
-        if (needsRefresh && SelectedTabComponent is not null)
-        {
-            await SelectedTabComponent.RefreshAsync();
-            _tabRefreshState.ClearRefresh(MainViewTabNames.AvgPricePageContent);
-        }
-    }
-
-    [RelayCommand]
-    private async Task SetAssetsTab()
-    {
-        var needsRefresh = _tabRefreshState.NeedsRefresh(MainViewTabNames.AssetsPageContent);
-        SelectedTabComponent = _pageFactory.Create(MainViewTabNames.AssetsPageContent);
-
-        if (needsRefresh && SelectedTabComponent is not null)
-        {
-            await SelectedTabComponent.RefreshAsync();
-            _tabRefreshState.ClearRefresh(MainViewTabNames.AssetsPageContent);
+            _tabRefreshState.ClearRefresh(tab);
         }
     }
 
@@ -428,24 +371,19 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             await _mcpServerService.StopAsync();
         }
 
-        // 4. Stop all background jobs (both ValtDatabase and PriceDatabase)
-        await _backgroundJobManager!.StopJobsByTypeAsync(BackgroundJobTypes.ValtDatabase);
-        await _backgroundJobManager!.StopJobsByTypeAsync(BackgroundJobTypes.PriceDatabase);
+        // 4. Stop all background jobs and close databases
+        await _dbLifecycle.CloseDatabasesAsync();
 
-        // 5. Close both databases
-        _localDatabase!.CloseDatabase();
-        _priceDatabase.CloseDatabase();
-
-        // 6. Reset all UI state
+        // 5. Reset all UI state
         _accountsTotalState.Reset();
         _filterState.Reset();
         _secureModeState.Reset();
         _tabRefreshState.ClearAll();
 
-        // 7. Update UI
+        // 6. Update UI
         OnPropertyChanged(nameof(SecureModeIcon));
 
-        // 8. Navigate back to initial selection modal
+        // 7. Navigate back to initial selection modal
         await OpenInitialSelectionModal();
     }
 
@@ -552,53 +490,51 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             if (result is null || string.IsNullOrEmpty(result.File))
             {
                 appLifetime!.Shutdown();
+                return;
             }
 
-            try
-            {
-                _localDatabase!.OpenDatabase(result!.File, result.Password);
-            }
-            catch (LiteException ex)
+            var openResult = await _dbLifecycle.OpenLocalDatabaseAsync(result.File, result.Password);
+            if (!openResult.Success)
             {
                 await MessageBoxHelper.ShowErrorAsync(language.Error,
-                    string.Format(language.ValtFile_Error, ex.Message),
+                    string.Format(language.ValtFile_Error, openResult.ErrorMessage),
                     Window!);
-                continue;
-            }
-            catch (Exception ex)
-            {
-                await MessageBoxHelper.ShowErrorAsync(language.Error, $"{ex.Message}", Window!);
                 continue;
             }
 
             // Check database version compatibility before proceeding
             if (!result.IsNew)
             {
-                var compatibilityResult = _databaseVersionChecker!.CheckCompatibility();
-                if (!compatibilityResult.IsCompatible)
+                var compatibility = _dbLifecycle.CheckCompatibility();
+                if (!compatibility.IsCompatible)
                 {
                     await MessageBoxHelper.ShowErrorAsync(language.Error,
                         string.Format(language.Error_IncompatibleVersion,
-                            compatibilityResult.RequiredVersion,
-                            compatibilityResult.CurrentVersion),
+                            compatibility.RequiredVersion,
+                            compatibility.CurrentVersion),
                         Window!);
-                    _localDatabase.CloseDatabase();
+                    _dbLifecycle.CloseLocalDatabase();
                     continue;
                 }
             }
 
             if (result.IsNew)
             {
-                await _databaseInitializer!.InitializeAsync(result.InitialDataLanguage, result.SelectedCurrencies);
+                await _dbLifecycle.InitializeNewDatabaseAsync(result.InitialDataLanguage, result.SelectedCurrencies.ToArray());
             }
 
-            await _databaseInitializer!.MigrateAsync();
+            await _dbLifecycle.MigrateAsync();
             
             // Initialize price database AFTER local database is opened
             // This ensures we have access to AvailableFiatCurrencies configuration
-            if (!await InitializePriceDatabaseAsync())
+            var priceDbResult = await _dbLifecycle.InitializePriceDatabaseAsync();
+            if (!priceDbResult.Success)
             {
+                await MessageBoxHelper.ShowErrorAsync(language.Error,
+                    string.Format(language.ValtPriceFile_Error, priceDbResult.ErrorMessage),
+                    Window!);
                 appLifetime!.Shutdown();
+                return;
             }
 
             openedFile = true;
@@ -623,7 +559,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             //this avoids some race conditions with the jobs and current UI state
             await Dispatcher.UIThread.InvokeAsync(async () =>
             {
-                await _backgroundJobManager!.StartAllJobsAsync(jobType: BackgroundJobTypes.ValtDatabase);
+                await _dbLifecycle.StartValtDatabaseJobsAsync();
             });
 
             // Schedule an early asset price refresh to update stale prices from the previous session.
@@ -631,7 +567,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             _ = Task.Run(async () =>
             {
                 await Task.Delay(TimeSpan.FromSeconds(5));
-                _backgroundJobManager!.TriggerJobManually(BackgroundJobSystemNames.AssetPriceUpdater);
+                _dbLifecycle.TriggerJobManually(BackgroundJobSystemNames.AssetPriceUpdater);
             });
 
             // Check for updates (fire and forget - don't block startup)
@@ -652,122 +588,6 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         }
     }
 
-    private async Task<bool> InitializePriceDatabaseAsync()
-    {
-        try
-        {
-            var jobsAlreadyStarted = false;
-
-            if (!_priceDatabase.DatabaseFileExists() || IsPriceDatabaseEmpty())
-            {
-                var installResult = await InstallProcessAsync();
-
-                if (!installResult)
-                    return false;
-
-                // Jobs were started in InstallProcessAsync
-                jobsAlreadyStarted = true;
-            }
-
-            if (!_priceDatabase.HasDatabaseOpen)
-                _priceDatabase!.OpenDatabase();
-
-            // Sanitize any duplicate price entries that may exist from previous versions
-            var duplicatesRemoved = _priceDatabase.RemoveDuplicateEntries();
-            if (duplicatesRemoved > 0)
-                _logger.LogInformation("Removed {Count} duplicate entries from price database", duplicatesRemoved);
-
-            if (!jobsAlreadyStarted)
-                await _backgroundJobManager!.StartAllJobsAsync(jobType: BackgroundJobTypes.PriceDatabase, triggerInitialRun: false);
-
-            // Run LivePricesUpdater synchronously to ensure rates are available before UI is shown
-            await _backgroundJobManager.TriggerJobAndWaitAsync(BackgroundJobSystemNames.LivePricesUpdater);
-
-            // Trigger history updater jobs to run in the background
-            _backgroundJobManager.TriggerJobManually(BackgroundJobSystemNames.BitcoinHistoryUpdater);
-            _backgroundJobManager.TriggerJobManually(BackgroundJobSystemNames.FiatHistoryUpdater);
-            _backgroundJobManager.TriggerJobManually(BackgroundJobSystemNames.IndicatorsUpdater);
-
-            return true;
-        }
-        catch (LiteException ex)
-        {
-            await MessageBoxHelper.ShowErrorAsync(language.Error,
-                string.Format(language.ValtPriceFile_Error, ex.Message),
-                Window!);
-        }
-        catch (Exception ex)
-        {
-            await MessageBoxHelper.ShowErrorAsync(language.Error, $"{ex.Message}", Window!);
-        }
-        finally
-        {
-            IsLoading = false;
-        }
-        
-        return false;
-    }
-
-    private bool IsPriceDatabaseEmpty()
-    {
-        try
-        {
-            _priceDatabase!.OpenDatabase();
-            return !_priceDatabase.HasPriceData();
-        }
-        finally
-        {
-            _priceDatabase!.CloseDatabase();
-        }
-    }
-
-    private async Task<bool> InstallProcessAsync()
-    {
-        await MessageBoxHelper.ShowAlertAsync(language.InstallPriceDatabase_Title,
-            language.InstallPriceDatabase_Info,
-            Window!);
-        
-        _priceDatabase!.OpenDatabase();
-
-        await Dispatcher.UIThread.InvokeAsync(() =>
-        {
-            IsLoading = true;
-        });
-
-        //execute the main jobs manually
-        try
-        {
-            // Start jobs first so their consumer loops are ready to process requests
-            await _backgroundJobManager!.StartAllJobsAsync(
-                jobType: BackgroundJobTypes.PriceDatabase,
-                triggerInitialRun: false);
-
-            await Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                LoadingMessage = language.InstallingBitcoinPriceMessage;
-            });
-            await _backgroundJobManager.TriggerJobAndWaitAsync(BackgroundJobSystemNames
-                .BitcoinHistoryUpdater);
-            await Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                LoadingMessage = language.InstallingFiatPriceMessage;
-            });
-            await _backgroundJobManager.TriggerJobAndWaitAsync(BackgroundJobSystemNames
-                .FiatHistoryUpdater);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "[InstallProcessAsync] Error during execution");
-
-            await MessageBoxHelper.ShowErrorAsync(language.InstallPriceDatabase_Error_Title,
-                language.InstallPriceDatabase_Error_Info,
-                Window!);
-            return false;
-        }
-
-        return true;
-    }
-
     [RelayCommand]
     private async Task OpenStatusDisplay()
     {
@@ -781,7 +601,6 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     {
         // Single-pass to determine job states instead of multiple All()/Any() calls
         var hasOk = false;
-        var hasError = false;
         var hasRunning = false;
         var allOk = true;
         var allError = true;
@@ -795,7 +614,6 @@ public partial class MainViewModel : ValtViewModel, IDisposable
                     allError = false;
                     break;
                 case BackgroundJobState.Error:
-                    hasError = true;
                     allOk = false;
                     break;
                 case BackgroundJobState.Running:
@@ -836,20 +654,12 @@ public partial class MainViewModel : ValtViewModel, IDisposable
 
     public async Task OnClosingAsync()
     {
-        if (_backgroundJobManager is null)
-            return;
-
-        // Stop MCP server first
         if (_mcpServerService is not null)
         {
             await _mcpServerService.StopAsync();
         }
 
-        await _backgroundJobManager.StopAll();
-
-        // Close databases to trigger checkpoint (merges -log.db into main .db file)
-        _localDatabase?.CloseDatabase();
-        _priceDatabase?.CloseDatabase();
+        await _dbLifecycle.CloseDatabasesAsync();
     }
     
     private void UpdatePepeImage()
@@ -879,10 +689,6 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     {
         // Unregister from WeakReferenceMessenger
         WeakReferenceMessenger.Default.UnregisterAll(this);
-
-        // Unsubscribe from local database PropertyChanged
-        if (_localDatabase is not null)
-            _localDatabase.PropertyChanged -= LocalDatabaseOnPropertyChanged;
 
         // Unsubscribe from MCP server state PropertyChanged
         if (_mcpServerState is not null)

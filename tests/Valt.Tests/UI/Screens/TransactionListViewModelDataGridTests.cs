@@ -64,6 +64,8 @@ public class TransactionListViewModelDataGridTests : DatabaseTest
             _commandDispatcher,
             _queryDispatcher,
             _transactionTermService,
+            new TransactionSelectionService(),
+            new AutoSatRefreshService(liveRateState, currencySettings),
             liveRateState,
             _localDatabase,
             currencySettings,

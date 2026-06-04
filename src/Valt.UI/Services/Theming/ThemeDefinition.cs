@@ -1,4 +1,3 @@
-using System;
 using Avalonia.Controls;
 
 namespace Valt.UI.Services.Theming;
@@ -9,5 +8,8 @@ namespace Valt.UI.Services.Theming;
 /// <param name="Name">Internal name used for storage and lookup</param>
 /// <param name="DisplayName">User-friendly name shown in UI</param>
 /// <param name="BaseTheme">Base theme variant: "Dark" or "Light"</param>
-/// <param name="CreateResources">Factory function that creates the theme's ResourceDictionary</param>
-public record ThemeDefinition(string Name, string DisplayName, string BaseTheme, Func<ResourceDictionary> CreateResources);
+/// <param name="Palette">The color palette for this theme</param>
+public record ThemeDefinition(string Name, string DisplayName, string BaseTheme, ThemePalette Palette)
+{
+    public ResourceDictionary CreateResources() => ThemeBuilder.Create(Palette);
+}

@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -58,6 +57,8 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     private readonly ICommandDispatcher _commandDispatcher = null!;
     private readonly IQueryDispatcher _queryDispatcher = null!;
     private readonly ITransactionTermService _transactionTermService = null!;
+    private readonly ITransactionSelectionService _selectionService = null!;
+    private readonly IAutoSatRefreshService _autoSatRefreshService = null!;
     private readonly LiveRateState _liveRateState = null!;
     private readonly ILocalDatabase _localDatabase = null!;
     private readonly CurrencySettings _currencySettings = null!;
@@ -100,6 +101,8 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
         ICommandDispatcher commandDispatcher,
         IQueryDispatcher queryDispatcher,
         ITransactionTermService transactionTermService,
+        ITransactionSelectionService selectionService,
+        IAutoSatRefreshService autoSatRefreshService,
         LiveRateState liveRateState,
         ILocalDatabase localDatabase,
         CurrencySettings currencySettings,
@@ -113,6 +116,8 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
         _commandDispatcher = commandDispatcher;
         _queryDispatcher = queryDispatcher;
         _transactionTermService = transactionTermService;
+        _selectionService = selectionService;
+        _autoSatRefreshService = autoSatRefreshService;
         _liveRateState = liveRateState;
         _localDatabase = localDatabase;
         _currencySettings = currencySettings;
@@ -646,11 +651,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
         Transactions.Clear();
 
         var transactionViewModels = TransactionViewModel.Parse(transactions.Items, _clock.GetCurrentLocalDate()).ToList();
-        foreach (var transactionViewModel in transactionViewModels)
-        {
-            transactionViewModel.RefreshCurrentAutoSatValue(_liveRateState.UsdPrice, _liveRateState.BitcoinPrice,
-                _currencySettings.MainFiatCurrency, _liveRateState.FiatRates);
-        }
+        _autoSatRefreshService.RefreshAll(transactionViewModels);
 
         Transactions.AddRange(transactionViewModels);
 
@@ -671,79 +672,16 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         SelectedTransactions = selectedItems.OfType<TransactionViewModel>().ToList();
 
-        if (selectedItems.Count == 0)
-        {
-            // No selection - clear state
-            IsSingleItemSelected = false;
-            SelectedTransaction = null;
-            AmountHeader = language.Transactions_Columns_Amount;
-            return;
-        }
+        var result = _selectionService.CalculateSelection(SelectedTransactions, SelectedAccount);
 
-        // Keep SelectedTransaction as anchor for context menu (first item in selection)
-        SelectedTransaction = SelectedTransactions.FirstOrDefault();
-
-        if (SelectedAccount == null)
-        {
-            IsSingleItemSelected = selectedItems.Count == 1;
-            AmountHeader = language.Transactions_Columns_Amount;
-            return;
-        }
-
-        if (selectedItems.Count == 1)
-        {
-            IsSingleItemSelected = true;
-            AmountHeader = language.Transactions_Columns_Amount;
-            return;
-        }
-
-        IsSingleItemSelected = false;
-
-        if (SelectedAccount!.IsBtcAccount)
-        {
-            long totalSats = 0;
-            foreach (var item in SelectedTransactions)
-            {
-                if (item.TransactionType is TransactionTypes.Credit or TransactionTypes.Debt)
-                    totalSats += item.FromAmountSats.GetValueOrDefault();
-                else
-                {
-                    if (item.FromAccountId == SelectedAccount.Id)
-                        totalSats += item.FromAmountSats.GetValueOrDefault();
-                    else
-                        totalSats += item.ToAmountSats.GetValueOrDefault();
-                }
-            }
-
-            AmountHeader = $"{language.Transactions_Columns_Amount}: {totalSats}";
-        }
-        else
-        {
-            decimal totalFiat = 0;
-            foreach (var item in SelectedTransactions)
-            {
-                if (item.TransactionType is TransactionTypes.Credit or TransactionTypes.Debt)
-                    totalFiat += item.FromAmountFiat.GetValueOrDefault();
-                else
-                {
-                    if (item.FromAccountId == SelectedAccount.Id)
-                        totalFiat += item.FromAmountFiat.GetValueOrDefault();
-                    else
-                        totalFiat += item.ToAmountFiat.GetValueOrDefault();
-                }
-            }
-
-            AmountHeader = $"{language.Transactions_Columns_Amount}: {totalFiat}";
-        }
+        IsSingleItemSelected = result.IsSingleItemSelected;
+        SelectedTransaction = result.AnchorTransaction;
+        AmountHeader = result.AmountHeader;
     }
 
     private void LiveRateStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        foreach (var transaction in Transactions)
-        {
-            transaction.RefreshCurrentAutoSatValue(_liveRateState.UsdPrice, _liveRateState.BitcoinPrice,
-                _currencySettings.MainFiatCurrency, _liveRateState.FiatRates);
-        }
+        _autoSatRefreshService.RefreshAll(Transactions);
     }
 
     #region Message recipients
@@ -752,16 +690,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         Dispatcher.UIThread.Post(() =>
         {
-            foreach (var transactionMessage in message.Transactions)
-            {
-                var transaction = Transactions.SingleOrDefault(x => x.Id == transactionMessage.TransactionId.Value);
-
-                if (transaction is null) continue;
-
-                transaction.SetupAutoSatAmount(transactionMessage.AutoSatAmount);
-                transaction.RefreshCurrentAutoSatValue(_liveRateState.UsdPrice, _liveRateState.BitcoinPrice,
-                    _currencySettings.MainFiatCurrency, _liveRateState.FiatRates);
-            }
+            _autoSatRefreshService.RefreshBatch(Transactions, message.Transactions);
         });
     }
 
@@ -793,8 +722,6 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         OnPropertyChanged(nameof(CanSendToAvgPrice));
     }
-
-
 
     #endregion
 

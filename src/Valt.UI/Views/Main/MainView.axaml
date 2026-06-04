@@ -4,8 +4,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:userControls1="clr-namespace:Valt.UI.UserControls"
         xmlns:local="clr-namespace:Valt.UI.Lang"
-        xmlns:main1="clr-namespace:Valt.UI.Views.Main"
-        xmlns:controls="clr-namespace:Valt.UI.Views.Main.Controls"
+         xmlns:main1="clr-namespace:Valt.UI.Views.Main"
+         xmlns:controls="clr-namespace:Valt.UI.Views.Main.Controls"
+         xmlns:views="clr-namespace:Valt.UI.Views"
         mc:Ignorable="d"
         d:DesignWidth="1280" d:DesignHeight="650"
         MinWidth="1280" MinHeight="650"
@@ -94,7 +95,8 @@
                     </DropDownButton>
                     <!-- Transactions tab -->
                     <Button Classes="tab" Classes.selected="{Binding IsTransactionButtonSelected}"
-                            Command="{Binding SetTransactionsTabCommand}"
+                            Command="{Binding SetTabCommand}"
+                            CommandParameter="{x:Static views:MainViewTabNames.TransactionsPageContent}"
                             Margin="5,0">
                         <Grid>
                             <StackPanel Orientation="Horizontal">
@@ -127,7 +129,8 @@
                     </Button>
                     <!-- Reports tab -->
                     <Button Classes="tab" Classes.selected="{Binding IsReportButtonSelected}"
-                            Command="{Binding SetReportsTabCommand}"
+                            Command="{Binding SetTabCommand}"
+                            CommandParameter="{x:Static views:MainViewTabNames.ReportsPageContent}"
                             Margin="5,0">
                         <Grid>
                             <StackPanel Orientation="Horizontal">
@@ -160,7 +163,8 @@
                     </Button>
                     <!-- AvgPrice tab -->
                     <Button Classes="tab" Classes.selected="{Binding IsAvgPriceButtonSelected}"
-                            Command="{Binding SetAvgPriceTabCommand}"
+                            Command="{Binding SetTabCommand}"
+                            CommandParameter="{x:Static views:MainViewTabNames.AvgPricePageContent}"
                             Margin="5,0">
                         <Grid>
                             <StackPanel Orientation="Horizontal">
@@ -193,7 +197,8 @@
                     </Button>
                     <!-- Assets tab -->
                     <Button Classes="tab" Classes.selected="{Binding IsAssetsButtonSelected}"
-                            Command="{Binding SetAssetsTabCommand}"
+                            Command="{Binding SetTabCommand}"
+                            CommandParameter="{x:Static views:MainViewTabNames.AssetsPageContent}"
                             Margin="5,0">
                         <Grid>
                             <StackPanel Orientation="Horizontal">

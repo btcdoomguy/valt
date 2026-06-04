@@ -29,25 +29,23 @@ internal class MarkGoalsStaleOnPriceUpdateHandler :
         _logger = logger;
     }
 
-    public Task HandleAsync(FiatHistoryPriceUpdatedMessage @event)
+    public async Task HandleAsync(FiatHistoryPriceUpdatedMessage @event)
     {
         _logger.LogInformation("[MarkGoalsStaleOnPriceUpdate] Fiat history prices updated, marking price-dependent goals as stale");
-        MarkPriceDependentGoalsStaleAndRefresh();
-        return Task.CompletedTask;
+        await MarkPriceDependentGoalsStaleAndRefreshAsync();
     }
 
-    public Task HandleAsync(BitcoinHistoryPriceUpdatedMessage @event)
+    public async Task HandleAsync(BitcoinHistoryPriceUpdatedMessage @event)
     {
         _logger.LogInformation("[MarkGoalsStaleOnPriceUpdate] Bitcoin history prices updated, marking price-dependent goals as stale");
-        MarkPriceDependentGoalsStaleAndRefresh();
-        return Task.CompletedTask;
+        await MarkPriceDependentGoalsStaleAndRefreshAsync();
     }
 
-    private void MarkPriceDependentGoalsStaleAndRefresh()
+    private async Task MarkPriceDependentGoalsStaleAndRefreshAsync()
     {
         try
         {
-            var goals = _goalRepository.GetAllAsync().GetAwaiter().GetResult();
+            var goals = await _goalRepository.GetAllAsync();
             var markedCount = 0;
 
             foreach (var goal in goals)
@@ -56,7 +54,7 @@ internal class MarkGoalsStaleOnPriceUpdateHandler :
                 if (goal.IsUpToDate && goal.GoalType.RequiresPriceDataForCalculation)
                 {
                     goal.MarkAsStale();
-                    _goalRepository.SaveAsync(goal).GetAwaiter().GetResult();
+                    await _goalRepository.SaveAsync(goal);
                     markedCount++;
                 }
             }

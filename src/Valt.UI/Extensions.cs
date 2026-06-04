@@ -32,6 +32,7 @@ using Valt.UI.Views.Main.Modals.StatusDisplay;
 using Valt.UI.Views.Main.Tabs.Assets;
 using Valt.UI.Views.Main.Tabs.AvgPrice;
 using Valt.UI.Views.Main.Tabs.Reports;
+using Valt.UI.Views.Main.Tabs.Reports.Panels;
 using Valt.UI.Services.LocalStorage;
 using Valt.UI.Views.Main.Modals.AvgPriceLineEditor;
 using Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles;
@@ -74,6 +75,10 @@ public static class Extensions
         //panel ViewModels
         services.AddSingleton<FixedExpensesPanelViewModel>();
         services.AddSingleton<GoalsPanelViewModel>();
+        services.AddSingleton<IndicatorsPanelViewModel>();
+        services.AddSingleton<WealthPanelViewModel>();
+        services.AddSingleton<BtcStackPanelViewModel>();
+        services.AddSingleton<SimulatedPricesPanelViewModel>();
         //factory method for pages
         services.AddSingleton<Func<MainViewTabNames, ValtTabViewModel>>(services => pageNames =>
         {
@@ -87,6 +92,9 @@ public static class Extensions
             };
         });
         services.AddSingleton<IPageFactory, PageFactory>();
+        services.AddSingleton<IDatabaseLifecycleService, DatabaseLifecycleService>();
+        services.AddSingleton<ITransactionSelectionService, TransactionSelectionService>();
+        services.AddSingleton<IAutoSatRefreshService, AutoSatRefreshService>();
         
         //transactions tabs
         services.AddSingleton<TransactionListViewModel>();

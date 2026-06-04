@@ -1,5 +1,5 @@
 using Valt.App.Kernel.Validation;
-using Valt.App.Modules.Goals.DTOs;
+using Valt.App.Modules.Goals.Validation;
 
 namespace Valt.App.Modules.Goals.Commands.CreateGoal;
 
@@ -7,88 +7,19 @@ public class CreateGoalValidator : IValidator<CreateGoalCommand>
 {
     public ValidationResult Validate(CreateGoalCommand instance)
     {
-        var errors = new Dictionary<string, string[]>();
+        var builder = new ValidationResultBuilder();
 
-        // Validate period
-        if (instance.Period < 0 || instance.Period > 1)
-            errors.Add(nameof(instance.Period), ["Period must be 0 (Monthly) or 1 (Yearly)"]);
+        GoalValidationRules.ValidateCommonFields(instance.Period, instance.StartDate, instance.RefDate, builder);
 
-        // Validate start date for yearly goals
-        if (instance.Period == 1 && instance.StartDate.HasValue && instance.StartDate.Value.Year != instance.RefDate.Year)
-            errors.Add(nameof(instance.StartDate), ["Start date must be in the same year as the reference year"]);
-
-        // Validate goal type
         if (instance.GoalType is null)
         {
-            errors.Add(nameof(instance.GoalType), ["Goal type is required"]);
+            builder.AddError(nameof(instance.GoalType), "Goal type is required");
         }
         else
         {
-            ValidateGoalType(instance.GoalType, errors);
+            GoalValidationRules.ValidateGoalType(instance.GoalType, builder);
         }
 
-        return errors.Count == 0 ? ValidationResult.Success() : ValidationResult.Failure(errors);
-    }
-
-    private static void ValidateGoalType(GoalTypeInputDTO goalType, Dictionary<string, string[]> errors)
-    {
-        switch (goalType)
-        {
-            case StackBitcoinGoalTypeDTO stackBitcoin:
-                if (stackBitcoin.TargetSats <= 0)
-                    errors.Add("GoalType.TargetSats", ["Target sats must be greater than zero"]);
-                break;
-
-            case SpendingLimitGoalTypeDTO spendingLimit:
-                if (spendingLimit.TargetAmount <= 0)
-                    errors.Add("GoalType.TargetAmount", ["Target amount must be greater than zero"]);
-                break;
-
-            case DcaGoalTypeDTO dca:
-                if (dca.TargetPurchaseCount <= 0)
-                    errors.Add("GoalType.TargetPurchaseCount", ["Target purchase count must be greater than zero"]);
-                break;
-
-            case IncomeFiatGoalTypeDTO incomeFiat:
-                if (incomeFiat.TargetAmount <= 0)
-                    errors.Add("GoalType.TargetAmount", ["Target amount must be greater than zero"]);
-                break;
-
-            case IncomeBtcGoalTypeDTO incomeBtc:
-                if (incomeBtc.TargetSats <= 0)
-                    errors.Add("GoalType.TargetSats", ["Target sats must be greater than zero"]);
-                break;
-
-            case ReduceExpenseCategoryGoalTypeDTO reduceExpense:
-                if (reduceExpense.TargetAmount <= 0)
-                    errors.Add("GoalType.TargetAmount", ["Target amount must be greater than zero"]);
-                if (string.IsNullOrWhiteSpace(reduceExpense.CategoryId))
-                    errors.Add("GoalType.CategoryId", ["Category is required"]);
-                break;
-
-            case BitcoinHodlGoalTypeDTO hodl:
-                if (hodl.MaxSellableSats < 0)
-                    errors.Add("GoalType.MaxSellableSats", ["Max sellable sats cannot be negative"]);
-                break;
-
-            case SaveFiatGoalTypeDTO saveFiat:
-                if (saveFiat.TargetAmount <= 0)
-                    errors.Add("GoalType.TargetAmount", ["Target amount must be greater than zero"]);
-                break;
-
-            case SavingsRateGoalTypeDTO savingsRate:
-                if (savingsRate.TargetPercentage <= 0 || savingsRate.TargetPercentage > 100)
-                    errors.Add("GoalType.TargetPercentage", ["Target percentage must be between 1 and 100"]);
-                break;
-
-            case NetWorthBtcGoalTypeDTO netWorthBtc:
-                if (netWorthBtc.TargetSats <= 0)
-                    errors.Add("GoalType.TargetSats", ["Target sats must be greater than zero"]);
-                break;
-
-            default:
-                errors.Add(nameof(CreateGoalCommand.GoalType), ["Unknown goal type"]);
-                break;
-        }
+        return builder.Build();
     }
 }

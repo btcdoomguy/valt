@@ -48,6 +48,7 @@ using Valt.UI.Views.Main.Modals.SimulatedPricesConfig;
 using Valt.UI.Views.Main.Modals.FixedPriceConfig;
 using Valt.UI.Views.Main.Modals.StatisticsConfig;
 using Valt.UI.Views.Main.Tabs.Reports.Models;
+using Valt.UI.Views.Main.Tabs.Reports.Panels;
 
 namespace Valt.UI.Views.Main.Tabs.Reports;
 
@@ -73,17 +74,16 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly IModalFactory _modalFactory = null!;
     private readonly IQueryDispatcher _queryDispatcher = null!;
     private readonly IIndicatorCache _indicatorCache = null!;
-
-    private const long TotalBtcSupplySats = 21_000_000_00_000_000L; // 21 million BTC in sats
+    private readonly IndicatorsPanelViewModel _indicatorsPanel;
+    private readonly WealthPanelViewModel _wealthPanel;
+    private readonly BtcStackPanelViewModel _btcStackPanel;
+    private readonly SimulatedPricesPanelViewModel _simulatedPricesPanel;
 
     // Cached provider for the lifetime of the tab being active
     private IReportDataProvider? _cachedProvider;
 
     // Cached ATH fiat value for reuse by leverage positions panel
     private decimal? _allTimeHighFiatValue;
-
-    // Cached max BTC stack data for reuse by BTC stack card
-    private MaxBtcStackData? _maxBtcStackData;
 
     [ObservableProperty] private DashboardData _wealthData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _allTimeHighData = DashboardData.Empty;
@@ -127,6 +127,11 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
     public bool IsSecureModeEnabled => _secureModeState.IsEnabled;
 
+    public IndicatorsPanelViewModel IndicatorsPanel => _indicatorsPanel;
+    public WealthPanelViewModel WealthPanel => _wealthPanel;
+    public BtcStackPanelViewModel BtcStackPanel => _btcStackPanel;
+    public SimulatedPricesPanelViewModel SimulatedPricesPanel => _simulatedPricesPanel;
+
     // Pie chart filter collections (expenses)
     [ObservableProperty] private AvaloniaList<SelectItem> _availableAccounts = new();
     [ObservableProperty] private AvaloniaList<SelectItem> _selectedAccounts = new();
@@ -160,7 +165,11 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         IConfigurationManager configurationManager,
         IModalFactory modalFactory,
         IQueryDispatcher queryDispatcher,
-        IIndicatorCache indicatorCache)
+        IIndicatorCache indicatorCache,
+        IndicatorsPanelViewModel indicatorsPanel,
+        WealthPanelViewModel wealthPanel,
+        BtcStackPanelViewModel btcStackPanel,
+        SimulatedPricesPanelViewModel simulatedPricesPanel)
     {
         _allTimeHighReport = allTimeHighReport;
         _maxBtcStackReport = maxBtcStackReport;
@@ -182,6 +191,15 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _modalFactory = modalFactory;
         _queryDispatcher = queryDispatcher;
         _indicatorCache = indicatorCache;
+        _indicatorsPanel = indicatorsPanel;
+        _wealthPanel = wealthPanel;
+        _btcStackPanel = btcStackPanel;
+        _simulatedPricesPanel = simulatedPricesPanel;
+
+        _wealthPanel.PropertyChanged += OnWealthPanelPropertyChanged;
+        _btcStackPanel.PropertyChanged += OnBtcStackPanelPropertyChanged;
+        _simulatedPricesPanel.PropertyChanged += OnSimulatedPricesPanelPropertyChanged;
+        _indicatorsPanel.PropertyChanged += OnIndicatorsPanelPropertyChanged;
 
         SimulateButtonText = language.Reports_SimulateButton;
         UpdateCurrentBtcPriceFormatted();
@@ -213,7 +231,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     IsBtcLoansLoading = true;
                     // Reload data when currency changes
                     ReloadDataAndFetchAllReportsAsync().SafeFireAndForget(logger: _logger, callerName: nameof(ReloadDataAndFetchAllReportsAsync));
-                    UpdateSimulatedPricesData();
+                    _simulatedPricesPanel.Refresh();
                     UpdateBtcLoansDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateBtcLoansDataAsync));
                     break;
             }
@@ -230,7 +248,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         WeakReferenceMessenger.Default.Register<IndicatorsUpdatedMessage>(this, (recipient, message) =>
         {
-            Dispatcher.UIThread.Post(() => UpdateIndicatorsData(message.Snapshot));
+            Dispatcher.UIThread.Post(() => _indicatorsPanel.UpdateIndicatorsData(message.Snapshot));
         });
 
         _ready = true;
@@ -256,10 +274,10 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             .ContinueWith(_ => UpdateLeveragePositionsDataAsync(), TaskScheduler.Default)
             .ContinueWith(_ => UpdateBtcLoansDataAsync(), TaskScheduler.Default)
             .SafeFireAndForget(logger: _logger, callerName: nameof(LoadDataAndFetchAllReportsAsync));
-        UpdateWealthData();
-        UpdateBtcStackData();
-        UpdateSimulatedPricesData();
-        LoadCachedIndicatorsData();
+        _wealthPanel.Refresh();
+        _btcStackPanel.Refresh();
+        _simulatedPricesPanel.Refresh();
+        _indicatorsPanel.RefreshAsync().ConfigureAwait(false).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -268,7 +286,6 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     public void UnloadData()
     {
         _cachedProvider = null;
-        _maxBtcStackData = null;
         _logger.LogDebug("Report data provider unloaded");
     }
 
@@ -697,157 +714,17 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
     private void UpdateWealthData()
     {
-        try
-        {
-            var wealth = CalculateWealthWithCustomPrice();
-            var fiatCurrency = FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency);
-
-            var totalInBtc = CurrencyDisplay.FormatSatsAsBitcoin(wealth.NetWorthInSats);
-            var btcWealth = CurrencyDisplay.FormatSatsAsBitcoin(wealth.WealthInSats);
-            var fiatWealth = CurrencyDisplay.FormatFiat(wealth.WealthInMainFiatCurrency, fiatCurrency.Code);
-            var totalInFiat = CurrencyDisplay.FormatFiat(wealth.NetWorthInMainFiatCurrency, fiatCurrency.Code);
-            var btcRatio = wealth.WealthInBtcRatio.ToString(CultureInfo.InvariantCulture) + "%";
-
-            var rows = new ObservableCollection<RowItem>
-            {
-                new(language.Transactions_Total, totalInBtc + " BTC", TooltipContent.Text(language.Reports_Wealth_TotalInBtc_Tooltip)),
-                new(language.Transactions_TotalInFiat, totalInFiat),
-                new(language.Transactions_MyStack, btcWealth + " BTC"),
-                new(language.Transactions_MyOther, fiatWealth)
-            };
-
-            // Add USD total row when main currency is not USD
-            if (fiatCurrency.Code != FiatCurrency.Usd.Code)
-            {
-                var totalInUsd = CurrencyDisplay.FormatFiat(wealth.NetWorthInUsd, FiatCurrency.Usd.Code);
-                rows.Insert(2, new RowItem(language.Reports_Wealth_TotalInUsd, totalInUsd));
-            }
-
-            // Separate totals from breakdown
-            rows.Insert(fiatCurrency.Code != FiatCurrency.Usd.Code ? 3 : 2, RowItem.Separator());
-
-            // Add assets line if there are any assets (positive or negative)
-            if (wealth.AssetsWealthInMainFiatCurrency != 0 || wealth.AssetsWealthInSats != 0)
-            {
-                var assetsWealth = CurrencyDisplay.FormatFiat(wealth.AssetsWealthInMainFiatCurrency, fiatCurrency.Code);
-                rows.Add(new RowItem(language.Reports_Wealth_MyAssets, assetsWealth));
-            }
-
-            rows.Add(new RowItem(language.Transactions_Ratio, btcRatio));
-
-            WealthData = new DashboardData(language.Reports_Wealth_Title, rows, Icon: "\uE84F");
-            IsWealthLoading = false;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating wealth data");
-            IsWealthLoading = false;
-        }
+        _wealthPanel.Refresh();
     }
 
     private void UpdateBtcStackData()
     {
-        try
-        {
-            var wealth = _accountsTotalState.CurrentWealth;
-            if (wealth.WealthInSats == 0)
-            {
-                BtcStackData = new DashboardData(language.Reports_BtcStack_Title, new ObservableCollection<RowItem>
-                {
-                    new(language.Reports_BtcStack_CurrentStack, "0 BTC"),
-                    new(language.Reports_BtcStack_PercentOfSupply, "0%"),
-                    new(language.Reports_BtcStack_PeopleWithSameStack, "∞", TooltipContent.Text(language.Reports_BtcStack_PeopleWithSameStack_Tooltip))
-                }, Icon: "\uEBC5");
-                IsBtcStackLoading = false;
-                return;
-            }
-
-            var btcFormatted = CurrencyDisplay.FormatSatsAsBitcoin(wealth.WealthInSats);
-            var percentOfSupply = (decimal)wealth.WealthInSats / TotalBtcSupplySats * 100m;
-            var percentFormatted = percentOfSupply.ToString("0.############") + "%";
-            var peopleWithSameStack = Math.Round((decimal)TotalBtcSupplySats / wealth.WealthInSats);
-            var peopleFormatted = peopleWithSameStack.ToString("N0", CultureInfo.CurrentCulture);
-
-            var rows = new ObservableCollection<RowItem>
-            {
-                new(language.Reports_BtcStack_CurrentStack, btcFormatted + " BTC"),
-                new(language.Reports_BtcStack_PercentOfSupply, percentFormatted),
-                new(language.Reports_BtcStack_PeopleWithSameStack, peopleFormatted, TooltipContent.Text(language.Reports_BtcStack_PeopleWithSameStack_Tooltip))
-            };
-
-            if (_maxBtcStackData is not null)
-            {
-                var maxBtcFormatted = CurrencyDisplay.FormatSatsAsBitcoin(_maxBtcStackData.MaxStackInSats);
-                rows.Add(new RowItem(language.Reports_BtcStack_MaxStack, maxBtcFormatted + " BTC"));
-                rows.Add(new RowItem(language.Reports_BtcStack_MaxStackDate, _maxBtcStackData.Date.ToString()));
-                rows.Add(new RowItem(language.Reports_BtcStack_DeclineFromMax, $"{_maxBtcStackData.DeclineFromMaxPercent}%"));
-            }
-
-            BtcStackData = new DashboardData(language.Reports_BtcStack_Title, rows, Icon: "\uEBC5");
-            IsBtcStackLoading = false;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating BTC stack data");
-            IsBtcStackLoading = false;
-        }
+        _btcStackPanel.Refresh();
     }
 
     private void UpdateSimulatedPricesData()
     {
-        try
-        {
-            var lines = _configurationManager.GetSimulatedPriceLines();
-            var currentBtcPriceUsd = _ratesState.BitcoinPrice;
-            var fiatRates = _ratesState.FiatRates;
-            var mainCurrency = FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency);
-            var wealth = _accountsTotalState.CurrentWealth;
-
-            if (currentBtcPriceUsd is null || fiatRates is null || !fiatRates.ContainsKey(mainCurrency.Code) || lines.Count == 0)
-            {
-                SimulatedPricesData = new DashboardData(language.Reports_SimulatedPrices_Title,
-                    new ObservableCollection<RowItem>(), OpenSimulatedPricesConfigCommand, "\uF04A");
-                IsSimulatedPricesLoading = false;
-                return;
-            }
-
-            var mainFiatRate = fiatRates[mainCurrency.Code];
-            var wealthInSats = wealth.WealthInSats;
-            var wealthInMainFiat = wealth.WealthInMainFiatCurrency;
-
-            var rows = new ObservableCollection<RowItem>();
-
-            foreach (var line in lines)
-            {
-                decimal simulatedPriceUsd;
-                string leftLabel;
-
-                if (line.Type == Infra.Modules.Configuration.SimulatedPriceType.Percentage)
-                {
-                    simulatedPriceUsd = (line.Value / 100m) * currentBtcPriceUsd.Value;
-                    leftLabel = $"{CurrencyDisplay.FormatFiat(simulatedPriceUsd, FiatCurrency.Usd.Code)} ({line.Value:G0}%)";
-                }
-                else
-                {
-                    simulatedPriceUsd = line.Value;
-                    leftLabel = $"{CurrencyDisplay.FormatFiat(simulatedPriceUsd, FiatCurrency.Usd.Code)} ({language.Reports_SimulatedPrices_Fixed})";
-                }
-
-                var btcPortionInFiat = (wealthInSats / 100_000_000m) * simulatedPriceUsd * mainFiatRate;
-                var simulatedTotalFiat = btcPortionInFiat + wealthInMainFiat;
-
-                var rightText = CurrencyDisplay.FormatFiat(simulatedTotalFiat, mainCurrency.Code);
-                rows.Add(new RowItem(leftLabel, rightText));
-            }
-
-            SimulatedPricesData = new DashboardData(language.Reports_SimulatedPrices_Title, rows, OpenSimulatedPricesConfigCommand, "\uF04A");
-            IsSimulatedPricesLoading = false;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating simulated prices data");
-            IsSimulatedPricesLoading = false;
-        }
+        _simulatedPricesPanel.Refresh();
     }
 
     [RelayCommand]
@@ -865,7 +742,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         if (result?.Ok == true)
         {
-            UpdateSimulatedPricesData();
+            _simulatedPricesPanel.Refresh();
         }
     }
 
@@ -916,9 +793,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
     private void TriggerCustomPriceRecalculations()
     {
-        UpdateWealthData();
-        UpdateBtcStackData();
-        UpdateSimulatedPricesData();
+        _wealthPanel.Refresh();
+        _btcStackPanel.Refresh();
+        _simulatedPricesPanel.Refresh();
         UpdateLeveragePositionsDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateLeveragePositionsDataAsync));
         UpdateBtcLoansDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateBtcLoansDataAsync));
     }
@@ -930,17 +807,6 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             var mainCurrency = _currencySettings.MainFiatCurrency;
             var fiatRate = _ratesState.FiatRates.GetValueOrDefault(mainCurrency, 1m);
             return _ratesState.BitcoinPrice.Value * fiatRate;
-        }
-        return 0m;
-    }
-
-    private decimal GetCustomBtcPriceInMainFiat()
-    {
-        if (_customBtcPriceState.CustomBtcPriceUsd.HasValue && _ratesState.FiatRates is not null)
-        {
-            var mainCurrency = _currencySettings.MainFiatCurrency;
-            var fiatRate = _ratesState.FiatRates.GetValueOrDefault(mainCurrency, 1m);
-            return _customBtcPriceState.CustomBtcPriceUsd.Value * fiatRate;
         }
         return 0m;
     }
@@ -967,77 +833,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         CurrentBtcPriceFormatted = CurrencyDisplay.FormatFiat(price, currencyCode);
     }
 
-    private Wealth CalculateWealthWithCustomPrice()
-    {
-        var liveWealth = _accountsTotalState.CurrentWealth;
-        if (!_customBtcPriceState.IsActive)
-            return liveWealth;
-
-        var customBtcPriceInMainFiat = GetCustomBtcPriceInMainFiat();
-        var liveBtcPriceInMainFiat = GetCurrentBtcPriceInMainFiat();
-        
-        if (liveBtcPriceInMainFiat == 0)
-            return liveWealth;
-
-        // Calculate the BTC portion using custom price
-        var btcPortionInMainFiat = liveWealth.WealthInSats / 100_000_000m * customBtcPriceInMainFiat;
-        
-        // Non-BTC wealth stays the same
-        var nonBtcWealth = liveWealth.WealthInMainFiatCurrency;
-        
-        // Recalculate total wealth
-        var currentWealthInFiat = Math.Round(btcPortionInMainFiat + nonBtcWealth, 2);
-        
-        // Recalculate net worth (accounts + assets)
-        var netWorthInMainFiatCurrency = currentWealthInFiat + liveWealth.AssetsWealthInMainFiatCurrency;
-        
-        // Recalculate sats equivalent
-        var allWealthPricedInSats = liveWealth.WealthInSats + (long)Math.Round(nonBtcWealth / customBtcPriceInMainFiat * 100_000_000m);
-        var netWorthInSats = allWealthPricedInSats + liveWealth.AssetsWealthInSats;
-        
-        // Recalculate BTC ratio
-        var wealthInBtcRatio = 0m;
-        if (allWealthPricedInSats > 0)
-            wealthInBtcRatio = Math.Round((liveWealth.WealthInSats / (decimal)allWealthPricedInSats) * 100m, 2);
-        
-        // Recalculate USD equivalent
-        var netWorthInUsd = 0m;
-        if (_currencySettings.MainFiatCurrency != FiatCurrency.Usd.Code
-            && _ratesState.FiatRates?.TryGetValue(_currencySettings.MainFiatCurrency, out var mainRate) == true
-            && mainRate != 0)
-        {
-            netWorthInUsd = Math.Round(netWorthInMainFiatCurrency / mainRate, 2);
-        }
-
-        return new Wealth(
-            currentWealthInFiat,
-            nonBtcWealth,
-            liveWealth.WealthInSats,
-            allWealthPricedInSats,
-            wealthInBtcRatio,
-            liveWealth.AssetsWealthInMainFiatCurrency,
-            liveWealth.AssetsWealthInSats,
-            netWorthInMainFiatCurrency,
-            netWorthInSats,
-            netWorthInUsd);
-    }
-
     private async Task FetchMaxBtcStackDataAsync(IReportDataProvider provider)
     {
-        try
-        {
-            var wealth = _accountsTotalState.CurrentWealth;
-            if (wealth.WealthInSats == 0)
-                return;
-
-            var data = await _maxBtcStackReport.GetAsync(wealth.WealthInSats, provider);
-            _maxBtcStackData = data;
-            Dispatcher.UIThread.Post(UpdateBtcStackData);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error fetching max BTC stack data");
-        }
+        await _btcStackPanel.FetchMaxBtcStackAsync(provider);
     }
 
     /// <summary>
@@ -1490,9 +1288,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     {
         if (e.PropertyName == nameof(AccountsTotalState.CurrentWealth))
         {
-            Dispatcher.UIThread.Post(UpdateWealthData);
-            Dispatcher.UIThread.Post(UpdateBtcStackData);
-            Dispatcher.UIThread.Post(UpdateSimulatedPricesData);
+            Dispatcher.UIThread.Post(_wealthPanel.Refresh);
+            Dispatcher.UIThread.Post(_btcStackPanel.Refresh);
+            Dispatcher.UIThread.Post(_simulatedPricesPanel.Refresh);
             UpdateLeveragePositionsDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateLeveragePositionsDataAsync));
             UpdateBtcLoansDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateBtcLoansDataAsync));
         }
@@ -1507,78 +1305,54 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 if (!IsCustomPriceActive)
                 {
                     UpdateCurrentBtcPriceFormatted();
-                    UpdateSimulatedPricesData();
+                    _simulatedPricesPanel.Refresh();
                 }
             });
         }
+    }
+
+    private void OnWealthPanelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(DashboardPanelViewModel.Data))
+            WealthData = _wealthPanel.Data;
+        else if (e.PropertyName == nameof(DashboardPanelViewModel.IsLoading))
+            IsWealthLoading = _wealthPanel.IsLoading;
+    }
+
+    private void OnBtcStackPanelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(DashboardPanelViewModel.Data))
+            BtcStackData = _btcStackPanel.Data;
+        else if (e.PropertyName == nameof(DashboardPanelViewModel.IsLoading))
+            IsBtcStackLoading = _btcStackPanel.IsLoading;
+    }
+
+    private void OnSimulatedPricesPanelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(DashboardPanelViewModel.Data))
+            SimulatedPricesData = _simulatedPricesPanel.Data with { ConfigureCommand = OpenSimulatedPricesConfigCommand };
+        else if (e.PropertyName == nameof(DashboardPanelViewModel.IsLoading))
+            IsSimulatedPricesLoading = _simulatedPricesPanel.IsLoading;
+    }
+
+    private void OnIndicatorsPanelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(DashboardPanelViewModel.Data))
+            IndicatorsData = _indicatorsPanel.Data;
+        else if (e.PropertyName == nameof(DashboardPanelViewModel.IsLoading))
+            IsIndicatorsLoading = _indicatorsPanel.IsLoading;
     }
 
     #endregion
 
     private void LoadCachedIndicatorsData()
     {
-        var cached = _indicatorCache.GetLatest();
-        if (cached is not null)
-        {
-            UpdateIndicatorsData(cached);
-        }
-        else
-        {
-            IsIndicatorsLoading = false;
-        }
+        _indicatorsPanel.RefreshAsync().ConfigureAwait(false).GetAwaiter().GetResult();
     }
 
     private void UpdateIndicatorsData(IndicatorSnapshot snapshot)
     {
-        var rows = new ObservableCollection<RowItem>();
-
-        if (snapshot.MayerMultiple is not null)
-            rows.Add(new RowItem(language.Reports_Indicators_MayerMultiple,
-                snapshot.MayerMultiple.Multiple.ToString("F2"),
-                Tooltip: new TooltipContent([
-                    new TooltipLine([new TooltipRun("> 2.4", Bold: true), new TooltipRun(": overvalued")]),
-                    new TooltipLine([new TooltipRun("1.0", Bold: true), new TooltipRun(": fair value")]),
-                    new TooltipLine([new TooltipRun("< 0.8", Bold: true), new TooltipRun(": buying opportunity")]),
-                ]),
-                Url: "https://charts.bitcoin.com/mayer.html"));
-
-        if (snapshot.RainbowChart is not null)
-            rows.Add(new RowItem(language.Reports_Indicators_RainbowChart,
-                snapshot.RainbowChart.CurrentZone,
-                Tooltip: new TooltipContent([
-                    new TooltipLine([new TooltipRun("Zones (low\u2192high):", Bold: true)]),
-                    new TooltipLine([new TooltipRun("Fire Sale \u2192 Basically a Fire Sale \u2192 Buy! \u2192 Accumulate \u2192 Still Cheap \u2192 HODL! \u2192 Is this a bubble? \u2192 FOMO Intensifies \u2192 Sell. Seriously, SELL! \u2192 Maximum Bubble Territory")]),
-                ]),
-                Url: "https://charts.bitcoin.com/rainbow.html"));
-
-        if (snapshot.FearAndGreed is not null)
-            rows.Add(new RowItem(language.Reports_Indicators_FearAndGreed,
-                $"{snapshot.FearAndGreed.Value} - {snapshot.FearAndGreed.Classification}",
-                Tooltip: new TooltipContent([
-                    new TooltipLine([new TooltipRun("0\u201325", Bold: true), new TooltipRun(": Extreme Fear (buy)")]),
-                    new TooltipLine([new TooltipRun("26\u201350", Bold: true), new TooltipRun(": Fear")]),
-                    new TooltipLine([new TooltipRun("51\u201375", Bold: true), new TooltipRun(": Greed")]),
-                    new TooltipLine([new TooltipRun("76\u2013100", Bold: true), new TooltipRun(": Extreme Greed (sell)")]),
-                ]),
-                Url: "https://alternative.me/crypto/fear-and-greed-index/"));
-
-        if (snapshot.BitcoinDominance is not null)
-            rows.Add(new RowItem(language.Reports_Indicators_BtcDominance,
-                $"{snapshot.BitcoinDominance.DominancePercent:F1}%",
-                Tooltip: new TooltipContent([
-                    new TooltipLine([new TooltipRun("> 60%", Bold: true), new TooltipRun(": Bitcoin season")]),
-                    new TooltipLine([new TooltipRun("< 40%", Bold: true), new TooltipRun(": Altcoin season")]),
-                ]),
-                Url: "https://www.coingecko.com/en/global-charts"));
-
-        var isStale = !snapshot.IsUpToDate;
-        IndicatorsData = new DashboardData(
-            language.Reports_Indicators_Title,
-            rows,
-            Icon: "\uE6C4",
-            IsStale: isStale);
-
-        IsIndicatorsLoading = false;
+        _indicatorsPanel.UpdateIndicatorsData(snapshot);
     }
 
     public void Dispose()
@@ -1593,6 +1367,10 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _secureModeState.PropertyChanged -= OnSecureModeStatePropertyChanged;
         _accountsTotalState.PropertyChanged -= OnAccountsTotalStatePropertyChanged;
         _ratesState.PropertyChanged -= OnRatesStatePropertyChanged;
+        _wealthPanel.PropertyChanged -= OnWealthPanelPropertyChanged;
+        _btcStackPanel.PropertyChanged -= OnBtcStackPanelPropertyChanged;
+        _simulatedPricesPanel.PropertyChanged -= OnSimulatedPricesPanelPropertyChanged;
+        _indicatorsPanel.PropertyChanged -= OnIndicatorsPanelPropertyChanged;
 
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
         WeakReferenceMessenger.Default.Unregister<AssetSummaryUpdatedMessage>(this);

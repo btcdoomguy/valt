@@ -20,6 +20,11 @@ public partial class ReportsViewModel
         if (!Design.IsDesignMode)
             return;
 
+        _indicatorsPanel = null!;
+        _wealthPanel = null!;
+        _btcStackPanel = null!;
+        _simulatedPricesPanel = null!;
+
         _secureModeState = new SecureModeState()
         {
             IsEnabled = false
