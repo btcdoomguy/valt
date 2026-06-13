@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Collections;
@@ -525,16 +526,27 @@ public partial class MainViewModel : ValtViewModel, IDisposable
 
             await _dbLifecycle.MigrateAsync();
             
-            // Initialize price database AFTER local database is opened
-            // This ensures we have access to AvailableFiatCurrencies configuration
-            var priceDbResult = await _dbLifecycle.InitializePriceDatabaseAsync();
+            LoadingMessage = language.Loading_PriceDatabase;
+            IsLoading = true;
+
+            using var priceDbCts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+            var priceDbResult = await Task.Run(() =>
+                _dbLifecycle.InitializePriceDatabaseAsync(priceDbCts.Token));
+
             if (!priceDbResult.Success)
             {
-                await MessageBoxHelper.ShowErrorAsync(language.Error,
-                    string.Format(language.ValtPriceFile_Error, priceDbResult.ErrorMessage),
-                    Window!);
-                appLifetime!.Shutdown();
-                return;
+                _logger.LogWarning("Price database initialization failed, continuing with stale/cached data");
+            }
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                LoadingMessage = language.Loading_LoadingTransactions;
+                SelectedTabComponent = _pageFactory.Create(MainViewTabNames.TransactionsPageContent);
+            });
+
+            if (SelectedTabComponent is not null)
+            {
+                await SelectedTabComponent.RefreshAsync();
             }
 
             openedFile = true;
@@ -542,12 +554,10 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             // Initialize filter state with current date for the new database
             _filterState.MainDate = DateTime.Now;
 
-            // Set the transactions tab and force refresh to load data from the new database
-            SelectedTabComponent = _pageFactory.Create(MainViewTabNames.TransactionsPageContent);
-            if (SelectedTabComponent is not null)
-            {
-                await SelectedTabComponent.RefreshAsync();
-            }
+            await _dbLifecycle.StartValtDatabaseJobsAsync();
+
+            IsLoading = false;
+            LoadingMessage = string.Empty;
 
             // Store the password hash for secure mode verification
             _secureModeState.SetPassword(result.Password);
@@ -555,12 +565,6 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             // Initialize secure mode state based on user preference from login
             _secureModeState.IsEnabled = result.StartInSecureMode;
             OnPropertyChanged(nameof(SecureModeIcon));
-
-            //this avoids some race conditions with the jobs and current UI state
-            await Dispatcher.UIThread.InvokeAsync(async () =>
-            {
-                await _dbLifecycle.StartValtDatabaseJobsAsync();
-            });
 
             // Schedule an early asset price refresh to update stale prices from the previous session.
             // The regular interval is 5 minutes, so this ensures totals are up-to-date shortly after startup.

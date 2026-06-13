@@ -207,6 +207,18 @@
     <data name="StatusDisplay.Title" xml:space="preserve">
         <value>Status dos serviços</value>
     </data>
+    <data name="Loading_DatabaseOpening" xml:space="preserve">
+        <value>Abrindo banco de dados…</value>
+    </data>
+    <data name="Loading_PriceDatabase" xml:space="preserve">
+        <value>Carregando dados de preço…</value>
+    </data>
+    <data name="Loading_LivePrices" xml:space="preserve">
+        <value>Buscando preços ao vivo…</value>
+    </data>
+    <data name="Loading_LoadingTransactions" xml:space="preserve">
+        <value>Carregando transações…</value>
+    </data>
     <data name="Transactions.AddTransaction" xml:space="preserve">
         <value>+ Nova transação</value>
     </data>

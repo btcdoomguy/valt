@@ -231,6 +231,18 @@
     <data name="StatusDisplay.Title" xml:space="preserve">
         <value>Estado del servicio</value>
     </data>
+    <data name="Loading_DatabaseOpening" xml:space="preserve">
+        <value>Abriendo base de datos…</value>
+    </data>
+    <data name="Loading_PriceDatabase" xml:space="preserve">
+        <value>Cargando datos de precios…</value>
+    </data>
+    <data name="Loading_LivePrices" xml:space="preserve">
+        <value>Obteniendo precios en vivo…</value>
+    </data>
+    <data name="Loading_LoadingTransactions" xml:space="preserve">
+        <value>Cargando transacciones…</value>
+    </data>
     <data name="Transactions.Ratio" xml:space="preserve">
         <value>% BTC al Contado</value>
     </data>

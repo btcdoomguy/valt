@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using LiteDB;
 using Microsoft.Extensions.Logging;
@@ -72,7 +73,7 @@ public class DatabaseLifecycleService : IDatabaseLifecycleService
         return _databaseInitializer.MigrateAsync();
     }
 
-    public async Task<PriceDatabaseInitResult> InitializePriceDatabaseAsync()
+    public async Task<PriceDatabaseInitResult> InitializePriceDatabaseAsync(CancellationToken cancellationToken = default)
     {
         try
         {
@@ -80,7 +81,7 @@ public class DatabaseLifecycleService : IDatabaseLifecycleService
 
             if (!_priceDatabase.DatabaseFileExists() || IsPriceDatabaseEmpty())
             {
-                var installResult = await InstallPriceDatabaseAsync();
+                var installResult = await InstallPriceDatabaseAsync(cancellationToken);
 
                 if (!installResult)
                     return new PriceDatabaseInitResult(false, null);
@@ -98,12 +99,17 @@ public class DatabaseLifecycleService : IDatabaseLifecycleService
             if (!jobsAlreadyStarted)
                 await _backgroundJobManager.StartAllJobsAsync(jobType: BackgroundJobTypes.PriceDatabase, triggerInitialRun: false);
 
-            await _backgroundJobManager.TriggerJobAndWaitAsync(BackgroundJobSystemNames.LivePricesUpdater);
+            await _backgroundJobManager.TriggerJobAndWaitAsync(BackgroundJobSystemNames.LivePricesUpdater, cancellationToken);
 
             _backgroundJobManager.TriggerJobManually(BackgroundJobSystemNames.BitcoinHistoryUpdater);
             _backgroundJobManager.TriggerJobManually(BackgroundJobSystemNames.FiatHistoryUpdater);
             _backgroundJobManager.TriggerJobManually(BackgroundJobSystemNames.IndicatorsUpdater);
 
+            return new PriceDatabaseInitResult(true, null);
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Price database initialization was canceled; continuing with stale/cached data");
             return new PriceDatabaseInitResult(true, null);
         }
         catch (LiteException ex)
@@ -131,7 +137,7 @@ public class DatabaseLifecycleService : IDatabaseLifecycleService
         }
     }
 
-    private async Task<bool> InstallPriceDatabaseAsync()
+    private async Task<bool> InstallPriceDatabaseAsync(CancellationToken cancellationToken)
     {
         _priceDatabase.OpenDatabase();
 
@@ -141,9 +147,14 @@ public class DatabaseLifecycleService : IDatabaseLifecycleService
                 jobType: BackgroundJobTypes.PriceDatabase,
                 triggerInitialRun: false);
 
-            await _backgroundJobManager.TriggerJobAndWaitAsync(BackgroundJobSystemNames.BitcoinHistoryUpdater);
-            await _backgroundJobManager.TriggerJobAndWaitAsync(BackgroundJobSystemNames.FiatHistoryUpdater);
+            await _backgroundJobManager.TriggerJobAndWaitAsync(BackgroundJobSystemNames.BitcoinHistoryUpdater, cancellationToken);
+            await _backgroundJobManager.TriggerJobAndWaitAsync(BackgroundJobSystemNames.FiatHistoryUpdater, cancellationToken);
 
+            return true;
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Price database installation was canceled; continuing with stale/cached data");
             return true;
         }
         catch (Exception ex)

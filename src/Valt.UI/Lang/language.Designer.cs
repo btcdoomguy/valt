@@ -471,6 +471,30 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string Loading_DatabaseOpening {
+            get {
+                return ResourceManager.GetString("Loading_DatabaseOpening", resourceCulture);
+            }
+        }
+        
+        public static string Loading_PriceDatabase {
+            get {
+                return ResourceManager.GetString("Loading_PriceDatabase", resourceCulture);
+            }
+        }
+        
+        public static string Loading_LivePrices {
+            get {
+                return ResourceManager.GetString("Loading_LivePrices", resourceCulture);
+            }
+        }
+        
+        public static string Loading_LoadingTransactions {
+            get {
+                return ResourceManager.GetString("Loading_LoadingTransactions", resourceCulture);
+            }
+        }
+        
         public static string Transactions_Ratio {
             get {
                 return ResourceManager.GetString("Transactions.Ratio", resourceCulture);

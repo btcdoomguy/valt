@@ -406,9 +406,16 @@
         </Border>
         <!-- Top Bar -->
 
-        <Label Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-               HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Content="{Binding LoadingMessage}"
-               IsVisible="{Binding IsLoading}" />
+        <StackPanel Grid.Row="2"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    IsVisible="{Binding IsLoading}"
+                    Spacing="16">
+            <ProgressBar IsIndeterminate="True" Width="240" Height="4" />
+            <TextBlock Text="{Binding LoadingMessage}"
+                       HorizontalAlignment="Center"
+                       Classes="bodyMd" />
+        </StackPanel>
 
         <ContentControl x:Name="MainContentControl"
                         Grid.Row="2"

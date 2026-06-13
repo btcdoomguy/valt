@@ -236,6 +236,18 @@
     <data name="StatusDisplay.Title" xml:space="preserve">
         <value>Service status</value>
     </data>
+    <data name="Loading_DatabaseOpening" xml:space="preserve">
+        <value>Opening database…</value>
+    </data>
+    <data name="Loading_PriceDatabase" xml:space="preserve">
+        <value>Loading price data…</value>
+    </data>
+    <data name="Loading_LivePrices" xml:space="preserve">
+        <value>Fetching live prices…</value>
+    </data>
+    <data name="Loading_LoadingTransactions" xml:space="preserve">
+        <value>Loading transactions…</value>
+    </data>
     <data name="Transactions.Ratio" xml:space="preserve">
         <value>BTC Spot %</value>
     </data>

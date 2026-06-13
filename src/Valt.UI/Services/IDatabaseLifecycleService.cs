@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Valt.Infra.DataAccess;
+using System.Threading;
 using System.Threading.Tasks;
 using Valt.Infra.Kernel.BackgroundJobs;
 using Valt.Infra.Modules.Configuration;
@@ -41,7 +42,7 @@ public interface IDatabaseLifecycleService
     /// Initializes the price database (open, install if empty, dedup, start jobs).
     /// Returns success or error message.
     /// </summary>
-    Task<PriceDatabaseInitResult> InitializePriceDatabaseAsync();
+    Task<PriceDatabaseInitResult> InitializePriceDatabaseAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Stops all background jobs and closes both databases.
