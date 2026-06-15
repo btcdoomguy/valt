@@ -339,6 +339,87 @@ internal sealed class AssetQueries : IAssetQueries
         };
     }
 
+    public Task<IReadOnlyList<LoanStateSnapshotDTO>> GetLoanStateTimelineAsync(string assetId)
+    {
+        var entity = _localDatabase.GetAssets().FindById(new LiteDB.ObjectId(assetId));
+        if (entity is null)
+            return Task.FromResult<IReadOnlyList<LoanStateSnapshotDTO>>(new List<LoanStateSnapshotDTO>().AsReadOnly());
+
+        var asset = entity.AsDomainObject();
+        if (asset.Details is not BtcLoanDetails btcLoan)
+            return Task.FromResult<IReadOnlyList<LoanStateSnapshotDTO>>(new List<LoanStateSnapshotDTO>().AsReadOnly());
+
+        var dtos = btcLoan.Snapshots
+            .OrderBy(s => s.EffectiveDate)
+            .Select(MapLoanStateSnapshot)
+            .ToList()
+            .AsReadOnly();
+
+        return Task.FromResult<IReadOnlyList<LoanStateSnapshotDTO>>(dtos);
+    }
+
+    public Task<LoanStateDTO?> GetLatestLoanStateAsync(string assetId)
+    {
+        var entity = _localDatabase.GetAssets().FindById(new LiteDB.ObjectId(assetId));
+        if (entity is null)
+            return Task.FromResult<LoanStateDTO?>(null);
+
+        var asset = entity.AsDomainObject();
+        if (asset.Details is not BtcLoanDetails btcLoan)
+            return Task.FromResult<LoanStateDTO?>(null);
+
+        var latestSnapshot = btcLoan.Snapshots.MaxBy(s => s.EffectiveDate);
+        if (latestSnapshot is null)
+            return Task.FromResult<LoanStateDTO?>(null);
+
+        return Task.FromResult<LoanStateDTO?>(new LoanStateDTO
+        {
+            AssetId = asset.Id.Value,
+            AssetName = asset.Name.Value,
+            PlatformName = latestSnapshot.PlatformName,
+            CollateralSats = latestSnapshot.CollateralSats,
+            LoanAmount = latestSnapshot.LoanAmount,
+            CurrencyCode = latestSnapshot.CurrencyCode,
+            Apr = latestSnapshot.Apr,
+            InitialLtv = latestSnapshot.InitialLtv,
+            LiquidationLtv = latestSnapshot.LiquidationLtv,
+            MarginCallLtv = latestSnapshot.MarginCallLtv,
+            Fees = latestSnapshot.Fees,
+            LoanStartDate = latestSnapshot.LoanStartDate,
+            RepaymentDate = latestSnapshot.RepaymentDate,
+            StatusId = (int)latestSnapshot.Status,
+            CurrentBtcPriceInLoanCurrency = latestSnapshot.CurrentBtcPriceInLoanCurrency,
+            FixedTotalDebt = latestSnapshot.FixedTotalDebt,
+            CurrentTotalDebt = latestSnapshot.CurrentTotalDebt,
+            EffectiveDate = latestSnapshot.EffectiveDate,
+            Note = latestSnapshot.Note
+        });
+    }
+
+    private static LoanStateSnapshotDTO MapLoanStateSnapshot(LoanStateSnapshot snapshot)
+    {
+        return new LoanStateSnapshotDTO
+        {
+            PlatformName = snapshot.PlatformName,
+            CollateralSats = snapshot.CollateralSats,
+            LoanAmount = snapshot.LoanAmount,
+            CurrencyCode = snapshot.CurrencyCode,
+            Apr = snapshot.Apr,
+            InitialLtv = snapshot.InitialLtv,
+            LiquidationLtv = snapshot.LiquidationLtv,
+            MarginCallLtv = snapshot.MarginCallLtv,
+            Fees = snapshot.Fees,
+            LoanStartDate = snapshot.LoanStartDate,
+            RepaymentDate = snapshot.RepaymentDate,
+            StatusId = (int)snapshot.Status,
+            CurrentBtcPriceInLoanCurrency = snapshot.CurrentBtcPriceInLoanCurrency,
+            FixedTotalDebt = snapshot.FixedTotalDebt,
+            CurrentTotalDebt = snapshot.CurrentTotalDebt,
+            EffectiveDate = snapshot.EffectiveDate,
+            Note = snapshot.Note
+        };
+    }
+
     public Task<IReadOnlyList<AssetGroupDTO>> GetAssetGroupsAsync()
     {
         var entities = _localDatabase.GetAssetGroups()

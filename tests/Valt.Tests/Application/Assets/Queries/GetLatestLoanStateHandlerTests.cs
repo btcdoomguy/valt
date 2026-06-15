@@ -13,7 +13,7 @@ public class GetLatestLoanStateHandlerTests : DatabaseTest
     [SetUp]
     public void SetUpHandler()
     {
-        _handler = new GetLatestLoanStateHandler(_assetRepository);
+        _handler = new GetLatestLoanStateHandler(_assetQueries);
     }
 
     [TearDown]

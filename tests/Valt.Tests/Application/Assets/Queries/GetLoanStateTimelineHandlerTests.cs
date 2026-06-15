@@ -13,7 +13,7 @@ public class GetLoanStateTimelineHandlerTests : DatabaseTest
     [SetUp]
     public void SetUpHandler()
     {
-        _handler = new GetLoanStateTimelineHandler(_assetRepository);
+        _handler = new GetLoanStateTimelineHandler(_assetQueries);
     }
 
     [TearDown]
