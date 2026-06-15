@@ -40,6 +40,14 @@ Let users record the evolving state of BTC loans over time and use the latest re
 7. `AssetDetailsSerializer` and `BtcLoanDetailsDto` persist the timeline in JSON.
 8. Domain unit tests cover ordering, latest-snapshot selection, fallback, and auto-seeding.
 
+**Plans:** 4 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Create LoanStateSnapshot value object and wire immutable snapshot storage into BtcLoanDetails
+- [ ] 06-02-PLAN.md — Route all BtcLoanDetails calculations through the latest snapshot and verify query consumers
+- [ ] 06-03-PLAN.md — Persist snapshots in AssetDetailsSerializer and auto-seed legacy loans on deserialization
+- [ ] 06-04-PLAN.md — Add domain and serializer tests for snapshot behavior and auto-seeding
+
 ### Phase 7: Commands & Queries
 
 **Goal:** Implement add/delete/query handlers and update existing loan queries to use the latest snapshot.
