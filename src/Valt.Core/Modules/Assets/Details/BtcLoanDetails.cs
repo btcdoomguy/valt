@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+
 namespace Valt.Core.Modules.Assets.Details;
 
 /// <summary>
@@ -82,6 +85,12 @@ public sealed class BtcLoanDetails : IAssetDetails
     public decimal? FixedTotalDebt { get; }
 
     /// <summary>
+    /// Ordered timeline of loan-state snapshots. The latest snapshot (by effective date)
+    /// is the source of truth for calculations; when empty, the immutable setup values are used.
+    /// </summary>
+    public IReadOnlyList<LoanStateSnapshot> Snapshots { get; }
+
+    /// <summary>
     /// Whether this loan uses a fixed total debt rather than daily APR accrual.
     /// </summary>
     public bool HasFixedTotalDebt => FixedTotalDebt.HasValue;
@@ -100,7 +109,8 @@ public sealed class BtcLoanDetails : IAssetDetails
         DateOnly? repaymentDate,
         LoanStatus status,
         decimal currentBtcPriceInLoanCurrency,
-        decimal? fixedTotalDebt = null)
+        decimal? fixedTotalDebt = null,
+        IReadOnlyList<LoanStateSnapshot>? snapshots = null)
     {
         if (collateralSats <= 0)
             throw new ArgumentException("Collateral must be positive", nameof(collateralSats));
@@ -136,6 +146,7 @@ public sealed class BtcLoanDetails : IAssetDetails
         Status = status;
         CurrentBtcPriceInLoanCurrency = currentBtcPriceInLoanCurrency;
         FixedTotalDebt = fixedTotalDebt;
+        Snapshots = snapshots ?? new List<LoanStateSnapshot>().AsReadOnly();
     }
 
     /// <summary>
@@ -243,7 +254,8 @@ public sealed class BtcLoanDetails : IAssetDetails
             RepaymentDate,
             Status,
             newPrice,
-            FixedTotalDebt);
+            FixedTotalDebt,
+            Snapshots);
     }
 
     public BtcLoanDetails WithStatus(LoanStatus newStatus)
@@ -262,7 +274,76 @@ public sealed class BtcLoanDetails : IAssetDetails
             RepaymentDate,
             newStatus,
             CurrentBtcPriceInLoanCurrency,
-            FixedTotalDebt);
+            FixedTotalDebt,
+            Snapshots);
+    }
+
+    /// <summary>
+    /// Returns a new <see cref="BtcLoanDetails"/> with the supplied snapshot added.
+    /// Throws <see cref="ArgumentException"/> if a snapshot for the same effective date already exists.
+    /// </summary>
+    public BtcLoanDetails WithAddedSnapshot(LoanStateSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(snapshot);
+
+        if (Snapshots.Any(s => s.EffectiveDate == snapshot.EffectiveDate))
+        {
+            throw new ArgumentException(
+                $"A snapshot already exists for {snapshot.EffectiveDate}",
+                nameof(snapshot));
+        }
+
+        var newSnapshots = Snapshots
+            .Append(snapshot)
+            .OrderBy(s => s.EffectiveDate)
+            .ToList()
+            .AsReadOnly();
+
+        return new BtcLoanDetails(
+            PlatformName,
+            CollateralSats,
+            LoanAmount,
+            CurrencyCode,
+            Apr,
+            InitialLtv,
+            LiquidationLtv,
+            MarginCallLtv,
+            Fees,
+            LoanStartDate,
+            RepaymentDate,
+            Status,
+            CurrentBtcPriceInLoanCurrency,
+            FixedTotalDebt,
+            newSnapshots);
+    }
+
+    /// <summary>
+    /// Returns a new <see cref="BtcLoanDetails"/> without the snapshot matching the supplied effective date.
+    /// </summary>
+    public BtcLoanDetails WithoutSnapshot(DateOnly effectiveDate)
+    {
+        var newSnapshots = Snapshots
+            .Where(s => s.EffectiveDate != effectiveDate)
+            .OrderBy(s => s.EffectiveDate)
+            .ToList()
+            .AsReadOnly();
+
+        return new BtcLoanDetails(
+            PlatformName,
+            CollateralSats,
+            LoanAmount,
+            CurrencyCode,
+            Apr,
+            InitialLtv,
+            LiquidationLtv,
+            MarginCallLtv,
+            Fees,
+            LoanStartDate,
+            RepaymentDate,
+            Status,
+            CurrentBtcPriceInLoanCurrency,
+            FixedTotalDebt,
+            newSnapshots);
     }
 
     /// <summary>
