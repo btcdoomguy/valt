@@ -7,11 +7,11 @@
 
 ### Loan State Timeline (Domain)
 
-- [ ] **LOAN-01**: A BTC loan can hold an ordered list of state snapshots, each with an effective date, APR/fee %, current total debt, collateral in sats, amount taken, and optional note
-- [ ] **LOAN-02**: Existing BTC loans without snapshots are automatically seeded with a single snapshot derived from their initial setup values
-- [ ] **LOAN-03**: The latest snapshot is used as the source of truth for current total debt, collateral, amount taken, and APR/fee % calculations
-- [ ] **LOAN-04**: When the latest snapshot is deleted, calculations fall back to the next most recent snapshot; if no snapshots remain, fall back to the initial setup values
-- [ ] **LOAN-05**: Initial loan setup values remain immutable after creation and are only visible in the original manage-asset screen
+- [x] **LOAN-01**: A BTC loan can hold an ordered list of state snapshots, each with an effective date, APR/fee %, current total debt, collateral in sats, amount taken, and optional note
+- [x] **LOAN-02**: Existing BTC loans without snapshots are automatically seeded with a single snapshot derived from their initial setup values
+- [x] **LOAN-03**: The latest snapshot is used as the source of truth for current total debt, collateral, amount taken, and APR/fee % calculations
+- [x] **LOAN-04**: When the latest snapshot is deleted, calculations fall back to the next most recent snapshot; if no snapshots remain, fall back to the initial setup values
+- [x] **LOAN-05**: Initial loan setup values remain immutable after creation and are only visible in the original manage-asset screen
 
 ### Commands & Queries (Application)
 
@@ -46,7 +46,7 @@
 ### Documentation & Quality
 
 - [ ] **DOC-01**: `.claude/docs/assets.md` is updated with the new loan state timeline behavior
-- [ ] **TEST-01**: Domain tests cover snapshot ordering, latest-snapshot calculation, fallback after deletion, and auto-seeding
+- [x] **TEST-01**: Domain tests cover snapshot ordering, latest-snapshot calculation, fallback after deletion, and auto-seeding
 - [ ] **TEST-02**: Handler tests cover add/delete/query commands and integration with existing loan queries
 
 ## v2 Requirements
@@ -74,11 +74,11 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LOAN-01 | Phase 6 | Pending |
-| LOAN-02 | Phase 6 | Pending |
-| LOAN-03 | Phase 6 | Pending |
-| LOAN-04 | Phase 6 | Pending |
-| LOAN-05 | Phase 6 | Pending |
+| LOAN-01 | Phase 6 | Complete |
+| LOAN-02 | Phase 6 | Complete |
+| LOAN-03 | Phase 6 | Complete |
+| LOAN-04 | Phase 6 | Complete |
+| LOAN-05 | Phase 6 | Complete |
 | CMD-01 | Phase 7 | Pending |
 | CMD-02 | Phase 7 | Pending |
 | QUERY-01 | Phase 7 | Pending |
@@ -98,7 +98,7 @@
 | LOC-01 | Phase 10 | Pending |
 | MCP-01 | Phase 10 | Pending |
 | DOC-01 | Phase 10 | Pending |
-| TEST-01 | Phase 6 | Pending |
+| TEST-01 | Phase 6 | Complete |
 | TEST-02 | Phase 7 | Pending |
 
 **Coverage:**
