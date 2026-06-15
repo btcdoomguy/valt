@@ -337,31 +337,66 @@ public class AssetDetailsSerializerTests
     [Test]
     public void Should_AutoSeed_Snapshot_When_Legacy_BtcLoan_Has_None()
     {
+        const decimal loanAmount = 25_000m;
+        const decimal fees = 100m;
         var legacyJson = "{\"PlatformName\":\"HodlHodl\",\"CollateralSats\":100000000,\"LoanAmount\":25000,\"CurrencyCode\":\"USD\",\"Apr\":0.12,\"InitialLtv\":50,\"LiquidationLtv\":80,\"MarginCallLtv\":70,\"Fees\":100,\"LoanStartDate\":\"2025-01-01T00:00:00\",\"RepaymentDate\":\"2026-01-01T00:00:00\",\"StatusId\":0,\"CurrentBtcPrice\":50000,\"FixedTotalDebt\":null}";
 
         var deserialized = (BtcLoanDetails)AssetDetailsSerializer.DeserializeDetails(AssetTypes.BtcLoan, legacyJson);
-
-        var expectedTotalDebt = new BtcLoanDetails(
-            platformName: "HodlHodl",
-            collateralSats: 100_000_000,
-            loanAmount: 25_000m,
-            currencyCode: "USD",
-            apr: 0.12m,
-            initialLtv: 50m,
-            liquidationLtv: 80m,
-            marginCallLtv: 70m,
-            fees: 100m,
-            loanStartDate: new DateOnly(2025, 1, 1),
-            repaymentDate: new DateOnly(2026, 1, 1),
-            status: LoanStatus.Active,
-            currentBtcPriceInLoanCurrency: 50_000m)
-            .CalculateTotalDebt();
 
         Assert.Multiple(() =>
         {
             Assert.That(deserialized.Snapshots, Has.Count.EqualTo(1));
             Assert.That(deserialized.Snapshots[0].EffectiveDate, Is.EqualTo(new DateOnly(2025, 1, 1)));
-            Assert.That(deserialized.Snapshots[0].CurrentTotalDebt, Is.EqualTo(expectedTotalDebt));
+            Assert.That(deserialized.Snapshots[0].CurrentTotalDebt, Is.EqualTo(loanAmount + fees));
+        });
+    }
+
+    [Test]
+    public void Should_AutoSeed_FixedDebt_Legacy_Loan()
+    {
+        const decimal fixedTotalDebt = 27_500m;
+        var legacyJson = "{\"PlatformName\":\"HodlHodl\",\"CollateralSats\":100000000,\"LoanAmount\":25000,\"CurrencyCode\":\"USD\",\"Apr\":0.10,\"InitialLtv\":50,\"LiquidationLtv\":80,\"MarginCallLtv\":70,\"Fees\":100,\"LoanStartDate\":\"2025-01-01T00:00:00\",\"RepaymentDate\":\"2026-01-01T00:00:00\",\"StatusId\":0,\"CurrentBtcPrice\":50000,\"FixedTotalDebt\":27500}";
+
+        var deserialized = (BtcLoanDetails)AssetDetailsSerializer.DeserializeDetails(AssetTypes.BtcLoan, legacyJson);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(deserialized.Snapshots, Has.Count.EqualTo(1));
+            Assert.That(deserialized.Snapshots[0].EffectiveDate, Is.EqualTo(new DateOnly(2025, 1, 1)));
+            Assert.That(deserialized.Snapshots[0].CurrentTotalDebt, Is.EqualTo(fixedTotalDebt));
+        });
+    }
+
+    [Test]
+    public void Should_AutoSeed_When_Snapshots_Array_Is_Explicitly_Empty()
+    {
+        var legacyJson = "{\"PlatformName\":\"HodlHodl\",\"CollateralSats\":100000000,\"LoanAmount\":25000,\"CurrencyCode\":\"USD\",\"Apr\":0.12,\"InitialLtv\":50,\"LiquidationLtv\":80,\"MarginCallLtv\":70,\"Fees\":100,\"LoanStartDate\":\"2025-01-01T00:00:00\",\"RepaymentDate\":\"2026-01-01T00:00:00\",\"StatusId\":0,\"CurrentBtcPrice\":50000,\"FixedTotalDebt\":null,\"Snapshots\":[]}";
+
+        var deserialized = (BtcLoanDetails)AssetDetailsSerializer.DeserializeDetails(AssetTypes.BtcLoan, legacyJson);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(deserialized.Snapshots, Has.Count.EqualTo(1));
+            Assert.That(deserialized.Snapshots[0].EffectiveDate, Is.EqualTo(new DateOnly(2025, 1, 1)));
+            Assert.That(deserialized.Snapshots[0].CurrentTotalDebt, Is.EqualTo(25_100m));
+        });
+    }
+
+    [Test]
+    public void Should_Deserialize_Legacy_Loan_Missing_LoanStartDate()
+    {
+        const decimal loanAmount = 25_000m;
+        const decimal fees = 100m;
+        var legacyJson = "{\"PlatformName\":\"HodlHodl\",\"CollateralSats\":100000000,\"LoanAmount\":25000,\"CurrencyCode\":\"USD\",\"Apr\":0.12,\"InitialLtv\":50,\"LiquidationLtv\":80,\"MarginCallLtv\":70,\"Fees\":100,\"RepaymentDate\":\"2026-01-01T00:00:00\",\"StatusId\":0,\"CurrentBtcPrice\":50000,\"FixedTotalDebt\":null}";
+
+        var deserialized = (BtcLoanDetails)AssetDetailsSerializer.DeserializeDetails(AssetTypes.BtcLoan, legacyJson);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(deserialized.Snapshots, Has.Count.EqualTo(1));
+            Assert.That(deserialized.Snapshots[0].EffectiveDate, Is.EqualTo(DateOnly.FromDateTime(DateTime.UtcNow)));
+            Assert.That(deserialized.Snapshots[0].CurrentTotalDebt, Is.EqualTo(loanAmount + fees));
+            Assert.That(deserialized.LoanStartDate, Is.EqualTo(DateOnly.FromDateTime(DateTime.UtcNow)));
         });
     }
 
