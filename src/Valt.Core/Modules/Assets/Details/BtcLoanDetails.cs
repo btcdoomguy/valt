@@ -147,6 +147,13 @@ public sealed class BtcLoanDetails : IAssetDetails
         CurrentBtcPriceInLoanCurrency = currentBtcPriceInLoanCurrency;
         FixedTotalDebt = fixedTotalDebt;
         Snapshots = snapshots ?? new List<LoanStateSnapshot>().AsReadOnly();
+
+        if (Snapshots.Count > 0)
+        {
+            var distinctEffectiveDates = Snapshots.Select(s => s.EffectiveDate).Distinct().Count();
+            if (distinctEffectiveDates != Snapshots.Count)
+                throw new ArgumentException("Snapshots cannot contain duplicate effective dates", nameof(snapshots));
+        }
     }
 
     /// <summary>

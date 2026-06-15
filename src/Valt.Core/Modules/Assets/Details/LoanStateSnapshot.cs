@@ -127,6 +127,9 @@ public sealed class LoanStateSnapshot
         if (liquidationLtv <= marginCallLtv)
             throw new ArgumentException("Liquidation LTV must be greater than margin call LTV", nameof(liquidationLtv));
 
+        if (fees < 0)
+            throw new ArgumentException("Fees cannot be negative", nameof(fees));
+
         if (currentTotalDebt < 0)
             throw new ArgumentException("Current total debt cannot be negative", nameof(currentTotalDebt));
 
