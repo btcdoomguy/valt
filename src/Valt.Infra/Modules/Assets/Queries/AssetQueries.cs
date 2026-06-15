@@ -278,43 +278,46 @@ internal sealed class AssetQueries : IAssetQueries
     private static AssetDTO MapBtcLoan(AssetEntity entity, Asset asset, BtcLoanDetails btcLoan)
     {
         var dto = CreateBaseDto(entity, asset);
+        var snapshot = btcLoan.Snapshots.MaxBy(s => s.EffectiveDate);
         decimal? currentLtv = null;
         int? loanHealthStatusId = null;
         string? loanHealthStatusName = null;
         decimal? distanceToLiquidationLtv = null;
 
-        if (btcLoan.CurrentBtcPriceInLoanCurrency > 0)
+        var currentBtcPriceInLoanCurrency = snapshot?.CurrentBtcPriceInLoanCurrency ?? btcLoan.CurrentBtcPriceInLoanCurrency;
+
+        if (currentBtcPriceInLoanCurrency > 0)
         {
-            currentLtv = btcLoan.CalculateCurrentLtv(btcLoan.CurrentBtcPriceInLoanCurrency);
-            var healthStatus = btcLoan.CalculateHealthStatus(btcLoan.CurrentBtcPriceInLoanCurrency);
+            currentLtv = btcLoan.CalculateCurrentLtv(currentBtcPriceInLoanCurrency);
+            var healthStatus = btcLoan.CalculateHealthStatus(currentBtcPriceInLoanCurrency);
             loanHealthStatusId = (int)healthStatus;
             loanHealthStatusName = healthStatus.ToString();
-            distanceToLiquidationLtv = btcLoan.CalculateDistanceToLiquidation(btcLoan.CurrentBtcPriceInLoanCurrency);
+            distanceToLiquidationLtv = btcLoan.CalculateDistanceToLiquidation(currentBtcPriceInLoanCurrency);
         }
 
         return dto with
         {
             PlatformName = btcLoan.PlatformName,
-            CollateralSats = btcLoan.CollateralSats,
-            LoanAmount = btcLoan.LoanAmount,
-            Apr = btcLoan.Apr,
+            CollateralSats = snapshot?.CollateralSats ?? btcLoan.CollateralSats,
+            LoanAmount = snapshot?.LoanAmount ?? btcLoan.LoanAmount,
+            Apr = snapshot?.Apr ?? btcLoan.Apr,
             CurrentLtv = currentLtv,
             InitialLtv = btcLoan.InitialLtv,
-            LiquidationLtv = btcLoan.LiquidationLtv,
-            MarginCallLtv = btcLoan.MarginCallLtv,
-            Fees = btcLoan.Fees,
+            LiquidationLtv = snapshot?.LiquidationLtv ?? btcLoan.LiquidationLtv,
+            MarginCallLtv = snapshot?.MarginCallLtv ?? btcLoan.MarginCallLtv,
+            Fees = snapshot?.Fees ?? btcLoan.Fees,
             LoanStartDate = btcLoan.LoanStartDate,
-            RepaymentDate = btcLoan.RepaymentDate,
-            LoanStatusId = (int)btcLoan.Status,
-            LoanStatusName = btcLoan.Status.ToString(),
+            RepaymentDate = snapshot?.RepaymentDate ?? btcLoan.RepaymentDate,
+            LoanStatusId = snapshot is not null ? (int)snapshot.Status : (int)btcLoan.Status,
+            LoanStatusName = (snapshot?.Status ?? btcLoan.Status).ToString(),
             LoanHealthStatusId = loanHealthStatusId,
             LoanHealthStatusName = loanHealthStatusName,
             AccruedInterest = btcLoan.CalculateAccruedInterest(),
             TotalDebt = btcLoan.CalculateTotalDebt(),
             DistanceToLiquidationLtv = distanceToLiquidationLtv,
             DaysUntilRepayment = btcLoan.CalculateDaysUntilRepayment(),
-            FixedTotalDebt = btcLoan.FixedTotalDebt,
-            HasFixedTotalDebt = btcLoan.HasFixedTotalDebt
+            FixedTotalDebt = snapshot?.FixedTotalDebt ?? btcLoan.FixedTotalDebt,
+            HasFixedTotalDebt = (snapshot?.FixedTotalDebt.HasValue).GetValueOrDefault(btcLoan.HasFixedTotalDebt)
         };
     }
 
