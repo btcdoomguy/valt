@@ -726,6 +726,20 @@ public class BtcLoanDetailsTests
     #region Snapshot Tests
 
     [Test]
+    public void Should_Throw_When_Snapshot_Fees_Is_Negative()
+    {
+        var loan = CreateDefaultDetails(loanStartDate: new DateOnly(2025, 1, 1));
+
+        var ex = Assert.Throws<ArgumentException>(() => CreateSnapshot(
+            loan,
+            new DateOnly(2025, 6, 1),
+            26_000m,
+            fees: -1m));
+
+        Assert.That(ex!.ParamName, Is.EqualTo("fees"));
+    }
+
+    [Test]
     public void Should_Order_Snapshots_By_EffectiveDate_Ascending()
     {
         var loan = CreateDefaultDetails(loanStartDate: new DateOnly(2025, 1, 1));
