@@ -150,16 +150,28 @@ public sealed class BtcLoanDetails : IAssetDetails
     }
 
     /// <summary>
+    /// Returns the latest snapshot (by effective date), or <c>null</c> when no snapshots exist.
+    /// All current-state calculations route through this method so the latest snapshot is the
+    /// single source of truth, falling back to the immutable setup values when empty.
+    /// </summary>
+    private LoanStateSnapshot? GetEffectiveSnapshot()
+        => Snapshots.Count == 0 ? null : Snapshots.MaxBy(s => s.EffectiveDate);
+
+    /// <summary>
     /// Calculates the current LTV ratio given a BTC price.
     /// LTV = LoanAmount / CollateralValue
     /// </summary>
     public decimal CalculateCurrentLtv(decimal btcPrice)
     {
-        var collateralValue = CollateralSats / 100_000_000m * btcPrice;
+        var snapshot = GetEffectiveSnapshot();
+        var collateralSats = snapshot?.CollateralSats ?? CollateralSats;
+        var loanAmount = snapshot?.LoanAmount ?? LoanAmount;
+
+        var collateralValue = collateralSats / 100_000_000m * btcPrice;
         if (collateralValue == 0)
             return 0;
 
-        return Math.Round(LoanAmount / collateralValue * 100, 2);
+        return Math.Round(loanAmount / collateralValue * 100, 2);
     }
 
     /// <summary>
@@ -167,10 +179,14 @@ public sealed class BtcLoanDetails : IAssetDetails
     /// </summary>
     public LoanHealthStatus CalculateHealthStatus(decimal btcPrice)
     {
+        var snapshot = GetEffectiveSnapshot();
+        var liquidationLtv = snapshot?.LiquidationLtv ?? LiquidationLtv;
+        var marginCallLtv = snapshot?.MarginCallLtv ?? MarginCallLtv;
+
         var currentLtv = CalculateCurrentLtv(btcPrice);
-        if (currentLtv >= LiquidationLtv)
+        if (currentLtv >= liquidationLtv)
             return LoanHealthStatus.Danger;
-        if (currentLtv >= MarginCallLtv)
+        if (currentLtv >= marginCallLtv)
             return LoanHealthStatus.Warning;
         return LoanHealthStatus.Healthy;
     }
@@ -180,17 +196,25 @@ public sealed class BtcLoanDetails : IAssetDetails
     /// </summary>
     public decimal CalculateDistanceToLiquidation(decimal btcPrice)
     {
+        var snapshot = GetEffectiveSnapshot();
+        var liquidationLtv = snapshot?.LiquidationLtv ?? LiquidationLtv;
+
         var currentLtv = CalculateCurrentLtv(btcPrice);
-        return Math.Round(Math.Max(0, LiquidationLtv - currentLtv), 2);
+        return Math.Round(Math.Max(0, liquidationLtv - currentLtv), 2);
     }
 
     /// <summary>
     /// Calculates the accrued interest from loan start to today. For fixed-debt loans,
     /// the total interest is known up-front (FixedTotalDebt - LoanAmount - Fees) and
     /// does not grow over time, so that full amount is returned.
+    /// When a snapshot exists, its <see cref="LoanStateSnapshot.CurrentTotalDebt"/> is
+    /// authoritative and already encompasses interest and fees, so this returns 0.
     /// </summary>
     public decimal CalculateAccruedInterest()
     {
+        if (GetEffectiveSnapshot() is not null)
+            return 0m;
+
         if (FixedTotalDebt.HasValue)
             return Math.Max(0, FixedTotalDebt.Value - LoanAmount - Fees);
 
@@ -205,9 +229,14 @@ public sealed class BtcLoanDetails : IAssetDetails
     /// Calculates the total debt obligation. For APR-based loans this is
     /// LoanAmount + AccruedInterest + Fees. For fixed-debt loans the predefined
     /// total is returned regardless of elapsed time.
+    /// When a snapshot exists, its <see cref="LoanStateSnapshot.CurrentTotalDebt"/> is used.
     /// </summary>
     public decimal CalculateTotalDebt()
     {
+        var snapshot = GetEffectiveSnapshot();
+        if (snapshot is not null)
+            return snapshot.CurrentTotalDebt;
+
         if (FixedTotalDebt.HasValue)
             return FixedTotalDebt.Value;
 
