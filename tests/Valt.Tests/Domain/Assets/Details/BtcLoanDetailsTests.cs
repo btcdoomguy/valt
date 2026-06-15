@@ -37,6 +37,41 @@ public class BtcLoanDetailsTests
             currentBtcPrice);
     }
 
+    private static LoanStateSnapshot CreateSnapshot(
+        BtcLoanDetails loan,
+        DateOnly effectiveDate,
+        decimal currentTotalDebt,
+        long? collateralSats = null,
+        decimal? loanAmount = null,
+        decimal? apr = null,
+        decimal? liquidationLtv = null,
+        decimal? marginCallLtv = null,
+        decimal? fees = null,
+        DateOnly? repaymentDate = null,
+        LoanStatus? status = null,
+        decimal? currentBtcPrice = null,
+        string? note = null)
+    {
+        return new LoanStateSnapshot(
+            platformName: loan.PlatformName,
+            collateralSats: collateralSats ?? loan.CollateralSats,
+            loanAmount: loanAmount ?? loan.LoanAmount,
+            currencyCode: loan.CurrencyCode,
+            apr: apr ?? loan.Apr,
+            initialLtv: loan.InitialLtv,
+            liquidationLtv: liquidationLtv ?? loan.LiquidationLtv,
+            marginCallLtv: marginCallLtv ?? loan.MarginCallLtv,
+            fees: fees ?? loan.Fees,
+            loanStartDate: loan.LoanStartDate,
+            repaymentDate: repaymentDate ?? loan.RepaymentDate,
+            status: status ?? loan.Status,
+            currentBtcPriceInLoanCurrency: currentBtcPrice ?? loan.CurrentBtcPriceInLoanCurrency,
+            fixedTotalDebt: loan.FixedTotalDebt,
+            currentTotalDebt: currentTotalDebt,
+            effectiveDate: effectiveDate,
+            note: note);
+    }
+
     #region Construction Tests
 
     [Test]
@@ -684,6 +719,202 @@ public class BtcLoanDetailsTests
             repaymentDate: new DateOnly(2026, 1, 1));
 
         Assert.That(apr, Is.EqualTo(0m));
+    }
+
+    #endregion
+
+    #region Snapshot Tests
+
+    [Test]
+    public void Should_Order_Snapshots_By_EffectiveDate_Ascending()
+    {
+        var loan = CreateDefaultDetails(loanStartDate: new DateOnly(2025, 1, 1));
+
+        var details = loan
+            .WithAddedSnapshot(CreateSnapshot(loan, new DateOnly(2025, 6, 1), 26_000m))
+            .WithAddedSnapshot(CreateSnapshot(loan, new DateOnly(2025, 1, 1), 25_100m))
+            .WithAddedSnapshot(CreateSnapshot(loan, new DateOnly(2025, 12, 1), 27_000m));
+
+        Assert.That(details.Snapshots, Has.Count.EqualTo(3));
+        Assert.That(details.Snapshots[0].EffectiveDate, Is.EqualTo(new DateOnly(2025, 1, 1)));
+        Assert.That(details.Snapshots[1].EffectiveDate, Is.EqualTo(new DateOnly(2025, 6, 1)));
+        Assert.That(details.Snapshots[2].EffectiveDate, Is.EqualTo(new DateOnly(2025, 12, 1)));
+    }
+
+    [Test]
+    public void Should_Use_Latest_Snapshot_For_Total_Debt()
+    {
+        var loan = CreateDefaultDetails(loanStartDate: new DateOnly(2025, 1, 1));
+
+        var details = loan
+            .WithAddedSnapshot(CreateSnapshot(loan, new DateOnly(2025, 6, 1), 26_000m))
+            .WithAddedSnapshot(CreateSnapshot(loan, new DateOnly(2025, 7, 1), 26_500m));
+
+        Assert.That(details.CalculateTotalDebt(), Is.EqualTo(26_500m));
+    }
+
+    [Test]
+    public void Should_Use_Latest_Snapshot_For_Current_Ltv()
+    {
+        var loan = CreateDefaultDetails(currentBtcPrice: 50_000m);
+
+        var details = loan.WithAddedSnapshot(CreateSnapshot(
+            loan,
+            new DateOnly(2025, 6, 1),
+            15_000m,
+            collateralSats: 50_000_000,
+            loanAmount: 15_000m));
+
+        // Collateral value = 0.5 BTC * $50,000 = $25,000
+        // LTV = 15,000 / 25,000 * 100 = 60%
+        Assert.That(details.CalculateCurrentLtv(50_000m), Is.EqualTo(60m));
+    }
+
+    [Test]
+    public void Should_Use_Latest_Snapshot_Ltv_Thresholds_For_HealthStatus()
+    {
+        var loan = CreateDefaultDetails(currentBtcPrice: 50_000m);
+
+        var details = loan.WithAddedSnapshot(CreateSnapshot(
+            loan,
+            new DateOnly(2025, 6, 1),
+            25_000m,
+            liquidationLtv: 50m,
+            marginCallLtv: 45m));
+
+        // Setup LTV = 50%, latest snapshot liquidation = 50% => Danger
+        Assert.That(details.CalculateHealthStatus(50_000m), Is.EqualTo(LoanHealthStatus.Danger));
+    }
+
+    [Test]
+    public void Should_Use_Latest_Snapshot_Ltv_Thresholds_For_DistanceToLiquidation()
+    {
+        var loan = CreateDefaultDetails(currentBtcPrice: 50_000m);
+
+        var details = loan.WithAddedSnapshot(CreateSnapshot(
+            loan,
+            new DateOnly(2025, 6, 1),
+            25_000m,
+            liquidationLtv: 60m,
+            marginCallLtv: 55m));
+
+        // Setup LTV = 50%, latest snapshot liquidation = 60% => distance = 10
+        Assert.That(details.CalculateDistanceToLiquidation(50_000m), Is.EqualTo(10m));
+    }
+
+    [Test]
+    public void Should_Return_Zero_Accrued_Interest_When_Snapshot_Exists()
+    {
+        var startDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-365);
+        var loan = CreateDefaultDetails(loanStartDate: startDate);
+
+        var details = loan.WithAddedSnapshot(CreateSnapshot(
+            loan,
+            new DateOnly(2025, 6, 1),
+            26_000m));
+
+        Assert.That(details.CalculateAccruedInterest(), Is.EqualTo(0m));
+    }
+
+    [Test]
+    public void Should_Fall_Back_To_Previous_Snapshot_After_Removing_Latest()
+    {
+        var loan = CreateDefaultDetails(loanStartDate: new DateOnly(2025, 1, 1));
+
+        var details = loan
+            .WithAddedSnapshot(CreateSnapshot(loan, new DateOnly(2025, 6, 1), 26_000m))
+            .WithAddedSnapshot(CreateSnapshot(loan, new DateOnly(2025, 9, 1), 27_000m))
+            .WithoutSnapshot(new DateOnly(2025, 9, 1));
+
+        Assert.That(details.CalculateTotalDebt(), Is.EqualTo(26_000m));
+    }
+
+    [Test]
+    public void Should_Fall_Back_To_Setup_Values_After_Removing_All_Snapshots()
+    {
+        var loan = CreateDefaultDetails(loanStartDate: new DateOnly(2025, 1, 1));
+        var setupTotalDebt = loan.CalculateTotalDebt();
+
+        var details = loan
+            .WithAddedSnapshot(CreateSnapshot(loan, new DateOnly(2025, 6, 1), 26_000m))
+            .WithoutSnapshot(new DateOnly(2025, 6, 1));
+
+        Assert.That(details.CalculateTotalDebt(), Is.EqualTo(setupTotalDebt));
+    }
+
+    [Test]
+    public void Should_Keep_Setup_Properties_Unchanged_After_Adding_Snapshot()
+    {
+        var original = CreateDefaultDetails(loanStartDate: new DateOnly(2025, 1, 1));
+
+        var updated = original.WithAddedSnapshot(CreateSnapshot(
+            original,
+            new DateOnly(2025, 6, 1),
+            26_000m,
+            loanAmount: 30_000m,
+            collateralSats: 50_000_000));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(original.LoanAmount, Is.EqualTo(25_000m));
+            Assert.That(original.CollateralSats, Is.EqualTo(100_000_000));
+            Assert.That(original.Snapshots, Has.Count.EqualTo(0));
+            Assert.That(updated.LoanAmount, Is.EqualTo(25_000m));
+            Assert.That(updated.CollateralSats, Is.EqualTo(100_000_000));
+            Assert.That(updated.Snapshots, Has.Count.EqualTo(1));
+        });
+    }
+
+    [Test]
+    public void Should_Throw_When_Adding_Snapshot_With_Duplicate_EffectiveDate()
+    {
+        var loan = CreateDefaultDetails(loanStartDate: new DateOnly(2025, 1, 1));
+        var snapshot = CreateSnapshot(loan, new DateOnly(2025, 6, 1), 26_000m);
+
+        var withSnapshot = loan.WithAddedSnapshot(snapshot);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(withSnapshot.Snapshots, Has.Count.EqualTo(1));
+            Assert.Throws<ArgumentException>(() =>
+                withSnapshot.WithAddedSnapshot(CreateSnapshot(loan, new DateOnly(2025, 6, 1), 27_000m)));
+        });
+    }
+
+    [Test]
+    public void Should_Validate_Snapshot_Constructor_Inputs()
+    {
+        var loan = CreateDefaultDetails(loanStartDate: new DateOnly(2025, 1, 1));
+
+        Assert.Multiple(() =>
+        {
+            Assert.Throws<ArgumentException>(() =>
+                CreateSnapshot(loan, new DateOnly(2025, 6, 1), -1m));
+
+            Assert.Throws<ArgumentException>(() =>
+                CreateSnapshot(loan, new DateOnly(2025, 6, 1), 26_000m, liquidationLtv: 70m, marginCallLtv: 70m));
+        });
+    }
+
+    [Test]
+    public void Should_Preserve_Snapshot_Note_And_Allow_Null_Or_Empty()
+    {
+        var loan = CreateDefaultDetails(loanStartDate: new DateOnly(2025, 1, 1));
+
+        var withNote = loan.WithAddedSnapshot(CreateSnapshot(
+            loan,
+            new DateOnly(2025, 6, 1),
+            26_000m,
+            note: "Updated after draw"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(withNote.Snapshots[0].Note, Is.EqualTo("Updated after draw"));
+            Assert.DoesNotThrow(() =>
+                CreateSnapshot(loan, new DateOnly(2025, 7, 1), 26_500m, note: null));
+            Assert.DoesNotThrow(() =>
+                CreateSnapshot(loan, new DateOnly(2025, 8, 1), 26_500m, note: string.Empty));
+        });
     }
 
     #endregion
