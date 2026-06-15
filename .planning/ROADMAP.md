@@ -13,7 +13,7 @@ Let users record the evolving state of BTC loans over time and use the latest re
 | # | Phase | Goal | Requirements | Success Criteria |
 |---|-------|------|--------------|------------------|
 | 6 | Domain & Persistence Model | Complete | LOAN-01, LOAN-02, LOAN-03, LOAN-04, LOAN-05, TEST-01 | 2026-06-15 |
-| 7 | Commands & Queries | Implement add/delete/query handlers and update existing loan queries to use latest snapshot | CMD-01, CMD-02, QUERY-01, QUERY-02, QUERY-03, TEST-02, MCP-01 | 7 |
+| 7 | Commands & Queries | 4/4 | Complete   | 2026-06-15 |
 | 8 | Update Loan State Screen | Build the update modal and context-menu item, prefilled with current totals | UI-01, UI-02, UI-03, UI-04, UI-05, UI-06 | 6 |
 | 9 | Loan State History Screen | Build the history modal with list, delete, and add-new-state actions | UI-07, UI-08, UI-09, UI-10, UI-11 | 5 |
 | 10 | Polish & Verification | Localize strings, update docs, verify end-to-end flow | LOC-01, MCP-01, DOC-01 | 3 |
@@ -81,25 +81,25 @@ Plans:
 6. Handler/integration tests verify add, delete, query, and dashboard refresh behavior.
 7. MCP `AssetTools` exposes the new commands/queries.
 
-**Plans:** 4 plans
+**Plans:** 4/4 plans complete
 
 Plans:
 
 **Wave 1**
 
-- [ ] 07-01-PLAN.md — Add and delete loan-state snapshot commands
+- [x] 07-01-PLAN.md — Add and delete loan-state snapshot commands
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 07-02-PLAN.md — Timeline and latest-state snapshot queries
+- [x] 07-02-PLAN.md — Timeline and latest-state snapshot queries
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 07-03-PLAN.md — Update existing queries to use latest snapshot and preserve snapshots on edit
+- [x] 07-03-PLAN.md — Update existing queries to use latest snapshot and preserve snapshots on edit
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 07-04-PLAN.md — Expose commands/queries through MCP AssetTools and integration tests
+- [x] 07-04-PLAN.md — Expose commands/queries through MCP AssetTools and integration tests
 
 ### Phase 8: Update Loan State Screen
 
@@ -116,6 +116,14 @@ Plans:
 5. Field labels match the existing add-loan screen captions.
 6. Validation rejects invalid dates and numeric values.
 7. Saving refreshes the Assets tab and reflects the new state.
+
+**Plans:** 1/1 plans complete
+
+Plans:
+
+**Wave 1**
+
+- [ ] 08-01-PLAN.md — Add modal infrastructure, implement prefill/save/wiring, and add ViewModel tests
 
 ### Phase 9: Loan State History Screen
 
