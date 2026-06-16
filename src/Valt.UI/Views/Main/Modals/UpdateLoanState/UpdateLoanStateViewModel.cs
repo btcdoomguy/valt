@@ -27,37 +27,57 @@ public partial class UpdateLoanStateViewModel : ValtModalValidatorViewModel
 
     [ObservableProperty] private string _assetId = string.Empty;
     [ObservableProperty] private string _assetName = string.Empty;
-    [ObservableProperty] private string _currencyCode = "USD";
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(LoanAmountFormatted))]
+    private string _currencyCode = "USD";
+
     [ObservableProperty] private string _platformName = string.Empty;
     [ObservableProperty] private string _currencySymbol = "$";
     [ObservableProperty] private bool _symbolOnRight;
 
-    [Required(ErrorMessage = "Effective date is required")]
+    [Required(ErrorMessageResourceName = "Validation_EffectiveDateRequired", ErrorMessageResourceType = typeof(language))]
     [ObservableProperty] private DateTime? _effectiveDate = DateTime.Today;
 
-    [Required(ErrorMessage = "Current total debt is required")]
+    [Required(ErrorMessageResourceName = "Validation_CurrentTotalDebtRequired", ErrorMessageResourceType = typeof(language))]
     [ObservableProperty] private FiatValue _currentTotalDebt = FiatValue.Empty;
 
-    [Required(ErrorMessage = "Collateral is required")]
-    [Range(1, long.MaxValue, ErrorMessage = "Collateral must be greater than zero")]
+    [Required(ErrorMessageResourceName = "Validation_CollateralRequired", ErrorMessageResourceType = typeof(language))]
+    [Range(1, long.MaxValue, ErrorMessageResourceName = "Validation_CollateralGreaterThanZero", ErrorMessageResourceType = typeof(language))]
     [ObservableProperty] private long _collateralSats;
 
-    [Required(ErrorMessage = "APR is required")]
-    [Range(0, double.MaxValue, ErrorMessage = "APR cannot be negative")]
+    [Required(ErrorMessageResourceName = "Validation_AprRequired", ErrorMessageResourceType = typeof(language))]
+    [Range(0, double.MaxValue, ErrorMessageResourceName = "Validation_AprNonNegative", ErrorMessageResourceType = typeof(language))]
     [ObservableProperty] private decimal _aprPercentage;
 
-    [Required(ErrorMessage = "Fees are required")]
+    [Required(ErrorMessageResourceName = "Validation_FeesRequired", ErrorMessageResourceType = typeof(language))]
     [ObservableProperty] private FiatValue _fees = FiatValue.Empty;
 
     [ObservableProperty] private string _note = string.Empty;
 
     // Read-only context
-    [ObservableProperty] private decimal _loanAmount;
-    [ObservableProperty] private decimal _initialLtv;
-    [ObservableProperty] private decimal _marginCallLtv;
-    [ObservableProperty] private decimal _liquidationLtv;
-    [ObservableProperty] private DateTime? _loanStartDate;
-    [ObservableProperty] private DateTime? _repaymentDate;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(LoanAmountFormatted))]
+    private decimal _loanAmount;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(InitialLtvFormatted))]
+    private decimal _initialLtv;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(MarginCallLtvFormatted))]
+    private decimal _marginCallLtv;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(LiquidationLtvFormatted))]
+    private decimal _liquidationLtv;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(LoanStartDateFormatted))]
+    private DateTime? _loanStartDate;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(RepaymentDateFormatted))]
+    private DateTime? _repaymentDate;
 
     public string LoanAmountFormatted => CurrencyDisplay.FormatFiat(LoanAmount, CurrencyCode);
     public string InitialLtvFormatted => $"{InitialLtv:N2}%";
