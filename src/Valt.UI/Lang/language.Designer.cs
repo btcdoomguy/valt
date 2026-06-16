@@ -5408,5 +5408,65 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports_FixedPriceModal_Cancel", resourceCulture);
             }
         }
+        
+        public static string Assets_UpdateLoanState {
+            get {
+                return ResourceManager.GetString("Assets_UpdateLoanState", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_Title {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_Title", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_SaveSnapshot {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_SaveSnapshot", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_DiscardChanges {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_DiscardChanges", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_ContextHeader {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_ContextHeader", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_NewStateHeader {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_NewStateHeader", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_EffectiveDate {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_EffectiveDate", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_CurrentTotalDebt {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_CurrentTotalDebt", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_Note {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_Note", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_HelpText {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_HelpText", resourceCulture);
+            }
+        }
     }
 }
