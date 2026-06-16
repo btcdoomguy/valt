@@ -41,6 +41,7 @@ using Valt.UI.Views.Main.Modals.ManageAssetGroup;
 using Valt.UI.Views.Main.Modals.ManageAssetGroupsList;
 using Valt.UI.Views.Main.Modals.TransactionEditor;
 using Valt.UI.Views.Main.Modals.UpdateLoanState;
+using Valt.UI.Views.Main.Modals.LoanStateHistory;
 using Valt.UI.Views.Main.Tabs.Assets.Models;
 using static Valt.UI.Base.TaskExtensions;
 
@@ -603,6 +604,25 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
             WeakReferenceMessenger.Default.Send(new LoanStateUpdatedMessage());
             NotifyAssetSummaryUpdated();
         }
+    }
+
+    [RelayCommand]
+    private async Task OpenLoanStateHistory(AssetViewModel? asset)
+    {
+        if (IsSecureModeEnabled) return;
+        if (asset is null || !asset.IsBtcLoan)
+            return;
+
+        var ownerWindow = GetUserControlOwnerWindow?.Invoke();
+        if (ownerWindow is null)
+            return;
+
+        var modal = (LoanStateHistoryView)await _modalFactory.CreateAsync(
+            ApplicationModalNames.LoanStateHistory,
+            ownerWindow,
+            new LoanStateHistoryViewModel.Request { AssetId = asset.Id });
+
+        await modal.ShowDialogSafeAsync<LoanStateHistoryViewModel.Response?>(ownerWindow);
     }
 
     [RelayCommand]
