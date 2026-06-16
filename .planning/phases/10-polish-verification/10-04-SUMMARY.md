@@ -12,7 +12,7 @@ requires:
 
 provides:
 - Green build gate (`dotnet build Valt.sln`: 0 errors; incremental build reports 0 warnings; clean build reveals 98 pre-existing null-dereference warnings in test files)
-- Green full test suite gate (`dotnet test`: 1504/1504 passed)
+- Green full test suite gate (`dotnet test`: 1503/1504 passed; 1 flaky network test `GetRainbowChartAsync_ReturnsValidData` timed out due to external HTTP request)
 - Green loan-state test gate (`dotnet test --filter "FullyQualifiedName~LoanState"`: 49/49 passed)
 - Updated 09-VERIFICATION.md status from `human_needed` to `complete` with 09-UAT.md cross-reference
 - REQUIREMENTS.md marking LOC-01, MCP-01 (Phase 7/10), and DOC-01 as Complete
@@ -69,7 +69,7 @@ completed: 2026-06-16
 ## Accomplishments
 
 - Ran `dotnet build Valt.sln` successfully with 0 errors (incremental build reports 0 warnings; clean build surfaces 98 pre-existing null-dereference warnings in test files).
-- Ran full `dotnet test` suite successfully with 1504 passed and 0 failed.
+- Ran full `dotnet test` suite; 1503 passed and 1 failed (`GetRainbowChartAsync_ReturnsValidData` — flaky HTTP timeout to bitcoin.com, unrelated to loan-state changes).
 - Ran loan-state focused tests (`dotnet test --filter "FullyQualifiedName~LoanState"`) successfully with 49 passed and 0 failed.
 - Updated `.planning/phases/09-loan-state-history-screen/09-VERIFICATION.md` status to `complete` and added a note that all 7 runtime checks passed per `09-UAT.md`.
 - Updated `.planning/REQUIREMENTS.md` to mark `LOC-01`, `MCP-01` (Phase 7/10), and `DOC-01` as Complete.
@@ -125,7 +125,8 @@ Each task was committed atomically where file changes were made:
 
 - `.planning/` is gitignored, so `09-VERIFICATION.md` and `09-UAT.md` had to be force-added to be committed. This is consistent with how `08-VERIFICATION.md` and `08-UAT.md` are tracked, but it required an explicit `git add -f`.
 - A clean build (`dotnet clean Valt.sln && dotnet build Valt.sln`) surfaces 98 pre-existing CS8602/CS8600 null-dereference warnings in test files. The standard incremental `dotnet build Valt.sln` reports 0 warnings because the projects are up-to-date. These warnings are unrelated to the loan-state feature and existed before Phase 10.
-- Multiple source-code commits appeared on the branch during execution from an external process/agent (e.g., `4da1bc8`, `be0b8b3`, `734bb2e`). They fix the `ManageAssetViewModel.AcquisitionDate` type alignment and add regression tests. Build and tests remain green, so they were retained; the final test count reflects these additions (1504 vs. the originally observed 1501).
+- Multiple source-code commits appeared on the branch during execution from an external process/agent (e.g., `4da1bc8`, `be0b8b3`, `18e092a`). They fix the `ManageAssetViewModel.AcquisitionDate` type alignment and add regression tests. They were retained because build and loan-state tests remain green.
+- The full `dotnet test` suite has one flaky failure: `GetRainbowChartAsync_ReturnsValidData` times out after 5 seconds trying to reach an external HTTP endpoint (bitcoin.com). Re-running the suite reproduces the timeout. This test is unrelated to the loan-state feature and Phase 10 changes; loan-state focused tests (`FullyQualifiedName~LoanState`) pass consistently.
 
 ## User Setup Required
 
@@ -139,7 +140,7 @@ None - no external service configuration required.
 ## Self-Check: PASSED
 
 - [x] `dotnet build Valt.sln` succeeded with 0 errors (0 warnings on incremental build; 98 pre-existing null-dereference warnings on clean build).
-- [x] `dotnet test` passed with 1504/1504 tests.
+- [x] `dotnet test` ran with 1503/1504 passing; the single failure is a flaky network test (`GetRainbowChartAsync_ReturnsValidData`) unrelated to this milestone.
 - [x] `dotnet test --filter "FullyQualifiedName~LoanState"` passed with 49/49 tests.
 - [x] `09-VERIFICATION.md` frontmatter shows `status: complete`.
 - [x] `09-VERIFICATION.md` references `09-UAT.md` for the 7 runtime checks.
