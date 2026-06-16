@@ -2758,4 +2758,34 @@
     <data name="Reports_FixedPriceModal_Cancel" xml:space="preserve">
         <value>Cancelar</value>
     </data>
+    <data name="Assets_UpdateLoanState" xml:space="preserve">
+        <value>Atualizar Estado do Empréstimo</value>
+    </data>
+    <data name="UpdateLoanState_Title" xml:space="preserve">
+        <value>Atualizar Estado do Empréstimo</value>
+    </data>
+    <data name="UpdateLoanState_SaveSnapshot" xml:space="preserve">
+        <value>Salvar Snapshot</value>
+    </data>
+    <data name="UpdateLoanState_DiscardChanges" xml:space="preserve">
+        <value>Descartar Alterações</value>
+    </data>
+    <data name="UpdateLoanState_ContextHeader" xml:space="preserve">
+        <value>Contexto do Empréstimo Atual</value>
+    </data>
+    <data name="UpdateLoanState_NewStateHeader" xml:space="preserve">
+        <value>Novo Estado</value>
+    </data>
+    <data name="UpdateLoanState_EffectiveDate" xml:space="preserve">
+        <value>Data Efetiva</value>
+    </data>
+    <data name="UpdateLoanState_CurrentTotalDebt" xml:space="preserve">
+        <value>Dívida Total Atual</value>
+    </data>
+    <data name="UpdateLoanState_Note" xml:space="preserve">
+        <value>Observação</value>
+    </data>
+    <data name="UpdateLoanState_HelpText" xml:space="preserve">
+        <value>Snapshots são apenas adicionados. Para corrigir um estado, exclua o snapshot antigo e adicione um novo.</value>
+    </data>
 </root>
