@@ -14,7 +14,9 @@ using Valt.Core.Common;
 using Valt.Infra.Kernel;
 using Valt.UI.Base;
 using Valt.UI.Lang;
+using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
+using Valt.UI.Views.Main.Modals.LoanStateHistory;
 
 namespace Valt.UI.Views.Main.Modals.UpdateLoanState;
 
@@ -22,6 +24,7 @@ public partial class UpdateLoanStateViewModel : ValtModalValidatorViewModel
 {
     private readonly IQueryDispatcher? _queryDispatcher;
     private readonly ICommandDispatcher? _commandDispatcher;
+    private readonly IModalFactory? _modalFactory;
 
     [ObservableProperty] private string _windowTitle = language.UpdateLoanState_Title;
 
@@ -91,10 +94,11 @@ public partial class UpdateLoanStateViewModel : ValtModalValidatorViewModel
         if (!Design.IsDesignMode) return;
     }
 
-    public UpdateLoanStateViewModel(IQueryDispatcher queryDispatcher, ICommandDispatcher commandDispatcher)
+    public UpdateLoanStateViewModel(IQueryDispatcher queryDispatcher, ICommandDispatcher commandDispatcher, IModalFactory modalFactory)
     {
         _queryDispatcher = queryDispatcher;
         _commandDispatcher = commandDispatcher;
+        _modalFactory = modalFactory;
     }
 
     public override async Task OnBindParameterAsync()
@@ -196,6 +200,21 @@ public partial class UpdateLoanStateViewModel : ValtModalValidatorViewModel
 
     [RelayCommand]
     private void Close() => CloseWindow?.Invoke();
+
+    [RelayCommand]
+    private async Task OpenHistory()
+    {
+        if (GetWindow is null)
+            return;
+
+        var ownerWindow = GetWindow();
+        var modal = (LoanStateHistoryView)await _modalFactory.CreateAsync(
+            ApplicationModalNames.LoanStateHistory,
+            ownerWindow,
+            new LoanStateHistoryViewModel.Request { AssetId = AssetId });
+
+        await modal.ShowDialogSafeAsync<LoanStateHistoryViewModel.Response?>(ownerWindow);
+    }
 
     public record Request
     {

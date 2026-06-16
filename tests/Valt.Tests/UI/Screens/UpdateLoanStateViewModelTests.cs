@@ -9,6 +9,7 @@ using Valt.App.Modules.Assets.Queries.GetLatestLoanState;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Factories;
 using Valt.Infra.Kernel;
+using Valt.UI.Services;
 using Valt.UI.Views.Main.Modals.UpdateLoanState;
 
 namespace Valt.Tests.UI.Screens;
@@ -18,6 +19,7 @@ public class UpdateLoanStateViewModelTests
 {
     private IQueryDispatcher _queryDispatcher;
     private ICommandDispatcher _commandDispatcher;
+    private IModalFactory _modalFactory;
 
     [OneTimeSetUp]
     public void OneTimeSetUp() => IdGenerator.Configure(new LiteDbIdProvider());
@@ -27,10 +29,11 @@ public class UpdateLoanStateViewModelTests
     {
         _queryDispatcher = Substitute.For<IQueryDispatcher>();
         _commandDispatcher = Substitute.For<ICommandDispatcher>();
+        _modalFactory = Substitute.For<IModalFactory>();
     }
 
     private UpdateLoanStateViewModel CreateViewModel()
-        => new(_queryDispatcher, _commandDispatcher);
+        => new(_queryDispatcher, _commandDispatcher, _modalFactory);
 
     private static LoanStateDTO CreateLatestLoanState(string assetId = "asset-1") => new()
     {

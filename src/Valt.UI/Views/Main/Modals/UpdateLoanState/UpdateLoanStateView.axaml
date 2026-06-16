@@ -36,8 +36,15 @@
                         <!-- Current Loan Context -->
                         <Border Classes="form-section">
                             <StackPanel>
-                                <TextBlock Classes="form-section-header"
-                                           Text="{x:Static lang:language.UpdateLoanState_ContextHeader}" />
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <TextBlock Grid.Column="0" Classes="form-section-header"
+                                               Text="{x:Static lang:language.UpdateLoanState_ContextHeader}" />
+                                    <Button Grid.Column="1"
+                                            Content="{x:Static lang:language.UpdateLoanState_ViewHistory}"
+                                            Command="{Binding OpenHistoryCommand}"
+                                            Classes="transparent link"
+                                            HorizontalAlignment="Right" />
+                                </Grid>
                                 <Grid ColumnDefinitions="*, 32, *"
                                       RowDefinitions="Auto, Auto, Auto, Auto"
                                       RowSpacing="16"
