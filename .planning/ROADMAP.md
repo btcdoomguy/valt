@@ -117,13 +117,18 @@ Plans:
 6. Validation rejects invalid dates and numeric values.
 7. Saving refreshes the Assets tab and reflects the new state.
 
-**Plans:** 1/1 plans complete
+**Plans:** 1/3 plans complete
 
 Plans:
 
 **Wave 1**
 
 - [x] 08-01-PLAN.md — Add modal infrastructure, implement prefill/save/wiring, and add ViewModel tests
+
+**Wave 2** *(gap closure from 08-UAT.md)*
+
+- [ ] 08-02-PLAN.md — Localize Update Loan State context menu, modal labels, and validation message keys
+- [ ] 08-03-PLAN.md — Fix Current Loan Context refresh, localized validation messages, and modal layout
 
 ### Phase 9: Loan State History Screen
 

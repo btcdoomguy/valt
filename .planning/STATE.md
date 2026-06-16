@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-06-15)
 
 ## Current Position
 
-Phase: 08 (update-loan-state-screen) — HUMAN VERIFICATION NEEDED
-Plan: 1 of 1 complete
-Status: Automated verification passed; 3 UAT items pending
-Last activity: 2026-06-16 -- Completed 08-01 automated verification; awaiting human UAT
+Phase: 08 (update-loan-state-screen) — GAP CLOSURE PLANNED
+Plan: 1 of 3 complete; 2 gap-closure plans created (08-02, 08-03)
+Status: Automated verification passed; UAT gaps diagnosed and planned for closure
+Last activity: 2026-06-16 -- Created 08-02 and 08-03 gap-closure plans from 08-UAT.md
 
 ## Accumulated Context
 
