@@ -759,12 +759,40 @@ public class BtcLoanDetailsTests
     public void Should_Use_Latest_Snapshot_For_Total_Debt()
     {
         var loan = CreateDefaultDetails(loanStartDate: new DateOnly(2025, 1, 1));
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
         var details = loan
             .WithAddedSnapshot(CreateSnapshot(loan, new DateOnly(2025, 6, 1), 26_000m))
-            .WithAddedSnapshot(CreateSnapshot(loan, new DateOnly(2025, 7, 1), 26_500m));
+            .WithAddedSnapshot(CreateSnapshot(loan, today, 26_500m));
 
         Assert.That(details.CalculateTotalDebt(), Is.EqualTo(26_500m));
+    }
+
+    [Test]
+    public void Should_Recalculate_Total_Debt_From_Past_Snapshot()
+    {
+        // Snapshot currentTotalDebt = 26_000, fees = 100, apr = 0.12
+        // Principal = 25_900. Over 365 days interest = 25_900 * 0.12 = 3_108.
+        // Total = 26_000 + 3_108 = 29_108.
+        var loan = CreateDefaultDetails(loanStartDate: new DateOnly(2025, 1, 1), fees: 100m);
+        var pastDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-365);
+
+        var details = loan.WithAddedSnapshot(CreateSnapshot(loan, pastDate, 26_000m));
+
+        Assert.That(details.CalculateTotalDebt(), Is.EqualTo(29_108m));
+    }
+
+    [Test]
+    public void Should_Calculate_Accrued_Interest_From_Snapshot_Effective_Date()
+    {
+        // Snapshot currentTotalDebt = 26_000, fees = 100, apr = 0.12
+        // Principal = 25_900. Over 365 days interest = 25_900 * 0.12 = 3_108.
+        var loan = CreateDefaultDetails(loanStartDate: new DateOnly(2025, 1, 1), fees: 100m);
+        var pastDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-365);
+
+        var details = loan.WithAddedSnapshot(CreateSnapshot(loan, pastDate, 26_000m));
+
+        Assert.That(details.CalculateAccruedInterest(), Is.EqualTo(3_108m));
     }
 
     [Test]
@@ -817,14 +845,15 @@ public class BtcLoanDetailsTests
     }
 
     [Test]
-    public void Should_Return_Zero_Accrued_Interest_When_Snapshot_Exists()
+    public void Should_Return_Zero_Accrued_Interest_When_Snapshot_Is_Effective_Today()
     {
         var startDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-365);
         var loan = CreateDefaultDetails(loanStartDate: startDate);
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
         var details = loan.WithAddedSnapshot(CreateSnapshot(
             loan,
-            new DateOnly(2025, 6, 1),
+            today,
             26_000m));
 
         Assert.That(details.CalculateAccruedInterest(), Is.EqualTo(0m));
@@ -834,13 +863,17 @@ public class BtcLoanDetailsTests
     public void Should_Fall_Back_To_Previous_Snapshot_After_Removing_Latest()
     {
         var loan = CreateDefaultDetails(loanStartDate: new DateOnly(2025, 1, 1));
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var yesterday = today.AddDays(-1);
 
         var details = loan
-            .WithAddedSnapshot(CreateSnapshot(loan, new DateOnly(2025, 6, 1), 26_000m))
-            .WithAddedSnapshot(CreateSnapshot(loan, new DateOnly(2025, 9, 1), 27_000m))
-            .WithoutSnapshot(new DateOnly(2025, 9, 1));
+            .WithAddedSnapshot(CreateSnapshot(loan, yesterday, 26_000m))
+            .WithAddedSnapshot(CreateSnapshot(loan, today, 27_000m))
+            .WithoutSnapshot(today);
 
-        Assert.That(details.CalculateTotalDebt(), Is.EqualTo(26_000m));
+        // Previous snapshot recalculates one day of interest:
+        // principal = 26_000 - 100 = 25_900; interest = 25_900 * 0.12 / 365 = 8.52
+        Assert.That(details.CalculateTotalDebt(), Is.EqualTo(26_008.52m));
     }
 
     [Test]

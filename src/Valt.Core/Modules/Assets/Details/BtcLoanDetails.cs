@@ -211,21 +211,24 @@ public sealed class BtcLoanDetails : IAssetDetails
     }
 
     /// <summary>
-    /// Calculates the accrued interest from loan start to today. For fixed-debt loans,
-    /// the total interest is known up-front (FixedTotalDebt - LoanAmount - Fees) and
-    /// does not grow over time, so that full amount is returned.
-    /// When a snapshot exists, its <see cref="LoanStateSnapshot.CurrentTotalDebt"/> is
-    /// authoritative and already encompasses interest and fees, so this returns 0.
+    /// Calculates the accrued interest from the effective snapshot's effective date to today.
+    /// For fixed-debt loans no additional interest accrues, so 0 is returned.
+    /// When no snapshot exists, interest accrues from <see cref="LoanStartDate"/>.
     /// </summary>
     public decimal CalculateAccruedInterest()
     {
-        if (GetEffectiveSnapshot() is not null)
-            return 0m;
+        if (GetEffectiveSnapshot() is { } snapshot)
+        {
+            if (snapshot.FixedTotalDebt.HasValue)
+                return 0m;
+
+            return CalculateAccruedInterestForSnapshot(snapshot);
+        }
 
         if (FixedTotalDebt.HasValue)
             return Math.Max(0, FixedTotalDebt.Value - LoanAmount - Fees);
 
-        var daysSinceStart = (DateOnly.FromDateTime(DateTime.UtcNow).DayNumber - LoanStartDate.DayNumber);
+        var daysSinceStart = DateOnly.FromDateTime(DateTime.UtcNow).DayNumber - LoanStartDate.DayNumber;
         if (daysSinceStart <= 0)
             return 0;
 
@@ -233,16 +236,36 @@ public sealed class BtcLoanDetails : IAssetDetails
     }
 
     /// <summary>
+    /// Calculates simple interest accrued from the snapshot's effective date to today,
+    /// based on the debt principal at the time of the snapshot.
+    /// </summary>
+    private decimal CalculateAccruedInterestForSnapshot(LoanStateSnapshot snapshot)
+    {
+        var daysSinceSnapshot = DateOnly.FromDateTime(DateTime.UtcNow).DayNumber - snapshot.EffectiveDate.DayNumber;
+        if (daysSinceSnapshot <= 0)
+            return 0m;
+
+        var principal = Math.Max(0, snapshot.CurrentTotalDebt - snapshot.Fees);
+        return Math.Round(principal * snapshot.Apr / 365 * daysSinceSnapshot, 2);
+    }
+
+    /// <summary>
     /// Calculates the total debt obligation. For APR-based loans this is
     /// LoanAmount + AccruedInterest + Fees. For fixed-debt loans the predefined
     /// total is returned regardless of elapsed time.
-    /// When a snapshot exists, its <see cref="LoanStateSnapshot.CurrentTotalDebt"/> is used.
+    /// When a snapshot exists, its <see cref="LoanStateSnapshot.CurrentTotalDebt"/> is used
+    /// as the basis and simple interest is added from the snapshot's effective date to today.
     /// </summary>
     public decimal CalculateTotalDebt()
     {
         var snapshot = GetEffectiveSnapshot();
         if (snapshot is not null)
-            return snapshot.CurrentTotalDebt;
+        {
+            if (snapshot.FixedTotalDebt.HasValue)
+                return snapshot.CurrentTotalDebt;
+
+            return Math.Round(snapshot.CurrentTotalDebt + CalculateAccruedInterestForSnapshot(snapshot), 2);
+        }
 
         if (FixedTotalDebt.HasValue)
             return FixedTotalDebt.Value;

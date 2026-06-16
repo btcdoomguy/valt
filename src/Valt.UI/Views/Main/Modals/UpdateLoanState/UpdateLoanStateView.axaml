@@ -42,8 +42,10 @@
                                     <Button Grid.Column="1"
                                             Content="{x:Static lang:language.UpdateLoanState_ViewHistory}"
                                             Command="{Binding OpenHistoryCommand}"
-                                            Classes="transparent link"
-                                            HorizontalAlignment="Right" />
+                                            Classes="link"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            FontSize="{DynamicResource FontSizeSmall}" />
                                 </Grid>
                                 <Grid ColumnDefinitions="*, 32, *"
                                       RowDefinitions="Auto, Auto, Auto, Auto"

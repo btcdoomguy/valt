@@ -48,13 +48,15 @@ public class DeleteLoanStateUpdateHandlerTests : DatabaseTest
     [Test]
     public async Task HandleAsync_AfterDeletingLatestSnapshot_FallsBackToPreviousSnapshot()
     {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var yesterday = today.AddDays(-1);
         var asset = AssetBuilder.ABtcLoan()
-            .WithSnapshot(new DateOnly(2025, 6, 1), 26_000m)
-            .WithSnapshot(new DateOnly(2025, 7, 1), 27_000m)
+            .WithSnapshot(yesterday, 26_000m)
+            .WithSnapshot(today, 27_000m)
             .Build();
         await _assetRepository.SaveAsync(asset);
 
-        var command = ValidCommand(asset.Id.Value, new DateOnly(2025, 7, 1));
+        var command = ValidCommand(asset.Id.Value, today);
         var result = await _handler.HandleAsync(command);
 
         var saved = await _assetRepository.GetByIdAsync(asset.Id);
@@ -64,7 +66,7 @@ public class DeleteLoanStateUpdateHandlerTests : DatabaseTest
         {
             Assert.That(result.IsSuccess, Is.True);
             Assert.That(details.Snapshots, Has.Count.EqualTo(1));
-            Assert.That(details.CalculateTotalDebt(), Is.EqualTo(26_000m));
+            Assert.That(details.CalculateTotalDebt(), Is.EqualTo(26_008.52m));
         });
     }
 

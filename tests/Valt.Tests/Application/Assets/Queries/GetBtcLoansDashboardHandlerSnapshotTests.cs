@@ -45,7 +45,7 @@ public class GetBtcLoansDashboardHandlerSnapshotTests : DatabaseTest
     {
         // Setup: 25k loan, 1 BTC collateral, 12% APR
         // Snapshot: 30k debt, 0.8 BTC collateral, 15% APR
-        var snapshotDate = new DateOnly(2025, 6, 1);
+        var snapshotDate = DateOnly.FromDateTime(DateTime.UtcNow);
         var asset = AssetBuilder.ABtcLoan(
                 loanAmount: 25_000m,
                 collateralSats: 100_000_000L,
@@ -75,21 +75,21 @@ public class GetBtcLoansDashboardHandlerSnapshotTests : DatabaseTest
     [Test]
     public async Task HandleAsync_DeleteLatestSnapshot_FallsBackToPreviousSnapshot()
     {
-        var firstDate = new DateOnly(2025, 6, 1);
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var yesterday = today.AddDays(-1);
         var firstDebt = 30_000m;
-        var secondDate = new DateOnly(2025, 7, 1);
 
         var asset = AssetBuilder.ABtcLoan(
                 loanAmount: 25_000m,
                 collateralSats: 100_000_000L,
                 currentBtcPrice: 50_000m)
             .WithSnapshot(
-                effectiveDate: firstDate,
+                effectiveDate: yesterday,
                 currentTotalDebt: firstDebt,
                 collateralSats: 80_000_000L,
                 apr: 0.15m)
             .WithSnapshot(
-                effectiveDate: secondDate,
+                effectiveDate: today,
                 currentTotalDebt: 35_000m,
                 collateralSats: 70_000_000L,
                 apr: 0.18m)
@@ -100,19 +100,24 @@ public class GetBtcLoansDashboardHandlerSnapshotTests : DatabaseTest
         var deleteResult = await _deleteHandler.HandleAsync(new DeleteLoanStateUpdateCommand
         {
             AssetId = asset.Id.Value,
-            EffectiveDate = secondDate
+            EffectiveDate = today
         });
 
         Assert.That(deleteResult.IsSuccess, Is.True);
 
         var result = await _dashboardHandler.HandleAsync(Query());
 
+        // Previous snapshot recalculates one day of interest:
+        // principal = 30_000 - 100 = 29_900; interest = 29_900 * 0.15 / 365 = 12.29
+        var expectedDebt = 30_012.29m;
+        var expectedLtv = Math.Round(expectedDebt / 40_000m * 100, 2);
+
         Assert.Multiple(() =>
         {
-            Assert.That(result.TotalDebtInMainCurrency, Is.EqualTo(firstDebt));
-            Assert.That(result.DebtWeightedAvgLtv, Is.EqualTo(75m));
+            Assert.That(result.TotalDebtInMainCurrency, Is.EqualTo(expectedDebt));
+            Assert.That(result.DebtWeightedAvgLtv, Is.EqualTo(expectedLtv));
             Assert.That(result.DebtWeightedAvgApr, Is.EqualTo(15m));
-            Assert.That(result.HighestLtv, Is.EqualTo(75m));
+            Assert.That(result.HighestLtv, Is.EqualTo(expectedLtv));
         });
     }
 }
