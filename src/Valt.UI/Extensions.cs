@@ -52,6 +52,7 @@ using Valt.UI.Views.Main.Modals.FixedPriceConfig;
 using Valt.UI.Views.Main.Modals.SpendingEvolution;
 using Valt.UI.Views.Main.Modals.Tips;
 using Valt.UI.Views.Main.Modals.UpdateLoanState;
+using Valt.UI.Views.Main.Modals.LoanStateHistory;
 using Valt.UI.Views.Main.Tabs.Transactions;
 
 namespace Valt.UI;
@@ -144,6 +145,7 @@ public static class Extensions
         services.AddTransient<FixedExpenseOverviewViewModel>();
         services.AddTransient<SpendingEvolutionViewModel>();
         services.AddTransient<UpdateLoanStateViewModel>();
+        services.AddTransient<LoanStateHistoryViewModel>();
 
         //other
         services.AddSingleton<IInitialCategoryNameLanguageProvider, InitialCategoryNameLanguageProvider>();
@@ -285,6 +287,10 @@ public static class Extensions
                 ApplicationModalNames.UpdateLoanState => new UpdateLoanStateView()
                 {
                     DataContext = services.GetRequiredService<UpdateLoanStateViewModel>(),
+                },
+                ApplicationModalNames.LoanStateHistory => new LoanStateHistoryView()
+                {
+                    DataContext = services.GetRequiredService<LoanStateHistoryViewModel>(),
                 },
                 _ => throw new ArgumentOutOfRangeException(nameof(modalNames), modalNames, null)
             };

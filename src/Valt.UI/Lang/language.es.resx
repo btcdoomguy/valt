@@ -2788,6 +2788,33 @@
     <data name="UpdateLoanState_HelpText" xml:space="preserve">
         <value>Los snapshots solo se agregan. Para corregir un estado, elimine el snapshot antiguo y agregue uno nuevo.</value>
     </data>
+    <data name="LoanStateHistory_Title" xml:space="preserve">
+        <value>Historial del Estado del Préstamo</value>
+    </data>
+    <data name="Assets_LoanStateHistory" xml:space="preserve">
+        <value>Historial del Estado del Préstamo</value>
+    </data>
+    <data name="LoanStateHistory_AddNewState" xml:space="preserve">
+        <value>Agregar nuevo estado</value>
+    </data>
+    <data name="LoanStateHistory_DeleteSelected" xml:space="preserve">
+        <value>Eliminar seleccionado</value>
+    </data>
+    <data name="LoanStateHistory_Close" xml:space="preserve">
+        <value>Cerrar</value>
+    </data>
+    <data name="UpdateLoanState_ViewHistory" xml:space="preserve">
+        <value>Ver Historial</value>
+    </data>
+    <data name="LoanStateHistory_DeleteConfirmationTitle" xml:space="preserve">
+        <value>Eliminar Snapshot</value>
+    </data>
+    <data name="LoanStateHistory_DeleteConfirmationMessage" xml:space="preserve">
+        <value>¿Eliminar el snapshot del {0}? Los cálculos volverán al snapshot anterior.</value>
+    </data>
+    <data name="LoanStateHistory_DeleteError" xml:space="preserve">
+        <value>No se pudo eliminar el snapshot: {0}. Intente nuevamente.</value>
+    </data>
     <data name="Validation_EffectiveDateRequired" xml:space="preserve">
         <value>La fecha efectiva es obligatoria</value>
     </data>

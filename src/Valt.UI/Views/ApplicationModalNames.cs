@@ -34,5 +34,6 @@ public enum ApplicationModalNames
     FixedExpenseOverview = 28,
     SpendingEvolution = 35,
     FixedPriceConfig = 36,
-    UpdateLoanState = 37
+    UpdateLoanState = 37,
+    LoanStateHistory = 38
 }

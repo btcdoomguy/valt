@@ -2793,6 +2793,33 @@
     <data name="UpdateLoanState_HelpText" xml:space="preserve">
         <value>Snapshots are append-only. To correct a state, delete the old snapshot and add a new one.</value>
     </data>
+    <data name="LoanStateHistory_Title" xml:space="preserve">
+        <value>Loan State History</value>
+    </data>
+    <data name="Assets_LoanStateHistory" xml:space="preserve">
+        <value>Loan State History</value>
+    </data>
+    <data name="LoanStateHistory_AddNewState" xml:space="preserve">
+        <value>Add new state</value>
+    </data>
+    <data name="LoanStateHistory_DeleteSelected" xml:space="preserve">
+        <value>Delete selected</value>
+    </data>
+    <data name="LoanStateHistory_Close" xml:space="preserve">
+        <value>Close</value>
+    </data>
+    <data name="UpdateLoanState_ViewHistory" xml:space="preserve">
+        <value>View History</value>
+    </data>
+    <data name="LoanStateHistory_DeleteConfirmationTitle" xml:space="preserve">
+        <value>Delete Snapshot</value>
+    </data>
+    <data name="LoanStateHistory_DeleteConfirmationMessage" xml:space="preserve">
+        <value>Delete the snapshot from {0}? Calculations will fall back to the previous snapshot.</value>
+    </data>
+    <data name="LoanStateHistory_DeleteError" xml:space="preserve">
+        <value>Failed to delete the snapshot: {0}. Please try again.</value>
+    </data>
     <data name="Validation_EffectiveDateRequired" xml:space="preserve">
         <value>Effective date is required</value>
     </data>

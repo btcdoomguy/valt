@@ -5469,6 +5469,60 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string LoanStateHistory_Title {
+            get {
+                return ResourceManager.GetString("LoanStateHistory_Title", resourceCulture);
+            }
+        }
+        
+        public static string Assets_LoanStateHistory {
+            get {
+                return ResourceManager.GetString("Assets_LoanStateHistory", resourceCulture);
+            }
+        }
+        
+        public static string LoanStateHistory_AddNewState {
+            get {
+                return ResourceManager.GetString("LoanStateHistory_AddNewState", resourceCulture);
+            }
+        }
+        
+        public static string LoanStateHistory_DeleteSelected {
+            get {
+                return ResourceManager.GetString("LoanStateHistory_DeleteSelected", resourceCulture);
+            }
+        }
+        
+        public static string LoanStateHistory_Close {
+            get {
+                return ResourceManager.GetString("LoanStateHistory_Close", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_ViewHistory {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_ViewHistory", resourceCulture);
+            }
+        }
+        
+        public static string LoanStateHistory_DeleteConfirmationTitle {
+            get {
+                return ResourceManager.GetString("LoanStateHistory_DeleteConfirmationTitle", resourceCulture);
+            }
+        }
+        
+        public static string LoanStateHistory_DeleteConfirmationMessage {
+            get {
+                return ResourceManager.GetString("LoanStateHistory_DeleteConfirmationMessage", resourceCulture);
+            }
+        }
+        
+        public static string LoanStateHistory_DeleteError {
+            get {
+                return ResourceManager.GetString("LoanStateHistory_DeleteError", resourceCulture);
+            }
+        }
+        
         public static string Validation_EffectiveDateRequired {
             get {
                 return ResourceManager.GetString("Validation_EffectiveDateRequired", resourceCulture);
