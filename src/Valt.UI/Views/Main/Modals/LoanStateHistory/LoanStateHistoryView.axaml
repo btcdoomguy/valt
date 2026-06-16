@@ -1,0 +1,81 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:lang="clr-namespace:Valt.UI.Lang"
+        xmlns:loanStateHistory="clr-namespace:Valt.UI.Views.Main.Modals.LoanStateHistory"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Views.Main.Modals.LoanStateHistory.LoanStateHistoryView"
+        Title="{Binding WindowTitle}"
+        x:DataType="loanStateHistory:LoanStateHistoryViewModel"
+        d:DesignWidth="550"
+        d:DesignHeight="650"
+        MinWidth="550"
+        MinHeight="650"
+        MaxWidth="550"
+        MaxHeight="650"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <loanStateHistory:LoanStateHistoryViewModel />
+    </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" />
+    </Window.KeyBindings>
+    <Border>
+        <Grid RowDefinitions="Auto, *, Auto">
+            <userControls:CustomTitleBar Grid.Row="0" Title="{Binding WindowTitle}"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+
+            <Grid Grid.Row="1" RowDefinitions="Auto, *" Margin="10">
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
+                    <Button Content="{x:Static lang:language.LoanStateHistory_AddNewState}"
+                            Command="{Binding AddNewStateCommand}" />
+                    <Button Content="{x:Static lang:language.LoanStateHistory_DeleteSelected}"
+                            Command="{Binding DeleteSelectedCommand}"
+                            Classes="delete-button" />
+                </StackPanel>
+
+                <DataGrid Grid.Row="1"
+                          x:Name="SnapshotsGrid"
+                          GridLinesVisibility="All"
+                          ItemsSource="{Binding Snapshots}"
+                          SelectionMode="Single"
+                          CanUserResizeColumns="True"
+                          IsReadOnly="True"
+                          SelectedItem="{Binding SelectedSnapshot}"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{x:Static lang:language.UpdateLoanState_EffectiveDate}" Width="110"
+                                            Binding="{Binding EffectiveDateFormatted}" />
+                        <DataGridTextColumn Header="{x:Static lang:language.UpdateLoanState_CurrentTotalDebt}" Width="120"
+                                            Binding="{Binding CurrentTotalDebtFormatted}" />
+                        <DataGridTextColumn Header="{x:Static lang:language.ManageAsset_CollateralSats}" Width="130"
+                                            Binding="{Binding CollateralSatsFormatted}" />
+                        <DataGridTextColumn Header="{x:Static lang:language.ManageAsset_APR}" Width="90"
+                                            Binding="{Binding AprFormatted}" />
+                        <DataGridTextColumn Header="{x:Static lang:language.ManageAsset_Fees}" Width="110"
+                                            Binding="{Binding FeesFormatted}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+
+            <Border Grid.Row="2"
+                    Classes="form-fields-area"
+                    VerticalAlignment="Stretch"
+                    Margin="10"
+                    Padding="10">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="{x:Static lang:language.LoanStateHistory_Close}"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding CloseCommand}"
+                            Width="100" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>
