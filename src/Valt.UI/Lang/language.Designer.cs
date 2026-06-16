@@ -5468,5 +5468,47 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("UpdateLoanState_HelpText", resourceCulture);
             }
         }
+        
+        public static string Validation_EffectiveDateRequired {
+            get {
+                return ResourceManager.GetString("Validation_EffectiveDateRequired", resourceCulture);
+            }
+        }
+        
+        public static string Validation_CurrentTotalDebtRequired {
+            get {
+                return ResourceManager.GetString("Validation_CurrentTotalDebtRequired", resourceCulture);
+            }
+        }
+        
+        public static string Validation_CollateralRequired {
+            get {
+                return ResourceManager.GetString("Validation_CollateralRequired", resourceCulture);
+            }
+        }
+        
+        public static string Validation_CollateralGreaterThanZero {
+            get {
+                return ResourceManager.GetString("Validation_CollateralGreaterThanZero", resourceCulture);
+            }
+        }
+        
+        public static string Validation_AprRequired {
+            get {
+                return ResourceManager.GetString("Validation_AprRequired", resourceCulture);
+            }
+        }
+        
+        public static string Validation_AprNonNegative {
+            get {
+                return ResourceManager.GetString("Validation_AprNonNegative", resourceCulture);
+            }
+        }
+        
+        public static string Validation_FeesRequired {
+            get {
+                return ResourceManager.GetString("Validation_FeesRequired", resourceCulture);
+            }
+        }
     }
 }

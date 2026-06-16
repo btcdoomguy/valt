@@ -2788,4 +2788,25 @@
     <data name="UpdateLoanState_HelpText" xml:space="preserve">
         <value>Snapshots são apenas adicionados. Para corrigir um estado, exclua o snapshot antigo e adicione um novo.</value>
     </data>
+    <data name="Validation_EffectiveDateRequired" xml:space="preserve">
+        <value>Data efetiva é obrigatória</value>
+    </data>
+    <data name="Validation_CurrentTotalDebtRequired" xml:space="preserve">
+        <value>Dívida total atual é obrigatória</value>
+    </data>
+    <data name="Validation_CollateralRequired" xml:space="preserve">
+        <value>Garantia é obrigatória</value>
+    </data>
+    <data name="Validation_CollateralGreaterThanZero" xml:space="preserve">
+        <value>Garantia deve ser maior que zero</value>
+    </data>
+    <data name="Validation_AprRequired" xml:space="preserve">
+        <value>Taxa anual é obrigatória</value>
+    </data>
+    <data name="Validation_AprNonNegative" xml:space="preserve">
+        <value>Taxa anual não pode ser negativa</value>
+    </data>
+    <data name="Validation_FeesRequired" xml:space="preserve">
+        <value>Taxas são obrigatórias</value>
+    </data>
 </root>
