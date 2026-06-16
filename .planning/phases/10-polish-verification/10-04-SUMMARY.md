@@ -82,7 +82,7 @@ Each task was committed atomically where file changes were made:
 
 1. **Task 1: Run full build and test suite gates** — verification only, no file changes.
 2. **Task 2: Update Phase 09 verification status and requirement trackers** — `420f379` (docs)
-3. **Task 3: Create phase summary and verify final state** — `eeae5a5` (docs)
+3. **Task 3: Create phase summary and verify final state** — final metadata docs commit (includes SUMMARY.md and STATE.md)
 
 **Pre-existing verification fixes committed:** `f5a825d` (fix) — applied Phase 9 UAT fixes for snapshot recalculation and View History visibility that were present in the working tree and required for the green test gates.
 
@@ -125,7 +125,7 @@ Each task was committed atomically where file changes were made:
 
 - `.planning/` is gitignored, so `09-VERIFICATION.md` and `09-UAT.md` had to be force-added to be committed. This is consistent with how `08-VERIFICATION.md` and `08-UAT.md` are tracked, but it required an explicit `git add -f`.
 - A clean build (`dotnet clean Valt.sln && dotnet build Valt.sln`) surfaces 98 pre-existing CS8602/CS8600 null-dereference warnings in test files. The standard incremental `dotnet build Valt.sln` reports 0 warnings because the projects are up-to-date. These warnings are unrelated to the loan-state feature and existed before Phase 10.
-- Two source-code commits (`4da1bc8` and `be0b8b3`) appeared on the branch during execution from an external process/agent. They fix the `ManageAssetViewModel.AcquisitionDate` type alignment and add regression tests. Build and tests remain green, so they were retained; the final test count reflects these additions (1504 vs. the originally observed 1501).
+- Multiple source-code commits appeared on the branch during execution from an external process/agent (e.g., `4da1bc8`, `be0b8b3`, `734bb2e`). They fix the `ManageAssetViewModel.AcquisitionDate` type alignment and add regression tests. Build and tests remain green, so they were retained; the final test count reflects these additions (1504 vs. the originally observed 1501).
 
 ## User Setup Required
 
@@ -149,7 +149,7 @@ None - no external service configuration required.
 - [x] All four plan SUMMARY files exist in `.planning/phases/10-polish-verification/`.
 - [x] Commit `f5a825d` exists in `git log`.
 - [x] Commit `420f379` exists in `git log`.
-- [x] Commit `eeae5a5` exists in `git log`.
+- [x] Commit `a15f1d7` exists in `git log`.
 
 ---
 *Phase: 10-polish-verification*
