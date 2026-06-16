@@ -16,7 +16,7 @@ Let users record the evolving state of BTC loans over time and use the latest re
 | 7 | Commands & Queries | 4/4 | Complete   | 2026-06-15 |
 | 8 | Update Loan State Screen | 3/3 | Complete    | 2026-06-16 |
 | 9 | Loan State History Screen | 3/3 | Complete    | 2026-06-16 |
-| 10 | Polish & Verification | 4/4 | Complete   | 2026-06-16 |
+| 10 | Polish & Verification | 4/4 | Complete    | 2026-06-16 |
 
 **Total phases:** 5
 **Total v1 requirements mapped:** 26
