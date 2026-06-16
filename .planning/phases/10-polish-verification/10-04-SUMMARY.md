@@ -12,7 +12,7 @@ requires:
 
 provides:
 - Green build gate (`dotnet build Valt.sln`: 0 errors; incremental build reports 0 warnings; clean build reveals 98 pre-existing null-dereference warnings in test files)
-- Green full test suite gate (`dotnet test`: 1501/1501 passed)
+- Green full test suite gate (`dotnet test`: 1504/1504 passed)
 - Green loan-state test gate (`dotnet test --filter "FullyQualifiedName~LoanState"`: 49/49 passed)
 - Updated 09-VERIFICATION.md status from `human_needed` to `complete` with 09-UAT.md cross-reference
 - REQUIREMENTS.md marking LOC-01, MCP-01 (Phase 7/10), and DOC-01 as Complete
@@ -69,7 +69,7 @@ completed: 2026-06-16
 ## Accomplishments
 
 - Ran `dotnet build Valt.sln` successfully with 0 errors (incremental build reports 0 warnings; clean build surfaces 98 pre-existing null-dereference warnings in test files).
-- Ran full `dotnet test` suite successfully with 1501 passed and 0 failed.
+- Ran full `dotnet test` suite successfully with 1504 passed and 0 failed.
 - Ran loan-state focused tests (`dotnet test --filter "FullyQualifiedName~LoanState"`) successfully with 49 passed and 0 failed.
 - Updated `.planning/phases/09-loan-state-history-screen/09-VERIFICATION.md` status to `complete` and added a note that all 7 runtime checks passed per `09-UAT.md`.
 - Updated `.planning/REQUIREMENTS.md` to mark `LOC-01`, `MCP-01` (Phase 7/10), and `DOC-01` as Complete.
@@ -82,7 +82,7 @@ Each task was committed atomically where file changes were made:
 
 1. **Task 1: Run full build and test suite gates** — verification only, no file changes.
 2. **Task 2: Update Phase 09 verification status and requirement trackers** — `420f379` (docs)
-3. **Task 3: Create phase summary and verify final state** — `91c115b` (docs)
+3. **Task 3: Create phase summary and verify final state** — `eeae5a5` (docs)
 
 **Pre-existing verification fixes committed:** `f5a825d` (fix) — applied Phase 9 UAT fixes for snapshot recalculation and View History visibility that were present in the working tree and required for the green test gates.
 
@@ -113,7 +113,7 @@ Each task was committed atomically where file changes were made:
   - `tests/Valt.Tests/Application/Assets/Commands/DeleteLoanStateUpdateHandlerTests.cs`
   - `tests/Valt.Tests/Application/Assets/Queries/GetBtcLoansDashboardHandlerSnapshotTests.cs`
   - `tests/Valt.Tests/Domain/Assets/Details/BtcLoanDetailsTests.cs`
-- **Verification:** `dotnet build Valt.sln` passed with 0 warnings/0 errors; `dotnet test` passed 1501/1501; `dotnet test --filter "FullyQualifiedName~LoanState"` passed 49/49.
+- **Verification:** `dotnet build Valt.sln` passed with 0 errors; `dotnet test` passed 1501/1501 (later 1504/1504 after external regression-test commits); `dotnet test --filter "FullyQualifiedName~LoanState"` passed 49/49. (Clean build surfaces 98 pre-existing null-dereference warnings in test files.)
 - **Committed in:** `f5a825d`
 
 ---
@@ -124,8 +124,8 @@ Each task was committed atomically where file changes were made:
 ## Issues Encountered
 
 - `.planning/` is gitignored, so `09-VERIFICATION.md` and `09-UAT.md` had to be force-added to be committed. This is consistent with how `08-VERIFICATION.md` and `08-UAT.md` are tracked, but it required an explicit `git add -f`.
-- A clean build (`dotnet clean Valt.sln && dotnet build Valt.sln`) surfaces 98 pre-existing CS8602 null-dereference warnings in test files. The standard incremental `dotnet build Valt.sln` reports 0 warnings because the projects are up-to-date. These warnings are unrelated to the loan-state feature and existed before Phase 10.
-- An unrelated uncommitted change in `ManageAssetViewModel.cs` (changing `AcquisitionDate` from `DateTimeOffset?` to `DateTime?`) appeared during execution and introduced 4 build errors. The change was reverted so the build/test gates could pass cleanly.
+- A clean build (`dotnet clean Valt.sln && dotnet build Valt.sln`) surfaces 98 pre-existing CS8602/CS8600 null-dereference warnings in test files. The standard incremental `dotnet build Valt.sln` reports 0 warnings because the projects are up-to-date. These warnings are unrelated to the loan-state feature and existed before Phase 10.
+- Two source-code commits (`4da1bc8` and `be0b8b3`) appeared on the branch during execution from an external process/agent. They fix the `ManageAssetViewModel.AcquisitionDate` type alignment and add regression tests. Build and tests remain green, so they were retained; the final test count reflects these additions (1504 vs. the originally observed 1501).
 
 ## User Setup Required
 
@@ -139,7 +139,7 @@ None - no external service configuration required.
 ## Self-Check: PASSED
 
 - [x] `dotnet build Valt.sln` succeeded with 0 errors (0 warnings on incremental build; 98 pre-existing null-dereference warnings on clean build).
-- [x] `dotnet test` passed with 1501/1501 tests.
+- [x] `dotnet test` passed with 1504/1504 tests.
 - [x] `dotnet test --filter "FullyQualifiedName~LoanState"` passed with 49/49 tests.
 - [x] `09-VERIFICATION.md` frontmatter shows `status: complete`.
 - [x] `09-VERIFICATION.md` references `09-UAT.md` for the 7 runtime checks.
@@ -149,6 +149,7 @@ None - no external service configuration required.
 - [x] All four plan SUMMARY files exist in `.planning/phases/10-polish-verification/`.
 - [x] Commit `f5a825d` exists in `git log`.
 - [x] Commit `420f379` exists in `git log`.
+- [x] Commit `eeae5a5` exists in `git log`.
 
 ---
 *Phase: 10-polish-verification*

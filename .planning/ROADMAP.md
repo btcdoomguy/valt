@@ -184,7 +184,7 @@ Plans:
 
 - [x] 10-04-PLAN.md — Run final build/test gates and update verification trackers
 
-**Success criteria:** All satisfied — build passes with 0 warnings/0 errors, full test suite passes (1501/1501), loan-state tests pass (49/49), verification trackers updated, and `09-VERIFICATION.md` marked complete.
+**Success criteria:** All satisfied — build passes with 0 errors, full test suite passes (1504/1504), loan-state tests pass (49/49), verification trackers updated, and `09-VERIFICATION.md` marked complete. (Note: clean build surfaces 98 pre-existing test-file warnings not related to this milestone.)
 
 ## Dependencies
 
