@@ -40,6 +40,7 @@ using Valt.UI.Views.Main.Modals.ManageAsset;
 using Valt.UI.Views.Main.Modals.ManageAssetGroup;
 using Valt.UI.Views.Main.Modals.ManageAssetGroupsList;
 using Valt.UI.Views.Main.Modals.TransactionEditor;
+using Valt.UI.Views.Main.Modals.UpdateLoanState;
 using Valt.UI.Views.Main.Tabs.Assets.Models;
 using static Valt.UI.Base.TaskExtensions;
 
@@ -282,6 +283,11 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
         });
 
         WeakReferenceMessenger.Default.Register<AddAssetRequested>(this, OnAddAssetRequested);
+
+        WeakReferenceMessenger.Default.Register<LoanStateUpdatedMessage>(this, (recipient, message) =>
+        {
+            LoadAssetsAsync().SafeFireAndForget(logger: _logger, callerName: nameof(LoadAssetsAsync));
+        });
     }
 
     private void OnAddAssetRequested(object recipient, AddAssetRequested message)
@@ -574,6 +580,32 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
     }
 
     [RelayCommand]
+    private async Task UpdateLoanState(AssetViewModel? asset)
+    {
+        if (IsSecureModeEnabled) return;
+        if (asset is null || !asset.IsBtcLoan)
+            return;
+
+        var ownerWindow = GetUserControlOwnerWindow?.Invoke();
+        if (ownerWindow is null)
+            return;
+
+        var modal = (UpdateLoanStateView)await _modalFactory.CreateAsync(
+            ApplicationModalNames.UpdateLoanState,
+            ownerWindow,
+            new UpdateLoanStateViewModel.Request { AssetId = asset.Id });
+
+        var result = await modal.ShowDialogSafeAsync<UpdateLoanStateViewModel.Response?>(ownerWindow);
+
+        if (result?.Ok == true)
+        {
+            await LoadAssetsAsync();
+            WeakReferenceMessenger.Default.Send(new LoanStateUpdatedMessage());
+            NotifyAssetSummaryUpdated();
+        }
+    }
+
+    [RelayCommand]
     private async Task RepayLoan(AssetViewModel? asset)
     {
         if (IsSecureModeEnabled) return;
@@ -853,5 +885,6 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
         if (_assetPriceUpdaterJobInfo != null)
             _assetPriceUpdaterJobInfo.PropertyChanged -= OnAssetPriceUpdaterJobPropertyChanged;
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
+        WeakReferenceMessenger.Default.Unregister<LoanStateUpdatedMessage>(this);
     }
 }
