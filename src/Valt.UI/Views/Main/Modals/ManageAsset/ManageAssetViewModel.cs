@@ -110,7 +110,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
 
     // Acquisition fields (common for basic assets and real estate)
     [ObservableProperty]
-    private DateTimeOffset? _acquisitionDate;
+    private DateTime? _acquisitionDate;
 
     [ObservableProperty]
     private FiatValue _acquisitionPriceFiat = FiatValue.Empty;
@@ -644,7 +644,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                     Quantity = Quantity,
                     CurrentPrice = currentPrice,
                     PriceSource = (int)priceSource,
-                    AcquisitionDate = AcquisitionDate.HasValue ? DateOnly.FromDateTime(AcquisitionDate.Value.DateTime) : null,
+                    AcquisitionDate = AcquisitionDate.HasValue ? DateOnly.FromDateTime(AcquisitionDate.Value) : null,
                     AcquisitionPrice = AcquisitionPriceFiat.Value > 0 ? AcquisitionPriceFiat.Value : null,
                     IncludeInNetWorth = IncludeInNetWorth,
                     Visible = Visible
@@ -667,7 +667,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                     CurrentValue = CurrentValueFiat.Value,
                     Address = string.IsNullOrWhiteSpace(Address) ? null : Address,
                     MonthlyRentalIncome = MonthlyRentalIncomeFiat.Value > 0 ? MonthlyRentalIncomeFiat.Value : null,
-                    AcquisitionDate = AcquisitionDate.HasValue ? DateOnly.FromDateTime(AcquisitionDate.Value.DateTime) : null,
+                    AcquisitionDate = AcquisitionDate.HasValue ? DateOnly.FromDateTime(AcquisitionDate.Value) : null,
                     AcquisitionPrice = AcquisitionPriceFiat.Value > 0 ? AcquisitionPriceFiat.Value : null,
                     IncludeInNetWorth = IncludeInNetWorth,
                     Visible = Visible
@@ -824,7 +824,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                     Quantity = Quantity,
                     CurrentPrice = currentPrice,
                     PriceSource = (int)priceSource,
-                    AcquisitionDate = AcquisitionDate.HasValue ? DateOnly.FromDateTime(AcquisitionDate.Value.DateTime) : null,
+                    AcquisitionDate = AcquisitionDate.HasValue ? DateOnly.FromDateTime(AcquisitionDate.Value) : null,
                     AcquisitionPrice = AcquisitionPriceFiat.Value > 0 ? AcquisitionPriceFiat.Value : null
                 };
                 break;
@@ -836,7 +836,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
                     CurrentValue = CurrentValueFiat.Value,
                     Address = string.IsNullOrWhiteSpace(Address) ? null : Address,
                     MonthlyRentalIncome = MonthlyRentalIncomeFiat.Value > 0 ? MonthlyRentalIncomeFiat.Value : null,
-                    AcquisitionDate = AcquisitionDate.HasValue ? DateOnly.FromDateTime(AcquisitionDate.Value.DateTime) : null,
+                    AcquisitionDate = AcquisitionDate.HasValue ? DateOnly.FromDateTime(AcquisitionDate.Value) : null,
                     AcquisitionPrice = AcquisitionPriceFiat.Value > 0 ? AcquisitionPriceFiat.Value : null
                 };
                 break;
