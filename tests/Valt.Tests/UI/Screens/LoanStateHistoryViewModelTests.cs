@@ -8,6 +8,7 @@ using Valt.App.Modules.Assets.DTOs;
 using Valt.App.Modules.Assets.Queries.GetLoanStateTimeline;
 using Valt.Core.Kernel.Factories;
 using Valt.Infra.Kernel;
+using Valt.UI.Base;
 using Valt.UI.Services;
 using Valt.UI.Views;
 using Valt.UI.Views.Main.Modals.LoanStateHistory;
@@ -18,9 +19,9 @@ namespace Valt.Tests.UI.Screens;
 [TestFixture]
 public class LoanStateHistoryViewModelTests
 {
-    private IQueryDispatcher _queryDispatcher;
-    private ICommandDispatcher _commandDispatcher;
-    private IModalFactory _modalFactory;
+    private IQueryDispatcher _queryDispatcher = null!;
+    private ICommandDispatcher _commandDispatcher = null!;
+    private IModalFactory _modalFactory = null!;
 
     [OneTimeSetUp]
     public void OneTimeSetUp() => IdGenerator.Configure(new LiteDbIdProvider());
@@ -124,6 +125,70 @@ public class LoanStateHistoryViewModelTests
         // dispatch DeleteLoanStateUpdateCommand with the selected snapshot's date.
         await _commandDispatcher.DidNotReceive().DispatchAsync(
             Arg.Any<DeleteLoanStateUpdateCommand>(),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Test]
+    public async Task Should_Open_UpdateLoanState_And_Close_History_When_AddNewState_Clicked()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        var snapshot = CreateSnapshot(new DateOnly(2024, 6, 1));
+
+        _queryDispatcher.DispatchAsync(Arg.Any<GetLoanStateTimelineQuery>(), Arg.Any<CancellationToken>())
+            .Returns(new List<LoanStateSnapshotDTO> { snapshot }.AsReadOnly());
+
+        _modalFactory.CreateAsync(
+                Arg.Is(ApplicationModalNames.UpdateLoanState),
+                Arg.Any<Window?>(),
+                Arg.Any<object>())
+            .Returns(Task.FromResult<ValtBaseWindow>(null!));
+
+        viewModel.Parameter = new LoanStateHistoryViewModel.Request { AssetId = "asset-1" };
+        await viewModel.OnBindParameterAsync();
+        viewModel.GetWindow = () => null!;
+
+        var closeWindowInvoked = false;
+        viewModel.CloseWindow = () => closeWindowInvoked = true;
+
+        // Act
+        try
+        {
+            await viewModel.AddNewStateCommand.ExecuteAsync(null);
+        }
+        catch (NullReferenceException)
+        {
+            // Expected: the substitute factory returns null and ShowDialogSafeAsync
+            // is invoked on a null view reference outside a real Avalonia app.
+        }
+
+        // Assert
+        Assert.That(closeWindowInvoked, Is.True);
+        _ = _modalFactory.Received(1).CreateAsync(
+            Arg.Is(ApplicationModalNames.UpdateLoanState),
+            Arg.Is<Window?>((Window?)null),
+            Arg.Is<UpdateLoanStateViewModel.Request>(r => r!.AssetId == "asset-1"));
+    }
+
+    [Test]
+    public async Task Should_Refresh_Snapshots_After_Reload()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        var snapshot = CreateSnapshot(new DateOnly(2024, 6, 1));
+
+        _queryDispatcher.DispatchAsync(Arg.Any<GetLoanStateTimelineQuery>(), Arg.Any<CancellationToken>())
+            .Returns(new List<LoanStateSnapshotDTO> { snapshot }.AsReadOnly());
+
+        viewModel.Parameter = new LoanStateHistoryViewModel.Request { AssetId = "asset-1" };
+
+        // Act
+        await viewModel.OnBindParameterAsync();
+        await viewModel.OnBindParameterAsync();
+
+        // Assert
+        await _queryDispatcher.Received(2).DispatchAsync(
+            Arg.Is<GetLoanStateTimelineQuery>(q => q.AssetId == "asset-1"),
             Arg.Any<CancellationToken>());
     }
 }
