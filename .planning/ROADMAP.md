@@ -14,7 +14,7 @@ Let users record the evolving state of BTC loans over time and use the latest re
 |---|-------|------|--------------|------------------|
 | 6 | Domain & Persistence Model | Complete | LOAN-01, LOAN-02, LOAN-03, LOAN-04, LOAN-05, TEST-01 | 2026-06-15 |
 | 7 | Commands & Queries | 4/4 | Complete   | 2026-06-15 |
-| 8 | Update Loan State Screen | Complete | Complete | 2026-06-16 |
+| 8 | Update Loan State Screen | Human Verification Needed | Complete | — |
 | 9 | Loan State History Screen | Build the history modal with list, delete, and add-new-state actions | UI-07, UI-08, UI-09, UI-10, UI-11 | 5 |
 | 10 | Polish & Verification | Localize strings, update docs, verify end-to-end flow | LOC-01, MCP-01, DOC-01 | 3 |
 
