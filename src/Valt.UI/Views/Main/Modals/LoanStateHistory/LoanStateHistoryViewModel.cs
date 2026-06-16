@@ -44,7 +44,7 @@ public partial class LoanStateHistoryViewModel : ValtModalViewModel
             EffectiveDate = new DateOnly(2024, 6, 1),
             EffectiveDateFormatted = "6/1/2024",
             CurrentTotalDebtFormatted = "$ 105 000.00",
-            CollateralSatsFormatted = "5 000 000 sats",
+            CollateralSatsFormatted = "5 000 000 " + language.SatsLabel,
             AprFormatted = "12.00%",
             FeesFormatted = "$ 500.00"
         });
@@ -86,7 +86,7 @@ public partial class LoanStateHistoryViewModel : ValtModalViewModel
                 EffectiveDate = s.EffectiveDate,
                 EffectiveDateFormatted = s.EffectiveDate.ToShortDateString(),
                 CurrentTotalDebtFormatted = CurrencyDisplay.FormatFiat(s.CurrentTotalDebt, s.CurrencyCode),
-                CollateralSatsFormatted = $"{s.CollateralSats:N0} sats",
+                CollateralSatsFormatted = $"{s.CollateralSats:N0} {language.SatsLabel}",
                 AprFormatted = $"{s.Apr * 100m:N2}%",
                 FeesFormatted = CurrencyDisplay.FormatFiat(s.Fees, s.CurrencyCode)
             });
@@ -98,10 +98,8 @@ public partial class LoanStateHistoryViewModel : ValtModalViewModel
     [RelayCommand]
     private async Task AddNewState()
     {
-        if (GetWindow is null)
-            return;
-
-        var ownerWindow = GetWindow();
+        var historyWindow = GetWindow?.Invoke();
+        var ownerWindow = (Window?)(historyWindow?.Owner ?? OwnerWindow);
         CloseWindow?.Invoke();
 
         var modal = (UpdateLoanStateView)await _modalFactory.CreateAsync(

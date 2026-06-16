@@ -5523,6 +5523,12 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string SatsLabel {
+            get {
+                return ResourceManager.GetString("SatsLabel", resourceCulture);
+            }
+        }
+        
         public static string Validation_EffectiveDateRequired {
             get {
                 return ResourceManager.GetString("Validation_EffectiveDateRequired", resourceCulture);

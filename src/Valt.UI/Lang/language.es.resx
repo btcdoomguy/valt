@@ -2815,6 +2815,9 @@
     <data name="LoanStateHistory_DeleteError" xml:space="preserve">
         <value>No se pudo eliminar el snapshot: {0}. Intente nuevamente.</value>
     </data>
+    <data name="SatsLabel" xml:space="preserve">
+        <value>sats</value>
+    </data>
     <data name="Validation_EffectiveDateRequired" xml:space="preserve">
         <value>La fecha efectiva es obligatoria</value>
     </data>
