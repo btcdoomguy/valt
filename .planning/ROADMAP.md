@@ -14,7 +14,7 @@ Let users record the evolving state of BTC loans over time and use the latest re
 |---|-------|------|--------------|------------------|
 | 6 | Domain & Persistence Model | Complete | LOAN-01, LOAN-02, LOAN-03, LOAN-04, LOAN-05, TEST-01 | 2026-06-15 |
 | 7 | Commands & Queries | 4/4 | Complete   | 2026-06-15 |
-| 8 | Update Loan State Screen | Build the update modal and context-menu item, prefilled with current totals | UI-01, UI-02, UI-03, UI-04, UI-05, UI-06 | 6 |
+| 8 | Update Loan State Screen | Complete | Complete | 2026-06-16 |
 | 9 | Loan State History Screen | Build the history modal with list, delete, and add-new-state actions | UI-07, UI-08, UI-09, UI-10, UI-11 | 5 |
 | 10 | Polish & Verification | Localize strings, update docs, verify end-to-end flow | LOC-01, MCP-01, DOC-01 | 3 |
 
@@ -123,7 +123,7 @@ Plans:
 
 **Wave 1**
 
-- [ ] 08-01-PLAN.md — Add modal infrastructure, implement prefill/save/wiring, and add ViewModel tests
+- [x] 08-01-PLAN.md — Add modal infrastructure, implement prefill/save/wiring, and add ViewModel tests
 
 ### Phase 9: Loan State History Screen
 
@@ -166,4 +166,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-06-15*
-*Last updated: 2026-06-15 after initial creation*
+*Last updated: 2026-06-16 after completing 08-01*

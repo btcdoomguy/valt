@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v0.3
 milestone_name: milestone
-status: Ready for Phase 07
-last_updated: "2026-06-15T18:13:14.932Z"
-last_activity: 2026-06-15 -- Phase 06 execution completed
+status: executing
+last_updated: "2026-06-16T00:53:38.000Z"
+last_activity: 2026-06-16 -- Completed 08-01 (Update Loan State screen)
 progress:
   total_phases: 5
-  completed_phases: 1
-  total_plans: 6
-  completed_plans: 6
-  percent: 20
+  completed_phases: 3
+  total_plans: 11
+  completed_plans: 11
+  percent: 60
 ---
 
 # STATE.md
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-15)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 07 — Commands & Queries
+**Current focus:** Phase 08 — update-loan-state-screen
 
 ## Current Position
 
-Phase: 06 (Domain & Persistence Model) — COMPLETE
-Plan: 6 of 6 complete
-Status: Ready for Phase 07
-Last activity: 2026-06-15 -- Phase 06 execution completed
+Phase: 09 (loan-state-history-screen) — READY
+Plan: 1 of 1
+Status: Ready to execute Phase 09
+Last activity: 2026-06-16 -- Completed 08-01 (Update Loan State screen)
 
 ## Accumulated Context
 
@@ -41,6 +41,10 @@ Last activity: 2026-06-15 -- Phase 06 execution completed
 - Missing `EffectiveDate` or `LoanStartDate` in persisted snapshots is invalid and must throw
 - Persisted dates are parsed with `CultureInfo.InvariantCulture`
 - Duplicate effective dates in the constructor-supplied snapshot list are invalid
+- `UpdateLoanStateViewModel` falls back to `AssetDTO` setup values when no loan-state snapshot exists
+- `FiatValue` properties on the update modal use `[Required]` only; `[Range]` is omitted because `FiatValue` does not implement `IComparable`
+- English-only localization for new strings in Phase 08; pt-BR/es translations deferred to Phase 10
+- `language.Designer.cs` is maintained manually in this environment because `PublicResXFileCodeGenerator` does not run on Linux builds
 
 ### Blockers
 
@@ -58,3 +62,4 @@ Last activity: 2026-06-15 -- Phase 06 execution completed
 - 06-04 — Domain & serializer test coverage
 - 06-05 — Close serializer & domain validation gaps
 - 06-06 — Correct & extend test coverage
+- 08-01 — Update Loan State screen modal, wiring, and ViewModel tests
