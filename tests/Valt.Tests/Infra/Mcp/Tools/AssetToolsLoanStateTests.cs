@@ -44,15 +44,16 @@ public class AssetToolsLoanStateTests : IntegrationTest
     {
         var asset = AssetBuilder.ABtcLoan().WithSeededSnapshot().Build();
         var loanDetails = (BtcLoanDetails)asset.Details;
-        var seededDebt = loanDetails.CalculateTotalDebt();
+        var seededSnapshotDebt = loanDetails.Snapshots[0].CurrentTotalDebt;
 
         await _assetRepository.SaveAsync(asset);
 
+        var today = DateOnly.FromDateTime(DateTime.UtcNow).ToString("yyyy-MM-dd");
         var addResult = await AssetTools.AddLoanStateUpdate(
             _commandDispatcher,
             _notificationPublisher,
             asset.Id.Value,
-            "2025-06-01",
+            today,
             20_000m,
             100_000_000,
             0.10m,
@@ -72,14 +73,52 @@ public class AssetToolsLoanStateTests : IntegrationTest
             _commandDispatcher,
             _notificationPublisher,
             asset.Id.Value,
-            "2025-06-01");
+            today);
 
         Assert.That(deleteResult, Does.Not.StartWith("Error:"));
 
         latest = await AssetTools.GetLatestLoanState(_queryDispatcher, asset.Id.Value);
         Assert.That(latest, Is.Not.Null);
-        Assert.That(latest!.CurrentTotalDebt, Is.EqualTo(seededDebt));
+        Assert.That(latest!.CurrentTotalDebt, Is.EqualTo(seededSnapshotDebt));
 
         await _notificationPublisher.Received().PublishAsync(Arg.Any<McpDataChangedNotification>());
+    }
+
+    [Test]
+    public async Task LoanStateTools_AddWithInvalidEffectiveDate_ReturnsCleanError()
+    {
+        var asset = AssetBuilder.ABtcLoan().WithSeededSnapshot().Build();
+        await _assetRepository.SaveAsync(asset);
+
+        var result = await AssetTools.AddLoanStateUpdate(
+            _commandDispatcher,
+            _notificationPublisher,
+            asset.Id.Value,
+            "not-a-date",
+            20_000m,
+            100_000_000,
+            0.10m,
+            100m);
+
+        Assert.That(result, Does.StartWith("Error:"));
+        Assert.That(result, Contains.Substring("yyyy-MM-dd"));
+        await _notificationPublisher.DidNotReceive().PublishAsync(Arg.Any<McpDataChangedNotification>());
+    }
+
+    [Test]
+    public async Task LoanStateTools_DeleteWithInvalidEffectiveDate_ReturnsCleanError()
+    {
+        var asset = AssetBuilder.ABtcLoan().WithSeededSnapshot().Build();
+        await _assetRepository.SaveAsync(asset);
+
+        var result = await AssetTools.DeleteLoanStateUpdate(
+            _commandDispatcher,
+            _notificationPublisher,
+            asset.Id.Value,
+            "not-a-date");
+
+        Assert.That(result, Does.StartWith("Error:"));
+        Assert.That(result, Contains.Substring("yyyy-MM-dd"));
+        await _notificationPublisher.DidNotReceive().PublishAsync(Arg.Any<McpDataChangedNotification>());
     }
 }
