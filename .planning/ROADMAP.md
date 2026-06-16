@@ -14,7 +14,7 @@ Let users record the evolving state of BTC loans over time and use the latest re
 |---|-------|------|--------------|------------------|
 | 6 | Domain & Persistence Model | Complete | LOAN-01, LOAN-02, LOAN-03, LOAN-04, LOAN-05, TEST-01 | 2026-06-15 |
 | 7 | Commands & Queries | 4/4 | Complete   | 2026-06-15 |
-| 8 | Update Loan State Screen | Human Verification Needed | Complete | — |
+| 8 | Update Loan State Screen | 3/3 | Complete    | 2026-06-16 |
 | 9 | Loan State History Screen | Build the history modal with list, delete, and add-new-state actions | UI-07, UI-08, UI-09, UI-10, UI-11 | 5 |
 | 10 | Polish & Verification | Localize strings, update docs, verify end-to-end flow | LOC-01, MCP-01, DOC-01 | 3 |
 
@@ -117,7 +117,7 @@ Plans:
 6. Validation rejects invalid dates and numeric values.
 7. Saving refreshes the Assets tab and reflects the new state.
 
-**Plans:** 1/3 plans complete
+**Plans:** 3/3 plans complete
 
 Plans:
 
@@ -127,8 +127,8 @@ Plans:
 
 **Wave 2** *(gap closure from 08-UAT.md)*
 
-- [ ] 08-02-PLAN.md — Localize Update Loan State context menu, modal labels, and validation message keys
-- [ ] 08-03-PLAN.md — Fix Current Loan Context refresh, localized validation messages, and modal layout
+- [x] 08-02-PLAN.md — Localize Update Loan State context menu, modal labels, and validation message keys
+- [x] 08-03-PLAN.md — Fix Current Loan Context refresh, localized validation messages, and modal layout
 
 ### Phase 9: Loan State History Screen
 
@@ -143,6 +143,19 @@ Plans:
 3. Each entry has a delete action with a confirmation prompt.
 4. A button opens the "Update Loan State" screen to add a new snapshot.
 5. After deletion, the Assets tab refreshes and calculations fall back correctly.
+
+**Plans:** 3 plans
+
+Plans:
+
+**Wave 1**
+
+- [ ] 09-01-PLAN.md — Build Loan State History modal, ViewModel, DI registration, and localization
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 09-02-PLAN.md — Wire Assets tab context menu and Update Loan State "View History" link
+- [ ] 09-03-PLAN.md — Add LoanStateHistoryViewModel unit tests
 
 ### Phase 10: Polish & Verification
 
@@ -171,4 +184,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-06-15*
-*Last updated: 2026-06-16 after completing 08-01*
+*Last updated: 2026-06-16 after completing 08-02*

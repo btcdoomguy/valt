@@ -23,12 +23,12 @@
 
 ### Update Loan State Screen (UI)
 
-- [ ] **UI-01**: Assets tab context menu for BTC loans includes an "Update Loan State" item
-- [ ] **UI-02**: The update modal opens prefilled with current calculated totals from the latest snapshot
-- [ ] **UI-03**: The effective date defaults to today and is editable via the existing `CalendarDatePicker` control
-- [ ] **UI-04**: The modal uses the same captions/labels as the existing add-loan screen for matching fields
-- [ ] **UI-05**: Validation prevents saving a snapshot with an empty/invalid effective date and invalid numeric values
-- [ ] **UI-06**: After saving, the Assets tab refreshes and reflects the new loan state
+- [x] **UI-01**: Assets tab context menu for BTC loans includes an "Update Loan State" item
+- [x] **UI-02**: The update modal opens prefilled with current calculated totals from the latest snapshot
+- [x] **UI-03**: The effective date defaults to today and is editable via the existing `CalendarDatePicker` control
+- [x] **UI-04**: The modal uses the same captions/labels as the existing add-loan screen for matching fields
+- [x] **UI-05**: Validation prevents saving a snapshot with an empty/invalid effective date and invalid numeric values
+- [x] **UI-06**: After saving, the Assets tab refreshes and reflects the new loan state
 
 ### Loan State History Screen (UI)
 
@@ -84,12 +84,12 @@
 | QUERY-01 | Phase 7 | Pending |
 | QUERY-02 | Phase 7 | Pending |
 | QUERY-03 | Phase 7 | Pending |
-| UI-01 | Phase 8 | Pending |
-| UI-02 | Phase 8 | Pending |
-| UI-03 | Phase 8 | Pending |
-| UI-04 | Phase 8 | Pending |
-| UI-05 | Phase 8 | Pending |
-| UI-06 | Phase 8 | Pending |
+| UI-01 | Phase 8 | Complete |
+| UI-02 | Phase 8 | Complete |
+| UI-03 | Phase 8 | Complete |
+| UI-04 | Phase 8 | Complete |
+| UI-05 | Phase 8 | Complete |
+| UI-06 | Phase 8 | Complete |
 | UI-07 | Phase 9 | Pending |
 | UI-08 | Phase 9 | Pending |
 | UI-09 | Phase 9 | Pending |
@@ -102,10 +102,11 @@
 | TEST-02 | Phase 7 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 24 total
 - Mapped to phases: 24
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-15*
-*Last updated: 2026-06-15 after initial definition*
+*Last updated: 2026-06-16 after completing 08-02*
