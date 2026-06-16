@@ -626,10 +626,20 @@ public class AssetTools
         [Description("Fees paid")] decimal fees,
         [Description("Optional note")] string? note = null)
     {
+        DateOnly parsedEffectiveDate;
+        try
+        {
+            parsedEffectiveDate = DateOnly.ParseExact(effectiveDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        }
+        catch (FormatException)
+        {
+            return "Error: Effective date must be in yyyy-MM-dd format";
+        }
+
         var result = await commandDispatcher.DispatchAsync(new AddLoanStateUpdateCommand
         {
             AssetId = assetId,
-            EffectiveDate = DateOnly.ParseExact(effectiveDate, "yyyy-MM-dd", CultureInfo.InvariantCulture),
+            EffectiveDate = parsedEffectiveDate,
             CurrentTotalDebt = currentTotalDebt,
             CollateralSats = collateralSats,
             Apr = apr,
@@ -656,10 +666,20 @@ public class AssetTools
         [Description("The asset ID")] string assetId,
         [Description("Effective date (yyyy-MM-dd)")] string effectiveDate)
     {
+        DateOnly parsedEffectiveDate;
+        try
+        {
+            parsedEffectiveDate = DateOnly.ParseExact(effectiveDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        }
+        catch (FormatException)
+        {
+            return "Error: Effective date must be in yyyy-MM-dd format";
+        }
+
         var result = await commandDispatcher.DispatchAsync(new DeleteLoanStateUpdateCommand
         {
             AssetId = assetId,
-            EffectiveDate = DateOnly.ParseExact(effectiveDate, "yyyy-MM-dd", CultureInfo.InvariantCulture)
+            EffectiveDate = parsedEffectiveDate
         });
 
         if (result.IsFailure)
