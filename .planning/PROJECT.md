@@ -18,18 +18,23 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - ✓ BTC-backed loans with collateral, APR, LTV, and liquidation tracking — Phase 1-3
 - ✓ Reports dashboard with wealth, leverage, and BTC loan summaries — Phase 1-3
 - ✓ Custom BTC price simulation for reports — Phase 4-5
+- ✓ Allow users to record BTC loan state changes over time (fee %, current debt, collateral, amount taken, effective date) — Phase 7-9
+- ✓ Use the latest recorded loan state as the basis for current-value calculations, falling back to previous entries when the latest is deleted — Phase 6-7
+- ✓ Provide an "Update Loan State" screen prefilled with current calculated totals, accessible from the Assets tab context menu — Phase 8
+- ✓ Provide a loan state history screen listing all recorded changes with delete and add-new-state actions — Phase 9
+- ✓ Auto-seed existing loans with an initial state entry derived from their setup values — Phase 6
+- ✓ Localize all new user-facing strings across `language.resx`, `language.pt-BR.resx`, and `language.es.resx` — Phase 10
+- ✓ Expose new loan-state commands/queries through MCP `AssetTools` — Phase 10
+- ✓ Update `.claude/docs/assets.md` with loan state timeline behavior — Phase 10
+- ✓ Complete end-to-end verification of add, update, delete, and fallback flows — Phase 10
 
 ### Active
 
-- [ ] Allow users to record BTC loan state changes over time (fee %, current debt, collateral, amount taken, effective date)
-- [ ] Use the latest recorded loan state as the basis for current-value calculations, falling back to previous entries when the latest is deleted
-- [ ] Provide an "Update Loan State" screen prefilled with current calculated totals, accessible from the Assets tab context menu
-- [ ] Provide a loan state history screen listing all recorded changes with delete and add-new-state actions
-- [ ] Auto-seed existing loans with an initial state entry derived from their current setup values
+(None — all v0.3 milestone requirements validated.)
 
 ### Out of Scope
 
-- Interest compounding or daily accrual between recorded states — only the latest snapshot is used for calculations
+- Interest compounding between recorded states — simple daily accrual is applied from the effective snapshot's date to today
 - Editing initial loan setup values from the new state screens — initial values remain immutable
 - Supporting non-BTC loans in the state timeline — scope is BTC-backed loans only
 - Exporting loan state history — can be added later if needed
@@ -54,10 +59,10 @@ Users now need a timeline of loan state snapshots because real-world loans chang
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Latest snapshot wins for calculations | Matches user expectation that manually recorded current state overrides initial setup | — Pending |
-| Immutable initial loan setup values | Prevents accidental edits that would corrupt historical calculations | — Pending |
-| Auto-seed existing loans on load/migration | Avoids a one-shot migration script and keeps every loan queryable through the same timeline model | — Pending |
-| Store history inside `BtcLoanDetails` JSON | Reuses existing `AssetDetailsSerializer` mechanism; avoids new collection complexity | — Pending |
+| Latest snapshot wins for calculations | Matches user expectation that manually recorded current state overrides initial setup | Implemented in `BtcLoanDetails` calculations; `AssetQueries` selects `MaxBy(s => s.EffectiveDate)` — Phase 6-7 |
+| Immutable initial loan setup values | Prevents accidental edits that would corrupt historical calculations | Initial setup fields remain unchanged; state snapshots are appended separately — Phase 6 |
+| Auto-seed existing loans on load/migration | Avoids a one-shot migration script and keeps every loan queryable through the same timeline model | `AssetDetailsSerializer` seeds a snapshot from setup values when deserializing legacy loans — Phase 6 |
+| Store history inside `BtcLoanDetails` JSON | Reuses existing `AssetDetailsSerializer` mechanism; avoids new collection complexity | Snapshots persisted as JSON array inside `BtcLoanDetailsDto` — Phase 6 |
 
 ## Evolution
 
@@ -89,4 +94,4 @@ This document evolves at phase transitions and milestone boundaries.
 - MCP tool exposure and localization updates
 
 ---
-*Last updated: 2026-06-15 after milestone v0.3 started*
+*Last updated: 2026-06-16 after Phase 10*

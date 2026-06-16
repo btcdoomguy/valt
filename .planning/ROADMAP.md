@@ -15,8 +15,8 @@ Let users record the evolving state of BTC loans over time and use the latest re
 | 6 | Domain & Persistence Model | Complete | LOAN-01, LOAN-02, LOAN-03, LOAN-04, LOAN-05, TEST-01 | 2026-06-15 |
 | 7 | Commands & Queries | 4/4 | Complete   | 2026-06-15 |
 | 8 | Update Loan State Screen | 3/3 | Complete    | 2026-06-16 |
-| 9 | Loan State History Screen | Build the history modal with list, delete, and add-new-state actions | UI-07, UI-08, UI-09, UI-10, UI-11 | 5 |
-| 10 | Polish & Verification | Localize strings, update docs, verify end-to-end flow | LOC-01, MCP-01, DOC-01 | 3 |
+| 9 | Loan State History Screen | 3/3 | Complete    | 2026-06-16 |
+| 10 | Polish & Verification | 4/4 | Complete   | 2026-06-16 |
 
 **Total phases:** 5
 **Total v1 requirements mapped:** 26
@@ -144,18 +144,18 @@ Plans:
 4. A button opens the "Update Loan State" screen to add a new snapshot.
 5. After deletion, the Assets tab refreshes and calculations fall back correctly.
 
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 
 Plans:
 
 **Wave 1**
 
-- [ ] 09-01-PLAN.md — Build Loan State History modal, ViewModel, DI registration, and localization
+- [x] 09-01-PLAN.md — Build Loan State History modal, ViewModel, DI registration, and localization
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 09-02-PLAN.md — Wire Assets tab context menu and Update Loan State "View History" link
-- [ ] 09-03-PLAN.md — Add LoanStateHistoryViewModel unit tests
+- [x] 09-02-PLAN.md — Wire Assets tab context menu and Update Loan State "View History" link
+- [x] 09-03-PLAN.md — Add LoanStateHistoryViewModel unit tests
 
 ### Phase 10: Polish & Verification
 
@@ -170,6 +170,22 @@ Plans:
 3. Full manual/integration verification passes for add, update, delete, and fallback flows.
 4. Build passes (`dotnet build Valt.sln`) and relevant tests pass (`dotnet test`).
 
+**Plans:** 4/4 plans complete
+
+Plans:
+
+**Wave 1**
+
+- [x] 10-01-PLAN.md — Audit and complete localization for Update Loan State and Loan State History screens
+- [x] 10-02-PLAN.md — Verify loan-state MCP tools and service forwarding
+- [x] 10-03-PLAN.md — Update `.claude/docs/assets.md` with BTC-backed loans and loan-state documentation
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [x] 10-04-PLAN.md — Run final build/test gates and update verification trackers
+
+**Success criteria:** All satisfied — build passes with 0 warnings/0 errors, full test suite passes (1501/1501), loan-state tests pass (49/49), verification trackers updated, and `09-VERIFICATION.md` marked complete.
+
 ## Dependencies
 
 - Phase 6 must complete before Phase 7.
@@ -183,5 +199,4 @@ Plans:
 - No `.planning/phases/` directories are created by this roadmap; they are generated when each phase is planned via `/gsd-plan-phase [N]`.
 
 ---
-*Roadmap created: 2026-06-15*
-*Last updated: 2026-06-16 after completing 08-02*
+*Last updated: 2026-06-16 after completing Phase 10*
