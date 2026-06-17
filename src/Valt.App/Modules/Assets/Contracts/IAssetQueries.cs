@@ -23,6 +23,16 @@ public interface IAssetQueries
     Task<AssetDTO?> GetByIdAsync(string id);
 
     /// <summary>
+    /// Gets the full chronological snapshot timeline for a BTC-backed loan.
+    /// </summary>
+    Task<IReadOnlyList<LoanStateSnapshotDTO>> GetLoanStateTimelineAsync(string assetId);
+
+    /// <summary>
+    /// Gets the latest recorded state of a BTC-backed loan, including asset metadata.
+    /// </summary>
+    Task<LoanStateDTO?> GetLatestLoanStateAsync(string assetId);
+
+    /// <summary>
     /// Gets asset summary with totals for net worth calculation.
     /// </summary>
     /// <param name="mainCurrencyCode">The main currency to convert totals to.</param>

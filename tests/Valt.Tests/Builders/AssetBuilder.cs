@@ -219,6 +219,74 @@ public class AssetBuilder
         return this;
     }
 
+    public AssetBuilder WithSnapshot(
+        DateOnly effectiveDate,
+        decimal currentTotalDebt,
+        long? collateralSats = null,
+        decimal? loanAmount = null,
+        decimal? apr = null,
+        decimal? liquidationLtv = null,
+        decimal? marginCallLtv = null,
+        decimal? fees = null,
+        DateOnly? repaymentDate = null,
+        LoanStatus? status = null,
+        decimal? currentBtcPrice = null,
+        string? note = null)
+    {
+        if (_details is not BtcLoanDetails loan)
+            throw new InvalidOperationException("WithSnapshot requires BTC loan details");
+
+        var snapshot = new LoanStateSnapshot(
+            effectiveDate: effectiveDate,
+            currentTotalDebt: currentTotalDebt,
+            platformName: loan.PlatformName,
+            collateralSats: collateralSats ?? loan.CollateralSats,
+            loanAmount: loanAmount ?? loan.LoanAmount,
+            currencyCode: loan.CurrencyCode,
+            apr: apr ?? loan.Apr,
+            initialLtv: loan.InitialLtv,
+            liquidationLtv: liquidationLtv ?? loan.LiquidationLtv,
+            marginCallLtv: marginCallLtv ?? loan.MarginCallLtv,
+            fees: fees ?? loan.Fees,
+            loanStartDate: loan.LoanStartDate,
+            repaymentDate: repaymentDate ?? loan.RepaymentDate,
+            status: status ?? loan.Status,
+            currentBtcPriceInLoanCurrency: currentBtcPrice ?? loan.CurrentBtcPriceInLoanCurrency,
+            fixedTotalDebt: loan.FixedTotalDebt,
+            note: note);
+
+        _details = loan.WithAddedSnapshot(snapshot);
+        return this;
+    }
+
+    public AssetBuilder WithSeededSnapshot()
+    {
+        if (_details is not BtcLoanDetails loan)
+            throw new InvalidOperationException("WithSeededSnapshot requires BTC loan details");
+
+        var snapshot = new LoanStateSnapshot(
+            effectiveDate: loan.LoanStartDate,
+            currentTotalDebt: loan.CalculateTotalDebt(),
+            platformName: loan.PlatformName,
+            collateralSats: loan.CollateralSats,
+            loanAmount: loan.LoanAmount,
+            currencyCode: loan.CurrencyCode,
+            apr: loan.Apr,
+            initialLtv: loan.InitialLtv,
+            liquidationLtv: loan.LiquidationLtv,
+            marginCallLtv: loan.MarginCallLtv,
+            fees: loan.Fees,
+            loanStartDate: loan.LoanStartDate,
+            repaymentDate: loan.RepaymentDate,
+            status: loan.Status,
+            currentBtcPriceInLoanCurrency: loan.CurrentBtcPriceInLoanCurrency,
+            fixedTotalDebt: loan.FixedTotalDebt,
+            note: null);
+
+        _details = loan.WithAddedSnapshot(snapshot);
+        return this;
+    }
+
     public static AssetBuilder ABtcLoan(
         string platformName = "HodlHodl",
         long collateralSats = 100_000_000,

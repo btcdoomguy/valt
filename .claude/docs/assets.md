@@ -1,6 +1,6 @@
 # Assets Module
 
-Tracks external investments (stocks, ETFs, crypto, real estate, leveraged positions) separately from budget accounts, with automatic value calculations and multi-currency support.
+Tracks external investments (stocks, ETFs, crypto, real estate, leveraged positions, BTC-backed loans) separately from budget accounts, with automatic value calculations and multi-currency support.
 
 ## Domain Layer (Valt.Core/Modules/Assets/)
 
@@ -43,6 +43,7 @@ Aggregate root for managing external investments.
 | 4 | Commodity | BasicAssetDetails |
 | 5 | LeveragedPosition | LeveragedPositionDetails |
 | 6 | Custom | BasicAssetDetails |
+| 7 | BtcLoan | BtcLoanDetails |
 
 ### Asset Details (IAssetDetails implementations)
 
@@ -123,6 +124,82 @@ Short: Collateral * (1 - leveragedChange)
 
 **Builder Methods:** `WithCollateral()`, `WithUpdatedPrice()`
 
+#### BtcLoanDetails
+
+**File:** `Details/BtcLoanDetails.cs`
+
+For BTC-collateralized loans (borrowing fiat against BTC collateral).
+
+**Properties:**
+- `PlatformName: string` - Lending platform name (e.g., "HodlHodl", "Ledn")
+- `CollateralSats: long` - BTC collateral amount in satoshis
+- `LoanAmount: decimal` - Borrowed fiat amount
+- `CurrencyCode: string` - Currency code for the loan (e.g., "USD", "BRL")
+- `Apr: decimal` - Annual percentage rate (e.g., 0.12 for 12%)
+- `InitialLtv: decimal` - LTV ratio at loan origination
+- `LiquidationLtv: decimal` - LTV ratio that triggers liquidation
+- `MarginCallLtv: decimal` - LTV ratio that triggers a margin call warning
+- `Fees: decimal` - Fees paid for the loan
+- `LoanStartDate: DateOnly` - When the loan started
+- `RepaymentDate: DateOnly?` - When the loan is due (null = open-ended)
+- `Status: LoanStatus` - Current loan status (`Active` or `Repaid`)
+- `CurrentBtcPriceInLoanCurrency: decimal` - BTC price in the loan currency, used for LTV calculations
+- `FixedTotalDebt: decimal?` - Optional predefined total debt (e.g., HodlHodl-style fixed repayment)
+- `Snapshots: IReadOnlyList<LoanStateSnapshot>` - Ordered timeline of loan-state snapshots
+- `HasFixedTotalDebt: bool` - True when `FixedTotalDebt` is set
+
+**Value Calculation:**
+- `CalculateCurrentValue(btcPrice)` returns `-CalculateTotalDebt()`; the loan is represented as a pure liability because the BTC collateral is tracked separately in a BTC account.
+- `CalculateTotalDebt()` uses the latest `LoanStateSnapshot` when available. For APR-based snapshots it adds simple interest accrued from the snapshot's effective date to today. For fixed-debt snapshots it returns the recorded `CurrentTotalDebt`. When no snapshot exists, it falls back to the immutable setup values (`LoanAmount`, `Fees`, `Apr`, `LoanStartDate`, `FixedTotalDebt`).
+- `CalculateCurrentLtv(btcPrice)` computes `LoanAmount / CollateralValue * 100` using the latest snapshot's `CollateralSats` and `LoanAmount` when available, falling back to setup values.
+- `CalculateHealthStatus(btcPrice)` returns `Healthy`, `Warning`, or `Danger` based on current LTV versus the latest snapshot's or setup's margin-call and liquidation thresholds.
+- `CalculateDistanceToLiquidation(btcPrice)` returns the percentage-point distance to the liquidation LTV.
+- `CalculateAccruedInterest()` returns accrued interest from the effective snapshot's effective date to today. For fixed-debt snapshots (or fixed-debt setup with no snapshots) it returns the fixed-amount delta or 0.
+- `CalculateDaysUntilRepayment()` returns the number of days until `RepaymentDate`, or `null` if unset.
+
+**Snapshot Mutations:**
+- `WithAddedSnapshot(snapshot)` returns a new `BtcLoanDetails` with the snapshot appended. Throws if a snapshot for the same `EffectiveDate` already exists.
+- `WithoutSnapshot(effectiveDate)` returns a new `BtcLoanDetails` without the matching snapshot.
+
+**Other Methods:**
+- `WithUpdatedPrice(newPrice)` returns a copy with `CurrentBtcPriceInLoanCurrency` updated.
+- `WithStatus(newStatus)` returns a copy with `Status` updated.
+- `DeriveAprFromFixedDebt(...)` computes an annualized APR from a fixed total debt and loan period.
+
+**Latest-Snapshot Rule:**
+`GetEffectiveSnapshot()` selects the snapshot with the maximum `EffectiveDate`. All current-state calculations use the latest snapshot's values as the source of truth. When the latest snapshot is deleted, the next-latest snapshot becomes effective; when no snapshots exist, the immutable initial setup values are used.
+
+**Auto-Seeding:**
+Existing loans that were created before the loan-state timeline feature may not have snapshots. The infrastructure serializer seeds an initial snapshot from the loan's setup values (`LoanStartDate` as the effective date, current calculated total debt, setup collateral, APR, fees, etc.) so every loan is queryable through the same timeline model.
+
+#### LoanStateSnapshot
+
+**File:** `Details/LoanStateSnapshot.cs`
+
+A point-in-time snapshot of a BTC-backed loan's state.
+
+**Properties:**
+- `PlatformName: string` - Lending platform name
+- `CollateralSats: long` - BTC collateral amount in satoshis
+- `LoanAmount: decimal` - Borrowed fiat amount
+- `CurrencyCode: string` - Currency code
+- `Apr: decimal` - Annual percentage rate at the time of the snapshot
+- `InitialLtv: decimal` - LTV ratio at loan origination
+- `LiquidationLtv: decimal` - Liquidation LTV at the time of the snapshot
+- `MarginCallLtv: decimal` - Margin-call LTV at the time of the snapshot
+- `Fees: decimal` - Fees recorded in the snapshot
+- `LoanStartDate: DateOnly` - Loan start date
+- `RepaymentDate: DateOnly?` - Repayment date
+- `Status: LoanStatus` - Loan status at the time of the snapshot
+- `CurrentBtcPriceInLoanCurrency: decimal` - BTC price used for LTV calculations
+- `FixedTotalDebt: decimal?` - Optional predefined total debt
+- `CurrentTotalDebt: decimal` - Total debt recorded at the time of the snapshot
+- `EffectiveDate: DateOnly` - Effective date of the snapshot. Only one snapshot is allowed per effective date on a loan.
+- `Note: string?` - Optional note describing the snapshot
+
+**Append-Only Semantics:**
+Snapshots are immutable value objects. New state is recorded by adding a new snapshot with a later `EffectiveDate`. Deleting a snapshot removes it permanently; calculations automatically fall back to the previous snapshot or to the initial setup values.
+
 ### Price Sources
 
 **Enum:** `AssetPriceSource.cs`
@@ -142,6 +219,83 @@ Short: Collateral * (1 - leveragedChange)
 - `AssetDeletedEvent` - Emitted when asset is deleted
 - `AssetPriceUpdatedEvent` - Emitted when price changes (includes old and new price)
 
+## Application Layer (Valt.App/Modules/Assets/)
+
+### Loan-State Commands
+
+**AddLoanStateUpdateCommand** — `Commands/AddLoanStateUpdate/`
+
+Adds a new state snapshot to a BTC-backed loan.
+
+```csharp
+public record AddLoanStateUpdateCommand : ICommand
+{
+    public required string AssetId { get; init; }
+    public required DateOnly EffectiveDate { get; init; }
+    public required decimal CurrentTotalDebt { get; init; }
+    public required long CollateralSats { get; init; }
+    public required decimal Apr { get; init; }
+    public required decimal Fees { get; init; }
+    public required string? Note { get; init; }
+}
+```
+
+Validation rules:
+- `AssetId` is required.
+- `EffectiveDate` is required and must be after the latest existing snapshot (or after `LoanStartDate` when no snapshots exist).
+- `CurrentTotalDebt` cannot be negative.
+- `CollateralSats` must be greater than zero.
+- `Apr` cannot be negative.
+- `Fees` cannot be negative.
+
+The handler copies immutable setup fields (`PlatformName`, `LoanAmount`, `InitialLtv`, `LiquidationLtv`, `MarginCallLtv`, `LoanStartDate`, `RepaymentDate`, `Status`, `CurrentBtcPriceInLoanCurrency`, `FixedTotalDebt`) from the loan or the latest snapshot, then creates a new `LoanStateSnapshot` with the supplied variable fields.
+
+**DeleteLoanStateUpdateCommand** — `Commands/DeleteLoanStateUpdate/`
+
+Deletes a state snapshot from a BTC-backed loan by its effective date.
+
+```csharp
+public record DeleteLoanStateUpdateCommand : ICommand
+{
+    public required string AssetId { get; init; }
+    public required DateOnly EffectiveDate { get; init; }
+}
+```
+
+Validation rules:
+- `AssetId` is required.
+- `EffectiveDate` is required.
+
+The handler removes the matching snapshot; calculations automatically fall back to the previous snapshot or to the immutable setup values.
+
+### Loan-State Queries
+
+**GetLoanStateTimelineQuery** — `Queries/GetLoanStateTimeline/`
+
+Returns the full chronological snapshot timeline of a BTC-backed loan.
+
+```csharp
+public record GetLoanStateTimelineQuery : IQuery<IReadOnlyList<LoanStateSnapshotDTO>>
+{
+    public required string AssetId { get; init; }
+}
+```
+
+Returns `IReadOnlyList<LoanStateSnapshotDTO>` where each DTO contains the same fields as `LoanStateSnapshot`, with `StatusId` in place of the enum.
+
+**GetLatestLoanStateQuery** — `Queries/GetLatestLoanState/`
+
+Returns the latest recorded state of a BTC-backed loan, including asset metadata.
+
+```csharp
+public record GetLatestLoanStateQuery : IQuery<LoanStateDTO?>
+{
+    public required string AssetId { get; init; }
+}
+```
+
+Returns `LoanStateDTO?` with `AssetId`, `AssetName`, and all snapshot fields. Returns `null` when the asset is not found.
+
 ## Infrastructure Layer (Valt.Infra/Modules/Assets/)
 
 ### Database Entity
@@ -157,7 +311,7 @@ LiteDB storage with JSON-serialized details:
 
 **File:** `AssetDetailsSerializer.cs`
 
-Handles polymorphic JSON serialization of `IAssetDetails` implementations using type discriminators.
+Handles polymorphic JSON serialization of `IAssetDetails` implementations using type discriminators. For legacy `BtcLoanDetails` loans without snapshots, the serializer seeds an initial `LoanStateSnapshot` from the loan's setup values so the timeline model is always populated.
 
 ### Repository
 
@@ -179,10 +333,14 @@ public interface IAssetQueries
     Task<IReadOnlyList<AssetDTO>> GetAllAsync();
     Task<IReadOnlyList<AssetDTO>> GetVisibleAsync();
     Task<AssetDTO?> GetByIdAsync(string id);
+    Task<IReadOnlyList<LoanStateSnapshotDTO>> GetLoanStateTimelineAsync(string assetId);
+    Task<LoanStateDTO?> GetLatestLoanStateAsync(string assetId);
     Task<AssetSummaryDTO> GetSummaryAsync(
         string mainCurrencyCode,
         decimal? btcPriceUsd = null,
-        IReadOnlyDictionary<string, decimal>? fiatRates = null);
+        IReadOnlyDictionary<string, decimal>? fiatRates = null,
+        decimal? customBtcPriceUsd = null);
+    Task<IReadOnlyList<AssetGroupDTO>> GetAssetGroupsAsync();
 }
 ```
 
@@ -198,6 +356,8 @@ Flattened DTO with all possible asset fields:
 | Icon, IncludeInNetWorth, Visible | | | LiquidationPrice, IsLong |
 | LastPriceUpdateAt, CreatedAt, DisplayOrder | | | PnL, PnLPercentage |
 | CurrentPrice, CurrentValue, CurrencyCode | | | DistanceToLiquidation, IsAtRisk |
+
+**BTC loan specific fields:** `PlatformName`, `CollateralSats`, `LoanAmount`, `Apr`, `CurrentLtv`, `InitialLtv`, `LiquidationLtv`, `MarginCallLtv`, `Fees`, `LoanStartDate`, `RepaymentDate`, `LoanStatusId`, `LoanStatusName`, `LoanHealthStatusId`, `LoanHealthStatusName`, `AccruedInterest`, `TotalDebt`, `DistanceToLiquidationLtv`, `DaysUntilRepayment`, `FixedTotalDebt`, `HasFixedTotalDebt`.
 
 **File:** `Queries/DTOs/AssetSummaryDTO.cs`
 
@@ -288,6 +448,25 @@ Modal for creating/editing assets.
 - RealEstate: `Address`, `CurrentValue`, `MonthlyRentalIncome`
 - Leveraged: `Symbol`, `Collateral`, `EntryPrice`, `CurrentPrice`, `Leverage`, `LiquidationPrice`, `IsLong`, `SelectedPriceSource`
 
+### Loan-State Modals
+
+**UpdateLoanStateView** — `Views/Main/Modals/UpdateLoanState/UpdateLoanStateView.axaml`
+
+- Dimensions: 550×650 (`MinWidth="550" MinHeight="650" MaxWidth="550" MaxHeight="650"`).
+- Header: custom title bar with the loan name.
+- Current Loan Context section: platform name, loan amount, initial LTV, margin-call LTV, liquidation LTV, loan start date, repayment date. Includes a "View History" link that opens the history modal.
+- New State section: effective date (`CalendarDatePicker`, defaulting to today), current total debt (`FiatInput`), collateral sats (`TextBox`), APR percentage (`TextBox`), fees (`FiatInput`), and an optional note (`TextBox`).
+- Actions: `Save Snapshot` (OK) and `Discard Changes` (Cancel).
+- The modal is prefilled from the latest snapshot when one exists; otherwise it falls back to the asset's setup values.
+
+**LoanStateHistoryView** — `Views/Main/Modals/LoanStateHistory/LoanStateHistoryView.axaml`
+
+- Dimensions: 550×650.
+- Header: custom title bar with the loan name.
+- Toolbar: `Add New State` button and `Delete Selected` button (delete guard prevents deleting without a selection).
+- DataGrid columns: Effective Date, Current Total Debt, Collateral (sats), APR, Fees.
+- Actions: `Close`. Double-click / Add New State navigation opens `UpdateLoanStateView` to append a new snapshot.
+
 ### AssetsView Grid
 
 **File:** `Views/Main/Tabs/Assets/AssetsView.axaml`
@@ -329,11 +508,24 @@ DataGrid columns:
 | `CreateBasicAsset` | Create stock/ETF/crypto/commodity/custom |
 | `CreateRealEstateAsset` | Create real estate asset |
 | `CreateLeveragedPosition` | Create leveraged trading position |
+| `CreateBtcLoan` | Create a BTC-collateralized loan |
+| `CreateBtcLending` | Create a BTC/fiat lending position |
+| `RepayLoan` | Mark a BTC loan or lending position as repaid |
 | `UpdateAssetPrice` | Update current price |
 | `UpdateAssetQuantity` | Update quantity (basic assets only) |
 | `ToggleAssetVisibility` | Toggle visibility flag |
 | `ToggleAssetNetWorthInclusion` | Toggle net worth inclusion |
 | `DeleteAsset` | Delete an asset |
+| `GetAssetGroups` | Get all asset groups |
+| `CreateAssetGroup` | Create an asset group |
+| `UpdateAssetGroup` | Update an asset group name and description |
+| `DeleteAssetGroup` | Delete an asset group |
+| `MoveAssetToGroup` | Move an asset to a group |
+| `RemoveAssetFromGroup` | Remove an asset from its group |
+| `AddLoanStateUpdate` | Add a new state snapshot to a BTC-backed loan |
+| `DeleteLoanStateUpdate` | Delete a state snapshot from a BTC-backed loan by effective date |
+| `GetLoanStateTimeline` | Get the full chronological snapshot timeline of a BTC-backed loan |
+| `GetLatestLoanState` | Get the latest recorded state of a BTC-backed loan |
 
 ## Key Patterns
 
@@ -356,6 +548,11 @@ DataGrid columns:
 - Value Color: White for positive, Red for negative
 - At Risk indicator for leveraged positions within 10% of liquidation
 
+### Loan-State Timeline
+- Latest snapshot (by `EffectiveDate`) wins for all current-value calculations
+- Snapshots are append-only; deleting a snapshot falls back to the previous snapshot or initial setup values
+- Existing loans are auto-seeded with a snapshot derived from their immutable setup values
+
 ## File Structure
 
 ```
@@ -363,11 +560,14 @@ src/Valt.Core/Modules/Assets/
 ├── Asset.cs (Aggregate Root)
 ├── AssetId.cs, AssetName.cs
 ├── AssetTypes.cs, AssetPriceSource.cs
+├── LoanStatus.cs, LoanHealthStatus.cs
 ├── IAssetDetails.cs (Interface)
 ├── Details/
 │   ├── BasicAssetDetails.cs
 │   ├── RealEstateAssetDetails.cs
-│   └── LeveragedPositionDetails.cs
+│   ├── LeveragedPositionDetails.cs
+│   ├── BtcLoanDetails.cs
+│   └── LoanStateSnapshot.cs
 ├── Contracts/
 │   └── IAssetRepository.cs
 └── Events/
@@ -375,6 +575,31 @@ src/Valt.Core/Modules/Assets/
     ├── AssetUpdatedEvent.cs
     ├── AssetDeletedEvent.cs
     └── AssetPriceUpdatedEvent.cs
+
+src/Valt.App/Modules/Assets/
+├── Commands/
+│   ├── AddLoanStateUpdate/
+│   │   ├── AddLoanStateUpdateCommand.cs
+│   │   ├── AddLoanStateUpdateHandler.cs
+│   │   └── AddLoanStateUpdateValidator.cs
+│   ├── DeleteLoanStateUpdate/
+│   │   ├── DeleteLoanStateUpdateCommand.cs
+│   │   ├── DeleteLoanStateUpdateHandler.cs
+│   │   └── DeleteLoanStateUpdateValidator.cs
+│   └── ...
+├── Queries/
+│   ├── GetLoanStateTimeline/
+│   │   ├── GetLoanStateTimelineQuery.cs
+│   │   └── GetLoanStateTimelineHandler.cs
+│   ├── GetLatestLoanState/
+│   │   ├── GetLatestLoanStateQuery.cs
+│   │   └── GetLatestLoanStateHandler.cs
+│   └── ...
+├── DTOs/
+│   ├── LoanStateSnapshotDTO.cs
+│   └── LoanStateDTO.cs
+└── Contracts/
+    └── IAssetQueries.cs
 
 src/Valt.Infra/Modules/Assets/
 ├── AssetEntity.cs
@@ -398,10 +623,19 @@ src/Valt.UI/Views/Main/
 │   ├── AssetsViewModel.cs
 │   └── Models/
 │       └── AssetViewModel.cs
-└── Modals/ManageAsset/
-    ├── ManageAssetView.axaml
-    ├── ManageAssetView.axaml.cs
-    └── ManageAssetViewModel.cs
+└── Modals/
+    ├── ManageAsset/
+    │   ├── ManageAssetView.axaml
+    │   ├── ManageAssetView.axaml.cs
+    │   └── ManageAssetViewModel.cs
+    ├── UpdateLoanState/
+    │   ├── UpdateLoanStateView.axaml
+    │   ├── UpdateLoanStateView.axaml.cs
+    │   └── UpdateLoanStateViewModel.cs
+    └── LoanStateHistory/
+        ├── LoanStateHistoryView.axaml
+        ├── LoanStateHistoryView.axaml.cs
+        └── LoanStateHistoryViewModel.cs
 ```
 
 ## Data Flow Example
@@ -433,3 +667,22 @@ BTC drops to $45,000:
 - value = 1000 * (1 + (-1.00)) = $0 (liquidation)
 - P&L = $0 - $1,000 = -$1,000 (-100%)
 - Value column shows: "$ -1,000.00 (-100%)" in red
+
+**Recording a BTC Loan State Update:**
+
+1. **Initial loan:** "HodlHodl loan" created with `BtcLoanDetails`.
+   - Serializer auto-seeds a snapshot with `EffectiveDate = LoanStartDate` if none exists.
+
+2. **User updates loan state:** Additional capital is drawn, so debt and collateral change.
+   - `UpdateLoanStateView` is prefilled from the latest snapshot (or setup values if empty).
+   - User sets `EffectiveDate` to today and enters new `CurrentTotalDebt`, `CollateralSats`, `Apr`, and `Fees`.
+   - `AddLoanStateUpdateCommand` creates a new `LoanStateSnapshot` and appends it via `BtcLoanDetails.WithAddedSnapshot`.
+
+3. **Calculations use the latest snapshot:**
+   - `BtcLoanDetails.GetEffectiveSnapshot()` returns the new snapshot.
+   - `CalculateTotalDebt()` uses the snapshot's `CurrentTotalDebt` plus accrued interest from the snapshot's date.
+   - `CalculateCurrentLtv()` uses the snapshot's collateral and loan amount.
+
+4. **User deletes the latest snapshot:**
+   - `DeleteLoanStateUpdateCommand` removes it via `BtcLoanDetails.WithoutSnapshot`.
+   - Calculations automatically fall back to the previous snapshot, or to the immutable setup values when no snapshots remain.

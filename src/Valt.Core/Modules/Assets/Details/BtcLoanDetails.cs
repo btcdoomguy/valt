@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+
 namespace Valt.Core.Modules.Assets.Details;
 
 /// <summary>
@@ -82,6 +85,12 @@ public sealed class BtcLoanDetails : IAssetDetails
     public decimal? FixedTotalDebt { get; }
 
     /// <summary>
+    /// Ordered timeline of loan-state snapshots. The latest snapshot (by effective date)
+    /// is the source of truth for calculations; when empty, the immutable setup values are used.
+    /// </summary>
+    public IReadOnlyList<LoanStateSnapshot> Snapshots { get; }
+
+    /// <summary>
     /// Whether this loan uses a fixed total debt rather than daily APR accrual.
     /// </summary>
     public bool HasFixedTotalDebt => FixedTotalDebt.HasValue;
@@ -100,7 +109,8 @@ public sealed class BtcLoanDetails : IAssetDetails
         DateOnly? repaymentDate,
         LoanStatus status,
         decimal currentBtcPriceInLoanCurrency,
-        decimal? fixedTotalDebt = null)
+        decimal? fixedTotalDebt = null,
+        IReadOnlyList<LoanStateSnapshot>? snapshots = null)
     {
         if (collateralSats <= 0)
             throw new ArgumentException("Collateral must be positive", nameof(collateralSats));
@@ -136,7 +146,23 @@ public sealed class BtcLoanDetails : IAssetDetails
         Status = status;
         CurrentBtcPriceInLoanCurrency = currentBtcPriceInLoanCurrency;
         FixedTotalDebt = fixedTotalDebt;
+        Snapshots = snapshots ?? new List<LoanStateSnapshot>().AsReadOnly();
+
+        if (Snapshots.Count > 0)
+        {
+            var distinctEffectiveDates = Snapshots.Select(s => s.EffectiveDate).Distinct().Count();
+            if (distinctEffectiveDates != Snapshots.Count)
+                throw new ArgumentException("Snapshots cannot contain duplicate effective dates", nameof(snapshots));
+        }
     }
+
+    /// <summary>
+    /// Returns the latest snapshot (by effective date), or <c>null</c> when no snapshots exist.
+    /// All current-state calculations route through this method so the latest snapshot is the
+    /// single source of truth, falling back to the immutable setup values when empty.
+    /// </summary>
+    private LoanStateSnapshot? GetEffectiveSnapshot()
+        => Snapshots.Count == 0 ? null : Snapshots.MaxBy(s => s.EffectiveDate);
 
     /// <summary>
     /// Calculates the current LTV ratio given a BTC price.
@@ -144,11 +170,15 @@ public sealed class BtcLoanDetails : IAssetDetails
     /// </summary>
     public decimal CalculateCurrentLtv(decimal btcPrice)
     {
-        var collateralValue = CollateralSats / 100_000_000m * btcPrice;
+        var snapshot = GetEffectiveSnapshot();
+        var collateralSats = snapshot?.CollateralSats ?? CollateralSats;
+        var loanAmount = snapshot?.LoanAmount ?? LoanAmount;
+
+        var collateralValue = collateralSats / 100_000_000m * btcPrice;
         if (collateralValue == 0)
             return 0;
 
-        return Math.Round(LoanAmount / collateralValue * 100, 2);
+        return Math.Round(loanAmount / collateralValue * 100, 2);
     }
 
     /// <summary>
@@ -156,10 +186,14 @@ public sealed class BtcLoanDetails : IAssetDetails
     /// </summary>
     public LoanHealthStatus CalculateHealthStatus(decimal btcPrice)
     {
+        var snapshot = GetEffectiveSnapshot();
+        var liquidationLtv = snapshot?.LiquidationLtv ?? LiquidationLtv;
+        var marginCallLtv = snapshot?.MarginCallLtv ?? MarginCallLtv;
+
         var currentLtv = CalculateCurrentLtv(btcPrice);
-        if (currentLtv >= LiquidationLtv)
+        if (currentLtv >= liquidationLtv)
             return LoanHealthStatus.Danger;
-        if (currentLtv >= MarginCallLtv)
+        if (currentLtv >= marginCallLtv)
             return LoanHealthStatus.Warning;
         return LoanHealthStatus.Healthy;
     }
@@ -169,21 +203,32 @@ public sealed class BtcLoanDetails : IAssetDetails
     /// </summary>
     public decimal CalculateDistanceToLiquidation(decimal btcPrice)
     {
+        var snapshot = GetEffectiveSnapshot();
+        var liquidationLtv = snapshot?.LiquidationLtv ?? LiquidationLtv;
+
         var currentLtv = CalculateCurrentLtv(btcPrice);
-        return Math.Round(Math.Max(0, LiquidationLtv - currentLtv), 2);
+        return Math.Round(Math.Max(0, liquidationLtv - currentLtv), 2);
     }
 
     /// <summary>
-    /// Calculates the accrued interest from loan start to today. For fixed-debt loans,
-    /// the total interest is known up-front (FixedTotalDebt - LoanAmount - Fees) and
-    /// does not grow over time, so that full amount is returned.
+    /// Calculates the accrued interest from the effective snapshot's effective date to today.
+    /// For fixed-debt loans no additional interest accrues, so 0 is returned.
+    /// When no snapshot exists, interest accrues from <see cref="LoanStartDate"/>.
     /// </summary>
     public decimal CalculateAccruedInterest()
     {
+        if (GetEffectiveSnapshot() is { } snapshot)
+        {
+            if (snapshot.FixedTotalDebt.HasValue)
+                return 0m;
+
+            return CalculateAccruedInterestForSnapshot(snapshot);
+        }
+
         if (FixedTotalDebt.HasValue)
             return Math.Max(0, FixedTotalDebt.Value - LoanAmount - Fees);
 
-        var daysSinceStart = (DateOnly.FromDateTime(DateTime.UtcNow).DayNumber - LoanStartDate.DayNumber);
+        var daysSinceStart = DateOnly.FromDateTime(DateTime.UtcNow).DayNumber - LoanStartDate.DayNumber;
         if (daysSinceStart <= 0)
             return 0;
 
@@ -191,12 +236,37 @@ public sealed class BtcLoanDetails : IAssetDetails
     }
 
     /// <summary>
+    /// Calculates simple interest accrued from the snapshot's effective date to today,
+    /// based on the debt principal at the time of the snapshot.
+    /// </summary>
+    private decimal CalculateAccruedInterestForSnapshot(LoanStateSnapshot snapshot)
+    {
+        var daysSinceSnapshot = DateOnly.FromDateTime(DateTime.UtcNow).DayNumber - snapshot.EffectiveDate.DayNumber;
+        if (daysSinceSnapshot <= 0)
+            return 0m;
+
+        var principal = Math.Max(0, snapshot.CurrentTotalDebt - snapshot.Fees);
+        return Math.Round(principal * snapshot.Apr / 365 * daysSinceSnapshot, 2);
+    }
+
+    /// <summary>
     /// Calculates the total debt obligation. For APR-based loans this is
     /// LoanAmount + AccruedInterest + Fees. For fixed-debt loans the predefined
     /// total is returned regardless of elapsed time.
+    /// When a snapshot exists, its <see cref="LoanStateSnapshot.CurrentTotalDebt"/> is used
+    /// as the basis and simple interest is added from the snapshot's effective date to today.
     /// </summary>
     public decimal CalculateTotalDebt()
     {
+        var snapshot = GetEffectiveSnapshot();
+        if (snapshot is not null)
+        {
+            if (snapshot.FixedTotalDebt.HasValue)
+                return snapshot.CurrentTotalDebt;
+
+            return Math.Round(snapshot.CurrentTotalDebt + CalculateAccruedInterestForSnapshot(snapshot), 2);
+        }
+
         if (FixedTotalDebt.HasValue)
             return FixedTotalDebt.Value;
 
@@ -243,7 +313,8 @@ public sealed class BtcLoanDetails : IAssetDetails
             RepaymentDate,
             Status,
             newPrice,
-            FixedTotalDebt);
+            FixedTotalDebt,
+            Snapshots);
     }
 
     public BtcLoanDetails WithStatus(LoanStatus newStatus)
@@ -262,7 +333,76 @@ public sealed class BtcLoanDetails : IAssetDetails
             RepaymentDate,
             newStatus,
             CurrentBtcPriceInLoanCurrency,
-            FixedTotalDebt);
+            FixedTotalDebt,
+            Snapshots);
+    }
+
+    /// <summary>
+    /// Returns a new <see cref="BtcLoanDetails"/> with the supplied snapshot added.
+    /// Throws <see cref="ArgumentException"/> if a snapshot for the same effective date already exists.
+    /// </summary>
+    public BtcLoanDetails WithAddedSnapshot(LoanStateSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(snapshot);
+
+        if (Snapshots.Any(s => s.EffectiveDate == snapshot.EffectiveDate))
+        {
+            throw new ArgumentException(
+                $"A snapshot already exists for {snapshot.EffectiveDate}",
+                nameof(snapshot));
+        }
+
+        var newSnapshots = Snapshots
+            .Append(snapshot)
+            .OrderBy(s => s.EffectiveDate)
+            .ToList()
+            .AsReadOnly();
+
+        return new BtcLoanDetails(
+            PlatformName,
+            CollateralSats,
+            LoanAmount,
+            CurrencyCode,
+            Apr,
+            InitialLtv,
+            LiquidationLtv,
+            MarginCallLtv,
+            Fees,
+            LoanStartDate,
+            RepaymentDate,
+            Status,
+            CurrentBtcPriceInLoanCurrency,
+            FixedTotalDebt,
+            newSnapshots);
+    }
+
+    /// <summary>
+    /// Returns a new <see cref="BtcLoanDetails"/> without the snapshot matching the supplied effective date.
+    /// </summary>
+    public BtcLoanDetails WithoutSnapshot(DateOnly effectiveDate)
+    {
+        var newSnapshots = Snapshots
+            .Where(s => s.EffectiveDate != effectiveDate)
+            .OrderBy(s => s.EffectiveDate)
+            .ToList()
+            .AsReadOnly();
+
+        return new BtcLoanDetails(
+            PlatformName,
+            CollateralSats,
+            LoanAmount,
+            CurrencyCode,
+            Apr,
+            InitialLtv,
+            LiquidationLtv,
+            MarginCallLtv,
+            Fees,
+            LoanStartDate,
+            RepaymentDate,
+            Status,
+            CurrentBtcPriceInLoanCurrency,
+            FixedTotalDebt,
+            newSnapshots);
     }
 
     /// <summary>

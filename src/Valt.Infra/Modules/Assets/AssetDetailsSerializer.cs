@@ -1,4 +1,6 @@
 using System.Text.Json;
+using System.Linq;
+using System.Globalization;
 using Valt.Core.Modules.Assets;
 using Valt.Core.Modules.Assets.Details;
 
@@ -74,6 +76,42 @@ internal static class AssetDetailsSerializer
     public static BtcLoanDetails DeserializeBtcLoan(string json)
     {
         var dto = Deserialize<BtcLoanDetailsDto>(json, nameof(BtcLoanDetails));
+
+        var snapshots = dto.Snapshots?.Select(MapDtoToSnapshot).ToList()
+                        ?? new List<LoanStateSnapshot>();
+
+        var startDate = string.IsNullOrEmpty(dto.LoanStartDate)
+            ? DateOnly.FromDateTime(DateTime.UtcNow)
+            : DateOnly.Parse(dto.LoanStartDate);
+
+        var repaymentDate = string.IsNullOrEmpty(dto.RepaymentDate)
+            ? (DateOnly?)null
+            : DateOnly.Parse(dto.RepaymentDate);
+
+        if (snapshots.Count == 0)
+        {
+            var seededTotalDebt = dto.FixedTotalDebt ?? (dto.LoanAmount + dto.Fees);
+
+            snapshots.Add(new LoanStateSnapshot(
+                effectiveDate: startDate,
+                currentTotalDebt: seededTotalDebt,
+                platformName: dto.PlatformName ?? string.Empty,
+                collateralSats: dto.CollateralSats,
+                loanAmount: dto.LoanAmount,
+                currencyCode: dto.CurrencyCode,
+                apr: dto.Apr,
+                initialLtv: dto.InitialLtv,
+                liquidationLtv: dto.LiquidationLtv,
+                marginCallLtv: dto.MarginCallLtv,
+                fees: dto.Fees,
+                loanStartDate: startDate,
+                repaymentDate: repaymentDate,
+                status: (LoanStatus)dto.StatusId,
+                currentBtcPriceInLoanCurrency: dto.CurrentBtcPrice,
+                fixedTotalDebt: dto.FixedTotalDebt,
+                note: null));
+        }
+
         return new BtcLoanDetails(
             dto.PlatformName ?? string.Empty,
             dto.CollateralSats,
@@ -84,11 +122,12 @@ internal static class AssetDetailsSerializer
             dto.LiquidationLtv,
             dto.MarginCallLtv,
             dto.Fees,
-            string.IsNullOrEmpty(dto.LoanStartDate) ? DateOnly.FromDateTime(DateTime.UtcNow) : DateOnly.Parse(dto.LoanStartDate),
-            string.IsNullOrEmpty(dto.RepaymentDate) ? null : DateOnly.Parse(dto.RepaymentDate),
+            startDate,
+            repaymentDate,
             (LoanStatus)dto.StatusId,
             dto.CurrentBtcPrice,
-            dto.FixedTotalDebt);
+            dto.FixedTotalDebt,
+            snapshots);
     }
 
     public static BtcLendingDetails DeserializeBtcLending(string json)
@@ -181,7 +220,8 @@ internal static class AssetDetailsSerializer
             RepaymentDate = details.RepaymentDate?.ToString("O"),
             StatusId = (int)details.Status,
             CurrentBtcPrice = details.CurrentBtcPriceInLoanCurrency,
-            FixedTotalDebt = details.FixedTotalDebt
+            FixedTotalDebt = details.FixedTotalDebt,
+            Snapshots = details.Snapshots.Select(MapSnapshotToDto).ToList()
         };
         return JsonSerializer.Serialize(dto);
     }
@@ -199,6 +239,61 @@ internal static class AssetDetailsSerializer
             StatusId = (int)details.Status
         };
         return JsonSerializer.Serialize(dto);
+    }
+
+    private static LoanStateSnapshot MapDtoToSnapshot(LoanStateSnapshotDto dto)
+    {
+        if (string.IsNullOrEmpty(dto.EffectiveDate))
+            throw new InvalidOperationException("LoanStateSnapshot.EffectiveDate is required");
+
+        if (string.IsNullOrEmpty(dto.LoanStartDate))
+            throw new InvalidOperationException("LoanStateSnapshot.LoanStartDate is required");
+
+        var effectiveDate = DateOnly.ParseExact(dto.EffectiveDate, "O", CultureInfo.InvariantCulture, DateTimeStyles.None);
+        var loanStartDate = DateOnly.ParseExact(dto.LoanStartDate, "O", CultureInfo.InvariantCulture, DateTimeStyles.None);
+
+        return new LoanStateSnapshot(
+            platformName: dto.PlatformName ?? string.Empty,
+            collateralSats: dto.CollateralSats,
+            loanAmount: dto.LoanAmount,
+            currencyCode: dto.CurrencyCode,
+            apr: dto.Apr,
+            initialLtv: dto.InitialLtv,
+            liquidationLtv: dto.LiquidationLtv,
+            marginCallLtv: dto.MarginCallLtv,
+            fees: dto.Fees,
+            loanStartDate: loanStartDate,
+            repaymentDate: string.IsNullOrEmpty(dto.RepaymentDate) ? (DateOnly?)null : DateOnly.ParseExact(dto.RepaymentDate, "O", CultureInfo.InvariantCulture, DateTimeStyles.None),
+            status: (LoanStatus)dto.StatusId,
+            currentBtcPriceInLoanCurrency: dto.CurrentBtcPrice,
+            fixedTotalDebt: dto.FixedTotalDebt,
+            currentTotalDebt: dto.CurrentTotalDebt,
+            effectiveDate: effectiveDate,
+            note: dto.Note);
+    }
+
+    private static LoanStateSnapshotDto MapSnapshotToDto(LoanStateSnapshot snapshot)
+    {
+        return new LoanStateSnapshotDto
+        {
+            EffectiveDate = snapshot.EffectiveDate.ToString("O"),
+            PlatformName = snapshot.PlatformName,
+            CollateralSats = snapshot.CollateralSats,
+            LoanAmount = snapshot.LoanAmount,
+            CurrencyCode = snapshot.CurrencyCode,
+            Apr = snapshot.Apr,
+            InitialLtv = snapshot.InitialLtv,
+            LiquidationLtv = snapshot.LiquidationLtv,
+            MarginCallLtv = snapshot.MarginCallLtv,
+            Fees = snapshot.Fees,
+            LoanStartDate = snapshot.LoanStartDate.ToString("O"),
+            RepaymentDate = snapshot.RepaymentDate?.ToString("O"),
+            StatusId = (int)snapshot.Status,
+            CurrentBtcPrice = snapshot.CurrentBtcPriceInLoanCurrency,
+            FixedTotalDebt = snapshot.FixedTotalDebt,
+            CurrentTotalDebt = snapshot.CurrentTotalDebt,
+            Note = snapshot.Note
+        };
     }
 }
 
@@ -254,6 +349,28 @@ internal class BtcLoanDetailsDto
     public int StatusId { get; set; }
     public decimal CurrentBtcPrice { get; set; }
     public decimal? FixedTotalDebt { get; set; }
+    public List<LoanStateSnapshotDto>? Snapshots { get; set; }
+}
+
+internal class LoanStateSnapshotDto
+{
+    public string? EffectiveDate { get; set; }
+    public string? PlatformName { get; set; }
+    public long CollateralSats { get; set; }
+    public decimal LoanAmount { get; set; }
+    public string CurrencyCode { get; set; } = null!;
+    public decimal Apr { get; set; }
+    public decimal InitialLtv { get; set; }
+    public decimal LiquidationLtv { get; set; }
+    public decimal MarginCallLtv { get; set; }
+    public decimal Fees { get; set; }
+    public string? LoanStartDate { get; set; }
+    public string? RepaymentDate { get; set; }
+    public int StatusId { get; set; }
+    public decimal CurrentBtcPrice { get; set; }
+    public decimal? FixedTotalDebt { get; set; }
+    public decimal CurrentTotalDebt { get; set; }
+    public string? Note { get; set; }
 }
 
 internal class BtcLendingDetailsDto

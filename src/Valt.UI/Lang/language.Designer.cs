@@ -471,6 +471,30 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string Loading_DatabaseOpening {
+            get {
+                return ResourceManager.GetString("Loading_DatabaseOpening", resourceCulture);
+            }
+        }
+        
+        public static string Loading_PriceDatabase {
+            get {
+                return ResourceManager.GetString("Loading_PriceDatabase", resourceCulture);
+            }
+        }
+        
+        public static string Loading_LivePrices {
+            get {
+                return ResourceManager.GetString("Loading_LivePrices", resourceCulture);
+            }
+        }
+        
+        public static string Loading_LoadingTransactions {
+            get {
+                return ResourceManager.GetString("Loading_LoadingTransactions", resourceCulture);
+            }
+        }
+        
         public static string Transactions_Ratio {
             get {
                 return ResourceManager.GetString("Transactions.Ratio", resourceCulture);
@@ -5382,6 +5406,174 @@ namespace Valt.UI.Lang {
         public static string Reports_FixedPriceModal_Cancel {
             get {
                 return ResourceManager.GetString("Reports_FixedPriceModal_Cancel", resourceCulture);
+            }
+        }
+        
+        public static string Assets_UpdateLoanState {
+            get {
+                return ResourceManager.GetString("Assets_UpdateLoanState", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_Title {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_Title", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_SaveSnapshot {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_SaveSnapshot", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_DiscardChanges {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_DiscardChanges", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_ContextHeader {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_ContextHeader", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_NewStateHeader {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_NewStateHeader", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_EffectiveDate {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_EffectiveDate", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_CurrentTotalDebt {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_CurrentTotalDebt", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_Note {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_Note", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_HelpText {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_HelpText", resourceCulture);
+            }
+        }
+        
+        public static string LoanStateHistory_Title {
+            get {
+                return ResourceManager.GetString("LoanStateHistory_Title", resourceCulture);
+            }
+        }
+        
+        public static string Assets_LoanStateHistory {
+            get {
+                return ResourceManager.GetString("Assets_LoanStateHistory", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_BtcLoan_OriginInformationWarning {
+            get {
+                return ResourceManager.GetString("ManageAsset_BtcLoan_OriginInformationWarning", resourceCulture);
+            }
+        }
+        
+        public static string LoanStateHistory_AddNewState {
+            get {
+                return ResourceManager.GetString("LoanStateHistory_AddNewState", resourceCulture);
+            }
+        }
+        
+        public static string LoanStateHistory_DeleteSelected {
+            get {
+                return ResourceManager.GetString("LoanStateHistory_DeleteSelected", resourceCulture);
+            }
+        }
+        
+        public static string LoanStateHistory_Close {
+            get {
+                return ResourceManager.GetString("LoanStateHistory_Close", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_ViewHistory {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_ViewHistory", resourceCulture);
+            }
+        }
+        
+        public static string LoanStateHistory_DeleteConfirmationTitle {
+            get {
+                return ResourceManager.GetString("LoanStateHistory_DeleteConfirmationTitle", resourceCulture);
+            }
+        }
+        
+        public static string LoanStateHistory_DeleteConfirmationMessage {
+            get {
+                return ResourceManager.GetString("LoanStateHistory_DeleteConfirmationMessage", resourceCulture);
+            }
+        }
+        
+        public static string LoanStateHistory_DeleteError {
+            get {
+                return ResourceManager.GetString("LoanStateHistory_DeleteError", resourceCulture);
+            }
+        }
+        
+        public static string SatsLabel {
+            get {
+                return ResourceManager.GetString("SatsLabel", resourceCulture);
+            }
+        }
+        
+        public static string Validation_EffectiveDateRequired {
+            get {
+                return ResourceManager.GetString("Validation_EffectiveDateRequired", resourceCulture);
+            }
+        }
+        
+        public static string Validation_CurrentTotalDebtRequired {
+            get {
+                return ResourceManager.GetString("Validation_CurrentTotalDebtRequired", resourceCulture);
+            }
+        }
+        
+        public static string Validation_CollateralRequired {
+            get {
+                return ResourceManager.GetString("Validation_CollateralRequired", resourceCulture);
+            }
+        }
+        
+        public static string Validation_CollateralGreaterThanZero {
+            get {
+                return ResourceManager.GetString("Validation_CollateralGreaterThanZero", resourceCulture);
+            }
+        }
+        
+        public static string Validation_AprRequired {
+            get {
+                return ResourceManager.GetString("Validation_AprRequired", resourceCulture);
+            }
+        }
+        
+        public static string Validation_AprNonNegative {
+            get {
+                return ResourceManager.GetString("Validation_AprNonNegative", resourceCulture);
+            }
+        }
+        
+        public static string Validation_FeesRequired {
+            get {
+                return ResourceManager.GetString("Validation_FeesRequired", resourceCulture);
             }
         }
     }

@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Channels;
 
 namespace Valt.Infra.Kernel.BackgroundJobs;
@@ -60,10 +61,15 @@ public sealed class BackgroundJobManager : IAsyncDisposable
 
     public async Task TriggerJobAndWaitAsync(BackgroundJobSystemNames systemName)
     {
+        await TriggerJobAndWaitAsync(systemName, CancellationToken.None);
+    }
+
+    public async Task TriggerJobAndWaitAsync(BackgroundJobSystemNames systemName, CancellationToken cancellationToken)
+    {
         var jobInfo = _jobInfos.Values.SingleOrDefault(x => x.Job.SystemName == systemName);
         if (jobInfo != null)
         {
-            var result = await jobInfo.RequestRunAndWaitAsync(CancellationToken.None);
+            var result = await jobInfo.RequestRunAndWaitAsync(cancellationToken);
             if (!result.Success && result.Exception != null)
                 throw result.Exception;
         }

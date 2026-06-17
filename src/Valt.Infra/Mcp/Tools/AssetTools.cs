@@ -1,7 +1,9 @@
 using System.ComponentModel;
+using System.Globalization;
 using ModelContextProtocol.Server;
 using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Assets.Commands.AddLoanStateUpdate;
 using Valt.App.Modules.Assets.Commands.CreateBasicAsset;
 using Valt.App.Modules.Assets.Commands.CreateBtcLending;
 using Valt.App.Modules.Assets.Commands.CreateBtcLoan;
@@ -10,6 +12,7 @@ using Valt.App.Modules.Assets.Commands.CreateRealEstateAsset;
 using Valt.App.Modules.Assets.Commands.CreateAssetGroup;
 using Valt.App.Modules.Assets.Commands.DeleteAsset;
 using Valt.App.Modules.Assets.Commands.DeleteAssetGroup;
+using Valt.App.Modules.Assets.Commands.DeleteLoanStateUpdate;
 using Valt.App.Modules.Assets.Commands.EditAssetGroup;
 using Valt.App.Modules.Assets.Commands.MoveAssetToGroup;
 using Valt.App.Modules.Assets.Commands.RepayLoan;
@@ -22,6 +25,8 @@ using Valt.App.Modules.Assets.Queries.GetAsset;
 using Valt.App.Modules.Assets.Queries.GetAssetGroups;
 using Valt.App.Modules.Assets.Queries.GetAssets;
 using Valt.App.Modules.Assets.Queries.GetAssetSummary;
+using Valt.App.Modules.Assets.Queries.GetLatestLoanState;
+using Valt.App.Modules.Assets.Queries.GetLoanStateTimeline;
 using Valt.App.Modules.Assets.Queries.GetVisibleAssets;
 using Valt.Core.Modules.Assets;
 using Valt.Infra.Kernel.Notifications;
@@ -604,5 +609,107 @@ public class AssetTools
 
         await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Asset {assetId} removed from group";
+    }
+
+    /// <summary>
+    /// Adds a new state snapshot to a BTC-backed loan.
+    /// </summary>
+    [McpServerTool, Description("Add a new state snapshot to a BTC-backed loan")]
+    public static async Task<string> AddLoanStateUpdate(
+        ICommandDispatcher commandDispatcher,
+        INotificationPublisher publisher,
+        [Description("The asset ID")] string assetId,
+        [Description("Effective date (yyyy-MM-dd)")] string effectiveDate,
+        [Description("Current total debt")] decimal currentTotalDebt,
+        [Description("BTC collateral in satoshis")] long collateralSats,
+        [Description("APR as decimal (e.g., 0.12 for 12%)")] decimal apr,
+        [Description("Fees paid")] decimal fees,
+        [Description("Optional note")] string? note = null)
+    {
+        DateOnly parsedEffectiveDate;
+        try
+        {
+            parsedEffectiveDate = DateOnly.ParseExact(effectiveDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        }
+        catch (FormatException)
+        {
+            return "Error: Effective date must be in yyyy-MM-dd format";
+        }
+
+        var result = await commandDispatcher.DispatchAsync(new AddLoanStateUpdateCommand
+        {
+            AssetId = assetId,
+            EffectiveDate = parsedEffectiveDate,
+            CurrentTotalDebt = currentTotalDebt,
+            CollateralSats = collateralSats,
+            Apr = apr,
+            Fees = fees,
+            Note = note
+        });
+
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error!.Message}";
+        }
+
+        await publisher.PublishAsync(new McpDataChangedNotification());
+        return $"Loan state snapshot added for asset {assetId}";
+    }
+
+    /// <summary>
+    /// Deletes a state snapshot from a BTC-backed loan by its effective date.
+    /// </summary>
+    [McpServerTool, Description("Delete a state snapshot from a BTC-backed loan by its effective date")]
+    public static async Task<string> DeleteLoanStateUpdate(
+        ICommandDispatcher commandDispatcher,
+        INotificationPublisher publisher,
+        [Description("The asset ID")] string assetId,
+        [Description("Effective date (yyyy-MM-dd)")] string effectiveDate)
+    {
+        DateOnly parsedEffectiveDate;
+        try
+        {
+            parsedEffectiveDate = DateOnly.ParseExact(effectiveDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        }
+        catch (FormatException)
+        {
+            return "Error: Effective date must be in yyyy-MM-dd format";
+        }
+
+        var result = await commandDispatcher.DispatchAsync(new DeleteLoanStateUpdateCommand
+        {
+            AssetId = assetId,
+            EffectiveDate = parsedEffectiveDate
+        });
+
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error!.Message}";
+        }
+
+        await publisher.PublishAsync(new McpDataChangedNotification());
+        return $"Loan state snapshot deleted for asset {assetId}";
+    }
+
+    /// <summary>
+    /// Gets the full chronological snapshot timeline of a BTC-backed loan.
+    /// </summary>
+    [McpServerTool, Description("Get the full chronological snapshot timeline of a BTC-backed loan")]
+    public static async Task<IReadOnlyList<LoanStateSnapshotDTO>> GetLoanStateTimeline(
+        IQueryDispatcher queryDispatcher,
+        [Description("The asset ID")] string assetId)
+    {
+        return await queryDispatcher.DispatchAsync(new GetLoanStateTimelineQuery { AssetId = assetId });
+    }
+
+    /// <summary>
+    /// Gets the latest recorded state of a BTC-backed loan.
+    /// </summary>
+    [McpServerTool, Description("Get the latest recorded state of a BTC-backed loan")]
+    public static async Task<LoanStateDTO?> GetLatestLoanState(
+        IQueryDispatcher queryDispatcher,
+        [Description("The asset ID")] string assetId)
+    {
+        return await queryDispatcher.DispatchAsync(new GetLatestLoanStateQuery { AssetId = assetId });
     }
 }

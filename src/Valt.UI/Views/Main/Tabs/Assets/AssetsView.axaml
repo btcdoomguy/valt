@@ -56,6 +56,14 @@
                                   Command="{Binding $parent[UserControl].((assets:AssetsViewModel)DataContext).SellAssetCommand}"
                                   CommandParameter="{Binding}" />
                         <Separator />
+                        <MenuItem Header="{x:Static lang:language.Assets_UpdateLoanState}"
+                                  Command="{Binding $parent[UserControl].((assets:AssetsViewModel)DataContext).UpdateLoanStateCommand}"
+                                  CommandParameter="{Binding}"
+                                  IsVisible="{Binding IsBtcLoan}" />
+                        <MenuItem Header="{x:Static lang:language.Assets_LoanStateHistory}"
+                                  Command="{Binding $parent[UserControl].((assets:AssetsViewModel)DataContext).OpenLoanStateHistoryCommand}"
+                                  CommandParameter="{Binding}"
+                                  IsVisible="{Binding IsBtcLoan}" />
                         <MenuItem Header="{x:Static lang:language.Assets_RepayLoan}"
                                   Command="{Binding $parent[UserControl].((assets:AssetsViewModel)DataContext).RepayLoanCommand}"
                                   CommandParameter="{Binding}"

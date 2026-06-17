@@ -19,19 +19,19 @@ public class ThemeService : IThemeService
     private static readonly List<ThemeDefinition> Themes =
     [
         // Dark themes
-        new ThemeDefinition("Default", "Default", "Dark", () => DefaultTheme.Create()),
-        new ThemeDefinition("Ocean", "Ocean", "Dark", () => OceanTheme.Create()),
-        new ThemeDefinition("MidnightGalaxy", "Midnight Galaxy", "Dark", () => MidnightGalaxyTheme.Create()),
-        new ThemeDefinition("GoldenHour", "Golden Hour", "Dark", () => GoldenHourTheme.Create()),
-        new ThemeDefinition("ArcticFrost", "Arctic Frost", "Dark", () => ArcticFrostTheme.Create()),
-        new ThemeDefinition("ForestCanopy", "Forest Canopy", "Dark", () => ForestCanopyTheme.Create()),
-        new ThemeDefinition("CrimsonEmber", "Crimson Ember", "Dark", () => CrimsonEmberTheme.Create()),
-        new ThemeDefinition("Monochrome", "Monochrome", "Dark", () => MonochromeTheme.Create()),
-        new ThemeDefinition("RoseQuartz", "Rose Quartz", "Dark", () => RoseQuartzTheme.Create()),
-        new ThemeDefinition("SunsetBlaze", "Sunset Blaze", "Dark", () => SunsetBlazeTheme.Create()),
-        new ThemeDefinition("MochaBrew", "Mocha Brew", "Dark", () => MochaBrewTheme.Create()),
-        new ThemeDefinition("CopperForge", "Copper Forge", "Dark", () => CopperForgeTheme.Create()),
-        new ThemeDefinition("Pepe", "Pepe", "Dark", () => PepeTheme.Create())
+        new ThemeDefinition("Default", "Default", "Dark", DefaultTheme.Palette),
+        new ThemeDefinition("Ocean", "Ocean", "Dark", OceanTheme.Palette),
+        new ThemeDefinition("MidnightGalaxy", "Midnight Galaxy", "Dark", MidnightGalaxyTheme.Palette),
+        new ThemeDefinition("GoldenHour", "Golden Hour", "Dark", GoldenHourTheme.Palette),
+        new ThemeDefinition("ArcticFrost", "Arctic Frost", "Dark", ArcticFrostTheme.Palette),
+        new ThemeDefinition("ForestCanopy", "Forest Canopy", "Dark", ForestCanopyTheme.Palette),
+        new ThemeDefinition("CrimsonEmber", "Crimson Ember", "Dark", CrimsonEmberTheme.Palette),
+        new ThemeDefinition("Monochrome", "Monochrome", "Dark", MonochromeTheme.Palette),
+        new ThemeDefinition("RoseQuartz", "Rose Quartz", "Dark", RoseQuartzTheme.Palette),
+        new ThemeDefinition("SunsetBlaze", "Sunset Blaze", "Dark", SunsetBlazeTheme.Palette),
+        new ThemeDefinition("MochaBrew", "Mocha Brew", "Dark", MochaBrewTheme.Palette),
+        new ThemeDefinition("CopperForge", "Copper Forge", "Dark", CopperForgeTheme.Palette),
+        new ThemeDefinition("Pepe", "Pepe", "Dark", PepeTheme.Palette)
     ];
 
     private readonly ILocalStorageService _localStorageService;

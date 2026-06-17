@@ -66,77 +66,8 @@ internal sealed class AssetQueries : IAssetQueries
             })
             .ToList<AssetValueByCurrencyDTO>();
 
-        var totalValueInMainCurrency = 0m;
-        var totalAssetsValueInMainCurrency = 0m;
-        var totalLiabilitiesInMainCurrency = 0m;
-        var liabilitiesCount = 0;
-        long totalValueInSats = 0;
-
-        var effectiveBtcPriceUsd = customBtcPriceUsd ?? btcPriceUsd;
-        
-        if (effectiveBtcPriceUsd.HasValue && fiatRates != null)
-        {
-            foreach (var asset in includedAssets)
-            {
-                var value = GetValueForSummary(asset);
-                var currency = asset.GetCurrencyCode();
-                var isLiability = asset.Details is BtcLoanDetails;
-
-                // Convert to USD first
-                var valueInUsd = currency == FiatCurrency.Usd.Code
-                    ? value
-                    : fiatRates.TryGetValue(currency, out var rate) && rate > 0
-                        ? value / rate
-                        : 0m;
-
-                // Convert to main currency
-                decimal valueInMainCurrency;
-                if (currency == mainCurrencyCode)
-                {
-                    valueInMainCurrency = value;
-                }
-                else if (fiatRates.TryGetValue(mainCurrencyCode, out var mainRate))
-                {
-                    valueInMainCurrency = valueInUsd * mainRate;
-                }
-                else
-                {
-                    valueInMainCurrency = 0m;
-                }
-
-                totalValueInMainCurrency += valueInMainCurrency;
-
-                // Track assets vs liabilities separately
-                if (isLiability)
-                {
-                    var btcLoan = (BtcLoanDetails)asset.Details;
-                    var debtValue = btcLoan.CalculateTotalDebt();
-                    var debtInUsd = currency == FiatCurrency.Usd.Code
-                        ? debtValue
-                        : fiatRates.TryGetValue(currency, out var debtRate) && debtRate > 0
-                            ? debtValue / debtRate
-                            : 0m;
-                    var debtInMainCurrency = currency == mainCurrencyCode
-                        ? debtValue
-                        : fiatRates.TryGetValue(mainCurrencyCode, out var debtMainRate)
-                            ? debtInUsd * debtMainRate
-                            : 0m;
-                    totalLiabilitiesInMainCurrency += debtInMainCurrency;
-                    liabilitiesCount++;
-                }
-                else
-                {
-                    totalAssetsValueInMainCurrency += valueInMainCurrency;
-                }
-
-                // Convert to sats
-                if (effectiveBtcPriceUsd.Value > 0)
-                {
-                    var btcAmount = valueInUsd / effectiveBtcPriceUsd.Value;
-                    totalValueInSats += (long)(btcAmount * 100_000_000);
-                }
-            }
-        }
+        var (totalValueInMainCurrency, totalAssetsValueInMainCurrency, totalLiabilitiesInMainCurrency, liabilitiesCount, totalValueInSats) =
+            CalculateSummaryTotals(includedAssets, mainCurrencyCode, fiatRates, customBtcPriceUsd ?? btcPriceUsd);
 
         var summary = new AssetSummaryDTO
         {
@@ -152,6 +83,73 @@ internal sealed class AssetQueries : IAssetQueries
         };
 
         return Task.FromResult(summary);
+    }
+
+    private static (decimal TotalValue, decimal TotalAssetsValue, decimal TotalLiabilitiesValue, int LiabilitiesCount, long TotalSats)
+        CalculateSummaryTotals(IReadOnlyList<Asset> includedAssets, string mainCurrencyCode, IReadOnlyDictionary<string, decimal>? fiatRates, decimal? effectiveBtcPriceUsd)
+    {
+        var totalValueInMainCurrency = 0m;
+        var totalAssetsValueInMainCurrency = 0m;
+        var totalLiabilitiesInMainCurrency = 0m;
+        var liabilitiesCount = 0;
+        long totalValueInSats = 0;
+
+        if (!effectiveBtcPriceUsd.HasValue || fiatRates is null)
+            return (totalValueInMainCurrency, totalAssetsValueInMainCurrency, totalLiabilitiesInMainCurrency, liabilitiesCount, totalValueInSats);
+
+        foreach (var asset in includedAssets)
+        {
+            var value = GetValueForSummary(asset);
+            var currency = asset.GetCurrencyCode();
+            var isLiability = asset.Details is BtcLoanDetails;
+
+            var valueInUsd = ConvertToUsd(value, currency, fiatRates);
+            var valueInMainCurrency = ConvertToMainCurrency(value, valueInUsd, currency, mainCurrencyCode, fiatRates);
+
+            totalValueInMainCurrency += valueInMainCurrency;
+
+            if (isLiability)
+            {
+                var debtValue = ((BtcLoanDetails)asset.Details).CalculateTotalDebt();
+                var debtInUsd = ConvertToUsd(debtValue, currency, fiatRates);
+                var debtInMainCurrency = ConvertToMainCurrency(debtValue, debtInUsd, currency, mainCurrencyCode, fiatRates);
+                totalLiabilitiesInMainCurrency += debtInMainCurrency;
+                liabilitiesCount++;
+            }
+            else
+            {
+                totalAssetsValueInMainCurrency += valueInMainCurrency;
+            }
+
+            if (effectiveBtcPriceUsd.Value > 0)
+            {
+                var btcAmount = valueInUsd / effectiveBtcPriceUsd.Value;
+                totalValueInSats += (long)(btcAmount * 100_000_000);
+            }
+        }
+
+        return (totalValueInMainCurrency, totalAssetsValueInMainCurrency, totalLiabilitiesInMainCurrency, liabilitiesCount, totalValueInSats);
+    }
+
+    private static decimal ConvertToUsd(decimal value, string currency, IReadOnlyDictionary<string, decimal> fiatRates)
+    {
+        if (currency == FiatCurrency.Usd.Code)
+            return value;
+
+        return fiatRates.TryGetValue(currency, out var rate) && rate > 0
+            ? value / rate
+            : 0m;
+    }
+
+    private static decimal ConvertToMainCurrency(decimal valueInOriginalCurrency, decimal valueInUsd, string originalCurrency, string mainCurrencyCode, IReadOnlyDictionary<string, decimal> fiatRates)
+    {
+        if (originalCurrency == mainCurrencyCode)
+            return valueInOriginalCurrency;
+
+        if (fiatRates.TryGetValue(mainCurrencyCode, out var mainRate))
+            return valueInUsd * mainRate;
+
+        return 0m;
     }
 
     /// <summary>
@@ -176,140 +174,19 @@ internal sealed class AssetQueries : IAssetQueries
     {
         var asset = entity.AsDomainObject();
 
-        // Extract type-specific fields
-        decimal? quantity = null;
-        string? symbol = null;
-        int? priceSourceId = null;
-        string? address = null;
-        decimal? monthlyRentalIncome = null;
-        decimal? collateral = null;
-        decimal? entryPrice = null;
-        decimal? leverage = null;
-        decimal? liquidationPrice = null;
-        bool? isLong = null;
-        decimal? pnl = null;
-        decimal? pnlPercentage = null;
-        decimal? distanceToLiquidation = null;
-        bool? isAtRisk = null;
-        decimal? positionSize = null;
-        int? inputModeId = null;
-        DateOnly? acquisitionDate = null;
-        decimal? acquisitionPrice = null;
-
-        decimal? totalDebt = null;
-
-        // BTC loan fields
-        string? platformName = null;
-        long? collateralSats = null;
-        decimal? loanAmount = null;
-        decimal? apr = null;
-        decimal? currentLtv = null;
-        decimal? initialLtv = null;
-        decimal? liquidationLtv = null;
-        decimal? marginCallLtv = null;
-        decimal? fees = null;
-        DateOnly? loanStartDate = null;
-        DateOnly? repaymentDate = null;
-        int? loanStatusId = null;
-        string? loanStatusName = null;
-        int? loanHealthStatusId = null;
-        string? loanHealthStatusName = null;
-        decimal? accruedInterest = null;
-        decimal? distanceToLiquidationLtv = null;
-        int? daysUntilRepayment = null;
-        decimal? fixedTotalDebt = null;
-        var hasFixedTotalDebt = false;
-
-        // BTC lending fields
-        decimal? amountLent = null;
-        string? borrowerOrPlatformName = null;
-        DateOnly? lendingStartDate = null;
-        decimal? earnedInterest = null;
-
-        switch (asset.Details)
+        return asset.Details switch
         {
-            case BasicAssetDetails basic:
-                quantity = basic.Quantity;
-                symbol = basic.Symbol;
-                priceSourceId = (int)basic.PriceSource;
-                acquisitionDate = basic.AcquisitionDate;
-                acquisitionPrice = basic.AcquisitionPrice;
-                if (basic.AcquisitionPrice.HasValue)
-                {
-                    pnl = basic.CalculatePnL();
-                    pnlPercentage = basic.CalculatePnLPercentage();
-                }
-                break;
+            BasicAssetDetails basic => MapBasicAsset(entity, asset, basic),
+            RealEstateAssetDetails realEstate => MapRealEstateAsset(entity, asset, realEstate),
+            LeveragedPositionDetails leveraged => MapLeveragedPosition(entity, asset, leveraged),
+            BtcLoanDetails btcLoan => MapBtcLoan(entity, asset, btcLoan),
+            BtcLendingDetails btcLending => MapBtcLending(entity, asset, btcLending),
+            _ => CreateBaseDto(entity, asset)
+        };
+    }
 
-            case RealEstateAssetDetails realEstate:
-                address = realEstate.Address;
-                monthlyRentalIncome = realEstate.MonthlyRentalIncome;
-                acquisitionDate = realEstate.AcquisitionDate;
-                acquisitionPrice = realEstate.AcquisitionPrice;
-                if (realEstate.AcquisitionPrice.HasValue)
-                {
-                    pnl = realEstate.CalculatePnL();
-                    pnlPercentage = realEstate.CalculatePnLPercentage();
-                }
-                break;
-
-            case LeveragedPositionDetails leveraged:
-                collateral = leveraged.Collateral;
-                entryPrice = leveraged.EntryPrice;
-                leverage = leveraged.Leverage;
-                liquidationPrice = leveraged.LiquidationPrice;
-                isLong = leveraged.IsLong;
-                symbol = leveraged.Symbol;
-                priceSourceId = (int)leveraged.PriceSource;
-                pnl = leveraged.CalculatePnL(leveraged.CurrentPrice);
-                pnlPercentage = leveraged.CalculatePnLPercentage(leveraged.CurrentPrice);
-                distanceToLiquidation = leveraged.CalculateDistanceToLiquidation(leveraged.CurrentPrice);
-                isAtRisk = leveraged.IsAtRisk(leveraged.CurrentPrice);
-                positionSize = leveraged.PositionSize;
-                inputModeId = (int)leveraged.InputMode;
-                break;
-
-            case BtcLoanDetails btcLoan:
-                platformName = btcLoan.PlatformName;
-                collateralSats = btcLoan.CollateralSats;
-                loanAmount = btcLoan.LoanAmount;
-                apr = btcLoan.Apr;
-                initialLtv = btcLoan.InitialLtv;
-                liquidationLtv = btcLoan.LiquidationLtv;
-                marginCallLtv = btcLoan.MarginCallLtv;
-                fees = btcLoan.Fees;
-                loanStartDate = btcLoan.LoanStartDate;
-                repaymentDate = btcLoan.RepaymentDate;
-                loanStatusId = (int)btcLoan.Status;
-                loanStatusName = btcLoan.Status.ToString();
-                accruedInterest = btcLoan.CalculateAccruedInterest();
-                totalDebt = btcLoan.CalculateTotalDebt();
-                daysUntilRepayment = btcLoan.CalculateDaysUntilRepayment();
-                fixedTotalDebt = btcLoan.FixedTotalDebt;
-                hasFixedTotalDebt = btcLoan.HasFixedTotalDebt;
-                if (btcLoan.CurrentBtcPriceInLoanCurrency > 0)
-                {
-                    currentLtv = btcLoan.CalculateCurrentLtv(btcLoan.CurrentBtcPriceInLoanCurrency);
-                    var healthStatus = btcLoan.CalculateHealthStatus(btcLoan.CurrentBtcPriceInLoanCurrency);
-                    loanHealthStatusId = (int)healthStatus;
-                    loanHealthStatusName = healthStatus.ToString();
-                    distanceToLiquidationLtv = btcLoan.CalculateDistanceToLiquidation(btcLoan.CurrentBtcPriceInLoanCurrency);
-                }
-                break;
-
-            case BtcLendingDetails btcLending:
-                amountLent = btcLending.AmountLent;
-                borrowerOrPlatformName = btcLending.BorrowerOrPlatformName;
-                lendingStartDate = btcLending.LendingStartDate;
-                apr = btcLending.Apr;
-                earnedInterest = btcLending.CalculateEarnedInterest();
-                loanStatusId = (int)btcLending.Status;
-                loanStatusName = btcLending.Status.ToString();
-                daysUntilRepayment = btcLending.CalculateDaysUntilRepayment();
-                repaymentDate = btcLending.ExpectedRepaymentDate;
-                break;
-        }
-
+    private static AssetDTO CreateBaseDto(AssetEntity entity, Asset asset)
+    {
         return new AssetDTO
         {
             Id = entity.Id.ToString(),
@@ -325,54 +202,226 @@ internal sealed class AssetQueries : IAssetQueries
             GroupId = entity.GroupId?.ToString(),
             CurrentPrice = asset.GetCurrentPrice(),
             CurrentValue = asset.GetCurrentValue(),
-            CurrencyCode = asset.GetCurrencyCode(),
-            // Type-specific fields
-            Quantity = quantity,
-            Symbol = symbol,
-            PriceSourceId = priceSourceId,
-            Address = address,
-            MonthlyRentalIncome = monthlyRentalIncome,
-            Collateral = collateral,
-            EntryPrice = entryPrice,
-            Leverage = leverage,
-            LiquidationPrice = liquidationPrice,
-            IsLong = isLong,
-            DistanceToLiquidation = distanceToLiquidation,
-            IsAtRisk = isAtRisk,
-            PositionSize = positionSize,
-            InputModeId = inputModeId,
-            // BTC loan fields
-            PlatformName = platformName,
-            CollateralSats = collateralSats,
-            LoanAmount = loanAmount,
-            Apr = apr,
-            CurrentLtv = currentLtv,
-            InitialLtv = initialLtv,
-            LiquidationLtv = liquidationLtv,
-            MarginCallLtv = marginCallLtv,
-            Fees = fees,
-            LoanStartDate = loanStartDate,
-            RepaymentDate = repaymentDate,
-            LoanStatusId = loanStatusId,
-            LoanStatusName = loanStatusName,
-            LoanHealthStatusId = loanHealthStatusId,
-            LoanHealthStatusName = loanHealthStatusName,
-            AccruedInterest = accruedInterest,
-            TotalDebt = totalDebt,
-            DistanceToLiquidationLtv = distanceToLiquidationLtv,
-            DaysUntilRepayment = daysUntilRepayment,
-            FixedTotalDebt = fixedTotalDebt,
-            HasFixedTotalDebt = hasFixedTotalDebt,
-            // BTC lending fields
-            AmountLent = amountLent,
-            BorrowerOrPlatformName = borrowerOrPlatformName,
-            LendingStartDate = lendingStartDate,
-            EarnedInterest = earnedInterest,
-            // Common acquisition and P&L fields
-            AcquisitionDate = acquisitionDate,
-            AcquisitionPrice = acquisitionPrice,
+            CurrencyCode = asset.GetCurrencyCode()
+        };
+    }
+
+    private static AssetDTO MapBasicAsset(AssetEntity entity, Asset asset, BasicAssetDetails basic)
+    {
+        var dto = CreateBaseDto(entity, asset);
+        decimal? pnl = null;
+        decimal? pnlPercentage = null;
+
+        if (basic.AcquisitionPrice.HasValue)
+        {
+            pnl = basic.CalculatePnL();
+            pnlPercentage = basic.CalculatePnLPercentage();
+        }
+
+        return dto with
+        {
+            Quantity = basic.Quantity,
+            Symbol = basic.Symbol,
+            PriceSourceId = (int)basic.PriceSource,
+            AcquisitionDate = basic.AcquisitionDate,
+            AcquisitionPrice = basic.AcquisitionPrice,
             PnL = pnl,
             PnLPercentage = pnlPercentage
+        };
+    }
+
+    private static AssetDTO MapRealEstateAsset(AssetEntity entity, Asset asset, RealEstateAssetDetails realEstate)
+    {
+        var dto = CreateBaseDto(entity, asset);
+        decimal? pnl = null;
+        decimal? pnlPercentage = null;
+
+        if (realEstate.AcquisitionPrice.HasValue)
+        {
+            pnl = realEstate.CalculatePnL();
+            pnlPercentage = realEstate.CalculatePnLPercentage();
+        }
+
+        return dto with
+        {
+            Address = realEstate.Address,
+            MonthlyRentalIncome = realEstate.MonthlyRentalIncome,
+            AcquisitionDate = realEstate.AcquisitionDate,
+            AcquisitionPrice = realEstate.AcquisitionPrice,
+            PnL = pnl,
+            PnLPercentage = pnlPercentage
+        };
+    }
+
+    private static AssetDTO MapLeveragedPosition(AssetEntity entity, Asset asset, LeveragedPositionDetails leveraged)
+    {
+        var dto = CreateBaseDto(entity, asset);
+
+        return dto with
+        {
+            Collateral = leveraged.Collateral,
+            EntryPrice = leveraged.EntryPrice,
+            Leverage = leveraged.Leverage,
+            LiquidationPrice = leveraged.LiquidationPrice,
+            IsLong = leveraged.IsLong,
+            Symbol = leveraged.Symbol,
+            PriceSourceId = (int)leveraged.PriceSource,
+            PnL = leveraged.CalculatePnL(leveraged.CurrentPrice),
+            PnLPercentage = leveraged.CalculatePnLPercentage(leveraged.CurrentPrice),
+            DistanceToLiquidation = leveraged.CalculateDistanceToLiquidation(leveraged.CurrentPrice),
+            IsAtRisk = leveraged.IsAtRisk(leveraged.CurrentPrice),
+            PositionSize = leveraged.PositionSize,
+            InputModeId = (int)leveraged.InputMode
+        };
+    }
+
+    private static AssetDTO MapBtcLoan(AssetEntity entity, Asset asset, BtcLoanDetails btcLoan)
+    {
+        var dto = CreateBaseDto(entity, asset);
+        var snapshot = btcLoan.Snapshots.MaxBy(s => s.EffectiveDate);
+        decimal? currentLtv = null;
+        int? loanHealthStatusId = null;
+        string? loanHealthStatusName = null;
+        decimal? distanceToLiquidationLtv = null;
+
+        var currentBtcPriceInLoanCurrency = snapshot?.CurrentBtcPriceInLoanCurrency ?? btcLoan.CurrentBtcPriceInLoanCurrency;
+
+        if (currentBtcPriceInLoanCurrency > 0)
+        {
+            currentLtv = btcLoan.CalculateCurrentLtv(currentBtcPriceInLoanCurrency);
+            var healthStatus = btcLoan.CalculateHealthStatus(currentBtcPriceInLoanCurrency);
+            loanHealthStatusId = (int)healthStatus;
+            loanHealthStatusName = healthStatus.ToString();
+            distanceToLiquidationLtv = btcLoan.CalculateDistanceToLiquidation(currentBtcPriceInLoanCurrency);
+        }
+
+        return dto with
+        {
+            PlatformName = btcLoan.PlatformName,
+            CollateralSats = snapshot?.CollateralSats ?? btcLoan.CollateralSats,
+            LoanAmount = snapshot?.LoanAmount ?? btcLoan.LoanAmount,
+            Apr = snapshot?.Apr ?? btcLoan.Apr,
+            CurrentLtv = currentLtv,
+            InitialLtv = btcLoan.InitialLtv,
+            LiquidationLtv = snapshot?.LiquidationLtv ?? btcLoan.LiquidationLtv,
+            MarginCallLtv = snapshot?.MarginCallLtv ?? btcLoan.MarginCallLtv,
+            Fees = snapshot?.Fees ?? btcLoan.Fees,
+            LoanStartDate = btcLoan.LoanStartDate,
+            RepaymentDate = snapshot?.RepaymentDate ?? btcLoan.RepaymentDate,
+            LoanStatusId = snapshot is not null ? (int)snapshot.Status : (int)btcLoan.Status,
+            LoanStatusName = (snapshot?.Status ?? btcLoan.Status).ToString(),
+            LoanHealthStatusId = loanHealthStatusId,
+            LoanHealthStatusName = loanHealthStatusName,
+            AccruedInterest = btcLoan.CalculateAccruedInterest(),
+            TotalDebt = btcLoan.CalculateTotalDebt(),
+            DistanceToLiquidationLtv = distanceToLiquidationLtv,
+            DaysUntilRepayment = btcLoan.CalculateDaysUntilRepayment(),
+            FixedTotalDebt = snapshot?.FixedTotalDebt ?? btcLoan.FixedTotalDebt,
+            HasFixedTotalDebt = (snapshot?.FixedTotalDebt.HasValue).GetValueOrDefault(btcLoan.HasFixedTotalDebt)
+        };
+    }
+
+    private static AssetDTO MapBtcLending(AssetEntity entity, Asset asset, BtcLendingDetails btcLending)
+    {
+        var dto = CreateBaseDto(entity, asset);
+
+        return dto with
+        {
+            AmountLent = btcLending.AmountLent,
+            BorrowerOrPlatformName = btcLending.BorrowerOrPlatformName,
+            LendingStartDate = btcLending.LendingStartDate,
+            Apr = btcLending.Apr,
+            EarnedInterest = btcLending.CalculateEarnedInterest(),
+            LoanStatusId = (int)btcLending.Status,
+            LoanStatusName = btcLending.Status.ToString(),
+            DaysUntilRepayment = btcLending.CalculateDaysUntilRepayment(),
+            RepaymentDate = btcLending.ExpectedRepaymentDate
+        };
+    }
+
+    public Task<IReadOnlyList<LoanStateSnapshotDTO>> GetLoanStateTimelineAsync(string assetId)
+    {
+        var entity = _localDatabase.GetAssets().FindById(new LiteDB.ObjectId(assetId));
+        if (entity is null)
+            return Task.FromResult<IReadOnlyList<LoanStateSnapshotDTO>>(new List<LoanStateSnapshotDTO>().AsReadOnly());
+
+        var asset = entity.AsDomainObject();
+        if (asset.Details is not BtcLoanDetails btcLoan)
+            return Task.FromResult<IReadOnlyList<LoanStateSnapshotDTO>>(new List<LoanStateSnapshotDTO>().AsReadOnly());
+
+        var orderedSnapshots = btcLoan.Snapshots
+            .OrderBy(s => s.EffectiveDate)
+            .ToList();
+        var initialEffectiveDate = orderedSnapshots.FirstOrDefault()?.EffectiveDate;
+
+        var dtos = orderedSnapshots
+            .Select(s => MapLoanStateSnapshot(s, s.EffectiveDate == initialEffectiveDate))
+            .ToList()
+            .AsReadOnly();
+
+        return Task.FromResult<IReadOnlyList<LoanStateSnapshotDTO>>(dtos);
+    }
+
+    public Task<LoanStateDTO?> GetLatestLoanStateAsync(string assetId)
+    {
+        var entity = _localDatabase.GetAssets().FindById(new LiteDB.ObjectId(assetId));
+        if (entity is null)
+            return Task.FromResult<LoanStateDTO?>(null);
+
+        var asset = entity.AsDomainObject();
+        if (asset.Details is not BtcLoanDetails btcLoan)
+            return Task.FromResult<LoanStateDTO?>(null);
+
+        var latestSnapshot = btcLoan.Snapshots.MaxBy(s => s.EffectiveDate);
+        if (latestSnapshot is null)
+            return Task.FromResult<LoanStateDTO?>(null);
+
+        return Task.FromResult<LoanStateDTO?>(new LoanStateDTO
+        {
+            AssetId = asset.Id.Value,
+            AssetName = asset.Name.Value,
+            PlatformName = latestSnapshot.PlatformName,
+            CollateralSats = latestSnapshot.CollateralSats,
+            LoanAmount = latestSnapshot.LoanAmount,
+            CurrencyCode = latestSnapshot.CurrencyCode,
+            Apr = latestSnapshot.Apr,
+            InitialLtv = latestSnapshot.InitialLtv,
+            LiquidationLtv = latestSnapshot.LiquidationLtv,
+            MarginCallLtv = latestSnapshot.MarginCallLtv,
+            Fees = latestSnapshot.Fees,
+            LoanStartDate = latestSnapshot.LoanStartDate,
+            RepaymentDate = latestSnapshot.RepaymentDate,
+            StatusId = (int)latestSnapshot.Status,
+            CurrentBtcPriceInLoanCurrency = latestSnapshot.CurrentBtcPriceInLoanCurrency,
+            FixedTotalDebt = latestSnapshot.FixedTotalDebt,
+            CurrentTotalDebt = latestSnapshot.CurrentTotalDebt,
+            EffectiveDate = latestSnapshot.EffectiveDate,
+            Note = latestSnapshot.Note
+        });
+    }
+
+    private static LoanStateSnapshotDTO MapLoanStateSnapshot(LoanStateSnapshot snapshot, bool isInitial)
+    {
+        return new LoanStateSnapshotDTO
+        {
+            PlatformName = snapshot.PlatformName,
+            CollateralSats = snapshot.CollateralSats,
+            LoanAmount = snapshot.LoanAmount,
+            CurrencyCode = snapshot.CurrencyCode,
+            Apr = snapshot.Apr,
+            InitialLtv = snapshot.InitialLtv,
+            LiquidationLtv = snapshot.LiquidationLtv,
+            MarginCallLtv = snapshot.MarginCallLtv,
+            Fees = snapshot.Fees,
+            LoanStartDate = snapshot.LoanStartDate,
+            RepaymentDate = snapshot.RepaymentDate,
+            StatusId = (int)snapshot.Status,
+            CurrentBtcPriceInLoanCurrency = snapshot.CurrentBtcPriceInLoanCurrency,
+            FixedTotalDebt = snapshot.FixedTotalDebt,
+            CurrentTotalDebt = snapshot.CurrentTotalDebt,
+            EffectiveDate = snapshot.EffectiveDate,
+            Note = snapshot.Note,
+            IsInitial = isInitial
         };
     }
 

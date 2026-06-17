@@ -124,6 +124,16 @@
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    IsVisible="{Binding IsIndicatorsLoading}" />
                     </Grid>
+                    <!-- Simulated Prices Dashboard -->
+                    <Grid MinHeight="150"
+                          reports1:DashboardGridPanel.RowSpan="{Binding SimulatedPricesData.IsLarge, Converter={x:Static reports1:DashboardGridPanel.IsLargeToRowSpanConverter}}">
+                        <Panel IsVisible="{Binding !IsSimulatedPricesLoading}">
+                            <reports1:DashboardDataUserControl DataContext="{Binding SimulatedPricesData}" />
+                        </Panel>
+                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   IsVisible="{Binding IsSimulatedPricesLoading}" />
+                    </Grid>
                     <!-- Leverage Positions Dashboard -->
                     <Grid MinHeight="150"
                           IsVisible="{Binding IsLeveragePositionsVisible}"

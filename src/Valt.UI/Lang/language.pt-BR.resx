@@ -207,6 +207,18 @@
     <data name="StatusDisplay.Title" xml:space="preserve">
         <value>Status dos serviços</value>
     </data>
+    <data name="Loading_DatabaseOpening" xml:space="preserve">
+        <value>Abrindo banco de dados…</value>
+    </data>
+    <data name="Loading_PriceDatabase" xml:space="preserve">
+        <value>Carregando dados de preço…</value>
+    </data>
+    <data name="Loading_LivePrices" xml:space="preserve">
+        <value>Buscando preços ao vivo…</value>
+    </data>
+    <data name="Loading_LoadingTransactions" xml:space="preserve">
+        <value>Carregando transações…</value>
+    </data>
     <data name="Transactions.AddTransaction" xml:space="preserve">
         <value>+ Nova transação</value>
     </data>
@@ -2745,5 +2757,89 @@
     </data>
     <data name="Reports_FixedPriceModal_Cancel" xml:space="preserve">
         <value>Cancelar</value>
+    </data>
+    <data name="Assets_UpdateLoanState" xml:space="preserve">
+        <value>Atualizar Estado do Empréstimo</value>
+    </data>
+    <data name="UpdateLoanState_Title" xml:space="preserve">
+        <value>Atualizar Estado do Empréstimo</value>
+    </data>
+    <data name="UpdateLoanState_SaveSnapshot" xml:space="preserve">
+        <value>Salvar Snapshot</value>
+    </data>
+    <data name="UpdateLoanState_DiscardChanges" xml:space="preserve">
+        <value>Descartar Alterações</value>
+    </data>
+    <data name="UpdateLoanState_ContextHeader" xml:space="preserve">
+        <value>Contexto do Empréstimo Atual</value>
+    </data>
+    <data name="UpdateLoanState_NewStateHeader" xml:space="preserve">
+        <value>Novo Estado</value>
+    </data>
+    <data name="UpdateLoanState_EffectiveDate" xml:space="preserve">
+        <value>Data Efetiva</value>
+    </data>
+    <data name="UpdateLoanState_CurrentTotalDebt" xml:space="preserve">
+        <value>Dívida Total Atual</value>
+    </data>
+    <data name="UpdateLoanState_Note" xml:space="preserve">
+        <value>Observação</value>
+    </data>
+    <data name="UpdateLoanState_HelpText" xml:space="preserve">
+        <value>Snapshots são apenas adicionados. Para corrigir um estado, exclua o snapshot antigo e adicione um novo.</value>
+    </data>
+    <data name="LoanStateHistory_Title" xml:space="preserve">
+        <value>Histórico do Estado do Empréstimo</value>
+    </data>
+    <data name="Assets_LoanStateHistory" xml:space="preserve">
+        <value>Histórico do Estado do Empréstimo</value>
+    </data>
+    <data name="ManageAsset_BtcLoan_OriginInformationWarning" xml:space="preserve">
+        <value>Esta é a informação do empréstimo original. Para atualizar a situação atual, use a funcionalidade Atualizar Estado do Empréstimo.</value>
+    </data>
+    <data name="LoanStateHistory_AddNewState" xml:space="preserve">
+        <value>Adicionar novo estado</value>
+    </data>
+    <data name="LoanStateHistory_DeleteSelected" xml:space="preserve">
+        <value>Excluir selecionado</value>
+    </data>
+    <data name="LoanStateHistory_Close" xml:space="preserve">
+        <value>Fechar</value>
+    </data>
+    <data name="UpdateLoanState_ViewHistory" xml:space="preserve">
+        <value>Ver Histórico</value>
+    </data>
+    <data name="LoanStateHistory_DeleteConfirmationTitle" xml:space="preserve">
+        <value>Excluir Snapshot</value>
+    </data>
+    <data name="LoanStateHistory_DeleteConfirmationMessage" xml:space="preserve">
+        <value>Excluir o snapshot de {0}? Os cálculos voltarão ao snapshot anterior.</value>
+    </data>
+    <data name="LoanStateHistory_DeleteError" xml:space="preserve">
+        <value>Falha ao excluir o snapshot: {0}. Tente novamente.</value>
+    </data>
+    <data name="SatsLabel" xml:space="preserve">
+        <value>sats</value>
+    </data>
+    <data name="Validation_EffectiveDateRequired" xml:space="preserve">
+        <value>Data efetiva é obrigatória</value>
+    </data>
+    <data name="Validation_CurrentTotalDebtRequired" xml:space="preserve">
+        <value>Dívida total atual é obrigatória</value>
+    </data>
+    <data name="Validation_CollateralRequired" xml:space="preserve">
+        <value>Garantia é obrigatória</value>
+    </data>
+    <data name="Validation_CollateralGreaterThanZero" xml:space="preserve">
+        <value>Garantia deve ser maior que zero</value>
+    </data>
+    <data name="Validation_AprRequired" xml:space="preserve">
+        <value>Taxa anual é obrigatória</value>
+    </data>
+    <data name="Validation_AprNonNegative" xml:space="preserve">
+        <value>Taxa anual não pode ser negativa</value>
+    </data>
+    <data name="Validation_FeesRequired" xml:space="preserve">
+        <value>Taxas são obrigatórias</value>
     </data>
 </root>

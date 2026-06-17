@@ -1,6 +1,3 @@
-using Avalonia.Controls;
-using Avalonia.Media;
-
 namespace Valt.UI.Services.Theming.Themes;
 
 /// <summary>
@@ -8,178 +5,28 @@ namespace Valt.UI.Services.Theming.Themes;
 /// </summary>
 public static class MidnightGalaxyTheme
 {
-    public static ResourceDictionary Create()
-    {
-        var resources = new ResourceDictionary();
-
-        // Accent (Violet/Purple)
-        resources["Accent100Color"] = Color.Parse("#E9D8FD");
-        resources["Accent200Color"] = Color.Parse("#D6BCFA");
-        resources["Accent300Color"] = Color.Parse("#B794F4");
-        resources["Accent400Color"] = Color.Parse("#9F7AEA");
-        resources["Accent500Color"] = Color.Parse("#805AD5");
-        resources["Accent600Color"] = Color.Parse("#6B46C1");
-        resources["Accent700Color"] = Color.Parse("#553C9A");
-        resources["Accent800Color"] = Color.Parse("#44337A");
-        resources["Accent900Color"] = Color.Parse("#322659");
-
-        // Secondary (Gold/Amber - complementary to violet)
-        resources["Secondary100Color"] = Color.Parse("#F1E7BC");
-        resources["Secondary200Color"] = Color.Parse("#F0DA83");
-        resources["Secondary300Color"] = Color.Parse("#EFC849");
-        resources["Secondary400Color"] = Color.Parse("#EEB522");
-        resources["Secondary500Color"] = Color.Parse("#E9960A");
-        resources["Secondary600Color"] = Color.Parse("#CE7106");
-        resources["Secondary700Color"] = Color.Parse("#AB4F09");
-        resources["Secondary800Color"] = Color.Parse("#8B3D0D");
-        resources["Secondary900Color"] = Color.Parse("#72320E");
-
-        // Text (Cool violet-tinted gray)
-        resources["Text100Color"] = Color.Parse("#FAF5FF");
-        resources["Text200Color"] = Color.Parse("#E9E3F0");
-        resources["Text300Color"] = Color.Parse("#D6CFE2");
-        resources["Text400Color"] = Color.Parse("#B8B0C8");
-        resources["Text500Color"] = Color.Parse("#9590A8");
-        resources["Text600Color"] = Color.Parse("#706B85");
-        resources["Text700Color"] = Color.Parse("#524D66");
-        resources["Text800Color"] = Color.Parse("#363245");
-        resources["Text900Color"] = Color.Parse("#1E1B2A");
-
-        // Background (Deep space purple - visible purple tint)
-        resources["Background100Color"] = Color.Parse("#8A7BAA");
-        resources["Background200Color"] = Color.Parse("#786898");
-        resources["Background300Color"] = Color.Parse("#665A85");
-        resources["Background400Color"] = Color.Parse("#564B72");
-        resources["Background500Color"] = Color.Parse("#483E62");
-        resources["Background600Color"] = Color.Parse("#3C3155");
-        resources["Background700Color"] = Color.Parse("#332848");
-        resources["Background800Color"] = Color.Parse("#2B2140");
-        resources["Background900Color"] = Color.Parse("#1E1530");
-
-        // Disabled (matches Background scale)
-        resources["Disabled100Color"] = Color.Parse("#8A7BAA");
-        resources["Disabled200Color"] = Color.Parse("#786898");
-        resources["Disabled300Color"] = Color.Parse("#665A85");
-        resources["Disabled400Color"] = Color.Parse("#564B72");
-        resources["Disabled500Color"] = Color.Parse("#483E62");
-        resources["Disabled600Color"] = Color.Parse("#3C3155");
-        resources["Disabled700Color"] = Color.Parse("#332848");
-        resources["Disabled800Color"] = Color.Parse("#2B2140");
-        resources["Disabled900Color"] = Color.Parse("#1E1530");
-
-        // Divider (Violet-tinted gray)
-        resources["Divider100Color"] = Color.Parse("#E9E3F0");
-        resources["Divider200Color"] = Color.Parse("#D6CFE2");
-        resources["Divider300Color"] = Color.Parse("#B8B0C8");
-        resources["Divider400Color"] = Color.Parse("#9590A8");
-        resources["Divider500Color"] = Color.Parse("#706B85");
-        resources["Divider600Color"] = Color.Parse("#524D66");
-        resources["Divider700Color"] = Color.Parse("#363245");
-        resources["Divider800Color"] = Color.Parse("#252035");
-        resources["Divider900Color"] = Color.Parse("#14111E");
-
-        // Icon (Gold/Amber - complementary to violet)
-        resources["Icon100Color"] = Color.Parse("#FEF3C7");
-        resources["Icon200Color"] = Color.Parse("#FDE68A");
-        resources["Icon300Color"] = Color.Parse("#FCD34D");
-        resources["Icon400Color"] = Color.Parse("#FBBF24");
-        resources["Icon500Color"] = Color.Parse("#F59E0B");
-        resources["Icon600Color"] = Color.Parse("#D97706");
-        resources["Icon700Color"] = Color.Parse("#B45309");
-        resources["Icon800Color"] = Color.Parse("#92400E");
-        resources["Icon900Color"] = Color.Parse("#78350F");
-
-        // Semantic Info (Blue)
-        resources["SemanticInfo100Color"] = Color.Parse("#A3BFFA");
-        resources["SemanticInfo200Color"] = Color.Parse("#7F9CF5");
-        resources["SemanticInfo300Color"] = Color.Parse("#667EEA");
-        resources["SemanticInfo400Color"] = Color.Parse("#5A67D8");
-        resources["SemanticInfo500Color"] = Color.Parse("#4C51BF");
-        resources["SemanticInfo600Color"] = Color.Parse("#434190");
-        resources["SemanticInfo700Color"] = Color.Parse("#3C366B");
-        resources["SemanticInfo800Color"] = Color.Parse("#2D2A5C");
-        resources["SemanticInfo900Color"] = Color.Parse("#1A1744");
-
-        // Semantic Negative (Red/Pink)
-        resources["SemanticNegative100Color"] = Color.Parse("#FED7E2");
-        resources["SemanticNegative200Color"] = Color.Parse("#FBB6CE");
-        resources["SemanticNegative300Color"] = Color.Parse("#F687B3");
-        resources["SemanticNegative400Color"] = Color.Parse("#ED64A6");
-        resources["SemanticNegative500Color"] = Color.Parse("#D53F8C");
-        resources["SemanticNegative600Color"] = Color.Parse("#B83280");
-        resources["SemanticNegative700Color"] = Color.Parse("#97266D");
-        resources["SemanticNegative800Color"] = Color.Parse("#702459");
-        resources["SemanticNegative900Color"] = Color.Parse("#4A1942");
-
-        // Semantic Positive (Green)
-        resources["SemanticPositive100Color"] = Color.Parse("#9AE6B4");
-        resources["SemanticPositive200Color"] = Color.Parse("#68D391");
-        resources["SemanticPositive300Color"] = Color.Parse("#48BB78");
-        resources["SemanticPositive400Color"] = Color.Parse("#38A169");
-        resources["SemanticPositive500Color"] = Color.Parse("#2F855A");
-        resources["SemanticPositive600Color"] = Color.Parse("#276749");
-        resources["SemanticPositive700Color"] = Color.Parse("#22543D");
-        resources["SemanticPositive800Color"] = Color.Parse("#1C4532");
-        resources["SemanticPositive900Color"] = Color.Parse("#0D2818");
-
-        // Semantic Special (Cyan)
-        resources["SemanticSpecial100Color"] = Color.Parse("#B2F5EA");
-        resources["SemanticSpecial200Color"] = Color.Parse("#81E6D9");
-        resources["SemanticSpecial300Color"] = Color.Parse("#4FD1C5");
-        resources["SemanticSpecial400Color"] = Color.Parse("#38B2AC");
-        resources["SemanticSpecial500Color"] = Color.Parse("#319795");
-        resources["SemanticSpecial600Color"] = Color.Parse("#2C7A7B");
-        resources["SemanticSpecial700Color"] = Color.Parse("#285E61");
-        resources["SemanticSpecial800Color"] = Color.Parse("#234E52");
-        resources["SemanticSpecial900Color"] = Color.Parse("#1D4044");
-
-        // Semantic Warning (Yellow/Amber)
-        resources["SemanticWarning100Color"] = Color.Parse("#FAF089");
-        resources["SemanticWarning200Color"] = Color.Parse("#F6E05E");
-        resources["SemanticWarning300Color"] = Color.Parse("#ECC94B");
-        resources["SemanticWarning400Color"] = Color.Parse("#D69E2E");
-        resources["SemanticWarning500Color"] = Color.Parse("#B7791F");
-        resources["SemanticWarning600Color"] = Color.Parse("#975A16");
-        resources["SemanticWarning700Color"] = Color.Parse("#744210");
-        resources["SemanticWarning800Color"] = Color.Parse("#5F370E");
-        resources["SemanticWarning900Color"] = Color.Parse("#3D2508");
-
-        // Special Colors
-        resources["BlackColor"] = Color.Parse("#08060C");
-        resources["WhiteColor"] = Color.Parse("#FAF5FF");
-
-        // Transaction Row Colors (for DataGrid highlighting)
-        resources["CreditBaseColor"] = Color.Parse("#78DB55");
-        resources["DebtBaseColor"] = Color.Parse("#FF7D7D");
-        resources["TransferBaseColor"] = Color.Parse("#FFF866");
-
-        // Title Bar
-        resources["TitleBarForegroundColor"] = Color.Parse("#FFFFFF");
-
-        // UI Element Colors
-        resources["LiveRatesBackgroundColor"] = Color.Parse("#2B2140");
-        resources["LiveRatesBorderGradientStartColor"] = Color.Parse("#6B46C1");
-        resources["LiveRatesBorderGradientEndColor"] = Color.Parse("#483E62");
-        resources["LiveRatesVariationBackgroundColor"] = Color.Parse("#332848");
-        resources["ButtonOverlayLightColor"] = Color.Parse("#40FFFFFF");
-        resources["ButtonOverlayMediumColor"] = Color.Parse("#26FFFFFF");
-        resources["StepIndicatorActiveColor"] = Color.Parse("#805AD5");
-        resources["StepIndicatorInactiveColor"] = Color.Parse("#665A85");
-        resources["StepIndicatorInactiveLightColor"] = Color.Parse("#8A7BAA");
-        resources["MessageBoxInfoColor"] = Color.Parse("#667EEA");
-        resources["MessageBoxWarningColor"] = Color.Parse("#D69E2E");
-        resources["MessageBoxErrorColor"] = Color.Parse("#ED64A6");
-        resources["MessageBoxQuestionColor"] = Color.Parse("#38B2AC");
-        resources["ColorPickerSelectedBorderColor"] = Color.Parse("#9F7AEA");
-        resources["ModalTopBarBackgroundColor"] = Color.Parse("#3C3155");
-        resources["TopBarButtonBackgroundColor"] = Color.Parse("#322659");
-        resources["TopBarButtonBackgroundHoverColor"] = Color.Parse("#44337A");
-        resources["TopBarButtonBackgroundSelectedColor"] = Color.Parse("#9F7AEA");
-        resources["TopBarButtonForegroundColor"] = Color.Parse("#B794F4");
-        resources["TopBarButtonForegroundHoverColor"] = Color.Parse("#FAF5FF");
-        resources["FooterGradientStartColor"] = Color.Parse("#1E1530");
-        resources["IconSelectorDefaultColor"] = Color.Parse("#FAF5FF");
-
-        return resources;
-    }
+    public static ThemePalette Palette => new(
+        "MidnightGalaxy",
+        "Dark",
+        new ColorScale("#E9D8FD", "#D6BCFA", "#B794F4", "#9F7AEA", "#805AD5", "#6B46C1", "#553C9A", "#44337A", "#322659"),
+        new ColorScale("#F1E7BC", "#F0DA83", "#EFC849", "#EEB522", "#E9960A", "#CE7106", "#AB4F09", "#8B3D0D", "#72320E"),
+        new ColorScale("#FAF5FF", "#E9E3F0", "#D6CFE2", "#B8B0C8", "#9590A8", "#706B85", "#524D66", "#363245", "#1E1B2A"),
+        new ColorScale("#8A7BAA", "#786898", "#665A85", "#564B72", "#483E62", "#3C3155", "#332848", "#2B2140", "#1E1530"),
+        new ColorScale("#8A7BAA", "#786898", "#665A85", "#564B72", "#483E62", "#3C3155", "#332848", "#2B2140", "#1E1530"),
+        new ColorScale("#E9E3F0", "#D6CFE2", "#B8B0C8", "#9590A8", "#706B85", "#524D66", "#363245", "#252035", "#14111E"),
+        new ColorScale("#FEF3C7", "#FDE68A", "#FCD34D", "#FBBF24", "#F59E0B", "#D97706", "#B45309", "#92400E", "#78350F"),
+        new ColorScale("#A3BFFA", "#7F9CF5", "#667EEA", "#5A67D8", "#4C51BF", "#434190", "#3C366B", "#2D2A5C", "#1A1744"),
+        new ColorScale("#FED7E2", "#FBB6CE", "#F687B3", "#ED64A6", "#D53F8C", "#B83280", "#97266D", "#702459", "#4A1942"),
+        new ColorScale("#9AE6B4", "#68D391", "#48BB78", "#38A169", "#2F855A", "#276749", "#22543D", "#1C4532", "#0D2818"),
+        new ColorScale("#B2F5EA", "#81E6D9", "#4FD1C5", "#38B2AC", "#319795", "#2C7A7B", "#285E61", "#234E52", "#1D4044"),
+        new ColorScale("#FAF089", "#F6E05E", "#ECC94B", "#D69E2E", "#B7791F", "#975A16", "#744210", "#5F370E", "#3D2508"),
+        new ThemeSpecificColors(
+            "#08060C", "#FAF5FF", "#78DB55", "#FF7D7D", "#FFF866",
+            "#FFFFFF", "#2B2140", "#6B46C1", "#483E62", "#332848",
+            "#40FFFFFF", "#26FFFFFF", "#805AD5", "#665A85", "#8A7BAA",
+            "#667EEA", "#D69E2E", "#ED64A6", "#38B2AC", "#9F7AEA",
+            "#3C3155", "#322659", "#44337A", "#9F7AEA", "#B794F4",
+            "#FAF5FF", "#1E1530", "#FAF5FF"
+        )
+    );
 }

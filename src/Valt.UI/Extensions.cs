@@ -32,6 +32,7 @@ using Valt.UI.Views.Main.Modals.StatusDisplay;
 using Valt.UI.Views.Main.Tabs.Assets;
 using Valt.UI.Views.Main.Tabs.AvgPrice;
 using Valt.UI.Views.Main.Tabs.Reports;
+using Valt.UI.Views.Main.Tabs.Reports.Panels;
 using Valt.UI.Services.LocalStorage;
 using Valt.UI.Views.Main.Modals.AvgPriceLineEditor;
 using Valt.UI.Views.Main.Modals.ManageAvgPriceProfiles;
@@ -50,6 +51,8 @@ using Valt.UI.Views.Main.Modals.SimulatedPricesConfig;
 using Valt.UI.Views.Main.Modals.FixedPriceConfig;
 using Valt.UI.Views.Main.Modals.SpendingEvolution;
 using Valt.UI.Views.Main.Modals.Tips;
+using Valt.UI.Views.Main.Modals.UpdateLoanState;
+using Valt.UI.Views.Main.Modals.LoanStateHistory;
 using Valt.UI.Views.Main.Tabs.Transactions;
 
 namespace Valt.UI;
@@ -74,6 +77,10 @@ public static class Extensions
         //panel ViewModels
         services.AddSingleton<FixedExpensesPanelViewModel>();
         services.AddSingleton<GoalsPanelViewModel>();
+        services.AddSingleton<IndicatorsPanelViewModel>();
+        services.AddSingleton<WealthPanelViewModel>();
+        services.AddSingleton<BtcStackPanelViewModel>();
+        services.AddSingleton<SimulatedPricesPanelViewModel>();
         //factory method for pages
         services.AddSingleton<Func<MainViewTabNames, ValtTabViewModel>>(services => pageNames =>
         {
@@ -87,6 +94,9 @@ public static class Extensions
             };
         });
         services.AddSingleton<IPageFactory, PageFactory>();
+        services.AddSingleton<IDatabaseLifecycleService, DatabaseLifecycleService>();
+        services.AddSingleton<ITransactionSelectionService, TransactionSelectionService>();
+        services.AddSingleton<IAutoSatRefreshService, AutoSatRefreshService>();
         
         //transactions tabs
         services.AddSingleton<TransactionListViewModel>();
@@ -134,6 +144,8 @@ public static class Extensions
         services.AddTransient<TipsViewModel>();
         services.AddTransient<FixedExpenseOverviewViewModel>();
         services.AddTransient<SpendingEvolutionViewModel>();
+        services.AddTransient<UpdateLoanStateViewModel>();
+        services.AddTransient<LoanStateHistoryViewModel>();
 
         //other
         services.AddSingleton<IInitialCategoryNameLanguageProvider, InitialCategoryNameLanguageProvider>();
@@ -271,6 +283,14 @@ public static class Extensions
                 ApplicationModalNames.FixedPriceConfig => new FixedPriceConfigView()
                 {
                     DataContext = services.GetRequiredService<FixedPriceConfigViewModel>(),
+                },
+                ApplicationModalNames.UpdateLoanState => new UpdateLoanStateView()
+                {
+                    DataContext = services.GetRequiredService<UpdateLoanStateViewModel>(),
+                },
+                ApplicationModalNames.LoanStateHistory => new LoanStateHistoryView()
+                {
+                    DataContext = services.GetRequiredService<LoanStateHistoryViewModel>(),
                 },
                 _ => throw new ArgumentOutOfRangeException(nameof(modalNames), modalNames, null)
             };
