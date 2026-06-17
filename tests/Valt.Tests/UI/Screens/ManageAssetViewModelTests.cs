@@ -14,6 +14,7 @@ using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Modules.Assets.PriceProviders;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Settings;
+using Valt.UI.Services;
 using Valt.UI.Views.Main.Modals.ManageAsset;
 
 namespace Valt.Tests.UI.Screens;
@@ -29,6 +30,7 @@ public class ManageAssetViewModelTests
     private ILocalDatabase _localDatabase;
     private INotificationPublisher _notificationPublisher;
     private CurrencySettings _currencySettings;
+    private IModalFactory _modalFactory;
 
     [OneTimeSetUp]
     public void OneTimeSetUp() => IdGenerator.Configure(new LiteDbIdProvider());
@@ -43,6 +45,7 @@ public class ManageAssetViewModelTests
         _logger = Substitute.For<ILogger<ManageAssetViewModel>>();
         _localDatabase = Substitute.For<ILocalDatabase>();
         _notificationPublisher = Substitute.For<INotificationPublisher>();
+        _modalFactory = Substitute.For<IModalFactory>();
         _currencySettings = new CurrencySettings(_localDatabase, _notificationPublisher)
         {
             MainFiatCurrency = "USD"
@@ -56,7 +59,7 @@ public class ManageAssetViewModelTests
     }
 
     private ManageAssetViewModel CreateViewModel()
-        => new(_queryDispatcher, _commandDispatcher, _priceProviderSelector, _currencySettings, _configurationManager, _logger);
+        => new(_queryDispatcher, _commandDispatcher, _priceProviderSelector, _currencySettings, _configurationManager, _logger, _modalFactory);
 
     private static AssetDTO CreateStockAssetDto(DateOnly? acquisitionDate = null) => new()
     {

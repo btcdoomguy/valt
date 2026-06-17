@@ -46,7 +46,8 @@ public partial class LoanStateHistoryViewModel : ValtModalViewModel
             CurrentTotalDebtFormatted = "$ 105 000.00",
             CollateralSatsFormatted = "5 000 000 " + language.SatsLabel,
             AprFormatted = "12.00%",
-            FeesFormatted = "$ 500.00"
+            FeesFormatted = "$ 500.00",
+            IsInitial = false
         });
 
         Snapshots.CollectionChanged += (_, _) => DeleteSelectedCommand.NotifyCanExecuteChanged();
@@ -88,7 +89,8 @@ public partial class LoanStateHistoryViewModel : ValtModalViewModel
                 CurrentTotalDebtFormatted = CurrencyDisplay.FormatFiat(s.CurrentTotalDebt, s.CurrencyCode),
                 CollateralSatsFormatted = $"{s.CollateralSats:N0} {language.SatsLabel}",
                 AprFormatted = $"{s.Apr * 100m:N2}%",
-                FeesFormatted = CurrencyDisplay.FormatFiat(s.Fees, s.CurrencyCode)
+                FeesFormatted = CurrencyDisplay.FormatFiat(s.Fees, s.CurrencyCode),
+                IsInitial = s.IsInitial
             });
         }
 
@@ -149,7 +151,7 @@ public partial class LoanStateHistoryViewModel : ValtModalViewModel
         await LoadTimelineAsync();
     }
 
-    private bool CanDeleteSelected() => SelectedSnapshot is not null && Snapshots.Count > 1;
+    private bool CanDeleteSelected() => SelectedSnapshot is { IsInitial: false } && Snapshots.Count > 1;
 
     [RelayCommand]
     private Task Close()
@@ -180,5 +182,6 @@ public partial class LoanStateHistoryViewModel : ValtModalViewModel
         public required string CollateralSatsFormatted { get; init; }
         public required string AprFormatted { get; init; }
         public required string FeesFormatted { get; init; }
+        public required bool IsInitial { get; init; }
     }
 }

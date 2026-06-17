@@ -2799,6 +2799,9 @@
     <data name="Assets_LoanStateHistory" xml:space="preserve">
         <value>Loan State History</value>
     </data>
+    <data name="ManageAsset_BtcLoan_OriginInformationWarning" xml:space="preserve">
+        <value>This is the origin loan information. For updating the current situation, use the Update Loan State feature instead.</value>
+    </data>
     <data name="LoanStateHistory_AddNewState" xml:space="preserve">
         <value>Add new state</value>
     </data>

@@ -30,7 +30,7 @@
             <userControls:CustomTitleBar Title="{x:Static local:language.ManageAsset_Title}"
                                          TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
-            <Border Classes="form-fields-area" Height="670">
+            <Border Classes="form-fields-area" Height="710">
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                     <StackPanel>
                         <!-- Section 1: Basic Information -->
@@ -337,7 +337,26 @@
                         <!-- Section 2d: BTC Loan Details -->
                         <Border Classes="form-section" IsVisible="{Binding ShowBtcLoanFields}">
                             <StackPanel>
-                                <TextBlock Classes="form-section-header" Text="{x:Static local:language.ManageAsset_Section_BtcLoan}" />
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <TextBlock Grid.Column="0" Classes="form-section-header" Text="{x:Static local:language.ManageAsset_Section_BtcLoan}" />
+
+                                    <StackPanel Grid.Column="1"
+                                                Orientation="Horizontal"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Top"
+                                                Spacing="10"
+                                                IsVisible="{Binding ShowLoanStateActions}">
+                                        <Button Content="{x:Static local:language.Assets_LoanStateHistory}"
+                                                Command="{Binding OpenLoanStateHistoryCommand}" />
+                                        <Button Content="{x:Static local:language.Assets_UpdateLoanState}"
+                                                Command="{Binding UpdateLoanStateCommand}" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Border Classes="hint-box"
+                                        IsVisible="{Binding ShowLoanStateActions}">
+                                    <TextBlock Text="{x:Static local:language.ManageAsset_BtcLoan_OriginInformationWarning}" />
+                                </Border>
 
                                 <StackPanel Classes="form-field" HorizontalAlignment="Left">
                                     <TextBlock Text="{x:Static local:language.ManageAsset_Platform}" />

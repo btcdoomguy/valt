@@ -38,6 +38,13 @@ internal sealed class DeleteLoanStateUpdateHandler : ICommandHandler<DeleteLoanS
                 "INVALID_ASSET_TYPE",
                 "Cannot delete loan state update on non-BTC loan assets. Only BTC-backed loans support state snapshots.");
 
+        var orderedSnapshots = btcLoan.Snapshots.OrderBy(s => s.EffectiveDate).ToList();
+        var initialSnapshot = orderedSnapshots.FirstOrDefault();
+        if (initialSnapshot is not null && initialSnapshot.EffectiveDate == command.EffectiveDate)
+            return Result<Unit>.Failure(
+                "CANNOT_DELETE_INITIAL_SNAPSHOT",
+                "Cannot delete the initial loan state snapshot.");
+
         var newDetails = btcLoan.WithoutSnapshot(command.EffectiveDate);
         asset.Edit(asset.Name, newDetails, asset.Icon, asset.IncludeInNetWorth, asset.Visible);
         await _assetRepository.SaveAsync(asset);

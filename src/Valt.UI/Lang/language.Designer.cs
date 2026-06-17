@@ -5481,6 +5481,12 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string ManageAsset_BtcLoan_OriginInformationWarning {
+            get {
+                return ResourceManager.GetString("ManageAsset_BtcLoan_OriginInformationWarning", resourceCulture);
+            }
+        }
+        
         public static string LoanStateHistory_AddNewState {
             get {
                 return ResourceManager.GetString("LoanStateHistory_AddNewState", resourceCulture);

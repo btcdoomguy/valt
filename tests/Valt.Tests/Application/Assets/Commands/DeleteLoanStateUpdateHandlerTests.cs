@@ -25,38 +25,34 @@ public class DeleteLoanStateUpdateHandlerTests : DatabaseTest
     };
 
     [Test]
-    public async Task HandleAsync_WithExistingSnapshot_DeletesSnapshot()
+    public async Task HandleAsync_WithInitialSnapshot_ReturnsCannotDeleteInitial()
     {
         var asset = AssetBuilder.ABtcLoan()
             .WithSnapshot(new DateOnly(2025, 6, 1), 26_000m)
+            .WithSnapshot(new DateOnly(2025, 7, 1), 27_000m)
             .Build();
         await _assetRepository.SaveAsync(asset);
 
         var command = ValidCommand(asset.Id.Value, new DateOnly(2025, 6, 1));
         var result = await _handler.HandleAsync(command);
 
-        var saved = await _assetRepository.GetByIdAsync(asset.Id);
-        var details = (BtcLoanDetails)saved!.Details;
-
         Assert.Multiple(() =>
         {
-            Assert.That(result.IsSuccess, Is.True);
-            Assert.That(details.Snapshots.Any(s => s.EffectiveDate == new DateOnly(2025, 6, 1)), Is.False);
+            Assert.That(result.IsFailure, Is.True);
+            Assert.That(result.Error!.Code, Is.EqualTo("CANNOT_DELETE_INITIAL_SNAPSHOT"));
         });
     }
 
     [Test]
-    public async Task HandleAsync_AfterDeletingLatestSnapshot_FallsBackToPreviousSnapshot()
+    public async Task HandleAsync_WithNonInitialSnapshot_DeletesSnapshot()
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
-        var yesterday = today.AddDays(-1);
         var asset = AssetBuilder.ABtcLoan()
-            .WithSnapshot(yesterday, 26_000m)
-            .WithSnapshot(today, 27_000m)
+            .WithSnapshot(new DateOnly(2025, 6, 1), 26_000m)
+            .WithSnapshot(new DateOnly(2025, 7, 1), 27_000m)
             .Build();
         await _assetRepository.SaveAsync(asset);
 
-        var command = ValidCommand(asset.Id.Value, today);
+        var command = ValidCommand(asset.Id.Value, new DateOnly(2025, 7, 1));
         var result = await _handler.HandleAsync(command);
 
         var saved = await _assetRepository.GetByIdAsync(asset.Id);
@@ -66,29 +62,7 @@ public class DeleteLoanStateUpdateHandlerTests : DatabaseTest
         {
             Assert.That(result.IsSuccess, Is.True);
             Assert.That(details.Snapshots, Has.Count.EqualTo(1));
-            Assert.That(details.CalculateTotalDebt(), Is.EqualTo(26_008.52m));
-        });
-    }
-
-    [Test]
-    public async Task HandleAsync_AfterDeletingOnlySnapshot_FallsBackToSetupValues()
-    {
-        var asset = AssetBuilder.ABtcLoan()
-            .WithSnapshot(new DateOnly(2025, 6, 1), 26_000m)
-            .Build();
-        await _assetRepository.SaveAsync(asset);
-
-        var command = ValidCommand(asset.Id.Value, new DateOnly(2025, 6, 1));
-        var result = await _handler.HandleAsync(command);
-
-        var saved = await _assetRepository.GetByIdAsync(asset.Id);
-        var savedDetails = (BtcLoanDetails)saved!.Details;
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.IsSuccess, Is.True);
-            Assert.That(savedDetails.Snapshots.Any(s => s.EffectiveDate == new DateOnly(2025, 6, 1)), Is.False);
-            Assert.That(savedDetails.CalculateTotalDebt(), Is.Not.EqualTo(26_000m));
+            Assert.That(details.Snapshots.Any(s => s.EffectiveDate == new DateOnly(2025, 7, 1)), Is.False);
         });
     }
 

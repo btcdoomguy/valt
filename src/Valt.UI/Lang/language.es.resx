@@ -2794,6 +2794,9 @@
     <data name="Assets_LoanStateHistory" xml:space="preserve">
         <value>Historial del Estado del Préstamo</value>
     </data>
+    <data name="ManageAsset_BtcLoan_OriginInformationWarning" xml:space="preserve">
+        <value>Esta es la información del préstamo original. Para actualizar la situación actual, use la función Actualizar Estado del Préstamo.</value>
+    </data>
     <data name="LoanStateHistory_AddNewState" xml:space="preserve">
         <value>Agregar nuevo estado</value>
     </data>

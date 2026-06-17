@@ -37,7 +37,7 @@ public class LoanStateHistoryViewModelTests
     private LoanStateHistoryViewModel CreateViewModel()
         => new(_queryDispatcher, _commandDispatcher, _modalFactory);
 
-    private static LoanStateSnapshotDTO CreateSnapshot(DateOnly effectiveDate) => new()
+    private static LoanStateSnapshotDTO CreateSnapshot(DateOnly effectiveDate, bool isInitial = false) => new()
     {
         PlatformName = "HodlHodl",
         CollateralSats = 5_000_000,
@@ -55,7 +55,8 @@ public class LoanStateHistoryViewModelTests
         FixedTotalDebt = null,
         CurrentTotalDebt = 105_000m,
         EffectiveDate = effectiveDate,
-        Note = null
+        Note = null,
+        IsInitial = isInitial
     };
 
     [Test]
@@ -85,7 +86,7 @@ public class LoanStateHistoryViewModelTests
     {
         // Arrange
         var viewModel = CreateViewModel();
-        var snapshot = CreateSnapshot(new DateOnly(2024, 6, 1));
+        var snapshot = CreateSnapshot(new DateOnly(2024, 6, 1), isInitial: true);
 
         _queryDispatcher.DispatchAsync(Arg.Any<GetLoanStateTimelineQuery>(), Arg.Any<CancellationToken>())
             .Returns(new List<LoanStateSnapshotDTO> { snapshot }.AsReadOnly());
@@ -101,11 +102,32 @@ public class LoanStateHistoryViewModelTests
     }
 
     [Test]
+    public async Task Should_Disable_Delete_When_Selected_Is_Initial()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        var older = CreateSnapshot(new DateOnly(2024, 1, 1), isInitial: true);
+        var newer = CreateSnapshot(new DateOnly(2024, 6, 1));
+
+        _queryDispatcher.DispatchAsync(Arg.Any<GetLoanStateTimelineQuery>(), Arg.Any<CancellationToken>())
+            .Returns(new List<LoanStateSnapshotDTO> { older, newer }.AsReadOnly());
+
+        viewModel.Parameter = new LoanStateHistoryViewModel.Request { AssetId = "asset-1" };
+        await viewModel.OnBindParameterAsync();
+
+        // Act
+        viewModel.SelectedSnapshot = viewModel.Snapshots[0];
+
+        // Assert
+        Assert.That(viewModel.DeleteSelectedCommand.CanExecute(null), Is.False);
+    }
+
+    [Test]
     public async Task Should_Dispatch_DeleteLoanStateUpdateCommand_When_Selected()
     {
         // Arrange
         var viewModel = CreateViewModel();
-        var older = CreateSnapshot(new DateOnly(2024, 1, 1));
+        var older = CreateSnapshot(new DateOnly(2024, 1, 1), isInitial: true);
         var newer = CreateSnapshot(new DateOnly(2024, 6, 1));
 
         _queryDispatcher.DispatchAsync(Arg.Any<GetLoanStateTimelineQuery>(), Arg.Any<CancellationToken>())

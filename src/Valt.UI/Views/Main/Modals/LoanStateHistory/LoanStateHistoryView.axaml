@@ -36,8 +36,7 @@
                     <Button Content="{x:Static lang:language.LoanStateHistory_AddNewState}"
                             Command="{Binding AddNewStateCommand}" />
                     <Button Content="{x:Static lang:language.LoanStateHistory_DeleteSelected}"
-                            Command="{Binding DeleteSelectedCommand}"
-                            Classes="delete-button" />
+                            Command="{Binding DeleteSelectedCommand}" />
                 </StackPanel>
 
                 <DataGrid Grid.Row="1"

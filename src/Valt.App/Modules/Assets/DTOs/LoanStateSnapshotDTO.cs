@@ -22,4 +22,5 @@ public record LoanStateSnapshotDTO
     public required decimal CurrentTotalDebt { get; init; }
     public required DateOnly EffectiveDate { get; init; }
     public required string? Note { get; init; }
+    public required bool IsInitial { get; init; }
 }

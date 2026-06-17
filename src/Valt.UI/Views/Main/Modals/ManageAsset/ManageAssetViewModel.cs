@@ -24,7 +24,10 @@ using Valt.Infra.Settings;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
 using Valt.UI.Lang;
+using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
+using Valt.UI.Views.Main.Modals.LoanStateHistory;
+using Valt.UI.Views.Main.Modals.UpdateLoanState;
 
 namespace Valt.UI.Views.Main.Modals.ManageAsset;
 
@@ -36,6 +39,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     private readonly CurrencySettings? _currencySettings;
     private readonly IConfigurationManager? _configurationManager;
     private readonly ILogger<ManageAssetViewModel>? _logger;
+    private readonly IModalFactory? _modalFactory;
 
     private string? _assetId;
 
@@ -53,6 +57,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     [NotifyPropertyChangedFor(nameof(ShowBtcLoanFields))]
     [NotifyPropertyChangedFor(nameof(ShowBtcLendingFields))]
     [NotifyPropertyChangedFor(nameof(ShowFixedTotalDebtToggle))]
+    [NotifyPropertyChangedFor(nameof(ShowLoanStateActions))]
     [NotifyPropertyChangedFor(nameof(IsBitcoinLeveraged))]
     [NotifyPropertyChangedFor(nameof(IsCustomLeveraged))]
     [NotifyPropertyChangedFor(nameof(ShowLeveragedSymbolRow))]
@@ -263,6 +268,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     private bool _visible = true;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowLoanStateActions))]
     private bool _isEditMode;
 
     // Symbol validation
@@ -285,6 +291,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     public bool ShowLeveragedFields => SelectedAssetType == "LeveragedPosition";
     public bool ShowBtcLoanFields => SelectedAssetType == "BtcLoan";
     public bool ShowBtcLendingFields => SelectedAssetType == "BtcLending";
+    public bool ShowLoanStateActions => ShowBtcLoanFields && IsEditMode;
 
     // Leveraged position Bitcoin/Custom toggle helpers
     public bool IsBitcoinLeveraged => ShowLeveragedFields && IsBitcoinUnderlyingAsset;
@@ -334,7 +341,8 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
         IAssetPriceProviderSelector priceProviderSelector,
         CurrencySettings currencySettings,
         IConfigurationManager configurationManager,
-        ILogger<ManageAssetViewModel> logger)
+        ILogger<ManageAssetViewModel> logger,
+        IModalFactory modalFactory)
     {
         _queryDispatcher = queryDispatcher;
         _commandDispatcher = commandDispatcher;
@@ -342,6 +350,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
         _currencySettings = currencySettings;
         _configurationManager = configurationManager;
         _logger = logger;
+        _modalFactory = modalFactory;
 
         SelectedAssetType = AssetTypes.Stock.ToString();
         SelectedCurrency = currencySettings.MainFiatCurrency;
@@ -933,6 +942,52 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
         }
 
         CloseDialog?.Invoke(new Response(true, _assetId));
+    }
+
+    [RelayCommand]
+    private async Task UpdateLoanState()
+    {
+        if (_assetId is null)
+            return;
+        if (_modalFactory is null)
+            return;
+
+        var ownerWindow = GetWindow?.Invoke();
+        if (ownerWindow is null)
+            return;
+
+        var modalFactory = _modalFactory;
+        var modal = (UpdateLoanStateView)await modalFactory.CreateAsync(
+            ApplicationModalNames.UpdateLoanState,
+            ownerWindow,
+            new UpdateLoanStateViewModel.Request { AssetId = _assetId });
+        if (modal is null)
+            return;
+
+        await modal.ShowDialogSafeAsync<UpdateLoanStateViewModel.Response?>(ownerWindow);
+    }
+
+    [RelayCommand]
+    private async Task OpenLoanStateHistory()
+    {
+        if (_assetId is null)
+            return;
+        if (_modalFactory is null)
+            return;
+
+        var ownerWindow = GetWindow?.Invoke();
+        if (ownerWindow is null)
+            return;
+
+        var modalFactory = _modalFactory;
+        var modal = (LoanStateHistoryView)await modalFactory.CreateAsync(
+            ApplicationModalNames.LoanStateHistory,
+            ownerWindow,
+            new LoanStateHistoryViewModel.Request { AssetId = _assetId });
+        if (modal is null)
+            return;
+
+        await modal.ShowDialogSafeAsync<LoanStateHistoryViewModel.Response?>(ownerWindow);
     }
 
     [RelayCommand]

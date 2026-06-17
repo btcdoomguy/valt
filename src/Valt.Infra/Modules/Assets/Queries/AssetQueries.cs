@@ -349,9 +349,13 @@ internal sealed class AssetQueries : IAssetQueries
         if (asset.Details is not BtcLoanDetails btcLoan)
             return Task.FromResult<IReadOnlyList<LoanStateSnapshotDTO>>(new List<LoanStateSnapshotDTO>().AsReadOnly());
 
-        var dtos = btcLoan.Snapshots
+        var orderedSnapshots = btcLoan.Snapshots
             .OrderBy(s => s.EffectiveDate)
-            .Select(MapLoanStateSnapshot)
+            .ToList();
+        var initialEffectiveDate = orderedSnapshots.FirstOrDefault()?.EffectiveDate;
+
+        var dtos = orderedSnapshots
+            .Select(s => MapLoanStateSnapshot(s, s.EffectiveDate == initialEffectiveDate))
             .ToList()
             .AsReadOnly();
 
@@ -396,7 +400,7 @@ internal sealed class AssetQueries : IAssetQueries
         });
     }
 
-    private static LoanStateSnapshotDTO MapLoanStateSnapshot(LoanStateSnapshot snapshot)
+    private static LoanStateSnapshotDTO MapLoanStateSnapshot(LoanStateSnapshot snapshot, bool isInitial)
     {
         return new LoanStateSnapshotDTO
         {
@@ -416,7 +420,8 @@ internal sealed class AssetQueries : IAssetQueries
             FixedTotalDebt = snapshot.FixedTotalDebt,
             CurrentTotalDebt = snapshot.CurrentTotalDebt,
             EffectiveDate = snapshot.EffectiveDate,
-            Note = snapshot.Note
+            Note = snapshot.Note,
+            IsInitial = isInitial
         };
     }
 
