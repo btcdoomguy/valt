@@ -4,6 +4,8 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Valt.UI.Base;
 using Valt.UI.Views.Main.Modals.ManageCategories.Models;
 
@@ -17,10 +19,18 @@ public partial class ManageCategoriesView : ValtBaseWindow
     private Point _initialPoint;
     private ScrollViewer? _scrollViewer;
     private PointerPressedEventArgs? _pointerPressedEventArgs;
+    private IFireAndForgetTaskRunner? _runner;
+    private ILogger<ManageCategoriesView>? _logger;
     
     public ManageCategoriesView()
     {
         InitializeComponent();
+
+        if (!Design.IsDesignMode && App.ServiceProvider != null)
+        {
+            _runner = App.ServiceProvider.GetRequiredService<IFireAndForgetTaskRunner>();
+            _logger = App.ServiceProvider.GetRequiredService<ILogger<ManageCategoriesView>>();
+        }
         
         Tree.AddHandler(DragDrop.DragOverEvent, TreeView_OnDragOver);
         Tree.AddHandler(DragDrop.DropEvent, TreeView_OnDrop);
@@ -60,25 +70,29 @@ public partial class ManageCategoriesView : ValtBaseWindow
         }
     }
     
-    private async void TreeView_OnPointerMoved(object? sender, PointerEventArgs e)
+    private void TreeView_OnPointerMoved(object? sender, PointerEventArgs e)
     {
-        if (_isPotentialDrag)
-        {
-            var treeView = sender as TreeView;
-            var currentPoint = e.GetPosition(treeView);
-            var distance = Point.Distance(currentPoint, _initialPoint);
+        if (!_isPotentialDrag) return;
+        if (_runner is null || _logger is null) return;
 
-            if (distance > 5) // Adjust this threshold as needed
-            {
-                _isPotentialDrag = false;
-                if (_draggedItem is null || _pointerPressedEventArgs is null) return;
-                var item = DataTransferItem.CreateText("draggedItem");
-                var data = new DataTransfer();
-                data.Add(item);
-                await DragDrop.DoDragDropAsync(_pointerPressedEventArgs, data, DragDropEffects.Move);
-                ResetDragState(e.Pointer);
-            }
-        }
+        var treeView = sender as TreeView;
+        var currentPoint = e.GetPosition(treeView);
+        var distance = Point.Distance(currentPoint, _initialPoint);
+
+        if (distance <= 5) // Adjust this threshold as needed
+            return;
+
+        _isPotentialDrag = false;
+        if (_draggedItem is null || _pointerPressedEventArgs is null) return;
+        var item = DataTransferItem.CreateText("draggedItem");
+        var data = new DataTransfer();
+        data.Add(item);
+
+        _runner.RunAsync(
+            DragDrop.DoDragDropAsync(_pointerPressedEventArgs, data, DragDropEffects.Move),
+            _logger);
+
+        ResetDragState(e.Pointer);
     }
     
     private void TreeView_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
