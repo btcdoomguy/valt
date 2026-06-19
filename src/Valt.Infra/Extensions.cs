@@ -83,6 +83,39 @@ public static class Extensions
 {
     public static IServiceCollection AddValtInfrastructure(this IServiceCollection services)
     {
+        //HTTP clients
+        services.AddHttpClient();
+
+        services.AddHttpClient(HttpClientNames.GitHubApi, client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(30);
+            client.DefaultRequestHeaders.Add("User-Agent", "Valt-Desktop-App");
+            client.DefaultRequestHeaders.Add("Accept", "application/vnd.github+json");
+            client.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
+        });
+
+        services.AddHttpClient(HttpClientNames.CoinGecko, client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(15);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("Valt/1.0");
+            client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+        });
+
+        services.AddHttpClient(HttpClientNames.Indicator, client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(5);
+        });
+
+        services.AddHttpClient(HttpClientNames.PriceProvider, client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(30);
+        });
+
+        services.AddHttpClient(HttpClientNames.UpdateDownload, client =>
+        {
+            client.Timeout = TimeSpan.FromMinutes(10);
+        });
+
         //register all essential dependencies
         IdGenerator.Configure(new LiteDbIdProvider());
 
