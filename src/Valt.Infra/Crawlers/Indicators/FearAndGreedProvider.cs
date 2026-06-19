@@ -1,3 +1,4 @@
+using System.Net.Http;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 
@@ -5,17 +6,18 @@ namespace Valt.Infra.Crawlers.Indicators;
 
 internal class FearAndGreedProvider : IFearAndGreedProvider
 {
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<FearAndGreedProvider> _logger;
 
-    public FearAndGreedProvider(ILogger<FearAndGreedProvider> logger)
+    public FearAndGreedProvider(IHttpClientFactory httpClientFactory, ILogger<FearAndGreedProvider> logger)
     {
+        _httpClientFactory = httpClientFactory;
         _logger = logger;
     }
 
     public async Task<FearAndGreedData> GetAsync()
     {
-        using var client = new HttpClient();
-        client.Timeout = TimeSpan.FromSeconds(5);
+        using var client = _httpClientFactory.CreateClient(HttpClientNames.Indicator);
         try
         {
             var url = "https://api.alternative.me/fng/?limit=1&format=json";

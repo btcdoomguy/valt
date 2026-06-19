@@ -1,3 +1,4 @@
+using System.Net.Http;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 
@@ -6,16 +7,18 @@ namespace Valt.Infra.Crawlers.Indicators;
 internal class BitcoinComIndicatorsProvider : IBitcoinComIndicatorsProvider
 {
     private const string BaseUrl = "https://charts.bitcoin.com/api/v1/charts";
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<BitcoinComIndicatorsProvider> _logger;
 
-    public BitcoinComIndicatorsProvider(ILogger<BitcoinComIndicatorsProvider> logger)
+    public BitcoinComIndicatorsProvider(IHttpClientFactory httpClientFactory, ILogger<BitcoinComIndicatorsProvider> logger)
     {
+        _httpClientFactory = httpClientFactory;
         _logger = logger;
     }
 
     public async Task<MayerMultipleData> GetMayerMultipleAsync()
     {
-        using var client = CreateClient();
+        using var client = _httpClientFactory.CreateClient(HttpClientNames.Indicator);
         try
         {
             // Actual endpoint is /mayer, response has a "current" object
@@ -44,7 +47,7 @@ internal class BitcoinComIndicatorsProvider : IBitcoinComIndicatorsProvider
 
     public async Task<RainbowChartData> GetRainbowChartAsync()
     {
-        using var client = CreateClient();
+        using var client = _httpClientFactory.CreateClient(HttpClientNames.Indicator);
         try
         {
             var url = $"{BaseUrl}/rainbow";
@@ -72,12 +75,5 @@ internal class BitcoinComIndicatorsProvider : IBitcoinComIndicatorsProvider
             _logger.LogError(ex, "Error fetching Rainbow Chart from Bitcoin.com");
             throw;
         }
-    }
-
-    private static HttpClient CreateClient()
-    {
-        var client = new HttpClient();
-        client.Timeout = TimeSpan.FromSeconds(5);
-        return client;
     }
 }

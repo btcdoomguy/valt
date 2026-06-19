@@ -13,6 +13,7 @@ public class FearAndGreedProviderTests
     public void OneTimeSetUp()
     {
         _provider = new FearAndGreedProvider(
+            HttpClientTestFactory.Create(),
             Substitute.For<ILogger<FearAndGreedProvider>>());
     }
 

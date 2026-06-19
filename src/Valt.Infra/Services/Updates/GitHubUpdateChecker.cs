@@ -1,3 +1,4 @@
+using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
@@ -7,20 +8,18 @@ namespace Valt.Infra.Services.Updates;
 internal class GitHubUpdateChecker : IUpdateChecker
 {
     private const string GitHubApiUrl = "https://api.github.com/repos/btcdoomguy/valt/releases?per_page=10";
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<GitHubUpdateChecker> _logger;
 
-    public GitHubUpdateChecker(ILogger<GitHubUpdateChecker> logger)
+    public GitHubUpdateChecker(IHttpClientFactory httpClientFactory, ILogger<GitHubUpdateChecker> logger)
     {
+        _httpClientFactory = httpClientFactory;
         _logger = logger;
     }
 
     public async Task<UpdateInfo?> CheckForUpdateAsync(Version currentVersion)
     {
-        using var client = new HttpClient();
-        client.Timeout = TimeSpan.FromSeconds(30);
-        client.DefaultRequestHeaders.Add("User-Agent", "Valt-Desktop-App");
-        client.DefaultRequestHeaders.Add("Accept", "application/vnd.github+json");
-        client.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
+        using var client = _httpClientFactory.CreateClient(HttpClientNames.GitHubApi);
 
         try
         {
