@@ -313,6 +313,9 @@ public static class Extensions
         //font scaling
         services.AddSingleton<IFontScaleService, FontScaleService>();
 
+        //fire-and-forget runner
+        services.AddSingleton<IFireAndForgetTaskRunner, FireAndForgetTaskRunner>();
+
         //notification handlers (bridge handlers to forward to WeakReferenceMessenger)
         services.Scan(scan => scan
             .FromAssemblyOf<LivePriceUpdateUIHandler>()
