@@ -24,7 +24,7 @@ using Valt.Core.Modules.AvgPrice.Calculations;
 using Valt.Infra.Modules.AvgPrice.Queries;
 using Avalonia.Platform.Storage;
 using Valt.UI.Base;
-using static Valt.UI.Base.TaskExtensions;
+
 using Valt.UI.Services;
 using Valt.UI.Lang;
 using Valt.UI.Services.MessageBoxes;
@@ -47,7 +47,8 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
     private readonly IClock _clock = null!;
     private readonly ICsvExportService _csvExportService = null!;
     private readonly SecureModeState? _secureModeState;
-    private readonly ILogger<AvgPriceViewModel>? _logger;
+    private readonly IFireAndForgetTaskRunner _runner = null!;
+    private readonly ILogger<AvgPriceViewModel> _logger = null!;
 
     [ObservableProperty] private AvaloniaList<AvgPriceProfileDTO> _profiles = new();
     [ObservableProperty] private AvgPriceProfileDTO? _selectedProfile;
@@ -114,6 +115,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
         IClock clock,
         ICsvExportService csvExportService,
         SecureModeState secureModeState,
+        IFireAndForgetTaskRunner runner,
         ILogger<AvgPriceViewModel> logger)
     {
         _commandDispatcher = commandDispatcher;
@@ -123,6 +125,7 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
         _clock = clock;
         _csvExportService = csvExportService;
         _secureModeState = secureModeState;
+        _runner = runner;
         _logger = logger;
 
         _secureModeState.PropertyChanged += OnSecureModeStatePropertyChanged;
@@ -139,12 +142,12 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
 
     public void Initialize()
     {
-        FetchAvgPriceProfiles().SafeFireAndForget(logger: _logger, callerName: nameof(FetchAvgPriceProfiles));
+        FetchAvgPriceProfiles().FireAndForgetSafeAsync(_runner, _logger);
     }
 
     partial void OnTotalsFilterRangeChanged(DateRange value)
     {
-        FetchTotals().SafeFireAndForget(logger: _logger, callerName: nameof(FetchTotals));
+        FetchTotals().FireAndForgetSafeAsync(_runner, _logger);
     }
 
     private async Task FetchAvgPriceProfiles()
@@ -163,8 +166,8 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
     {
         AddOperationCommand.NotifyCanExecuteChanged();
         ExportToCsvCommand.NotifyCanExecuteChanged();
-        FetchAvgPriceLines().SafeFireAndForget(logger: _logger, callerName: nameof(FetchAvgPriceLines));
-        FetchTotals().SafeFireAndForget(logger: _logger, callerName: nameof(FetchTotals));
+        FetchAvgPriceLines().FireAndForgetSafeAsync(_runner, _logger);
+        FetchTotals().FireAndForgetSafeAsync(_runner, _logger);
     }
 
     private async Task FetchAvgPriceLines(string? selectLineId = null)

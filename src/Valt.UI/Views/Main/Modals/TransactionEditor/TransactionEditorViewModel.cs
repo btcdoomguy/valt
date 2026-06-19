@@ -9,6 +9,7 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Budget.Accounts.DTOs;
@@ -31,7 +32,7 @@ using Valt.Core.Modules.Budget.Transactions.Services;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
 using Valt.UI.Base;
-using static Valt.UI.Base.TaskExtensions;
+
 using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
@@ -58,6 +59,8 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
     private readonly CurrencySettings _currencySettings = null!;
     private readonly DisplaySettings _displaySettings = null!;
     private readonly LastTransactionDateState _lastTransactionDateState;
+    private readonly IFireAndForgetTaskRunner _runner = null!;
+    private readonly ILogger<TransactionEditorViewModel> _logger = null!;
 
     public AvaloniaList<CategoryDTO> AvailableCategories { get; set; } = [];
     public AvaloniaList<AccountDTO> AvailableAccounts { get; set; } = [];
@@ -410,7 +413,9 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         IModalFactory modalFactory,
         CurrencySettings currencySettings,
         DisplaySettings displaySettings,
-        LastTransactionDateState lastTransactionDateState)
+        LastTransactionDateState lastTransactionDateState,
+        IFireAndForgetTaskRunner runner,
+        ILogger<TransactionEditorViewModel> logger)
     {
         _commandDispatcher = commandDispatcher;
         _queryDispatcher = queryDispatcher;
@@ -419,8 +424,10 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         _currencySettings = currencySettings;
         _displaySettings = displaySettings;
         _lastTransactionDateState = lastTransactionDateState;
+        _runner = runner;
+        _logger = logger;
 
-        InitializeAsync().SafeFireAndForget(callerName: nameof(InitializeAsync));
+        InitializeAsync().FireAndForgetSafeAsync(_runner, _logger);
     }
 
     private async Task InitializeAsync()
@@ -883,7 +890,7 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
             or nameof(ToAccountFiatValue) or nameof(FromAccount) or nameof(FromAccountBtcValue)
             or nameof(FromAccountFiatValue))
         {
-            UpdateTransferRateAsync().SafeFireAndForget(callerName: nameof(UpdateTransferRateAsync));
+            UpdateTransferRateAsync().FireAndForgetSafeAsync(_runner, _logger);
         }
     }
 

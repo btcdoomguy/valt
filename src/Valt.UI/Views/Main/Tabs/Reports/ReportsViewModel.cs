@@ -36,7 +36,7 @@ using Valt.Infra.Modules.Reports.Statistics;
 using Valt.Infra.Modules.Reports.WealthOverview;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
-using static Valt.UI.Base.TaskExtensions;
+
 using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
@@ -74,6 +74,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly IModalFactory _modalFactory = null!;
     private readonly IQueryDispatcher _queryDispatcher = null!;
     private readonly IIndicatorCache _indicatorCache = null!;
+    private readonly IFireAndForgetTaskRunner _runner = null!;
     private readonly IndicatorsPanelViewModel _indicatorsPanel;
     private readonly WealthPanelViewModel _wealthPanel;
     private readonly BtcStackPanelViewModel _btcStackPanel;
@@ -166,6 +167,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         IModalFactory modalFactory,
         IQueryDispatcher queryDispatcher,
         IIndicatorCache indicatorCache,
+        IFireAndForgetTaskRunner runner,
         IndicatorsPanelViewModel indicatorsPanel,
         WealthPanelViewModel wealthPanel,
         BtcStackPanelViewModel btcStackPanel,
@@ -191,6 +193,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _modalFactory = modalFactory;
         _queryDispatcher = queryDispatcher;
         _indicatorCache = indicatorCache;
+        _runner = runner;
         _indicatorsPanel = indicatorsPanel;
         _wealthPanel = wealthPanel;
         _btcStackPanel = btcStackPanel;
@@ -230,9 +233,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     IsWealthOverviewLoading = true;
                     IsBtcLoansLoading = true;
                     // Reload data when currency changes
-                    ReloadDataAndFetchAllReportsAsync().SafeFireAndForget(logger: _logger, callerName: nameof(ReloadDataAndFetchAllReportsAsync));
+                    ReloadDataAndFetchAllReportsAsync().FireAndForgetSafeAsync(_runner, _logger);
                     _simulatedPricesPanel.Refresh();
-                    UpdateBtcLoansDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateBtcLoansDataAsync));
+                    UpdateBtcLoansDataAsync().FireAndForgetSafeAsync(_runner, _logger);
                     break;
             }
         });
@@ -242,8 +245,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         WeakReferenceMessenger.Default.Register<AssetSummaryUpdatedMessage>(this, (recipient, message) =>
         {
-            UpdateLeveragePositionsDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateLeveragePositionsDataAsync));
-            UpdateBtcLoansDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateBtcLoansDataAsync));
+            UpdateLeveragePositionsDataAsync().FireAndForgetSafeAsync(_runner, _logger);
+            UpdateBtcLoansDataAsync().FireAndForgetSafeAsync(_runner, _logger);
         });
 
         WeakReferenceMessenger.Default.Register<IndicatorsUpdatedMessage>(this, (recipient, message) =>
@@ -273,7 +276,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         LoadDataAndFetchAllReportsAsync()
             .ContinueWith(_ => UpdateLeveragePositionsDataAsync(), TaskScheduler.Default)
             .ContinueWith(_ => UpdateBtcLoansDataAsync(), TaskScheduler.Default)
-            .SafeFireAndForget(logger: _logger, callerName: nameof(LoadDataAndFetchAllReportsAsync));
+            .FireAndForgetSafeAsync(_runner, _logger);
         _wealthPanel.Refresh();
         _btcStackPanel.Refresh();
         _simulatedPricesPanel.Refresh();
@@ -447,7 +450,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         if (!_ready) return;
 
         IsMonthlyTotalsLoading = true;
-        FetchMonthlyTotalsWithProviderAsync().SafeFireAndForget(logger: _logger, callerName: nameof(FetchMonthlyTotalsWithProviderAsync));
+        FetchMonthlyTotalsWithProviderAsync().FireAndForgetSafeAsync(_runner, _logger);
     }
 
     private async Task FetchMonthlyTotalsWithProviderAsync()
@@ -463,7 +466,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         RefreshAvailableAccounts();
         IsSpendingByCategoriesLoading = true;
         IsIncomeByCategoriesLoading = true;
-        FetchCategoriesWithProviderAsync().SafeFireAndForget(logger: _logger, callerName: nameof(FetchCategoriesWithProviderAsync));
+        FetchCategoriesWithProviderAsync().FireAndForgetSafeAsync(_runner, _logger);
     }
 
     private async Task FetchCategoriesWithProviderAsync()
@@ -484,7 +487,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         IsSpendingByCategoriesLoading = true;
         IsIncomeByCategoriesLoading = true;
-        DebouncedFetchCategoriesAsync(_filterDebounceTokenSource.Token).SafeFireAndForget(logger: _logger, callerName: nameof(DebouncedFetchCategoriesAsync));
+        DebouncedFetchCategoriesAsync(_filterDebounceTokenSource.Token).FireAndForgetSafeAsync(_runner, _logger);
     }
 
     private async Task DebouncedFetchCategoriesAsync(CancellationToken cancellationToken)
@@ -796,8 +799,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _wealthPanel.Refresh();
         _btcStackPanel.Refresh();
         _simulatedPricesPanel.Refresh();
-        UpdateLeveragePositionsDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateLeveragePositionsDataAsync));
-        UpdateBtcLoansDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateBtcLoansDataAsync));
+        UpdateLeveragePositionsDataAsync().FireAndForgetSafeAsync(_runner, _logger);
+        UpdateBtcLoansDataAsync().FireAndForgetSafeAsync(_runner, _logger);
     }
 
     private decimal GetCurrentBtcPriceInMainFiat()
@@ -1254,7 +1257,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         if (!_ready) return;
 
         IsWealthOverviewLoading = true;
-        FetchWealthOverviewWithProviderAsync().SafeFireAndForget(logger: _logger, callerName: nameof(FetchWealthOverviewWithProviderAsync));
+        FetchWealthOverviewWithProviderAsync().FireAndForgetSafeAsync(_runner, _logger);
     }
 
     partial void OnSelectedWealthOverviewMaxElementsChanged(int value)
@@ -1262,7 +1265,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         if (!_ready) return;
 
         IsWealthOverviewLoading = true;
-        FetchWealthOverviewWithProviderAsync().SafeFireAndForget(logger: _logger, callerName: nameof(FetchWealthOverviewWithProviderAsync));
+        FetchWealthOverviewWithProviderAsync().FireAndForgetSafeAsync(_runner, _logger);
     }
 
     private async Task FetchWealthOverviewWithProviderAsync()
@@ -1291,8 +1294,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             Dispatcher.UIThread.Post(_wealthPanel.Refresh);
             Dispatcher.UIThread.Post(_btcStackPanel.Refresh);
             Dispatcher.UIThread.Post(_simulatedPricesPanel.Refresh);
-            UpdateLeveragePositionsDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateLeveragePositionsDataAsync));
-            UpdateBtcLoansDataAsync().SafeFireAndForget(logger: _logger, callerName: nameof(UpdateBtcLoansDataAsync));
+            UpdateLeveragePositionsDataAsync().FireAndForgetSafeAsync(_runner, _logger);
+            UpdateBtcLoansDataAsync().FireAndForgetSafeAsync(_runner, _logger);
         }
     }
 

@@ -36,7 +36,7 @@ using Valt.Infra.Modules.Budget.Transactions.Messages;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
 using Valt.UI.Base;
-using static Valt.UI.Base.TaskExtensions;
+
 using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.LocalStorage;
@@ -67,6 +67,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     private readonly ILocalStorageService _localStorageService = null!;
     private readonly ILogger<TransactionListViewModel> _logger = null!;
     private readonly DisplaySettings _displaySettings = null!;
+    private readonly IFireAndForgetTaskRunner _runner = null!;
 
     private DateTime _dateForTransaction = DateTime.Now;
 
@@ -110,7 +111,8 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
         IClock clock,
         ILocalStorageService localStorageService,
         ILogger<TransactionListViewModel> logger,
-        DisplaySettings displaySettings)
+        DisplaySettings displaySettings,
+        IFireAndForgetTaskRunner runner)
     {
         _modalFactory = modalFactory;
         _commandDispatcher = commandDispatcher;
@@ -126,6 +128,7 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
         _localStorageService = localStorageService;
         _logger = logger;
         _displaySettings = displaySettings;
+        _runner = runner;
 
         _liveRateState.PropertyChanged += LiveRateStateOnPropertyChanged;
         _localDatabase.PropertyChanged += LocalDatabaseOnPropertyChanged;
@@ -709,13 +712,13 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     {
         OnPropertyChanged(nameof(FilterMainDate));
         OnPropertyChanged(nameof(FilterRange));
-        FetchTransactions().SafeFireAndForget(logger: _logger, callerName: nameof(FetchTransactions));
+        FetchTransactions().FireAndForgetSafeAsync(_runner, _logger);
     }
 
     partial void OnSelectedTransactionChanged(TransactionViewModel? value)
     {
         RefreshFixedExpensesContextProperties();
-        RefreshMatchingAvgPriceProfilesAsync().SafeFireAndForget(logger: _logger);
+        RefreshMatchingAvgPriceProfilesAsync().FireAndForgetSafeAsync(_runner, _logger);
     }
 
     partial void OnIsSingleItemSelectedChanged(bool value)

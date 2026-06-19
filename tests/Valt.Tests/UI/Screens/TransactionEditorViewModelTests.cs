@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Valt.App.Kernel;
 using Valt.App.Kernel.Commands;
@@ -12,6 +13,7 @@ using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Transactions;
 using Valt.Infra.Settings;
 using Valt.Tests.Builders;
+using Valt.UI.Base;
 using Valt.UI.State;
 using Valt.UI.Views.Main.Modals.TransactionEditor;
 
@@ -22,6 +24,8 @@ public class TransactionEditorViewModelTests : DatabaseTest
 {
     private ICommandDispatcher _commandDispatcher;
     private IQueryDispatcher _queryDispatcher;
+    private IFireAndForgetTaskRunner _runner;
+    private ILogger<TransactionEditorViewModel> _logger;
     private List<AccountDTO> _accounts;
     private List<CategoryDTO> _categories;
 
@@ -30,6 +34,8 @@ public class TransactionEditorViewModelTests : DatabaseTest
     {
         _commandDispatcher = Substitute.For<ICommandDispatcher>();
         _queryDispatcher = Substitute.For<IQueryDispatcher>();
+        _runner = Substitute.For<IFireAndForgetTaskRunner>();
+        _logger = Substitute.For<ILogger<TransactionEditorViewModel>>();
         _accounts = [];
         _categories = [];
 
@@ -54,7 +60,9 @@ public class TransactionEditorViewModelTests : DatabaseTest
             null!,
             currencySettings,
             displaySettings,
-            lastTransactionDateState);
+            lastTransactionDateState,
+            _runner,
+            _logger);
     }
 
     private void AddFiatAccount(string id, string name, FiatCurrency currency)

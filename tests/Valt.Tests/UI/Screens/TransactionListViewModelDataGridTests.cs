@@ -8,6 +8,7 @@ using Valt.Infra.Crawlers.HistoricPriceCrawlers;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
+using Valt.UI.Base;
 using Valt.UI.Services;
 using Valt.UI.Services.LocalStorage;
 using Valt.UI.State;
@@ -27,6 +28,7 @@ public class TransactionListViewModelDataGridTests : DatabaseTest
     private FilterState _filterState = null!;
     private IClock _clock = null!;
     private ILogger<TransactionListViewModel> _vmLogger = null!;
+    private IFireAndForgetTaskRunner _runner = null!;
 
     [SetUp]
     public new void SetUp()
@@ -43,6 +45,7 @@ public class TransactionListViewModelDataGridTests : DatabaseTest
         _filterState = new FilterState();
         _clock = Substitute.For<IClock>();
         _vmLogger = Substitute.For<ILogger<TransactionListViewModel>>();
+        _runner = Substitute.For<IFireAndForgetTaskRunner>();
     }
 
     private TransactionListViewModel CreateViewModel()
@@ -73,7 +76,8 @@ public class TransactionListViewModelDataGridTests : DatabaseTest
             _clock,
             _localStorageService,
             _vmLogger,
-            displaySettings);
+            displaySettings,
+            _runner);
     }
 
     #region UpdateSortState Tests
