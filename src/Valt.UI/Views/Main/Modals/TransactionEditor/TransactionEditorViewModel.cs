@@ -426,19 +426,14 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         _lastTransactionDateState = lastTransactionDateState;
         _runner = runner;
         _logger = logger;
-
-        InitializeAsync().FireAndForgetSafeAsync(_runner, _logger);
-    }
-
-    private async Task InitializeAsync()
-    {
-        Date = DateTime.Now.Date;
-        await FetchCategoriesAsync();
-        await FetchAccountsAsync();
     }
 
     public override async Task OnBindParameterAsync()
     {
+        Date = DateTime.Now.Date;
+        await FetchCategoriesAsync();
+        await FetchAccountsAsync();
+
         if (Parameter is not Request request)
             return;
 

@@ -139,8 +139,7 @@ public class TransactionEditorViewModelTests : DatabaseTest
 
         var model = CreateInstance();
 
-        // Wait for initialization
-        await Task.Delay(100);
+        await model.OnBindParameterAsync();
 
         model.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromFiatAccountId);
 
@@ -155,8 +154,7 @@ public class TransactionEditorViewModelTests : DatabaseTest
 
         var model = CreateInstance();
 
-        // Wait for initialization
-        await Task.Delay(100);
+        await model.OnBindParameterAsync();
 
         model.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromBtcAccountId);
 
@@ -174,8 +172,7 @@ public class TransactionEditorViewModelTests : DatabaseTest
 
         var model = CreateInstance();
 
-        // Wait for initialization
-        await Task.Delay(100);
+        await model.OnBindParameterAsync();
 
         model.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromBtcAccountId);
         model.ToAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == toBtcAccountId);
@@ -197,8 +194,7 @@ public class TransactionEditorViewModelTests : DatabaseTest
 
         var model = CreateInstance();
 
-        // Wait for initialization
-        await Task.Delay(100);
+        await model.OnBindParameterAsync();
 
         model.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromBtcAccountId);
         model.ToAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == toFiatAccountId);
@@ -223,8 +219,7 @@ public class TransactionEditorViewModelTests : DatabaseTest
 
         var model = CreateInstance();
 
-        // Wait for initialization
-        await Task.Delay(100);
+        await model.OnBindParameterAsync();
 
         model.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromFiatAccountId);
         model.ToAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == toBtcAccountId);
@@ -249,8 +244,7 @@ public class TransactionEditorViewModelTests : DatabaseTest
 
         var model = CreateInstance();
 
-        // Wait for initialization
-        await Task.Delay(100);
+        await model.OnBindParameterAsync();
 
         var propertiesChanged = new List<string>();
         model.PropertyChanged += (sender, args) => propertiesChanged.Add(args.PropertyName!);
