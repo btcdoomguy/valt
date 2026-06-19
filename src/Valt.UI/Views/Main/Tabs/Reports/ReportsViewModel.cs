@@ -280,7 +280,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _wealthPanel.Refresh();
         _btcStackPanel.Refresh();
         _simulatedPricesPanel.Refresh();
-        _indicatorsPanel.RefreshAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+        _indicatorsPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
     }
 
     /// <summary>
@@ -1347,11 +1347,6 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     }
 
     #endregion
-
-    private void LoadCachedIndicatorsData()
-    {
-        _indicatorsPanel.RefreshAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-    }
 
     private void UpdateIndicatorsData(IndicatorSnapshot snapshot)
     {
