@@ -406,6 +406,68 @@ public sealed class BtcLoanDetails : IAssetDetails
     }
 
     /// <summary>
+    /// Returns a new <see cref="BtcLoanDetails"/> with the supplied setup values applied to both the
+    /// loan and all existing snapshots. Point-in-time snapshot data (current total debt, effective
+    /// date, note, status, BTC price and fixed total debt flag) is preserved.
+    /// </summary>
+    public BtcLoanDetails WithUpdatedSetup(
+        string platformName,
+        long collateralSats,
+        decimal loanAmount,
+        string currencyCode,
+        decimal apr,
+        decimal initialLtv,
+        decimal liquidationLtv,
+        decimal marginCallLtv,
+        decimal fees,
+        DateOnly loanStartDate,
+        DateOnly? repaymentDate,
+        LoanStatus status,
+        decimal currentBtcPriceInLoanCurrency,
+        decimal? fixedTotalDebt)
+    {
+        var updatedSnapshots = Snapshots
+            .Select(s => new LoanStateSnapshot(
+                platformName,
+                collateralSats,
+                loanAmount,
+                currencyCode,
+                apr,
+                initialLtv,
+                liquidationLtv,
+                marginCallLtv,
+                fees,
+                loanStartDate,
+                repaymentDate,
+                s.Status,
+                s.CurrentBtcPriceInLoanCurrency,
+                s.FixedTotalDebt,
+                s.CurrentTotalDebt,
+                s.EffectiveDate,
+                s.Note))
+            .OrderBy(s => s.EffectiveDate)
+            .ToList()
+            .AsReadOnly();
+
+        return new BtcLoanDetails(
+            platformName,
+            collateralSats,
+            loanAmount,
+            currencyCode,
+            apr,
+            initialLtv,
+            liquidationLtv,
+            marginCallLtv,
+            fees,
+            loanStartDate,
+            repaymentDate,
+            status,
+            currentBtcPriceInLoanCurrency,
+            fixedTotalDebt,
+            updatedSnapshots);
+    }
+
+    /// <summary>
     /// Derives an annualized percentage rate from a fixed total debt and loan period.
     /// Returns 0 when the required inputs are missing.
     /// </summary>
