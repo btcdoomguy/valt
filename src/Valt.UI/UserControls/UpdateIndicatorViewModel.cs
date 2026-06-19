@@ -11,6 +11,7 @@ using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
+using Valt.Infra;
 using Valt.Infra.Services.Updates;
 using Valt.UI.Lang;
 
@@ -19,6 +20,7 @@ namespace Valt.UI.UserControls;
 public partial class UpdateIndicatorViewModel : ObservableObject
 {
     private readonly IUpdateChecker _updateChecker;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<UpdateIndicatorViewModel> _logger;
 
     private UpdateInfo? _updateInfo;
@@ -55,6 +57,7 @@ public partial class UpdateIndicatorViewModel : ObservableObject
     public UpdateIndicatorViewModel()
     {
         _updateChecker = null!;
+        _httpClientFactory = null!;
         _logger = null!;
 
         // Design-time data
@@ -64,9 +67,10 @@ public partial class UpdateIndicatorViewModel : ObservableObject
         CanDownload = true;
     }
 
-    public UpdateIndicatorViewModel(IUpdateChecker updateChecker, ILogger<UpdateIndicatorViewModel> logger)
+    public UpdateIndicatorViewModel(IUpdateChecker updateChecker, IHttpClientFactory httpClientFactory, ILogger<UpdateIndicatorViewModel> logger)
     {
         _updateChecker = updateChecker;
+        _httpClientFactory = httpClientFactory;
         _logger = logger;
     }
 
@@ -146,8 +150,7 @@ public partial class UpdateIndicatorViewModel : ObservableObject
             var filePath = file.Path.LocalPath;
 
             // Download the file
-            using var client = new HttpClient();
-            client.Timeout = TimeSpan.FromMinutes(10);
+            using var client = _httpClientFactory.CreateClient(HttpClientNames.UpdateDownload);
 
             using var response = await client.GetAsync(asset.DownloadUrl, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
