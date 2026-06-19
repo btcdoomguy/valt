@@ -11,7 +11,10 @@ public class FrankfurterFiatProviderTests
     [Test]
     public async Task Should_Get_Prices()
     {
-        var frankfurterUsdRateProvider = new FrankfurterFiatRateProvider(new Clock(), new NullLogger<FrankfurterFiatRateProvider>());
+        var frankfurterUsdRateProvider = new FrankfurterFiatRateProvider(
+            HttpClientTestFactory.Create(),
+            new Clock(),
+            new NullLogger<FrankfurterFiatRateProvider>());
         var currencies = new[] { FiatCurrency.Brl, FiatCurrency.Eur };
 
         var prices = await frankfurterUsdRateProvider.GetAsync(currencies);

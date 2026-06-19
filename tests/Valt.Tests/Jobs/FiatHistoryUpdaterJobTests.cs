@@ -388,6 +388,7 @@ public class FiatHistoryUpdaterJobTests
     {
         // Arrange & Act
         var provider = new Infra.Crawlers.HistoricPriceCrawlers.Fiat.Providers.StaticCsvFiatHistoricalDataProvider(
+            HttpClientTestFactory.Create(),
             new NullLogger<Infra.Crawlers.HistoricPriceCrawlers.Fiat.Providers.StaticCsvFiatHistoricalDataProvider>());
 
         // Assert
@@ -399,6 +400,7 @@ public class FiatHistoryUpdaterJobTests
     {
         // Arrange & Act
         var provider = new Infra.Crawlers.HistoricPriceCrawlers.Fiat.Providers.FrankfurterFiatHistoricalDataProvider(
+            HttpClientTestFactory.Create(),
             new NullLogger<Infra.Crawlers.HistoricPriceCrawlers.Fiat.Providers.FrankfurterFiatHistoricalDataProvider>());
 
         // Assert

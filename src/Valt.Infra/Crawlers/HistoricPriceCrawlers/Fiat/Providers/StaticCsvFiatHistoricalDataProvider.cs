@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Net.Http;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
 
@@ -8,6 +9,7 @@ public class StaticCsvFiatHistoricalDataProvider : IFiatHistoricalDataProvider
 {
     private const string BASE_URL = "https://raw.githubusercontent.com/btcdoomguy/valt-data/refs/heads/master/";
 
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<StaticCsvFiatHistoricalDataProvider> _logger;
 
     private static readonly HashSet<FiatCurrency> SupportedCurrenciesSet = new(
@@ -23,8 +25,9 @@ public class StaticCsvFiatHistoricalDataProvider : IFiatHistoricalDataProvider
         FiatCurrency.Pyg
     ]);
 
-    public StaticCsvFiatHistoricalDataProvider(ILogger<StaticCsvFiatHistoricalDataProvider> logger)
+    public StaticCsvFiatHistoricalDataProvider(IHttpClientFactory httpClientFactory, ILogger<StaticCsvFiatHistoricalDataProvider> logger)
     {
+        _httpClientFactory = httpClientFactory;
         _logger = logger;
     }
 
@@ -80,7 +83,7 @@ public class StaticCsvFiatHistoricalDataProvider : IFiatHistoricalDataProvider
         DateOnly startDate,
         DateOnly endDate)
     {
-        using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+        using var client = _httpClientFactory.CreateClient(HttpClientNames.PriceProvider);
 
         var url = $"{BASE_URL}{currency.Code}.csv";
         _logger.LogInformation("Downloading CSV data from {Url}", url);

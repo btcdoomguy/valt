@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Net.Http;
 using Microsoft.Extensions.Logging;
 
 namespace Valt.Infra.Crawlers.HistoricPriceCrawlers.Bitcoin;
@@ -7,16 +8,18 @@ internal class BitcoinInitialSeedPriceProvider : IBitcoinInitialSeedPriceProvide
 {
     private const string SEED_URL = "https://raw.githubusercontent.com/btcdoomguy/valt-data/refs/heads/master/initial-seed-price.csv";
     
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<BitcoinInitialSeedPriceProvider> _logger;
 
-    public BitcoinInitialSeedPriceProvider(ILogger<BitcoinInitialSeedPriceProvider> logger)
+    public BitcoinInitialSeedPriceProvider(IHttpClientFactory httpClientFactory, ILogger<BitcoinInitialSeedPriceProvider> logger)
     {
+        _httpClientFactory = httpClientFactory;
         _logger = logger;
     }
     
     public async Task<IEnumerable<BitcoinPriceData>> GetPricesAsync()
     {
-        using var client = new HttpClient() { Timeout = TimeSpan.FromSeconds(30) };
+        using var client = _httpClientFactory.CreateClient(HttpClientNames.PriceProvider);
 
         var result = new List<BitcoinPriceData>();
         try
