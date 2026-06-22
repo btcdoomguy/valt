@@ -96,6 +96,7 @@ public static class Extensions
         services.AddSingleton<IPageFactory, PageFactory>();
         services.AddSingleton<IDatabaseLifecycleService, DatabaseLifecycleService>();
         services.AddSingleton<ITransactionSelectionService, TransactionSelectionService>();
+        services.AddSingleton<ITransactionDetailsBuilder, TransactionDetailsBuilder>();
         services.AddSingleton<IAutoSatRefreshService, AutoSatRefreshService>();
         
         //transactions tabs
