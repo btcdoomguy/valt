@@ -234,7 +234,7 @@ lock (_lock) { /* ... */ }
 | `FiatHistoryUpdaterJob` | 120s | Updates historical fiat rates |
 | `AutoSatAmountJob` | 120s | Calculates sat amounts for eligible transactions |
 | `AccountTotalsJob` | 5s | Refreshes account cache |
-| `GoalProgressUpdaterJob` | 5s | Recalculates stale goal progress |
+| `GoalProgressUpdaterJob` | 120s | Recalculates stale goal progress |
 
 ## MCP Server
 

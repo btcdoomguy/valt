@@ -27,7 +27,7 @@ internal class GoalProgressUpdaterJob : IBackgroundJob
     public string Name => "Goal Progress Updater";
     public BackgroundJobSystemNames SystemName => BackgroundJobSystemNames.GoalProgressUpdater;
     public BackgroundJobTypes JobType => BackgroundJobTypes.ValtDatabase;
-    public TimeSpan Interval => TimeSpan.FromSeconds(5);
+    public TimeSpan Interval => TimeSpan.FromSeconds(120);
 
     public GoalProgressUpdaterJob(
         ILocalDatabase localDatabase,
