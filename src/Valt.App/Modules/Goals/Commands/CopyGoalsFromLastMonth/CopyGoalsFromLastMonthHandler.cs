@@ -1,6 +1,8 @@
 using Valt.App.Kernel;
 using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Notifications;
 using Valt.App.Modules.Goals.Contracts;
+using Valt.App.Modules.Goals.Notifications;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.Contracts;
 
@@ -9,14 +11,14 @@ namespace Valt.App.Modules.Goals.Commands.CopyGoalsFromLastMonth;
 internal sealed class CopyGoalsFromLastMonthHandler : ICommandHandler<CopyGoalsFromLastMonthCommand, CopyGoalsFromLastMonthResult>
 {
     private readonly IGoalRepository _goalRepository;
-    private readonly IGoalProgressState _goalProgressState;
+    private readonly INotificationPublisher _notificationPublisher;
 
     public CopyGoalsFromLastMonthHandler(
         IGoalRepository goalRepository,
-        IGoalProgressState goalProgressState)
+        INotificationPublisher notificationPublisher)
     {
         _goalRepository = goalRepository;
-        _goalProgressState = goalProgressState;
+        _notificationPublisher = notificationPublisher;
     }
 
     public async Task<Result<CopyGoalsFromLastMonthResult>> HandleAsync(
@@ -60,7 +62,7 @@ internal sealed class CopyGoalsFromLastMonthHandler : ICommandHandler<CopyGoalsF
 
         if (copiedCount > 0)
         {
-            _goalProgressState.MarkAsStale();
+            await _notificationPublisher.PublishAsync(new GoalProgressUpdateRequested());
         }
 
         return Result<CopyGoalsFromLastMonthResult>.Success(
