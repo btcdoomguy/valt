@@ -120,31 +120,47 @@
                                 
                                 <Grid ColumnDefinitions="*, 32, *">
                                     <StackPanel Grid.Column="0" Classes="form-field">
-                                        <TextBlock Text="{x:Static lang:language.UpdateLoanState_CurrentTotalDebt}" />
-                                        <userControls:FiatInput FiatValue="{Binding CurrentTotalDebt, Mode=TwoWay}"
+                                        <TextBlock Text="{x:Static lang:language.UpdateLoanState_TotalBorrowed}" />
+                                        <userControls:FiatInput FiatValue="{Binding TotalBorrowed, Mode=TwoWay}"
                                                                 CurrencySymbol="{Binding CurrencySymbol}"
                                                                 SymbolOnRight="{Binding SymbolOnRight}" />
                                     </StackPanel>
                                     
                                     <StackPanel Grid.Column="2" Classes="form-field">
+                                        <TextBlock Text="{x:Static lang:language.UpdateLoanState_InterestAccruedUntilDate}" />
+                                        <userControls:FiatInput FiatValue="{Binding InterestAccruedUntilDate, Mode=TwoWay}"
+                                                                CurrencySymbol="{Binding CurrencySymbol}"
+                                                                SymbolOnRight="{Binding SymbolOnRight}" />
+                                    </StackPanel>
+                                </Grid>
+                                
+                                <Grid ColumnDefinitions="*, 32, *">
+                                    <StackPanel Grid.Column="0" Classes="form-field">
                                         <TextBlock Text="{x:Static lang:language.ManageAsset_CollateralSats}" />
                                         <TextBox Text="{Binding CollateralSats}"
+                                                  HorizontalAlignment="Stretch" />
+                                    </StackPanel>
+                                    
+                                    <StackPanel Grid.Column="2" Classes="form-field">
+                                        <TextBlock Text="{x:Static lang:language.ManageAsset_APR}" />
+                                        <TextBox Text="{Binding AprPercentage}"
                                                   HorizontalAlignment="Stretch" />
                                     </StackPanel>
                                 </Grid>
                                 
                                 <Grid ColumnDefinitions="*, 32, *">
                                     <StackPanel Grid.Column="0" Classes="form-field">
-                                        <TextBlock Text="{x:Static lang:language.ManageAsset_APR}" />
-                                        <TextBox Text="{Binding AprPercentage}"
-                                                  HorizontalAlignment="Stretch" />
-                                    </StackPanel>
-                                    
-                                    <StackPanel Grid.Column="2" Classes="form-field">
                                         <TextBlock Text="{x:Static lang:language.ManageAsset_Fees}" />
                                         <userControls:FiatInput FiatValue="{Binding Fees, Mode=TwoWay}"
                                                                 CurrencySymbol="{Binding CurrencySymbol}"
                                                                 SymbolOnRight="{Binding SymbolOnRight}" />
+                                    </StackPanel>
+                                    
+                                    <StackPanel Grid.Column="2" Classes="form-field">
+                                        <TextBlock Text="{x:Static lang:language.UpdateLoanState_CurrentTotalDebt}" />
+                                        <TextBlock Text="{Binding CurrentTotalDebtFormatted}"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource Text100Brush}" />
                                     </StackPanel>
                                 </Grid>
                                 

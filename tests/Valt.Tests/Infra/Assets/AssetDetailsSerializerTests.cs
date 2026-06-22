@@ -13,6 +13,8 @@ public class AssetDetailsSerializerTests
         decimal currentTotalDebt,
         string? note = null)
     {
+        var interest = Math.Max(0m, currentTotalDebt - loan.LoanAmount - loan.Fees);
+
         return new LoanStateSnapshot(
             platformName: loan.PlatformName,
             collateralSats: loan.CollateralSats,
@@ -28,7 +30,8 @@ public class AssetDetailsSerializerTests
             status: loan.Status,
             currentBtcPriceInLoanCurrency: loan.CurrentBtcPriceInLoanCurrency,
             fixedTotalDebt: loan.FixedTotalDebt,
-            currentTotalDebt: currentTotalDebt,
+            totalBorrowed: loan.LoanAmount,
+            interestAccruedUntilDate: interest,
             effectiveDate: effectiveDate,
             note: note);
     }
@@ -292,6 +295,8 @@ public class AssetDetailsSerializerTests
             Assert.That(deserialized.Snapshots, Has.Count.EqualTo(1));
             Assert.That(deserialized.Snapshots[0].EffectiveDate, Is.EqualTo(new DateOnly(2025, 6, 1)));
             Assert.That(deserialized.Snapshots[0].CurrentTotalDebt, Is.EqualTo(26_000m));
+            Assert.That(deserialized.Snapshots[0].TotalBorrowed, Is.EqualTo(25_000m));
+            Assert.That(deserialized.Snapshots[0].InterestAccruedUntilDate, Is.EqualTo(900m));
             Assert.That(deserialized.Snapshots[0].Note, Is.EqualTo("Half-year update"));
         });
     }
@@ -348,6 +353,8 @@ public class AssetDetailsSerializerTests
             Assert.That(deserialized.Snapshots, Has.Count.EqualTo(1));
             Assert.That(deserialized.Snapshots[0].EffectiveDate, Is.EqualTo(new DateOnly(2025, 1, 1)));
             Assert.That(deserialized.Snapshots[0].CurrentTotalDebt, Is.EqualTo(loanAmount + fees));
+            Assert.That(deserialized.Snapshots[0].TotalBorrowed, Is.EqualTo(loanAmount));
+            Assert.That(deserialized.Snapshots[0].InterestAccruedUntilDate, Is.EqualTo(0m));
         });
     }
 
@@ -355,6 +362,8 @@ public class AssetDetailsSerializerTests
     public void Should_AutoSeed_FixedDebt_Legacy_Loan()
     {
         const decimal fixedTotalDebt = 27_500m;
+        const decimal loanAmount = 25_000m;
+        const decimal fees = 100m;
         var legacyJson = "{\"PlatformName\":\"HodlHodl\",\"CollateralSats\":100000000,\"LoanAmount\":25000,\"CurrencyCode\":\"USD\",\"Apr\":0.10,\"InitialLtv\":50,\"LiquidationLtv\":80,\"MarginCallLtv\":70,\"Fees\":100,\"LoanStartDate\":\"2025-01-01T00:00:00\",\"RepaymentDate\":\"2026-01-01T00:00:00\",\"StatusId\":0,\"CurrentBtcPrice\":50000,\"FixedTotalDebt\":27500}";
 
         var deserialized = (BtcLoanDetails)AssetDetailsSerializer.DeserializeDetails(AssetTypes.BtcLoan, legacyJson);
@@ -364,6 +373,8 @@ public class AssetDetailsSerializerTests
             Assert.That(deserialized.Snapshots, Has.Count.EqualTo(1));
             Assert.That(deserialized.Snapshots[0].EffectiveDate, Is.EqualTo(new DateOnly(2025, 1, 1)));
             Assert.That(deserialized.Snapshots[0].CurrentTotalDebt, Is.EqualTo(fixedTotalDebt));
+            Assert.That(deserialized.Snapshots[0].TotalBorrowed, Is.EqualTo(loanAmount));
+            Assert.That(deserialized.Snapshots[0].InterestAccruedUntilDate, Is.EqualTo(fixedTotalDebt - loanAmount - fees));
         });
     }
 
@@ -379,6 +390,8 @@ public class AssetDetailsSerializerTests
             Assert.That(deserialized.Snapshots, Has.Count.EqualTo(1));
             Assert.That(deserialized.Snapshots[0].EffectiveDate, Is.EqualTo(new DateOnly(2025, 1, 1)));
             Assert.That(deserialized.Snapshots[0].CurrentTotalDebt, Is.EqualTo(25_100m));
+            Assert.That(deserialized.Snapshots[0].TotalBorrowed, Is.EqualTo(25_000m));
+            Assert.That(deserialized.Snapshots[0].InterestAccruedUntilDate, Is.EqualTo(0m));
         });
     }
 
@@ -396,6 +409,8 @@ public class AssetDetailsSerializerTests
             Assert.That(deserialized.Snapshots, Has.Count.EqualTo(1));
             Assert.That(deserialized.Snapshots[0].EffectiveDate, Is.EqualTo(DateOnly.FromDateTime(DateTime.UtcNow)));
             Assert.That(deserialized.Snapshots[0].CurrentTotalDebt, Is.EqualTo(loanAmount + fees));
+            Assert.That(deserialized.Snapshots[0].TotalBorrowed, Is.EqualTo(loanAmount));
+            Assert.That(deserialized.Snapshots[0].InterestAccruedUntilDate, Is.EqualTo(0m));
             Assert.That(deserialized.LoanStartDate, Is.EqualTo(DateOnly.FromDateTime(DateTime.UtcNow)));
         });
     }
@@ -434,6 +449,8 @@ public class AssetDetailsSerializerTests
             Assert.That(deserialized2.Snapshots, Has.Count.EqualTo(1));
             Assert.That(deserialized2.Snapshots[0].EffectiveDate, Is.EqualTo(new DateOnly(2025, 6, 1)));
             Assert.That(deserialized2.Snapshots[0].CurrentTotalDebt, Is.EqualTo(26_000m));
+            Assert.That(deserialized2.Snapshots[0].TotalBorrowed, Is.EqualTo(25_000m));
+            Assert.That(deserialized2.Snapshots[0].InterestAccruedUntilDate, Is.EqualTo(900m));
             Assert.That(deserialized2.Snapshots[0].Note, Is.EqualTo("Idempotency check"));
         });
     }

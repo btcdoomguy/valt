@@ -55,6 +55,7 @@ public class AssetToolsLoanStateTests : IntegrationTest
             asset.Id.Value,
             today,
             20_000m,
+            500m,
             100_000_000,
             0.10m,
             100m,
@@ -64,7 +65,7 @@ public class AssetToolsLoanStateTests : IntegrationTest
 
         var latest = await AssetTools.GetLatestLoanState(_queryDispatcher, asset.Id.Value);
         Assert.That(latest, Is.Not.Null);
-        Assert.That(latest!.CurrentTotalDebt, Is.EqualTo(20_000m));
+        Assert.That(latest!.CurrentTotalDebt, Is.EqualTo(20_600m));
 
         var timeline = await AssetTools.GetLoanStateTimeline(_queryDispatcher, asset.Id.Value);
         Assert.That(timeline.Count, Is.GreaterThanOrEqualTo(2));
@@ -96,6 +97,7 @@ public class AssetToolsLoanStateTests : IntegrationTest
             asset.Id.Value,
             "not-a-date",
             20_000m,
+            500m,
             100_000_000,
             0.10m,
             100m);

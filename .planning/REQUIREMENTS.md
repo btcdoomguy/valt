@@ -13,9 +13,9 @@
 
 ### HTTP Resilience
 
-- [ ] **HTTP-01**: `IHttpClientFactory` is registered in DI and all `new HttpClient()` sites use named/typed clients
-- [ ] **HTTP-02**: Price providers and update checkers share a consistent HTTP client lifetime and configuration
-- [ ] **HTTP-03**: Existing provider tests continue to pass against the factory-based clients
+- [x] **HTTP-01**: `IHttpClientFactory` is registered in DI and all `new HttpClient()` sites use named/typed clients
+- [x] **HTTP-02**: Price providers and update checkers share a consistent HTTP client lifetime and configuration
+- [x] **HTTP-03**: Existing provider tests continue to pass against the factory-based clients
 
 ### Background Job Efficiency
 
@@ -102,9 +102,9 @@
 | ASYNC-01 | Phase 11 | Complete |
 | ASYNC-02 | Phase 12 | Complete |
 | ASYNC-03 | Phase 11 | Complete |
-| HTTP-01 | Phase 13 | Pending |
-| HTTP-02 | Phase 13 | Pending |
-| HTTP-03 | Phase 13 | Pending |
+| HTTP-01 | Phase 13 | Complete |
+| HTTP-02 | Phase 13 | Complete |
+| HTTP-03 | Phase 13 | Complete |
 | JOB-01 | Phase 15 | Pending |
 | JOB-02 | Phase 14 | Pending |
 | JOB-03 | Phase 14/15 | Pending |

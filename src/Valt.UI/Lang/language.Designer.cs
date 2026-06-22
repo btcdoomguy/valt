@@ -1821,6 +1821,36 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string UpdateLoanState_TotalBorrowed {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_TotalBorrowed", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_InterestAccruedUntilDate {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_InterestAccruedUntilDate", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcLoans_TotalBorrowed {
+            get {
+                return ResourceManager.GetString("Reports.BtcLoans.TotalBorrowed", resourceCulture);
+            }
+        }
+        
+        public static string Validation_TotalBorrowedRequired {
+            get {
+                return ResourceManager.GetString("Validation_TotalBorrowedRequired", resourceCulture);
+            }
+        }
+        
+        public static string Validation_InterestAccruedUntilDateRequired {
+            get {
+                return ResourceManager.GetString("Validation_InterestAccruedUntilDateRequired", resourceCulture);
+            }
+        }
+        
         public static string Reports_BtcLoans_TotalDebtBtc {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.TotalDebtBtc", resourceCulture);

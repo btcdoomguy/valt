@@ -52,22 +52,27 @@ public class BtcLoanDetailsTests
         decimal? currentBtcPrice = null,
         string? note = null)
     {
+        var totalBorrowed = loanAmount ?? loan.LoanAmount;
+        var actualFees = fees ?? loan.Fees;
+        var interest = Math.Max(0m, currentTotalDebt - totalBorrowed - actualFees);
+
         return new LoanStateSnapshot(
             platformName: loan.PlatformName,
             collateralSats: collateralSats ?? loan.CollateralSats,
-            loanAmount: loanAmount ?? loan.LoanAmount,
+            loanAmount: totalBorrowed,
             currencyCode: loan.CurrencyCode,
             apr: apr ?? loan.Apr,
             initialLtv: loan.InitialLtv,
             liquidationLtv: liquidationLtv ?? loan.LiquidationLtv,
             marginCallLtv: marginCallLtv ?? loan.MarginCallLtv,
-            fees: fees ?? loan.Fees,
+            fees: actualFees,
             loanStartDate: loan.LoanStartDate,
             repaymentDate: repaymentDate ?? loan.RepaymentDate,
             status: status ?? loan.Status,
             currentBtcPriceInLoanCurrency: currentBtcPrice ?? loan.CurrentBtcPriceInLoanCurrency,
             fixedTotalDebt: loan.FixedTotalDebt,
-            currentTotalDebt: currentTotalDebt,
+            totalBorrowed: totalBorrowed,
+            interestAccruedUntilDate: interest,
             effectiveDate: effectiveDate,
             note: note);
     }
@@ -740,6 +745,56 @@ public class BtcLoanDetailsTests
     }
 
     [Test]
+    public void Should_Throw_When_Snapshot_TotalBorrowed_Is_Negative()
+    {
+        var loan = CreateDefaultDetails(loanStartDate: new DateOnly(2025, 1, 1));
+
+        Assert.Throws<ArgumentException>(() => new LoanStateSnapshot(
+            platformName: loan.PlatformName,
+            collateralSats: loan.CollateralSats,
+            loanAmount: loan.LoanAmount,
+            currencyCode: loan.CurrencyCode,
+            apr: loan.Apr,
+            initialLtv: loan.InitialLtv,
+            liquidationLtv: loan.LiquidationLtv,
+            marginCallLtv: loan.MarginCallLtv,
+            fees: loan.Fees,
+            loanStartDate: loan.LoanStartDate,
+            repaymentDate: loan.RepaymentDate,
+            status: loan.Status,
+            currentBtcPriceInLoanCurrency: loan.CurrentBtcPriceInLoanCurrency,
+            fixedTotalDebt: loan.FixedTotalDebt,
+            totalBorrowed: -1m,
+            interestAccruedUntilDate: 0m,
+            effectiveDate: new DateOnly(2025, 6, 1)));
+    }
+
+    [Test]
+    public void Should_Throw_When_Snapshot_Interest_Is_Negative()
+    {
+        var loan = CreateDefaultDetails(loanStartDate: new DateOnly(2025, 1, 1));
+
+        Assert.Throws<ArgumentException>(() => new LoanStateSnapshot(
+            platformName: loan.PlatformName,
+            collateralSats: loan.CollateralSats,
+            loanAmount: loan.LoanAmount,
+            currencyCode: loan.CurrencyCode,
+            apr: loan.Apr,
+            initialLtv: loan.InitialLtv,
+            liquidationLtv: loan.LiquidationLtv,
+            marginCallLtv: loan.MarginCallLtv,
+            fees: loan.Fees,
+            loanStartDate: loan.LoanStartDate,
+            repaymentDate: loan.RepaymentDate,
+            status: loan.Status,
+            currentBtcPriceInLoanCurrency: loan.CurrentBtcPriceInLoanCurrency,
+            fixedTotalDebt: loan.FixedTotalDebt,
+            totalBorrowed: loan.LoanAmount,
+            interestAccruedUntilDate: -1m,
+            effectiveDate: new DateOnly(2025, 6, 1)));
+    }
+
+    [Test]
     public void Should_Order_Snapshots_By_EffectiveDate_Ascending()
     {
         var loan = CreateDefaultDetails(loanStartDate: new DateOnly(2025, 1, 1));
@@ -772,27 +827,28 @@ public class BtcLoanDetailsTests
     public void Should_Recalculate_Total_Debt_From_Past_Snapshot()
     {
         // Snapshot currentTotalDebt = 26_000, fees = 100, apr = 0.12
-        // Principal = 25_900. Over 365 days interest = 25_900 * 0.12 = 3_108.
-        // Total = 26_000 + 3_108 = 29_108.
+        // Borrowed = 25_000, interest until date = 900. Over 365 days interest = 25_000 * 0.12 = 3_000.
+        // Total = 26_000 + 3_000 = 29_000.
         var loan = CreateDefaultDetails(loanStartDate: new DateOnly(2025, 1, 1), fees: 100m);
         var pastDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-365);
 
         var details = loan.WithAddedSnapshot(CreateSnapshot(loan, pastDate, 26_000m));
 
-        Assert.That(details.CalculateTotalDebt(), Is.EqualTo(29_108m));
+        Assert.That(details.CalculateTotalDebt(), Is.EqualTo(29_000m));
     }
 
     [Test]
     public void Should_Calculate_Accrued_Interest_From_Snapshot_Effective_Date()
     {
         // Snapshot currentTotalDebt = 26_000, fees = 100, apr = 0.12
-        // Principal = 25_900. Over 365 days interest = 25_900 * 0.12 = 3_108.
+        // Borrowed = 25_000, interest until date = 900. Over 365 days interest = 25_000 * 0.12 = 3_000.
+        // Total accrued interest = 900 + 3_000 = 3_900.
         var loan = CreateDefaultDetails(loanStartDate: new DateOnly(2025, 1, 1), fees: 100m);
         var pastDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-365);
 
         var details = loan.WithAddedSnapshot(CreateSnapshot(loan, pastDate, 26_000m));
 
-        Assert.That(details.CalculateAccruedInterest(), Is.EqualTo(3_108m));
+        Assert.That(details.CalculateAccruedInterest(), Is.EqualTo(3_900m));
     }
 
     [Test]
@@ -854,7 +910,7 @@ public class BtcLoanDetailsTests
         var details = loan.WithAddedSnapshot(CreateSnapshot(
             loan,
             today,
-            26_000m));
+            25_000m));
 
         Assert.That(details.CalculateAccruedInterest(), Is.EqualTo(0m));
     }
@@ -872,8 +928,9 @@ public class BtcLoanDetailsTests
             .WithoutSnapshot(today);
 
         // Previous snapshot recalculates one day of interest:
-        // principal = 26_000 - 100 = 25_900; interest = 25_900 * 0.12 / 365 = 8.52
-        Assert.That(details.CalculateTotalDebt(), Is.EqualTo(26_008.52m));
+        // borrowed = 25_000; interest until date = 900; additional interest = 25_000 * 0.12 / 365 = 8.22
+        // Total = 25_000 + 900 + 100 + 8.22 = 26_008.22
+        Assert.That(details.CalculateTotalDebt(), Is.EqualTo(26_008.22m));
     }
 
     [Test]
@@ -925,21 +982,6 @@ public class BtcLoanDetailsTests
             Assert.That(withSnapshot.Snapshots, Has.Count.EqualTo(1));
             Assert.Throws<ArgumentException>(() =>
                 withSnapshot.WithAddedSnapshot(CreateSnapshot(loan, new DateOnly(2025, 6, 1), 27_000m)));
-        });
-    }
-
-    [Test]
-    public void Should_Validate_Snapshot_Constructor_Inputs()
-    {
-        var loan = CreateDefaultDetails(loanStartDate: new DateOnly(2025, 1, 1));
-
-        Assert.Multiple(() =>
-        {
-            Assert.Throws<ArgumentException>(() =>
-                CreateSnapshot(loan, new DateOnly(2025, 6, 1), -1m));
-
-            Assert.Throws<ArgumentException>(() =>
-                CreateSnapshot(loan, new DateOnly(2025, 6, 1), 26_000m, liquidationLtv: 70m, marginCallLtv: 70m));
         });
     }
 

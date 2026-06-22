@@ -53,7 +53,8 @@ public class UpdateLoanStateViewModelTests
         StatusId = 0,
         CurrentBtcPriceInLoanCurrency = 100_000m,
         FixedTotalDebt = null,
-        CurrentTotalDebt = 105_000m,
+        TotalBorrowed = 100_000m,
+        InterestAccruedUntilDate = 4_500m,
         EffectiveDate = new DateOnly(2024, 6, 1),
         Note = "Snapshot note"
     };
@@ -82,7 +83,9 @@ public class UpdateLoanStateViewModelTests
         Assert.That(viewModel.CurrencySymbol, Is.EqualTo("$"));
         Assert.That(viewModel.SymbolOnRight, Is.False);
         Assert.That(viewModel.EffectiveDate!.Value.Date, Is.EqualTo(DateTime.Today.Date));
-        Assert.That(viewModel.CurrentTotalDebt.Value, Is.EqualTo(105_000m));
+        Assert.That(viewModel.CurrentTotalDebtFormatted, Is.EqualTo(CurrencyDisplay.FormatFiat(105_000m, "USD")));
+        Assert.That(viewModel.TotalBorrowed.Value, Is.EqualTo(100_000m));
+        Assert.That(viewModel.InterestAccruedUntilDate.Value, Is.EqualTo(4_500m));
         Assert.That(viewModel.CollateralSats, Is.EqualTo(5_000_000));
         Assert.That(viewModel.AprPercentage, Is.EqualTo(12m));
         Assert.That(viewModel.Fees.Value, Is.EqualTo(500m));
@@ -122,7 +125,8 @@ public class UpdateLoanStateViewModelTests
             Fees = 300m,
             LoanStartDate = new DateOnly(2024, 3, 1),
             RepaymentDate = null,
-            TotalDebt = 50_300m
+            TotalDebt = 50_300m,
+            TotalBorrowed = 50_000m
         };
 
         _queryDispatcher.DispatchAsync(Arg.Any<GetLatestLoanStateQuery>(), Arg.Any<CancellationToken>())
@@ -137,7 +141,8 @@ public class UpdateLoanStateViewModelTests
 
         // Assert
         Assert.That(viewModel.PlatformName, Is.EqualTo("Fallback Platform"));
-        Assert.That(viewModel.CurrentTotalDebt.Value, Is.EqualTo(50_300m));
+        Assert.That(viewModel.TotalBorrowed.Value, Is.EqualTo(50_000m));
+        Assert.That(viewModel.InterestAccruedUntilDate.Value, Is.EqualTo(0m));
         Assert.That(viewModel.CollateralSats, Is.EqualTo(1_000_000));
         Assert.That(viewModel.AprPercentage, Is.EqualTo(10m));
         Assert.That(viewModel.Fees.Value, Is.EqualTo(300m));
@@ -185,7 +190,8 @@ public class UpdateLoanStateViewModelTests
         await viewModel.OnBindParameterAsync();
 
         viewModel.EffectiveDate = new DateTime(2024, 12, 1);
-        viewModel.CurrentTotalDebt = FiatValue.New(110_000m);
+        viewModel.TotalBorrowed = FiatValue.New(105_000m);
+        viewModel.InterestAccruedUntilDate = FiatValue.New(4_500m);
         viewModel.CollateralSats = 6_000_000;
         viewModel.AprPercentage = 15m;
         viewModel.Fees = FiatValue.New(600m);
@@ -199,7 +205,8 @@ public class UpdateLoanStateViewModelTests
             Arg.Is<AddLoanStateUpdateCommand>(c =>
                 c.AssetId == "asset-1" &&
                 c.EffectiveDate == new DateOnly(2024, 12, 1) &&
-                c.CurrentTotalDebt == 110_000m &&
+                c.TotalBorrowed == 105_000m &&
+                c.InterestAccruedUntilDate == 4_500m &&
                 c.CollateralSats == 6_000_000 &&
                 c.Apr == 0.15m &&
                 c.Fees == 600m &&

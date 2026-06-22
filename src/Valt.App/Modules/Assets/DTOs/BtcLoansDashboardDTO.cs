@@ -9,6 +9,7 @@ public record BtcLoansDashboardDTO
     public required decimal CollateralPercentOfStack { get; init; }
     public required decimal DebtWeightedAvgLtv { get; init; }
     public required decimal DebtWeightedAvgApr { get; init; }
+    public required decimal TotalBorrowedInMainCurrency { get; init; }
     public required decimal TotalDebtInMainCurrency { get; init; }
     public required decimal TotalDebtInBtc { get; init; }
 
@@ -46,6 +47,7 @@ public record BtcLoansDashboardDTO
         DebtWeightedAvgApr = 0,
         TotalDebtInMainCurrency = 0,
         TotalDebtInBtc = 0,
+        TotalBorrowedInMainCurrency = 0,
         HighestLtv = 0,
         ClosestDistanceToLiquidationLtv = 0,
         ClosestLoanName = string.Empty,

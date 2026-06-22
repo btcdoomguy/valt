@@ -1085,6 +1085,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     new(language.Reports_BtcLoans_ActiveLoans, dto.ActiveLoansCount.ToString(CultureInfo.InvariantCulture)),
                     new(language.Reports_BtcLoans_TotalDebt, CurrencyDisplay.FormatFiat(dto.TotalDebtInMainCurrency, fiatCurrency.Code)),
                     new(language.Reports_BtcLoans_TotalDebtBtc, CurrencyDisplay.FormatAsBitcoin(dto.TotalDebtInBtc) + " BTC"),
+                    new(language.Reports_BtcLoans_TotalBorrowed, CurrencyDisplay.FormatFiat(dto.TotalBorrowedInMainCurrency, fiatCurrency.Code)),
                     new(language.Reports_BtcLoans_AvgLtv, dto.DebtWeightedAvgLtv.ToString("0.##", CultureInfo.InvariantCulture) + "%",
                         TooltipContent.Text(language.Reports_BtcLoans_AvgLtv_Tooltip)),
                     new(language.Reports_BtcLoans_AvgApr, dto.DebtWeightedAvgApr.ToString("0.##", CultureInfo.InvariantCulture) + "%",

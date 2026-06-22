@@ -911,6 +911,9 @@
     <data name="Reports.BtcLoans.TotalDebtBtc" xml:space="preserve">
         <value>Total debt (BTC)</value>
     </data>
+    <data name="Reports.BtcLoans.TotalBorrowed" xml:space="preserve">
+        <value>Total borrowed</value>
+    </data>
     <data name="Reports.BtcLoans.AvgLtv" xml:space="preserve">
         <value>Avg LTV</value>
     </data>
@@ -2787,6 +2790,12 @@
     <data name="UpdateLoanState_CurrentTotalDebt" xml:space="preserve">
         <value>Current Total Debt</value>
     </data>
+    <data name="UpdateLoanState_TotalBorrowed" xml:space="preserve">
+        <value>Total Borrowed</value>
+    </data>
+    <data name="UpdateLoanState_InterestAccruedUntilDate" xml:space="preserve">
+        <value>Interest Accrued Until Date</value>
+    </data>
     <data name="UpdateLoanState_Note" xml:space="preserve">
         <value>Note</value>
     </data>
@@ -2831,6 +2840,12 @@
     </data>
     <data name="Validation_CurrentTotalDebtRequired" xml:space="preserve">
         <value>Current total debt is required</value>
+    </data>
+    <data name="Validation_TotalBorrowedRequired" xml:space="preserve">
+        <value>Total borrowed is required</value>
+    </data>
+    <data name="Validation_InterestAccruedUntilDateRequired" xml:space="preserve">
+        <value>Interest accrued is required</value>
     </data>
     <data name="Validation_CollateralRequired" xml:space="preserve">
         <value>Collateral is required</value>

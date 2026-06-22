@@ -31,7 +31,8 @@ public class EditAssetHandlerSnapshotPreservationTests : DatabaseTest
     {
         // Arrange
         var effectiveDate = new DateOnly(2025, 6, 1);
-        var currentTotalDebt = 30_000m;
+        var totalBorrowed = 20_000m;
+        var interestAccruedUntilDate = 9_900m;
 
         var asset = AssetBuilder.ABtcLoan(
                 platformName: "HodlHodl",
@@ -40,7 +41,8 @@ public class EditAssetHandlerSnapshotPreservationTests : DatabaseTest
                 currentBtcPrice: 50_000m)
             .WithSnapshot(
                 effectiveDate: effectiveDate,
-                currentTotalDebt: currentTotalDebt,
+                totalBorrowed: totalBorrowed,
+                interestAccruedUntilDate: interestAccruedUntilDate,
                 collateralSats: 80_000_000L,
                 apr: 0.15m)
             .Build();
@@ -89,7 +91,8 @@ public class EditAssetHandlerSnapshotPreservationTests : DatabaseTest
         {
             // Point-in-time data preserved
             Assert.That(snapshot.EffectiveDate, Is.EqualTo(effectiveDate));
-            Assert.That(snapshot.CurrentTotalDebt, Is.EqualTo(currentTotalDebt));
+            Assert.That(snapshot.TotalBorrowed, Is.EqualTo(totalBorrowed));
+            Assert.That(snapshot.InterestAccruedUntilDate, Is.EqualTo(interestAccruedUntilDate));
 
             // Setup values propagated to the snapshot
             Assert.That(snapshot.PlatformName, Is.EqualTo("Ledn"));
@@ -111,9 +114,11 @@ public class EditAssetHandlerSnapshotPreservationTests : DatabaseTest
     {
         // Arrange
         var firstDate = new DateOnly(2025, 6, 1);
-        var firstDebt = 30_000m;
+        var firstBorrowed = 20_000m;
+        var firstInterest = 9_900m;
         var secondDate = new DateOnly(2025, 7, 1);
-        var secondDebt = 32_000m;
+        var secondBorrowed = 20_000m;
+        var secondInterest = 10_900m;
 
         var asset = AssetBuilder.ABtcLoan(
                 platformName: "HodlHodl",
@@ -122,11 +127,13 @@ public class EditAssetHandlerSnapshotPreservationTests : DatabaseTest
                 currentBtcPrice: 50_000m)
             .WithSnapshot(
                 effectiveDate: firstDate,
-                currentTotalDebt: firstDebt,
+                totalBorrowed: firstBorrowed,
+                interestAccruedUntilDate: firstInterest,
                 collateralSats: 80_000_000L)
             .WithSnapshot(
                 effectiveDate: secondDate,
-                currentTotalDebt: secondDebt,
+                totalBorrowed: secondBorrowed,
+                interestAccruedUntilDate: secondInterest,
                 collateralSats: 75_000_000L)
             .Build();
 
@@ -167,7 +174,8 @@ public class EditAssetHandlerSnapshotPreservationTests : DatabaseTest
 
         Assert.That(loanDetails.Snapshots, Has.Count.EqualTo(2));
         Assert.That(loanDetails.Snapshots.Select(s => s.EffectiveDate), Is.EquivalentTo(new[] { firstDate, secondDate }));
-        Assert.That(loanDetails.Snapshots.Select(s => s.CurrentTotalDebt), Is.EquivalentTo(new[] { firstDebt, secondDebt }));
+        Assert.That(loanDetails.Snapshots.Select(s => s.TotalBorrowed), Is.EquivalentTo(new[] { firstBorrowed, secondBorrowed }));
+        Assert.That(loanDetails.Snapshots.Select(s => s.InterestAccruedUntilDate), Is.EquivalentTo(new[] { firstInterest, secondInterest }));
 
         foreach (var snapshot in loanDetails.Snapshots)
         {
@@ -200,7 +208,8 @@ public class EditAssetHandlerSnapshotPreservationTests : DatabaseTest
                 currentBtcPrice: 50_000m)
             .WithSnapshot(
                 effectiveDate: effectiveDate,
-                currentTotalDebt: 30_000m,
+                totalBorrowed: 25_000m,
+                interestAccruedUntilDate: 4_900m,
                 collateralSats: 100_000_000L,
                 loanAmount: 25_000m)
             .Build();
