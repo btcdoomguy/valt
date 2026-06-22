@@ -25,8 +25,8 @@
 
 ### Database Performance
 
-- [ ] **DB-01**: LiteDB indexes are ensured once per database open, not on every collection access
-- [ ] **DB-02**: `LocalDatabase` and `PriceDatabase` expose a single `EnsureIndexes()` call invoked from all open paths
+- [x] **DB-01**: LiteDB indexes are ensured once per database open, not on every collection access
+- [x] **DB-02**: `LocalDatabase` and `PriceDatabase` expose a single `EnsureIndexes()` call invoked from all open paths
 - [ ] **DB-03**: No regression in query behavior or index coverage after centralization
 
 ### ViewModel Simplification — Services
@@ -108,8 +108,8 @@
 | JOB-01 | Phase 15 | Complete |
 | JOB-02 | Phase 14 | Complete |
 | JOB-03 | Phase 14/15 | Complete |
-| DB-01 | Phase 16 | Pending |
-| DB-02 | Phase 16 | Pending |
+| DB-01 | Phase 16 | Complete |
+| DB-02 | Phase 16 | Complete |
 | DB-03 | Phase 16 | Pending |
 | VM-SVC-01 | Phase 17 | Pending |
 | VM-SVC-02 | Phase 18 | Pending |
