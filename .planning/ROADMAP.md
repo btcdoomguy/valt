@@ -17,7 +17,7 @@ Eliminate stability risks, reduce wasteful background work, simplify oversized V
 | 13 | HTTP Client Factory | 2/2 | Complete    | 2026-06-19 |
 | 14 | Event-Driven Goal Updates | 3/3 | Complete   | 2026-06-22 |
 | 15 | Throttle Account Totals Job | 1/1 | Complete | 2026-06-22 |
-| 16 | Centralize LiteDB Indexes | 1/2 | In Progress|  |
+| 16 | Centralize LiteDB Indexes | 2/2 | Complete   | 2026-06-22 |
 | 17 | Transaction Editor Builder | Extract transaction-details DTO builder service | VM-SVC-01 | 4 |
 | 18 | Manage Asset Builder | Extract per-type asset command/DTO builder service | VM-SVC-02 | 4 |
 | 19 | Modal Launcher Service | Extract reusable modal-launcher service from `MainViewModel` | VM-SVC-03 | 3 |
@@ -167,7 +167,7 @@ Plans:
 3. Per-access `EnsureIndex` calls are removed from collection accessor methods.
 4. All existing indexes remain in place; no query regressions.
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 
@@ -177,7 +177,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 16-02-PLAN.md — Verify centralized LiteDB index coverage with in-memory tests
+- [x] 16-02-PLAN.md — Verify centralized LiteDB index coverage with in-memory tests
 
 ### Phase 17: Transaction Editor Builder
 
