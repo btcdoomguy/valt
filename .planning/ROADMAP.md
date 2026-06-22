@@ -192,7 +192,17 @@ Plans:
 3. `TransactionEditorViewModel` calls the service and remains functionally identical.
 4. Unit tests cover the builder for all transfer types.
 
-**Plans:** TBD
+**Plans:** 2 plans
+
+Plans:
+
+**Wave 1**
+
+- [ ] 17-01-PLAN.md — Create ITransactionDetailsBuilder/TransactionDetailsBuilder service and unit tests
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 17-02-PLAN.md — Wire builder into TransactionEditorViewModel and verify full suite
 
 ### Phase 18: Manage Asset Builder
 
