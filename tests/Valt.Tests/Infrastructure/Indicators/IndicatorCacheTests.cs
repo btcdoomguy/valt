@@ -1,6 +1,6 @@
 using NSubstitute;
 using Valt.Infra.Crawlers.Indicators;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 
 namespace Valt.Tests.Infrastructure.Indicators;
 

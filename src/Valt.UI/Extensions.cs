@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Kernel.Scopes;
 using Valt.Infra.Modules.Budget.Categories;
 using Valt.UI.Base;

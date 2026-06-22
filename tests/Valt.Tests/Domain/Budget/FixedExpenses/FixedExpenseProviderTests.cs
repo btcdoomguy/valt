@@ -10,7 +10,7 @@ using Valt.Core.Modules.Budget.FixedExpenses.Contracts;
 using Valt.Core.Modules.Budget.Transactions;
 using Valt.Core.Modules.Budget.Transactions.Details;
 using Valt.Infra;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.FixedExpenses;
 using Valt.Infra.Modules.Budget.Transactions;

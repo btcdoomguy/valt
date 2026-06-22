@@ -69,7 +69,7 @@ public class TransactionListViewModelAvgPriceTests : DatabaseTest
             ratesState,
             Substitute.For<ILogger<LiveRateState>>());
 
-        var displaySettings = new DisplaySettings(_localDatabase, Substitute.For<Valt.Infra.Kernel.Notifications.INotificationPublisher>());
+        var displaySettings = new DisplaySettings(_localDatabase, Substitute.For<Valt.App.Kernel.Notifications.INotificationPublisher>());
 
         return new TransactionListViewModel(
             _modalFactory,

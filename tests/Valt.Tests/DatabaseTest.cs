@@ -15,7 +15,7 @@ using Valt.Core.Modules.AvgPrice.Calculations;
 using Valt.Core.Modules.Goals.Contracts;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Kernel.Time;
 using Valt.Infra.Modules.Assets;
 using Valt.Infra.Modules.Assets.Queries;

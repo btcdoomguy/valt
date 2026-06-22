@@ -216,7 +216,7 @@ public class WealthOverviewReportTests : DatabaseTest
         using var emptyPriceDbStream = new MemoryStream();
         var emptyPriceDb = new Infra.DataAccess.PriceDatabase(
             new Infra.Kernel.Time.Clock(),
-            NSubstitute.Substitute.For<Infra.Kernel.Notifications.INotificationPublisher>());
+            NSubstitute.Substitute.For<App.Kernel.Notifications.INotificationPublisher>());
         emptyPriceDb.OpenInMemoryDatabase(emptyPriceDbStream);
 
         var clock = new FakeClock(new DateTime(2025, 1, 25));

@@ -10,7 +10,7 @@ using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Assets;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Modules.Assets.PriceProviders;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Settings;

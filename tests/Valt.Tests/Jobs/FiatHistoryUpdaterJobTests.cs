@@ -4,7 +4,7 @@ using Valt.Core.Common;
 using Valt.Infra;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Fiat;
 using Valt.Infra.DataAccess;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Modules.DataSources.Fiat;

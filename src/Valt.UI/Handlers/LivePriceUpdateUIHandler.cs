@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Messaging;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Messages;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 
 namespace Valt.UI.Handlers;
 

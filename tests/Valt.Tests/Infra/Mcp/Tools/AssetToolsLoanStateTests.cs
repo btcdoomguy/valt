@@ -6,7 +6,7 @@ using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Queries;
 using Valt.Core.Modules.Assets.Contracts;
 using Valt.Core.Modules.Assets.Details;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Mcp.Notifications;
 using Valt.Infra.Mcp.Tools;
 using Valt.Tests.Builders;
