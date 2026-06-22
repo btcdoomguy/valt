@@ -6,7 +6,7 @@ using Valt.Core.Modules.Budget.Transactions.Contracts;
 using Valt.Core.Modules.Budget.Transactions.Events;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Messages;
 using Valt.Infra.DataAccess;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 
 namespace Valt.Infra.Modules.Budget.Transactions;
 

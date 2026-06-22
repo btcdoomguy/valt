@@ -29,7 +29,7 @@ using Valt.App.Modules.Assets.Queries.GetLatestLoanState;
 using Valt.App.Modules.Assets.Queries.GetLoanStateTimeline;
 using Valt.App.Modules.Assets.Queries.GetVisibleAssets;
 using Valt.Core.Modules.Assets;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Mcp.Notifications;
 using Valt.Infra.Modules.Assets.PriceProviders;
 using Valt.Infra.Settings;

@@ -4,7 +4,7 @@ using LiteDB;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Infra.DataAccess.LiteDBMappers;
 using Valt.Infra.Kernel;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Crawlers.Indicators;
 using Valt.Infra.Modules.DataSources.Bitcoin;
 using Valt.Infra.Modules.DataSources.Fiat;

@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 using Valt.App.Modules.Goals.Contracts;
 using Valt.Core.Modules.Goals.Contracts;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Messages;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 
 namespace Valt.Infra.Modules.Goals.Handlers;
 

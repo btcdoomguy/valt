@@ -12,7 +12,7 @@ using Valt.App.Modules.AvgPrice.DTOs;
 using Valt.App.Modules.AvgPrice.Queries.GetLinesOfProfile;
 using Valt.App.Modules.AvgPrice.Queries.GetProfile;
 using Valt.App.Modules.AvgPrice.Queries.GetProfiles;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Mcp.Notifications;
 
 namespace Valt.Infra.Mcp.Tools;

@@ -25,6 +25,7 @@ using Valt.Infra.DataAccess.Migrations.Scripts;
 using Valt.Infra.Kernel;
 using Valt.Infra.Kernel.BackgroundJobs;
 using Valt.Infra.Kernel.EventSystem;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Kernel.Notifications;
 using Valt.Infra.Kernel.Scopes;
 using Valt.Infra.Kernel.Time;

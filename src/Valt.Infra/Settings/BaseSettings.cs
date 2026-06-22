@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Valt.Infra.DataAccess;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 
 namespace Valt.Infra.Settings;
 

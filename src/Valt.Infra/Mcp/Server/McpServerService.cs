@@ -20,7 +20,7 @@ using Valt.Infra.Modules.Reports.IncomeByCategory;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.Infra.Modules.Reports.Statistics;
 using Valt.Infra.Modules.Reports.WealthOverview;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Settings;
 
 namespace Valt.Infra.Mcp.Server;

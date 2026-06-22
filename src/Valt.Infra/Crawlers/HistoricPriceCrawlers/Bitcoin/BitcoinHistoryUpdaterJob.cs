@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Messages;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel.BackgroundJobs;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Modules.DataSources.Bitcoin;
 
 namespace Valt.Infra.Crawlers.HistoricPriceCrawlers.Bitcoin;

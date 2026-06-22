@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Messages;
 using Valt.Infra.Kernel.BackgroundJobs;
 
