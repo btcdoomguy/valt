@@ -15,6 +15,7 @@ using Valt.Infra.Settings;
 using Valt.Tests.Builders;
 using Valt.UI.Base;
 using Valt.UI.State;
+using Valt.UI.Services;
 using Valt.UI.Views.Main.Modals.TransactionEditor;
 
 namespace Valt.Tests.UI.Screens;
@@ -62,7 +63,8 @@ public class TransactionEditorViewModelTests : DatabaseTest
             displaySettings,
             lastTransactionDateState,
             _runner,
-            _logger);
+            _logger,
+            new TransactionDetailsBuilder());
     }
 
     private void AddFiatAccount(string id, string name, FiatCurrency currency)
