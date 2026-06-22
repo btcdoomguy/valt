@@ -167,7 +167,17 @@ Plans:
 3. Per-access `EnsureIndex` calls are removed from collection accessor methods.
 4. All existing indexes remain in place; no query regressions.
 
-**Plans:** TBD
+**Plans:** 2/2 plans pending
+
+Plans:
+
+**Wave 1**
+
+- [ ] 16-01-PLAN.md — Centralize LiteDB indexes in LocalDatabase and PriceDatabase
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 16-02-PLAN.md — Verify centralized LiteDB index coverage with in-memory tests
 
 ### Phase 17: Transaction Editor Builder
 
