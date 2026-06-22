@@ -1,8 +1,9 @@
 using Microsoft.Extensions.Logging;
+using Valt.App.Kernel.Notifications;
 using Valt.App.Modules.Goals.Contracts;
 using Valt.Core.Modules.Goals.Contracts;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Messages;
-using Valt.App.Kernel.Notifications;
+using Valt.Infra.Kernel.BackgroundJobs;
 
 namespace Valt.Infra.Modules.Goals.Handlers;
 
@@ -17,15 +18,18 @@ internal class MarkGoalsStaleOnPriceUpdateHandler :
 {
     private readonly IGoalRepository _goalRepository;
     private readonly IGoalProgressState _progressState;
+    private readonly BackgroundJobManager _backgroundJobManager;
     private readonly ILogger<MarkGoalsStaleOnPriceUpdateHandler> _logger;
 
     public MarkGoalsStaleOnPriceUpdateHandler(
         IGoalRepository goalRepository,
         IGoalProgressState progressState,
+        BackgroundJobManager backgroundJobManager,
         ILogger<MarkGoalsStaleOnPriceUpdateHandler> logger)
     {
         _goalRepository = goalRepository;
         _progressState = progressState;
+        _backgroundJobManager = backgroundJobManager;
         _logger = logger;
     }
 
@@ -63,6 +67,7 @@ internal class MarkGoalsStaleOnPriceUpdateHandler :
             {
                 _logger.LogInformation("[MarkGoalsStaleOnPriceUpdate] Marked {Count} price-dependent goals as stale", markedCount);
                 _progressState.MarkAsStale();
+                _backgroundJobManager.TriggerJobManually(BackgroundJobSystemNames.GoalProgressUpdater);
             }
         }
         catch (Exception ex)
