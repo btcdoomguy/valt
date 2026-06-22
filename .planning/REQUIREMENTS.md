@@ -19,9 +19,9 @@
 
 ### Background Job Efficiency
 
-- [ ] **JOB-01**: `AccountTotalsJob` polling interval is raised and only acts as a day-rollover safety net
-- [ ] **JOB-02**: `GoalProgressUpdaterJob` is triggered by stale-flag events instead of relying primarily on polling
-- [ ] **JOB-03**: Job fallback intervals remain high enough to avoid unnecessary wake-ups
+- [x] **JOB-01**: `AccountTotalsJob` polling interval is raised and only acts as a day-rollover safety net
+- [x] **JOB-02**: `GoalProgressUpdaterJob` is triggered by stale-flag events instead of relying primarily on polling
+- [x] **JOB-03**: Job fallback intervals remain high enough to avoid unnecessary wake-ups
 
 ### Database Performance
 
@@ -105,9 +105,9 @@
 | HTTP-01 | Phase 13 | Complete |
 | HTTP-02 | Phase 13 | Complete |
 | HTTP-03 | Phase 13 | Complete |
-| JOB-01 | Phase 15 | Pending |
-| JOB-02 | Phase 14 | Pending |
-| JOB-03 | Phase 14/15 | Pending |
+| JOB-01 | Phase 15 | Complete |
+| JOB-02 | Phase 14 | Complete |
+| JOB-03 | Phase 14/15 | Complete |
 | DB-01 | Phase 16 | Pending |
 | DB-02 | Phase 16 | Pending |
 | DB-03 | Phase 16 | Pending |

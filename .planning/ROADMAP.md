@@ -16,7 +16,7 @@ Eliminate stability risks, reduce wasteful background work, simplify oversized V
 | 12 | Remove Blocking Calls | 1/1 | Complete   | 2026-06-19 |
 | 13 | HTTP Client Factory | 2/2 | Complete    | 2026-06-19 |
 | 14 | Event-Driven Goal Updates | 3/3 | Complete   | 2026-06-22 |
-| 15 | Throttle Account Totals Job | Raise `AccountTotalsJob` interval to a day-rollover safety net | JOB-01, JOB-03 | 3 |
+| 15 | Throttle Account Totals Job | 1/1 | Complete | 2026-06-22 |
 | 16 | Centralize LiteDB Indexes | Ensure indexes once per database open | DB-01, DB-02, DB-03 | 4 |
 | 17 | Transaction Editor Builder | Extract transaction-details DTO builder service | VM-SVC-01 | 4 |
 | 18 | Manage Asset Builder | Extract per-type asset command/DTO builder service | VM-SVC-02 | 4 |
@@ -146,13 +146,13 @@ Plans:
 3. Incremental account cache updates remain event-driven through existing domain-event handlers.
 4. No user-visible delay in account totals after day change.
 
-**Plans:** 1/1 planned
+**Plans:** 1/1 complete
 
 Plans:
 
 **Wave 1**
 
-- [ ] 15-01-PLAN.md — Raise `AccountTotalsJob` interval to 120 seconds and add day-rollover unit + architecture tests
+- [x] 15-01-PLAN.md — Raise `AccountTotalsJob` interval to 120 seconds and add day-rollover unit + architecture tests
 
 ### Phase 16: Centralize LiteDB Indexes
 
