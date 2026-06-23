@@ -60,7 +60,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     private readonly AccountsTotalState _accountsTotalState = null!;
     private readonly FilterState _filterState = null!;
 
-    public MainView? Window { get; set; }
+    public Window? Window { get; set; }
 
     [ObservableProperty] private bool _hasDatabaseOpen;
     
