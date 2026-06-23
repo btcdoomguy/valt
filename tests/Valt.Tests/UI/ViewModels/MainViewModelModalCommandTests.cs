@@ -32,6 +32,9 @@ public class MainViewModelModalCommandTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
+        if (global::Avalonia.Application.Current is not null)
+            return;
+
         AppBuilder.Configure<global::Avalonia.Application>()
             .UsePlatformDetect()
             .SetupWithoutStarting();
