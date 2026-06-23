@@ -18,7 +18,7 @@ Eliminate stability risks, reduce wasteful background work, simplify oversized V
 | 14 | Event-Driven Goal Updates | 3/3 | Complete   | 2026-06-22 |
 | 15 | Throttle Account Totals Job | 1/1 | Complete | 2026-06-22 |
 | 16 | Centralize LiteDB Indexes | 2/2 | Complete   | 2026-06-22 |
-| 17 | Transaction Editor Builder | Extract transaction-details DTO builder service | VM-SVC-01 | 4 |
+| 17 | Transaction Editor Builder | 2/2 | Complete    | 2026-06-22 |
 | 18 | Manage Asset Builder | Extract per-type asset command/DTO builder service | VM-SVC-02 | 4 |
 | 19 | Modal Launcher Service | Extract reusable modal-launcher service from `MainViewModel` | VM-SVC-03 | 3 |
 | 20 | Reports Dashboard Builders | Extract leverage/loan dashboard builders | VM-SVC-04 | 4 |
@@ -192,17 +192,17 @@ Plans:
 3. `TransactionEditorViewModel` calls the service and remains functionally identical.
 4. Unit tests cover the builder for all transfer types.
 
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 
 **Wave 1**
 
-- [ ] 17-01-PLAN.md — Create ITransactionDetailsBuilder/TransactionDetailsBuilder service and unit tests
+- [x] 17-01-PLAN.md — Create ITransactionDetailsBuilder/TransactionDetailsBuilder service and unit tests
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 17-02-PLAN.md — Wire builder into TransactionEditorViewModel and verify full suite
+- [x] 17-02-PLAN.md — Wire builder into TransactionEditorViewModel and verify full suite
 
 ### Phase 18: Manage Asset Builder
 
@@ -217,7 +217,17 @@ Plans:
 3. `ManageAssetViewModel` calls the service and remains functionally identical.
 4. Unit tests cover the builder for at least the complex asset types (BTC loan, leveraged, real estate).
 
-**Plans:** TBD
+**Plans:** 2/2 plans
+
+Plans:
+
+**Wave 1**
+
+- [ ] 18-01-PLAN.md — Create IAssetFormBuilder/AssetFormBuilder service and exception type
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 18-02-PLAN.md — Wire builder into ManageAssetViewModel, register DI, update/add tests
 
 ### Phase 19: Modal Launcher Service
 

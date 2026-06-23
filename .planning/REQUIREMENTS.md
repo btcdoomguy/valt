@@ -31,7 +31,7 @@
 
 ### ViewModel Simplification — Services
 
-- [ ] **VM-SVC-01**: `TransactionEditorViewModel` delegates transaction-details DTO construction to a dedicated builder service
+- [x] **VM-SVC-01**: `TransactionEditorViewModel` delegates transaction-details DTO construction to a dedicated builder service
 - [ ] **VM-SVC-02**: `ManageAssetViewModel` delegates per-type asset command/DTO construction to a dedicated builder service
 - [ ] **VM-SVC-03**: `MainViewModel` uses a reusable modal-launcher service instead of repeated `_modalFactory`/`ShowDialogSafeAsync` boilerplate
 - [ ] **VM-SVC-04**: `ReportsViewModel` delegates leverage-position and BTC-loan dashboard data generation to dedicated services or child VMs
@@ -111,7 +111,7 @@
 | DB-01 | Phase 16 | Complete |
 | DB-02 | Phase 16 | Complete |
 | DB-03 | Phase 16 | Complete |
-| VM-SVC-01 | Phase 17 | Pending |
+| VM-SVC-01 | Phase 17 | Complete |
 | VM-SVC-02 | Phase 18 | Pending |
 | VM-SVC-03 | Phase 19 | Pending |
 | VM-SVC-04 | Phase 20 | Pending |
