@@ -32,17 +32,8 @@ using Valt.UI.State;
 using Valt.UI.State.Events;
 using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Controls;
-using Valt.UI.Views.Main.Modals.About;
 using Valt.UI.Views.Main.Modals.InitialSelection;
-using Valt.UI.Views.Main.Modals.Tips;
-using Valt.UI.Views.Main.Modals.ManageCategories;
-using Valt.UI.Views.Main.Modals.Settings;
-using Valt.UI.Views.Main.Modals.StatusDisplay;
-using Valt.UI.Views.Main.Modals.ImportWizard;
 using Valt.UI.Views.Main.Modals.InputPassword;
-using Valt.UI.Views.Main.Modals.ConversionCalculator;
-using Valt.UI.Views.Main.Modals.LeverageSimulator;
-using Valt.UI.Views.Main.Modals.SpendingEvolution;
 using Valt.Infra.Mcp.Notifications;
 using Valt.Infra.Mcp.Server;
 
@@ -51,7 +42,7 @@ namespace Valt.UI.Views.Main;
 public partial class MainViewModel : ValtViewModel, IDisposable
 {
     private readonly IPageFactory _pageFactory;
-    private readonly IModalFactory _modalFactory;
+    private readonly IModalLauncher _modalLauncher;
     private readonly IDatabaseLifecycleService _dbLifecycle;
     private readonly CurrencySettings _currencySettings;
     private readonly BackgroundJobManager? _backgroundJobManager;
@@ -162,7 +153,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     public MainViewModel()
     {
         _pageFactory = new DesignTimePageFactory();
-        _modalFactory = new DesignTimeModalFactory();
+        _modalLauncher = new DesignTimeModalLauncher();
         _dbLifecycle = null!;
         _currencySettings = new CurrencySettings(null!, null!);
         _updateIndicatorViewModel = new UpdateIndicatorViewModel();
@@ -174,7 +165,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     }
 
     public MainViewModel(IPageFactory pageFactory,
-        IModalFactory modalFactory,
+        IModalLauncher modalLauncher,
         IDatabaseLifecycleService dbLifecycle,
         CurrencySettings currencySettings,
         BackgroundJobManager backgroundJobManager,
@@ -194,7 +185,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         FilterState filterState)
     {
         _pageFactory = pageFactory;
-        _modalFactory = modalFactory;
+        _modalLauncher = modalLauncher;
         _dbLifecycle = dbLifecycle;
         _currencySettings = currencySettings;
         _backgroundJobManager = backgroundJobManager;
@@ -266,10 +257,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     [RelayCommand]
     private async Task OpenPriceHistory()
     {
-        var modal =
-            (Views.Main.Modals.PriceHistory.PriceHistoryView)await _modalFactory.CreateAsync(ApplicationModalNames.PriceHistory, Window)!;
-
-        await modal.ShowDialogSafeAsync(Window!);
+        await _modalLauncher.ShowAsync(ApplicationModalNames.PriceHistory, Window!);
     }
 
     [RelayCommand]
@@ -278,14 +266,10 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         // If leaving secure mode, require password verification
         if (_secureModeState.IsEnabled)
         {
-            var inputPasswordModal =
-                (InputPasswordView)await _modalFactory.CreateAsync(ApplicationModalNames.InputPassword, Window)!;
-
-            // Hide the "Start in Secure Mode" checkbox when verifying password to leave
-            var viewModel = (InputPasswordViewModel)inputPasswordModal.DataContext!;
-            viewModel.HideSecureModeCheckbox = true;
-
-            var result = await inputPasswordModal.ShowDialogSafeAsync<InputPasswordViewModel.Response?>(Window!);
+            var result = await _modalLauncher.ShowAsync<InputPasswordViewModel, InputPasswordViewModel.Response?>(
+                ApplicationModalNames.InputPassword,
+                Window!,
+                vm => vm.HideSecureModeCheckbox = true);
 
             if (result?.Password is null)
                 return;
@@ -311,28 +295,19 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     [RelayCommand]
     private async Task ManageCategories()
     {
-        var modal =
-            (ManageCategoriesView)await _modalFactory.CreateAsync(ApplicationModalNames.ManageCategories, Window)!;
-
-        await modal.ShowDialogSafeAsync(Window!);
+        await _modalLauncher.ShowAsync(ApplicationModalNames.ManageCategories, Window!);
     }
 
     [RelayCommand]
     private async Task ManageSettings()
     {
-        var modal =
-            (SettingsView)await _modalFactory.CreateAsync(ApplicationModalNames.Settings, Window)!;
-
-        await modal.ShowDialogSafeAsync(Window!);
+        await _modalLauncher.ShowAsync(ApplicationModalNames.Settings, Window!);
     }
 
     [RelayCommand]
     private async Task OpenImportWizard()
     {
-        var modal =
-            (ImportWizardView)await _modalFactory.CreateAsync(ApplicationModalNames.ImportWizard, Window)!;
-
-        await modal.ShowDialogSafeAsync(Window!);
+        await _modalLauncher.ShowAsync(ApplicationModalNames.ImportWizard, Window!);
     }
 
     [RelayCommand]
@@ -391,37 +366,25 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     [RelayCommand]
     private async Task About()
     {
-        var modal =
-            (AboutView)await _modalFactory.CreateAsync(ApplicationModalNames.About, Window)!;
-
-        await modal.ShowDialogSafeAsync(Window!);
+        await _modalLauncher.ShowAsync(ApplicationModalNames.About, Window!);
     }
 
     [RelayCommand]
     private async Task OpenConversionCalculator()
     {
-        var modal =
-            (ConversionCalculatorView)await _modalFactory.CreateAsync(ApplicationModalNames.ConversionCalculator, Window)!;
-
-        await modal.ShowDialogSafeAsync(Window!);
+        await _modalLauncher.ShowAsync(ApplicationModalNames.ConversionCalculator, Window!);
     }
 
     [RelayCommand]
     private async Task OpenLeverageSimulator()
     {
-        var modal =
-            (LeverageSimulatorView)await _modalFactory.CreateAsync(ApplicationModalNames.LeverageSimulator, Window)!;
-
-        await modal.ShowDialogSafeAsync(Window!);
+        await _modalLauncher.ShowAsync(ApplicationModalNames.LeverageSimulator, Window!);
     }
 
     [RelayCommand]
     private async Task OpenSpendingEvolution()
     {
-        var modal =
-            (SpendingEvolutionView)await _modalFactory.CreateAsync(ApplicationModalNames.SpendingEvolution, Window)!;
-
-        await modal.ShowDialogSafeAsync(Window!);
+        await _modalLauncher.ShowAsync(ApplicationModalNames.SpendingEvolution, Window!);
     }
 
     [RelayCommand]
@@ -470,8 +433,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
 
     private async Task ShowTipsAsync()
     {
-        var modal = (TipsView)await _modalFactory.CreateAsync(ApplicationModalNames.Tips, Window)!;
-        await modal.ShowDialogSafeAsync(Window!);
+        await _modalLauncher.ShowAsync(ApplicationModalNames.Tips, Window!);
     }
 
     public async Task OpenInitialSelectionModal()
@@ -482,10 +444,9 @@ public partial class MainViewModel : ValtViewModel, IDisposable
         var openedFile = false;
         while (!openedFile)
         {
-            var window =
-                (InitialSelectionView)await _modalFactory.CreateAsync(ApplicationModalNames.InitialSelection, Window)!;
-
-            var result = await window.ShowDialogSafeAsync<InitialSelectionViewModel.Response?>(Window!);
+            var result = await _modalLauncher.ShowAsync<InitialSelectionViewModel, InitialSelectionViewModel.Response?>(
+                ApplicationModalNames.InitialSelection,
+                Window!);
             Window?.Activate();
 
             if (result is null || string.IsNullOrEmpty(result.File))
@@ -595,10 +556,7 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     [RelayCommand]
     private async Task OpenStatusDisplay()
     {
-        var modal =
-            (StatusDisplayView)await _modalFactory.CreateAsync(ApplicationModalNames.StatusDisplay, Window)!;
-
-        await modal.ShowDialogSafeAsync(Window!);
+        await _modalLauncher.ShowAsync(ApplicationModalNames.StatusDisplay, Window!);
     }
     
     private void JobOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
