@@ -19,7 +19,7 @@ Eliminate stability risks, reduce wasteful background work, simplify oversized V
 | 15 | Throttle Account Totals Job | 1/1 | Complete | 2026-06-22 |
 | 16 | Centralize LiteDB Indexes | 2/2 | Complete   | 2026-06-22 |
 | 17 | Transaction Editor Builder | 2/2 | Complete    | 2026-06-22 |
-| 18 | Manage Asset Builder | Extract per-type asset command/DTO builder service | VM-SVC-02 | 4 |
+| 18 | Manage Asset Builder | 2/2 | Complete    | 2026-06-23 |
 | 19 | Modal Launcher Service | Extract reusable modal-launcher service from `MainViewModel` | VM-SVC-03 | 3 |
 | 20 | Reports Dashboard Builders | Extract leverage/loan dashboard builders | VM-SVC-04 | 4 |
 | 21 | Transaction Editor Child VMs | Split editor into per-transfer-type child VMs | VM-CHILD-01 | 5 |
@@ -217,17 +217,17 @@ Plans:
 3. `ManageAssetViewModel` calls the service and remains functionally identical.
 4. Unit tests cover the builder for at least the complex asset types (BTC loan, leveraged, real estate).
 
-**Plans:** 2/2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 
 **Wave 1**
 
-- [ ] 18-01-PLAN.md — Create IAssetFormBuilder/AssetFormBuilder service and exception type
+- [x] 18-01-PLAN.md — Create IAssetFormBuilder/AssetFormBuilder service and exception type
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 18-02-PLAN.md — Wire builder into ManageAssetViewModel, register DI, update/add tests
+- [x] 18-02-PLAN.md — Wire builder into ManageAssetViewModel, register DI, update/add tests
 
 ### Phase 19: Modal Launcher Service
 
@@ -242,7 +242,17 @@ Plans:
 3. ~150 lines of repetitive code are removed.
 4. Modal behavior remains unchanged.
 
-**Plans:** TBD
+**Plans:** 2 plans
+
+Plans:
+
+**Wave 1**
+
+- [ ] 19-01-PLAN.md — Create IModalLauncher/ModalLauncher service, DI registration, and unit tests
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 19-02-PLAN.md — Refactor MainViewModel to use IModalLauncher and add command tests
 
 ### Phase 20: Reports Dashboard Builders
 
