@@ -32,6 +32,8 @@ public class ManageAssetViewModelTests
     private CurrencySettings _currencySettings;
     private IModalFactory _modalFactory;
 
+    private IAssetFormBuilder _assetFormBuilder;
+
     [OneTimeSetUp]
     public void OneTimeSetUp() => IdGenerator.Configure(new LiteDbIdProvider());
 
@@ -50,6 +52,7 @@ public class ManageAssetViewModelTests
         {
             MainFiatCurrency = "USD"
         };
+        _assetFormBuilder = new AssetFormBuilder(_priceProviderSelector);
     }
 
     [TearDown]
@@ -59,7 +62,7 @@ public class ManageAssetViewModelTests
     }
 
     private ManageAssetViewModel CreateViewModel()
-        => new(_queryDispatcher, _commandDispatcher, _priceProviderSelector, _currencySettings, _configurationManager, _logger, _modalFactory);
+        => new(_queryDispatcher, _commandDispatcher, _priceProviderSelector, _currencySettings, _configurationManager, _logger, _modalFactory, _assetFormBuilder);
 
     private static AssetDTO CreateStockAssetDto(DateOnly? acquisitionDate = null) => new()
     {
