@@ -298,6 +298,7 @@ public static class Extensions
             };
         });
         services.AddSingleton<IModalFactory, ModalFactory>();
+        services.AddSingleton<IModalLauncher, ModalLauncher>();
 
         //state objects
         services.AddSingleton<RatesState>();
