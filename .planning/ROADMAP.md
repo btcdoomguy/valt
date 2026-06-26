@@ -20,7 +20,7 @@ Eliminate stability risks, reduce wasteful background work, simplify oversized V
 | 16 | Centralize LiteDB Indexes | 2/2 | Complete   | 2026-06-22 |
 | 17 | Transaction Editor Builder | 2/2 | Complete    | 2026-06-22 |
 | 18 | Manage Asset Builder | 2/2 | Complete    | 2026-06-23 |
-| 19 | Modal Launcher Service | Extract reusable modal-launcher service from `MainViewModel` | VM-SVC-03 | 3 |
+| 19 | Modal Launcher Service | 2/2 | Complete   | 2026-06-23 |
 | 20 | Reports Dashboard Builders | Extract leverage/loan dashboard builders | VM-SVC-04 | 4 |
 | 21 | Transaction Editor Child VMs | Split editor into per-transfer-type child VMs | VM-CHILD-01 | 5 |
 | 22 | Manage Asset Child VMs | Split asset modal into per-asset-type child VMs | VM-CHILD-02 | 5 |
@@ -242,17 +242,17 @@ Plans:
 3. ~150 lines of repetitive code are removed.
 4. Modal behavior remains unchanged.
 
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 
 **Wave 1**
 
-- [ ] 19-01-PLAN.md — Create IModalLauncher/ModalLauncher service, DI registration, and unit tests
+- [x] 19-01-PLAN.md — Create IModalLauncher/ModalLauncher service, DI registration, and unit tests
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 19-02-PLAN.md — Refactor MainViewModel to use IModalLauncher and add command tests
+- [x] 19-02-PLAN.md — Refactor MainViewModel to use IModalLauncher and add command tests
 
 ### Phase 20: Reports Dashboard Builders
 
