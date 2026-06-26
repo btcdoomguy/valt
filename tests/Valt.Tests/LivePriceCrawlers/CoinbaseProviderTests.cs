@@ -11,7 +11,10 @@ public class CoinbaseProviderTests
     [Test]
     public async Task Should_Get_Prices()
     {
-        var coinbaseProvider = new CoinbaseProvider(new Clock(), new NullLogger<CoinbaseProvider>());
+        var coinbaseProvider = new CoinbaseProvider(
+            HttpClientTestFactory.Create(),
+            new Clock(),
+            new NullLogger<CoinbaseProvider>());
 
         var prices = await coinbaseProvider.GetAsync();
 

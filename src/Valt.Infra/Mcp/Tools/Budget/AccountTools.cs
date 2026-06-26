@@ -10,7 +10,7 @@ using Valt.App.Modules.Budget.Accounts.DTOs;
 using Valt.App.Modules.Budget.Accounts.Queries.GetAccount;
 using Valt.App.Modules.Budget.Accounts.Queries.GetAccountGroups;
 using Valt.App.Modules.Budget.Accounts.Queries.GetAccounts;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Mcp.Notifications;
 
 namespace Valt.Infra.Mcp.Tools.Budget;

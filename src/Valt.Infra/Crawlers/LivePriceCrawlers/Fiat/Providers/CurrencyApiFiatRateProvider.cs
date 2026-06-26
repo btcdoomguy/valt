@@ -1,3 +1,4 @@
+using System.Net.Http;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
@@ -8,6 +9,7 @@ namespace Valt.Infra.Crawlers.LivePriceCrawlers.Fiat.Providers;
 
 public class CurrencyApiFiatRateProvider : IFiatPriceProvider
 {
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly IClock _clock;
     private readonly ILogger<CurrencyApiFiatRateProvider> _logger;
 
@@ -25,8 +27,9 @@ public class CurrencyApiFiatRateProvider : IFiatPriceProvider
         FiatCurrency.Zar
     ]);
 
-    public CurrencyApiFiatRateProvider(IClock clock, ILogger<CurrencyApiFiatRateProvider> logger)
+    public CurrencyApiFiatRateProvider(IHttpClientFactory httpClientFactory, IClock clock, ILogger<CurrencyApiFiatRateProvider> logger)
     {
+        _httpClientFactory = httpClientFactory;
         _clock = clock;
         _logger = logger;
     }
@@ -36,8 +39,7 @@ public class CurrencyApiFiatRateProvider : IFiatPriceProvider
 
     public async Task<FiatUsdPrice> GetAsync(IEnumerable<FiatCurrency> currencies)
     {
-        using var client = new HttpClient();
-        client.Timeout = TimeSpan.FromSeconds(5);
+        using var client = _httpClientFactory.CreateClient(HttpClientNames.Indicator);
         try
         {
             var currencyList = currencies.Where(c => c != FiatCurrency.Usd).ToList();

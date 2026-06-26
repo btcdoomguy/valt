@@ -6,7 +6,7 @@ using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.Contracts;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel.BackgroundJobs;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Modules.Goals.Queries.DTOs;
 
 namespace Valt.Infra.Modules.Goals.Services;
@@ -27,7 +27,7 @@ internal class GoalProgressUpdaterJob : IBackgroundJob
     public string Name => "Goal Progress Updater";
     public BackgroundJobSystemNames SystemName => BackgroundJobSystemNames.GoalProgressUpdater;
     public BackgroundJobTypes JobType => BackgroundJobTypes.ValtDatabase;
-    public TimeSpan Interval => TimeSpan.FromSeconds(5);
+    public TimeSpan Interval => TimeSpan.FromSeconds(120);
 
     public GoalProgressUpdaterJob(
         ILocalDatabase localDatabase,

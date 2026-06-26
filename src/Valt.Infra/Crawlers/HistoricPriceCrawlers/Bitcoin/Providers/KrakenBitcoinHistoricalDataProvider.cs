@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
@@ -7,20 +8,22 @@ namespace Valt.Infra.Crawlers.HistoricPriceCrawlers.Bitcoin.Providers;
 
 public class KrakenBitcoinHistoricalDataProvider : IBitcoinHistoricalDataProvider
 {
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<KrakenBitcoinHistoricalDataProvider> _logger;
     public bool RequiresApiKey => false;
 
     private static readonly DateTime UNIX_EPOCH = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-    public KrakenBitcoinHistoricalDataProvider(ILogger<KrakenBitcoinHistoricalDataProvider> logger)
+    public KrakenBitcoinHistoricalDataProvider(IHttpClientFactory httpClientFactory, ILogger<KrakenBitcoinHistoricalDataProvider> logger)
     {
+        _httpClientFactory = httpClientFactory;
         _logger = logger;
     }
 
     public async Task<IEnumerable<BitcoinPriceData>> GetPricesAsync(DateOnly startDate,
         DateOnly endDate)
     {
-        using var client = new HttpClient() { Timeout = TimeSpan.FromSeconds(10) };
+        using var client = _httpClientFactory.CreateClient(HttpClientNames.PriceProvider);
 
         try
         {

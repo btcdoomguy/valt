@@ -28,8 +28,8 @@ public class GetLoanStateTimelineHandlerTests : DatabaseTest
     public async Task HandleAsync_WithOutOfOrderSnapshots_ReturnsChronologicalOrder()
     {
         var asset = AssetBuilder.ABtcLoan()
-            .WithSnapshot(new DateOnly(2025, 6, 1), 26_000m)
-            .WithSnapshot(new DateOnly(2025, 3, 1), 25_500m)
+            .WithSnapshot(new DateOnly(2025, 6, 1), 25_900m)
+            .WithSnapshot(new DateOnly(2025, 3, 1), 25_400m)
             .Build();
         await _assetRepository.SaveAsync(asset);
 
@@ -73,7 +73,8 @@ public class GetLoanStateTimelineHandlerTests : DatabaseTest
         var asset = AssetBuilder.ABtcLoan()
             .WithSnapshot(
                 effectiveDate: new DateOnly(2025, 3, 1),
-                currentTotalDebt: 25_500m,
+                totalBorrowed: 25_000m,
+                interestAccruedUntilDate: 400m,
                 note: "Q1 update")
             .Build();
         await _assetRepository.SaveAsync(asset);
@@ -97,6 +98,8 @@ public class GetLoanStateTimelineHandlerTests : DatabaseTest
             Assert.That(dto.StatusId, Is.EqualTo((int)LoanStatus.Active));
             Assert.That(dto.CurrentBtcPriceInLoanCurrency, Is.EqualTo(50_000m));
             Assert.That(dto.FixedTotalDebt, Is.Null);
+            Assert.That(dto.TotalBorrowed, Is.EqualTo(25_000m));
+            Assert.That(dto.InterestAccruedUntilDate, Is.EqualTo(400m));
             Assert.That(dto.CurrentTotalDebt, Is.EqualTo(25_500m));
             Assert.That(dto.EffectiveDate, Is.EqualTo(new DateOnly(2025, 3, 1)));
             Assert.That(dto.Note, Is.EqualTo("Q1 update"));

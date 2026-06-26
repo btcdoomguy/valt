@@ -313,6 +313,7 @@ internal sealed class AssetQueries : IAssetQueries
             LoanHealthStatusId = loanHealthStatusId,
             LoanHealthStatusName = loanHealthStatusName,
             AccruedInterest = btcLoan.CalculateAccruedInterest(),
+            TotalBorrowed = snapshot?.TotalBorrowed ?? btcLoan.LoanAmount,
             TotalDebt = btcLoan.CalculateTotalDebt(),
             DistanceToLiquidationLtv = distanceToLiquidationLtv,
             DaysUntilRepayment = btcLoan.CalculateDaysUntilRepayment(),
@@ -394,7 +395,8 @@ internal sealed class AssetQueries : IAssetQueries
             StatusId = (int)latestSnapshot.Status,
             CurrentBtcPriceInLoanCurrency = latestSnapshot.CurrentBtcPriceInLoanCurrency,
             FixedTotalDebt = latestSnapshot.FixedTotalDebt,
-            CurrentTotalDebt = latestSnapshot.CurrentTotalDebt,
+            TotalBorrowed = latestSnapshot.TotalBorrowed,
+            InterestAccruedUntilDate = latestSnapshot.InterestAccruedUntilDate,
             EffectiveDate = latestSnapshot.EffectiveDate,
             Note = latestSnapshot.Note
         });
@@ -418,7 +420,8 @@ internal sealed class AssetQueries : IAssetQueries
             StatusId = (int)snapshot.Status,
             CurrentBtcPriceInLoanCurrency = snapshot.CurrentBtcPriceInLoanCurrency,
             FixedTotalDebt = snapshot.FixedTotalDebt,
-            CurrentTotalDebt = snapshot.CurrentTotalDebt,
+            TotalBorrowed = snapshot.TotalBorrowed,
+            InterestAccruedUntilDate = snapshot.InterestAccruedUntilDate,
             EffectiveDate = snapshot.EffectiveDate,
             Note = snapshot.Note,
             IsInitial = isInitial

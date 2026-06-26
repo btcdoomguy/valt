@@ -10,7 +10,7 @@ using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Assets;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Modules.Assets.PriceProviders;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Settings;
@@ -32,6 +32,8 @@ public class ManageAssetViewModelTests
     private CurrencySettings _currencySettings;
     private IModalFactory _modalFactory;
 
+    private IAssetFormBuilder _assetFormBuilder;
+
     [OneTimeSetUp]
     public void OneTimeSetUp() => IdGenerator.Configure(new LiteDbIdProvider());
 
@@ -50,6 +52,7 @@ public class ManageAssetViewModelTests
         {
             MainFiatCurrency = "USD"
         };
+        _assetFormBuilder = new AssetFormBuilder(_priceProviderSelector);
     }
 
     [TearDown]
@@ -59,7 +62,7 @@ public class ManageAssetViewModelTests
     }
 
     private ManageAssetViewModel CreateViewModel()
-        => new(_queryDispatcher, _commandDispatcher, _priceProviderSelector, _currencySettings, _configurationManager, _logger, _modalFactory);
+        => new(_queryDispatcher, _commandDispatcher, _priceProviderSelector, _currencySettings, _configurationManager, _logger, _modalFactory, _assetFormBuilder);
 
     private static AssetDTO CreateStockAssetDto(DateOnly? acquisitionDate = null) => new()
     {

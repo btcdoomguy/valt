@@ -118,6 +118,7 @@ public class GetBtcLoansDashboardHandlerTests : DatabaseTest
         {
             Assert.That(result.HasActiveLoans, Is.True);
             Assert.That(result.ActiveLoansCount, Is.EqualTo(1));
+            Assert.That(result.TotalBorrowedInMainCurrency, Is.EqualTo(25_000m));
             Assert.That(result.TotalDebtInMainCurrency, Is.EqualTo(25_000m));
             Assert.That(result.DebtWeightedAvgLtv, Is.EqualTo(50m));
             Assert.That(result.DebtWeightedAvgApr, Is.EqualTo(12m));
@@ -255,6 +256,7 @@ public class GetBtcLoansDashboardHandlerTests : DatabaseTest
         var result = await _handler.HandleAsync(Query());
 
         Assert.That(result.TotalDebtInMainCurrency, Is.EqualTo(20_000m).Within(1m));
+        Assert.That(result.TotalBorrowedInMainCurrency, Is.EqualTo(20_000m).Within(1m));
     }
 
     [Test]
@@ -321,6 +323,7 @@ public class GetBtcLoansDashboardHandlerTests : DatabaseTest
         Assert.Multiple(() =>
         {
             Assert.That(result.ActiveLoansCount, Is.EqualTo(1));
+            Assert.That(result.TotalBorrowedInMainCurrency, Is.EqualTo(10_000m));
             Assert.That(result.TotalDebtInMainCurrency, Is.EqualTo(10_000m));
         });
     }

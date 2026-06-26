@@ -41,3 +41,6 @@ ClientBin/
 
 # Planning
 .planning/
+
+# Test artifacts
+TestResults/

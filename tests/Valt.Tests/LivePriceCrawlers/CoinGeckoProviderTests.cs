@@ -12,6 +12,7 @@ public class CoinGeckoProviderTests
     public async Task Should_Get_Prices_With_Usd_And_Up_To_Date()
     {
         var provider = new CoinGeckoProvider(
+            HttpClientTestFactory.Create(),
             new Clock(),
             new NullLogger<CoinGeckoProvider>(),
             new CoinGeckoRateLimiter(new NullLogger<CoinGeckoRateLimiter>()));

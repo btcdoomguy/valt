@@ -43,7 +43,7 @@ using Valt.UI.Views.Main.Modals.TransactionEditor;
 using Valt.UI.Views.Main.Modals.UpdateLoanState;
 using Valt.UI.Views.Main.Modals.LoanStateHistory;
 using Valt.UI.Views.Main.Tabs.Assets.Models;
-using static Valt.UI.Base.TaskExtensions;
+
 
 namespace Valt.UI.Views.Main.Tabs.Assets;
 
@@ -57,6 +57,7 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
     private readonly IModalFactory _modalFactory = null!;
     private readonly BackgroundJobManager _backgroundJobManager = null!;
     private readonly ILogger<AssetsViewModel> _logger = null!;
+    private readonly IFireAndForgetTaskRunner _runner = null!;
     private JobInfo? _assetPriceUpdaterJobInfo;
 
     [ObservableProperty] private AvaloniaList<AssetViewModel> _assets = new();
@@ -251,6 +252,7 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
         SecureModeState secureModeState,
         IModalFactory modalFactory,
         BackgroundJobManager backgroundJobManager,
+        IFireAndForgetTaskRunner runner,
         ILogger<AssetsViewModel> logger)
     {
         _queryDispatcher = queryDispatcher;
@@ -260,6 +262,7 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
         _secureModeState = secureModeState;
         _modalFactory = modalFactory;
         _backgroundJobManager = backgroundJobManager;
+        _runner = runner;
         _logger = logger;
 
         _secureModeState.PropertyChanged += OnSecureModeStatePropertyChanged;
@@ -279,7 +282,7 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
             if (message.PropertyName == nameof(CurrencySettings.MainFiatCurrency))
             {
                 OnPropertyChanged(nameof(MainCurrencyCode));
-                LoadAssetsAsync().SafeFireAndForget(logger: _logger, callerName: nameof(LoadAssetsAsync));
+                LoadAssetsAsync().FireAndForgetSafeAsync(_runner, _logger);
             }
         });
 
@@ -287,7 +290,7 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
 
         WeakReferenceMessenger.Default.Register<LoanStateUpdatedMessage>(this, (recipient, message) =>
         {
-            LoadAssetsAsync().SafeFireAndForget(logger: _logger, callerName: nameof(LoadAssetsAsync));
+            LoadAssetsAsync().FireAndForgetSafeAsync(_runner, _logger);
         });
     }
 
@@ -298,7 +301,7 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
 
     public void Initialize()
     {
-        LoadAssetsAsync().SafeFireAndForget(logger: _logger, callerName: nameof(LoadAssetsAsync));
+        LoadAssetsAsync().FireAndForgetSafeAsync(_runner, _logger);
     }
 
     public override MainViewTabNames TabName => MainViewTabNames.AssetsPageContent;
@@ -884,7 +887,7 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
     private void OnRatesStatePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         // Refresh summary when rates change
-        LoadAssetsAsync().SafeFireAndForget(logger: _logger, callerName: nameof(LoadAssetsAsync));
+        LoadAssetsAsync().FireAndForgetSafeAsync(_runner, _logger);
     }
 
     private void OnAssetPriceUpdaterJobPropertyChanged(object? sender, PropertyChangedEventArgs e)

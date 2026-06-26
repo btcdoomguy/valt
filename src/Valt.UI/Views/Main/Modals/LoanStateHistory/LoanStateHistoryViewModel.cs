@@ -43,6 +43,8 @@ public partial class LoanStateHistoryViewModel : ValtModalViewModel
         {
             EffectiveDate = new DateOnly(2024, 6, 1),
             EffectiveDateFormatted = "6/1/2024",
+            TotalBorrowedFormatted = "$ 100 000.00",
+            InterestAccruedUntilDateFormatted = "$ 5 000.00",
             CurrentTotalDebtFormatted = "$ 105 000.00",
             CollateralSatsFormatted = "5 000 000 " + language.SatsLabel,
             AprFormatted = "12.00%",
@@ -86,6 +88,8 @@ public partial class LoanStateHistoryViewModel : ValtModalViewModel
             {
                 EffectiveDate = s.EffectiveDate,
                 EffectiveDateFormatted = s.EffectiveDate.ToShortDateString(),
+                TotalBorrowedFormatted = CurrencyDisplay.FormatFiat(s.TotalBorrowed, s.CurrencyCode),
+                InterestAccruedUntilDateFormatted = CurrencyDisplay.FormatFiat(s.InterestAccruedUntilDate, s.CurrencyCode),
                 CurrentTotalDebtFormatted = CurrencyDisplay.FormatFiat(s.CurrentTotalDebt, s.CurrencyCode),
                 CollateralSatsFormatted = $"{s.CollateralSats:N0} {language.SatsLabel}",
                 AprFormatted = $"{s.Apr * 100m:N2}%",
@@ -178,6 +182,8 @@ public partial class LoanStateHistoryViewModel : ValtModalViewModel
     {
         public required DateOnly EffectiveDate { get; init; }
         public required string EffectiveDateFormatted { get; init; }
+        public required string TotalBorrowedFormatted { get; init; }
+        public required string InterestAccruedUntilDateFormatted { get; init; }
         public required string CurrentTotalDebtFormatted { get; init; }
         public required string CollateralSatsFormatted { get; init; }
         public required string AprFormatted { get; init; }

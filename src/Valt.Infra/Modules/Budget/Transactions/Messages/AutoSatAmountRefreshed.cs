@@ -1,6 +1,6 @@
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Transactions;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 
 namespace Valt.Infra.Modules.Budget.Transactions.Messages;
 

@@ -1,7 +1,9 @@
+using NSubstitute;
+using Valt.App.Kernel.Notifications;
 using Valt.App.Modules.Goals.Commands.CopyGoalsFromLastMonth;
+using Valt.App.Modules.Goals.Notifications;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.GoalTypes;
-using Valt.Infra.Modules.Goals.Services;
 using Valt.Tests.Builders;
 
 namespace Valt.Tests.Application.Goals;
@@ -10,7 +12,7 @@ namespace Valt.Tests.Application.Goals;
 public class CopyGoalsFromLastMonthHandlerTests : DatabaseTest
 {
     private CopyGoalsFromLastMonthHandler _handler = null!;
-    private GoalProgressState _goalProgressState = null!;
+    private INotificationPublisher _notificationPublisher = null!;
 
     [SetUp]
     public async Task SetUpHandler()
@@ -20,8 +22,8 @@ public class CopyGoalsFromLastMonthHandlerTests : DatabaseTest
         foreach (var goal in existingGoals)
             await _goalRepository.DeleteAsync(goal);
 
-        _goalProgressState = new GoalProgressState();
-        _handler = new CopyGoalsFromLastMonthHandler(_goalRepository, _goalProgressState);
+        _notificationPublisher = Substitute.For<INotificationPublisher>();
+        _handler = new CopyGoalsFromLastMonthHandler(_goalRepository, _notificationPublisher);
     }
 
     [Test]
@@ -136,7 +138,7 @@ public class CopyGoalsFromLastMonthHandlerTests : DatabaseTest
     }
 
     [Test]
-    public async Task HandleAsync_MarksProgressStateAsStale_WhenGoalsCopied()
+    public async Task HandleAsync_PublishesGoalProgressUpdateRequested_WhenGoalsCopied()
     {
         var goal = GoalBuilder.AStackBitcoinGoal(1_000_000)
             .WithRefDate(new DateOnly(2024, 1, 1))
@@ -151,11 +153,12 @@ public class CopyGoalsFromLastMonthHandlerTests : DatabaseTest
 
         await _handler.HandleAsync(command);
 
-        Assert.That(_goalProgressState.HasStaleGoals, Is.True);
+        await _notificationPublisher.Received(1)
+            .PublishAsync(Arg.Is<GoalProgressUpdateRequested>(_ => true));
     }
 
     [Test]
-    public async Task HandleAsync_DoesNotMarkProgressStateAsStale_WhenNoGoalsCopied()
+    public async Task HandleAsync_DoesNotPublishGoalProgressUpdateRequested_WhenNoGoalsCopied()
     {
         var command = new CopyGoalsFromLastMonthCommand
         {
@@ -164,6 +167,7 @@ public class CopyGoalsFromLastMonthHandlerTests : DatabaseTest
 
         await _handler.HandleAsync(command);
 
-        Assert.That(_goalProgressState.HasStaleGoals, Is.False);
+        await _notificationPublisher.DidNotReceive()
+            .PublishAsync(Arg.Any<GoalProgressUpdateRequested>());
     }
 }

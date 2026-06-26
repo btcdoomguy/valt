@@ -9,6 +9,7 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Budget.Accounts.DTOs;
@@ -31,7 +32,7 @@ using Valt.Core.Modules.Budget.Transactions.Services;
 using Valt.Infra.Settings;
 using Valt.Infra.TransactionTerms;
 using Valt.UI.Base;
-using static Valt.UI.Base.TaskExtensions;
+
 using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
@@ -58,6 +59,9 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
     private readonly CurrencySettings _currencySettings = null!;
     private readonly DisplaySettings _displaySettings = null!;
     private readonly LastTransactionDateState _lastTransactionDateState;
+    private readonly IFireAndForgetTaskRunner _runner = null!;
+    private readonly ILogger<TransactionEditorViewModel> _logger = null!;
+    private readonly ITransactionDetailsBuilder? _transactionDetailsBuilder;
 
     public AvaloniaList<CategoryDTO> AvailableCategories { get; set; } = [];
     public AvaloniaList<AccountDTO> AvailableAccounts { get; set; } = [];
@@ -410,7 +414,10 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         IModalFactory modalFactory,
         CurrencySettings currencySettings,
         DisplaySettings displaySettings,
-        LastTransactionDateState lastTransactionDateState)
+        LastTransactionDateState lastTransactionDateState,
+        IFireAndForgetTaskRunner runner,
+        ILogger<TransactionEditorViewModel> logger,
+        ITransactionDetailsBuilder transactionDetailsBuilder)
     {
         _commandDispatcher = commandDispatcher;
         _queryDispatcher = queryDispatcher;
@@ -419,19 +426,17 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         _currencySettings = currencySettings;
         _displaySettings = displaySettings;
         _lastTransactionDateState = lastTransactionDateState;
-
-        InitializeAsync().SafeFireAndForget(callerName: nameof(InitializeAsync));
-    }
-
-    private async Task InitializeAsync()
-    {
-        Date = DateTime.Now.Date;
-        await FetchCategoriesAsync();
-        await FetchAccountsAsync();
+        _runner = runner;
+        _logger = logger;
+        _transactionDetailsBuilder = transactionDetailsBuilder;
     }
 
     public override async Task OnBindParameterAsync()
     {
+        Date = DateTime.Now.Date;
+        await FetchCategoriesAsync();
+        await FetchAccountsAsync();
+
         if (Parameter is not Request request)
             return;
 
@@ -561,45 +566,14 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
 
     private void LoadTransactionDetailsFromDto(TransactionDetailsDto details)
     {
-        switch (details)
-        {
-            case FiatTransactionDto fiat:
-                SelectedMode = fiat.IsCredit ? TransactionTypes.Credit : TransactionTypes.Debt;
-                FromAccountFiatValue = FiatValue.New(fiat.Amount);
-                break;
-            case BitcoinTransactionDto btc:
-                SelectedMode = btc.IsCredit ? TransactionTypes.Credit : TransactionTypes.Debt;
-                FromAccountBtcValue = BtcValue.New(btc.AmountSats);
-                break;
-            case FiatToFiatTransferDto fiatToFiat:
-                SelectedMode = TransactionTypes.Transfer;
-                ToAccount = AvailableAccounts.FirstOrDefault(a => a.Id == fiatToFiat.ToAccountId);
-                FromAccountFiatValue = FiatValue.New(fiatToFiat.FromAmount);
-                ToAccountFiatValue = AccountsAreSameTypeAndCurrency
-                    ? FromAccountFiatValue
-                    : FiatValue.New(fiatToFiat.ToAmount);
-                break;
-            case BitcoinToBitcoinTransferDto btcToBtc:
-                SelectedMode = TransactionTypes.Transfer;
-                ToAccount = AvailableAccounts.FirstOrDefault(a => a.Id == btcToBtc.ToAccountId);
-                FromAccountBtcValue = BtcValue.New(btcToBtc.AmountSats);
-                ToAccountBtcValue = BtcValue.New(btcToBtc.AmountSats);
-                break;
-            case FiatToBitcoinTransferDto fiatToBtc:
-                SelectedMode = TransactionTypes.Transfer;
-                ToAccount = AvailableAccounts.FirstOrDefault(a => a.Id == fiatToBtc.ToAccountId);
-                FromAccountFiatValue = FiatValue.New(fiatToBtc.FromFiatAmount);
-                ToAccountBtcValue = BtcValue.New(fiatToBtc.ToSatsAmount);
-                break;
-            case BitcoinToFiatTransferDto btcToFiat:
-                SelectedMode = TransactionTypes.Transfer;
-                ToAccount = AvailableAccounts.FirstOrDefault(a => a.Id == btcToFiat.ToAccountId);
-                FromAccountBtcValue = BtcValue.New(btcToFiat.FromSatsAmount);
-                ToAccountFiatValue = FiatValue.New(btcToFiat.ToFiatAmount);
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(details), details.GetType().Name, "Unknown transaction details type");
-        }
+        var values = _transactionDetailsBuilder!.LoadFromDto(details, AvailableAccounts);
+
+        SelectedMode = values.SelectedMode;
+        ToAccount = values.ToAccount;
+        FromAccountBtcValue = values.FromAccountBtcValue;
+        FromAccountFiatValue = values.FromAccountFiatValue;
+        ToAccountBtcValue = values.ToAccountBtcValue;
+        ToAccountFiatValue = values.ToAccountFiatValue;
     }
 
     partial void OnTransactionTermResultChanged(TransactionTermResult? value)
@@ -883,7 +857,7 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
             or nameof(ToAccountFiatValue) or nameof(FromAccount) or nameof(FromAccountBtcValue)
             or nameof(FromAccountFiatValue))
         {
-            UpdateTransferRateAsync().SafeFireAndForget(callerName: nameof(UpdateTransferRateAsync));
+            UpdateTransferRateAsync().FireAndForgetSafeAsync(_runner, _logger);
         }
     }
 
@@ -949,57 +923,15 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
 
     private TransactionDetailsDto BuildTransactionDetailsDtoFromForm()
     {
-        if (SelectedMode == TransactionTypes.Transfer)
-        {
-            return CurrentAccountMode switch
-            {
-                "BitcoinToBitcoin" => new BitcoinToBitcoinTransferDto
-                {
-                    FromAccountId = FromAccount!.Id,
-                    ToAccountId = ToAccount!.Id,
-                    AmountSats = FromAccountBtcValue!.Sats
-                },
-                "BitcoinToFiat" => new BitcoinToFiatTransferDto
-                {
-                    FromAccountId = FromAccount!.Id,
-                    ToAccountId = ToAccount!.Id,
-                    FromSatsAmount = FromAccountBtcValue!.Sats,
-                    ToFiatAmount = ToAccountFiatValue!.Value
-                },
-                "FiatToBitcoin" => new FiatToBitcoinTransferDto
-                {
-                    FromAccountId = FromAccount!.Id,
-                    ToAccountId = ToAccount!.Id,
-                    FromFiatAmount = FromAccountFiatValue!.Value,
-                    ToSatsAmount = ToAccountBtcValue!.Sats
-                },
-                "FiatToFiat" => new FiatToFiatTransferDto
-                {
-                    FromAccountId = FromAccount!.Id,
-                    ToAccountId = ToAccount!.Id,
-                    FromAmount = FromAccountFiatValue!.Value,
-                    ToAmount = AccountsAreSameTypeAndCurrency ? FromAccountFiatValue!.Value : ToAccountFiatValue!.Value
-                },
-                _ => throw new TransactionDetailsBuildException()
-            };
-        }
-
-        return CurrentAccountMode switch
-        {
-            "Bitcoin" => new BitcoinTransactionDto
-            {
-                FromAccountId = FromAccount!.Id,
-                AmountSats = FromAccountBtcValue!.Sats,
-                IsCredit = SelectedMode == TransactionTypes.Credit
-            },
-            "Fiat" => new FiatTransactionDto
-            {
-                FromAccountId = FromAccount!.Id,
-                Amount = FromAccountFiatValue!.Value,
-                IsCredit = SelectedMode == TransactionTypes.Credit
-            },
-            _ => throw new TransactionDetailsBuildException()
-        };
+        return _transactionDetailsBuilder!.BuildDto(new TransactionFormSnapshot(
+            SelectedMode,
+            FromAccount!,
+            ToAccount,
+            FromAccountBtcValue,
+            FromAccountFiatValue,
+            ToAccountBtcValue,
+            ToAccountFiatValue,
+            AccountsAreSameTypeAndCurrency));
     }
 
     public Task<IEnumerable<object>> GetTransactionTermsAsync(string? term, CancellationToken cancellationToken)

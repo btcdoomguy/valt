@@ -1,4 +1,4 @@
-namespace Valt.Infra.Kernel.Notifications;
+namespace Valt.App.Kernel.Notifications;
 
 public interface INotificationHandler<in TEvent> where TEvent : class, INotification
 {

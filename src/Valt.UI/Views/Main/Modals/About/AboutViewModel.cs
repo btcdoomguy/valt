@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
+using Valt.Infra;
 using Valt.UI.Base;
 
 namespace Valt.UI.Views.Main.Modals.About;
 
 public partial class AboutViewModel : ValtModalViewModel
 {
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<AboutViewModel> _logger = null!;
     private const string DONATION_URL = "https://raw.githubusercontent.com/btcdoomguy/valt-data/refs/heads/master/donation.txt";
     
@@ -20,20 +22,21 @@ public partial class AboutViewModel : ValtModalViewModel
     [ObservableProperty]
     private string _appVersion = $"v{Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "Unknown"}";
 
-    public AboutViewModel(ILogger<AboutViewModel> logger)
+    public AboutViewModel(IHttpClientFactory httpClientFactory, ILogger<AboutViewModel> logger)
     {
+        _httpClientFactory = httpClientFactory;
         _logger = logger;
     }
 
     public AboutViewModel()
     {
-        
+        _httpClientFactory = null!;
     }
         
     [RelayCommand]
     private async Task LoadDonationAddressesAsync()
     {
-        using var client = new HttpClient() { Timeout = TimeSpan.FromSeconds(10) };
+        using var client = _httpClientFactory.CreateClient(HttpClientNames.PriceProvider);
 
         try
         {

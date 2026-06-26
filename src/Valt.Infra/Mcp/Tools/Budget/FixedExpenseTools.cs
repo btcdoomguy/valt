@@ -8,7 +8,7 @@ using Valt.App.Modules.Budget.FixedExpenses.Commands.EditFixedExpense;
 using Valt.App.Modules.Budget.FixedExpenses.DTOs;
 using Valt.App.Modules.Budget.FixedExpenses.Queries.GetFixedExpense;
 using Valt.App.Modules.Budget.FixedExpenses.Queries.GetFixedExpenses;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Mcp.Notifications;
 
 namespace Valt.Infra.Mcp.Tools.Budget;

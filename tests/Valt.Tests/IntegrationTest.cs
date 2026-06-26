@@ -7,7 +7,7 @@ using Valt.Infra;
 using Valt.Infra.Crawlers.LivePriceCrawlers;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Kernel.Time;
 using Valt.UI;
 using Valt.UI.Base;

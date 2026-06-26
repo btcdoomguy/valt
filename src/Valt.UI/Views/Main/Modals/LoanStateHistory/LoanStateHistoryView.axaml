@@ -49,15 +49,19 @@
                           SelectedItem="{Binding SelectedSnapshot}"
                           ScrollViewer.HorizontalScrollBarVisibility="Auto">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="{x:Static lang:language.UpdateLoanState_EffectiveDate}" Width="110"
+                        <DataGridTextColumn Header="{x:Static lang:language.UpdateLoanState_EffectiveDate}" Width="100"
                                             Binding="{Binding EffectiveDateFormatted}" />
-                        <DataGridTextColumn Header="{x:Static lang:language.UpdateLoanState_CurrentTotalDebt}" Width="120"
+                        <DataGridTextColumn Header="{x:Static lang:language.UpdateLoanState_TotalBorrowed}" Width="110"
+                                            Binding="{Binding TotalBorrowedFormatted}" />
+                        <DataGridTextColumn Header="{x:Static lang:language.UpdateLoanState_InterestAccruedUntilDate}" Width="110"
+                                            Binding="{Binding InterestAccruedUntilDateFormatted}" />
+                        <DataGridTextColumn Header="{x:Static lang:language.UpdateLoanState_CurrentTotalDebt}" Width="110"
                                             Binding="{Binding CurrentTotalDebtFormatted}" />
-                        <DataGridTextColumn Header="{x:Static lang:language.ManageAsset_CollateralSats}" Width="130"
+                        <DataGridTextColumn Header="{x:Static lang:language.ManageAsset_CollateralSats}" Width="120"
                                             Binding="{Binding CollateralSatsFormatted}" />
-                        <DataGridTextColumn Header="{x:Static lang:language.ManageAsset_APR}" Width="90"
+                        <DataGridTextColumn Header="{x:Static lang:language.ManageAsset_APR}" Width="80"
                                             Binding="{Binding AprFormatted}" />
-                        <DataGridTextColumn Header="{x:Static lang:language.ManageAsset_Fees}" Width="110"
+                        <DataGridTextColumn Header="{x:Static lang:language.ManageAsset_Fees}" Width="100"
                                             Binding="{Binding FeesFormatted}" />
                     </DataGrid.Columns>
                 </DataGrid>

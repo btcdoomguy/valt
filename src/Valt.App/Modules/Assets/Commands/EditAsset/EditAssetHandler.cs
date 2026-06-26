@@ -140,9 +140,26 @@ internal sealed class EditAssetHandler : ICommandHandler<EditAssetCommand, Unit>
                 btcLoan.LoanStartDate, btcLoan.RepaymentDate)
             : btcLoan.Apr;
 
-        var existingSnapshots = existingAsset.Details is BtcLoanDetails existingLoanForSnapshots
-            ? existingLoanForSnapshots.Snapshots
-            : null;
+        var status = (LoanStatus)btcLoan.Status;
+
+        if (existingAsset.Details is BtcLoanDetails existingLoanForUpdate)
+        {
+            return Result<IAssetDetails>.Success(existingLoanForUpdate.WithUpdatedSetup(
+                platformName: btcLoan.PlatformName,
+                collateralSats: btcLoan.CollateralSats,
+                loanAmount: btcLoan.LoanAmount,
+                currencyCode: btcLoan.CurrencyCode,
+                apr: apr,
+                initialLtv: btcLoan.InitialLtv,
+                liquidationLtv: btcLoan.LiquidationLtv,
+                marginCallLtv: btcLoan.MarginCallLtv,
+                fees: btcLoan.Fees,
+                loanStartDate: btcLoan.LoanStartDate,
+                repaymentDate: btcLoan.RepaymentDate,
+                status: status,
+                currentBtcPriceInLoanCurrency: btcPrice,
+                fixedTotalDebt: btcLoan.FixedTotalDebt));
+        }
 
         return Result<IAssetDetails>.Success(new BtcLoanDetails(
             platformName: btcLoan.PlatformName,
@@ -156,9 +173,8 @@ internal sealed class EditAssetHandler : ICommandHandler<EditAssetCommand, Unit>
             fees: btcLoan.Fees,
             loanStartDate: btcLoan.LoanStartDate,
             repaymentDate: btcLoan.RepaymentDate,
-            status: (LoanStatus)btcLoan.Status,
+            status: status,
             currentBtcPriceInLoanCurrency: btcPrice,
-            fixedTotalDebt: btcLoan.FixedTotalDebt,
-            snapshots: existingSnapshots));
+            fixedTotalDebt: btcLoan.FixedTotalDebt));
     }
 }

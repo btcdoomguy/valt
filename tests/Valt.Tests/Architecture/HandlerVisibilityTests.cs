@@ -3,7 +3,7 @@ using NetArchTest.Rules;
 using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Queries;
 using Valt.Core.Kernel.Abstractions.EventSystem;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 
 namespace Valt.Tests.Architecture;
 

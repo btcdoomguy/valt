@@ -1,7 +1,8 @@
 using NSubstitute;
+using Valt.App.Kernel.Notifications;
 using Valt.App.Modules.Goals.Commands.RecalculateGoal;
+using Valt.App.Modules.Goals.Notifications;
 using Valt.Core.Modules.Goals;
-using Valt.Infra.Modules.Goals.Services;
 using Valt.Tests.Builders;
 
 namespace Valt.Tests.Application.Goals;
@@ -10,7 +11,7 @@ namespace Valt.Tests.Application.Goals;
 public class RecalculateGoalHandlerTests : DatabaseTest
 {
     private RecalculateGoalHandler _handler = null!;
-    private GoalProgressState _goalProgressState = null!;
+    private INotificationPublisher _notificationPublisher = null!;
 
     [SetUp]
     public async Task SetUpHandler()
@@ -20,8 +21,8 @@ public class RecalculateGoalHandlerTests : DatabaseTest
         foreach (var goal in existingGoals)
             await _goalRepository.DeleteAsync(goal);
 
-        _goalProgressState = new GoalProgressState();
-        _handler = new RecalculateGoalHandler(_goalRepository, _goalProgressState);
+        _notificationPublisher = Substitute.For<INotificationPublisher>();
+        _handler = new RecalculateGoalHandler(_goalRepository, _notificationPublisher);
     }
 
     [Test]
@@ -118,7 +119,7 @@ public class RecalculateGoalHandlerTests : DatabaseTest
     }
 
     [Test]
-    public async Task HandleAsync_MarksProgressStateAsStale()
+    public async Task HandleAsync_PublishesGoalProgressUpdateRequested()
     {
         var goal = GoalBuilder.AStackBitcoinGoal(1_000_000)
             .WithState(GoalStates.Completed)
@@ -129,6 +130,7 @@ public class RecalculateGoalHandlerTests : DatabaseTest
 
         await _handler.HandleAsync(command);
 
-        Assert.That(_goalProgressState.HasStaleGoals, Is.True);
+        await _notificationPublisher.Received(1)
+            .PublishAsync(Arg.Is<GoalProgressUpdateRequested>(_ => true));
     }
 }

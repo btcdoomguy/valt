@@ -11,7 +11,10 @@ public class CurrencyApiFiatProviderTests
     [Test]
     public async Task Should_Get_Prices()
     {
-        var provider = new CurrencyApiFiatRateProvider(new Clock(), new NullLogger<CurrencyApiFiatRateProvider>());
+        var provider = new CurrencyApiFiatRateProvider(
+            HttpClientTestFactory.Create(),
+            new Clock(),
+            new NullLogger<CurrencyApiFiatRateProvider>());
         var currencies = new[] { FiatCurrency.Brl, FiatCurrency.Eur };
 
         var prices = await provider.GetAsync(currencies);
@@ -23,7 +26,10 @@ public class CurrencyApiFiatProviderTests
     [Test]
     public async Task Should_Return_Usd_When_Only_Usd_Requested()
     {
-        var provider = new CurrencyApiFiatRateProvider(new Clock(), new NullLogger<CurrencyApiFiatRateProvider>());
+        var provider = new CurrencyApiFiatRateProvider(
+            HttpClientTestFactory.Create(),
+            new Clock(),
+            new NullLogger<CurrencyApiFiatRateProvider>());
         var currencies = new[] { FiatCurrency.Usd };
 
         var prices = await provider.GetAsync(currencies);
@@ -36,7 +42,10 @@ public class CurrencyApiFiatProviderTests
     [Test]
     public async Task Should_Get_All_Supported_Currencies()
     {
-        var provider = new CurrencyApiFiatRateProvider(new Clock(), new NullLogger<CurrencyApiFiatRateProvider>());
+        var provider = new CurrencyApiFiatRateProvider(
+            HttpClientTestFactory.Create(),
+            new Clock(),
+            new NullLogger<CurrencyApiFiatRateProvider>());
         var currencies = provider.SupportedCurrencies.ToArray();
 
         var prices = await provider.GetAsync(currencies);
@@ -54,7 +63,10 @@ public class CurrencyApiFiatProviderTests
     [Test]
     public void Should_Support_All_Fiat_Currencies()
     {
-        var provider = new CurrencyApiFiatRateProvider(new Clock(), new NullLogger<CurrencyApiFiatRateProvider>());
+        var provider = new CurrencyApiFiatRateProvider(
+            HttpClientTestFactory.Create(),
+            new Clock(),
+            new NullLogger<CurrencyApiFiatRateProvider>());
 
         Assert.That(provider.SupportedCurrencies.Count, Is.EqualTo(33));
         Assert.That(provider.SupportedCurrencies, Does.Contain(FiatCurrency.Usd));
@@ -67,7 +79,10 @@ public class CurrencyApiFiatProviderTests
     [Test]
     public void Should_Have_Correct_Name()
     {
-        var provider = new CurrencyApiFiatRateProvider(new Clock(), new NullLogger<CurrencyApiFiatRateProvider>());
+        var provider = new CurrencyApiFiatRateProvider(
+            HttpClientTestFactory.Create(),
+            new Clock(),
+            new NullLogger<CurrencyApiFiatRateProvider>());
 
         Assert.That(provider.Name, Is.EqualTo("CurrencyApi"));
     }
@@ -75,7 +90,10 @@ public class CurrencyApiFiatProviderTests
     [Test]
     public async Task Should_Get_Prices_For_Uyu_And_Pyg()
     {
-        var provider = new CurrencyApiFiatRateProvider(new Clock(), new NullLogger<CurrencyApiFiatRateProvider>());
+        var provider = new CurrencyApiFiatRateProvider(
+            HttpClientTestFactory.Create(),
+            new Clock(),
+            new NullLogger<CurrencyApiFiatRateProvider>());
         var currencies = new[] { FiatCurrency.Uyu, FiatCurrency.Pyg };
 
         var prices = await provider.GetAsync(currencies);

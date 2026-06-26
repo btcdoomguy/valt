@@ -26,6 +26,7 @@ namespace Valt.UI;
 public partial class App : Application
 {
     public static IServiceProvider? ServiceProvider { get; private set; }
+    private bool _shutdownCleanupStarted;
 
     public override void Initialize()
     {
@@ -83,12 +84,7 @@ public partial class App : Application
                 DataContext = serviceProvider.GetRequiredService<MainViewModel>()
             };
 
-            // Stop background jobs when the application exits
-            desktop.ShutdownRequested += async (_, _) =>
-            {
-                var bgJobManager = serviceProvider.GetRequiredService<BackgroundJobManager>();
-                await bgJobManager.StopAll();
-            };
+            desktop.ShutdownRequested += OnShutdownRequested;
         }
         
         TransactionGridResources.Initialize();
@@ -109,6 +105,41 @@ public partial class App : Application
 
             _ = backgroundJobManager.StartAllJobsAsync(jobType: BackgroundJobTypes.App);
         }
+    }
+
+    private async void OnShutdownRequested(object? sender, ShutdownRequestedEventArgs e)
+    {
+        if (_shutdownCleanupStarted)
+            return;
+
+        _shutdownCleanupStarted = true;
+        e.Cancel = true;
+
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            desktop.ShutdownRequested -= OnShutdownRequested;
+
+        var logger = ServiceProvider?.GetRequiredService<ILogger<App>>();
+
+        try
+        {
+            var bgJobManager = ServiceProvider?.GetRequiredService<BackgroundJobManager>();
+            if (bgJobManager is not null)
+            {
+                await bgJobManager.StopAll();
+            }
+
+            var mainVm = ServiceProvider?.GetService<MainViewModel>();
+            if (mainVm is not null)
+            {
+                await mainVm.OnClosingAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger?.LogError(ex, "Shutdown cleanup failed");
+        }
+
+        (ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.Shutdown(0);
     }
 
 }

@@ -1,6 +1,8 @@
 using Valt.App.Kernel;
 using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Notifications;
 using Valt.App.Modules.Goals.Contracts;
+using Valt.App.Modules.Goals.Notifications;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.Contracts;
 
@@ -9,14 +11,14 @@ namespace Valt.App.Modules.Goals.Commands.RecalculateGoal;
 internal sealed class RecalculateGoalHandler : ICommandHandler<RecalculateGoalCommand, RecalculateGoalResult>
 {
     private readonly IGoalRepository _goalRepository;
-    private readonly IGoalProgressState _goalProgressState;
+    private readonly INotificationPublisher _notificationPublisher;
 
     public RecalculateGoalHandler(
         IGoalRepository goalRepository,
-        IGoalProgressState goalProgressState)
+        INotificationPublisher notificationPublisher)
     {
         _goalRepository = goalRepository;
-        _goalProgressState = goalProgressState;
+        _notificationPublisher = notificationPublisher;
     }
 
     public async Task<Result<RecalculateGoalResult>> HandleAsync(
@@ -43,7 +45,7 @@ internal sealed class RecalculateGoalHandler : ICommandHandler<RecalculateGoalCo
 
         goal.Recalculate();
         await _goalRepository.SaveAsync(goal);
-        _goalProgressState.MarkAsStale();
+        await _notificationPublisher.PublishAsync(new GoalProgressUpdateRequested());
 
         return Result<RecalculateGoalResult>.Success(new RecalculateGoalResult());
     }

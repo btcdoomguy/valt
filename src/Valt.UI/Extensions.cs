@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Kernel.Scopes;
 using Valt.Infra.Modules.Budget.Categories;
 using Valt.UI.Base;
@@ -96,6 +96,8 @@ public static class Extensions
         services.AddSingleton<IPageFactory, PageFactory>();
         services.AddSingleton<IDatabaseLifecycleService, DatabaseLifecycleService>();
         services.AddSingleton<ITransactionSelectionService, TransactionSelectionService>();
+        services.AddSingleton<ITransactionDetailsBuilder, TransactionDetailsBuilder>();
+        services.AddSingleton<IAssetFormBuilder, AssetFormBuilder>();
         services.AddSingleton<IAutoSatRefreshService, AutoSatRefreshService>();
         
         //transactions tabs
@@ -296,6 +298,7 @@ public static class Extensions
             };
         });
         services.AddSingleton<IModalFactory, ModalFactory>();
+        services.AddSingleton<IModalLauncher, ModalLauncher>();
 
         //state objects
         services.AddSingleton<RatesState>();
@@ -312,6 +315,9 @@ public static class Extensions
 
         //font scaling
         services.AddSingleton<IFontScaleService, FontScaleService>();
+
+        //fire-and-forget runner
+        services.AddSingleton<IFireAndForgetTaskRunner, FireAndForgetTaskRunner>();
 
         //notification handlers (bridge handlers to forward to WeakReferenceMessenger)
         services.Scan(scan => scan

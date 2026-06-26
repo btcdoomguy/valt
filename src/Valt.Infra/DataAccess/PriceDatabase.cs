@@ -4,7 +4,7 @@ using LiteDB;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Infra.DataAccess.LiteDBMappers;
 using Valt.Infra.Kernel;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Crawlers.Indicators;
 using Valt.Infra.Modules.DataSources.Bitcoin;
 using Valt.Infra.Modules.DataSources.Fiat;
@@ -47,6 +47,7 @@ internal sealed class PriceDatabase : IPriceDatabase
         _filePath = filePath;
         _inMemoryDb = false;
 
+        EnsureIndexes();
         OnPropertyChanged(nameof(HasDatabaseOpen));
     }
 
@@ -58,7 +59,8 @@ internal sealed class PriceDatabase : IPriceDatabase
         _database = new LiteDatabase(stream, CreateMapper());
         _filePath = null;
         _inMemoryDb = true;
-        
+
+        EnsureIndexes();
         OnPropertyChanged(nameof(HasDatabaseOpen));
     }
 
@@ -105,27 +107,26 @@ internal sealed class PriceDatabase : IPriceDatabase
         return _database;
     }
 
+    private void EnsureIndexes()
+    {
+        var bitcoin = GetOpenDatabase().GetCollection<BitcoinDataEntity>("datasource_bitcoin");
+        bitcoin.EnsureIndex(x => x.Date);
+
+        var fiat = GetOpenDatabase().GetCollection<FiatDataEntity>("datasource_fiat");
+        fiat.EnsureIndex(x => x.Date);
+        fiat.EnsureIndex(x => x.Currency);
+    }
+
     #region DataSource module
 
     public ILiteCollection<BitcoinDataEntity> GetBitcoinData()
     {
-        var db = GetOpenDatabase();
-        var collection = db.GetCollection<BitcoinDataEntity>("datasource_bitcoin");
-
-        collection.EnsureIndex(x => x.Date);
-
-        return collection;
+        return GetOpenDatabase().GetCollection<BitcoinDataEntity>("datasource_bitcoin");
     }
 
     public ILiteCollection<FiatDataEntity> GetFiatData()
     {
-        var db = GetOpenDatabase();
-        var collection = db.GetCollection<FiatDataEntity>("datasource_fiat");
-
-        collection.EnsureIndex(x => x.Date);
-        collection.EnsureIndex(x => x.Currency);
-
-        return collection;
+        return GetOpenDatabase().GetCollection<FiatDataEntity>("datasource_fiat");
     }
 
     public ILiteCollection<IndicatorSnapshotEntity> GetIndicators()

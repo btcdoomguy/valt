@@ -41,8 +41,11 @@ public partial class UpdateLoanStateViewModel : ValtModalValidatorViewModel
     [Required(ErrorMessageResourceName = "Validation_EffectiveDateRequired", ErrorMessageResourceType = typeof(language))]
     [ObservableProperty] private DateTime? _effectiveDate = DateTime.Today;
 
-    [Required(ErrorMessageResourceName = "Validation_CurrentTotalDebtRequired", ErrorMessageResourceType = typeof(language))]
-    [ObservableProperty] private FiatValue _currentTotalDebt = FiatValue.Empty;
+    [Required(ErrorMessageResourceName = "Validation_TotalBorrowedRequired", ErrorMessageResourceType = typeof(language))]
+    [ObservableProperty] private FiatValue _totalBorrowed = FiatValue.Empty;
+
+    [Required(ErrorMessageResourceName = "Validation_InterestAccruedUntilDateRequired", ErrorMessageResourceType = typeof(language))]
+    [ObservableProperty] private FiatValue _interestAccruedUntilDate = FiatValue.Empty;
 
     [Required(ErrorMessageResourceName = "Validation_CollateralRequired", ErrorMessageResourceType = typeof(language))]
     [Range(1, long.MaxValue, ErrorMessageResourceName = "Validation_CollateralGreaterThanZero", ErrorMessageResourceType = typeof(language))]
@@ -88,6 +91,7 @@ public partial class UpdateLoanStateViewModel : ValtModalValidatorViewModel
     public string LiquidationLtvFormatted => $"{LiquidationLtv:N2}%";
     public string LoanStartDateFormatted => LoanStartDate.HasValue ? LoanStartDate.Value.ToShortDateString() : "-";
     public string RepaymentDateFormatted => RepaymentDate.HasValue ? RepaymentDate.Value.ToShortDateString() : language.ManageAsset_IndefinitePeriod;
+    public string CurrentTotalDebtFormatted => CurrencyDisplay.FormatFiat(TotalBorrowed.Value + InterestAccruedUntilDate.Value + Fees.Value, CurrencyCode);
 
     public UpdateLoanStateViewModel()
     {
@@ -124,7 +128,8 @@ public partial class UpdateLoanStateViewModel : ValtModalValidatorViewModel
             SymbolOnRight = currency.SymbolOnRight;
 
             EffectiveDate = DateTime.Today;
-            CurrentTotalDebt = FiatValue.New(latest.CurrentTotalDebt);
+            TotalBorrowed = FiatValue.New(latest.TotalBorrowed);
+            InterestAccruedUntilDate = FiatValue.New(latest.InterestAccruedUntilDate);
             CollateralSats = latest.CollateralSats;
             AprPercentage = latest.Apr * 100m;
             Fees = FiatValue.New(latest.Fees);
@@ -150,9 +155,12 @@ public partial class UpdateLoanStateViewModel : ValtModalValidatorViewModel
                 CurrencySymbol = currency.Symbol;
                 SymbolOnRight = currency.SymbolOnRight;
 
-                EffectiveDate = DateTime.Today;
-                CurrentTotalDebt = FiatValue.New(asset.TotalDebt ?? asset.LoanAmount ?? 0m);
-                CollateralSats = asset.CollateralSats ?? 0L;
+            EffectiveDate = DateTime.Today;
+            var fallbackTotalDebt = asset.TotalDebt ?? asset.LoanAmount ?? 0m;
+            var fallbackBorrowed = asset.TotalBorrowed ?? asset.LoanAmount ?? 0m;
+            TotalBorrowed = FiatValue.New(fallbackBorrowed);
+            InterestAccruedUntilDate = FiatValue.New(Math.Max(0m, fallbackTotalDebt - fallbackBorrowed - (asset.Fees ?? 0m)));
+            CollateralSats = asset.CollateralSats ?? 0L;
                 AprPercentage = (asset.Apr ?? 0m) * 100m;
                 Fees = FiatValue.New(asset.Fees ?? 0m);
                 Note = string.Empty;
@@ -179,7 +187,8 @@ public partial class UpdateLoanStateViewModel : ValtModalValidatorViewModel
         {
             AssetId = AssetId,
             EffectiveDate = DateOnly.FromDateTime(EffectiveDate!.Value),
-            CurrentTotalDebt = CurrentTotalDebt.Value,
+            TotalBorrowed = TotalBorrowed.Value,
+            InterestAccruedUntilDate = InterestAccruedUntilDate.Value,
             CollateralSats = CollateralSats,
             Apr = AprPercentage / 100m,
             Fees = Fees.Value,
