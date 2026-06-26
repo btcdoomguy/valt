@@ -18,9 +18,14 @@ public record AddLoanStateUpdateCommand : ICommand
     public required DateOnly EffectiveDate { get; init; }
 
     /// <summary>
-    /// The current total debt at the time of the snapshot.
+    /// The borrowed principal still owed at the time of the snapshot.
     /// </summary>
-    public required decimal CurrentTotalDebt { get; init; }
+    public required decimal TotalBorrowed { get; init; }
+
+    /// <summary>
+    /// Interest charged up to the snapshot's effective date.
+    /// </summary>
+    public required decimal InterestAccruedUntilDate { get; init; }
 
     /// <summary>
     /// BTC collateral amount in satoshis.

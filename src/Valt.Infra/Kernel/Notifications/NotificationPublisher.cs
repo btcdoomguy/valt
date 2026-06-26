@@ -1,6 +1,7 @@
 using System.Collections;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Kernel.Scopes;
 
 namespace Valt.Infra.Kernel.Notifications;

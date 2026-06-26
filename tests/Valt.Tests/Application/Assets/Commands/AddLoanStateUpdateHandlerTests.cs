@@ -22,7 +22,8 @@ public class AddLoanStateUpdateHandlerTests : DatabaseTest
     {
         AssetId = assetId,
         EffectiveDate = effectiveDate ?? new DateOnly(2025, 6, 1),
-        CurrentTotalDebt = 26_000m,
+        TotalBorrowed = 25_000m,
+        InterestAccruedUntilDate = 900m,
         CollateralSats = 110_000_000,
         Apr = 0.13m,
         Fees = 150m,
@@ -47,7 +48,9 @@ public class AddLoanStateUpdateHandlerTests : DatabaseTest
             Assert.That(result.IsSuccess, Is.True);
             Assert.That(details.Snapshots, Has.Count.EqualTo(2));
             Assert.That(latest.EffectiveDate, Is.EqualTo(command.EffectiveDate));
-            Assert.That(latest.CurrentTotalDebt, Is.EqualTo(command.CurrentTotalDebt));
+            Assert.That(latest.TotalBorrowed, Is.EqualTo(command.TotalBorrowed));
+            Assert.That(latest.InterestAccruedUntilDate, Is.EqualTo(command.InterestAccruedUntilDate));
+            Assert.That(latest.CurrentTotalDebt, Is.EqualTo(command.TotalBorrowed + command.InterestAccruedUntilDate + command.Fees));
             Assert.That(latest.CollateralSats, Is.EqualTo(command.CollateralSats));
             Assert.That(latest.Apr, Is.EqualTo(command.Apr));
             Assert.That(latest.Fees, Is.EqualTo(command.Fees));
@@ -130,12 +133,28 @@ public class AddLoanStateUpdateHandlerTests : DatabaseTest
     }
 
     [Test]
-    public async Task HandleAsync_WithNegativeCurrentTotalDebt_ReturnsValidationFailed()
+    public async Task HandleAsync_WithNegativeTotalBorrowed_ReturnsValidationFailed()
     {
         var asset = AssetBuilder.ABtcLoan().Build();
         await _assetRepository.SaveAsync(asset);
 
-        var command = ValidCommand(asset.Id.Value) with { CurrentTotalDebt = -100m };
+        var command = ValidCommand(asset.Id.Value) with { TotalBorrowed = -100m };
+        var result = await _handler.HandleAsync(command);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailure, Is.True);
+            Assert.That(result.Error!.Code, Is.EqualTo("VALIDATION_FAILED"));
+        });
+    }
+
+    [Test]
+    public async Task HandleAsync_WithNegativeInterestAccrued_ReturnsValidationFailed()
+    {
+        var asset = AssetBuilder.ABtcLoan().Build();
+        await _assetRepository.SaveAsync(asset);
+
+        var command = ValidCommand(asset.Id.Value) with { InterestAccruedUntilDate = -100m };
         var result = await _handler.HandleAsync(command);
 
         Assert.Multiple(() =>

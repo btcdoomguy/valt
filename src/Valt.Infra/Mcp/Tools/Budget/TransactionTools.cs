@@ -6,7 +6,7 @@ using Valt.App.Modules.Budget.Transactions.Commands.AddTransaction;
 using Valt.App.Modules.Budget.Transactions.Commands.DeleteTransaction;
 using Valt.App.Modules.Budget.Transactions.DTOs;
 using Valt.App.Modules.Budget.Transactions.Queries.GetTransactions;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Mcp.Notifications;
 
 namespace Valt.Infra.Mcp.Tools.Budget;

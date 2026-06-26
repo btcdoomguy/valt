@@ -17,7 +17,7 @@ internal class AccountTotalsJob : IBackgroundJob
     public string Name => "Account totals calculator";
     public BackgroundJobSystemNames SystemName => BackgroundJobSystemNames.AccountTotalsCalculator;
     public BackgroundJobTypes JobType => BackgroundJobTypes.ValtDatabase;
-    public TimeSpan Interval => new(0, 0, 5);
+    public TimeSpan Interval => TimeSpan.FromSeconds(120);
 
     public AccountTotalsJob(IClock clock, IAccountCacheService accountCacheService, IPriceDatabase priceDatabase,
         ILocalDatabase localDatabase, ILogger<AccountTotalsJob> logger)

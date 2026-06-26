@@ -76,9 +76,19 @@ public sealed class LoanStateSnapshot
     public decimal? FixedTotalDebt { get; }
 
     /// <summary>
+    /// The borrowed principal still owed at the time of the snapshot.
+    /// </summary>
+    public decimal TotalBorrowed { get; }
+
+    /// <summary>
+    /// Interest charged up to the snapshot's effective date.
+    /// </summary>
+    public decimal InterestAccruedUntilDate { get; }
+
+    /// <summary>
     /// The current total debt at the time of the snapshot.
     /// </summary>
-    public decimal CurrentTotalDebt { get; }
+    public decimal CurrentTotalDebt => TotalBorrowed + InterestAccruedUntilDate + Fees;
 
     /// <summary>
     /// The effective date of the snapshot. Only one snapshot is allowed per effective date on a loan.
@@ -108,7 +118,8 @@ public sealed class LoanStateSnapshot
         LoanStatus status,
         decimal currentBtcPriceInLoanCurrency,
         decimal? fixedTotalDebt,
-        decimal currentTotalDebt,
+        decimal totalBorrowed,
+        decimal interestAccruedUntilDate,
         DateOnly effectiveDate,
         string? note = null)
     {
@@ -130,8 +141,11 @@ public sealed class LoanStateSnapshot
         if (fees < 0)
             throw new ArgumentException("Fees cannot be negative", nameof(fees));
 
-        if (currentTotalDebt < 0)
-            throw new ArgumentException("Current total debt cannot be negative", nameof(currentTotalDebt));
+        if (totalBorrowed < 0)
+            throw new ArgumentException("Total borrowed cannot be negative", nameof(totalBorrowed));
+
+        if (interestAccruedUntilDate < 0)
+            throw new ArgumentException("Interest accrued cannot be negative", nameof(interestAccruedUntilDate));
 
         PlatformName = platformName;
         CollateralSats = collateralSats;
@@ -147,8 +161,52 @@ public sealed class LoanStateSnapshot
         Status = status;
         CurrentBtcPriceInLoanCurrency = currentBtcPriceInLoanCurrency;
         FixedTotalDebt = fixedTotalDebt;
-        CurrentTotalDebt = currentTotalDebt;
+        TotalBorrowed = totalBorrowed;
+        InterestAccruedUntilDate = interestAccruedUntilDate;
         EffectiveDate = effectiveDate;
         Note = note;
+    }
+
+    /// <summary>
+    /// Legacy overload that derives total borrowed and accrued interest from a single total debt value.
+    /// </summary>
+    public LoanStateSnapshot(
+        string platformName,
+        long collateralSats,
+        decimal loanAmount,
+        string currencyCode,
+        decimal apr,
+        decimal initialLtv,
+        decimal liquidationLtv,
+        decimal marginCallLtv,
+        decimal fees,
+        DateOnly loanStartDate,
+        DateOnly? repaymentDate,
+        LoanStatus status,
+        decimal currentBtcPriceInLoanCurrency,
+        decimal? fixedTotalDebt,
+        decimal currentTotalDebt,
+        DateOnly effectiveDate,
+        string? note = null)
+        : this(
+            platformName,
+            collateralSats,
+            loanAmount,
+            currencyCode,
+            apr,
+            initialLtv,
+            liquidationLtv,
+            marginCallLtv,
+            fees,
+            loanStartDate,
+            repaymentDate,
+            status,
+            currentBtcPriceInLoanCurrency,
+            fixedTotalDebt,
+            totalBorrowed: loanAmount,
+            interestAccruedUntilDate: Math.Max(0m, currentTotalDebt - loanAmount - fees),
+            effectiveDate,
+            note)
+    {
     }
 }

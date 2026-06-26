@@ -13,7 +13,9 @@ public class FillLocalDbWithDataTests : DatabaseTest
     {
         if (_priceDatabase.GetBitcoinData().Query().Count() == 0)
         {
-            var provider = new BitcoinInitialSeedPriceProvider(NullLogger<BitcoinInitialSeedPriceProvider>.Instance);
+            var provider = new BitcoinInitialSeedPriceProvider(
+                HttpClientTestFactory.Create(),
+                NullLogger<BitcoinInitialSeedPriceProvider>.Instance);
             var prices = await provider.GetPricesAsync();
             _priceDatabase.GetBitcoinData().InsertBulk(prices.Select(x => new BitcoinDataEntity()
             {

@@ -8,7 +8,7 @@ using Valt.App.Modules.Goals.Commands.EditGoal;
 using Valt.App.Modules.Goals.DTOs;
 using Valt.App.Modules.Goals.Queries.GetGoal;
 using Valt.App.Modules.Goals.Queries.GetGoals;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Mcp.Notifications;
 
 namespace Valt.Infra.Mcp.Tools;

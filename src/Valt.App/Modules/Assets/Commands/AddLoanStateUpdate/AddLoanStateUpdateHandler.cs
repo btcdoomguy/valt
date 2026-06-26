@@ -63,7 +63,8 @@ internal sealed class AddLoanStateUpdateHandler : ICommandHandler<AddLoanStateUp
             status: btcLoan.Status,
             currentBtcPriceInLoanCurrency: btcLoan.CurrentBtcPriceInLoanCurrency,
             fixedTotalDebt: btcLoan.FixedTotalDebt,
-            currentTotalDebt: btcLoan.CalculateTotalDebt(),
+            totalBorrowed: btcLoan.LoanAmount,
+            interestAccruedUntilDate: Math.Max(0m, btcLoan.CalculateTotalDebt() - btcLoan.LoanAmount - btcLoan.Fees),
             effectiveDate: btcLoan.LoanStartDate,
             note: null);
 
@@ -82,7 +83,8 @@ internal sealed class AddLoanStateUpdateHandler : ICommandHandler<AddLoanStateUp
             status: source.Status,
             currentBtcPriceInLoanCurrency: source.CurrentBtcPriceInLoanCurrency,
             fixedTotalDebt: source.FixedTotalDebt,
-            currentTotalDebt: command.CurrentTotalDebt,
+            totalBorrowed: command.TotalBorrowed,
+            interestAccruedUntilDate: command.InterestAccruedUntilDate,
             effectiveDate: command.EffectiveDate,
             note: command.Note);
 

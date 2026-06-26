@@ -3,7 +3,7 @@ using NSubstitute;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.GoalTypes;
 using Valt.Infra.DataAccess;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.DataSources.Bitcoin;
 using Valt.Infra.Modules.DataSources.Fiat;

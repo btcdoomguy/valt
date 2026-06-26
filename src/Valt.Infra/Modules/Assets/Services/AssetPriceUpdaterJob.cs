@@ -4,7 +4,7 @@ using Valt.Core.Modules.Assets.Contracts;
 using Valt.Core.Modules.Assets.Details;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel.BackgroundJobs;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Modules.Assets.PriceProviders;
 
 namespace Valt.Infra.Modules.Assets.Services;

@@ -13,8 +13,11 @@ internal sealed class AddLoanStateUpdateValidator : IValidator<AddLoanStateUpdat
         if (instance.EffectiveDate == default)
             builder.AddError(nameof(instance.EffectiveDate), "Effective date is required.");
 
-        if (instance.CurrentTotalDebt < 0)
-            builder.AddError(nameof(instance.CurrentTotalDebt), "Current total debt cannot be negative.");
+        if (instance.TotalBorrowed < 0)
+            builder.AddError(nameof(instance.TotalBorrowed), "Total borrowed cannot be negative.");
+
+        if (instance.InterestAccruedUntilDate < 0)
+            builder.AddError(nameof(instance.InterestAccruedUntilDate), "Interest accrued cannot be negative.");
 
         if (instance.CollateralSats <= 0)
             builder.AddError(nameof(instance.CollateralSats), "Collateral must be greater than zero.");

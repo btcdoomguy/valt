@@ -13,6 +13,7 @@ public class BitcoinComIndicatorsProviderTests
     public void OneTimeSetUp()
     {
         _provider = new BitcoinComIndicatorsProvider(
+            HttpClientTestFactory.Create(),
             Substitute.For<ILogger<BitcoinComIndicatorsProvider>>());
     }
 

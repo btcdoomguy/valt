@@ -29,7 +29,7 @@ using Valt.App.Modules.Assets.Queries.GetLatestLoanState;
 using Valt.App.Modules.Assets.Queries.GetLoanStateTimeline;
 using Valt.App.Modules.Assets.Queries.GetVisibleAssets;
 using Valt.Core.Modules.Assets;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Mcp.Notifications;
 using Valt.Infra.Modules.Assets.PriceProviders;
 using Valt.Infra.Settings;
@@ -620,7 +620,8 @@ public class AssetTools
         INotificationPublisher publisher,
         [Description("The asset ID")] string assetId,
         [Description("Effective date (yyyy-MM-dd)")] string effectiveDate,
-        [Description("Current total debt")] decimal currentTotalDebt,
+        [Description("Borrowed principal still owed at the snapshot date")] decimal totalBorrowed,
+        [Description("Interest accrued up to the snapshot date")] decimal interestAccruedUntilDate,
         [Description("BTC collateral in satoshis")] long collateralSats,
         [Description("APR as decimal (e.g., 0.12 for 12%)")] decimal apr,
         [Description("Fees paid")] decimal fees,
@@ -640,7 +641,8 @@ public class AssetTools
         {
             AssetId = assetId,
             EffectiveDate = parsedEffectiveDate,
-            CurrentTotalDebt = currentTotalDebt,
+            TotalBorrowed = totalBorrowed,
+            InterestAccruedUntilDate = interestAccruedUntilDate,
             CollateralSats = collateralSats,
             Apr = apr,
             Fees = fees,

@@ -57,11 +57,13 @@ internal sealed class GetBtcLoansDashboardHandler : IQueryHandler<GetBtcLoansDas
         var loanData = loans.Select(loan => new
         {
             Loan = loan,
+            BorrowedInMain = ConvertToMain(loan.TotalBorrowed ?? 0m, loan.CurrencyCode),
             DebtInMain = ConvertToMain(loan.TotalDebt ?? 0m, loan.CurrencyCode),
             AccruedInMain = ConvertToMain(loan.AccruedInterest ?? 0m, loan.CurrencyCode),
             FeesInMain = ConvertToMain(loan.Fees ?? 0m, loan.CurrencyCode)
         }).ToList();
 
+        var totalBorrowedMain = loanData.Sum(x => x.BorrowedInMain);
         var totalDebtMain = loanData.Sum(x => x.DebtInMain);
         var totalAccruedMain = loanData.Sum(x => x.AccruedInMain);
         var totalFeesMain = loanData.Sum(x => x.FeesInMain);
@@ -227,6 +229,7 @@ internal sealed class GetBtcLoansDashboardHandler : IQueryHandler<GetBtcLoansDas
             CollateralPercentOfStack = Math.Round(collateralPercent, 2),
             DebtWeightedAvgLtv = Math.Round(weightedLtv, 2),
             DebtWeightedAvgApr = Math.Round(weightedApr, 2),
+            TotalBorrowedInMainCurrency = Math.Round(totalBorrowedMain, 2),
             TotalDebtInMainCurrency = Math.Round(totalDebtMain, 2),
             TotalDebtInBtc = Math.Round(totalDebtInBtc, 8),
             HighestLtv = Math.Round(highestLtv, 2),

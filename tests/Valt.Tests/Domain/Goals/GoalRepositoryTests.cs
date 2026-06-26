@@ -6,7 +6,7 @@ using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.GoalTypes;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Kernel.Time;
 using Valt.Infra.Modules.Goals;
 using Valt.Tests.Builders;

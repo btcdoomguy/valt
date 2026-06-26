@@ -44,6 +44,7 @@ internal sealed class LocalDatabase : ILocalDatabase
         _inMemoryDb = false;
         _password = password;
 
+        EnsureIndexes();
         OnPropertyChanged(nameof(HasDatabaseOpen));
     }
 
@@ -57,6 +58,7 @@ internal sealed class LocalDatabase : ILocalDatabase
         _inMemoryDb = true;
         _password = null;
 
+        EnsureIndexes();
         OnPropertyChanged(nameof(HasDatabaseOpen));
     }
 
@@ -141,8 +143,9 @@ internal sealed class LocalDatabase : ILocalDatabase
         }
 
         File.Replace(targetFilePath, filePath, bkpFinalFilePath);
-        
+
         OpenDatabase(filePath, newPassword);
+        EnsureIndexes();
     }
 
     public void ClearAccountCache()
@@ -165,6 +168,53 @@ internal sealed class LocalDatabase : ILocalDatabase
         return _database;
     }
 
+    private void EnsureIndexes()
+    {
+        var avgPriceLines = GetOpenDatabase().GetCollection<AvgPriceLineEntity>("avgprice_line");
+        avgPriceLines.EnsureIndex(x => x.ProfileId);
+        avgPriceLines.EnsureIndex(x => x.Date);
+        avgPriceLines.EnsureIndex(x => x.DisplayOrder);
+
+        var accounts = GetOpenDatabase().GetCollection<AccountEntity>("budget_accounts");
+        accounts.EnsureIndex(x => x.Visible);
+        accounts.EnsureIndex(x => x.GroupId);
+
+        var transactionTerms = GetOpenDatabase().GetCollection<TransactionTermEntity>("transaction_terms");
+        transactionTerms.EnsureIndex(x => x.Name);
+        transactionTerms.EnsureIndex(x => x.Count);
+        transactionTerms.EnsureIndex(x => x.CategoryId);
+
+        var fixedExpenseRecords = GetOpenDatabase().GetCollection<FixedExpenseRecordEntity>("budget_fixedexpenserecords");
+        fixedExpenseRecords.EnsureIndex(x => x.ReferenceDate);
+        fixedExpenseRecords.EnsureIndex(x => x.Transaction);
+        fixedExpenseRecords.EnsureIndex(x => x.FixedExpense);
+
+        var transactions = GetOpenDatabase().GetCollection<TransactionEntity>("budget_transactions");
+        transactions.EnsureIndex(x => x.Date);
+        transactions.EnsureIndex(x => x.FromAccountId);
+        transactions.EnsureIndex(x => x.ToAccountId);
+        transactions.EnsureIndex(x => x.CategoryId);
+        transactions.EnsureIndex(x => x.SatAmountStateId);
+        transactions.EnsureIndex(x => x.Type);
+        transactions.EnsureIndex(x => x.GroupId);
+
+        var configuration = GetOpenDatabase().GetCollection<ConfigurationEntity>("system_config");
+        configuration.EnsureIndex(x => x.Key);
+
+        var settings = GetOpenDatabase().GetCollection<SettingEntity>("system_settings");
+        settings.EnsureIndex(x => x.Property);
+
+        var goals = GetOpenDatabase().GetCollection<GoalEntity>("goals");
+        goals.EnsureIndex(x => x.RefDate);
+        goals.EnsureIndex(x => x.IsUpToDate);
+
+        var assets = GetOpenDatabase().GetCollection<AssetEntity>("assets");
+        assets.EnsureIndex(x => x.Visible);
+        assets.EnsureIndex(x => x.IncludeInNetWorth);
+        assets.EnsureIndex(x => x.DisplayOrder);
+        assets.EnsureIndex(x => x.GroupId);
+    }
+
     #region AvgPrice module
 
     public ILiteCollection<AvgPriceProfileEntity> GetAvgPriceProfiles()
@@ -174,13 +224,7 @@ internal sealed class LocalDatabase : ILocalDatabase
 
     public ILiteCollection<AvgPriceLineEntity> GetAvgPriceLines()
     {
-        var collection = GetOpenDatabase().GetCollection<AvgPriceLineEntity>("avgprice_line");
-
-        collection.EnsureIndex(x => x.ProfileId);
-        collection.EnsureIndex(x => x.Date);
-        collection.EnsureIndex(x => x.DisplayOrder);
-
-        return collection;
+        return GetOpenDatabase().GetCollection<AvgPriceLineEntity>("avgprice_line");
     }
 
     #endregion
@@ -189,12 +233,7 @@ internal sealed class LocalDatabase : ILocalDatabase
 
     public ILiteCollection<AccountEntity> GetAccounts()
     {
-        var collection = GetOpenDatabase().GetCollection<AccountEntity>("budget_accounts");
-
-        collection.EnsureIndex(x => x.Visible);
-        collection.EnsureIndex(x => x.GroupId);
-
-        return collection;
+        return GetOpenDatabase().GetCollection<AccountEntity>("budget_accounts");
     }
 
     public ILiteCollection<AccountGroupEntity> GetAccountGroups()
@@ -209,13 +248,7 @@ internal sealed class LocalDatabase : ILocalDatabase
 
     public ILiteCollection<TransactionTermEntity> GetTransactionTerms()
     {
-        var collection = GetOpenDatabase().GetCollection<TransactionTermEntity>("transaction_terms");
-
-        collection.EnsureIndex(x => x.Name);
-        collection.EnsureIndex(x => x.Count);
-        collection.EnsureIndex(x => x.CategoryId);
-
-        return collection;
+        return GetOpenDatabase().GetCollection<TransactionTermEntity>("transaction_terms");
     }
 
     public ILiteCollection<CategoryEntity> GetCategories()
@@ -230,28 +263,12 @@ internal sealed class LocalDatabase : ILocalDatabase
 
     public ILiteCollection<FixedExpenseRecordEntity> GetFixedExpenseRecords()
     {
-        var collection = GetOpenDatabase().GetCollection<FixedExpenseRecordEntity>("budget_fixedexpenserecords");
-
-        collection.EnsureIndex(x => x.ReferenceDate);
-        collection.EnsureIndex(x => x.Transaction);
-        collection.EnsureIndex(x => x.FixedExpense);
-
-        return collection;
+        return GetOpenDatabase().GetCollection<FixedExpenseRecordEntity>("budget_fixedexpenserecords");
     }
 
     public ILiteCollection<TransactionEntity> GetTransactions()
     {
-        var collection = GetOpenDatabase().GetCollection<TransactionEntity>("budget_transactions");
-
-        collection.EnsureIndex(x => x.Date);
-        collection.EnsureIndex(x => x.FromAccountId);
-        collection.EnsureIndex(x => x.ToAccountId);
-        collection.EnsureIndex(x => x.CategoryId);
-        collection.EnsureIndex(x => x.SatAmountStateId);
-        collection.EnsureIndex(x => x.Type);
-        collection.EnsureIndex(x => x.GroupId);
-
-        return collection;
+        return GetOpenDatabase().GetCollection<TransactionEntity>("budget_transactions");
     }
 
     #endregion
@@ -260,20 +277,12 @@ internal sealed class LocalDatabase : ILocalDatabase
 
     public ILiteCollection<ConfigurationEntity> GetConfiguration()
     {
-        var collection = GetOpenDatabase().GetCollection<ConfigurationEntity>("system_config");
-
-        collection.EnsureIndex(x => x.Key);
-
-        return collection;
+        return GetOpenDatabase().GetCollection<ConfigurationEntity>("system_config");
     }
 
     public ILiteCollection<SettingEntity> GetSettings()
     {
-        var collection = GetOpenDatabase().GetCollection<SettingEntity>("system_settings");
-
-        collection.EnsureIndex(x => x.Property);
-
-        return collection;
+        return GetOpenDatabase().GetCollection<SettingEntity>("system_settings");
     }
 
     #endregion
@@ -282,12 +291,7 @@ internal sealed class LocalDatabase : ILocalDatabase
 
     public ILiteCollection<GoalEntity> GetGoals()
     {
-        var collection = GetOpenDatabase().GetCollection<GoalEntity>("goals");
-
-        collection.EnsureIndex(x => x.RefDate);
-        collection.EnsureIndex(x => x.IsUpToDate);
-
-        return collection;
+        return GetOpenDatabase().GetCollection<GoalEntity>("goals");
     }
 
     #endregion
@@ -296,14 +300,7 @@ internal sealed class LocalDatabase : ILocalDatabase
 
     public ILiteCollection<AssetEntity> GetAssets()
     {
-        var collection = GetOpenDatabase().GetCollection<AssetEntity>("assets");
-
-        collection.EnsureIndex(x => x.Visible);
-        collection.EnsureIndex(x => x.IncludeInNetWorth);
-        collection.EnsureIndex(x => x.DisplayOrder);
-        collection.EnsureIndex(x => x.GroupId);
-
-        return collection;
+        return GetOpenDatabase().GetCollection<AssetEntity>("assets");
     }
 
     public ILiteCollection<AssetGroupEntity> GetAssetGroups()

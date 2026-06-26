@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Goals.Commands.CreateGoal;
@@ -25,6 +26,8 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     private readonly ICommandDispatcher? _commandDispatcher;
     private readonly IQueryDispatcher? _queryDispatcher;
     private readonly CurrencySettings? _currencySettings;
+    private readonly IFireAndForgetTaskRunner _runner = null!;
+    private readonly ILogger<ManageGoalViewModel> _logger = null!;
 
     #region Form Data
 
@@ -102,11 +105,15 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
     public ManageGoalViewModel(
         ICommandDispatcher commandDispatcher,
         IQueryDispatcher queryDispatcher,
-        CurrencySettings currencySettings)
+        CurrencySettings currencySettings,
+        IFireAndForgetTaskRunner runner,
+        ILogger<ManageGoalViewModel> logger)
     {
         _commandDispatcher = commandDispatcher;
         _queryDispatcher = queryDispatcher;
         _currencySettings = currencySettings;
+        _runner = runner;
+        _logger = logger;
 
         SelectedPeriod = GoalPeriods.Monthly.ToString();
         SelectedGoalType = GoalTypeNames.StackBitcoin.ToString();
@@ -119,6 +126,11 @@ public partial class ManageGoalViewModel : ValtModalValidatorViewModel
         if (Enum.TryParse<GoalTypeNames>(value, out var goalTypeName))
         {
             CurrentGoalTypeEditor = CreateEditorForGoalType(goalTypeName);
+
+            if (CurrentGoalTypeEditor is ReduceExpenseCategoryGoalTypeEditorViewModel reduceEditor)
+            {
+                _runner.RunAsync(reduceEditor.LoadCategoriesAsync(), _logger);
+            }
         }
     }
 

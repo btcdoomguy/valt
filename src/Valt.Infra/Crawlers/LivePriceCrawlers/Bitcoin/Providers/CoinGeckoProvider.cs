@@ -1,3 +1,4 @@
+using System.Net.Http;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
@@ -8,13 +9,15 @@ namespace Valt.Infra.Crawlers.LivePriceCrawlers.Bitcoin.Providers;
 
 internal class CoinGeckoProvider : IBitcoinPriceProvider
 {
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly IClock _clock;
     private readonly ILogger<CoinGeckoProvider> _logger;
     private readonly CoinGeckoRateLimiter _rateLimiter;
     public string Name => "coingecko";
 
-    public CoinGeckoProvider(IClock clock, ILogger<CoinGeckoProvider> logger, CoinGeckoRateLimiter rateLimiter)
+    public CoinGeckoProvider(IHttpClientFactory httpClientFactory, IClock clock, ILogger<CoinGeckoProvider> logger, CoinGeckoRateLimiter rateLimiter)
     {
+        _httpClientFactory = httpClientFactory;
         _clock = clock;
         _logger = logger;
         _rateLimiter = rateLimiter;
@@ -24,10 +27,7 @@ internal class CoinGeckoProvider : IBitcoinPriceProvider
     {
         await _rateLimiter.WaitAsync();
 
-        using var client = new HttpClient();
-        client.Timeout = TimeSpan.FromSeconds(15);
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("Valt/1.0");
-        client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+        using var client = _httpClientFactory.CreateClient(HttpClientNames.CoinGecko);
         try
         {
             var currencies = FiatCurrency.GetAll();

@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Valt.App.Kernel.Queries;
@@ -40,10 +41,9 @@ public partial class ReduceExpenseCategoryGoalTypeEditorViewModel : ObservableOb
     {
         _currencySettings = currencySettings;
         _queryDispatcher = queryDispatcher;
-        LoadCategoriesAsync();
     }
 
-    private async void LoadCategoriesAsync()
+    public async Task LoadCategoriesAsync()
     {
         if (_queryDispatcher is null) return;
         var result = await _queryDispatcher.DispatchAsync(new GetCategoriesQuery());

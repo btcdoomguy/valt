@@ -5,7 +5,7 @@ using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Infra.Crawlers.Indicators;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel.BackgroundJobs;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 
 namespace Valt.Tests.Infrastructure.Indicators;
 

@@ -21,7 +21,9 @@ public record LoanStateDTO
     public required int StatusId { get; init; }
     public required decimal CurrentBtcPriceInLoanCurrency { get; init; }
     public required decimal? FixedTotalDebt { get; init; }
-    public required decimal CurrentTotalDebt { get; init; }
+    public required decimal TotalBorrowed { get; init; }
+    public required decimal InterestAccruedUntilDate { get; init; }
+    public decimal CurrentTotalDebt => TotalBorrowed + InterestAccruedUntilDate + Fees;
     public required DateOnly EffectiveDate { get; init; }
     public required string? Note { get; init; }
 }

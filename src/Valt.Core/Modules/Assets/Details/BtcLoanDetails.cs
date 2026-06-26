@@ -212,7 +212,7 @@ public sealed class BtcLoanDetails : IAssetDetails
 
     /// <summary>
     /// Calculates the accrued interest from the effective snapshot's effective date to today.
-    /// For fixed-debt loans no additional interest accrues, so 0 is returned.
+    /// For fixed-debt loans no additional interest accrues, so the snapshot's stored interest is returned.
     /// When no snapshot exists, interest accrues from <see cref="LoanStartDate"/>.
     /// </summary>
     public decimal CalculateAccruedInterest()
@@ -220,9 +220,9 @@ public sealed class BtcLoanDetails : IAssetDetails
         if (GetEffectiveSnapshot() is { } snapshot)
         {
             if (snapshot.FixedTotalDebt.HasValue)
-                return 0m;
+                return snapshot.InterestAccruedUntilDate;
 
-            return CalculateAccruedInterestForSnapshot(snapshot);
+            return snapshot.InterestAccruedUntilDate + CalculateAccruedInterestForSnapshot(snapshot);
         }
 
         if (FixedTotalDebt.HasValue)
@@ -237,7 +237,7 @@ public sealed class BtcLoanDetails : IAssetDetails
 
     /// <summary>
     /// Calculates simple interest accrued from the snapshot's effective date to today,
-    /// based on the debt principal at the time of the snapshot.
+    /// based on the remaining borrowed principal at the time of the snapshot.
     /// </summary>
     private decimal CalculateAccruedInterestForSnapshot(LoanStateSnapshot snapshot)
     {
@@ -245,15 +245,14 @@ public sealed class BtcLoanDetails : IAssetDetails
         if (daysSinceSnapshot <= 0)
             return 0m;
 
-        var principal = Math.Max(0, snapshot.CurrentTotalDebt - snapshot.Fees);
-        return Math.Round(principal * snapshot.Apr / 365 * daysSinceSnapshot, 2);
+        return Math.Round(snapshot.TotalBorrowed * snapshot.Apr / 365 * daysSinceSnapshot, 2);
     }
 
     /// <summary>
     /// Calculates the total debt obligation. For APR-based loans this is
     /// LoanAmount + AccruedInterest + Fees. For fixed-debt loans the predefined
     /// total is returned regardless of elapsed time.
-    /// When a snapshot exists, its <see cref="LoanStateSnapshot.CurrentTotalDebt"/> is used
+    /// When a snapshot exists, its stored borrowed principal and accrued interest are used
     /// as the basis and simple interest is added from the snapshot's effective date to today.
     /// </summary>
     public decimal CalculateTotalDebt()
@@ -403,6 +402,69 @@ public sealed class BtcLoanDetails : IAssetDetails
             CurrentBtcPriceInLoanCurrency,
             FixedTotalDebt,
             newSnapshots);
+    }
+
+    /// <summary>
+    /// Returns a new <see cref="BtcLoanDetails"/> with the supplied setup values applied to both the
+    /// loan and all existing snapshots. Point-in-time snapshot data (borrowed principal, accrued interest,
+    /// effective date, note, status, BTC price and fixed total debt flag) is preserved.
+    /// </summary>
+    public BtcLoanDetails WithUpdatedSetup(
+        string platformName,
+        long collateralSats,
+        decimal loanAmount,
+        string currencyCode,
+        decimal apr,
+        decimal initialLtv,
+        decimal liquidationLtv,
+        decimal marginCallLtv,
+        decimal fees,
+        DateOnly loanStartDate,
+        DateOnly? repaymentDate,
+        LoanStatus status,
+        decimal currentBtcPriceInLoanCurrency,
+        decimal? fixedTotalDebt)
+    {
+        var updatedSnapshots = Snapshots
+            .Select(s => new LoanStateSnapshot(
+                platformName,
+                collateralSats,
+                loanAmount,
+                currencyCode,
+                apr,
+                initialLtv,
+                liquidationLtv,
+                marginCallLtv,
+                fees,
+                loanStartDate,
+                repaymentDate,
+                s.Status,
+                s.CurrentBtcPriceInLoanCurrency,
+                s.FixedTotalDebt,
+                s.TotalBorrowed,
+                s.InterestAccruedUntilDate,
+                s.EffectiveDate,
+                s.Note))
+            .OrderBy(s => s.EffectiveDate)
+            .ToList()
+            .AsReadOnly();
+
+        return new BtcLoanDetails(
+            platformName,
+            collateralSats,
+            loanAmount,
+            currencyCode,
+            apr,
+            initialLtv,
+            liquidationLtv,
+            marginCallLtv,
+            fees,
+            loanStartDate,
+            repaymentDate,
+            status,
+            currentBtcPriceInLoanCurrency,
+            fixedTotalDebt,
+            updatedSnapshots);
     }
 
     /// <summary>

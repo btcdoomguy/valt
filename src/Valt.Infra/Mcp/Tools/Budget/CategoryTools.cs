@@ -7,7 +7,7 @@ using Valt.App.Modules.Budget.Categories.Commands.DeleteCategory;
 using Valt.App.Modules.Budget.Categories.Commands.EditCategory;
 using Valt.App.Modules.Budget.Categories.DTOs;
 using Valt.App.Modules.Budget.Categories.Queries.GetCategories;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Mcp.Notifications;
 
 namespace Valt.Infra.Mcp.Tools.Budget;

@@ -8,11 +8,6 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Queries;
-using Valt.App.Modules.Assets.Commands.CreateBasicAsset;
-using Valt.App.Modules.Assets.Commands.CreateBtcLending;
-using Valt.App.Modules.Assets.Commands.CreateBtcLoan;
-using Valt.App.Modules.Assets.Commands.CreateLeveragedPosition;
-using Valt.App.Modules.Assets.Commands.CreateRealEstateAsset;
 using Valt.App.Modules.Assets.Commands.EditAsset;
 using Valt.App.Modules.Assets.DTOs;
 using Valt.App.Modules.Assets.Queries.GetAsset;
@@ -25,6 +20,7 @@ using Valt.UI.Base;
 using Valt.UI.Helpers;
 using Valt.UI.Lang;
 using Valt.UI.Services;
+using Valt.UI.Services.Exceptions;
 using Valt.UI.Services.MessageBoxes;
 using Valt.UI.Views.Main.Modals.LoanStateHistory;
 using Valt.UI.Views.Main.Modals.UpdateLoanState;
@@ -40,6 +36,8 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     private readonly IConfigurationManager? _configurationManager;
     private readonly ILogger<ManageAssetViewModel>? _logger;
     private readonly IModalFactory? _modalFactory;
+
+    private readonly IAssetFormBuilder? _assetFormBuilder;
 
     private string? _assetId;
 
@@ -342,7 +340,8 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
         CurrencySettings currencySettings,
         IConfigurationManager configurationManager,
         ILogger<ManageAssetViewModel> logger,
-        IModalFactory modalFactory)
+        IModalFactory modalFactory,
+        IAssetFormBuilder assetFormBuilder)
     {
         _queryDispatcher = queryDispatcher;
         _commandDispatcher = commandDispatcher;
@@ -351,6 +350,7 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
         _configurationManager = configurationManager;
         _logger = logger;
         _modalFactory = modalFactory;
+        _assetFormBuilder = assetFormBuilder;
 
         SelectedAssetType = AssetTypes.Stock.ToString();
         SelectedCurrency = currencySettings.MainFiatCurrency;
@@ -370,94 +370,56 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
             _assetId = assetDto.Id;
             IsEditMode = true;
 
+            var values = _assetFormBuilder!.LoadFromDto(assetDto);
+
             // Load common fields (set SelectedAssetType LAST so date pickers
             // are populated before their section becomes visible)
-            Name = assetDto.Name;
-            SelectedCurrency = assetDto.CurrencyCode;
-            IncludeInNetWorth = assetDto.IncludeInNetWorth;
-            Visible = assetDto.Visible;
+            Name = values.Name;
+            SelectedCurrency = values.SelectedCurrency;
+            IncludeInNetWorth = values.IncludeInNetWorth;
+            Visible = values.Visible;
 
             // Load type-specific fields BEFORE setting SelectedAssetType
-            switch ((AssetTypes)assetDto.AssetTypeId)
-            {
-                case AssetTypes.Stock:
-                case AssetTypes.Etf:
-                case AssetTypes.Crypto:
-                case AssetTypes.Commodity:
-                case AssetTypes.Custom:
-                    Symbol = assetDto.Symbol ?? string.Empty;
-                    Quantity = assetDto.Quantity ?? 0;
-                    CurrentPriceFiat = FiatValue.New(assetDto.CurrentPrice);
-                    SelectedPriceSource = ((AssetPriceSource)(assetDto.PriceSourceId ?? 0)).ToString();
-                    if (assetDto.AcquisitionDate.HasValue)
-                        AcquisitionDate = assetDto.AcquisitionDate.Value.ToDateTime(TimeOnly.MinValue);
-                    AcquisitionPriceFiat = FiatValue.New(assetDto.AcquisitionPrice ?? 0);
-                    break;
-
-                case AssetTypes.RealEstate:
-                    Address = assetDto.Address ?? string.Empty;
-                    CurrentValueFiat = FiatValue.New(assetDto.CurrentValue);
-                    MonthlyRentalIncomeFiat = FiatValue.New(assetDto.MonthlyRentalIncome ?? 0);
-                    if (assetDto.AcquisitionDate.HasValue)
-                        AcquisitionDate = assetDto.AcquisitionDate.Value.ToDateTime(TimeOnly.MinValue);
-                    AcquisitionPriceFiat = FiatValue.New(assetDto.AcquisitionPrice ?? 0);
-                    break;
-
-                case AssetTypes.LeveragedPosition:
-                    Symbol = assetDto.Symbol ?? string.Empty;
-                    CollateralFiat = FiatValue.New(assetDto.Collateral ?? 0);
-                    EntryPriceFiat = FiatValue.New(assetDto.EntryPrice ?? 0);
-                    CurrentPriceFiat = FiatValue.New(assetDto.CurrentPrice);
-                    Leverage = assetDto.Leverage ?? 1;
-                    LiquidationPriceFiat = FiatValue.New(assetDto.LiquidationPrice ?? 0);
-                    IsLong = assetDto.IsLong ?? true;
-                    SelectedPriceSource = ((AssetPriceSource)(assetDto.PriceSourceId ?? 0)).ToString();
-                    UseExactPosition = (assetDto.InputModeId ?? 0) == 1;
-                    if (assetDto.PositionSize.HasValue)
-                        PositionSize = assetDto.PositionSize.Value;
-                    // Detect if this is a Bitcoin leveraged position
-                    IsBitcoinUnderlyingAsset = (AssetPriceSource)(assetDto.PriceSourceId ?? 0) == AssetPriceSource.LivePrice &&
-                                                Symbol.StartsWith("BTC", StringComparison.OrdinalIgnoreCase);
-                    break;
-
-                case AssetTypes.BtcLoan:
-                    PlatformName = assetDto.PlatformName ?? string.Empty;
-                    CollateralSats = assetDto.CollateralSats ?? 0;
-                    LoanAmountFiat = FiatValue.New(assetDto.LoanAmount ?? 0);
-                    AprPercentage = (assetDto.Apr ?? 0) * 100m;
-                    InitialLtvPercentage = assetDto.InitialLtv ?? 0;
-                    LiquidationLtvPercentage = assetDto.LiquidationLtv ?? 0;
-                    MarginCallLtvPercentage = assetDto.MarginCallLtv ?? 0;
-                    FeesFiat = FiatValue.New(assetDto.Fees ?? 0);
-                    if (assetDto.LoanStartDate.HasValue)
-                        LoanStartDate = assetDto.LoanStartDate.Value.ToDateTime(TimeOnly.MinValue);
-                    if (assetDto.RepaymentDate.HasValue)
-                        RepaymentDateOffset = assetDto.RepaymentDate.Value.ToDateTime(TimeOnly.MinValue);
-                    else
-                        IsIndefiniteLoan = true;
-                    if (assetDto.HasFixedTotalDebt && assetDto.FixedTotalDebt.HasValue)
-                    {
-                        UseFixedTotalDebt = true;
-                        FixedTotalDebtFiat = FiatValue.New(assetDto.FixedTotalDebt.Value);
-                    }
-                    break;
-
-                case AssetTypes.BtcLending:
-                    BorrowerOrPlatformName = assetDto.BorrowerOrPlatformName ?? string.Empty;
-                    AmountLentFiat = FiatValue.New(assetDto.AmountLent ?? 0);
-                    LendingAprPercentage = (assetDto.Apr ?? 0) * 100m;
-                    if (assetDto.LendingStartDate.HasValue)
-                        LendingStartDateOffset = assetDto.LendingStartDate.Value.ToDateTime(TimeOnly.MinValue);
-                    if (assetDto.RepaymentDate.HasValue)
-                        ExpectedRepaymentDateOffset = assetDto.RepaymentDate.Value.ToDateTime(TimeOnly.MinValue);
-                    else
-                        IsIndefiniteLending = true;
-                    break;
-            }
+            Symbol = values.Symbol;
+            Quantity = values.Quantity;
+            CurrentPriceFiat = values.CurrentPriceFiat;
+            SelectedPriceSource = values.SelectedPriceSource;
+            Address = values.Address;
+            CurrentValueFiat = values.CurrentValueFiat;
+            MonthlyRentalIncomeFiat = values.MonthlyRentalIncomeFiat;
+            AcquisitionDate = values.AcquisitionDate;
+            AcquisitionPriceFiat = values.AcquisitionPriceFiat;
+            IsBitcoinUnderlyingAsset = values.IsBitcoinUnderlyingAsset;
+            CollateralFiat = values.CollateralFiat;
+            EntryPriceFiat = values.EntryPriceFiat;
+            Leverage = values.Leverage;
+            LiquidationPriceFiat = values.LiquidationPriceFiat;
+            IsLong = values.IsLong;
+            UseExactPosition = values.UseExactPosition;
+            PositionSize = values.PositionSize;
+            PlatformName = values.PlatformName;
+            CollateralSats = values.CollateralSats;
+            LoanAmountFiat = values.LoanAmountFiat;
+            AprPercentage = values.AprPercentage;
+            InitialLtvPercentage = values.InitialLtvPercentage;
+            LiquidationLtvPercentage = values.LiquidationLtvPercentage;
+            MarginCallLtvPercentage = values.MarginCallLtvPercentage;
+            FeesFiat = values.FeesFiat;
+            LoanStartDate = values.LoanStartDate;
+            RepaymentDateOffset = values.RepaymentDateOffset;
+            IsIndefiniteLoan = values.IsIndefiniteLoan;
+            UseFixedTotalDebt = values.UseFixedTotalDebt;
+            FixedTotalDebtFiat = values.FixedTotalDebtFiat;
+            BorrowerOrPlatformName = values.BorrowerOrPlatformName;
+            AmountLentFiat = values.AmountLentFiat;
+            LendingAprPercentage = values.LendingAprPercentage;
+            LendingStartDateOffset = values.LendingStartDateOffset;
+            ExpectedRepaymentDateOffset = values.ExpectedRepaymentDateOffset;
+            IsIndefiniteLending = values.IsIndefiniteLending;
 
             // Set asset type LAST — this makes the type-specific section visible,
             // and by this point all field values (including dates) are already set
-            SelectedAssetType = ((AssetTypes)assetDto.AssetTypeId).ToString();
+            SelectedAssetType = values.SelectedAssetType;
         }
     }
 
@@ -607,12 +569,12 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
             if (_assetId is null)
             {
                 // Create new asset
-                await CreateNewAssetAsync(assetType);
+                await CreateNewAssetAsync();
             }
             else
             {
                 // Edit existing asset
-                await EditExistingAssetAsync(assetType);
+                await EditExistingAssetAsync();
             }
         }
         catch (Exception ex)
@@ -622,309 +584,120 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
         }
     }
 
-    private async Task CreateNewAssetAsync(AssetTypes assetType)
+    private AssetFormSnapshot BuildSnapshot() => new(
+        Name: Name,
+        SelectedAssetType: SelectedAssetType,
+        SelectedCurrency: SelectedCurrency,
+        IncludeInNetWorth: IncludeInNetWorth,
+        Visible: Visible,
+        Symbol: Symbol,
+        Quantity: Quantity,
+        CurrentPriceFiat: CurrentPriceFiat,
+        SelectedPriceSource: SelectedPriceSource,
+        Address: Address,
+        CurrentValueFiat: CurrentValueFiat,
+        MonthlyRentalIncomeFiat: MonthlyRentalIncomeFiat,
+        AcquisitionDate: AcquisitionDate,
+        AcquisitionPriceFiat: AcquisitionPriceFiat,
+        IsBitcoinUnderlyingAsset: IsBitcoinUnderlyingAsset,
+        CollateralFiat: CollateralFiat,
+        EntryPriceFiat: EntryPriceFiat,
+        Leverage: Leverage,
+        LiquidationPriceFiat: LiquidationPriceFiat,
+        IsLong: IsLong,
+        UseExactPosition: UseExactPosition,
+        PositionSize: PositionSize,
+        PlatformName: PlatformName,
+        CollateralSats: CollateralSats,
+        LoanAmountFiat: LoanAmountFiat,
+        AprPercentage: AprPercentage,
+        InitialLtvPercentage: InitialLtvPercentage,
+        LiquidationLtvPercentage: LiquidationLtvPercentage,
+        MarginCallLtvPercentage: MarginCallLtvPercentage,
+        FeesFiat: FeesFiat,
+        LoanStartDate: LoanStartDate,
+        RepaymentDateOffset: RepaymentDateOffset,
+        IsIndefiniteLoan: IsIndefiniteLoan,
+        UseFixedTotalDebt: UseFixedTotalDebt,
+        FixedTotalDebtFiat: FixedTotalDebtFiat,
+        BorrowerOrPlatformName: BorrowerOrPlatformName,
+        AmountLentFiat: AmountLentFiat,
+        LendingAprPercentage: LendingAprPercentage,
+        LendingStartDateOffset: LendingStartDateOffset,
+        ExpectedRepaymentDateOffset: ExpectedRepaymentDateOffset,
+        IsIndefiniteLending: IsIndefiniteLending);
+
+    private async Task CreateNewAssetAsync()
     {
-        switch (assetType)
+        var snapshot = BuildSnapshot();
+        var envelope = await _assetFormBuilder!.BuildCreateCommandAsync(snapshot);
+
+        switch (envelope)
         {
-            case AssetTypes.Stock:
-            case AssetTypes.Etf:
-            case AssetTypes.Crypto:
-            case AssetTypes.Commodity:
-            case AssetTypes.Custom:
-                var priceSource = Enum.Parse<AssetPriceSource>(SelectedPriceSource);
-                var currentPrice = CurrentPriceFiat.Value;
-
-                // Fetch price from provider if not Manual
-                if (priceSource != AssetPriceSource.Manual && !string.IsNullOrWhiteSpace(Symbol))
+            case BasicAssetCommandEnvelope basic:
+            {
+                var result = await _commandDispatcher!.DispatchAsync(basic.Command);
+                if (result.IsFailure)
                 {
-                    var priceResult = await _priceProviderSelector!.GetPriceAsync(priceSource, Symbol, SelectedCurrency);
-                    if (priceResult is not null)
-                    {
-                        currentPrice = priceResult.Price;
-                    }
-                }
-
-                var basicResult = await _commandDispatcher!.DispatchAsync(new CreateBasicAssetCommand
-                {
-                    Name = Name,
-                    AssetType = (int)assetType,
-                    CurrencyCode = SelectedCurrency,
-                    Symbol = Symbol,
-                    Quantity = Quantity,
-                    CurrentPrice = currentPrice,
-                    PriceSource = (int)priceSource,
-                    AcquisitionDate = AcquisitionDate.HasValue ? DateOnly.FromDateTime(AcquisitionDate.Value) : null,
-                    AcquisitionPrice = AcquisitionPriceFiat.Value > 0 ? AcquisitionPriceFiat.Value : null,
-                    IncludeInNetWorth = IncludeInNetWorth,
-                    Visible = Visible
-                });
-
-                if (basicResult.IsFailure)
-                {
-                    await MessageBoxHelper.ShowErrorAsync(language.Error, basicResult.Error!.Message, GetWindow!());
+                    await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
                     return;
                 }
-
-                CloseDialog?.Invoke(new Response(true, basicResult.Value!.AssetId));
+                CloseDialog?.Invoke(new Response(true, result.Value!.AssetId));
                 break;
-
-            case AssetTypes.RealEstate:
-                var realEstateResult = await _commandDispatcher!.DispatchAsync(new CreateRealEstateAssetCommand
+            }
+            case RealEstateAssetCommandEnvelope realEstate:
+            {
+                var result = await _commandDispatcher!.DispatchAsync(realEstate.Command);
+                if (result.IsFailure)
                 {
-                    Name = Name,
-                    CurrencyCode = SelectedCurrency,
-                    CurrentValue = CurrentValueFiat.Value,
-                    Address = string.IsNullOrWhiteSpace(Address) ? null : Address,
-                    MonthlyRentalIncome = MonthlyRentalIncomeFiat.Value > 0 ? MonthlyRentalIncomeFiat.Value : null,
-                    AcquisitionDate = AcquisitionDate.HasValue ? DateOnly.FromDateTime(AcquisitionDate.Value) : null,
-                    AcquisitionPrice = AcquisitionPriceFiat.Value > 0 ? AcquisitionPriceFiat.Value : null,
-                    IncludeInNetWorth = IncludeInNetWorth,
-                    Visible = Visible
-                });
-
-                if (realEstateResult.IsFailure)
-                {
-                    await MessageBoxHelper.ShowErrorAsync(language.Error, realEstateResult.Error!.Message, GetWindow!());
+                    await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
                     return;
                 }
-
-                CloseDialog?.Invoke(new Response(true, realEstateResult.Value!.AssetId));
+                CloseDialog?.Invoke(new Response(true, result.Value!.AssetId));
                 break;
-
-            case AssetTypes.LeveragedPosition:
-                var leveragedPriceSource = Enum.Parse<AssetPriceSource>(SelectedPriceSource);
-                var leveragedCurrentPrice = CurrentPriceFiat.Value;
-
-                // Fetch price from provider if not Manual
-                if (leveragedPriceSource != AssetPriceSource.Manual && !string.IsNullOrWhiteSpace(Symbol))
+            }
+            case LeveragedPositionCommandEnvelope leveraged:
+            {
+                var result = await _commandDispatcher!.DispatchAsync(leveraged.Command);
+                if (result.IsFailure)
                 {
-                    var priceResult = await _priceProviderSelector!.GetPriceAsync(leveragedPriceSource, Symbol, SelectedCurrency);
-                    if (priceResult is not null)
-                    {
-                        leveragedCurrentPrice = priceResult.Price;
-                    }
-                }
-
-                var leveragedResult = await _commandDispatcher!.DispatchAsync(new CreateLeveragedPositionCommand
-                {
-                    Name = Name,
-                    CurrencyCode = SelectedCurrency,
-                    Symbol = Symbol,
-                    Collateral = CollateralFiat.Value,
-                    EntryPrice = EntryPriceFiat.Value,
-                    CurrentPrice = leveragedCurrentPrice,
-                    Leverage = Leverage,
-                    LiquidationPrice = LiquidationPriceFiat.Value,
-                    IsLong = IsLong,
-                    PriceSource = (int)leveragedPriceSource,
-                    IncludeInNetWorth = IncludeInNetWorth,
-                    Visible = Visible,
-                    InputMode = UseExactPosition ? 1 : 0,
-                    PositionSize = UseExactPosition ? PositionSize : null
-                });
-
-                if (leveragedResult.IsFailure)
-                {
-                    await MessageBoxHelper.ShowErrorAsync(language.Error, leveragedResult.Error!.Message, GetWindow!());
+                    await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
                     return;
                 }
-
-                CloseDialog?.Invoke(new Response(true, leveragedResult.Value!.AssetId));
+                CloseDialog?.Invoke(new Response(true, result.Value!.AssetId));
                 break;
-
-            case AssetTypes.BtcLoan:
-                // Fetch current BTC price for initial LTV calculation
-                decimal btcLoanCurrentPrice = 0;
-                if (_priceProviderSelector is not null)
+            }
+            case BtcLoanCommandEnvelope btcLoan:
+            {
+                var result = await _commandDispatcher!.DispatchAsync(btcLoan.Command);
+                if (result.IsFailure)
                 {
-                    var btcPriceResult = await _priceProviderSelector.GetPriceAsync(
-                        AssetPriceSource.LivePrice, "BTC", SelectedCurrency);
-                    if (btcPriceResult is not null)
-                        btcLoanCurrentPrice = btcPriceResult.Price;
-                }
-
-                var btcLoanResult = await _commandDispatcher!.DispatchAsync(new CreateBtcLoanCommand
-                {
-                    Name = Name,
-                    CurrencyCode = SelectedCurrency,
-                    PlatformName = PlatformName,
-                    CollateralSats = CollateralSats,
-                    LoanAmount = LoanAmountFiat.Value,
-                    Apr = UseFixedTotalDebt ? 0m : AprPercentage / 100m,
-                    InitialLtv = InitialLtvPercentage,
-                    LiquidationLtv = LiquidationLtvPercentage,
-                    MarginCallLtv = MarginCallLtvPercentage,
-                    Fees = FeesFiat.Value,
-                    LoanStartDate = LoanStartDate.HasValue ? DateOnly.FromDateTime(LoanStartDate.Value) : DateOnly.FromDateTime(DateTime.UtcNow),
-                    RepaymentDate = RepaymentDateOffset.HasValue ? DateOnly.FromDateTime(RepaymentDateOffset.Value) : null,
-                    CurrentBtcPrice = btcLoanCurrentPrice,
-                    FixedTotalDebt = UseFixedTotalDebt ? FixedTotalDebtFiat.Value : null,
-                    IncludeInNetWorth = IncludeInNetWorth,
-                    Visible = Visible
-                });
-
-                if (btcLoanResult.IsFailure)
-                {
-                    await MessageBoxHelper.ShowErrorAsync(language.Error, btcLoanResult.Error!.Message, GetWindow!());
+                    await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
                     return;
                 }
-
-                CloseDialog?.Invoke(new Response(true, btcLoanResult.Value!.AssetId));
+                CloseDialog?.Invoke(new Response(true, result.Value!.AssetId));
                 break;
-
-            case AssetTypes.BtcLending:
-                var btcLendingResult = await _commandDispatcher!.DispatchAsync(new CreateBtcLendingCommand
+            }
+            case BtcLendingCommandEnvelope btcLending:
+            {
+                var result = await _commandDispatcher!.DispatchAsync(btcLending.Command);
+                if (result.IsFailure)
                 {
-                    Name = Name,
-                    CurrencyCode = SelectedCurrency,
-                    AmountLent = AmountLentFiat.Value,
-                    Apr = LendingAprPercentage / 100m,
-                    BorrowerOrPlatformName = BorrowerOrPlatformName,
-                    LendingStartDate = LendingStartDateOffset.HasValue ? DateOnly.FromDateTime(LendingStartDateOffset.Value) : DateOnly.FromDateTime(DateTime.UtcNow),
-                    ExpectedRepaymentDate = ExpectedRepaymentDateOffset.HasValue ? DateOnly.FromDateTime(ExpectedRepaymentDateOffset.Value) : null,
-                    IncludeInNetWorth = IncludeInNetWorth,
-                    Visible = Visible
-                });
-
-                if (btcLendingResult.IsFailure)
-                {
-                    await MessageBoxHelper.ShowErrorAsync(language.Error, btcLendingResult.Error!.Message, GetWindow!());
+                    await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetWindow!());
                     return;
                 }
-
-                CloseDialog?.Invoke(new Response(true, btcLendingResult.Value!.AssetId));
+                CloseDialog?.Invoke(new Response(true, result.Value!.AssetId));
                 break;
-
+            }
             default:
-                await MessageBoxHelper.ShowErrorAsync(language.Error, "Unsupported asset type", GetWindow!());
-                return;
+                throw new AssetFormBuildException();
         }
     }
 
-    private async Task EditExistingAssetAsync(AssetTypes assetType)
+    private async Task EditExistingAssetAsync()
     {
-        AssetDetailsInputDTO details;
-
-        switch (assetType)
-        {
-            case AssetTypes.Stock:
-            case AssetTypes.Etf:
-            case AssetTypes.Crypto:
-            case AssetTypes.Commodity:
-            case AssetTypes.Custom:
-                var priceSource = Enum.Parse<AssetPriceSource>(SelectedPriceSource);
-                var currentPrice = CurrentPriceFiat.Value;
-
-                // Fetch price from provider if not Manual
-                if (priceSource != AssetPriceSource.Manual && !string.IsNullOrWhiteSpace(Symbol))
-                {
-                    var priceResult = await _priceProviderSelector!.GetPriceAsync(priceSource, Symbol, SelectedCurrency);
-                    if (priceResult is not null)
-                    {
-                        currentPrice = priceResult.Price;
-                    }
-                }
-
-                details = new BasicAssetDetailsInputDTO
-                {
-                    AssetType = (int)assetType,
-                    CurrencyCode = SelectedCurrency,
-                    Symbol = Symbol,
-                    Quantity = Quantity,
-                    CurrentPrice = currentPrice,
-                    PriceSource = (int)priceSource,
-                    AcquisitionDate = AcquisitionDate.HasValue ? DateOnly.FromDateTime(AcquisitionDate.Value) : null,
-                    AcquisitionPrice = AcquisitionPriceFiat.Value > 0 ? AcquisitionPriceFiat.Value : null
-                };
-                break;
-
-            case AssetTypes.RealEstate:
-                details = new RealEstateAssetDetailsInputDTO
-                {
-                    CurrencyCode = SelectedCurrency,
-                    CurrentValue = CurrentValueFiat.Value,
-                    Address = string.IsNullOrWhiteSpace(Address) ? null : Address,
-                    MonthlyRentalIncome = MonthlyRentalIncomeFiat.Value > 0 ? MonthlyRentalIncomeFiat.Value : null,
-                    AcquisitionDate = AcquisitionDate.HasValue ? DateOnly.FromDateTime(AcquisitionDate.Value) : null,
-                    AcquisitionPrice = AcquisitionPriceFiat.Value > 0 ? AcquisitionPriceFiat.Value : null
-                };
-                break;
-
-            case AssetTypes.LeveragedPosition:
-                var leveragedPriceSource = Enum.Parse<AssetPriceSource>(SelectedPriceSource);
-                var leveragedCurrentPrice = CurrentPriceFiat.Value;
-
-                // Fetch price from provider if not Manual
-                if (leveragedPriceSource != AssetPriceSource.Manual && !string.IsNullOrWhiteSpace(Symbol))
-                {
-                    var priceResult = await _priceProviderSelector!.GetPriceAsync(leveragedPriceSource, Symbol, SelectedCurrency);
-                    if (priceResult is not null)
-                    {
-                        leveragedCurrentPrice = priceResult.Price;
-                    }
-                }
-
-                details = new LeveragedPositionDetailsInputDTO
-                {
-                    CurrencyCode = SelectedCurrency,
-                    Symbol = Symbol,
-                    Collateral = CollateralFiat.Value,
-                    EntryPrice = EntryPriceFiat.Value,
-                    CurrentPrice = leveragedCurrentPrice,
-                    Leverage = Leverage,
-                    LiquidationPrice = LiquidationPriceFiat.Value,
-                    IsLong = IsLong,
-                    PriceSource = (int)leveragedPriceSource,
-                    InputMode = UseExactPosition ? 1 : 0,
-                    PositionSize = UseExactPosition ? PositionSize : null
-                };
-                break;
-
-            case AssetTypes.BtcLoan:
-                // Fetch current BTC price for LTV calculation (same as creation)
-                decimal editBtcPrice = 0;
-                if (_priceProviderSelector is not null)
-                {
-                    var btcPriceResult = await _priceProviderSelector.GetPriceAsync(
-                        AssetPriceSource.LivePrice, "BTC", SelectedCurrency);
-                    if (btcPriceResult is not null)
-                        editBtcPrice = btcPriceResult.Price;
-                }
-
-                details = new BtcLoanDetailsInputDTO
-                {
-                    CurrencyCode = SelectedCurrency,
-                    PlatformName = PlatformName,
-                    CollateralSats = CollateralSats,
-                    LoanAmount = LoanAmountFiat.Value,
-                    Apr = UseFixedTotalDebt ? 0m : AprPercentage / 100m,
-                    InitialLtv = InitialLtvPercentage,
-                    LiquidationLtv = LiquidationLtvPercentage,
-                    MarginCallLtv = MarginCallLtvPercentage,
-                    Fees = FeesFiat.Value,
-                    LoanStartDate = LoanStartDate.HasValue ? DateOnly.FromDateTime(LoanStartDate.Value) : DateOnly.FromDateTime(DateTime.UtcNow),
-                    RepaymentDate = RepaymentDateOffset.HasValue ? DateOnly.FromDateTime(RepaymentDateOffset.Value) : null,
-                    CurrentBtcPrice = editBtcPrice,
-                    FixedTotalDebt = UseFixedTotalDebt ? FixedTotalDebtFiat.Value : null
-                };
-                break;
-
-            case AssetTypes.BtcLending:
-                details = new BtcLendingDetailsInputDTO
-                {
-                    CurrencyCode = SelectedCurrency,
-                    AmountLent = AmountLentFiat.Value,
-                    Apr = LendingAprPercentage / 100m,
-                    BorrowerOrPlatformName = BorrowerOrPlatformName,
-                    LendingStartDate = LendingStartDateOffset.HasValue ? DateOnly.FromDateTime(LendingStartDateOffset.Value) : DateOnly.FromDateTime(DateTime.UtcNow),
-                    ExpectedRepaymentDate = ExpectedRepaymentDateOffset.HasValue ? DateOnly.FromDateTime(ExpectedRepaymentDateOffset.Value) : null
-                };
-                break;
-
-            default:
-                await MessageBoxHelper.ShowErrorAsync(language.Error, "Unsupported asset type", GetWindow!());
-                return;
-        }
+        var snapshot = BuildSnapshot();
+        var details = await _assetFormBuilder!.BuildEditDetailsAsync(snapshot);
 
         var result = await _commandDispatcher!.DispatchAsync(new EditAssetCommand
         {

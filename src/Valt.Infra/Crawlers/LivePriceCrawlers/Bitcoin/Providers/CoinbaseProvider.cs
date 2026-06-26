@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
@@ -10,20 +11,21 @@ namespace Valt.Infra.Crawlers.LivePriceCrawlers.Bitcoin.Providers;
 
 internal class CoinbaseProvider : IBitcoinPriceProvider
 {
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly IClock _clock;
     private readonly ILogger<CoinbaseProvider> _logger;
     public string Name => "coinbase";
 
-    public CoinbaseProvider(IClock clock, ILogger<CoinbaseProvider> logger)
+    public CoinbaseProvider(IHttpClientFactory httpClientFactory, IClock clock, ILogger<CoinbaseProvider> logger)
     {
+        _httpClientFactory = httpClientFactory;
         _clock = clock;
         _logger = logger;
     }
 
     public async Task<BtcPrice> GetAsync()
     {
-        using var client = new HttpClient();
-        client.Timeout = TimeSpan.FromSeconds(5);
+        using var client = _httpClientFactory.CreateClient(HttpClientNames.Indicator);
         try
         {
             var url = "https://api.coinbase.com/v2/exchange-rates?currency=BTC";

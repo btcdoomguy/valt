@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Valt.App.Kernel;
 using Valt.App.Kernel.Commands;
@@ -14,6 +15,7 @@ using Valt.Core.Modules.Goals;
 using Valt.Infra.Kernel;
 using Valt.Infra.Settings;
 using Valt.Tests.Builders;
+using Valt.UI.Base;
 using Valt.UI.Views.Main.Modals.ManageGoal;
 using Valt.UI.Views.Main.Modals.ManageGoal.GoalTypeEditors;
 
@@ -54,7 +56,9 @@ public class ManageGoalViewModelTests : DatabaseTest
 
     private ManageGoalViewModel CreateViewModel()
     {
-        var vm = new ManageGoalViewModel(_commandDispatcher, _queryDispatcher, _currencySettings);
+        var runner = Substitute.For<IFireAndForgetTaskRunner>();
+        var logger = Substitute.For<ILogger<ManageGoalViewModel>>();
+        var vm = new ManageGoalViewModel(_commandDispatcher, _queryDispatcher, _currencySettings, runner, logger);
         vm.GetWindow = () => null!;
         vm.CloseWindow = () => { };
         vm.CloseDialog = _ => { };

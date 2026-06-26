@@ -1,3 +1,4 @@
+using System.Net.Http;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 
@@ -7,11 +8,13 @@ using Valt.Infra.Crawlers.LivePriceCrawlers.Bitcoin.Providers;
 
 internal class BitcoinDominanceProvider : IBitcoinDominanceProvider
 {
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<BitcoinDominanceProvider> _logger;
     private readonly CoinGeckoRateLimiter _rateLimiter;
 
-    public BitcoinDominanceProvider(ILogger<BitcoinDominanceProvider> logger, CoinGeckoRateLimiter rateLimiter)
+    public BitcoinDominanceProvider(IHttpClientFactory httpClientFactory, ILogger<BitcoinDominanceProvider> logger, CoinGeckoRateLimiter rateLimiter)
     {
+        _httpClientFactory = httpClientFactory;
         _logger = logger;
         _rateLimiter = rateLimiter;
     }
@@ -20,9 +23,7 @@ internal class BitcoinDominanceProvider : IBitcoinDominanceProvider
     {
         await _rateLimiter.WaitAsync();
 
-        using var client = new HttpClient();
-        client.Timeout = TimeSpan.FromSeconds(5);
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("Valt/1.0");
+        using var client = _httpClientFactory.CreateClient(HttpClientNames.CoinGecko);
         try
         {
             var url = "https://api.coingecko.com/api/v3/global";

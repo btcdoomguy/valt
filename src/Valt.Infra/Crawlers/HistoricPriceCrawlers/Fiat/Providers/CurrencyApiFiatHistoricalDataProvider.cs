@@ -1,3 +1,4 @@
+using System.Net.Http;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
@@ -13,6 +14,7 @@ public class CurrencyApiFiatHistoricalDataProvider : IFiatHistoricalDataProvider
 {
     private const string BASE_URL = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@";
 
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<CurrencyApiFiatHistoricalDataProvider> _logger;
 
     // Currency API supports all FiatCurrency codes
@@ -29,8 +31,9 @@ public class CurrencyApiFiatHistoricalDataProvider : IFiatHistoricalDataProvider
         FiatCurrency.Zar
     ]);
 
-    public CurrencyApiFiatHistoricalDataProvider(ILogger<CurrencyApiFiatHistoricalDataProvider> logger)
+    public CurrencyApiFiatHistoricalDataProvider(IHttpClientFactory httpClientFactory, ILogger<CurrencyApiFiatHistoricalDataProvider> logger)
     {
+        _httpClientFactory = httpClientFactory;
         _logger = logger;
     }
 
@@ -53,7 +56,7 @@ public class CurrencyApiFiatHistoricalDataProvider : IFiatHistoricalDataProvider
 
         var result = new List<IFiatHistoricalDataProvider.FiatPriceData>();
 
-        using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+        using var client = _httpClientFactory.CreateClient(HttpClientNames.PriceProvider);
 
         // Fetch date-by-date, skipping weekends to save requests
         var currentDate = SkipWeekendsForward(startDate);

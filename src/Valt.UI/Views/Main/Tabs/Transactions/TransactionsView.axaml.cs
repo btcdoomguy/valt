@@ -3,6 +3,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Valt.UI.Base;
 using Valt.UI.Services.LocalStorage;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
@@ -12,6 +13,8 @@ namespace Valt.UI.Views.Main.Tabs.Transactions;
 public partial class TransactionsView : ValtBaseUserControl
 {
     private ILocalStorageService? _localStorageService;
+    private IFireAndForgetTaskRunner? _runner;
+    private ILogger<TransactionsView>? _logger;
 
     public TransactionsView()
     {
@@ -33,6 +36,8 @@ public partial class TransactionsView : ValtBaseUserControl
             FixedExpensesPanel.DataContext = App.ServiceProvider.GetRequiredService<FixedExpensesPanelViewModel>();
             GoalsPanel.DataContext = App.ServiceProvider.GetRequiredService<GoalsPanelViewModel>();
             _localStorageService = App.ServiceProvider.GetRequiredService<ILocalStorageService>();
+            _runner = App.ServiceProvider.GetRequiredService<IFireAndForgetTaskRunner>();
+            _logger = App.ServiceProvider.GetRequiredService<ILogger<TransactionsView>>();
         }
 
         RestoreLayoutSettings();
@@ -67,7 +72,7 @@ public partial class TransactionsView : ValtBaseUserControl
 
     private void SaveLayoutSettings()
     {
-        if (_localStorageService is null) return;
+        if (_localStorageService is null || _runner is null || _logger is null) return;
 
         var rightPanelWidth = MainLayoutGrid.ColumnDefinitions.Count > 3
             ? MainLayoutGrid.ColumnDefinitions[3].ActualWidth
@@ -83,12 +88,13 @@ public partial class TransactionsView : ValtBaseUserControl
             FixedExpensesPanelHeight = fixedExpensesPanelHeight
         };
 
-        _ = _localStorageService.SaveLayoutSettingsAsync(settings);
+        _runner.RunAsync(_localStorageService.SaveLayoutSettingsAsync(settings), _logger);
     }
 
-    private async void AccountsList_KeyDown(object? sender, KeyEventArgs e)
+    private void AccountsList_KeyDown(object? sender, KeyEventArgs e)
     {
         if (e.KeyModifiers != KeyModifiers.Control) return;
+        if (_runner is null || _logger is null) return;
 
         var vm = DataContext as TransactionsViewModel;
         if (vm is null) return;
@@ -100,11 +106,11 @@ public partial class TransactionsView : ValtBaseUserControl
         {
             if (selectedItem is AccountViewModel account)
             {
-                await vm.MoveUpAccountCommand.ExecuteAsync(account);
+                _runner.RunAsync(vm.MoveUpAccountCommand.ExecuteAsync(account), _logger);
             }
             else if (selectedItem is AccountGroupHeaderViewModel group)
             {
-                await vm.MoveUpAccountGroupCommand.ExecuteAsync(group);
+                _runner.RunAsync(vm.MoveUpAccountGroupCommand.ExecuteAsync(group), _logger);
             }
             e.Handled = true;
             FocusSelectedItem();
@@ -113,11 +119,11 @@ public partial class TransactionsView : ValtBaseUserControl
         {
             if (selectedItem is AccountViewModel account)
             {
-                await vm.MoveDownAccountCommand.ExecuteAsync(account);
+                _runner.RunAsync(vm.MoveDownAccountCommand.ExecuteAsync(account), _logger);
             }
             else if (selectedItem is AccountGroupHeaderViewModel group)
             {
-                await vm.MoveDownAccountGroupCommand.ExecuteAsync(group);
+                _runner.RunAsync(vm.MoveDownAccountGroupCommand.ExecuteAsync(group), _logger);
             }
             e.Handled = true;
             FocusSelectedItem();

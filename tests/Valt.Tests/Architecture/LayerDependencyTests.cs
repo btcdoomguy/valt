@@ -1,7 +1,7 @@
 using System.Reflection;
 using NetArchTest.Rules;
 using Valt.Core.Kernel;
-using Valt.Infra.Kernel.Notifications;
+using Valt.App.Kernel.Notifications;
 
 namespace Valt.Tests.Architecture;
 
@@ -212,7 +212,7 @@ public class LayerDependencyTests
     public void Notifications_Should_Not_Be_Abstract()
     {
         // Notifications should be concrete types (records or sealed classes)
-        var result = Types.InAssembly(InfraAssembly)
+        var result = Types.InAssemblies([AppAssembly, InfraAssembly])
             .That()
             .ImplementInterface(typeof(INotification))
             .ShouldNot()

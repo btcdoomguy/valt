@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Valt.UI.Base;
 using Valt.UI.Services.LocalStorage;
 
@@ -13,7 +14,8 @@ namespace Valt.UI.Views.Main;
 public partial class MainView : ValtBaseWindow
 {
     private ILocalStorageService? _localStorageService;
-    private bool _isClosing;
+    private IFireAndForgetTaskRunner? _runner;
+    private ILogger<MainView>? _logger;
 
     public MainView()
     {
@@ -39,6 +41,8 @@ public partial class MainView : ValtBaseWindow
         if (App.ServiceProvider != null)
         {
             _localStorageService = App.ServiceProvider.GetRequiredService<ILocalStorageService>();
+            _runner = App.ServiceProvider.GetRequiredService<IFireAndForgetTaskRunner>();
+            _logger = App.ServiceProvider.GetRequiredService<ILogger<MainView>>();
         }
 
         RestoreWindowSettings();
@@ -68,14 +72,14 @@ public partial class MainView : ValtBaseWindow
 
     private void SaveWindowSettings()
     {
-        if (_localStorageService is null) return;
+        if (_localStorageService is null || _runner is null || _logger is null) return;
 
         var settings = new WindowSettings
         {
             IsMaximized = WindowState == WindowState.Maximized
         };
 
-        _ = _localStorageService.SaveWindowSettingsAsync(settings);
+        _runner.RunAsync(_localStorageService.SaveWindowSettingsAsync(settings), _logger);
     }
 
     private void Window_OnPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -86,24 +90,10 @@ public partial class MainView : ValtBaseWindow
         }
     }
 
-    private async void Window_OnClosing(object? sender, WindowClosingEventArgs e)
+    private void Window_OnClosing(object? sender, WindowClosingEventArgs e)
     {
-        // If we're already in the closing process, allow the close to proceed
-        if (_isClosing)
-            return;
-
-        // Cancel this close attempt - we'll close again after async cleanup
-        e.Cancel = true;
-        _isClosing = true;
-
+        // Cleanup moved to application lifetime ShutdownRequested.
+        // This handler is now synchronous and only saves synchronous state.
         SaveWindowSettings();
-
-        if (DataContext is MainViewModel viewModel)
-        {
-            await viewModel.OnClosingAsync();
-        }
-
-        // Now close the window for real
-        Close();
     }
 }

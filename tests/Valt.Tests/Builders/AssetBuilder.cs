@@ -221,7 +221,8 @@ public class AssetBuilder
 
     public AssetBuilder WithSnapshot(
         DateOnly effectiveDate,
-        decimal currentTotalDebt,
+        decimal totalBorrowed,
+        decimal interestAccruedUntilDate = 0m,
         long? collateralSats = null,
         decimal? loanAmount = null,
         decimal? apr = null,
@@ -238,7 +239,8 @@ public class AssetBuilder
 
         var snapshot = new LoanStateSnapshot(
             effectiveDate: effectiveDate,
-            currentTotalDebt: currentTotalDebt,
+            totalBorrowed: totalBorrowed,
+            interestAccruedUntilDate: interestAccruedUntilDate,
             platformName: loan.PlatformName,
             collateralSats: collateralSats ?? loan.CollateralSats,
             loanAmount: loanAmount ?? loan.LoanAmount,
@@ -264,9 +266,13 @@ public class AssetBuilder
         if (_details is not BtcLoanDetails loan)
             throw new InvalidOperationException("WithSeededSnapshot requires BTC loan details");
 
+        var currentTotalDebt = loan.CalculateTotalDebt();
+        var interest = Math.Max(0m, currentTotalDebt - loan.LoanAmount - loan.Fees);
+
         var snapshot = new LoanStateSnapshot(
             effectiveDate: loan.LoanStartDate,
-            currentTotalDebt: loan.CalculateTotalDebt(),
+            totalBorrowed: loan.LoanAmount,
+            interestAccruedUntilDate: interest,
             platformName: loan.PlatformName,
             collateralSats: loan.CollateralSats,
             loanAmount: loan.LoanAmount,

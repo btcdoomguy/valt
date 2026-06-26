@@ -14,6 +14,7 @@ public class BitcoinDominanceProviderTests
     public void OneTimeSetUp()
     {
         _provider = new BitcoinDominanceProvider(
+            HttpClientTestFactory.Create(),
             Substitute.For<ILogger<BitcoinDominanceProvider>>(),
             new CoinGeckoRateLimiter(Substitute.For<ILogger<CoinGeckoRateLimiter>>()));
     }

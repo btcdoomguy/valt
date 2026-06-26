@@ -32,7 +32,8 @@ public class GetLatestLoanStateHandlerTests : DatabaseTest
             .WithSnapshot(new DateOnly(2025, 3, 1), 25_500m)
             .WithSnapshot(
                 effectiveDate: new DateOnly(2025, 6, 1),
-                currentTotalDebt: 26_000m,
+                totalBorrowed: 25_000m,
+                interestAccruedUntilDate: 850m,
                 collateralSats: 110_000_000,
                 apr: 0.13m,
                 fees: 150m,
@@ -47,6 +48,8 @@ public class GetLatestLoanStateHandlerTests : DatabaseTest
         {
             Assert.That(result!.AssetId, Is.EqualTo(asset.Id.Value));
             Assert.That(result.AssetName, Is.EqualTo("My BTC Loan"));
+            Assert.That(result.TotalBorrowed, Is.EqualTo(25_000m));
+            Assert.That(result.InterestAccruedUntilDate, Is.EqualTo(850m));
             Assert.That(result.CurrentTotalDebt, Is.EqualTo(26_000m));
             Assert.That(result.CollateralSats, Is.EqualTo(110_000_000L));
             Assert.That(result.Apr, Is.EqualTo(0.13m));
@@ -95,7 +98,8 @@ public class GetLatestLoanStateHandlerTests : DatabaseTest
         var asset = AssetBuilder.ABtcLoan()
             .WithSnapshot(
                 effectiveDate: new DateOnly(2025, 6, 1),
-                currentTotalDebt: 26_000m,
+                totalBorrowed: 25_000m,
+                interestAccruedUntilDate: 850m,
                 note: "Mid-year")
             .Build();
         await _assetRepository.SaveAsync(asset);

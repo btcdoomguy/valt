@@ -1,13 +1,16 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Collections;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Modules.Configuration;
@@ -38,6 +41,8 @@ public partial class SettingsViewModel : ValtModalViewModel
     private readonly IConfigurationManager? _configurationManager;
     private readonly IThemeService? _themeService;
     private readonly IFontScaleService? _fontScaleService;
+    private readonly IFireAndForgetTaskRunner _runner = null!;
+    private readonly ILogger<SettingsViewModel> _logger = null!;
 
     [ObservableProperty] private string _mainFiatCurrency = string.Empty;
     [ObservableProperty] private bool _showHiddenAccounts;
@@ -126,7 +131,9 @@ public partial class SettingsViewModel : ValtModalViewModel
         ILocalStorageService localStorageService,
         IConfigurationManager configurationManager,
         IThemeService themeService,
-        IFontScaleService fontScaleService)
+        IFontScaleService fontScaleService,
+        IFireAndForgetTaskRunner runner,
+        ILogger<SettingsViewModel> logger)
     {
         _currencySettings = currencySettings;
         _displaySettings = displaySettings;
@@ -137,6 +144,8 @@ public partial class SettingsViewModel : ValtModalViewModel
         _configurationManager = configurationManager;
         _themeService = themeService;
         _fontScaleService = fontScaleService;
+        _runner = runner;
+        _logger = logger;
 
         MainFiatCurrency = _currencySettings.MainFiatCurrency;
         ShowHiddenAccounts = _displaySettings.ShowHiddenAccounts;
@@ -174,23 +183,28 @@ public partial class SettingsViewModel : ValtModalViewModel
         }
     }
 
-    private async void OnSelectedFiatCurrenciesChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void OnSelectedFiatCurrenciesChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems is not null)
-        {
-            foreach (FiatCurrencyItem item in e.OldItems)
-            {
-                // Check if currency is in use
-                if (_currenciesInUse.Contains(item.Code))
-                {
-                    // Re-add the item to prevent removal
-                    SelectedFiatCurrencies.Add(item);
+        if (e.Action != NotifyCollectionChangedAction.Remove || e.OldItems is null)
+            return;
 
-                    await MessageBoxHelper.ShowAlertAsync(
-                        language.Error,
-                        string.Format(language.Settings_FiatCurrencies_CannotRemove, item.Code),
-                        OwnerWindow!);
-                }
+        _runner.RunAsync(HandleRemovedCurrenciesAsync(e.OldItems), _logger);
+    }
+
+    private async Task HandleRemovedCurrenciesAsync(IList oldItems)
+    {
+        foreach (FiatCurrencyItem item in oldItems)
+        {
+            // Check if currency is in use
+            if (_currenciesInUse.Contains(item.Code))
+            {
+                // Re-add the item to prevent removal
+                await Dispatcher.UIThread.InvokeAsync(() => SelectedFiatCurrencies.Add(item));
+
+                await MessageBoxHelper.ShowAlertAsync(
+                    language.Error,
+                    string.Format(language.Settings_FiatCurrencies_CannotRemove, item.Code),
+                    OwnerWindow!);
             }
         }
     }
