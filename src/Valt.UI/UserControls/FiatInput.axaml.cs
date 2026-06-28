@@ -88,8 +88,9 @@ public partial class FiatInput : UserControl
         get => _fiatValue;
         set
         {
-            SetAndRaise(FiatValueProperty, ref _fiatValue, value);
-            _rawValue = (long)(value.Value * (decimal)Math.Pow(10, _decimalPlaces));
+            var safeValue = value ?? FiatValue.Empty;
+            SetAndRaise(FiatValueProperty, ref _fiatValue, safeValue);
+            _rawValue = (long)(safeValue.Value * (decimal)Math.Pow(10, _decimalPlaces));
             UpdateDisplayValue();
         }
     }
@@ -291,6 +292,7 @@ public partial class FiatInput : UserControl
 
     private void UpdateFiatValue()
     {
+        _fiatValue ??= FiatValue.Empty;
         decimal value = _rawValue / (decimal)Math.Pow(10, _decimalPlaces);
         if (value != _fiatValue.Value)
             FiatValue = FiatValue.New(value);
@@ -298,6 +300,7 @@ public partial class FiatInput : UserControl
 
     private void UpdateDisplayValue()
     {
+        _fiatValue ??= FiatValue.Empty;
         var displayDecimal = _rawValue / (decimal)Math.Pow(10, _decimalPlaces);
         var format = $"N{_decimalPlaces}";
         _displayValue = displayDecimal.ToString(format, CultureInfo.CurrentUICulture);
