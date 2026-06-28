@@ -66,7 +66,8 @@ public partial class BtcInput : UserControl
         get => _btcValue;
         set
         {
-            this.SetAndRaise(BtcValueProperty, ref _btcValue, value);
+            var safeValue = value ?? BtcValue.Empty;
+            this.SetAndRaise(BtcValueProperty, ref _btcValue, safeValue);
             UpdateDisplayValue();
         }
     }
@@ -231,7 +232,8 @@ public partial class BtcInput : UserControl
 
     private void UpdateDisplayValue()
     {
-        var newValue = _isBitcoin ? BtcValue.ToBitcoinString() : BtcValue.ToString();
+        var btcValue = _btcValue ?? BtcValue.Empty;
+        var newValue = _isBitcoin ? btcValue.ToBitcoinString() : btcValue.ToString();
         this.SetAndRaise(DisplayValueProperty, ref _displayValue, newValue);
     }
 
