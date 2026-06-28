@@ -5,9 +5,9 @@ milestone_name: Quality & Performance
 current_phase: 19
 status: completed
 stopped_at: Completed 18-02-PLAN.md
-last_updated: "2026-06-28T21:19:48.918Z"
+last_updated: "2026-06-28T21:29:31.653Z"
 last_activity: 2026-06-28
-last_activity_desc: Completed quick task 260628-pgi: Fix NullReferenceException in BtcInput when copying a transaction
+last_activity_desc: Completed quick task 260628-pol: Fix NullReferenceException in FiatInput when editing/copying a transaction
 progress:
   total_phases: 18
   completed_phases: 9
@@ -99,6 +99,7 @@ Progress: [██        ] 28%
 | 260616-rcu | Fix Stock asset edit modal not loading stored acquisition date | 2026-06-16 | be0b8b3 | [260616-rcu-fix-stock-asset-edit-modal-not-loading-s](./quick/260616-rcu-fix-stock-asset-edit-modal-not-loading-s/) |
 | 260619-fix-loan-snapshot-edit | Fix editing original BTC loan data after snapshots exist | 2026-06-19 | f8bdf78 | [260619-fix-loan-snapshot-edit](./quick/260619-fix-loan-snapshot-edit/) |
 | 260628-pgi | Fix NullReferenceException in BtcInput when copying a transaction | 2026-06-28 | d2f8685 | [260628-pgi-fix-nullreferenceexception-in-btcinput-w](./quick/260628-pgi-fix-nullreferenceexception-in-btcinput-w/) |
+| 260628-pol | Fix NullReferenceException in FiatInput when editing/copying a transaction | 2026-06-28 | 7a39a6c | [260628-pol-fix-nullreferenceexception-in-fiatinput-](./quick/260628-pol-fix-nullreferenceexception-in-fiatinput-/) |
 
 ### Todos
 
