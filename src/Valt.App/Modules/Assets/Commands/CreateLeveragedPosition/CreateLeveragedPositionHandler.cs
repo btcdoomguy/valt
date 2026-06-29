@@ -46,26 +46,38 @@ internal sealed class CreateLeveragedPositionHandler : ICommandHandler<CreateLev
         var assetName = new AssetName(command.Name);
         var priceSource = (AssetPriceSource)command.PriceSource;
         var inputMode = (LeveragedPositionInputMode)command.InputMode;
+        var collateralAssetType = (LeveragedPositionCollateralAssetType)command.CollateralAssetType;
 
         var collateral = command.Collateral;
-        if (inputMode == LeveragedPositionInputMode.ExactPosition
+        var leverage = command.Leverage;
+
+        if (collateralAssetType == LeveragedPositionCollateralAssetType.Fiat
+            && inputMode == LeveragedPositionInputMode.ExactPosition
             && command.PositionSize.HasValue && command.PositionSize.Value > 0
             && command.Leverage > 0)
         {
             collateral = command.PositionSize.Value * command.EntryPrice / command.Leverage;
         }
+        else if (collateralAssetType == LeveragedPositionCollateralAssetType.Btc)
+        {
+            var notionalBtcEntry = command.ContractCount * command.ContractSizeUsd / command.EntryPrice;
+            leverage = notionalBtcEntry / command.Collateral;
+        }
 
         var details = new LeveragedPositionDetails(
             collateral: collateral,
             entryPrice: command.EntryPrice,
-            leverage: command.Leverage,
+            leverage: leverage,
             liquidationPrice: command.LiquidationPrice,
             currentPrice: command.CurrentPrice,
             currencyCode: command.CurrencyCode,
             symbol: command.Symbol,
             priceSource: priceSource,
             isLong: command.IsLong,
-            inputMode: inputMode);
+            inputMode: inputMode,
+            collateralAssetType: collateralAssetType,
+            contractCount: command.ContractCount,
+            contractSizeUsd: command.ContractSizeUsd);
 
         var icon = string.IsNullOrWhiteSpace(command.Icon)
             ? Icon.Empty

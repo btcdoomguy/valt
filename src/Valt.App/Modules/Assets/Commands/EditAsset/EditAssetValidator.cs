@@ -90,15 +90,34 @@ internal sealed class EditAssetValidator : IValidator<EditAssetCommand>
     {
         builder.AddErrorIfNullOrWhiteSpace(details.Symbol, "Details.Symbol", "Symbol is required.");
 
-        if (details.InputMode == 1)
+        var collateralAssetType = (LeveragedPositionCollateralAssetType)details.CollateralAssetType;
+
+        if (collateralAssetType == LeveragedPositionCollateralAssetType.Btc)
         {
-            if (!details.PositionSize.HasValue || details.PositionSize.Value <= 0)
-                builder.AddError("Details.PositionSize", "Position size must be greater than zero.");
+            if (details.Collateral <= 0)
+                builder.AddError("Details.Collateral", "Collateral BTC must be greater than zero.");
+
+            if (details.ContractCount <= 0)
+                builder.AddError("Details.ContractCount", "Contract count must be greater than zero.");
+
+            if (details.ContractSizeUsd <= 0)
+                builder.AddError("Details.ContractSizeUsd", "Contract size must be greater than zero.");
         }
         else
         {
-            if (details.Collateral <= 0)
-                builder.AddError("Details.Collateral", "Collateral must be greater than zero.");
+            if (details.InputMode == 1)
+            {
+                if (!details.PositionSize.HasValue || details.PositionSize.Value <= 0)
+                    builder.AddError("Details.PositionSize", "Position size must be greater than zero.");
+            }
+            else
+            {
+                if (details.Collateral <= 0)
+                    builder.AddError("Details.Collateral", "Collateral must be greater than zero.");
+            }
+
+            if (details.Leverage < 1)
+                builder.AddError("Details.Leverage", "Leverage must be at least 1.");
         }
 
         if (details.EntryPrice <= 0)
@@ -106,9 +125,6 @@ internal sealed class EditAssetValidator : IValidator<EditAssetCommand>
 
         if (details.CurrentPrice <= 0)
             builder.AddError("Details.CurrentPrice", "Current price must be greater than zero.");
-
-        if (details.Leverage < 1)
-            builder.AddError("Details.Leverage", "Leverage must be at least 1.");
 
         if (details.LiquidationPrice <= 0)
             builder.AddError("Details.LiquidationPrice", "Liquidation price must be greater than zero.");

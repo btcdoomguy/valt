@@ -95,6 +95,8 @@ public record LeveragedPositionDetailsInputDTO : AssetDetailsInputDTO
 
     /// <summary>
     /// Collateral amount.
+    /// For Fiat collateral: the fiat amount.
+    /// For BTC collateral: the BTC amount.
     /// </summary>
     public required decimal Collateral { get; init; }
 
@@ -124,12 +126,13 @@ public record LeveragedPositionDetailsInputDTO : AssetDetailsInputDTO
     public required bool IsLong { get; init; }
 
     /// <summary>
-    /// Price source: 0=Manual, 1=YahooFinance
+    /// Price source: 0=Manual, 1=YahooFinance, 2=LivePrice
     /// </summary>
     public required int PriceSource { get; init; }
 
     /// <summary>
     /// Input mode: 0=Collateral (default), 1=ExactPosition.
+    /// Only meaningful for Fiat collateral.
     /// </summary>
     public int InputMode { get; init; } = 0;
 
@@ -137,6 +140,21 @@ public record LeveragedPositionDetailsInputDTO : AssetDetailsInputDTO
     /// Position size in underlying units (e.g., 0.2 BTC). Used when InputMode=1.
     /// </summary>
     public decimal? PositionSize { get; init; }
+
+    /// <summary>
+    /// Type of collateral: 0=Fiat, 1=Btc.
+    /// </summary>
+    public int CollateralAssetType { get; init; } = 0;
+
+    /// <summary>
+    /// Number of contracts. Only used when CollateralAssetType=Btc.
+    /// </summary>
+    public decimal ContractCount { get; init; }
+
+    /// <summary>
+    /// Contract size in USD. Only used when CollateralAssetType=Btc.
+    /// </summary>
+    public decimal ContractSizeUsd { get; init; }
 }
 
 /// <summary>

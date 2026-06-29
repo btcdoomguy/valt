@@ -59,6 +59,10 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     [NotifyPropertyChangedFor(nameof(IsBitcoinLeveraged))]
     [NotifyPropertyChangedFor(nameof(IsCustomLeveraged))]
     [NotifyPropertyChangedFor(nameof(ShowLeveragedSymbolRow))]
+    [NotifyPropertyChangedFor(nameof(ShowLeveragedInputModeRow))]
+    [NotifyPropertyChangedFor(nameof(ShowLeveragedCollateralFiatRow))]
+    [NotifyPropertyChangedFor(nameof(ShowLeveragedCollateralBtcRow))]
+    [NotifyPropertyChangedFor(nameof(ShowLeveragedLeverageRow))]
     private string _selectedAssetType = AssetTypes.Stock.ToString();
 
     [ObservableProperty]
@@ -71,6 +75,10 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     [NotifyPropertyChangedFor(nameof(IsBitcoinLeveraged))]
     [NotifyPropertyChangedFor(nameof(IsCustomLeveraged))]
     [NotifyPropertyChangedFor(nameof(ShowLeveragedSymbolRow))]
+    [NotifyPropertyChangedFor(nameof(ShowLeveragedInputModeRow))]
+    [NotifyPropertyChangedFor(nameof(ShowLeveragedCollateralFiatRow))]
+    [NotifyPropertyChangedFor(nameof(ShowLeveragedCollateralBtcRow))]
+    [NotifyPropertyChangedFor(nameof(ShowLeveragedLeverageRow))]
     private bool _isBitcoinUnderlyingAsset = false;
 
     // Basic asset fields
@@ -123,6 +131,11 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     private FiatValue _collateralFiat = FiatValue.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DerivedLeverageDisplay))]
+    private BtcValue _leveragedCollateralBtc = BtcValue.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DerivedLeverageDisplay))]
     private FiatValue _entryPriceFiat = FiatValue.Empty;
 
     [ObservableProperty]
@@ -138,6 +151,14 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
 
     [ObservableProperty]
     private decimal _positionSize;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DerivedLeverageDisplay))]
+    private decimal _contractCount;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DerivedLeverageDisplay))]
+    private decimal _contractSizeUsd = 10m; // Default Deribit BTC-PERP contract size
 
     private bool _isAutoCalculating;
 
@@ -295,6 +316,22 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
     public bool IsBitcoinLeveraged => ShowLeveragedFields && IsBitcoinUnderlyingAsset;
     public bool IsCustomLeveraged => ShowLeveragedFields && !IsBitcoinUnderlyingAsset;
     public bool ShowLeveragedSymbolRow => ShowLeveragedFields && !IsBitcoinUnderlyingAsset;
+    public bool ShowLeveragedInputModeRow => ShowLeveragedFields && !IsBitcoinUnderlyingAsset;
+    public bool ShowLeveragedCollateralFiatRow => ShowLeveragedFields && !IsBitcoinUnderlyingAsset;
+    public bool ShowLeveragedCollateralBtcRow => ShowLeveragedFields && IsBitcoinUnderlyingAsset;
+    public bool ShowLeveragedLeverageRow => ShowLeveragedFields && !IsBitcoinUnderlyingAsset;
+    public string DerivedLeverageDisplay
+    {
+        get
+        {
+            if (!IsBitcoinUnderlyingAsset || LeveragedCollateralBtc.Sats <= 0 || EntryPriceFiat.Value <= 0)
+                return "-";
+
+            var notionalBtc = ContractCount * ContractSizeUsd / EntryPriceFiat.Value;
+            var derivedLeverage = notionalBtc / LeveragedCollateralBtc.Btc;
+            return $"{derivedLeverage:0.##}x";
+        }
+    }
 
     // Leveraged position input mode helpers
     public bool IsCollateralMode => !UseExactPosition;
@@ -391,12 +428,16 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
             AcquisitionPriceFiat = values.AcquisitionPriceFiat;
             IsBitcoinUnderlyingAsset = values.IsBitcoinUnderlyingAsset;
             CollateralFiat = values.CollateralFiat;
+            LeveragedCollateralBtc = BtcValue.New((long)(values.LeveragedCollateralBtc * 100_000_000m));
             EntryPriceFiat = values.EntryPriceFiat;
             Leverage = values.Leverage;
             LiquidationPriceFiat = values.LiquidationPriceFiat;
             IsLong = values.IsLong;
             UseExactPosition = values.UseExactPosition;
             PositionSize = values.PositionSize;
+            ContractCount = values.ContractCount;
+            ContractSizeUsd = values.ContractSizeUsd > 0 ? values.ContractSizeUsd : 10m;
+            OnPropertyChanged(nameof(DerivedLeverageDisplay));
             PlatformName = values.PlatformName;
             CollateralSats = values.CollateralSats;
             LoanAmountFiat = values.LoanAmountFiat;
@@ -471,7 +512,9 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
         IsBitcoinUnderlyingAsset = true;
         Symbol = "BTC";
         SelectedPriceSource = AssetPriceSource.LivePrice.ToString();
-        // Keep user's selected currency - don't force USD
+        UseExactPosition = false;
+        ContractSizeUsd = ContractSizeUsd > 0 ? ContractSizeUsd : 10m;
+        OnPropertyChanged(nameof(DerivedLeverageDisplay));
         SymbolValidationMessage = null;
         IsSymbolValid = true;
     }
@@ -601,12 +644,15 @@ public partial class ManageAssetViewModel : ValtModalValidatorViewModel
         AcquisitionPriceFiat: AcquisitionPriceFiat,
         IsBitcoinUnderlyingAsset: IsBitcoinUnderlyingAsset,
         CollateralFiat: CollateralFiat,
+        LeveragedCollateralBtc: LeveragedCollateralBtc.Btc,
         EntryPriceFiat: EntryPriceFiat,
         Leverage: Leverage,
         LiquidationPriceFiat: LiquidationPriceFiat,
         IsLong: IsLong,
         UseExactPosition: UseExactPosition,
         PositionSize: PositionSize,
+        ContractCount: ContractCount,
+        ContractSizeUsd: ContractSizeUsd,
         PlatformName: PlatformName,
         CollateralSats: CollateralSats,
         LoanAmountFiat: LoanAmountFiat,

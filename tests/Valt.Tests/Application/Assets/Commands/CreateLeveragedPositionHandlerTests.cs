@@ -161,4 +161,38 @@ public class CreateLeveragedPositionHandlerTests : DatabaseTest
             Assert.That(details.PositionSize, Is.EqualTo(2m));
         });
     }
+
+    [Test]
+    public async Task HandleAsync_WithBtcCollateral_CreatesAssetAndDerivesLeverage()
+    {
+        var command = new CreateLeveragedPositionCommand
+        {
+            Name = "Deribit BTC-PERP",
+            CurrencyCode = "USD",
+            Symbol = "BTC",
+            Collateral = 1m, // 1 BTC
+            EntryPrice = 100000m,
+            CurrentPrice = 100000m,
+            Leverage = 0, // Not used for BTC collateral
+            LiquidationPrice = 90000m,
+            IsLong = true,
+            InputMode = 0,
+            CollateralAssetType = 1,
+            ContractCount = 100000m,
+            ContractSizeUsd = 10m
+        };
+
+        var result = await _handler.HandleAsync(command);
+
+        Assert.That(result.IsSuccess, Is.True);
+
+        var asset = await _assetRepository.GetByIdAsync(new AssetId(result.Value!.AssetId));
+        var details = (LeveragedPositionDetails)asset!.Details;
+        Assert.Multiple(() =>
+        {
+            Assert.That(details.CollateralAssetType, Is.EqualTo(LeveragedPositionCollateralAssetType.Btc));
+            Assert.That(details.PositionSize, Is.EqualTo(10m));
+            Assert.That(details.Leverage, Is.EqualTo(10m));
+        });
+    }
 }

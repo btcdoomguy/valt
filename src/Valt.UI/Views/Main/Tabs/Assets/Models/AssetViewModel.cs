@@ -51,6 +51,10 @@ public partial class AssetViewModel : ObservableObject
     public bool? IsLong { get; }
     public decimal? DistanceToLiquidation { get; }
     public decimal? PositionSize { get; }
+    public int? CollateralAssetTypeId { get; }
+    public decimal? ContractCount { get; }
+    public decimal? ContractSizeUsd { get; }
+    public bool IsBtcCollateralLeveragedPosition => IsLeveragedPosition && CollateralAssetTypeId == (int)LeveragedPositionCollateralAssetType.Btc;
 
     /// <summary>
     /// Indicates if the leveraged position is at risk of liquidation.
@@ -196,6 +200,9 @@ public partial class AssetViewModel : ObservableObject
         IsLong = dto.IsLong;
         DistanceToLiquidation = dto.DistanceToLiquidation;
         PositionSize = dto.PositionSize;
+        CollateralAssetTypeId = dto.CollateralAssetTypeId;
+        ContractCount = dto.ContractCount;
+        ContractSizeUsd = dto.ContractSizeUsd;
         // Only show at risk if reported AND PnL is not significantly positive
         // A position with > 50% profit cannot logically be close to liquidation
         IsAtRisk = dto.IsAtRisk == true && (dto.PnLPercentage == null || dto.PnLPercentage <= 50);
@@ -272,11 +279,15 @@ public partial class AssetViewModel : ObservableObject
             : "-";
 
         CollateralFormatted = Collateral.HasValue
-            ? CurrencyDisplay.FormatFiat(Collateral.Value, CurrencyCode)
+            ? IsBtcCollateralLeveragedPosition
+                ? $"{Collateral.Value:0.########} BTC"
+                : CurrencyDisplay.FormatFiat(Collateral.Value, CurrencyCode)
             : "-";
 
         PositionSizeFormatted = PositionSize.HasValue
-            ? $"{PositionSize.Value:G} {Symbol ?? ""}"
+            ? IsBtcCollateralLeveragedPosition
+                ? $"{PositionSize.Value:0.########} BTC"
+                : $"{PositionSize.Value:G} {Symbol ?? ""}"
             : "-";
 
         AcquisitionPriceFormatted = AcquisitionPrice.HasValue

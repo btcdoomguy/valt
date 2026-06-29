@@ -155,6 +155,8 @@ internal sealed class AssetQueries : IAssetQueries
     /// <summary>
     /// Gets the value to use for portfolio summary calculations.
     /// For leveraged positions, returns only the P&amp;L (not the full position value).
+    /// For BTC-collateral leveraged positions, returns the full position value because
+    /// the collateral is part of the position itself.
     /// For BTC loans, returns -TotalDebt (pure liability, collateral tracked separately).
     /// For BTC lending, returns amount lent + earned interest.
     /// For other assets, returns the current value.
@@ -163,7 +165,9 @@ internal sealed class AssetQueries : IAssetQueries
     {
         return asset.Details switch
         {
-            LeveragedPositionDetails leveraged => leveraged.CalculatePnL(leveraged.CurrentPrice),
+            LeveragedPositionDetails leveraged => leveraged.CollateralAssetType == LeveragedPositionCollateralAssetType.Btc
+                ? leveraged.CalculateCurrentValue(leveraged.CurrentPrice)
+                : leveraged.CalculatePnL(leveraged.CurrentPrice),
             BtcLoanDetails btcLoan => btcLoan.CalculateCurrentValue(btcLoan.CurrentBtcPriceInLoanCurrency),
             BtcLendingDetails btcLending => btcLending.CalculateCurrentValue(0),
             _ => asset.GetCurrentValue()
@@ -271,7 +275,10 @@ internal sealed class AssetQueries : IAssetQueries
             DistanceToLiquidation = leveraged.CalculateDistanceToLiquidation(leveraged.CurrentPrice),
             IsAtRisk = leveraged.IsAtRisk(leveraged.CurrentPrice),
             PositionSize = leveraged.PositionSize,
-            InputModeId = (int)leveraged.InputMode
+            InputModeId = (int)leveraged.InputMode,
+            CollateralAssetTypeId = (int)leveraged.CollateralAssetType,
+            ContractCount = leveraged.ContractCount,
+            ContractSizeUsd = leveraged.ContractSizeUsd
         };
     }
 

@@ -84,12 +84,18 @@ public class AssetFormBuilder : IAssetFormBuilder
                         leveragedCurrentPrice = priceResult.Price;
                 }
 
+                var collateralAssetType = snapshot.IsBitcoinUnderlyingAsset
+                    ? LeveragedPositionCollateralAssetType.Btc
+                    : LeveragedPositionCollateralAssetType.Fiat;
+
                 return new LeveragedPositionCommandEnvelope(new CreateLeveragedPositionCommand
                 {
                     Name = snapshot.Name,
                     CurrencyCode = snapshot.SelectedCurrency,
                     Symbol = snapshot.Symbol,
-                    Collateral = snapshot.CollateralFiat.Value,
+                    Collateral = collateralAssetType == LeveragedPositionCollateralAssetType.Btc
+                        ? snapshot.LeveragedCollateralBtc
+                        : snapshot.CollateralFiat.Value,
                     EntryPrice = snapshot.EntryPriceFiat.Value,
                     CurrentPrice = leveragedCurrentPrice,
                     Leverage = snapshot.Leverage,
@@ -99,7 +105,10 @@ public class AssetFormBuilder : IAssetFormBuilder
                     IncludeInNetWorth = snapshot.IncludeInNetWorth,
                     Visible = snapshot.Visible,
                     InputMode = snapshot.UseExactPosition ? 1 : 0,
-                    PositionSize = snapshot.UseExactPosition ? snapshot.PositionSize : null
+                    PositionSize = snapshot.UseExactPosition ? snapshot.PositionSize : null,
+                    CollateralAssetType = (int)collateralAssetType,
+                    ContractCount = snapshot.ContractCount,
+                    ContractSizeUsd = snapshot.ContractSizeUsd
                 });
 
             case AssetTypes.BtcLoan:
@@ -191,29 +200,38 @@ public class AssetFormBuilder : IAssetFormBuilder
                 };
 
             case AssetTypes.LeveragedPosition:
-                var leveragedPriceSource = Enum.Parse<AssetPriceSource>(snapshot.SelectedPriceSource);
-                var leveragedCurrentPrice = snapshot.CurrentPriceFiat.Value;
+                var editLeveragedPriceSource = Enum.Parse<AssetPriceSource>(snapshot.SelectedPriceSource);
+                var editLeveragedCurrentPrice = snapshot.CurrentPriceFiat.Value;
 
-                if (leveragedPriceSource != AssetPriceSource.Manual && !string.IsNullOrWhiteSpace(snapshot.Symbol))
+                if (editLeveragedPriceSource != AssetPriceSource.Manual && !string.IsNullOrWhiteSpace(snapshot.Symbol))
                 {
-                    var priceResult = await _priceProviderSelector.GetPriceAsync(leveragedPriceSource, snapshot.Symbol, snapshot.SelectedCurrency);
+                    var priceResult = await _priceProviderSelector.GetPriceAsync(editLeveragedPriceSource, snapshot.Symbol, snapshot.SelectedCurrency);
                     if (priceResult is not null)
-                        leveragedCurrentPrice = priceResult.Price;
+                        editLeveragedCurrentPrice = priceResult.Price;
                 }
+
+                var editCollateralAssetType = snapshot.IsBitcoinUnderlyingAsset
+                    ? LeveragedPositionCollateralAssetType.Btc
+                    : LeveragedPositionCollateralAssetType.Fiat;
 
                 return new LeveragedPositionDetailsInputDTO
                 {
                     CurrencyCode = snapshot.SelectedCurrency,
                     Symbol = snapshot.Symbol,
-                    Collateral = snapshot.CollateralFiat.Value,
+                    Collateral = editCollateralAssetType == LeveragedPositionCollateralAssetType.Btc
+                        ? snapshot.LeveragedCollateralBtc
+                        : snapshot.CollateralFiat.Value,
                     EntryPrice = snapshot.EntryPriceFiat.Value,
-                    CurrentPrice = leveragedCurrentPrice,
+                    CurrentPrice = editLeveragedCurrentPrice,
                     Leverage = snapshot.Leverage,
                     LiquidationPrice = snapshot.LiquidationPriceFiat.Value,
                     IsLong = snapshot.IsLong,
-                    PriceSource = (int)leveragedPriceSource,
+                    PriceSource = (int)editLeveragedPriceSource,
                     InputMode = snapshot.UseExactPosition ? 1 : 0,
-                    PositionSize = snapshot.UseExactPosition ? snapshot.PositionSize : null
+                    PositionSize = snapshot.UseExactPosition ? snapshot.PositionSize : null,
+                    CollateralAssetType = (int)editCollateralAssetType,
+                    ContractCount = snapshot.ContractCount,
+                    ContractSizeUsd = snapshot.ContractSizeUsd
                 };
 
             case AssetTypes.BtcLoan:
@@ -282,12 +300,15 @@ public class AssetFormBuilder : IAssetFormBuilder
                     AcquisitionPriceFiat: FiatValue.New(dto.AcquisitionPrice ?? 0),
                     IsBitcoinUnderlyingAsset: false,
                     CollateralFiat: FiatValue.Empty,
+                    LeveragedCollateralBtc: 0,
                     EntryPriceFiat: FiatValue.Empty,
                     Leverage: 1,
                     LiquidationPriceFiat: FiatValue.Empty,
                     IsLong: true,
                     UseExactPosition: false,
                     PositionSize: 0,
+                    ContractCount: 0,
+                    ContractSizeUsd: 0,
                     PlatformName: string.Empty,
                     CollateralSats: 0,
                     LoanAmountFiat: FiatValue.Empty,
@@ -326,12 +347,15 @@ public class AssetFormBuilder : IAssetFormBuilder
                     AcquisitionPriceFiat: FiatValue.New(dto.AcquisitionPrice ?? 0),
                     IsBitcoinUnderlyingAsset: false,
                     CollateralFiat: FiatValue.Empty,
+                    LeveragedCollateralBtc: 0,
                     EntryPriceFiat: FiatValue.Empty,
                     Leverage: 1,
                     LiquidationPriceFiat: FiatValue.Empty,
                     IsLong: true,
                     UseExactPosition: false,
                     PositionSize: 0,
+                    ContractCount: 0,
+                    ContractSizeUsd: 0,
                     PlatformName: string.Empty,
                     CollateralSats: 0,
                     LoanAmountFiat: FiatValue.Empty,
@@ -355,6 +379,7 @@ public class AssetFormBuilder : IAssetFormBuilder
             case AssetTypes.LeveragedPosition:
                 var symbol = dto.Symbol ?? string.Empty;
                 var priceSource = (AssetPriceSource)(dto.PriceSourceId ?? 0);
+                var isBtcCollateral = dto.CollateralAssetTypeId == (int)LeveragedPositionCollateralAssetType.Btc;
                 return new AssetFormValues(
                     Name: dto.Name,
                     SelectedAssetType: selectedAssetType,
@@ -370,14 +395,17 @@ public class AssetFormBuilder : IAssetFormBuilder
                     MonthlyRentalIncomeFiat: FiatValue.Empty,
                     AcquisitionDate: null,
                     AcquisitionPriceFiat: FiatValue.Empty,
-                    IsBitcoinUnderlyingAsset: priceSource == AssetPriceSource.LivePrice && symbol.StartsWith("BTC", StringComparison.OrdinalIgnoreCase),
-                    CollateralFiat: FiatValue.New(dto.Collateral ?? 0),
+                    IsBitcoinUnderlyingAsset: isBtcCollateral || (priceSource == AssetPriceSource.LivePrice && symbol.StartsWith("BTC", StringComparison.OrdinalIgnoreCase)),
+                    CollateralFiat: FiatValue.New(isBtcCollateral ? 0 : (dto.Collateral ?? 0)),
+                    LeveragedCollateralBtc: isBtcCollateral ? (dto.Collateral ?? 0) : 0,
                     EntryPriceFiat: FiatValue.New(dto.EntryPrice ?? 0),
                     Leverage: dto.Leverage ?? 1,
                     LiquidationPriceFiat: FiatValue.New(dto.LiquidationPrice ?? 0),
                     IsLong: dto.IsLong ?? true,
-                    UseExactPosition: (dto.InputModeId ?? 0) == 1,
+                    UseExactPosition: (dto.InputModeId ?? 0) == 1 && !isBtcCollateral,
                     PositionSize: dto.PositionSize ?? 0,
+                    ContractCount: dto.ContractCount ?? 0,
+                    ContractSizeUsd: dto.ContractSizeUsd ?? 0,
                     PlatformName: string.Empty,
                     CollateralSats: 0,
                     LoanAmountFiat: FiatValue.Empty,
@@ -425,12 +453,15 @@ public class AssetFormBuilder : IAssetFormBuilder
                     AcquisitionPriceFiat: FiatValue.Empty,
                     IsBitcoinUnderlyingAsset: false,
                     CollateralFiat: FiatValue.Empty,
+                    LeveragedCollateralBtc: 0,
                     EntryPriceFiat: FiatValue.Empty,
                     Leverage: 1,
                     LiquidationPriceFiat: FiatValue.Empty,
                     IsLong: true,
                     UseExactPosition: false,
                     PositionSize: 0,
+                    ContractCount: 0,
+                    ContractSizeUsd: 0,
                     PlatformName: dto.PlatformName ?? string.Empty,
                     CollateralSats: dto.CollateralSats ?? 0,
                     LoanAmountFiat: FiatValue.New(dto.LoanAmount ?? 0),
@@ -476,12 +507,15 @@ public class AssetFormBuilder : IAssetFormBuilder
                     AcquisitionPriceFiat: FiatValue.Empty,
                     IsBitcoinUnderlyingAsset: false,
                     CollateralFiat: FiatValue.Empty,
+                    LeveragedCollateralBtc: 0,
                     EntryPriceFiat: FiatValue.Empty,
                     Leverage: 1,
                     LiquidationPriceFiat: FiatValue.Empty,
                     IsLong: true,
                     UseExactPosition: false,
                     PositionSize: 0,
+                    ContractCount: 0,
+                    ContractSizeUsd: 0,
                     PlatformName: string.Empty,
                     CollateralSats: 0,
                     LoanAmountFiat: FiatValue.Empty,

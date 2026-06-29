@@ -17,18 +17,36 @@ internal sealed class CreateLeveragedPositionValidator : IValidator<CreateLevera
             builder.AddError(nameof(instance.Name), $"Position name cannot exceed {MaxNameLength} characters.");
 
         builder.AddErrorIfNullOrWhiteSpace(instance.CurrencyCode, nameof(instance.CurrencyCode), "Currency code is required.");
-
         builder.AddErrorIfNullOrWhiteSpace(instance.Symbol, nameof(instance.Symbol), "Symbol is required.");
 
-        if (instance.InputMode == 1)
+        var collateralAssetType = (LeveragedPositionCollateralAssetType)instance.CollateralAssetType;
+
+        if (collateralAssetType == LeveragedPositionCollateralAssetType.Btc)
         {
-            if (!instance.PositionSize.HasValue || instance.PositionSize.Value <= 0)
-                builder.AddError(nameof(instance.PositionSize), "Position size must be greater than zero.");
+            if (instance.Collateral <= 0)
+                builder.AddError(nameof(instance.Collateral), "Collateral BTC must be greater than zero.");
+
+            if (instance.ContractCount <= 0)
+                builder.AddError(nameof(instance.ContractCount), "Contract count must be greater than zero.");
+
+            if (instance.ContractSizeUsd <= 0)
+                builder.AddError(nameof(instance.ContractSizeUsd), "Contract size must be greater than zero.");
         }
         else
         {
-            if (instance.Collateral <= 0)
-                builder.AddError(nameof(instance.Collateral), "Collateral must be greater than zero.");
+            if (instance.InputMode == 1)
+            {
+                if (!instance.PositionSize.HasValue || instance.PositionSize.Value <= 0)
+                    builder.AddError(nameof(instance.PositionSize), "Position size must be greater than zero.");
+            }
+            else
+            {
+                if (instance.Collateral <= 0)
+                    builder.AddError(nameof(instance.Collateral), "Collateral must be greater than zero.");
+            }
+
+            if (instance.Leverage < 1)
+                builder.AddError(nameof(instance.Leverage), "Leverage must be at least 1.");
         }
 
         if (instance.EntryPrice <= 0)
@@ -36,9 +54,6 @@ internal sealed class CreateLeveragedPositionValidator : IValidator<CreateLevera
 
         if (instance.CurrentPrice <= 0)
             builder.AddError(nameof(instance.CurrentPrice), "Current price must be greater than zero.");
-
-        if (instance.Leverage < 1)
-            builder.AddError(nameof(instance.Leverage), "Leverage must be at least 1.");
 
         if (instance.LiquidationPrice <= 0)
             builder.AddError(nameof(instance.LiquidationPrice), "Liquidation price must be greater than zero.");

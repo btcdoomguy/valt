@@ -130,6 +130,11 @@ public partial class LeverageSimulatorViewModel : ValtModalViewModel
 
             foreach (var asset in leveraged)
             {
+                // Skip BTC-collateral positions in the simulator for now;
+                // the simulator's math is built around fiat-collateral positions.
+                if (asset.CollateralAssetTypeId == (int)LeveragedPositionCollateralAssetType.Btc)
+                    continue;
+
                 AvailablePositions.Add(new LeveragePositionItem
                 {
                     DisplayName = asset.Name,

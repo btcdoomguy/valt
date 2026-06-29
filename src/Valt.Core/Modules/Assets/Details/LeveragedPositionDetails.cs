@@ -1,24 +1,33 @@
 namespace Valt.Core.Modules.Assets.Details;
 
 /// <summary>
-/// Asset details for leveraged positions (e.g., futures, margin trading).
+/// Asset details for leveraged positions (e.g., futures, perpetuals, margin trading).
 /// </summary>
 public sealed class LeveragedPositionDetails : IAssetDetails
 {
     public AssetTypes AssetType => AssetTypes.LeveragedPosition;
 
     /// <summary>
-    /// The collateral amount (initial margin).
+    /// The type of asset used as collateral.
+    /// </summary>
+    public LeveragedPositionCollateralAssetType CollateralAssetType { get; }
+
+    /// <summary>
+    /// The collateral amount.
+    /// For Fiat collateral: the fiat amount (initial margin).
+    /// For BTC collateral: the BTC amount deposited.
     /// </summary>
     public decimal Collateral { get; }
 
     /// <summary>
-    /// The entry price when the position was opened.
+    /// The entry price when the position was opened (BTC price in the chosen fiat currency).
     /// </summary>
     public decimal EntryPrice { get; }
 
     /// <summary>
     /// The leverage multiplier (e.g., 2x, 5x, 10x).
+    /// For Fiat collateral this is provided by the user.
+    /// For BTC collateral this is derived from notional exposure / collateral.
     /// </summary>
     public decimal Leverage { get; }
 
@@ -54,14 +63,30 @@ public sealed class LeveragedPositionDetails : IAssetDetails
 
     /// <summary>
     /// The input mode used to define the position (Collateral or ExactPosition).
+    /// Only meaningful when collateral is Fiat.
     /// </summary>
     public LeveragedPositionInputMode InputMode { get; }
 
     /// <summary>
-    /// The position size in units of the underlying asset (e.g., 10 BTC).
-    /// Calculated as Collateral * Leverage / EntryPrice.
+    /// Number of contracts. Only used when collateral is BTC.
     /// </summary>
-    public decimal PositionSize => EntryPrice > 0 ? Collateral * Leverage / EntryPrice : 0;
+    public decimal ContractCount { get; }
+
+    /// <summary>
+    /// Contract size in USD. Only used when collateral is BTC.
+    /// </summary>
+    public decimal ContractSizeUsd { get; }
+
+    /// <summary>
+    /// The position size in units of the underlying asset.
+    /// For Fiat collateral: Collateral * Leverage / EntryPrice.
+    /// For BTC collateral: ContractCount * ContractSizeUsd / EntryPrice (notional BTC at entry).
+    /// </summary>
+    public decimal PositionSize => EntryPrice > 0
+        ? (CollateralAssetType == LeveragedPositionCollateralAssetType.Btc
+            ? ContractCount * ContractSizeUsd / EntryPrice
+            : Collateral * Leverage / EntryPrice)
+        : 0;
 
     public LeveragedPositionDetails(
         decimal collateral,
@@ -73,7 +98,10 @@ public sealed class LeveragedPositionDetails : IAssetDetails
         string? symbol = null,
         AssetPriceSource priceSource = AssetPriceSource.Manual,
         bool isLong = true,
-        LeveragedPositionInputMode inputMode = LeveragedPositionInputMode.Collateral)
+        LeveragedPositionInputMode inputMode = LeveragedPositionInputMode.Collateral,
+        LeveragedPositionCollateralAssetType collateralAssetType = LeveragedPositionCollateralAssetType.Fiat,
+        decimal contractCount = 0,
+        decimal contractSizeUsd = 0)
     {
         if (collateral <= 0)
             throw new ArgumentException("Collateral must be positive", nameof(collateral));
@@ -81,15 +109,12 @@ public sealed class LeveragedPositionDetails : IAssetDetails
         if (entryPrice <= 0)
             throw new ArgumentException("Entry price must be positive", nameof(entryPrice));
 
-        if (leverage < 1)
-            throw new ArgumentException("Leverage must be at least 1", nameof(leverage));
+        if (liquidationPrice <= 0)
+            throw new ArgumentException("Liquidation price must be positive", nameof(liquidationPrice));
 
-        if (liquidationPrice < 0)
-            throw new ArgumentException("Liquidation price cannot be negative", nameof(liquidationPrice));
-
+        CollateralAssetType = collateralAssetType;
         Collateral = collateral;
         EntryPrice = entryPrice;
-        Leverage = leverage;
         LiquidationPrice = liquidationPrice;
         CurrentPrice = currentPrice;
         CurrencyCode = currencyCode;
@@ -97,33 +122,97 @@ public sealed class LeveragedPositionDetails : IAssetDetails
         PriceSource = priceSource;
         IsLong = isLong;
         InputMode = inputMode;
+        ContractCount = contractCount;
+        ContractSizeUsd = contractSizeUsd;
+
+        if (collateralAssetType == LeveragedPositionCollateralAssetType.Fiat)
+        {
+            if (leverage < 1)
+                throw new ArgumentException("Leverage must be at least 1 for fiat collateral", nameof(leverage));
+
+            Leverage = leverage;
+        }
+        else
+        {
+            if (contractCount <= 0)
+                throw new ArgumentException("Contract count must be positive for BTC collateral", nameof(contractCount));
+
+            if (contractSizeUsd <= 0)
+                throw new ArgumentException("Contract size must be positive for BTC collateral", nameof(contractSizeUsd));
+
+            var notionalBtc = contractCount * contractSizeUsd / entryPrice;
+            Leverage = notionalBtc / collateral;
+        }
     }
 
     /// <summary>
     /// Calculates the current value of the leveraged position.
-    /// For long positions: Collateral * (1 + PriceChange * Leverage)
-    /// For short positions: Collateral * (1 - PriceChange * Leverage)
+    /// For Fiat collateral: Collateral * (1 ± PriceChange * Leverage)
+    /// For BTC collateral: (Collateral + PnL_Btc) * CurrentPrice
     /// </summary>
     public decimal CalculateCurrentValue(decimal currentPrice)
     {
+        if (CollateralAssetType == LeveragedPositionCollateralAssetType.Btc)
+            return CalculateBtcCurrentValue(currentPrice);
+
         if (EntryPrice == 0)
             return Collateral;
 
         var priceChange = (currentPrice - EntryPrice) / EntryPrice;
         var leveragedChange = priceChange * Leverage;
 
-        if (IsLong)
-            return Collateral * (1 + leveragedChange);
-        else
-            return Collateral * (1 - leveragedChange);
+        return IsLong
+            ? Collateral * (1 + leveragedChange)
+            : Collateral * (1 - leveragedChange);
+    }
+
+    private decimal CalculateBtcCurrentValue(decimal currentPrice)
+    {
+        if (currentPrice == 0)
+            return 0;
+
+        var pnlBtc = CalculateBtcPnL(currentPrice);
+        var totalBtc = Collateral + pnlBtc;
+        return totalBtc * currentPrice;
+    }
+
+    private decimal CalculateBtcPnL(decimal currentPrice)
+    {
+        if (EntryPrice == 0 || currentPrice == 0)
+            return 0;
+
+        var notionalBtcEntry = ContractCount * ContractSizeUsd / EntryPrice;
+        var notionalBtcCurrent = ContractCount * ContractSizeUsd / currentPrice;
+
+        return IsLong
+            ? notionalBtcEntry - notionalBtcCurrent
+            : notionalBtcCurrent - notionalBtcEntry;
     }
 
     /// <summary>
     /// Calculates the unrealized P&L.
+    /// For Fiat collateral: current value - collateral.
+    /// For BTC collateral: USD-denominated position P&L = price change * notional USD.
     /// </summary>
     public decimal CalculatePnL(decimal currentPrice)
     {
+        if (CollateralAssetType == LeveragedPositionCollateralAssetType.Btc)
+            return CalculateBtcPositionPnLUsd(currentPrice);
+
         return CalculateCurrentValue(currentPrice) - Collateral;
+    }
+
+    private decimal CalculateBtcPositionPnLUsd(decimal currentPrice)
+    {
+        if (EntryPrice == 0 || currentPrice == 0)
+            return 0;
+
+        var notionalUsd = ContractCount * ContractSizeUsd;
+        var priceChange = IsLong
+            ? (currentPrice - EntryPrice) / EntryPrice
+            : (EntryPrice - currentPrice) / EntryPrice;
+
+        return notionalUsd * priceChange;
     }
 
     /// <summary>
@@ -131,10 +220,14 @@ public sealed class LeveragedPositionDetails : IAssetDetails
     /// </summary>
     public decimal CalculatePnLPercentage(decimal currentPrice)
     {
-        if (Collateral == 0)
+        var costBasis = CollateralAssetType == LeveragedPositionCollateralAssetType.Btc
+            ? Collateral * EntryPrice
+            : Collateral;
+
+        if (costBasis == 0)
             return 0;
 
-        return Math.Round(CalculatePnL(currentPrice) / Collateral * 100, 2);
+        return Math.Round(CalculatePnL(currentPrice) / costBasis * 100, 2);
     }
 
     /// <summary>
@@ -172,7 +265,10 @@ public sealed class LeveragedPositionDetails : IAssetDetails
             Symbol,
             PriceSource,
             IsLong,
-            InputMode);
+            InputMode,
+            CollateralAssetType,
+            ContractCount,
+            ContractSizeUsd);
     }
 
     public LeveragedPositionDetails WithCollateral(decimal newCollateral)
@@ -187,6 +283,9 @@ public sealed class LeveragedPositionDetails : IAssetDetails
             Symbol,
             PriceSource,
             IsLong,
-            InputMode);
+            InputMode,
+            CollateralAssetType,
+            ContractCount,
+            ContractSizeUsd);
     }
 }

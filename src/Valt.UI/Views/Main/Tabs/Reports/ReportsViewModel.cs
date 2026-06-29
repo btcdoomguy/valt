@@ -20,6 +20,7 @@ using Valt.App.Modules.Assets.Queries.GetBtcLoansDashboard;
 using Valt.App.Modules.Assets.Queries.GetVisibleAssets;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
+using Valt.Core.Modules.Assets;
 using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Categories;
 using Valt.Infra.Crawlers.Indicators;
@@ -851,13 +852,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         if (!_customBtcPriceState.IsActive || !_customBtcPriceState.CustomBtcPriceUsd.HasValue)
             return position.PnL;
 
-        // Only recalculate for BTC positions
-        if (string.IsNullOrWhiteSpace(position.Symbol) ||
-            !position.Symbol.StartsWith("BTC", StringComparison.OrdinalIgnoreCase))
-            return position.PnL;
-
-        if (!position.Collateral.HasValue || !position.Leverage.HasValue ||
-            !position.EntryPrice.HasValue || position.EntryPrice.Value == 0)
+        if (!position.EntryPrice.HasValue || position.EntryPrice.Value == 0)
             return position.PnL;
 
         // Get simulated BTC price in position's currency
@@ -876,12 +871,31 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             return position.PnL;
         }
 
-        // Calculate P&L using leveraged position formula
+        var isLong = position.IsLong ?? true;
+
+        if (position.CollateralAssetTypeId == (int)LeveragedPositionCollateralAssetType.Btc)
+        {
+            if (!position.ContractCount.HasValue || !position.ContractSizeUsd.HasValue || !position.Collateral.HasValue)
+                return position.PnL;
+
+            var notionalBtcEntry = position.ContractCount.Value * position.ContractSizeUsd.Value / position.EntryPrice.Value;
+            var notionalBtcCurrent = position.ContractCount.Value * position.ContractSizeUsd.Value / simulatedPrice;
+            var pnlBtc = isLong
+                ? notionalBtcEntry - notionalBtcCurrent
+                : notionalBtcCurrent - notionalBtcEntry;
+            var totalBtc = position.Collateral.Value + pnlBtc;
+            return totalBtc * simulatedPrice - position.Collateral.Value * position.EntryPrice.Value;
+        }
+
+        // Legacy fiat-collateral calculation
+        if (!position.Collateral.HasValue || !position.Leverage.HasValue)
+            return position.PnL;
+
         var priceChange = (simulatedPrice - position.EntryPrice.Value) / position.EntryPrice.Value;
         var leveragedChange = priceChange * position.Leverage.Value;
 
         decimal currentValue;
-        if (position.IsLong.HasValue && position.IsLong.Value)
+        if (isLong)
             currentValue = position.Collateral.Value * (1 + leveragedChange);
         else
             currentValue = position.Collateral.Value * (1 - leveragedChange);
@@ -919,13 +933,27 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             decimal totalBtcExposure = 0;
             foreach (var position in leveragedPositions)
             {
-                if (!position.Collateral.HasValue || !position.Leverage.HasValue || !position.EntryPrice.HasValue || position.EntryPrice.Value == 0)
+                if (!position.EntryPrice.HasValue || position.EntryPrice.Value == 0)
                     continue;
 
-                // Notional value = Collateral * Leverage
-                var notionalValue = position.Collateral.Value * position.Leverage.Value;
-                // BTC exposure = Notional / Entry Price
-                var btcExposure = notionalValue / position.EntryPrice.Value;
+                decimal btcExposure;
+                if (position.CollateralAssetTypeId == (int)LeveragedPositionCollateralAssetType.Btc)
+                {
+                    if (!position.ContractCount.HasValue || !position.ContractSizeUsd.HasValue)
+                        continue;
+
+                    btcExposure = position.ContractCount.Value * position.ContractSizeUsd.Value / position.EntryPrice.Value;
+                }
+                else
+                {
+                    if (!position.Collateral.HasValue || !position.Leverage.HasValue)
+                        continue;
+
+                    // Notional value = Collateral * Leverage
+                    var notionalValue = position.Collateral.Value * position.Leverage.Value;
+                    // BTC exposure = Notional / Entry Price
+                    btcExposure = notionalValue / position.EntryPrice.Value;
+                }
 
                 // Apply direction: Long = positive, Short = negative
                 if (!position.IsLong!.Value)

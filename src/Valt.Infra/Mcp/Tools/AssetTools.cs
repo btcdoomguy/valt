@@ -187,7 +187,10 @@ public class AssetTools
         [Description("Visible in list")] bool visible = true,
         [Description("Icon identifier (optional)")] string? icon = null,
         [Description("Input mode: 0=Collateral (default), 1=ExactPosition (specify positionSize instead)")] int inputMode = 0,
-        [Description("Position size in underlying units (e.g., 0.2 BTC). Only used when inputMode=1")] decimal? positionSize = null)
+        [Description("Position size in underlying units (e.g., 0.2 BTC). Only used when inputMode=1")] decimal? positionSize = null,
+        [Description("Collateral asset type: 0=Fiat (default), 1=Btc")] int collateralAssetType = 0,
+        [Description("Number of contracts. Only used when collateralAssetType=1")] decimal contractCount = 0,
+        [Description("Contract size in USD. Only used when collateralAssetType=1")] decimal contractSizeUsd = 0)
     {
         var result = await commandDispatcher.DispatchAsync(new CreateLeveragedPositionCommand
         {
@@ -205,7 +208,10 @@ public class AssetTools
             Visible = visible,
             Icon = icon,
             InputMode = inputMode,
-            PositionSize = positionSize
+            PositionSize = positionSize,
+            CollateralAssetType = collateralAssetType,
+            ContractCount = contractCount,
+            ContractSizeUsd = contractSizeUsd
         });
 
         if (result.IsFailure)

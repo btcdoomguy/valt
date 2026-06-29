@@ -87,16 +87,6 @@ public class LeveragedPositionDetailsTests
             new LeveragedPositionDetails(1000m, 50000m, 10, -45000m, 55000m, "USD"));
     }
 
-    [Test]
-    public void Should_Allow_Zero_Liquidation_Price()
-    {
-        // Act
-        var details = new LeveragedPositionDetails(1000m, 50000m, 10, 0, 55000m, "USD");
-
-        // Assert
-        Assert.That(details.LiquidationPrice, Is.EqualTo(0));
-    }
-
     #endregion
 
     #region Value Calculation Tests
@@ -351,23 +341,14 @@ public class LeveragedPositionDetailsTests
     }
 
     [Test]
-    public void Should_Return_100_When_Liquidation_Price_Is_Zero()
+    public void Should_Require_Positive_Liquidation_Price()
     {
-        // Arrange
-        var details = new LeveragedPositionDetails(
-            collateral: 1000m,
-            entryPrice: 50000m,
-            leverage: 10m,
-            liquidationPrice: 0,
-            currentPrice: 50000m,
-            currencyCode: "USD",
-            isLong: true);
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() =>
+            new LeveragedPositionDetails(1000m, 50000m, 10, 0, 55000m, "USD"));
 
-        // Act
-        var distance = details.CalculateDistanceToLiquidation(50000m);
-
-        // Assert
-        Assert.That(distance, Is.EqualTo(100m));
+        Assert.Throws<ArgumentException>(() =>
+            new LeveragedPositionDetails(1000m, 50000m, 10, -45000m, 55000m, "USD"));
     }
 
     #endregion
@@ -592,6 +573,132 @@ public class LeveragedPositionDetailsTests
 
         // Assert
         Assert.That(details.PriceSource, Is.EqualTo(AssetPriceSource.LivePrice));
+    }
+
+    #endregion
+
+    #region BTC Collateral Tests
+
+    [Test]
+    public void Should_Create_Btc_Collateral_Position()
+    {
+        // Arrange - 1 BTC collateral, 100000 contracts of $10 each, entry at $100000
+        var details = new LeveragedPositionDetails(
+            collateral: 1m,
+            entryPrice: 100000m,
+            leverage: 0, // computed
+            liquidationPrice: 90000m,
+            currentPrice: 100000m,
+            currencyCode: "USD",
+            symbol: "BTC",
+            priceSource: AssetPriceSource.LivePrice,
+            isLong: true,
+            inputMode: LeveragedPositionInputMode.Collateral,
+            collateralAssetType: LeveragedPositionCollateralAssetType.Btc,
+            contractCount: 100000m,
+            contractSizeUsd: 10m);
+
+        // Assert
+        Assert.That(details.CollateralAssetType, Is.EqualTo(LeveragedPositionCollateralAssetType.Btc));
+        Assert.That(details.PositionSize, Is.EqualTo(10m)); // 100000 * 10 / 100000
+        Assert.That(details.Leverage, Is.EqualTo(10m)); // 10 / 1
+    }
+
+    [Test]
+    public void Should_Calculate_Btc_Collateral_Position_Value()
+    {
+        // Arrange - 10x long, BTC goes from 100k to 110k (+10%)
+        // Notional = 10 BTC at entry, 9.0909 BTC at 110k
+        // PnL BTC = 10 - 9.0909 = 0.9091 BTC
+        // Total BTC = 1 + 0.9091 = 1.9091 BTC
+        // Value = 1.9091 * 110000 = 210000
+        var details = new LeveragedPositionDetails(
+            collateral: 1m,
+            entryPrice: 100000m,
+            leverage: 0,
+            liquidationPrice: 90000m,
+            currentPrice: 110000m,
+            currencyCode: "USD",
+            isLong: true,
+            collateralAssetType: LeveragedPositionCollateralAssetType.Btc,
+            contractCount: 100000m,
+            contractSizeUsd: 10m);
+
+        // Act
+        var value = details.CalculateCurrentValue(110000m);
+
+        // Assert
+        Assert.That(value, Is.EqualTo(210000m).Within(0.01m));
+    }
+
+    [Test]
+    public void Should_Calculate_Btc_Collateral_Position_PnL()
+    {
+        // Arrange - 10x long, notional USD = 1,000,000, BTC goes from 100k to 110k (+10%)
+        // Position P&L = 1,000,000 * 0.10 = 100,000
+        var details = new LeveragedPositionDetails(
+            collateral: 1m,
+            entryPrice: 100000m,
+            leverage: 0,
+            liquidationPrice: 90000m,
+            currentPrice: 110000m,
+            currencyCode: "USD",
+            isLong: true,
+            collateralAssetType: LeveragedPositionCollateralAssetType.Btc,
+            contractCount: 100000m,
+            contractSizeUsd: 10m);
+
+        // Act
+        var pnl = details.CalculatePnL(110000m);
+
+        // Assert
+        Assert.That(pnl, Is.EqualTo(100000m).Within(0.01m));
+    }
+
+    [Test]
+    public void Should_Calculate_Btc_Collateral_Short_Position_PnL()
+    {
+        // Arrange - 10x short, notional USD = 1,000,000, BTC goes from 100k to 90k (-10%)
+        // Position P&L = 1,000,000 * 0.10 = 100,000
+        var details = new LeveragedPositionDetails(
+            collateral: 1m,
+            entryPrice: 100000m,
+            leverage: 0,
+            liquidationPrice: 110000m,
+            currentPrice: 90000m,
+            currencyCode: "USD",
+            isLong: false,
+            collateralAssetType: LeveragedPositionCollateralAssetType.Btc,
+            contractCount: 100000m,
+            contractSizeUsd: 10m);
+
+        // Act
+        var pnl = details.CalculatePnL(90000m);
+
+        // Assert
+        Assert.That(pnl, Is.EqualTo(100000m).Within(0.01m));
+    }
+
+    [Test]
+    public void Should_Validate_Btc_Collateral_Requires_ContractCount()
+    {
+        Assert.Throws<ArgumentException>(() =>
+            new LeveragedPositionDetails(
+                1m, 100000m, 0, 90000m, 100000m, "USD",
+                collateralAssetType: LeveragedPositionCollateralAssetType.Btc,
+                contractCount: 0,
+                contractSizeUsd: 10m));
+    }
+
+    [Test]
+    public void Should_Validate_Btc_Collateral_Requires_ContractSize()
+    {
+        Assert.Throws<ArgumentException>(() =>
+            new LeveragedPositionDetails(
+                1m, 100000m, 0, 90000m, 100000m, "USD",
+                collateralAssetType: LeveragedPositionCollateralAssetType.Btc,
+                contractCount: 100000m,
+                contractSizeUsd: 0m));
     }
 
     #endregion

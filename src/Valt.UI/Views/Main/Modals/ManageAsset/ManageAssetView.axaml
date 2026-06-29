@@ -267,7 +267,8 @@
                                     </StackPanel>
                                 </StackPanel>
 
-                                <StackPanel Classes="form-field">
+                                <StackPanel Classes="form-field"
+                                            IsVisible="{Binding ShowLeveragedInputModeRow}">
                                     <TextBlock Text="{x:Static local:language.ManageAsset_InputMode}" />
                                     <StackPanel Orientation="Horizontal" Spacing="20">
                                         <RadioButton Content="{x:Static local:language.ManageAsset_Collateral}"
@@ -281,7 +282,8 @@
                                     </StackPanel>
                                 </StackPanel>
 
-                                <Grid ColumnDefinitions="250, 20, 250">
+                                <Grid ColumnDefinitions="250, 20, 250"
+                                      IsVisible="{Binding ShowLeveragedCollateralFiatRow}">
                                     <StackPanel Grid.Column="0" Classes="form-field"
                                                 IsVisible="{Binding IsCollateralMode}">
                                         <TextBlock Text="{x:Static local:language.ManageAsset_Collateral}" />
@@ -298,6 +300,34 @@
                                     <StackPanel Grid.Column="2" Classes="form-field">
                                         <TextBlock Text="{x:Static local:language.ManageAsset_Leverage}" />
                                         <TextBox Text="{Binding Leverage}" Width="250" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="250, 20, 250"
+                                      IsVisible="{Binding ShowLeveragedCollateralBtcRow}">
+                                    <StackPanel Grid.Column="0" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_ContractCount}" />
+                                        <TextBox Text="{Binding ContractCount}" Width="250" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_ContractSizeUsd}" />
+                                        <TextBox Text="{Binding ContractSizeUsd}" Width="250" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="250, 20, 250"
+                                      IsVisible="{Binding ShowLeveragedCollateralBtcRow}">
+                                    <StackPanel Grid.Column="0" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_CollateralBtc}" />
+                                        <userControls:BtcInput BtcValue="{Binding LeveragedCollateralBtc, Mode=TwoWay}"
+                                                               IsBitcoin="True"
+                                                               Width="250" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Classes="form-field">
+                                        <TextBlock Text="{x:Static local:language.ManageAsset_DerivedLeverage}" />
+                                        <TextBlock Text="{Binding DerivedLeverageDisplay}"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="{DynamicResource FontSizeBody}" />
                                     </StackPanel>
                                 </Grid>
 
