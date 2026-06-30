@@ -155,8 +155,9 @@ internal sealed class AssetQueries : IAssetQueries
     /// <summary>
     /// Gets the value to use for portfolio summary calculations.
     /// For leveraged positions, returns only the P&amp;L (not the full position value).
-    /// For BTC-collateral leveraged positions, returns the full position value because
-    /// the collateral is part of the position itself.
+    /// For LONG BTC-collateral leveraged positions, returns only the P&amp;L so the BTC
+    /// collateral is not counted twice (it is already tracked as BTC holdings).
+    /// For SHORT BTC-collateral leveraged positions, returns the full position value.
     /// For BTC loans, returns -TotalDebt (pure liability, collateral tracked separately).
     /// For BTC lending, returns amount lent + earned interest.
     /// For other assets, returns the current value.
@@ -166,7 +167,9 @@ internal sealed class AssetQueries : IAssetQueries
         return asset.Details switch
         {
             LeveragedPositionDetails leveraged => leveraged.CollateralAssetType == LeveragedPositionCollateralAssetType.Btc
-                ? leveraged.CalculateCurrentValue(leveraged.CurrentPrice)
+                ? leveraged.IsLong
+                    ? leveraged.CalculatePnL(leveraged.CurrentPrice)
+                    : leveraged.CalculateCurrentValue(leveraged.CurrentPrice)
                 : leveraged.CalculatePnL(leveraged.CurrentPrice),
             BtcLoanDetails btcLoan => btcLoan.CalculateCurrentValue(btcLoan.CurrentBtcPriceInLoanCurrency),
             BtcLendingDetails btcLending => btcLending.CalculateCurrentValue(0),
