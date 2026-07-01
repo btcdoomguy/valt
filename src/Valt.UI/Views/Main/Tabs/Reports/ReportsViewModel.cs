@@ -80,6 +80,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly WealthPanelViewModel _wealthPanel;
     private readonly BtcStackPanelViewModel _btcStackPanel;
     private readonly SimulatedPricesPanelViewModel _simulatedPricesPanel;
+    private readonly ILeveragePositionsPanelViewModel _leveragePanel;
+    private readonly IBtcLoansPanelViewModel _btcLoansPanel;
 
     // Cached provider for the lifetime of the tab being active
     private IReportDataProvider? _cachedProvider;
@@ -172,7 +174,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         IndicatorsPanelViewModel indicatorsPanel,
         WealthPanelViewModel wealthPanel,
         BtcStackPanelViewModel btcStackPanel,
-        SimulatedPricesPanelViewModel simulatedPricesPanel)
+        SimulatedPricesPanelViewModel simulatedPricesPanel,
+        ILeveragePositionsPanelViewModel leveragePanel,
+        IBtcLoansPanelViewModel btcLoansPanel)
     {
         _allTimeHighReport = allTimeHighReport;
         _maxBtcStackReport = maxBtcStackReport;
@@ -199,11 +203,15 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _wealthPanel = wealthPanel;
         _btcStackPanel = btcStackPanel;
         _simulatedPricesPanel = simulatedPricesPanel;
+        _leveragePanel = leveragePanel;
+        _btcLoansPanel = btcLoansPanel;
 
         _wealthPanel.PropertyChanged += OnWealthPanelPropertyChanged;
         _btcStackPanel.PropertyChanged += OnBtcStackPanelPropertyChanged;
         _simulatedPricesPanel.PropertyChanged += OnSimulatedPricesPanelPropertyChanged;
         _indicatorsPanel.PropertyChanged += OnIndicatorsPanelPropertyChanged;
+        ((INotifyPropertyChanged)_leveragePanel).PropertyChanged += OnLeveragePanelPropertyChanged;
+        ((INotifyPropertyChanged)_btcLoansPanel).PropertyChanged += OnBtcLoansPanelPropertyChanged;
 
         SimulateButtonText = language.Reports_SimulateButton;
         UpdateCurrentBtcPriceFormatted();
@@ -236,7 +244,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     // Reload data when currency changes
                     ReloadDataAndFetchAllReportsAsync().FireAndForgetSafeAsync(_runner, _logger);
                     _simulatedPricesPanel.Refresh();
-                    UpdateBtcLoansDataAsync().FireAndForgetSafeAsync(_runner, _logger);
+                    _btcLoansPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
                     break;
             }
         });
@@ -246,8 +254,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         WeakReferenceMessenger.Default.Register<AssetSummaryUpdatedMessage>(this, (recipient, message) =>
         {
-            UpdateLeveragePositionsDataAsync().FireAndForgetSafeAsync(_runner, _logger);
-            UpdateBtcLoansDataAsync().FireAndForgetSafeAsync(_runner, _logger);
+            _leveragePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+            _btcLoansPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
         });
 
         WeakReferenceMessenger.Default.Register<IndicatorsUpdatedMessage>(this, (recipient, message) =>
@@ -275,8 +283,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
 
         LoadDataAndFetchAllReportsAsync()
-            .ContinueWith(_ => UpdateLeveragePositionsDataAsync(), TaskScheduler.Default)
-            .ContinueWith(_ => UpdateBtcLoansDataAsync(), TaskScheduler.Default)
+            .ContinueWith(_ => _leveragePanel.RefreshAsync(), TaskScheduler.Default)
+            .ContinueWith(_ => _btcLoansPanel.RefreshAsync(), TaskScheduler.Default)
             .FireAndForgetSafeAsync(_runner, _logger);
         _wealthPanel.Refresh();
         _btcStackPanel.Refresh();
@@ -581,6 +589,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             {
                 var targetAthValue = allTimeHighData.Value.Value;
                 _allTimeHighFiatValue = targetAthValue;
+                _leveragePanel.AllTimeHighFiatValue = _allTimeHighFiatValue;
                 var requiredBtcPriceValue = targetAthValue - currentFiat;
 
                 if (requiredBtcPriceValue > 0)
@@ -800,8 +809,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _wealthPanel.Refresh();
         _btcStackPanel.Refresh();
         _simulatedPricesPanel.Refresh();
-        UpdateLeveragePositionsDataAsync().FireAndForgetSafeAsync(_runner, _logger);
-        UpdateBtcLoansDataAsync().FireAndForgetSafeAsync(_runner, _logger);
+        _leveragePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+        _btcLoansPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
     }
 
     private decimal GetCurrentBtcPriceInMainFiat()
@@ -840,332 +849,6 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private async Task FetchMaxBtcStackDataAsync(IReportDataProvider provider)
     {
         await _btcStackPanel.FetchMaxBtcStackAsync(provider);
-    }
-
-    /// <summary>
-    /// Calculates the simulated P&L for a leveraged position when BTC price is simulated.
-    /// Only recalculates if the position is a BTC position (Symbol starts with "BTC").
-    /// </summary>
-    private decimal? CalculateSimulatedLeveragedPnl(AssetDTO position, IReadOnlyDictionary<string, decimal> fiatRates)
-    {
-        // If no custom price is active, return the stored P&L
-        if (!_customBtcPriceState.IsActive || !_customBtcPriceState.CustomBtcPriceUsd.HasValue)
-            return position.PnL;
-
-        if (!position.EntryPrice.HasValue || position.EntryPrice.Value == 0)
-            return position.PnL;
-
-        // Get simulated BTC price in position's currency
-        var simulatedPriceUsd = _customBtcPriceState.CustomBtcPriceUsd.Value;
-        decimal simulatedPrice;
-        if (position.CurrencyCode == FiatCurrency.Usd.Code)
-        {
-            simulatedPrice = simulatedPriceUsd;
-        }
-        else if (fiatRates.TryGetValue(position.CurrencyCode, out var rate))
-        {
-            simulatedPrice = simulatedPriceUsd * rate;
-        }
-        else
-        {
-            return position.PnL;
-        }
-
-        var isLong = position.IsLong ?? true;
-
-        if (position.CollateralAssetTypeId == (int)LeveragedPositionCollateralAssetType.Btc)
-        {
-            if (!position.ContractCount.HasValue || !position.ContractSizeUsd.HasValue || !position.Collateral.HasValue)
-                return position.PnL;
-
-            var notionalBtcEntry = position.ContractCount.Value * position.ContractSizeUsd.Value / position.EntryPrice.Value;
-            var notionalBtcCurrent = position.ContractCount.Value * position.ContractSizeUsd.Value / simulatedPrice;
-            var pnlBtc = isLong
-                ? notionalBtcEntry - notionalBtcCurrent
-                : notionalBtcCurrent - notionalBtcEntry;
-            var totalBtc = position.Collateral.Value + pnlBtc;
-            return totalBtc * simulatedPrice - position.Collateral.Value * position.EntryPrice.Value;
-        }
-
-        // Legacy fiat-collateral calculation
-        if (!position.Collateral.HasValue || !position.Leverage.HasValue)
-            return position.PnL;
-
-        var priceChange = (simulatedPrice - position.EntryPrice.Value) / position.EntryPrice.Value;
-        var leveragedChange = priceChange * position.Leverage.Value;
-
-        decimal currentValue;
-        if (isLong)
-            currentValue = position.Collateral.Value * (1 + leveragedChange);
-        else
-            currentValue = position.Collateral.Value * (1 - leveragedChange);
-
-        return currentValue - position.Collateral.Value;
-    }
-
-    private async Task UpdateLeveragePositionsDataAsync()
-    {
-        try
-        {
-            IsLeveragePositionsLoading = true;
-
-            var assets = await _queryDispatcher.DispatchAsync(new GetVisibleAssetsQuery());
-
-            // Filter to leveraged positions that are visible and included in net worth
-            var leveragedPositions = assets
-                .Where(a => a.IsLong.HasValue && a.IncludeInNetWorth && a.Visible)
-                .ToList();
-
-            if (leveragedPositions.Count == 0)
-            {
-                await Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    IsLeveragePositionsVisible = false;
-                    IsLeveragePositionsLoading = false;
-                });
-                return;
-            }
-
-            var wealth = _accountsTotalState.CurrentWealth;
-            var btcSpotSats = wealth.WealthInSats;
-
-            // Calculate BTC exposure from leveraged positions
-            decimal totalBtcExposure = 0;
-            foreach (var position in leveragedPositions)
-            {
-                if (!position.EntryPrice.HasValue || position.EntryPrice.Value == 0)
-                    continue;
-
-                decimal btcExposure;
-                if (position.CollateralAssetTypeId == (int)LeveragedPositionCollateralAssetType.Btc)
-                {
-                    if (!position.ContractCount.HasValue || !position.ContractSizeUsd.HasValue)
-                        continue;
-
-                    btcExposure = position.ContractCount.Value * position.ContractSizeUsd.Value / position.EntryPrice.Value;
-                }
-                else
-                {
-                    if (!position.Collateral.HasValue || !position.Leverage.HasValue)
-                        continue;
-
-                    // Notional value = Collateral * Leverage
-                    var notionalValue = position.Collateral.Value * position.Leverage.Value;
-                    // BTC exposure = Notional / Entry Price
-                    btcExposure = notionalValue / position.EntryPrice.Value;
-                }
-
-                // Apply direction: Long = positive, Short = negative
-                if (!position.IsLong!.Value)
-                    btcExposure = -btcExposure;
-
-                totalBtcExposure += btcExposure;
-            }
-
-            // Convert BTC exposure to sats
-            var exposureSats = (long)(totalBtcExposure * 100_000_000m);
-
-            // Leveraged stack = BTC spot + exposure from leverage
-            var leveragedStackSats = btcSpotSats + exposureSats;
-
-            // Calculate leverage percentage: |exposure| / |leveraged stack| * 100
-            decimal leveragePercentage = 0;
-            if (leveragedStackSats != 0)
-            {
-                leveragePercentage = Math.Abs(totalBtcExposure) / Math.Abs(leveragedStackSats / 100_000_000m) * 100m;
-            }
-
-            // Calculate total P&L in main fiat currency
-            var fiatRates = _ratesState.FiatRates;
-            var btcPrice = _ratesState.BitcoinPrice;
-            var mainCurrency = _currencySettings.MainFiatCurrency;
-            decimal totalPnlInMainFiat = 0;
-
-            if (fiatRates != null && btcPrice.HasValue)
-            {
-                foreach (var position in leveragedPositions)
-                {
-                    var pnl = CalculateSimulatedLeveragedPnl(position, fiatRates);
-                    if (!pnl.HasValue) continue;
-                    var currency = position.CurrencyCode;
-
-                    if (currency == mainCurrency)
-                        totalPnlInMainFiat += pnl.Value;
-                    else if (currency == FiatCurrency.Usd.Code)
-                        totalPnlInMainFiat += pnl.Value * fiatRates[mainCurrency];
-                    else if (fiatRates.ContainsKey(currency))
-                        totalPnlInMainFiat += (pnl.Value / fiatRates[currency]) * fiatRates[mainCurrency];
-                }
-            }
-            totalPnlInMainFiat = Math.Round(totalPnlInMainFiat, 2);
-
-            // Calculate P&L in BTC (sats)
-            long pnlInSats = 0;
-            if (fiatRates != null && btcPrice.HasValue && fiatRates.ContainsKey(mainCurrency))
-            {
-                var mainFiatRate = fiatRates[mainCurrency];
-                pnlInSats = BtcPriceCalculator.CalculateBtcAmountOfFiat(
-                    totalPnlInMainFiat, mainFiatRate, btcPrice.Value);
-            }
-
-            // Calculate BTC price to hit ATH using leveraged stack
-            decimal? requiredBtcPriceLeveraged = null;
-            if (_allTimeHighFiatValue.HasValue)
-            {
-                var currentFiat = wealth.WealthInMainFiatCurrency;
-                var leveragedStackBtc = leveragedStackSats / 100_000_000m;
-                if (leveragedStackBtc > 0)
-                {
-                    var requiredFiatDiff = _allTimeHighFiatValue.Value - currentFiat;
-                    if (requiredFiatDiff > 0)
-                        requiredBtcPriceLeveraged = requiredFiatDiff / leveragedStackBtc;
-                }
-            }
-
-            var fiatCurrency = FiatCurrency.GetFromCode(mainCurrency);
-            var leveragedStackFormatted = CurrencyDisplay.FormatSatsAsBitcoin(leveragedStackSats) + " BTC";
-            var exposureFormatted = (totalBtcExposure >= 0 ? "+" : "") + totalBtcExposure.ToString("0.########") + " BTC";
-            var leveragePercentFormatted = leveragePercentage.ToString("0.##") + "%";
-            var positionCountFormatted = leveragedPositions.Count.ToString();
-            var pnlFiatFormatted = (totalPnlInMainFiat >= 0 ? "+" : "")
-                + CurrencyDisplay.FormatFiat(totalPnlInMainFiat, fiatCurrency.Code);
-            var pnlBtcFormatted = (pnlInSats >= 0 ? "+" : "")
-                + CurrencyDisplay.FormatSatsAsBitcoin(pnlInSats) + " BTC";
-
-            await Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                var rows = new ObservableCollection<RowItem>
-                {
-                    new(language.Reports_LeveragePositions_LeveragedStack, leveragedStackFormatted, TooltipContent.Text(language.Reports_LeveragePositions_LeveragedStack_Tooltip)),
-                    new(language.Reports_LeveragePositions_LeverageExposure, exposureFormatted),
-                    new(language.Reports_LeveragePositions_LeveragePercentage, leveragePercentFormatted, TooltipContent.Text(language.Reports_LeveragePositions_LeveragePercentage_Tooltip)),
-                    new(language.Reports_LeveragePositions_PositionCount, positionCountFormatted),
-                    new(language.Reports_LeveragePositions_CurrentResult, pnlFiatFormatted),
-                    new(language.Reports_LeveragePositions_CurrentResultBtc, pnlBtcFormatted)
-                };
-
-                if (requiredBtcPriceLeveraged.HasValue)
-                    rows.Add(new RowItem(language.Reports_LeveragePositions_BtcPriceToHitAth,
-                        CurrencyDisplay.FormatFiat(requiredBtcPriceLeveraged.Value, fiatCurrency.Code)));
-
-                LeveragePositionsData = new DashboardData(language.Reports_LeveragePositions_Title, rows, Icon: "\uEA0B");
-                IsLeveragePositionsVisible = true;
-                IsLeveragePositionsLoading = false;
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating leverage positions data");
-            await Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                IsLeveragePositionsVisible = false;
-                IsLeveragePositionsLoading = false;
-            });
-        }
-    }
-
-    private async Task UpdateBtcLoansDataAsync()
-    {
-        try
-        {
-            IsBtcLoansLoading = true;
-
-            var fiatRates = _ratesState.FiatRates;
-            var btcPrice = _ratesState.BitcoinPrice;
-            var mainCurrency = _currencySettings.MainFiatCurrency;
-            var stackSats = _accountsTotalState.CurrentWealth.WealthInSats;
-
-            if (fiatRates is null || !btcPrice.HasValue)
-            {
-                await Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    IsBtcLoansVisible = false;
-                    IsBtcLoansLoading = false;
-                });
-                return;
-            }
-
-            var dto = await _queryDispatcher.DispatchAsync(new GetBtcLoansDashboardQuery
-            {
-                MainCurrencyCode = mainCurrency,
-                BtcPriceUsd = btcPrice,
-                CustomBtcPriceUsd = _customBtcPriceState.CustomBtcPriceUsd,
-                FiatRates = fiatRates,
-                TotalBtcStackSats = stackSats
-            });
-
-            if (!dto.HasActiveLoans)
-            {
-                await Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    IsBtcLoansVisible = false;
-                    IsBtcLoansLoading = false;
-                });
-                return;
-            }
-
-            var fiatCurrency = FiatCurrency.GetFromCode(mainCurrency);
-
-            await Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                var rows = new ObservableCollection<RowItem>
-                {
-                    new(language.Reports_BtcLoans_ActiveLoans, dto.ActiveLoansCount.ToString(CultureInfo.InvariantCulture)),
-                    new(language.Reports_BtcLoans_TotalDebt, CurrencyDisplay.FormatFiat(dto.TotalDebtInMainCurrency, fiatCurrency.Code)),
-                    new(language.Reports_BtcLoans_TotalDebtBtc, CurrencyDisplay.FormatAsBitcoin(dto.TotalDebtInBtc) + " BTC"),
-                    new(language.Reports_BtcLoans_TotalBorrowed, CurrencyDisplay.FormatFiat(dto.TotalBorrowedInMainCurrency, fiatCurrency.Code)),
-                    new(language.Reports_BtcLoans_AvgLtv, dto.DebtWeightedAvgLtv.ToString("0.##", CultureInfo.InvariantCulture) + "%",
-                        TooltipContent.Text(language.Reports_BtcLoans_AvgLtv_Tooltip)),
-                    new(language.Reports_BtcLoans_AvgApr, dto.DebtWeightedAvgApr.ToString("0.##", CultureInfo.InvariantCulture) + "%",
-                        TooltipContent.Text(language.Reports_BtcLoans_AvgApr_Tooltip)),
-                    RowItem.Separator(),
-                    new(language.Reports_BtcLoans_CollateralFiat, CurrencyDisplay.FormatFiat(dto.TotalCollateralFiatInMainCurrency, fiatCurrency.Code)),
-                    new(language.Reports_BtcLoans_CollateralSats, CurrencyDisplay.FormatSatsAsBitcoin(dto.TotalCollateralSats) + " BTC"),
-                    new(language.Reports_BtcLoans_CollateralPercent,
-                        dto.CollateralPercentOfStack.ToString("0.##", CultureInfo.InvariantCulture) + "%",
-                        TooltipContent.Text(language.Reports_BtcLoans_CollateralPercent_Tooltip)),
-                    new(language.Reports_BtcLoans_FreeBtc, CurrencyDisplay.FormatSatsAsBitcoin(dto.FreeBtcSats) + " BTC"),
-                    RowItem.Separator(),
-                    new(language.Reports_BtcLoans_HealthBreakdown,
-                        string.Format(CultureInfo.InvariantCulture, language.Reports_BtcLoans_HealthBreakdown_Format,
-                            dto.HealthyCount, dto.WarningCount, dto.DangerCount)),
-                    new(language.Reports_BtcLoans_HighestLtv, dto.HighestLtv.ToString("0.##", CultureInfo.InvariantCulture) + "%"),
-                    new(language.Reports_BtcLoans_ClosestDistance,
-                        dto.ClosestDistanceToLiquidationLtv.ToString("0.##", CultureInfo.InvariantCulture) + "%",
-                        TooltipContent.Text(string.Format(CultureInfo.InvariantCulture, language.Reports_BtcLoans_ClosestDistance_Tooltip, dto.ClosestLoanName))),
-                    new(language.Reports_BtcLoans_WorstCaseLiquidationPrice,
-                        CurrencyDisplay.FormatFiat(dto.WorstCaseLiquidationBtcPriceUsd, FiatCurrency.Usd.Code),
-                        TooltipContent.Text(language.Reports_BtcLoans_WorstCaseLiquidationPrice_Tooltip)),
-                    RowItem.Separator(),
-                    new(language.Reports_BtcLoans_AccruedInterest, CurrencyDisplay.FormatFiat(dto.TotalAccruedInterestInMainCurrency, fiatCurrency.Code)),
-                    new(language.Reports_BtcLoans_FeesPaid, CurrencyDisplay.FormatFiat(dto.TotalFeesPaidInMainCurrency, fiatCurrency.Code)),
-                    RowItem.Separator(),
-                    new(language.Reports_BtcLoans_AvgLoanAge,
-                        string.Format(CultureInfo.InvariantCulture, language.Reports_BtcLoans_DaysFormat, (int)Math.Round(dto.AverageLoanAgeDays)))
-                };
-
-                if (dto.NextRepaymentDate.HasValue)
-                {
-                    var daysText = string.Format(CultureInfo.InvariantCulture, language.Reports_BtcLoans_DaysFormat, dto.DaysUntilNextRepayment ?? 0);
-                    rows.Add(new RowItem(language.Reports_BtcLoans_NextRepayment,
-                        $"{dto.NextRepaymentDate.Value} ({daysText})",
-                        TooltipContent.Text(string.Format(CultureInfo.InvariantCulture, language.Reports_BtcLoans_NextRepayment_Tooltip, dto.NextRepaymentLoanName))));
-                }
-
-                BtcLoansData = new DashboardData(language.Reports_BtcLoans_Title, rows, Icon: "\uE227");
-                IsBtcLoansVisible = true;
-                IsBtcLoansLoading = false;
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating BTC loans data");
-            await Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                IsBtcLoansVisible = false;
-                IsBtcLoansLoading = false;
-            });
-        }
     }
 
     private async Task FetchExpensesByCategoryAsync(IReportDataProvider provider)
@@ -1323,8 +1006,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             Dispatcher.UIThread.Post(_wealthPanel.Refresh);
             Dispatcher.UIThread.Post(_btcStackPanel.Refresh);
             Dispatcher.UIThread.Post(_simulatedPricesPanel.Refresh);
-            UpdateLeveragePositionsDataAsync().FireAndForgetSafeAsync(_runner, _logger);
-            UpdateBtcLoansDataAsync().FireAndForgetSafeAsync(_runner, _logger);
+            _leveragePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+            _btcLoansPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
         }
     }
 
@@ -1375,6 +1058,28 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             IsIndicatorsLoading = _indicatorsPanel.IsLoading;
     }
 
+    private void OnLeveragePanelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        var panel = (DashboardPanelViewModel)_leveragePanel;
+        if (e.PropertyName == nameof(DashboardPanelViewModel.Data))
+            LeveragePositionsData = panel.Data;
+        else if (e.PropertyName == nameof(DashboardPanelViewModel.IsLoading))
+            IsLeveragePositionsLoading = panel.IsLoading;
+        else if (e.PropertyName == nameof(DashboardPanelViewModel.IsVisible))
+            IsLeveragePositionsVisible = panel.IsVisible;
+    }
+
+    private void OnBtcLoansPanelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        var panel = (DashboardPanelViewModel)_btcLoansPanel;
+        if (e.PropertyName == nameof(DashboardPanelViewModel.Data))
+            BtcLoansData = panel.Data;
+        else if (e.PropertyName == nameof(DashboardPanelViewModel.IsLoading))
+            IsBtcLoansLoading = panel.IsLoading;
+        else if (e.PropertyName == nameof(DashboardPanelViewModel.IsVisible))
+            IsBtcLoansVisible = panel.IsVisible;
+    }
+
     #endregion
 
     private void UpdateIndicatorsData(IndicatorSnapshot snapshot)
@@ -1398,6 +1103,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _btcStackPanel.PropertyChanged -= OnBtcStackPanelPropertyChanged;
         _simulatedPricesPanel.PropertyChanged -= OnSimulatedPricesPanelPropertyChanged;
         _indicatorsPanel.PropertyChanged -= OnIndicatorsPanelPropertyChanged;
+        ((INotifyPropertyChanged)_leveragePanel).PropertyChanged -= OnLeveragePanelPropertyChanged;
+        ((INotifyPropertyChanged)_btcLoansPanel).PropertyChanged -= OnBtcLoansPanelPropertyChanged;
 
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
         WeakReferenceMessenger.Default.Unregister<AssetSummaryUpdatedMessage>(this);
