@@ -52,6 +52,8 @@ public class ReportsViewModelTests
     private BtcStackPanelViewModel _btcStackPanel = null!;
     private SimulatedPricesPanelViewModel _simulatedPricesPanel = null!;
     private ILogger<ReportsViewModel> _logger = null!;
+    private ILeveragePositionsPanelViewModel _leveragePanel = null!;
+    private IBtcLoansPanelViewModel _btcLoansPanel = null!;
     private IAllTimeHighReport _allTimeHighReport = null!;
     private IMaxBtcStackReport _maxBtcStackReport = null!;
     private IMonthlyTotalsReport _monthlyTotalsReport = null!;
@@ -107,6 +109,9 @@ public class ReportsViewModelTests
         _simulatedPricesLogger = Substitute.For<ILogger<SimulatedPricesPanelViewModel>>();
         _simulatedPricesPanel = Substitute.For<SimulatedPricesPanelViewModel>(
             _configurationManager, _accountsTotalState, _ratesState, _currencySettings, _simulatedPricesLogger);
+
+        _leveragePanel = Substitute.For<ILeveragePositionsPanelViewModel>();
+        _btcLoansPanel = Substitute.For<IBtcLoansPanelViewModel>();
 
         _logger = Substitute.For<ILogger<ReportsViewModel>>();
         _allTimeHighReport = Substitute.For<IAllTimeHighReport>();
@@ -188,7 +193,9 @@ public class ReportsViewModelTests
             _indicatorsPanel,
             _wealthPanel,
             _btcStackPanel,
-            _simulatedPricesPanel);
+            _simulatedPricesPanel,
+            _leveragePanel,
+            _btcLoansPanel);
     }
 
     [Test]

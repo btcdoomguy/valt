@@ -210,8 +210,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _btcStackPanel.PropertyChanged += OnBtcStackPanelPropertyChanged;
         _simulatedPricesPanel.PropertyChanged += OnSimulatedPricesPanelPropertyChanged;
         _indicatorsPanel.PropertyChanged += OnIndicatorsPanelPropertyChanged;
-        ((INotifyPropertyChanged)_leveragePanel).PropertyChanged += OnLeveragePanelPropertyChanged;
-        ((INotifyPropertyChanged)_btcLoansPanel).PropertyChanged += OnBtcLoansPanelPropertyChanged;
+        _leveragePanel.PropertyChanged += OnLeveragePanelPropertyChanged;
+        _btcLoansPanel.PropertyChanged += OnBtcLoansPanelPropertyChanged;
 
         SimulateButtonText = language.Reports_SimulateButton;
         UpdateCurrentBtcPriceFormatted();
@@ -1060,24 +1060,22 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
     private void OnLeveragePanelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        var panel = (DashboardPanelViewModel)_leveragePanel;
         if (e.PropertyName == nameof(DashboardPanelViewModel.Data))
-            LeveragePositionsData = panel.Data;
+            LeveragePositionsData = _leveragePanel.Data;
         else if (e.PropertyName == nameof(DashboardPanelViewModel.IsLoading))
-            IsLeveragePositionsLoading = panel.IsLoading;
+            IsLeveragePositionsLoading = _leveragePanel.IsLoading;
         else if (e.PropertyName == nameof(DashboardPanelViewModel.IsVisible))
-            IsLeveragePositionsVisible = panel.IsVisible;
+            IsLeveragePositionsVisible = _leveragePanel.IsVisible;
     }
 
     private void OnBtcLoansPanelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        var panel = (DashboardPanelViewModel)_btcLoansPanel;
         if (e.PropertyName == nameof(DashboardPanelViewModel.Data))
-            BtcLoansData = panel.Data;
+            BtcLoansData = _btcLoansPanel.Data;
         else if (e.PropertyName == nameof(DashboardPanelViewModel.IsLoading))
-            IsBtcLoansLoading = panel.IsLoading;
+            IsBtcLoansLoading = _btcLoansPanel.IsLoading;
         else if (e.PropertyName == nameof(DashboardPanelViewModel.IsVisible))
-            IsBtcLoansVisible = panel.IsVisible;
+            IsBtcLoansVisible = _btcLoansPanel.IsVisible;
     }
 
     #endregion
@@ -1103,8 +1101,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _btcStackPanel.PropertyChanged -= OnBtcStackPanelPropertyChanged;
         _simulatedPricesPanel.PropertyChanged -= OnSimulatedPricesPanelPropertyChanged;
         _indicatorsPanel.PropertyChanged -= OnIndicatorsPanelPropertyChanged;
-        ((INotifyPropertyChanged)_leveragePanel).PropertyChanged -= OnLeveragePanelPropertyChanged;
-        ((INotifyPropertyChanged)_btcLoansPanel).PropertyChanged -= OnBtcLoansPanelPropertyChanged;
+        _leveragePanel.PropertyChanged -= OnLeveragePanelPropertyChanged;
+        _btcLoansPanel.PropertyChanged -= OnBtcLoansPanelPropertyChanged;
 
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
         WeakReferenceMessenger.Default.Unregister<AssetSummaryUpdatedMessage>(this);
