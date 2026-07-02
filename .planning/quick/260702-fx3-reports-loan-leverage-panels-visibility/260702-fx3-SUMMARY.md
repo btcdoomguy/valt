@@ -30,4 +30,4 @@ Fixed a regression in the Reports tab where the Loan and Leverage panels were no
 ## Commit
 
 - Code/test changes: 0d43acb
-- Docs: e64cea0
+- Docs: 95dad34
