@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v0.4
 milestone_name: Quality & Performance
-current_phase: 19
-status: completed
-stopped_at: Completed 18-02-PLAN.md
-last_updated: "2026-06-30T00:18:00Z"
-last_activity: 2026-06-30
-last_activity_desc: Completed quick task 260630-e2j: Fix Assets tab LONG BTC-collateral leveraged position total in Transactions tab totals summary
+current_phase: 20
+current_phase_name: reports-dashboard-builders
+status: gaps_found
+stopped_at: Verification found gaps; awaiting gap closure planning
+last_updated: "2026-07-01T23:30:00.000Z"
+last_activity: 2026-07-02
+last_activity_desc: Completed quick task 260702-ed9 - Restore Loan and Leverage panels in Assets tab
 progress:
   total_phases: 18
   completed_phases: 9
   total_plans: 18
   completed_plans: 18
-  percent: 50
-current_phase_name: Modal Launcher Service
+  percent: 28
 ---
 
 # STATE.md
@@ -24,14 +24,14 @@ current_phase_name: Modal Launcher Service
 See: .planning/PROJECT.md (updated 2026-06-19)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 19 — Modal Launcher Service
+**Current focus:** Phase 20 — reports-dashboard-builders
 
 ## Current Position
 
-Phase: 19 — COMPLETE
+Phase: 20 (reports-dashboard-builders) — GAPS FOUND
 Plan: 2 of 2
-Status: Phase 19 complete
-Last activity: 2026-06-23 — Phase 19 marked complete
+Status: Verification found gaps; awaiting gap closure planning
+Last activity: 2026-07-01 — Phase 20 verification found gaps
 
 Progress: [██        ] 28%
 
@@ -83,6 +83,10 @@ Progress: [██        ] 28%
 - [Phase ?]: Kept the asset form builder in Valt.UI to preserve the App-layer dependency boundary
 - [Phase 18-manage-asset-builder]: Accepted 18-01 implementation as complete — All acceptance criteria in 18-02-PLAN.md are satisfied by the existing commits from Plan 18-01; no additional source changes were required for Plan 18-02.
 - [Phase 18-manage-asset-builder]: Deferred live-API test failures to Phase 25 — Two full-suite failures (BitcoinDominanceProviderTests and CoinGeckoProviderTests) are pre-existing network/TEST-01 debt scheduled for Phase 25 and are unrelated to the asset form builder refactor.
+- [Phase 20]: Kept panels passive: no subscriptions to RatesState, AccountsTotalState, CustomBtcPriceState, or messenger events so ReportsViewModel remains the single coordinator. — Avoids double refreshes and keeps ReportsViewModel as the sole coordinator per RESEARCH.md anti-pattern guidance.
+- [Phase 20]: Unit tests invoke synchronous Refresh() directly to avoid Avalonia dispatcher coupling. — Matches RESEARCH.md Pitfall 4 guidance and keeps panel VM tests deterministic without UI thread dependency.
+- [Phase 20]: Exposed Data/IsLoading/IsVisible and INotifyPropertyChanged on panel interfaces so ReportsViewModel can forward state without coupling to concrete DashboardPanelViewModel types. — The original interfaces only exposed AllTimeHighFiatValue and RefreshAsync. Adding observable state lets the coordinator subscribe and forward panel properties directly, and lets tests mock panels by interface as the plan intended.
+- [Phase 20]: Used interface mocks in ReportsViewModelTests per the plan's guidance, relying on the expanded interface contract. — Keeping tests aligned with the plan's mock-by-interface approach avoids concrete constructor setup and matches the new interface contract.
 
 ### Blockers
 
@@ -96,6 +100,7 @@ Progress: [██        ] 28%
 
 | # | Description | Date | Commit | Directory |
 |---|---|------|--------|-----------|
+| 260702-ed9 | Restore Loan and Leverage panels in Assets tab | 2026-07-02 | 8c8fc82 | [260702-ed9-after-the-latest-changes-the-loan-and-le](./quick/260702-ed9-after-the-latest-changes-the-loan-and-le/) |
 | 260616-rcu | Fix Stock asset edit modal not loading stored acquisition date | 2026-06-16 | be0b8b3 | [260616-rcu-fix-stock-asset-edit-modal-not-loading-s](./quick/260616-rcu-fix-stock-asset-edit-modal-not-loading-s/) |
 | 260619-fix-loan-snapshot-edit | Fix editing original BTC loan data after snapshots exist | 2026-06-19 | f8bdf78 | [260619-fix-loan-snapshot-edit](./quick/260619-fix-loan-snapshot-edit/) |
 | 260628-pgi | Fix NullReferenceException in BtcInput when copying a transaction | 2026-06-28 | d2f8685 | [260628-pgi-fix-nullreferenceexception-in-btcinput-w](./quick/260628-pgi-fix-nullreferenceexception-in-btcinput-w/) |
@@ -129,9 +134,9 @@ Progress: [██        ] 28%
 
 ## Session Continuity
 
-Last session: 2026-06-23T15:05:33.570Z
-Stopped at: Completed 18-02-PLAN.md
-Resume file: None
+Last session: 2026-07-01T18:55:17.543Z
+Stopped at: Completed 20-01-PLAN.md
+Resume file: .planning/phases/20-reports-dashboard-builders/20-CONTEXT.md
 
 ## Performance Metrics
 
@@ -160,3 +165,5 @@ Resume file: None
 | Phase 17-transaction-editor-builder P02 | 4min | 3 tasks | 2 files |
 | Phase 18-manage-asset-builder P01 | 15min | 3 tasks | 8 files |
 | Phase 18-manage-asset-builder P02 | 5min | 3 tasks | 0 files |
+| Phase 20 P01 | 9min | 3 tasks | 6 files |
+| Phase 20 P02 | 8min | 3 tasks | 6 files |
