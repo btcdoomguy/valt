@@ -6,9 +6,9 @@ current_phase: 20
 current_phase_name: reports-dashboard-builders
 status: gaps_found
 stopped_at: Verification found gaps; awaiting gap closure planning
-last_updated: "2026-07-01T23:30:00.000Z"
+last_updated: "2026-07-02T00:00:00.000Z"
 last_activity: 2026-07-02
-last_activity_desc: Completed quick task 260702-ed9 - Restore Loan and Leverage panels in Assets tab
+last_activity_desc: Completed quick task 260702-fx3 - Restore Loan and Leverage panels in Reports tab
 progress:
   total_phases: 18
   completed_phases: 9
@@ -100,6 +100,7 @@ Progress: [██        ] 28%
 
 | # | Description | Date | Commit | Directory |
 |---|---|------|--------|-----------|
+| 260702-fx3 | Restore Loan and Leverage panels in Reports tab | 2026-07-02 | 0d43acb | [260702-fx3-reports-loan-leverage-panels-visibility](./quick/260702-fx3-reports-loan-leverage-panels-visibility/) |
 | 260702-ed9 | Restore Loan and Leverage panels in Assets tab | 2026-07-02 | 8c8fc82 | [260702-ed9-after-the-latest-changes-the-loan-and-le](./quick/260702-ed9-after-the-latest-changes-the-loan-and-le/) |
 | 260616-rcu | Fix Stock asset edit modal not loading stored acquisition date | 2026-06-16 | be0b8b3 | [260616-rcu-fix-stock-asset-edit-modal-not-loading-s](./quick/260616-rcu-fix-stock-asset-edit-modal-not-loading-s/) |
 | 260619-fix-loan-snapshot-edit | Fix editing original BTC loan data after snapshots exist | 2026-06-19 | f8bdf78 | [260619-fix-loan-snapshot-edit](./quick/260619-fix-loan-snapshot-edit/) |
