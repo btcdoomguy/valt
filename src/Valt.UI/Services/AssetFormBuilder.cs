@@ -395,7 +395,7 @@ public class AssetFormBuilder : IAssetFormBuilder
                     MonthlyRentalIncomeFiat: FiatValue.Empty,
                     AcquisitionDate: null,
                     AcquisitionPriceFiat: FiatValue.Empty,
-                    IsBitcoinUnderlyingAsset: isBtcCollateral || (priceSource == AssetPriceSource.LivePrice && symbol.StartsWith("BTC", StringComparison.OrdinalIgnoreCase)),
+                    IsBitcoinUnderlyingAsset: isBtcCollateral,
                     CollateralFiat: FiatValue.New(isBtcCollateral ? 0 : (dto.Collateral ?? 0)),
                     LeveragedCollateralBtc: isBtcCollateral ? (dto.Collateral ?? 0) : 0,
                     EntryPriceFiat: FiatValue.New(dto.EntryPrice ?? 0),
