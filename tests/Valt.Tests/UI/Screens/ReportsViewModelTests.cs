@@ -215,4 +215,146 @@ public class ReportsViewModelTests
         // Assert
         _runner.Received(1).RunAsync(expectedTask, _logger, "Initialize");
     }
+
+    [Test]
+    public void Initialize_Should_Refresh_LeveragePanel()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+
+        // Act
+        viewModel.Initialize();
+
+        // Assert
+        _leveragePanel.Received(1).RefreshAsync();
+    }
+
+    [Test]
+    public void Initialize_Should_Refresh_BtcLoansPanel()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+
+        // Act
+        viewModel.Initialize();
+
+        // Assert
+        _btcLoansPanel.Received(1).RefreshAsync();
+    }
+
+    [Test]
+    public void Panel_IsVisible_Changes_Are_Forwarded_To_ReportsViewModel()
+    {
+        // Arrange
+        var leverageLogger = Substitute.For<ILogger<LeveragePositionsPanelViewModel>>();
+        var btcLoansLogger = Substitute.For<ILogger<BtcLoansPanelViewModel>>();
+
+        var realLeveragePanel = new LeveragePositionsPanelViewModel(
+            _queryDispatcher, _accountsTotalState, _ratesState, _customBtcPriceState, _currencySettings, leverageLogger);
+        var realBtcLoansPanel = new BtcLoansPanelViewModel(
+            _queryDispatcher, _accountsTotalState, _ratesState, _customBtcPriceState, _currencySettings, btcLoansLogger);
+
+        var viewModel = new ReportsViewModel(
+            _allTimeHighReport,
+            _maxBtcStackReport,
+            _monthlyTotalsReport,
+            _expensesByCategoryReport,
+            _incomeByCategoryReport,
+            _statisticsReport,
+            _wealthOverviewReport,
+            _reportDataProviderFactory,
+            _currencySettings,
+            _localDatabase,
+            _clock,
+            _logger,
+            _accountsTotalState,
+            _ratesState,
+            _customBtcPriceState,
+            _secureModeState,
+            _configurationManager,
+            _modalFactory,
+            _queryDispatcher,
+            _indicatorCache,
+            _runner,
+            _indicatorsPanel,
+            _wealthPanel,
+            _btcStackPanel,
+            _simulatedPricesPanel,
+            realLeveragePanel,
+            realBtcLoansPanel);
+
+        // Act
+        var leverageEventCount = 0;
+        realLeveragePanel.PropertyChanged += (s, e) =>
+        {
+            leverageEventCount++;
+        };
+
+        Assert.That(viewModel.IsLeveragePositionsVisible, Is.False, "Initial leverage visibility should be false");
+        Assert.That(realLeveragePanel.IsVisible, Is.False, "Panel initial IsVisible should be false");
+
+        realLeveragePanel.IsVisible = true;
+        Assert.That(viewModel.IsLeveragePositionsVisible, Is.True, "After panel shown");
+
+        realLeveragePanel.IsVisible = false;
+        Assert.That(viewModel.IsLeveragePositionsVisible, Is.False, "After panel hidden");
+
+        realBtcLoansPanel.IsVisible = true;
+        Assert.That(viewModel.IsBtcLoansVisible, Is.True, "After BTC loans panel shown");
+
+        realBtcLoansPanel.IsVisible = false;
+        Assert.That(viewModel.IsBtcLoansVisible, Is.False, "After BTC loans panel hidden");
+
+        // Assert
+        Assert.That(leverageEventCount, Is.GreaterThan(0), "Leverage panel should raise PropertyChanged");
+    }
+
+    [Test]
+    public void Panel_Initial_Visibility_Is_Forwarded_To_ReportsViewModel()
+    {
+        // Arrange
+        var leverageLogger = Substitute.For<ILogger<LeveragePositionsPanelViewModel>>();
+        var btcLoansLogger = Substitute.For<ILogger<BtcLoansPanelViewModel>>();
+
+        var realLeveragePanel = new LeveragePositionsPanelViewModel(
+            _queryDispatcher, _accountsTotalState, _ratesState, _customBtcPriceState, _currencySettings, leverageLogger);
+        var realBtcLoansPanel = new BtcLoansPanelViewModel(
+            _queryDispatcher, _accountsTotalState, _ratesState, _customBtcPriceState, _currencySettings, btcLoansLogger);
+
+        // Act
+        var viewModel = new ReportsViewModel(
+            _allTimeHighReport,
+            _maxBtcStackReport,
+            _monthlyTotalsReport,
+            _expensesByCategoryReport,
+            _incomeByCategoryReport,
+            _statisticsReport,
+            _wealthOverviewReport,
+            _reportDataProviderFactory,
+            _currencySettings,
+            _localDatabase,
+            _clock,
+            _logger,
+            _accountsTotalState,
+            _ratesState,
+            _customBtcPriceState,
+            _secureModeState,
+            _configurationManager,
+            _modalFactory,
+            _queryDispatcher,
+            _indicatorCache,
+            _runner,
+            _indicatorsPanel,
+            _wealthPanel,
+            _btcStackPanel,
+            _simulatedPricesPanel,
+            realLeveragePanel,
+            realBtcLoansPanel);
+
+        // Assert
+        Assert.That(viewModel.IsLeveragePositionsVisible, Is.EqualTo(realLeveragePanel.IsVisible),
+            "ReportsViewModel should reflect the panel's initial visibility");
+        Assert.That(viewModel.IsBtcLoansVisible, Is.EqualTo(realBtcLoansPanel.IsVisible),
+            "ReportsViewModel should reflect the panel's initial visibility");
+    }
 }
