@@ -20,7 +20,7 @@ public abstract partial class DashboardPanelViewModel : ObservableObject
 
     [ObservableProperty] private DashboardData _data = DashboardData.Empty;
     [ObservableProperty] private bool _isLoading = true;
-    [ObservableProperty] private bool _isVisible = true;
+    [ObservableProperty] private bool _isVisible = false;
 
     protected DashboardPanelViewModel(ILogger logger)
     {

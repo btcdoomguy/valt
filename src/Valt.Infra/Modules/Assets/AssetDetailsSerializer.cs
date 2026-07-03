@@ -70,7 +70,10 @@ internal static class AssetDetailsSerializer
             dto.Symbol,
             (AssetPriceSource)dto.PriceSourceId,
             dto.IsLong,
-            (LeveragedPositionInputMode)dto.InputMode);
+            (LeveragedPositionInputMode)dto.InputMode,
+            (LeveragedPositionCollateralAssetType)dto.CollateralAssetType,
+            dto.ContractCount,
+            dto.ContractSizeUsd);
     }
 
     public static BtcLoanDetails DeserializeBtcLoan(string json)
@@ -209,7 +212,10 @@ internal static class AssetDetailsSerializer
             Symbol = details.Symbol,
             PriceSourceId = (int)details.PriceSource,
             IsLong = details.IsLong,
-            InputMode = (int)details.InputMode
+            InputMode = (int)details.InputMode,
+            CollateralAssetType = (int)details.CollateralAssetType,
+            ContractCount = details.ContractCount,
+            ContractSizeUsd = details.ContractSizeUsd
         };
         return JsonSerializer.Serialize(dto);
     }
@@ -373,6 +379,9 @@ internal class LeveragedPositionDetailsDto
     public int PriceSourceId { get; set; }
     public bool IsLong { get; set; }
     public int InputMode { get; set; }
+    public int CollateralAssetType { get; set; }
+    public decimal ContractCount { get; set; }
+    public decimal ContractSizeUsd { get; set; }
 }
 
 internal class BtcLoanDetailsDto

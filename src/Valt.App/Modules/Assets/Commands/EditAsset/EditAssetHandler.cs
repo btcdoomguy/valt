@@ -105,26 +105,38 @@ internal sealed class EditAssetHandler : ICommandHandler<EditAssetCommand, Unit>
     private static Result<IAssetDetails> BuildLeveragedDetails(LeveragedPositionDetailsInputDTO leveraged)
     {
         var inputMode = (LeveragedPositionInputMode)leveraged.InputMode;
+        var collateralAssetType = (LeveragedPositionCollateralAssetType)leveraged.CollateralAssetType;
 
         var collateral = leveraged.Collateral;
-        if (inputMode == LeveragedPositionInputMode.ExactPosition
+        var leverage = leveraged.Leverage;
+
+        if (collateralAssetType == LeveragedPositionCollateralAssetType.Fiat
+            && inputMode == LeveragedPositionInputMode.ExactPosition
             && leveraged.PositionSize.HasValue && leveraged.PositionSize.Value > 0
             && leveraged.Leverage > 0)
         {
             collateral = leveraged.PositionSize.Value * leveraged.EntryPrice / leveraged.Leverage;
         }
+        else if (collateralAssetType == LeveragedPositionCollateralAssetType.Btc)
+        {
+            var notionalBtcEntry = leveraged.ContractCount * leveraged.ContractSizeUsd / leveraged.EntryPrice;
+            leverage = notionalBtcEntry / leveraged.Collateral;
+        }
 
         return Result<IAssetDetails>.Success(new LeveragedPositionDetails(
             collateral: collateral,
             entryPrice: leveraged.EntryPrice,
-            leverage: leveraged.Leverage,
+            leverage: leverage,
             liquidationPrice: leveraged.LiquidationPrice,
             currentPrice: leveraged.CurrentPrice,
             currencyCode: leveraged.CurrencyCode,
             symbol: leveraged.Symbol,
             priceSource: (AssetPriceSource)leveraged.PriceSource,
             isLong: leveraged.IsLong,
-            inputMode: inputMode));
+            inputMode: inputMode,
+            collateralAssetType: collateralAssetType,
+            contractCount: leveraged.ContractCount,
+            contractSizeUsd: leveraged.ContractSizeUsd));
     }
 
     private static Result<IAssetDetails> BuildBtcLoanDetails(BtcLoanDetailsInputDTO btcLoan, Asset existingAsset)

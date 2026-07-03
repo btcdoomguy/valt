@@ -45,12 +45,15 @@ public class AssetFormBuilderTests
         AcquisitionPriceFiat: FiatValue.New(150m),
         IsBitcoinUnderlyingAsset: false,
         CollateralFiat: FiatValue.Empty,
+        LeveragedCollateralBtc: 0,
         EntryPriceFiat: FiatValue.Empty,
         Leverage: 1,
         LiquidationPriceFiat: FiatValue.Empty,
         IsLong: true,
         UseExactPosition: false,
         PositionSize: 0,
+        ContractCount: 0,
+        ContractSizeUsd: 0,
         PlatformName: string.Empty,
         CollateralSats: 0,
         LoanAmountFiat: FiatValue.Empty,
@@ -88,12 +91,15 @@ public class AssetFormBuilderTests
         AcquisitionPriceFiat: FiatValue.New(400_000m),
         IsBitcoinUnderlyingAsset: false,
         CollateralFiat: FiatValue.Empty,
+        LeveragedCollateralBtc: 0,
         EntryPriceFiat: FiatValue.Empty,
         Leverage: 1,
         LiquidationPriceFiat: FiatValue.Empty,
         IsLong: true,
         UseExactPosition: false,
         PositionSize: 0,
+        ContractCount: 0,
+        ContractSizeUsd: 0,
         PlatformName: string.Empty,
         CollateralSats: 0,
         LoanAmountFiat: FiatValue.Empty,
@@ -131,12 +137,15 @@ public class AssetFormBuilderTests
         AcquisitionPriceFiat: FiatValue.Empty,
         IsBitcoinUnderlyingAsset: false,
         CollateralFiat: FiatValue.New(10_000m),
+        LeveragedCollateralBtc: 0,
         EntryPriceFiat: FiatValue.New(50_000m),
         Leverage: 5,
         LiquidationPriceFiat: FiatValue.New(40_000m),
         IsLong: true,
         UseExactPosition: useExactPosition,
         PositionSize: useExactPosition ? 1m : 0,
+        ContractCount: 0,
+        ContractSizeUsd: 0,
         PlatformName: string.Empty,
         CollateralSats: 0,
         LoanAmountFiat: FiatValue.Empty,
@@ -174,12 +183,15 @@ public class AssetFormBuilderTests
         AcquisitionPriceFiat: FiatValue.Empty,
         IsBitcoinUnderlyingAsset: false,
         CollateralFiat: FiatValue.Empty,
+        LeveragedCollateralBtc: 0,
         EntryPriceFiat: FiatValue.Empty,
         Leverage: 1,
         LiquidationPriceFiat: FiatValue.Empty,
         IsLong: true,
         UseExactPosition: false,
         PositionSize: 0,
+        ContractCount: 0,
+        ContractSizeUsd: 0,
         PlatformName: "HodlHodl",
         CollateralSats: 1_000_000,
         LoanAmountFiat: FiatValue.New(50_000m),
@@ -217,12 +229,15 @@ public class AssetFormBuilderTests
         AcquisitionPriceFiat: FiatValue.Empty,
         IsBitcoinUnderlyingAsset: false,
         CollateralFiat: FiatValue.Empty,
+        LeveragedCollateralBtc: 0,
         EntryPriceFiat: FiatValue.Empty,
         Leverage: 1,
         LiquidationPriceFiat: FiatValue.Empty,
         IsLong: true,
         UseExactPosition: false,
         PositionSize: 0,
+        ContractCount: 0,
+        ContractSizeUsd: 0,
         PlatformName: string.Empty,
         CollateralSats: 0,
         LoanAmountFiat: FiatValue.Empty,
@@ -579,7 +594,7 @@ public class AssetFormBuilderTests
 
         Assert.That(values.SelectedAssetType, Is.EqualTo(AssetTypes.LeveragedPosition.ToString()));
         Assert.That(values.Symbol, Is.EqualTo("BTC-PERP"));
-        Assert.That(values.IsBitcoinUnderlyingAsset, Is.True);
+        Assert.That(values.IsBitcoinUnderlyingAsset, Is.False);
         Assert.That(values.CollateralFiat, Is.EqualTo(FiatValue.New(10_000m)));
         Assert.That(values.EntryPriceFiat, Is.EqualTo(FiatValue.New(50_000m)));
         Assert.That(values.Leverage, Is.EqualTo(5));
@@ -601,6 +616,28 @@ public class AssetFormBuilderTests
         var values = _builder.LoadFromDto(dto);
 
         Assert.That(values.IsBitcoinUnderlyingAsset, Is.False);
+    }
+
+    [Test]
+    public void LoadFromDto_LeveragedPosition_BtcCollateral_SetsBitcoinUnderlyingAsset()
+    {
+        var dto = BaseDto(AssetTypes.LeveragedPosition) with
+        {
+            Symbol = "BTC-PERP",
+            PriceSourceId = (int)AssetPriceSource.LivePrice,
+            CollateralAssetTypeId = (int)LeveragedPositionCollateralAssetType.Btc,
+            Collateral = 0.5m,
+            ContractCount = 10_000m,
+            ContractSizeUsd = 10m
+        };
+
+        var values = _builder.LoadFromDto(dto);
+
+        Assert.That(values.IsBitcoinUnderlyingAsset, Is.True);
+        Assert.That(values.LeveragedCollateralBtc, Is.EqualTo(0.5m));
+        Assert.That(values.ContractCount, Is.EqualTo(10_000m));
+        Assert.That(values.ContractSizeUsd, Is.EqualTo(10m));
+        Assert.That(values.CollateralFiat, Is.EqualTo(FiatValue.New(0m)));
     }
 
     [Test]

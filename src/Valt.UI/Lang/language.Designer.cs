@@ -2468,7 +2468,31 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("ManageAsset_ExactPosition", resourceCulture);
             }
         }
-
+        
+        public static string ManageAsset_ContractCount {
+            get {
+                return ResourceManager.GetString("ManageAsset_ContractCount", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_ContractSizeUsd {
+            get {
+                return ResourceManager.GetString("ManageAsset_ContractSizeUsd", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_CollateralBtc {
+            get {
+                return ResourceManager.GetString("ManageAsset_CollateralBtc", resourceCulture);
+            }
+        }
+        
+        public static string ManageAsset_DerivedLeverage {
+            get {
+                return ResourceManager.GetString("ManageAsset_DerivedLeverage", resourceCulture);
+            }
+        }
+        
         public static string ManageAsset_IncludeInNetWorth {
             get {
                 return ResourceManager.GetString("ManageAsset_IncludeInNetWorth", resourceCulture);

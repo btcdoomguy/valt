@@ -41,6 +41,9 @@ public record AssetDTO
     public bool? IsAtRisk { get; init; }
     public decimal? PositionSize { get; init; }
     public int? InputModeId { get; init; }
+    public int? CollateralAssetTypeId { get; init; }
+    public decimal? ContractCount { get; init; }
+    public decimal? ContractSizeUsd { get; init; }
 
     // BTC loan specific
     public string? PlatformName { get; init; }

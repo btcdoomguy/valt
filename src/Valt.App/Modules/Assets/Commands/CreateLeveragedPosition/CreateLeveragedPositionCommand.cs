@@ -81,6 +81,21 @@ public record CreateLeveragedPositionCommand : ICommand<CreateLeveragedPositionR
     /// Position size in underlying units (e.g., 0.2 BTC). Used when InputMode=1.
     /// </summary>
     public decimal? PositionSize { get; init; }
+
+    /// <summary>
+    /// Collateral asset type: 0=Fiat (default), 1=Btc.
+    /// </summary>
+    public int CollateralAssetType { get; init; } = 0;
+
+    /// <summary>
+    /// Number of contracts. Only used when CollateralAssetType=Btc.
+    /// </summary>
+    public decimal ContractCount { get; init; }
+
+    /// <summary>
+    /// Contract size in USD. Only used when CollateralAssetType=Btc.
+    /// </summary>
+    public decimal ContractSizeUsd { get; init; }
 }
 
 public record CreateLeveragedPositionResult(string AssetId);

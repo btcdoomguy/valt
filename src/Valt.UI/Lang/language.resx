@@ -1224,6 +1224,18 @@
     <data name="ManageAsset_ExactPosition" xml:space="preserve">
         <value>Exact Position</value>
     </data>
+    <data name="ManageAsset_ContractCount" xml:space="preserve">
+        <value>Contract Count</value>
+    </data>
+    <data name="ManageAsset_ContractSizeUsd" xml:space="preserve">
+        <value>Contract Size (USD)</value>
+    </data>
+    <data name="ManageAsset_CollateralBtc" xml:space="preserve">
+        <value>Collateral (BTC)</value>
+    </data>
+    <data name="ManageAsset_DerivedLeverage" xml:space="preserve">
+        <value>Derived Leverage</value>
+    </data>
     <data name="ManageAsset_IncludeInNetWorth" xml:space="preserve">
         <value>Include in Net Worth</value>
     </data>
