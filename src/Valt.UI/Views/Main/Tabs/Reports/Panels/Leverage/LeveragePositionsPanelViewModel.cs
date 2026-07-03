@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Assets.DTOs;
@@ -12,6 +11,7 @@ using Valt.Core.Common;
 using Valt.Core.Modules.Assets;
 using Valt.Infra.Kernel;
 using Valt.Infra.Settings;
+using Valt.UI.Base;
 using Valt.UI.Lang;
 using Valt.UI.State;
 using Valt.UI.UserControls;
@@ -49,19 +49,13 @@ public partial class LeveragePositionsPanelViewModel : DashboardPanelViewModel, 
         _logger = logger;
     }
 
-    public override Task RefreshAsync()
-    {
-        Dispatcher.UIThread.Post(Refresh);
-        return Task.CompletedTask;
-    }
-
-    public override void Refresh()
+    public override async Task RefreshAsync()
     {
         try
         {
             IsLoading = true;
 
-            var assets = _queryDispatcher.DispatchAsync(new GetVisibleAssetsQuery()).GetAwaiter().GetResult();
+            var assets = await _queryDispatcher.DispatchAsync(new GetVisibleAssetsQuery());
 
             // Filter to leveraged positions that are visible and included in net worth
             var leveragedPositions = assets
@@ -207,6 +201,11 @@ public partial class LeveragePositionsPanelViewModel : DashboardPanelViewModel, 
         {
             IsLoading = false;
         }
+    }
+
+    public override void Refresh()
+    {
+        RefreshAsync().FireAndForgetSafeAsync(new FireAndForgetTaskRunner(), _logger);
     }
 
     /// <summary>

@@ -2,7 +2,6 @@ using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Threading.Tasks;
-using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Assets.Queries.GetBtcLoansDashboard;
@@ -10,6 +9,7 @@ using Valt.Core.Common;
 using Valt.Infra.Kernel;
 using Valt.Infra.Settings;
 using Valt.UI.Lang;
+using Valt.UI.Base;
 using Valt.UI.State;
 using Valt.UI.UserControls;
 
@@ -44,13 +44,7 @@ public partial class BtcLoansPanelViewModel : DashboardPanelViewModel, IBtcLoans
         _logger = logger;
     }
 
-    public override Task RefreshAsync()
-    {
-        Dispatcher.UIThread.Post(Refresh);
-        return Task.CompletedTask;
-    }
-
-    public override void Refresh()
+    public override async Task RefreshAsync()
     {
         try
         {
@@ -68,14 +62,14 @@ public partial class BtcLoansPanelViewModel : DashboardPanelViewModel, IBtcLoans
                 return;
             }
 
-            var dto = _queryDispatcher.DispatchAsync(new GetBtcLoansDashboardQuery
+            var dto = await _queryDispatcher.DispatchAsync(new GetBtcLoansDashboardQuery
             {
                 MainCurrencyCode = mainCurrency,
                 BtcPriceUsd = btcPrice,
                 CustomBtcPriceUsd = _customBtcPriceState.CustomBtcPriceUsd,
                 FiatRates = fiatRates,
                 TotalBtcStackSats = stackSats
-            }).GetAwaiter().GetResult();
+            });
 
             if (!dto.HasActiveLoans)
             {
@@ -142,5 +136,10 @@ public partial class BtcLoansPanelViewModel : DashboardPanelViewModel, IBtcLoans
         {
             IsLoading = false;
         }
+    }
+
+    public override void Refresh()
+    {
+        RefreshAsync().FireAndForgetSafeAsync(new FireAndForgetTaskRunner(), _logger);
     }
 }

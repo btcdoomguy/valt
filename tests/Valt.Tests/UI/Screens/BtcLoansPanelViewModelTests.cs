@@ -110,7 +110,7 @@ public class BtcLoansPanelViewModelTests
     }
 
     [Test]
-    public void Refresh_WhenNoActiveLoans_SetsIsVisibleFalse()
+    public async Task Refresh_WhenNoActiveLoans_SetsIsVisibleFalse()
     {
         // Arrange
         SeedWealth(100_000_000L);
@@ -118,7 +118,7 @@ public class BtcLoansPanelViewModelTests
 
         // Act
         var vm = CreateViewModel();
-        vm.Refresh();
+        await vm.RefreshAsync();
 
         // Assert
         Assert.That(vm.IsVisible, Is.False);
@@ -126,7 +126,7 @@ public class BtcLoansPanelViewModelTests
     }
 
     [Test]
-    public void Refresh_WhenRatesAreNull_HidesPanel()
+    public async Task Refresh_WhenRatesAreNull_HidesPanel()
     {
         // Arrange
         SeedWealth(100_000_000L);
@@ -135,7 +135,7 @@ public class BtcLoansPanelViewModelTests
 
         // Act
         var vm = CreateViewModel();
-        vm.Refresh();
+        await vm.RefreshAsync();
 
         // Assert
         Assert.That(vm.IsVisible, Is.False);
@@ -143,7 +143,7 @@ public class BtcLoansPanelViewModelTests
     }
 
     [Test]
-    public void Refresh_WithActiveLoan_ProducesExpectedRows()
+    public async Task Refresh_WithActiveLoan_ProducesExpectedRows()
     {
         // Arrange
         SeedWealth(100_000_000L);
@@ -178,7 +178,7 @@ public class BtcLoansPanelViewModelTests
 
         // Act
         var vm = CreateViewModel();
-        vm.Refresh();
+        await vm.RefreshAsync();
 
         // Assert
         Assert.That(vm.IsVisible, Is.True);
@@ -215,7 +215,7 @@ public class BtcLoansPanelViewModelTests
     }
 
     [Test]
-    public void Refresh_WhenQueryThrows_LogsErrorAndHidesPanel()
+    public async Task Refresh_WhenQueryThrows_LogsErrorAndHidesPanel()
     {
         // Arrange
         SeedWealth(100_000_000L);
@@ -224,7 +224,7 @@ public class BtcLoansPanelViewModelTests
 
         // Act
         var vm = CreateViewModel();
-        vm.Refresh();
+        await vm.RefreshAsync();
 
         // Assert
         Assert.That(vm.IsVisible, Is.False);

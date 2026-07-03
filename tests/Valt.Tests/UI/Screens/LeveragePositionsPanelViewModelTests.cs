@@ -169,14 +169,14 @@ public class LeveragePositionsPanelViewModelTests
     }
 
     [Test]
-    public void Refresh_WhenNoLeveragedPositions_SetsIsVisibleFalse()
+    public async Task Refresh_WhenNoLeveragedPositions_SetsIsVisibleFalse()
     {
         // Arrange
         SeedWealth(100_000_000L);
 
         // Act
         var vm = CreateViewModel();
-        vm.Refresh();
+        await vm.RefreshAsync();
 
         // Assert
         Assert.That(vm.IsVisible, Is.False);
@@ -184,7 +184,7 @@ public class LeveragePositionsPanelViewModelTests
     }
 
     [Test]
-    public void Refresh_WithBtcCollateralLongPosition_ProducesExpectedRows()
+    public async Task Refresh_WithBtcCollateralLongPosition_ProducesExpectedRows()
     {
         // Arrange
         SeedWealth(100_000_000L); // 1 BTC
@@ -201,7 +201,7 @@ public class LeveragePositionsPanelViewModelTests
         // Act
         var vm = CreateViewModel();
         vm.AllTimeHighFiatValue = 200_000m;
-        vm.Refresh();
+        await vm.RefreshAsync();
 
         // Assert
         Assert.That(vm.IsVisible, Is.True);
@@ -231,7 +231,7 @@ public class LeveragePositionsPanelViewModelTests
     }
 
     [Test]
-    public void Refresh_WithFiatCollateralPosition_FormatsPnlCorrectly()
+    public async Task Refresh_WithFiatCollateralPosition_FormatsPnlCorrectly()
     {
         // Arrange
         SeedWealth(100_000_000L);
@@ -244,7 +244,7 @@ public class LeveragePositionsPanelViewModelTests
 
         // Act
         var vm = CreateViewModel();
-        vm.Refresh();
+        await vm.RefreshAsync();
 
         // Assert
         Assert.That(vm.IsVisible, Is.True);
@@ -253,7 +253,7 @@ public class LeveragePositionsPanelViewModelTests
     }
 
     [Test]
-    public void Refresh_WithCustomBtcPrice_UsesSimulatedPnl()
+    public async Task Refresh_WithCustomBtcPrice_UsesSimulatedPnl()
     {
         // Arrange
         SeedWealth(100_000_000L);
@@ -271,7 +271,7 @@ public class LeveragePositionsPanelViewModelTests
 
         // Act
         var vm = CreateViewModel();
-        vm.Refresh();
+        await vm.RefreshAsync();
 
         // Assert
         var currentResultRow = vm.Data.Rows.First(r => r.LeftText == language.Reports_LeveragePositions_CurrentResult);
@@ -279,7 +279,7 @@ public class LeveragePositionsPanelViewModelTests
     }
 
     [Test]
-    public void Refresh_WhenQueryThrows_LogsErrorAndHidesPanel()
+    public async Task Refresh_WhenQueryThrows_LogsErrorAndHidesPanel()
     {
         // Arrange
         SeedWealth(100_000_000L);
@@ -288,7 +288,7 @@ public class LeveragePositionsPanelViewModelTests
 
         // Act
         var vm = CreateViewModel();
-        vm.Refresh();
+        await vm.RefreshAsync();
 
         // Assert
         Assert.That(vm.IsVisible, Is.False);

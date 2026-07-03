@@ -4,11 +4,11 @@ milestone: v0.4
 milestone_name: Quality & Performance
 current_phase: 20
 current_phase_name: reports-dashboard-builders
-status: gaps_found
-stopped_at: Verification found gaps; awaiting gap closure planning
-last_updated: "2026-07-02T00:00:00.000Z"
-last_activity: 2026-07-02
-last_activity_desc: Completed quick task 260702-fx3 - Restore Loan and Leverage panels in Reports tab
+status: gap_closure_complete
+stopped_at: Phase 20 blocking-call gap fixed; verification guard restored
+last_updated: "2026-07-03T00:00:00.000Z"
+last_activity: 2026-07-03
+last_activity_desc: Closed Phase 20 verification gap - removed GetAwaiter().GetResult() from Reports dashboard panel VMs
 progress:
   total_phases: 18
   completed_phases: 9
@@ -135,9 +135,9 @@ Progress: [██        ] 28%
 
 ## Session Continuity
 
-Last session: 2026-07-01T18:55:17.543Z
-Stopped at: Completed 20-01-PLAN.md
-Resume file: .planning/phases/20-reports-dashboard-builders/20-CONTEXT.md
+Last session: 2026-07-03T00:00:00.000Z
+Stopped at: Phase 20 gap closed — blocking calls removed from LeveragePositionsPanelViewModel and BtcLoansPanelViewModel; architecture guard and panel tests pass
+Resume file: .planning/phases/20-reports-dashboard-builders/20-VERIFICATION.md
 
 ## Performance Metrics
 
