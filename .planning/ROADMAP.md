@@ -22,7 +22,7 @@ Eliminate stability risks, reduce wasteful background work, simplify oversized V
 | 18 | Manage Asset Builder | 2/2 | Complete    | 2026-06-23 |
 | 19 | Modal Launcher Service | 2/2 | Complete   | 2026-06-23 |
 | 20 | Reports Dashboard Builders | Extract leverage/loan dashboard builders | VM-SVC-04 | 4 |
-| 21 | Transaction Editor Child VMs | Split editor into per-transfer-type child VMs | VM-CHILD-01 | 5 |
+| 21 | Transaction Editor Child VMs | 1/1 | Complete   | 2026-07-08 |
 | 22 | Manage Asset Child VMs | Split asset modal into per-asset-type child VMs | VM-CHILD-02 | 5 |
 | 23 | Reports Child VMs | Split reports into per-report child VMs | VM-CHILD-03 | 5 |
 | 24 | MainViewModel Final Split | Split main shell into coordinator/aggregator/child VMs | VM-CHILD-04 | 4 |
@@ -277,12 +277,18 @@ Plans:
 
 **Success criteria:**
 
-1. Child VMs exist for the major transfer-type groups (e.g., fiat transaction, bitcoin transaction, transfer).
+1. Child VMs exist for the major transfer-type groups (fiat transaction, bitcoin transaction, transfer).
 2. `TransactionEditorView.axaml` uses `ContentControl` with `DataTemplate`s bound to the active child VM.
 3. Validation and command building still work for all transaction types.
 4. Existing tests pass; new child-VM tests added.
 
-**Plans:** TBD
+**Plans:** 1/1 plans complete
+
+Plans:
+
+**Wave 1**
+
+- [x] 21-01-PLAN.md — Split TransactionEditorViewModel into coordinator parent and per-transfer-type child VMs with ContentControl + DataTemplates
 
 ### Phase 22: Manage Asset Child VMs
 

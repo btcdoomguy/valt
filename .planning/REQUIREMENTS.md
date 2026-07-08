@@ -38,7 +38,7 @@
 
 ### ViewModel Simplification — Child VMs & XAML
 
-- [ ] **VM-CHILD-01**: `TransactionEditorViewModel` is split into per-transfer-type child VMs bound through `ContentControl` + `DataTemplate`s
+- [x] **VM-CHILD-01**: `TransactionEditorViewModel` is split into per-transfer-type child VMs bound through `ContentControl` + `DataTemplate`s
 - [ ] **VM-CHILD-02**: `ManageAssetViewModel` is split into per-asset-type child VMs bound through `ContentControl` + `DataTemplate`s
 - [ ] **VM-CHILD-03**: `ReportsViewModel` is split into per-report child VMs with a coordinator owning filters and the report-data cache
 - [ ] **VM-CHILD-04**: `MainViewModel` is split into database-flow coordinator, job-status aggregator, and market-mood child VMs
@@ -115,7 +115,7 @@
 | VM-SVC-02 | Phase 18 | Complete |
 | VM-SVC-03 | Phase 19 | Pending |
 | VM-SVC-04 | Phase 20 | Pending |
-| VM-CHILD-01 | Phase 21 | Pending |
+| VM-CHILD-01 | Phase 21 | Complete |
 | VM-CHILD-02 | Phase 22 | Pending |
 | VM-CHILD-03 | Phase 23 | Pending |
 | VM-CHILD-04 | Phase 24 | Pending |

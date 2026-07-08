@@ -4,17 +4,17 @@ milestone: v0.4
 milestone_name: Quality & Performance
 current_phase: 21
 current_phase_name: transaction-editor-child-vms
-status: planned
-stopped_at: Phase 21 planned - 21-01-PLAN.md ready for execution
-last_updated: "2026-07-08T00:00:00.000Z"
+status: complete
+stopped_at: Phase 21 complete - 21-01-SUMMARY.md created
+last_updated: "2026-07-08T18:52:43.512Z"
 last_activity: 2026-07-08
-last_activity_desc: Planned Phase 21 - Transaction Editor Child VMs (21-01-PLAN.md)
+last_activity_desc: Phase 21 execution started
 progress:
   total_phases: 18
-  completed_phases: 9
-  total_plans: 18
-  completed_plans: 18
-  percent: 28
+  completed_phases: 11
+  total_plans: 21
+  completed_plans: 21
+  percent: 61
 ---
 
 # STATE.md
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-19)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 20 — reports-dashboard-builders
+**Current focus:** Phase 21 — transaction-editor-child-vms
 
 ## Current Position
 
-Phase: 21 (transaction-editor-child-vms) — Planned
-Plan: 1 of 1
-Status: Plan ready for execution
-Last activity: 2026-07-08 — Planned Phase 21 - Transaction Editor Child VMs (21-01-PLAN.md)
+Phase: 21 (transaction-editor-child-vms) — Complete
+Plan: 1 of 1 complete
+Status: Phase complete
+Last activity: 2026-07-08 — Phase 21 execution started
 
 Progress: [██        ] 28%
 
@@ -87,6 +87,11 @@ Progress: [██        ] 28%
 - [Phase 20]: Unit tests invoke synchronous Refresh() directly to avoid Avalonia dispatcher coupling. — Matches RESEARCH.md Pitfall 4 guidance and keeps panel VM tests deterministic without UI thread dependency.
 - [Phase 20]: Exposed Data/IsLoading/IsVisible and INotifyPropertyChanged on panel interfaces so ReportsViewModel can forward state without coupling to concrete DashboardPanelViewModel types. — The original interfaces only exposed AllTimeHighFiatValue and RefreshAsync. Adding observable state lets the coordinator subscribe and forward panel properties directly, and lets tests mock panels by interface as the plan intended.
 - [Phase 20]: Used interface mocks in ReportsViewModelTests per the plan's guidance, relying on the expanded interface contract. — Keeping tests aligned with the plan's mock-by-interface approach avoids concrete constructor setup and matches the new interface contract.
+- [Phase ?]: Added ILoggerFactory to TransactionEditorViewModel constructor so it can create typed loggers for child VMs without requiring a factory parameter per child type
+- [Phase ?]: Used x:CompileBindings=False on child views because RelativeSource ancestor bindings cannot be compiled when AvaloniaUseCompiledBindingsByDefault is true
+- [Phase ?]: Made TransferTransactionEditorViewModel.AccountsAreSameTypeAndCurrency public so the parent coordinator can build TransactionFormSnapshot without reflection
+- [Phase ?]: Exposed ValidateAllProperties on TransactionEditorChildViewModel base so the parent can trigger child validation before submission
+- [Phase ?]: Set a default Debt active child when OnBindParameterAsync has no Request parameter to keep existing tests and design-time behavior consistent
 
 ### Blockers
 
@@ -135,7 +140,7 @@ Progress: [██        ] 28%
 
 ## Session Continuity
 
-Last session: 2026-07-08T14:30:00Z
+Last session: 2026-07-08T18:52:08.815Z
 Stopped at: Phase 21 planned - Transaction Editor Child VMs; ready for execution
 Resume file: .planning/phases/21-transaction-editor-child-vms/21-01-PLAN.md
 
@@ -168,3 +173,4 @@ Resume file: .planning/phases/21-transaction-editor-child-vms/21-01-PLAN.md
 | Phase 18-manage-asset-builder P02 | 5min | 3 tasks | 0 files |
 | Phase 20 P01 | 9min | 3 tasks | 6 files |
 | Phase 20 P02 | 8min | 3 tasks | 6 files |
+| Phase 21 P01 | 35min | 3 tasks | 23 files |
