@@ -6,9 +6,9 @@ current_phase: 20
 current_phase_name: reports-dashboard-builders
 status: gap_closure_complete
 stopped_at: Phase 20 blocking-call gap fixed; verification guard restored
-last_updated: "2026-07-03T00:00:00.000Z"
-last_activity: 2026-07-03
-last_activity_desc: Closed Phase 20 verification gap - removed GetAwaiter().GetResult() from Reports dashboard panel VMs
+last_updated: "2026-07-08T00:00:00.000Z"
+last_activity: 2026-07-08
+last_activity_desc: Completed quick task 260708-f0c - Fix Assets BTC loan card to use updated TotalBorrowed for LTV and display
 progress:
   total_phases: 18
   completed_phases: 9
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-06-19)
 Phase: 20 (reports-dashboard-builders) — GAPS FOUND
 Plan: 2 of 2
 Status: Verification found gaps; awaiting gap closure planning
-Last activity: 2026-07-01 — Phase 20 verification found gaps
+Last activity: 2026-07-08 — Completed quick task 260708-f0c - Fix Assets BTC loan card to use updated TotalBorrowed for LTV and display
 
 Progress: [██        ] 28%
 
@@ -106,7 +106,7 @@ Progress: [██        ] 28%
 | 260619-fix-loan-snapshot-edit | Fix editing original BTC loan data after snapshots exist | 2026-06-19 | f8bdf78 | [260619-fix-loan-snapshot-edit](./quick/260619-fix-loan-snapshot-edit/) |
 | 260628-pgi | Fix NullReferenceException in BtcInput when copying a transaction | 2026-06-28 | d2f8685 | [260628-pgi-fix-nullreferenceexception-in-btcinput-w](./quick/260628-pgi-fix-nullreferenceexception-in-btcinput-w/) |
 | 260628-pol | Fix NullReferenceException in FiatInput when editing/copying a transaction | 2026-06-28 | 7a39a6c | [260628-pol-fix-nullreferenceexception-in-fiatinput-](./quick/260628-pol-fix-nullreferenceexception-in-fiatinput-/) |
-| 260630-e2j | Fix Assets tab LONG BTC-collateral leveraged position total in Transactions tab totals summary | 2026-06-30 | ea3405e, 0364ffe | [260630-e2j-fix-assets-tab-long-position-total-in-tr](./quick/260630-e2j-fix-assets-tab-long-position-total-in-tr/) |
+| 260630-e2j | Fix Assets tab LONG BTC-collateral leveraged position total in Transactions tab totals summary | 2026-06-30 | ea3405e, 0364ffe | [260630-e2j-fix-assets-tab-long-position-total-in-tr](./quick/260630-e2j-fix-assets-tab-long-position-total-in-tr/) || 260708-f0c | Fix Assets BTC loan card to use updated TotalBorrowed for LTV and display | 2026-07-08 | cf08e95 | [260708-f0c-fix-assets-btc-loan-card-to-use-updated-](./quick/260708-f0c-fix-assets-btc-loan-card-to-use-updated-/) |
 
 ### Todos
 
