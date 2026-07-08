@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v0.4
 milestone_name: Quality & Performance
-current_phase: 20
-current_phase_name: reports-dashboard-builders
-status: gap_closure_complete
-stopped_at: Phase 20 blocking-call gap fixed; verification guard restored
+current_phase: 21
+current_phase_name: transaction-editor-child-vms
+status: planned
+stopped_at: Phase 21 planned - 21-01-PLAN.md ready for execution
 last_updated: "2026-07-08T00:00:00.000Z"
 last_activity: 2026-07-08
-last_activity_desc: Completed quick task 260708-f0c - Fix Assets BTC loan card to use updated TotalBorrowed for LTV and display
+last_activity_desc: Planned Phase 21 - Transaction Editor Child VMs (21-01-PLAN.md)
 progress:
   total_phases: 18
   completed_phases: 9
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-06-19)
 
 ## Current Position
 
-Phase: 20 (reports-dashboard-builders) — GAPS FOUND
-Plan: 2 of 2
-Status: Verification found gaps; awaiting gap closure planning
-Last activity: 2026-07-08 — Completed quick task 260708-f0c - Fix Assets BTC loan card to use updated TotalBorrowed for LTV and display
+Phase: 21 (transaction-editor-child-vms) — Planned
+Plan: 1 of 1
+Status: Plan ready for execution
+Last activity: 2026-07-08 — Planned Phase 21 - Transaction Editor Child VMs (21-01-PLAN.md)
 
 Progress: [██        ] 28%
 
@@ -135,9 +135,9 @@ Progress: [██        ] 28%
 
 ## Session Continuity
 
-Last session: 2026-07-08T14:00:00Z
-Stopped at: Phase 21 UI-SPEC approved for Transaction Editor Child VMs; ready for planning
-Resume file: .planning/phases/21-transaction-editor-child-vms/21-UI-SPEC.md
+Last session: 2026-07-08T14:30:00Z
+Stopped at: Phase 21 planned - Transaction Editor Child VMs; ready for execution
+Resume file: .planning/phases/21-transaction-editor-child-vms/21-01-PLAN.md
 
 ## Performance Metrics
 
