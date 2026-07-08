@@ -172,7 +172,7 @@ public sealed class BtcLoanDetails : IAssetDetails
     {
         var snapshot = GetEffectiveSnapshot();
         var collateralSats = snapshot?.CollateralSats ?? CollateralSats;
-        var loanAmount = snapshot?.LoanAmount ?? LoanAmount;
+        var loanAmount = snapshot?.TotalBorrowed ?? LoanAmount;
 
         var collateralValue = collateralSats / 100_000_000m * btcPrice;
         if (collateralValue == 0)

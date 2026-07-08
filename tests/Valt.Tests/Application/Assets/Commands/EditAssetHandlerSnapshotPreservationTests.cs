@@ -249,8 +249,8 @@ public class EditAssetHandlerSnapshotPreservationTests : DatabaseTest
         var reloaded = await _assetRepository.GetByIdAsync(asset.Id);
         var loanDetails = (BtcLoanDetails)reloaded!.Details;
 
-        // LTV = LoanAmount / CollateralValue * 100
-        // Collateral = 1 BTC * 50,000 = 50,000; Loan = 40,000 => LTV = 80%
-        Assert.That(loanDetails.CalculateCurrentLtv(50_000m), Is.EqualTo(80m));
+        // LTV uses the snapshot's preserved TotalBorrowed, not the propagated setup LoanAmount
+        // Collateral = 1 BTC * 50,000 = 50,000; TotalBorrowed = 25,000 => LTV = 50%
+        Assert.That(loanDetails.CalculateCurrentLtv(50_000m), Is.EqualTo(50m));
     }
 }

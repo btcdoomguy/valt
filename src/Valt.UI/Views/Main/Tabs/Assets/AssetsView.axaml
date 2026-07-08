@@ -333,7 +333,7 @@
                                                Foreground="{DynamicResource AssetCardLabelBrush}"
                                                Margin="0,0,4,0" />
                                     <TextBlock Grid.Column="1"
-                                               Text="{Binding LoanAmountFormatted}"
+                                               Text="{Binding TotalBorrowedFormatted}"
                                                FontSize="{DynamicResource FontSizeXSmall}"
                                                Foreground="{DynamicResource AssetCardTextBrush}" />
                                 </Grid>

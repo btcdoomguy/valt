@@ -85,6 +85,7 @@ public partial class AssetViewModel : ObservableObject
     public string? PlatformName { get; }
     public long? CollateralSats { get; }
     public decimal? LoanAmount { get; }
+    public decimal? TotalBorrowed { get; }
     public decimal? Apr { get; }
     public decimal? CurrentLtv { get; }
     public decimal? InitialLtv { get; }
@@ -111,6 +112,7 @@ public partial class AssetViewModel : ObservableObject
     // Formatted loan/lending fields
     public string CollateralSatsFormatted { get; }
     public string LoanAmountFormatted { get; }
+    public string TotalBorrowedFormatted { get; }
     public string AprFormatted { get; }
     public string CurrentLtvFormatted { get; }
     public string AccruedInterestFormatted { get; }
@@ -211,6 +213,7 @@ public partial class AssetViewModel : ObservableObject
         PlatformName = dto.PlatformName;
         CollateralSats = dto.CollateralSats;
         LoanAmount = dto.LoanAmount;
+        TotalBorrowed = dto.TotalBorrowed;
         Apr = dto.Apr;
         CurrentLtv = dto.CurrentLtv;
         InitialLtv = dto.InitialLtv;
@@ -301,6 +304,10 @@ public partial class AssetViewModel : ObservableObject
 
         LoanAmountFormatted = LoanAmount.HasValue
             ? CurrencyDisplay.FormatFiat(LoanAmount.Value, CurrencyCode)
+            : "-";
+
+        TotalBorrowedFormatted = TotalBorrowed.HasValue
+            ? CurrencyDisplay.FormatFiat(TotalBorrowed.Value, CurrencyCode)
             : "-";
 
         AprFormatted = Apr.HasValue
