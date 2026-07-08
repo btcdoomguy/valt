@@ -1,8 +1,10 @@
 using System;
+using System.Linq;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Valt.UI.Base;
+using Valt.UI.Views.Main.Modals.TransactionEditor.Views;
 
 namespace Valt.UI.Views.Main.Modals.TransactionEditor;
 
@@ -11,30 +13,28 @@ public partial class TransactionEditorView : ValtBaseWindow
     public TransactionEditorView()
     {
         InitializeComponent();
-        
+
         this.AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Bubble, handledEventsToo: true);
     }
-    
+
     protected override void OnOpened(EventArgs e)
     {
         base.OnOpened(e);
 
         var viewModel = DataContext as TransactionEditorViewModel;
+        if (viewModel is null) return;
 
-        InputElement controlToFocus = AutoCompleteTransactionNameBox;
-        
-        AutoCompleteTransactionNameBox.AsyncPopulator = viewModel!.GetTransactionTermsAsync;
+        var childView = ChildContentControl?.GetVisualDescendants().OfType<ITransactionEditorChildView>().FirstOrDefault();
+        if (childView is null) return;
 
         if (viewModel.TransactionFixedExpenseReference is not null)
         {
-            if (viewModel.FromAccountIsBtc)
-                controlToFocus = FromBtc;
-            else
-                controlToFocus = FromFiat;
+            childView.FocusAmountInput();
         }
-        
-
-        Dispatcher.UIThread.InvokeAsync(() => controlToFocus.Focus(), DispatcherPriority.ApplicationIdle);
+        else
+        {
+            childView.FocusNameInput();
+        }
     }
 
     private void OnKeyDown(object? sender, KeyEventArgs e)
@@ -78,28 +78,5 @@ public partial class TransactionEditorView : ValtBaseWindow
         {
             viewModel.ProcessEnterCommand.Execute(null);
         }
-    }
-
-    private void AutoCompleteTransactionNameBox_OnDropDownClosed(object? sender, EventArgs e)
-    {
-        var viewModel = DataContext as TransactionEditorViewModel;
-
-        if (viewModel?.TransactionTermResult is null) return;
-
-        if (viewModel.FromAccount is null) return;
-
-        Action focusAction;
-        if (viewModel.FromAccountIsBtc)
-            focusAction = () =>
-            {
-                FromBtc.Focus();
-            };
-        else
-            focusAction = () =>
-            {
-                FromFiat.Focus();
-            };
-        //call post instead of Invoke to put it on a queue and process after the UI thread is done
-        Dispatcher.UIThread.Post(focusAction, DispatcherPriority.ApplicationIdle);
     }
 }

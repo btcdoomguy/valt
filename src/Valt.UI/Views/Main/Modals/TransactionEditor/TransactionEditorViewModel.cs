@@ -37,6 +37,7 @@ using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
 using Valt.UI.State;
+using Valt.UI.Views.Main.Modals.TransactionEditor.ChildViewModels;
 using Valt.UI.Views.Main.Modals.ConversionCalculator;
 using Valt.UI.Views.Main.Modals.TransactionEditor.Exceptions;
 
@@ -382,6 +383,12 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
 
     public bool HasMetadata => IsBoundToFixedExpense || IsAutoSatAmount;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(OkButtonLabel))]
+    private TransactionEditorChildViewModel? _activeChildViewModel;
+
+    public string OkButtonLabel => language.OkButton;
+
     #endregion Properties
 
     #region Auto Sat Area
@@ -404,6 +411,8 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel, I
         if (Design.IsDesignMode)
         {
             Date = DateTime.Now.Date;
+            SelectedMode = TransactionTypes.Debt;
+            ActiveChildViewModel = new DebtTransactionEditorViewModel();
         }
     }
 
