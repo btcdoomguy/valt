@@ -68,6 +68,8 @@ public abstract partial class TransactionEditorChildViewModel : ValtValidatorVie
                                        IsToBtcInputFocused ||
                                        IsToFiatInputFocused;
 
+    public new void ValidateAllProperties() => base.ValidateAllProperties();
+
     public static ValidationResult ValidateFromAccountBtcValue(BtcValue? btcValue, ValidationContext context)
     {
         var instance = (TransactionEditorChildViewModel)context.ObjectInstance;

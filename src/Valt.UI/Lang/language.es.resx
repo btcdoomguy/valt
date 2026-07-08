@@ -2168,6 +2168,15 @@
     <data name="ManageTransactions_UseInstallments" xml:space="preserve">
         <value>Usar cuotas</value>
     </data>
+    <data name="TransactionEditor_SaveTransaction" xml:space="preserve">
+        <value>Guardar transacción</value>
+    </data>
+    <data name="TransactionEditor_CreateTransfer" xml:space="preserve">
+        <value>Crear transferencia</value>
+    </data>
+    <data name="TransactionEditor_SaveTransfer" xml:space="preserve">
+        <value>Guardar transferencia</value>
+    </data>
     <data name="DeleteInstallment_Title" xml:space="preserve">
         <value>Eliminar Cuota</value>
     </data>

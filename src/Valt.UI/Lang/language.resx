@@ -2171,6 +2171,15 @@
     <data name="ManageTransactions_UseInstallments" xml:space="preserve">
         <value>Use installments</value>
     </data>
+    <data name="TransactionEditor_SaveTransaction" xml:space="preserve">
+        <value>Save Transaction</value>
+    </data>
+    <data name="TransactionEditor_CreateTransfer" xml:space="preserve">
+        <value>Create Transfer</value>
+    </data>
+    <data name="TransactionEditor_SaveTransfer" xml:space="preserve">
+        <value>Save Transfer</value>
+    </data>
     <data name="DeleteInstallment_Title" xml:space="preserve">
         <value>Delete Installment</value>
     </data>

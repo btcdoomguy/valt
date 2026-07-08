@@ -4335,6 +4335,24 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string TransactionEditor_SaveTransaction {
+            get {
+                return ResourceManager.GetString("TransactionEditor_SaveTransaction", resourceCulture);
+            }
+        }
+        
+        public static string TransactionEditor_CreateTransfer {
+            get {
+                return ResourceManager.GetString("TransactionEditor_CreateTransfer", resourceCulture);
+            }
+        }
+        
+        public static string TransactionEditor_SaveTransfer {
+            get {
+                return ResourceManager.GetString("TransactionEditor_SaveTransfer", resourceCulture);
+            }
+        }
+        
         public static string DeleteInstallment_Title {
             get {
                 return ResourceManager.GetString("DeleteInstallment_Title", resourceCulture);

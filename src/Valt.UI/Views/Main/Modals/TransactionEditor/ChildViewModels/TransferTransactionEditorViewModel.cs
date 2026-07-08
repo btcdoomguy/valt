@@ -68,7 +68,7 @@ public partial class TransferTransactionEditorViewModel : TransactionEditorChild
 
     public bool ToAccountIsBtc => ToAccountType == AccountTypes.Bitcoin;
 
-    private bool AccountsAreSameTypeAndCurrency
+    public bool AccountsAreSameTypeAndCurrency
     {
         get
         {
