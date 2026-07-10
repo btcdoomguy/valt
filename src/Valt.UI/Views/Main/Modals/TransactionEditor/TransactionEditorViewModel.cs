@@ -102,6 +102,7 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel
     {
         TransactionTypes.Transfer when _transactionId is null => language.TransactionEditor_CreateTransfer,
         TransactionTypes.Transfer => language.TransactionEditor_SaveTransfer,
+        _ when _transactionId is null => language.TransactionEditor_CreateTransaction,
         _ => language.TransactionEditor_SaveTransaction
     };
 

@@ -4341,6 +4341,12 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string TransactionEditor_CreateTransaction {
+            get {
+                return ResourceManager.GetString("TransactionEditor_CreateTransaction", resourceCulture);
+            }
+        }
+        
         public static string TransactionEditor_CreateTransfer {
             get {
                 return ResourceManager.GetString("TransactionEditor_CreateTransfer", resourceCulture);

@@ -2174,6 +2174,9 @@
     <data name="TransactionEditor_SaveTransaction" xml:space="preserve">
         <value>Save Transaction</value>
     </data>
+    <data name="TransactionEditor_CreateTransaction" xml:space="preserve">
+        <value>Add Transaction</value>
+    </data>
     <data name="TransactionEditor_CreateTransfer" xml:space="preserve">
         <value>Create Transfer</value>
     </data>

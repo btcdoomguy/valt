@@ -297,10 +297,20 @@ public class TransactionEditorViewModelTests : DatabaseTest
     }
 
     [Test]
-    public void TransactionEditorViewModel_OkButtonLabel_ShouldBeSaveTransactionForDebt()
+    public void TransactionEditorViewModel_OkButtonLabel_ShouldBeAddTransactionForDebt()
     {
         var model = CreateInstance();
         model.SwitchToDebtCommand.Execute(null);
+
+        Assert.That(model.OkButtonLabel, Is.EqualTo(language.TransactionEditor_CreateTransaction));
+    }
+
+    [Test]
+    public void TransactionEditorViewModel_OkButtonLabel_ShouldBeSaveTransactionForDebt_WhenEditing()
+    {
+        var model = CreateInstance();
+        model.SwitchToDebtCommand.Execute(null);
+        typeof(TransactionEditorViewModel).GetField("_transactionId", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.SetValue(model, new TransactionId("test-id"));
 
         Assert.That(model.OkButtonLabel, Is.EqualTo(language.TransactionEditor_SaveTransaction));
     }
