@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Valt.UI.Base;
 using Valt.UI.Views.Main.Modals.TransactionEditor.Views;
@@ -24,17 +25,20 @@ public partial class TransactionEditorView : ValtBaseWindow
         var viewModel = DataContext as TransactionEditorViewModel;
         if (viewModel is null) return;
 
-        var childView = ChildContentControl?.GetVisualDescendants().OfType<ITransactionEditorChildView>().FirstOrDefault();
-        if (childView is null) return;
+        Dispatcher.UIThread.Post(() =>
+        {
+            var childView = ChildContentControl?.GetVisualDescendants().OfType<ITransactionEditorChildView>().FirstOrDefault();
+            if (childView is null) return;
 
-        if (viewModel.TransactionFixedExpenseReference is not null)
-        {
-            childView.FocusAmountInput();
-        }
-        else
-        {
-            childView.FocusNameInput();
-        }
+            if (viewModel.TransactionFixedExpenseReference is not null)
+            {
+                childView.FocusAmountInput();
+            }
+            else
+            {
+                childView.FocusNameInput();
+            }
+        }, DispatcherPriority.ApplicationIdle);
     }
 
     private void OnKeyDown(object? sender, KeyEventArgs e)
