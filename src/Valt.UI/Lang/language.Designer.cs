@@ -4335,27 +4335,15 @@ namespace Valt.UI.Lang {
             }
         }
         
-        public static string TransactionEditor_SaveTransaction {
+        public static string TransactionEditor_Ok {
             get {
-                return ResourceManager.GetString("TransactionEditor_SaveTransaction", resourceCulture);
+                return ResourceManager.GetString("TransactionEditor_Ok", resourceCulture);
             }
         }
         
-        public static string TransactionEditor_CreateTransaction {
+        public static string TransactionEditor_Save {
             get {
-                return ResourceManager.GetString("TransactionEditor_CreateTransaction", resourceCulture);
-            }
-        }
-        
-        public static string TransactionEditor_CreateTransfer {
-            get {
-                return ResourceManager.GetString("TransactionEditor_CreateTransfer", resourceCulture);
-            }
-        }
-        
-        public static string TransactionEditor_SaveTransfer {
-            get {
-                return ResourceManager.GetString("TransactionEditor_SaveTransfer", resourceCulture);
+                return ResourceManager.GetString("TransactionEditor_Save", resourceCulture);
             }
         }
         

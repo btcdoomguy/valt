@@ -297,30 +297,40 @@ public class TransactionEditorViewModelTests : DatabaseTest
     }
 
     [Test]
-    public void TransactionEditorViewModel_OkButtonLabel_ShouldBeAddTransactionForDebt()
+    public void TransactionEditorViewModel_OkButtonLabel_ShouldBeOkForDebt_WhenAdding()
     {
         var model = CreateInstance();
         model.SwitchToDebtCommand.Execute(null);
 
-        Assert.That(model.OkButtonLabel, Is.EqualTo(language.TransactionEditor_CreateTransaction));
+        Assert.That(model.OkButtonLabel, Is.EqualTo(language.TransactionEditor_Ok));
     }
 
     [Test]
-    public void TransactionEditorViewModel_OkButtonLabel_ShouldBeSaveTransactionForDebt_WhenEditing()
+    public void TransactionEditorViewModel_OkButtonLabel_ShouldBeSaveForDebt_WhenEditing()
     {
         var model = CreateInstance();
         model.SwitchToDebtCommand.Execute(null);
         typeof(TransactionEditorViewModel).GetField("_transactionId", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.SetValue(model, new TransactionId("test-id"));
 
-        Assert.That(model.OkButtonLabel, Is.EqualTo(language.TransactionEditor_SaveTransaction));
+        Assert.That(model.OkButtonLabel, Is.EqualTo(language.TransactionEditor_Save));
     }
 
     [Test]
-    public void TransactionEditorViewModel_OkButtonLabel_ShouldBeCreateTransferForTransferAdd()
+    public void TransactionEditorViewModel_OkButtonLabel_ShouldBeOkForTransfer_WhenAdding()
     {
         var model = CreateInstance();
         model.SwitchToTransferCommand.Execute(null);
 
-        Assert.That(model.OkButtonLabel, Is.EqualTo(language.TransactionEditor_CreateTransfer));
+        Assert.That(model.OkButtonLabel, Is.EqualTo(language.TransactionEditor_Ok));
+    }
+
+    [Test]
+    public void TransactionEditorViewModel_OkButtonLabel_ShouldBeSaveForTransfer_WhenEditing()
+    {
+        var model = CreateInstance();
+        model.SwitchToTransferCommand.Execute(null);
+        typeof(TransactionEditorViewModel).GetField("_transactionId", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.SetValue(model, new TransactionId("test-id"));
+
+        Assert.That(model.OkButtonLabel, Is.EqualTo(language.TransactionEditor_Save));
     }
 }

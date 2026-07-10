@@ -2168,17 +2168,11 @@
     <data name="ManageTransactions_UseInstallments" xml:space="preserve">
         <value>Parcelar</value>
     </data>
-    <data name="TransactionEditor_SaveTransaction" xml:space="preserve">
-        <value>Salvar transação</value>
+    <data name="TransactionEditor_Ok" xml:space="preserve">
+        <value>OK</value>
     </data>
-    <data name="TransactionEditor_CreateTransaction" xml:space="preserve">
-        <value>Adicionar transação</value>
-    </data>
-    <data name="TransactionEditor_CreateTransfer" xml:space="preserve">
-        <value>Criar transferência</value>
-    </data>
-    <data name="TransactionEditor_SaveTransfer" xml:space="preserve">
-        <value>Salvar transferência</value>
+    <data name="TransactionEditor_Save" xml:space="preserve">
+        <value>Salvar</value>
     </data>
     <data name="DeleteInstallment_Title" xml:space="preserve">
         <value>Excluir Parcela</value>

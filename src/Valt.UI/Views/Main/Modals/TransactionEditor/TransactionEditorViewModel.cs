@@ -95,16 +95,11 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel
     public bool TransferSelected => SelectedMode == TransactionTypes.Transfer;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(OkButtonLabel))]
     private TransactionEditorChildViewModel? _activeChildViewModel;
 
-    public string OkButtonLabel => SelectedMode switch
-    {
-        TransactionTypes.Transfer when _transactionId is null => language.TransactionEditor_CreateTransfer,
-        TransactionTypes.Transfer => language.TransactionEditor_SaveTransfer,
-        _ when _transactionId is null => language.TransactionEditor_CreateTransaction,
-        _ => language.TransactionEditor_SaveTransaction
-    };
+    public string OkButtonLabel => _transactionId is null
+        ? language.TransactionEditor_Ok
+        : language.TransactionEditor_Save;
 
     [ObservableProperty] private string _windowTitle = language.ManageTransactions_AddTitle;
 
