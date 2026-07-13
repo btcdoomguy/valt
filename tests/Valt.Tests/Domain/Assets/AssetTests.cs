@@ -261,6 +261,71 @@ public class AssetTests
 
     #endregion
 
+    #region Sold State Tests
+
+    [Test]
+    public void MarkAsSold_Sets_IsSold_DateSold_Visible_False_And_Captures_PreviousVisibility()
+    {
+        // Arrange
+        var asset = AssetBuilder.AnAsset().WithVisible(true).Build();
+        asset.ClearEvents();
+        var saleDate = new DateOnly(2025, 1, 15);
+
+        // Act
+        asset.MarkAsSold(saleDate);
+
+        // Assert
+        Assert.That(asset.IsSold, Is.True);
+        Assert.That(asset.DateSold, Is.EqualTo(saleDate));
+        Assert.That(asset.Visible, Is.False);
+        Assert.That(asset.PreviousVisibility, Is.True);
+        Assert.That(asset.Events.Count, Is.EqualTo(1));
+        Assert.That(asset.Events.First(), Is.TypeOf<AssetUpdatedEvent>());
+    }
+
+    [Test]
+    public void UndoSale_Restores_PreviousVisibility_And_Clears_Sold_State()
+    {
+        // Arrange
+        var asset = AssetBuilder.AnAsset()
+            .WithVisible(false)
+            .WithPreviousVisibility(true)
+            .WithSold(true)
+            .WithDateSold(new DateOnly(2025, 1, 15))
+            .Build();
+        asset.ClearEvents();
+
+        // Act
+        asset.UndoSale();
+
+        // Assert
+        Assert.That(asset.IsSold, Is.False);
+        Assert.That(asset.DateSold, Is.Null);
+        Assert.That(asset.Visible, Is.True);
+        Assert.That(asset.PreviousVisibility, Is.True);
+        Assert.That(asset.Events.Count, Is.EqualTo(1));
+        Assert.That(asset.Events.First(), Is.TypeOf<AssetUpdatedEvent>());
+    }
+
+    [Test]
+    public void MarkAsSold_Without_Date_Defaults_To_Today()
+    {
+        // Arrange
+        var asset = AssetBuilder.AnAsset().Build();
+        asset.ClearEvents();
+        var today = DateOnly.FromDateTime(DateTime.Today);
+
+        // Act
+        asset.MarkAsSold(null);
+
+        // Assert
+        Assert.That(asset.IsSold, Is.True);
+        Assert.That(asset.DateSold, Is.EqualTo(today));
+        Assert.That(asset.Visible, Is.False);
+    }
+
+    #endregion
+
     #region Currency Code Tests
 
     [Test]
