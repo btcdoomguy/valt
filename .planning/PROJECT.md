@@ -35,11 +35,13 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - ✓ Provide Undo Sell action to restore the asset to the active view — Phase 29
 - ✓ Prompt for Date Sold when not provided during the sell action — Phase 29
 
+- ✓ Add a History button on the Assets toolbar to access sold assets — Phase 30
+- ✓ Build a History screen listing sold assets with their sale date — Phase 30
+- ✓ Show per-type asset details summary in the History screen when an asset is selected — Phase 30
+- ✓ Undo Sell action restores the asset to the active view and refreshes the Assets tab — Phase 30
+
 ### Active
 
-- [ ] Add a History button on the Assets toolbar to access sold assets
-- [ ] Build a History screen listing sold assets with their sale date
-- [ ] Show per-type asset details summary in the History screen when an asset is selected
 - [ ] Update Assets documentation and MCP tool exposure for sold assets
 
 
@@ -108,4 +110,4 @@ This document evolves at phase transitions and milestone boundaries.
 - Optional Date Sold prompt when not provided at sale time
 
 ---
-*Last updated: 2026-07-13 after Phase 29 completion — domain sold-state foundation, active-view filtering, and gap fixes delivered*
+*Last updated: 2026-07-13 after Phase 30 completion — History UI, Mark as Sold flow, and undo-to-refresh gap closure delivered*
