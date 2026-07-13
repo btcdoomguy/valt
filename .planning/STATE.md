@@ -5,8 +5,8 @@ milestone_name: Asset Sold History
 current_phase: 30
 current_phase_name: History UI and Details Reuse
 status: verifying
-stopped_at: Completed 29-04-PLAN.md
-last_updated: "2026-07-13T18:13:56.015Z"
+stopped_at: Phase 30 UI-SPEC approved
+last_updated: "2026-07-13T18:45:01.920Z"
 last_activity: 2026-07-13
 last_activity_desc: Phase 29 complete, transitioned to Phase 30
 progress:
@@ -98,6 +98,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-13T17:54:04.632Z
-Stopped at: Completed 29-04-PLAN.md
-Resume file: None
+Last session: 2026-07-13T18:45:01.915Z
+Stopped at: Phase 30 UI-SPEC approved
+Resume file: .planning/phases/30-history-ui-and-details-reuse/30-UI-SPEC.md

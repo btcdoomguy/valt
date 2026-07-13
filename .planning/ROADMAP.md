@@ -66,7 +66,16 @@ Plans:
 3. Selecting a sold asset shows a per-type details summary matching the main asset card.
 4. User can undo a sale directly from the History screen.
 
-**Plans:** TBD
+**Plans:** 2 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 30-01-PLAN.md — Build the SoldAssetHistory modal, list, details card, and toolbar button
+
+**Wave 2** *(depends on Wave 1 completion)*
+
+- [ ] 30-02-PLAN.md — Wire active-view Mark as Sold flow with DateSoldPrompt and optional proceeds transaction
 
 **UI hint:** yes
 
