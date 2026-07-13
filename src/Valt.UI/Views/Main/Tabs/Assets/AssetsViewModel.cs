@@ -42,6 +42,7 @@ using Valt.UI.Views.Main.Modals.ManageAssetGroupsList;
 using Valt.UI.Views.Main.Modals.TransactionEditor;
 using Valt.UI.Views.Main.Modals.UpdateLoanState;
 using Valt.UI.Views.Main.Modals.LoanStateHistory;
+using Valt.UI.Views.Main.Modals.SoldAssetHistory;
 using Valt.UI.Views.Main.Tabs.Assets.Models;
 
 
@@ -626,6 +627,22 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
             new LoanStateHistoryViewModel.Request { AssetId = asset.Id });
 
         await modal.ShowDialogSafeAsync<LoanStateHistoryViewModel.Response?>(ownerWindow);
+    }
+
+    [RelayCommand]
+    private async Task OpenHistory()
+    {
+        if (IsSecureModeEnabled) return;
+
+        var ownerWindow = GetUserControlOwnerWindow?.Invoke();
+        if (ownerWindow is null)
+            return;
+
+        var modal = (SoldAssetHistoryView)await _modalFactory.CreateAsync(
+            ApplicationModalNames.SoldAssetHistory,
+            ownerWindow);
+
+        await modal.ShowDialogSafeAsync<SoldAssetHistoryViewModel.Response?>(ownerWindow);
     }
 
     [RelayCommand]

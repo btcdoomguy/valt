@@ -15,4 +15,8 @@ public partial class SoldAssetHistoryViewModel : ValtModalViewModel
         CloseWindow?.Invoke();
         return Task.CompletedTask;
     }
+
+    public record Response
+    {
+    }
 }

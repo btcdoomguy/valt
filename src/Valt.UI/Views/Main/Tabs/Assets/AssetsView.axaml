@@ -582,6 +582,8 @@
                                 Content="{x:Static lang:language.Assets_Add}" />
                         <Button Command="{Binding AddAssetGroupCommand}"
                                 Content="{x:Static lang:language.Assets_ManageGroups}" />
+                        <Button Command="{Binding OpenHistoryCommand}"
+                                Content="History" />
                     </StackPanel>
                 </Grid>
 
