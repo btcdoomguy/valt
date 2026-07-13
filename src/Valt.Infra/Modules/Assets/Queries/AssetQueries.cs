@@ -45,7 +45,7 @@ internal sealed class AssetQueries : IAssetQueries
     public Task<IReadOnlyList<AssetDTO>> GetVisibleAsync()
     {
         var entities = _localDatabase.GetAssets()
-            .Find(x => x.Visible)
+            .Find(x => x.Visible && !x.IsSold)
             .OrderBy(x => x.DisplayOrder)
             .ThenBy(x => x.Name)
             .ToList();

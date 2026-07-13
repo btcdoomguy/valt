@@ -36,6 +36,9 @@ internal sealed class MarkAssetAsSoldHandler : ICommandHandler<MarkAssetAsSoldCo
         if (asset is null)
             return Result<Unit>.NotFound("Asset", command.AssetId);
 
+        if (asset.IsSold)
+            return Result<Unit>.Failure(new Error("ASSET_ALREADY_SOLD", "Asset is already sold."));
+
         var effectiveDate = command.DateSold ?? _clock.GetCurrentLocalDate();
         asset.MarkAsSold(effectiveDate);
         await _assetRepository.SaveAsync(asset);

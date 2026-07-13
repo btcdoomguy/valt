@@ -32,6 +32,9 @@ internal sealed class UndoAssetSaleHandler : ICommandHandler<UndoAssetSaleComman
         if (asset is null)
             return Result<Unit>.NotFound("Asset", command.AssetId);
 
+        if (!asset.IsSold)
+            return Result<Unit>.Failure(new Error("ASSET_NOT_SOLD", "Asset is not sold."));
+
         asset.UndoSale();
         await _assetRepository.SaveAsync(asset);
 

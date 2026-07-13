@@ -157,6 +157,9 @@ public sealed class Asset : AggregateRoot<AssetId>
 
     public void MarkAsSold(DateOnly? dateSold)
     {
+        if (IsSold)
+            return;
+
         IsSold = true;
         DateSold = dateSold ?? DateOnly.FromDateTime(DateTime.Today);
         PreviousVisibility = Visible;
@@ -166,6 +169,9 @@ public sealed class Asset : AggregateRoot<AssetId>
 
     public void UndoSale()
     {
+        if (!IsSold)
+            return;
+
         IsSold = false;
         DateSold = null;
         Visible = PreviousVisibility;
