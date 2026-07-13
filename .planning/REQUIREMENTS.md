@@ -1,138 +1,103 @@
-# Requirements: Valt
+# Requirements: Valt v0.5 Asset Sold History
 
-**Defined:** 2026-06-19
+**Defined:** 2026-07-13
 **Core Value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
 
 ## v1 Requirements
 
-### Async & Fire-and-Forget Safety
+Requirements for the Asset Sold History milestone. Each maps to roadmap phases.
 
-- [x] **ASYNC-01**: No `async void` methods remain in the UI layer; all fire-and-forget work is observable and logs failures
-- [x] **ASYNC-02**: No `.GetAwaiter().GetResult()` blocking calls remain in ViewModels
-- [x] **ASYNC-03**: `SafeFireAndForget` either surfaces exceptions to a logger or is replaced by an explicit command/task pattern
+### Asset Sold State
 
-### HTTP Resilience
+- [ ] **ASSET-01**: User can mark an asset as sold with a recorded `Date Sold`
+- [ ] **ASSET-02**: Sold assets are hidden from the main Assets tab grid
+- [ ] **ASSET-03**: Sold assets are excluded from asset totals, net worth, and leverage calculations
+- [ ] **ASSET-04**: User can undo a sale, restoring the asset to the active view with its prior visibility state
+- [ ] **ASSET-05**: `Date Sold` defaults to today and accepts past dates when not provided at sale time
+- [ ] **ASSET-06**: Asset price updater skips sold assets to avoid unnecessary API calls
 
-- [x] **HTTP-01**: `IHttpClientFactory` is registered in DI and all `new HttpClient()` sites use named/typed clients
-- [x] **HTTP-02**: Price providers and update checkers share a consistent HTTP client lifetime and configuration
-- [x] **HTTP-03**: Existing provider tests continue to pass against the factory-based clients
+### History Screen
 
-### Background Job Efficiency
+- [ ] **HIST-01**: User can open a History screen from the Assets toolbar (beside Add Asset and Manage Groups)
+- [ ] **HIST-02**: History screen lists sold assets sorted by `Date Sold` descending with name, type, and date sold
+- [ ] **HIST-03**: Selecting a sold asset in History shows a per-type details summary using the same mapping as the main asset card
+- [ ] **HIST-04**: User can undo a sale directly from the History screen
 
-- [x] **JOB-01**: `AccountTotalsJob` polling interval is raised and only acts as a day-rollover safety net
-- [x] **JOB-02**: `GoalProgressUpdaterJob` is triggered by stale-flag events instead of relying primarily on polling
-- [x] **JOB-03**: Job fallback intervals remain high enough to avoid unnecessary wake-ups
+### MCP Tools
 
-### Database Performance
+- [ ] **MCP-01**: AI assistant can mark an asset as sold via MCP tool
+- [ ] **MCP-02**: AI assistant can undo a sale via MCP tool
+- [ ] **MCP-03**: AI assistant can list sold assets via MCP tool
 
-- [x] **DB-01**: LiteDB indexes are ensured once per database open, not on every collection access
-- [x] **DB-02**: `LocalDatabase` and `PriceDatabase` expose a single `EnsureIndexes()` call invoked from all open paths
-- [x] **DB-03**: No regression in query behavior or index coverage after centralization
+### Localization & Documentation
 
-### ViewModel Simplification — Services
+- [ ] **DOCS-01**: All new user-facing strings are localized in `language.resx`, `language.pt-BR.resx`, and `language.es.resx`
+- [ ] **DOCS-02**: `.claude/docs/assets.md` is updated with sold-history behavior and MCP impact
 
-- [x] **VM-SVC-01**: `TransactionEditorViewModel` delegates transaction-details DTO construction to a dedicated builder service
-- [x] **VM-SVC-02**: `ManageAssetViewModel` delegates per-type asset command/DTO construction to a dedicated builder service
-- [ ] **VM-SVC-03**: `MainViewModel` uses a reusable modal-launcher service instead of repeated `_modalFactory`/`ShowDialogSafeAsync` boilerplate
-- [ ] **VM-SVC-04**: `ReportsViewModel` delegates leverage-position and BTC-loan dashboard data generation to dedicated services or child VMs
+### Verification
 
-### ViewModel Simplification — Child VMs & XAML
-
-- [x] **VM-CHILD-01**: `TransactionEditorViewModel` is split into per-transfer-type child VMs bound through `ContentControl` + `DataTemplate`s
-- [ ] **VM-CHILD-02**: `ManageAssetViewModel` is split into per-asset-type child VMs bound through `ContentControl` + `DataTemplate`s
-- [ ] **VM-CHILD-03**: `ReportsViewModel` is split into per-report child VMs with a coordinator owning filters and the report-data cache
-- [ ] **VM-CHILD-04**: `MainViewModel` is split into database-flow coordinator, job-status aggregator, and market-mood child VMs
-
-### Test Reliability
-
-- [ ] **TEST-01**: Live-API tests are isolated behind `[Category("LiveApi")]` and do not run in normal CI
-- [ ] **TEST-02**: `DatabaseTest` lifecycle issues are fixed (duplicate `[OneTimeTearDown]`, `new SetUp()` hiding, state sharing)
-- [ ] **TEST-03**: Timing-dependent `Task.Delay` calls in UI tests are replaced with deterministic synchronization
-
-### Handler Test Coverage
-
-- [ ] **HANDLER-01**: `EditTransactionCommand`, `EditFixedExpenseCommand`, and `EditAssetCommand` handlers have unit tests
-- [ ] **HANDLER-02**: `UpdateAssetPriceCommand`, `UpdateAssetQuantityCommand`, `BulkChangeCategoryTransactionsCommand`, and `BulkRenameTransactionsCommand` handlers have unit tests
-- [ ] **HANDLER-03**: `GetTransactionsQuery`, `GetAccountsQuery`, `GetFixedExpenseHistoryQuery`, and `GetSpendingEvolutionQuery` handlers have unit tests
-- [ ] **HANDLER-04**: `GetAssetQuery` and `GetAssetSummaryQuery` handlers have unit tests
+- [ ] **TEST-01**: Unit tests cover `SellAsset` and `UndoSellAsset` command validation and state changes
+- [ ] **TEST-02**: Query tests verify active-asset and sold-asset filters and totals exclusion
+- [ ] **TEST-03**: End-to-end verification covers mark sold, history browse, details panel, undo, and totals refresh
 
 ## v2 Requirements
 
-### Architecture Hardening
+Deferred to future release. Tracked but not in current roadmap.
 
-- **ARCH-01**: Remove the direct `Valt.UI` → `Valt.Infra` project reference and enforce the boundary with a NetArchTest rule
-- **ARCH-02**: Move report-engine abstractions from `Valt.Infra` to `Valt.App` and expose them through queries
-- **ARCH-03**: Move wealth calculation out of `AccountsTotalState` into an App-layer query
-- **ARCH-04**: Split `IConfigurationManager` into focused interfaces
-- **ARCH-05**: Introduce application-level ports for settings, transaction-term search, and price lookup
+### History Enhancements
 
-### Security Hardening
+- **HIST-05**: User can filter history by year or asset type
+- **HIST-06**: User can bulk mark multiple assets as sold
 
-- **SEC-01**: Replace secure-mode SHA-256 password hashing with PBKDF2 or equivalent
-- **SEC-02**: Avoid writing the unencrypted database to a temporary path during password changes
-- **SEC-03**: Review and harden MCP server authentication if it remains enabled
+### Advanced Sale Tracking
 
-### Additional Performance
-
-- **PERF-01**: Replace `ItemsControl` with virtualized `ListBox` in asset lists
-- **PERF-02**: Diff/update large bound collections instead of clear/rebuild
-- **PERF-03**: Cache chart series and points instead of recreating them on every refresh
-- **PERF-04**: Parallelize or batch asset-price updates instead of sequential 1-second-delay loop
-
-### Additional Test Coverage
-
-- **TEST-V2-01**: Add MCP tool tests for `TransactionTools`, `AccountTools`, `GoalTools`, `CurrencyTools`, and `ReportTools`
-- **TEST-V2-02**: Add background-job tests for `AutoSatAmountJob`, `AccountTotalsJob`, `GoalProgressUpdaterJob`, `AssetPriceUpdaterJob`, and `BitcoinHistoryUpdaterJob`
-- **TEST-V2-03**: Add migration and settings serialization tests
+- **ASSET-07**: User can record sale price, proceeds, and commission
+- **ASSET-08**: System calculates realized capital gains/losses per sold asset
+- **ASSET-09**: Tax-lot tracking and tax-year reporting for sold assets
 
 ## Out of Scope
 
+Explicitly excluded. Documented to prevent scope creep.
+
 | Feature | Reason |
 |---------|--------|
-| Major UI redesign or new user-facing features | This milestone is hardening/quality, not new capability |
-| Replacing LiteDB or Avalonia | Out of scope for a quality milestone; would require its own roadmap |
-| Full MCP server redesign | Security review only; redesign deferred to v0.5 |
-| Real-time price streaming architecture | Not needed; current polling + event triggers are sufficient after tuning |
-| Mobile or web port | Not a quality concern |
+| Sale price, capital gains, or tax-lot tracking | Out of scope for v0.5; record-keeping only. Requires new domain concepts and a dedicated tax/gains milestone. |
+| Auto-detect sold assets from external data | Valt has no broker/exchange integrations; manual Mark as Sold only. |
+| Hard-delete sold assets from history | Defeats the record-keeping purpose of the feature. |
+| Separate archive collection/table for sold assets | Adds migration/query complexity; a flag on the existing entity is simpler and backward-compatible. |
+| Realized P&L in History | Depends on sale price tracking, which is deferred. |
+| v0.4 quality/hardening items | Deferred to a future quality milestone; v0.5 is focused on Asset Sold History. |
 
 ## Traceability
 
+Which phases cover which requirements. Updated during roadmap creation.
+
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ASYNC-01 | Phase 11 | Complete |
-| ASYNC-02 | Phase 12 | Complete |
-| ASYNC-03 | Phase 11 | Complete |
-| HTTP-01 | Phase 13 | Complete |
-| HTTP-02 | Phase 13 | Complete |
-| HTTP-03 | Phase 13 | Complete |
-| JOB-01 | Phase 15 | Complete |
-| JOB-02 | Phase 14 | Complete |
-| JOB-03 | Phase 14/15 | Complete |
-| DB-01 | Phase 16 | Complete |
-| DB-02 | Phase 16 | Complete |
-| DB-03 | Phase 16 | Complete |
-| VM-SVC-01 | Phase 17 | Complete |
-| VM-SVC-02 | Phase 18 | Complete |
-| VM-SVC-03 | Phase 19 | Pending |
-| VM-SVC-04 | Phase 20 | Pending |
-| VM-CHILD-01 | Phase 21 | Complete |
-| VM-CHILD-02 | Phase 22 | Pending |
-| VM-CHILD-03 | Phase 23 | Pending |
-| VM-CHILD-04 | Phase 24 | Pending |
-| TEST-01 | Phase 25 | Pending |
-| TEST-02 | Phase 26 | Pending |
-| TEST-03 | Phase 26 | Pending |
-| HANDLER-01 | Phase 27 | Pending |
-| HANDLER-02 | Phase 27 | Pending |
-| HANDLER-03 | Phase 28 | Pending |
-| HANDLER-04 | Phase 28 | Pending |
+| ASSET-01 | Phase 1 | Pending |
+| ASSET-02 | Phase 1 | Pending |
+| ASSET-03 | Phase 1 | Pending |
+| ASSET-04 | Phase 1 | Pending |
+| ASSET-05 | Phase 1 | Pending |
+| ASSET-06 | Phase 1 | Pending |
+| HIST-01 | Phase 2 | Pending |
+| HIST-02 | Phase 2 | Pending |
+| HIST-03 | Phase 2 | Pending |
+| HIST-04 | Phase 2 | Pending |
+| MCP-01 | Phase 3 | Pending |
+| MCP-02 | Phase 3 | Pending |
+| MCP-03 | Phase 3 | Pending |
+| DOCS-01 | Phase 3 | Pending |
+| DOCS-02 | Phase 3 | Pending |
+| TEST-01 | Phase 1 | Pending |
+| TEST-02 | Phase 1 | Pending |
+| TEST-03 | Phase 3 | Pending |
 
 **Coverage:**
-
-- v1 requirements: 27 total
-- Mapped to phases: 27
+- v1 requirements: 18 total
+- Mapped to phases: 18
 - Unmapped: 0 ✓
 
 ---
-*Requirements defined: 2026-06-19*
-*Last updated: 2026-06-19 after milestone v0.4 planning start*
+*Requirements defined: 2026-07-13*
+*Last updated: 2026-07-13 after initial definition*
