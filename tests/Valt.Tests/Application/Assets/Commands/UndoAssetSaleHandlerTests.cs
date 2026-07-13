@@ -67,6 +67,32 @@ public class UndoAssetSaleHandlerTests : DatabaseTest
     }
 
     [Test]
+    public async Task HandleAsync_WithActiveAsset_ReturnsNotSoldError()
+    {
+        // Arrange
+        var activeAsset = AssetBuilder.AStockAsset("TSLA", 300m, 5)
+            .WithSold(false)
+            .WithVisible(false)
+            .Build();
+        await _assetRepository.SaveAsync(activeAsset);
+
+        var command = new UndoAssetSaleCommand
+        {
+            AssetId = activeAsset.Id.Value
+        };
+
+        // Act
+        var result = await _handler.HandleAsync(command);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailure, Is.True);
+            Assert.That(result.Error!.Code, Is.EqualTo("ASSET_NOT_SOLD"));
+        });
+    }
+
+    [Test]
     public async Task HandleAsync_WithEmptyAssetId_ReturnsValidationError()
     {
         var command = new UndoAssetSaleCommand

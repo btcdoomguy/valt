@@ -34,7 +34,7 @@ public class GetAssetsHandlerTests : DatabaseTest
     }
 
     [Test]
-    public async Task HandleAsync_ReturnsAllAssets()
+    public async Task HandleAsync_ReturnsActiveAssets()
     {
         var query = new GetAssetsQuery();
 

@@ -32,9 +32,14 @@ public class MarkAssetAsSoldHandlerTests : DatabaseTest
     [Test]
     public async Task HandleAsync_MarksAssetAsSold()
     {
+        var freshAsset = AssetBuilder.AStockAsset("AAPL", 150m, 10)
+            .WithVisible(true)
+            .Build();
+        await _assetRepository.SaveAsync(freshAsset);
+
         var command = new MarkAssetAsSoldCommand
         {
-            AssetId = _existingAsset.Id.Value,
+            AssetId = freshAsset.Id.Value,
             DateSold = new DateOnly(2025, 1, 15)
         };
 
@@ -42,7 +47,7 @@ public class MarkAssetAsSoldHandlerTests : DatabaseTest
 
         Assert.That(result.IsSuccess, Is.True);
 
-        var updatedAsset = await _assetRepository.GetByIdAsync(_existingAsset.Id);
+        var updatedAsset = await _assetRepository.GetByIdAsync(freshAsset.Id);
         Assert.That(updatedAsset, Is.Not.Null);
         Assert.That(updatedAsset!.IsSold, Is.True);
         Assert.That(updatedAsset.DateSold, Is.EqualTo(new DateOnly(2025, 1, 15)));
@@ -53,9 +58,14 @@ public class MarkAssetAsSoldHandlerTests : DatabaseTest
     [Test]
     public async Task HandleAsync_WithPastDate_Succeeds()
     {
+        var freshAsset = AssetBuilder.AStockAsset("MSFT", 200m, 5)
+            .WithVisible(true)
+            .Build();
+        await _assetRepository.SaveAsync(freshAsset);
+
         var command = new MarkAssetAsSoldCommand
         {
-            AssetId = _existingAsset.Id.Value,
+            AssetId = freshAsset.Id.Value,
             DateSold = new DateOnly(2024, 12, 31)
         };
 
@@ -63,7 +73,7 @@ public class MarkAssetAsSoldHandlerTests : DatabaseTest
 
         Assert.That(result.IsSuccess, Is.True);
 
-        var updatedAsset = await _assetRepository.GetByIdAsync(_existingAsset.Id);
+        var updatedAsset = await _assetRepository.GetByIdAsync(freshAsset.Id);
         Assert.That(updatedAsset!.DateSold, Is.EqualTo(new DateOnly(2024, 12, 31)));
     }
 
@@ -88,9 +98,14 @@ public class MarkAssetAsSoldHandlerTests : DatabaseTest
     [Test]
     public async Task HandleAsync_WithNullDate_DefaultsToToday()
     {
+        var freshAsset = AssetBuilder.AStockAsset("GOOGL", 250m, 8)
+            .WithVisible(true)
+            .Build();
+        await _assetRepository.SaveAsync(freshAsset);
+
         var command = new MarkAssetAsSoldCommand
         {
-            AssetId = _existingAsset.Id.Value,
+            AssetId = freshAsset.Id.Value,
             DateSold = null
         };
 
@@ -98,7 +113,7 @@ public class MarkAssetAsSoldHandlerTests : DatabaseTest
 
         Assert.That(result.IsSuccess, Is.True);
 
-        var updatedAsset = await _assetRepository.GetByIdAsync(_existingAsset.Id);
+        var updatedAsset = await _assetRepository.GetByIdAsync(freshAsset.Id);
         Assert.That(updatedAsset!.DateSold, Is.EqualTo(new DateOnly(2025, 6, 15)));
     }
 
@@ -117,6 +132,33 @@ public class MarkAssetAsSoldHandlerTests : DatabaseTest
         {
             Assert.That(result.IsFailure, Is.True);
             Assert.That(result.Error!.Code, Is.EqualTo("ASSET_NOT_FOUND"));
+        });
+    }
+
+    [Test]
+    public async Task HandleAsync_WithAlreadySoldAsset_ReturnsAlreadySoldError()
+    {
+        // Arrange
+        var soldAsset = AssetBuilder.AStockAsset("TSLA", 300m, 5)
+            .WithSold(true)
+            .WithDateSold(new DateOnly(2025, 1, 10))
+            .Build();
+        await _assetRepository.SaveAsync(soldAsset);
+
+        var command = new MarkAssetAsSoldCommand
+        {
+            AssetId = soldAsset.Id.Value,
+            DateSold = new DateOnly(2025, 1, 15)
+        };
+
+        // Act
+        var result = await _handler.HandleAsync(command);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailure, Is.True);
+            Assert.That(result.Error!.Code, Is.EqualTo("ASSET_ALREADY_SOLD"));
         });
     }
 }
