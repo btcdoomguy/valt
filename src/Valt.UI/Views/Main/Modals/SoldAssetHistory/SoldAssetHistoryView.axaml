@@ -52,7 +52,7 @@
                                   GridLinesVisibility="All"
                                   AutoGenerateColumns="False">
                             <DataGrid.Columns>
-                                <DataGridTemplateColumn Header="Name" Width="*">
+                                <DataGridTemplateColumn Header="{x:Static lang:language.SoldAssetHistory_Column_Name}" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate DataType="soldAssetHistory:SoldAssetHistoryViewModel+SoldAssetItemViewModel">
                                             <StackPanel Orientation="Horizontal" Spacing="6">
@@ -64,10 +64,10 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <DataGridTextColumn Header="Type"
+                                <DataGridTextColumn Header="{x:Static lang:language.SoldAssetHistory_Column_Type}"
                                                     Width="120"
                                                     Binding="{Binding AssetTypeName}" />
-                                <DataGridTextColumn Header="Date Sold"
+                                <DataGridTextColumn Header="{x:Static lang:language.SoldAssetHistory_Column_DateSold}"
                                                     Width="120"
                                                     Binding="{Binding DateSoldFormatted}" />
                             </DataGrid.Columns>
@@ -78,11 +78,11 @@
                                     VerticalAlignment="Center"
                                     HorizontalAlignment="Center"
                                     Spacing="8">
-                            <TextBlock Text="No sold assets yet"
+                            <TextBlock Text="{x:Static lang:language.SoldAssetHistory_NoSoldAssets}"
                                        FontSize="{DynamicResource FontSizeLarge}"
                                        FontWeight="SemiBold"
                                        HorizontalAlignment="Center" />
-                            <TextBlock Text="Assets you mark as sold will appear here with their sale date."
+                            <TextBlock Text="{x:Static lang:language.SoldAssetHistory_NoSoldAssets_Detail}"
                                        FontSize="{DynamicResource FontSizeSmall}"
                                        Foreground="{DynamicResource Text400Brush}"
                                        TextWrapping="Wrap"
@@ -95,7 +95,7 @@
                                     VerticalAlignment="Center"
                                     HorizontalAlignment="Center"
                                     Spacing="8">
-                            <TextBlock Text="Could not load sold assets"
+                            <TextBlock Text="{x:Static lang:language.SoldAssetHistory_LoadError}"
                                        FontSize="{DynamicResource FontSizeLarge}"
                                        FontWeight="SemiBold"
                                        HorizontalAlignment="Center" />
@@ -123,7 +123,7 @@
                             <!-- Date Sold metadata row -->
                             <Grid ColumnDefinitions="Auto, *">
                                 <TextBlock Grid.Column="0"
-                                           Text="Date Sold:"
+                                           Text="{x:Static lang:language.SoldAssetHistory_DateSold_Label}"
                                            FontSize="{DynamicResource FontSizeSmall}"
                                            Foreground="{DynamicResource AssetCardLabelBrush}"
                                            Margin="0,0,8,0" />
@@ -133,7 +133,7 @@
                                            Foreground="{DynamicResource AssetCardTextBrush}" />
                             </Grid>
 
-                            <Button Content="Restore Asset"
+                            <Button Content="{x:Static lang:language.SoldAssetHistory_RestoreAsset}"
                                      Command="{Binding RestoreAssetCommand}"
                                      Classes="primary"
                                      HorizontalAlignment="Stretch" />
@@ -148,7 +148,7 @@
                     Margin="10"
                     Padding="10">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Content="Close"
+                    <Button Content="{x:Static lang:language.SoldAssetHistory_Close}"
                             HorizontalContentAlignment="Center"
                             Command="{Binding CloseCommand}"
                             Width="100" />

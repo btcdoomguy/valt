@@ -18,6 +18,7 @@ using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
 using Valt.UI.State.Events;
 using Valt.UI.Views.Main.Tabs.Assets.Models;
+using Valt.UI.Lang;
 
 namespace Valt.UI.Views.Main.Modals.SoldAssetHistory;
 
@@ -28,7 +29,7 @@ public partial class SoldAssetHistoryViewModel : ValtModalViewModel
     private readonly CurrencySettings _currencySettings = null!;
     private readonly ILogger<SoldAssetHistoryViewModel> _logger = null!;
 
-    [ObservableProperty] private string _windowTitle = "Sold Asset History";
+    [ObservableProperty] private string _windowTitle = language.SoldAssetHistory_Title;
     [ObservableProperty] private bool _isLoadingError;
     [ObservableProperty] private string _errorMessage = string.Empty;
     [ObservableProperty] private SoldAssetItemViewModel? _selectedSoldAsset;
@@ -113,7 +114,7 @@ public partial class SoldAssetHistoryViewModel : ValtModalViewModel
         {
             _logger.LogError(ex, "Failed to load sold assets");
             IsLoadingError = true;
-            ErrorMessage = "Check your data and try again. If the problem persists, contact support.";
+            ErrorMessage = language.SoldAssetHistory_LoadError_Detail;
         }
 
         OnPropertyChanged(nameof(HasSoldAssets));
@@ -139,8 +140,8 @@ public partial class SoldAssetHistoryViewModel : ValtModalViewModel
 
         var ownerWindow = GetWindow();
         var confirmed = await MessageBoxHelper.ShowQuestionAsync(
-            "Restore Asset?",
-            "Restore this asset to the active Assets view?",
+            language.SoldAssetHistory_RestoreConfirmation_Title,
+            language.SoldAssetHistory_RestoreConfirmation_Message,
             ownerWindow);
 
         if (!confirmed)

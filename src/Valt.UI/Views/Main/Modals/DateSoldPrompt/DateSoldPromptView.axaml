@@ -33,7 +33,7 @@
 
             <Border Grid.Row="1" Margin="10" Padding="10">
                 <StackPanel Spacing="12">
-                    <TextBlock Text="When was this asset sold?"
+                    <TextBlock Text="{x:Static lang:language.SoldAssetHistory_DateSold_Prompt}"
                                FontSize="{DynamicResource FontSizeMedium}" />
                     <userControls:DateCalendarSelector Date="{Binding DateSold, Mode=TwoWay}">
                         <userControls:DateCalendarSelector.AllowedSelectorModes>

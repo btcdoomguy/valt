@@ -52,7 +52,7 @@
                         <MenuItem Header="{x:Static lang:language.Assets_Delete}"
                                   Command="{Binding $parent[UserControl].((assets:AssetsViewModel)DataContext).DeleteAssetCommand}"
                                   CommandParameter="{Binding}" />
-                        <MenuItem Header="Mark as Sold"
+                        <MenuItem Header="{x:Static lang:language.SoldAssetHistory_MarkAsSold}"
                                   Command="{Binding $parent[UserControl].((assets:AssetsViewModel)DataContext).MarkAssetAsSoldCommand}"
                                   CommandParameter="{Binding}" />
                         <Separator />
@@ -583,7 +583,7 @@
                         <Button Command="{Binding AddAssetGroupCommand}"
                                 Content="{x:Static lang:language.Assets_ManageGroups}" />
                         <Button Command="{Binding OpenHistoryCommand}"
-                                Content="History" />
+                                Content="{x:Static lang:language.SoldAssetHistory_History}" />
                     </StackPanel>
                 </Grid>
 

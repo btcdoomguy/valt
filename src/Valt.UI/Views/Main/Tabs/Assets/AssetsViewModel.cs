@@ -492,8 +492,8 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
             return;
 
         var confirmed = await MessageBoxHelper.ShowQuestionAsync(
-            "Mark as Sold?",
-            "This asset will be hidden from the active Assets view and moved to History.",
+            language.SoldAssetHistory_MarkAsSoldConfirmation_Title,
+            language.SoldAssetHistory_MarkAsSoldConfirmation_Message,
             ownerWindow);
 
         if (!confirmed)
@@ -520,8 +520,8 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
         }
 
         var recordProceeds = await MessageBoxHelper.ShowQuestionAsync(
-            "Record proceeds?",
-            "Would you like to record a transaction for the sale proceeds?",
+            language.SoldAssetHistory_RecordProceeds_Title,
+            language.SoldAssetHistory_RecordProceeds_Message,
             ownerWindow);
 
         if (recordProceeds)
