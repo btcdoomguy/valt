@@ -9,12 +9,12 @@ Requirements for the Asset Sold History milestone. Each maps to roadmap phases.
 
 ### Asset Sold State
 
-- [ ] **ASSET-01**: User can mark an asset as sold with a recorded `Date Sold`
-- [ ] **ASSET-02**: Sold assets are hidden from the main Assets tab grid
-- [ ] **ASSET-03**: Sold assets are excluded from asset totals, net worth, and leverage calculations
-- [ ] **ASSET-04**: User can undo a sale, restoring the asset to the active view with its prior visibility state
-- [ ] **ASSET-05**: `Date Sold` defaults to today and accepts past dates when not provided at sale time
-- [ ] **ASSET-06**: Asset price updater skips sold assets to avoid unnecessary API calls
+- [x] **ASSET-01**: User can mark an asset as sold with a recorded `Date Sold`
+- [x] **ASSET-02**: Sold assets are hidden from the main Assets tab grid
+- [x] **ASSET-03**: Sold assets are excluded from asset totals, net worth, and leverage calculations
+- [x] **ASSET-04**: User can undo a sale, restoring the asset to the active view with its prior visibility state
+- [x] **ASSET-05**: `Date Sold` defaults to today and accepts past dates when not provided at sale time
+- [x] **ASSET-06**: Asset price updater skips sold assets to avoid unnecessary API calls
 
 ### History Screen
 
@@ -36,8 +36,8 @@ Requirements for the Asset Sold History milestone. Each maps to roadmap phases.
 
 ### Verification
 
-- [ ] **TEST-01**: Unit tests cover `SellAsset` and `UndoSellAsset` command validation and state changes
-- [ ] **TEST-02**: Query tests verify active-asset and sold-asset filters and totals exclusion
+- [x] **TEST-01**: Unit tests cover `SellAsset` and `UndoSellAsset` command validation and state changes
+- [x] **TEST-02**: Query tests verify active-asset and sold-asset filters and totals exclusion
 - [ ] **TEST-03**: End-to-end verification covers mark sold, history browse, details panel, undo, and totals refresh
 
 ## v2 Requirements
@@ -74,12 +74,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ASSET-01 | Phase 29 | Pending |
-| ASSET-02 | Phase 29 | Pending |
-| ASSET-03 | Phase 29 | Pending |
-| ASSET-04 | Phase 29 | Pending |
-| ASSET-05 | Phase 29 | Pending |
-| ASSET-06 | Phase 29 | Pending |
+| ASSET-01 | Phase 29 | Complete |
+| ASSET-02 | Phase 29 | Complete |
+| ASSET-03 | Phase 29 | Complete |
+| ASSET-04 | Phase 29 | Complete |
+| ASSET-05 | Phase 29 | Complete |
+| ASSET-06 | Phase 29 | Complete |
 | HIST-01 | Phase 30 | Pending |
 | HIST-02 | Phase 30 | Pending |
 | HIST-03 | Phase 30 | Pending |
@@ -89,11 +89,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MCP-03 | Phase 31 | Pending |
 | DOCS-01 | Phase 31 | Pending |
 | DOCS-02 | Phase 31 | Pending |
-| TEST-01 | Phase 29 | Pending |
-| TEST-02 | Phase 29 | Pending |
+| TEST-01 | Phase 29 | Complete |
+| TEST-02 | Phase 29 | Complete |
 | TEST-03 | Phase 31 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 18 total
 - Mapped to phases: 18
 - Unmapped: 0 ✓
