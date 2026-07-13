@@ -14,10 +14,12 @@ using Valt.App.Modules.Assets.Commands.DeleteAsset;
 using Valt.App.Modules.Assets.Commands.DeleteAssetGroup;
 using Valt.App.Modules.Assets.Commands.DeleteLoanStateUpdate;
 using Valt.App.Modules.Assets.Commands.EditAssetGroup;
+using Valt.App.Modules.Assets.Commands.MarkAssetAsSold;
 using Valt.App.Modules.Assets.Commands.MoveAssetToGroup;
 using Valt.App.Modules.Assets.Commands.RepayLoan;
 using Valt.App.Modules.Assets.Commands.SetAssetIncludeInNetWorth;
 using Valt.App.Modules.Assets.Commands.SetAssetVisibility;
+using Valt.App.Modules.Assets.Commands.UndoAssetSale;
 using Valt.App.Modules.Assets.Commands.UpdateAssetPrice;
 using Valt.App.Modules.Assets.Commands.UpdateAssetQuantity;
 using Valt.App.Modules.Assets.DTOs;
@@ -27,6 +29,7 @@ using Valt.App.Modules.Assets.Queries.GetAssets;
 using Valt.App.Modules.Assets.Queries.GetAssetSummary;
 using Valt.App.Modules.Assets.Queries.GetLatestLoanState;
 using Valt.App.Modules.Assets.Queries.GetLoanStateTimeline;
+using Valt.App.Modules.Assets.Queries.GetSoldAssets;
 using Valt.App.Modules.Assets.Queries.GetVisibleAssets;
 using Valt.Core.Modules.Assets;
 using Valt.App.Kernel.Notifications;
@@ -711,13 +714,71 @@ public class AssetTools
     }
 
     /// <summary>
-    /// Gets the latest recorded state of a BTC-backed loan.
+    /// Marks an asset as sold on the given date.
     /// </summary>
-    [McpServerTool, Description("Get the latest recorded state of a BTC-backed loan")]
-    public static async Task<LoanStateDTO?> GetLatestLoanState(
-        IQueryDispatcher queryDispatcher,
-        [Description("The asset ID")] string assetId)
+    [McpServerTool, Description("Marks an asset as sold on the given date (defaults to today).")]
+    public static async Task<string> MarkAssetAsSold(
+        ICommandDispatcher commandDispatcher,
+        INotificationPublisher notificationPublisher,
+        [Description("The ID of the asset to mark as sold")] string assetId,
+        [Description("Sale date in yyyy-MM-dd format (optional, defaults to today)")] string dateSold = "")
     {
-        return await queryDispatcher.DispatchAsync(new GetLatestLoanStateQuery { AssetId = assetId });
+        DateOnly? parsedDateSold = null;
+        if (!string.IsNullOrWhiteSpace(dateSold))
+        {
+            if (!DateOnly.TryParseExact(dateSold, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedDate))
+            {
+                return "Error: dateSold must be in yyyy-MM-dd format.";
+            }
+
+            parsedDateSold = parsedDate;
+        }
+
+        var result = await commandDispatcher.DispatchAsync(new MarkAssetAsSoldCommand
+        {
+            AssetId = assetId,
+            DateSold = parsedDateSold
+        });
+
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error!.Message}";
+        }
+
+        await notificationPublisher.PublishAsync(new McpDataChangedNotification());
+        return "Asset marked as sold successfully.";
+    }
+
+    /// <summary>
+    /// Reverts a previous asset sale and restores the asset to the active list.
+    /// </summary>
+    [McpServerTool, Description("Reverts a previous asset sale and restores the asset to the active list.")]
+    public static async Task<string> UndoAssetSale(
+        ICommandDispatcher commandDispatcher,
+        INotificationPublisher notificationPublisher,
+        [Description("The ID of the sold asset to restore")] string assetId)
+    {
+        var result = await commandDispatcher.DispatchAsync(new UndoAssetSaleCommand
+        {
+            AssetId = assetId
+        });
+
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error!.Message}";
+        }
+
+        await notificationPublisher.PublishAsync(new McpDataChangedNotification());
+        return "Asset sale undone successfully.";
+    }
+
+    /// <summary>
+    /// Lists all assets that have been marked as sold.
+    /// </summary>
+    [McpServerTool, Description("Lists all assets that have been marked as sold.")]
+    public static async Task<IReadOnlyList<AssetDTO>> ListSoldAssets(
+        IQueryDispatcher queryDispatcher)
+    {
+        return await queryDispatcher.DispatchAsync(new GetSoldAssetsQuery());
     }
 }

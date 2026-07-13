@@ -15,7 +15,7 @@ Let users mark assets as sold, record the sale date, hide them from the active A
 ## Phases
 
 - [x] **Phase 29: Domain, Persistence, and Active-View Filtering** - Add sold state to the asset aggregate, persistence, and queries; ensure sold assets are excluded from active views, totals, and price updates. (completed 2026-07-13)
-- [ ] **Phase 30: History UI and Details Reuse** - Build the History modal with sold-asset listing, per-type details panel, and Undo Sell action.
+- [x] **Phase 30: History UI and Details Reuse** - Build the History modal with sold-asset listing, per-type details panel, and Undo Sell action. (completed 2026-07-13)
 - [ ] **Phase 31: MCP, Localization, Documentation, and Verification** - Expose sold-asset operations through MCP, localize new strings, update documentation, and run end-to-end verification.
 
 ## Phase Details
@@ -66,16 +66,19 @@ Plans:
 3. Selecting a sold asset shows a per-type details summary matching the main asset card.
 4. User can undo a sale directly from the History screen.
 
-**Plans:** 2 plans
+**Plans:** 3/3 plans complete
 
 Plans:
+
+- [x] 30-03-PLAN.md
+
 **Wave 1**
 
-- [ ] 30-01-PLAN.md — Build the SoldAssetHistory modal, list, details card, and toolbar button
+- [x] 30-01-PLAN.md — Build the SoldAssetHistory modal, list, details card, and toolbar button
 
 **Wave 2** *(depends on Wave 1 completion)*
 
-- [ ] 30-02-PLAN.md — Wire active-view Mark as Sold flow with DateSoldPrompt and optional proceeds transaction
+- [x] 30-02-PLAN.md — Wire active-view Mark as Sold flow with DateSoldPrompt and optional proceeds transaction
 
 **UI hint:** yes
 
@@ -94,7 +97,22 @@ Plans:
 3. Asset documentation is updated with sold-history behavior and MCP impact.
 4. End-to-end verification passes for mark sold, history browse, details panel, undo, and totals refresh.
 
-**Plans:** TBD
+**Plans:** 5/5 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 31-01-PLAN.md — Add sold-state MCP tools (MarkAssetAsSold, UndoAssetSale, ListSoldAssets)
+- [ ] 31-02-PLAN.md — Localize new sold-asset UI strings in resx files and AXAML/ViewModels
+- [ ] 31-03-PLAN.md — Update Asset module documentation with sold-history workflow and MCP tools
+
+**Wave 2** *(depends on Wave 1 completion)*
+
+- [ ] 31-04-PLAN.md — Add integration tests for sold-state MCP tools
+
+**Wave 3** *(depends on Wave 2 completion and localization)*
+
+- [ ] 31-05-PLAN.md — End-to-end verification: build/test gate and manual UI smoke test
 
 ## Progress
 
@@ -104,8 +122,8 @@ Phases execute in numeric order: 29 → 30 → 31
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 29. Domain, Persistence, and Active-View Filtering | 4/4 | Complete    | 2026-07-13 |
-| 30. History UI and Details Reuse | 0/TBD | Not started | - |
-| 31. MCP, Localization, Documentation, and Verification | 0/TBD | Not started | - |
+| 30. History UI and Details Reuse | 3/3 | Complete    | 2026-07-13 |
+| 31. MCP, Localization, Documentation, and Verification | 0/5 | Not started | - |
 
 **Total phases:** 3
 **Total v1 requirements mapped:** 18
