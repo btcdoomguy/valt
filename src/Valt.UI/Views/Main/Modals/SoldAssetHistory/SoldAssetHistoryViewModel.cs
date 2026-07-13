@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Assets.Commands.UndoAssetSale;
@@ -25,6 +26,7 @@ public partial class SoldAssetHistoryViewModel : ValtModalViewModel
     private readonly IQueryDispatcher _queryDispatcher = null!;
     private readonly ICommandDispatcher _commandDispatcher = null!;
     private readonly CurrencySettings _currencySettings = null!;
+    private readonly ILogger<SoldAssetHistoryViewModel> _logger = null!;
 
     [ObservableProperty] private string _windowTitle = "Sold Asset History";
     [ObservableProperty] private bool _isLoadingError;
@@ -79,11 +81,13 @@ public partial class SoldAssetHistoryViewModel : ValtModalViewModel
     public SoldAssetHistoryViewModel(
         IQueryDispatcher queryDispatcher,
         ICommandDispatcher commandDispatcher,
-        CurrencySettings currencySettings)
+        CurrencySettings currencySettings,
+        ILogger<SoldAssetHistoryViewModel> logger)
     {
         _queryDispatcher = queryDispatcher;
         _commandDispatcher = commandDispatcher;
         _currencySettings = currencySettings;
+        _logger = logger;
     }
 
     public override async Task OnBindParameterAsync()
@@ -105,8 +109,9 @@ public partial class SoldAssetHistoryViewModel : ValtModalViewModel
                 SoldAssets.Add(new SoldAssetItemViewModel(dto, _currencySettings.MainFiatCurrency));
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Failed to load sold assets");
             IsLoadingError = true;
             ErrorMessage = "Check your data and try again. If the problem persists, contact support.";
         }
@@ -153,7 +158,7 @@ public partial class SoldAssetHistoryViewModel : ValtModalViewModel
         }
 
         WeakReferenceMessenger.Default.Send(new AssetSummaryUpdatedMessage());
-        CloseWindow?.Invoke();
+        CloseDialog?.Invoke(new Response(true));
     }
 
     private bool CanRestoreAsset() => SelectedSoldAsset is not null;
@@ -165,9 +170,7 @@ public partial class SoldAssetHistoryViewModel : ValtModalViewModel
         return Task.CompletedTask;
     }
 
-    public record Response
-    {
-    }
+    public record Response(bool WasRestored = false);
 
     public record SoldAssetItemViewModel
     {
