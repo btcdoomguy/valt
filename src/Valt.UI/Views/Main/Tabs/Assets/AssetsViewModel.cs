@@ -14,6 +14,7 @@ using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Assets.Commands.DeleteAsset;
 using Valt.App.Modules.Assets.Commands.DeleteAssetGroup;
 using Valt.App.Modules.Assets.Commands.EditAssetGroup;
+using Valt.App.Modules.Assets.Commands.MarkAssetAsSold;
 using Valt.App.Modules.Assets.Commands.MoveAssetToGroup;
 using Valt.App.Modules.Assets.Commands.RepayLoan;
 using Valt.App.Modules.Assets.Commands.SetAssetIncludeInNetWorth;
@@ -43,6 +44,7 @@ using Valt.UI.Views.Main.Modals.TransactionEditor;
 using Valt.UI.Views.Main.Modals.UpdateLoanState;
 using Valt.UI.Views.Main.Modals.LoanStateHistory;
 using Valt.UI.Views.Main.Modals.SoldAssetHistory;
+using Valt.UI.Views.Main.Modals.DateSoldPrompt;
 using Valt.UI.Views.Main.Tabs.Assets.Models;
 
 
@@ -481,66 +483,68 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
     }
 
     [RelayCommand]
-    private async Task SellAsset(AssetViewModel? asset)
+    private async Task MarkAssetAsSold(AssetViewModel? asset)
     {
-        if (IsSecureModeEnabled) return;
-        if (asset is null)
-            return;
+        if (IsSecureModeEnabled || asset is null) return;
 
         var ownerWindow = GetUserControlOwnerWindow?.Invoke();
         if (ownerWindow is null)
             return;
 
-        // Confirmation dialog
         var confirmed = await MessageBoxHelper.ShowQuestionAsync(
-            language.Assets_Sell_Alert,
-            language.Assets_Sell_Message,
+            "Mark as Sold?",
+            "This asset will be hidden from the active Assets view and moved to History.",
             ownerWindow);
 
         if (!confirmed)
             return;
 
-        // Generate pre-populated values
-        var transactionName = GenerateSellTransactionName(asset);
-        var transactionNotes = GenerateSellTransactionNotes(asset);
-        var transactionMode = asset.CurrentValue >= 0
-            ? TransactionTypes.Credit
-            : TransactionTypes.Debt;
-        var absoluteValue = FiatValue.New(Math.Abs(asset.CurrentValue));
+        var modal = (DateSoldPromptView)await _modalFactory.CreateAsync(
+            ApplicationModalNames.DateSoldPrompt,
+            ownerWindow);
 
-        var request = new TransactionEditorViewModel.Request
+        var response = await modal.ShowDialogSafeAsync<DateSoldPromptViewModel.Response?>(ownerWindow);
+        if (response is null || response.DateSold is null)
+            return;
+
+        var result = await _commandDispatcher.DispatchAsync(new MarkAssetAsSoldCommand
         {
-            Date = DateTime.Now,
-            Name = transactionName,
-            DefaultFromFiatValue = absoluteValue,
-            Notes = transactionNotes,
-            DefaultMode = transactionMode
-        };
+            AssetId = asset.Id,
+            DateSold = DateOnly.FromDateTime(response.DateSold.Value)
+        });
 
-        var modal = (TransactionEditorView)await _modalFactory.CreateAsync(
-            ApplicationModalNames.TransactionEditor,
-            ownerWindow,
-            request);
-
-        var result = await modal.ShowDialogSafeAsync<TransactionEditorViewModel.Response?>(ownerWindow);
-
-        // Only delete if transaction was saved
-        if (result?.Ok == true)
+        if (result.IsFailure)
         {
-            var deleteResult = await _commandDispatcher.DispatchAsync(new DeleteAssetCommand
-            {
-                AssetId = asset.Id
-            });
-
-            if (deleteResult.IsFailure)
-            {
-                await MessageBoxHelper.ShowErrorAsync(language.Error, deleteResult.Error!.Message, ownerWindow);
-                return;
-            }
-
-            await LoadAssetsAsync();
-            NotifyAssetSummaryUpdated();
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, ownerWindow);
+            return;
         }
+
+        var recordProceeds = await MessageBoxHelper.ShowQuestionAsync(
+            "Record proceeds?",
+            "Would you like to record a transaction for the sale proceeds?",
+            ownerWindow);
+
+        if (recordProceeds)
+        {
+            var request = new TransactionEditorViewModel.Request
+            {
+                Date = DateTime.Now,
+                Name = GenerateSellTransactionName(asset),
+                DefaultFromFiatValue = FiatValue.New(Math.Abs(asset.CurrentValue)),
+                Notes = GenerateSellTransactionNotes(asset),
+                DefaultMode = asset.CurrentValue >= 0 ? TransactionTypes.Credit : TransactionTypes.Debt
+            };
+
+            var editor = (TransactionEditorView)await _modalFactory.CreateAsync(
+                ApplicationModalNames.TransactionEditor,
+                ownerWindow,
+                request);
+
+            await editor.ShowDialogSafeAsync<TransactionEditorViewModel.Response?>(ownerWindow);
+        }
+
+        await LoadAssetsAsync();
+        NotifyAssetSummaryUpdated();
     }
 
     private static string GenerateSellTransactionName(AssetViewModel asset)

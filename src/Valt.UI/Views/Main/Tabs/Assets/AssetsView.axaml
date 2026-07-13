@@ -52,8 +52,8 @@
                         <MenuItem Header="{x:Static lang:language.Assets_Delete}"
                                   Command="{Binding $parent[UserControl].((assets:AssetsViewModel)DataContext).DeleteAssetCommand}"
                                   CommandParameter="{Binding}" />
-                        <MenuItem Header="{x:Static lang:language.Assets_Sell}"
-                                  Command="{Binding $parent[UserControl].((assets:AssetsViewModel)DataContext).SellAssetCommand}"
+                        <MenuItem Header="Mark as Sold"
+                                  Command="{Binding $parent[UserControl].((assets:AssetsViewModel)DataContext).MarkAssetAsSoldCommand}"
                                   CommandParameter="{Binding}" />
                         <Separator />
                         <MenuItem Header="{x:Static lang:language.Assets_UpdateLoanState}"
