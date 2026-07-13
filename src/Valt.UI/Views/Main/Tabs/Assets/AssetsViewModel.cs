@@ -646,7 +646,13 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
             ApplicationModalNames.SoldAssetHistory,
             ownerWindow);
 
-        await modal.ShowDialogSafeAsync<SoldAssetHistoryViewModel.Response?>(ownerWindow);
+        var result = await modal.ShowDialogSafeAsync<SoldAssetHistoryViewModel.Response?>(ownerWindow);
+
+        if (result?.WasRestored == true)
+        {
+            await LoadAssetsAsync();
+            NotifyAssetSummaryUpdated();
+        }
     }
 
     [RelayCommand]
