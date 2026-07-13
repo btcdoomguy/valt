@@ -17,6 +17,9 @@ internal static class Extensions
             Icon = asset.Icon.ToString(),
             IncludeInNetWorth = asset.IncludeInNetWorth,
             Visible = asset.Visible,
+            IsSold = asset.IsSold,
+            DateSold = asset.DateSold,
+            PreviousVisibility = asset.PreviousVisibility,
             LastPriceUpdateAt = asset.LastPriceUpdateAt,
             CreatedAt = asset.CreatedAt,
             DisplayOrder = asset.DisplayOrder,
@@ -41,7 +44,10 @@ internal static class Extensions
             entity.CreatedAt,
             entity.DisplayOrder,
             entity.GroupId is not null ? new AssetGroupId(entity.GroupId.ToString()) : null,
-            entity.Version);
+            entity.Version,
+            entity.IsSold,
+            entity.DateSold,
+            entity.PreviousVisibility);
     }
 
     public static AssetGroupEntity AsEntity(this AssetGroup group)

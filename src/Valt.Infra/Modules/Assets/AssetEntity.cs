@@ -12,6 +12,9 @@ public class AssetEntity
     [BsonField("icon")] public string? Icon { get; set; }
     [BsonField("includeInNetWorth")] public bool IncludeInNetWorth { get; set; }
     [BsonField("visible")] public bool Visible { get; set; }
+    [BsonField("isSold")] public bool IsSold { get; set; }
+    [BsonField("dateSold")] public DateOnly? DateSold { get; set; }
+    [BsonField("previousVisibility")] public bool PreviousVisibility { get; set; }
     [BsonField("lastPriceUpdate")] public DateTime LastPriceUpdateAt { get; set; }
     [BsonField("created")] public DateTime CreatedAt { get; set; }
     [BsonField("displayOrder")] public int DisplayOrder { get; set; }

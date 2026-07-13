@@ -69,6 +69,27 @@ public class AssetRepositoryTests
     }
 
     [Test]
+    public async Task SaveAsync_Should_Round_Trip_Sold_State_With_DateSold()
+    {
+        // Arrange
+        var asset = AssetBuilder.AnAsset()
+            .WithSold(true)
+            .WithDateSold(new DateOnly(2025, 1, 15))
+            .WithPreviousVisibility(false)
+            .Build();
+
+        // Act
+        await _repository.SaveAsync(asset);
+
+        // Assert
+        var retrievedAsset = await _repository.GetByIdAsync(asset.Id);
+        Assert.That(retrievedAsset, Is.Not.Null);
+        Assert.That(retrievedAsset!.IsSold, Is.True);
+        Assert.That(retrievedAsset.DateSold, Is.EqualTo(new DateOnly(2025, 1, 15)));
+        Assert.That(retrievedAsset.PreviousVisibility, Is.False);
+    }
+
+    [Test]
     public async Task SaveAsync_Should_Clear_Events_After_Saving()
     {
         // Arrange
