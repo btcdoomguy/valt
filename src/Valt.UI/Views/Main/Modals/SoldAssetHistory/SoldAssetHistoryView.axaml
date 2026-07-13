@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:lang="clr-namespace:Valt.UI.Lang"
         xmlns:soldAssetHistory="clr-namespace:Valt.UI.Views.Main.Modals.SoldAssetHistory"
         mc:Ignorable="d"
         x:Class="Valt.UI.Views.Main.Modals.SoldAssetHistory.SoldAssetHistoryView"
@@ -31,18 +32,114 @@
                                          CloseClick="CustomTitleBarCloseClicked" />
 
             <Grid Grid.Row="1" ColumnDefinitions="*, 350" Margin="10">
+                <!-- Left: sold-asset list -->
                 <Border Grid.Column="0"
+                        Margin="0,0,10,0"
                         Background="{DynamicResource Background800Brush}"
                         BorderBrush="{DynamicResource Background600Brush}"
                         BorderThickness="1"
-                        CornerRadius="8" />
+                        CornerRadius="8"
+                        Padding="10">
+                    <Panel>
+                        <DataGrid IsVisible="{Binding HasSoldAssets}"
+                                  ItemsSource="{Binding SoldAssets}"
+                                  SelectedItem="{Binding SelectedSoldAsset, Mode=TwoWay}"
+                                  SelectionMode="Single"
+                                  CanUserSortColumns="False"
+                                  CanUserResizeColumns="False"
+                                  CanUserReorderColumns="False"
+                                  IsReadOnly="True"
+                                  GridLinesVisibility="All"
+                                  AutoGenerateColumns="False">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Header="Name" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate DataType="soldAssetHistory:SoldAssetHistoryViewModel+SoldAssetItemViewModel">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <TextBlock Text="{Binding Icon}"
+                                                           FontFamily="{StaticResource MaterialDesign}"
+                                                           FontSize="16" />
+                                                <TextBlock Text="{Binding Name}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="Type"
+                                                    Width="120"
+                                                    Binding="{Binding AssetTypeName}" />
+                                <DataGridTextColumn Header="Date Sold"
+                                                    Width="120"
+                                                    Binding="{Binding DateSoldFormatted}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
 
+                        <!-- Empty state -->
+                        <StackPanel IsVisible="{Binding HasNoSoldAssets}"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    Spacing="8">
+                            <TextBlock Text="No sold assets yet"
+                                       FontSize="{DynamicResource FontSizeLarge}"
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Center" />
+                            <TextBlock Text="Assets you mark as sold will appear here with their sale date."
+                                       FontSize="{DynamicResource FontSizeSmall}"
+                                       Foreground="{DynamicResource Text400Brush}"
+                                       TextWrapping="Wrap"
+                                       TextAlignment="Center"
+                                       MaxWidth="300" />
+                        </StackPanel>
+
+                        <!-- Error state -->
+                        <StackPanel IsVisible="{Binding IsLoadingError}"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    Spacing="8">
+                            <TextBlock Text="Could not load sold assets"
+                                       FontSize="{DynamicResource FontSizeLarge}"
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Center" />
+                            <TextBlock Text="{Binding ErrorMessage}"
+                                       FontSize="{DynamicResource FontSizeSmall}"
+                                       Foreground="{DynamicResource Text400Brush}"
+                                       TextWrapping="Wrap"
+                                       TextAlignment="Center"
+                                       MaxWidth="300" />
+                        </StackPanel>
+                    </Panel>
+                </Border>
+
+                <!-- Right: details panel -->
                 <Border Grid.Column="1"
-                        Margin="10,0,0,0"
                         Background="{DynamicResource Background800Brush}"
                         BorderBrush="{DynamicResource Background600Brush}"
                         BorderThickness="1"
-                        CornerRadius="8" />
+                        CornerRadius="8"
+                        Padding="10">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="12"
+                                    IsVisible="{Binding SelectedSoldAsset, Converter={x:Static ObjectConverters.IsNotNull}}">                        <soldAssetHistory:SoldAssetDetailsCard DataContext="{Binding SelectedSoldAsset.AssetDetails}" />
+
+                            <!-- Date Sold metadata row -->
+                            <Grid ColumnDefinitions="Auto, *">
+                                <TextBlock Grid.Column="0"
+                                           Text="Date Sold:"
+                                           FontSize="{DynamicResource FontSizeSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,8,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding SelectedSoldAsset.DateSoldFormatted}"
+                                           FontSize="{DynamicResource FontSizeSmall}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}" />
+                            </Grid>
+
+                            <Button Content="Restore Asset"
+                                     Command="{Binding RestoreAssetCommand}"
+                                     Classes="primary"
+                                     HorizontalAlignment="Stretch" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
             </Grid>
 
             <Border Grid.Row="2"
