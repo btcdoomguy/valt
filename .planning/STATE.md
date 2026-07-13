@@ -1,20 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v0.4
-milestone_name: Quality & Performance
-current_phase: 21
-current_phase_name: transaction-editor-child-vms
-status: complete
-stopped_at: Phase 21 complete - 21-01-SUMMARY.md created
-last_updated: "2026-07-10T14:55:07.256Z"
-last_activity: 2026-07-10
-last_activity_desc: Completed quick task 260710-gjx: Restore keyboard focus behavior on TransactionEditorView
+milestone: v0.5
+milestone_name: Asset Sold History
+status: planning
+last_updated: "2026-07-13T15:31:53.528Z"
+last_activity: 2026-07-13
 progress:
-  total_phases: 18
-  completed_phases: 11
-  total_plans: 21
-  completed_plans: 21
-  percent: 61
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # STATE.md
@@ -28,12 +24,10 @@ See: .planning/PROJECT.md (updated 2026-06-19)
 
 ## Current Position
 
-Phase: 21 (transaction-editor-child-vms) — Complete
-Plan: 1 of 1 complete
-Status: Phase complete
-Last activity: 2026-07-10 — Completed quick task 260710-gjx: Restore keyboard focus behavior on TransactionEditorView
-
-Progress: [██        ] 28%
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-07-13 — Milestone v0.5 started
 
 ## Accumulated Context
 
@@ -144,9 +138,9 @@ Progress: [██        ] 28%
 
 ## Session Continuity
 
-Last session: 2026-07-10T14:55:07.256Z
-Stopped at: Completed quick task 260710-gjx — Restore keyboard focus behavior on TransactionEditorView
-Resume file: .planning/quick/260710-gjx-restore-keyboard-focus-behavior-on-trans/260710-gjx-PLAN.md
+Last session: 2026-07-10T15:00:00Z
+Stopped at: Session resumed, proceeding to Phase 22 planning discussion
+Resume file: (none)
 
 ## Performance Metrics
 
