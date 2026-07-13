@@ -11,6 +11,9 @@ public sealed class Asset : AggregateRoot<AssetId>
     public Icon Icon { get; private set; }
     public bool IncludeInNetWorth { get; private set; }
     public bool Visible { get; private set; }
+    public bool IsSold { get; private set; }
+    public DateOnly? DateSold { get; private set; }
+    public bool PreviousVisibility { get; private set; }
     public DateTime LastPriceUpdateAt { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public int DisplayOrder { get; private set; }
@@ -27,7 +30,10 @@ public sealed class Asset : AggregateRoot<AssetId>
         DateTime createdAt,
         int displayOrder,
         AssetGroupId? groupId,
-        int version)
+        int version,
+        bool isSold,
+        DateOnly? dateSold,
+        bool previousVisibility)
     {
         Id = id;
         Name = name;
@@ -35,6 +41,9 @@ public sealed class Asset : AggregateRoot<AssetId>
         Icon = icon;
         IncludeInNetWorth = includeInNetWorth;
         Visible = visible;
+        IsSold = isSold;
+        DateSold = dateSold;
+        PreviousVisibility = previousVisibility;
         LastPriceUpdateAt = lastPriceUpdateAt;
         CreatedAt = createdAt;
         DisplayOrder = displayOrder;
@@ -53,9 +62,12 @@ public sealed class Asset : AggregateRoot<AssetId>
         DateTime createdAt,
         int displayOrder,
         AssetGroupId? groupId,
-        int version)
+        int version,
+        bool isSold,
+        DateOnly? dateSold,
+        bool previousVisibility)
     {
-        return new Asset(id, name, details, icon, includeInNetWorth, visible, lastPriceUpdateAt, createdAt, displayOrder, groupId, version);
+        return new Asset(id, name, details, icon, includeInNetWorth, visible, lastPriceUpdateAt, createdAt, displayOrder, groupId, version, isSold, dateSold, previousVisibility);
     }
 
     public static Asset New(
@@ -79,7 +91,10 @@ public sealed class Asset : AggregateRoot<AssetId>
             now,
             displayOrder,
             groupId,
-            0);
+            0,
+            isSold: false,
+            dateSold: null,
+            previousVisibility: true);
 
         asset.AddEvent(new AssetCreatedEvent(asset));
         return asset;
@@ -137,6 +152,24 @@ public sealed class Asset : AggregateRoot<AssetId>
             return;
 
         GroupId = groupId;
+        AddEvent(new AssetUpdatedEvent(this));
+    }
+
+    public void MarkAsSold(DateOnly? dateSold)
+    {
+        IsSold = true;
+        DateSold = dateSold ?? DateOnly.FromDateTime(DateTime.Today);
+        PreviousVisibility = Visible;
+        Visible = false;
+        AddEvent(new AssetUpdatedEvent(this));
+    }
+
+    public void UndoSale()
+    {
+        IsSold = false;
+        DateSold = null;
+        Visible = PreviousVisibility;
+        PreviousVisibility = true;
         AddEvent(new AssetUpdatedEvent(this));
     }
 

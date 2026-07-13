@@ -35,7 +35,13 @@ Let users mark assets as sold, record the sale date, hide them from the active A
 4. Asset price updater skips sold assets during price updates.
 5. Unit tests pass for sell/undo command validation and active/sold query filters.
 
-**Plans:** TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 29-01-PLAN.md — Domain, persistence, and test-builder sold-state foundation
+- [ ] 29-02-PLAN.md — MarkAssetAsSold and UndoAssetSale commands with validation tests
+- [ ] 29-03-PLAN.md — Active/sold query split, DTO fields, and query tests
+- [ ] 29-04-PLAN.md — AssetPriceUpdaterJob skips sold assets and job tests
 
 **UI hint:** yes
 
@@ -80,7 +86,7 @@ Phases execute in numeric order: 29 → 30 → 31
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 29. Domain, Persistence, and Active-View Filtering | 0/TBD | Not started | - |
+| 29. Domain, Persistence, and Active-View Filtering | 0/4 | Not started | - |
 | 30. History UI and Details Reuse | 0/TBD | Not started | - |
 | 31. MCP, Localization, Documentation, and Verification | 0/TBD | Not started | - |
 
