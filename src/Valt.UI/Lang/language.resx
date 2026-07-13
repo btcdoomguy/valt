@@ -2850,6 +2850,69 @@
     <data name="LoanStateHistory_DeleteError" xml:space="preserve">
         <value>Failed to delete the snapshot: {0}. Please try again.</value>
     </data>
+    <data name="SoldAssetHistory_Title" xml:space="preserve">
+        <value>Sold Asset History</value>
+    </data>
+    <data name="SoldAssetHistory_Column_Name" xml:space="preserve">
+        <value>Name</value>
+    </data>
+    <data name="SoldAssetHistory_Column_Type" xml:space="preserve">
+        <value>Type</value>
+    </data>
+    <data name="SoldAssetHistory_Column_DateSold" xml:space="preserve">
+        <value>Date Sold</value>
+    </data>
+    <data name="SoldAssetHistory_NoSoldAssets" xml:space="preserve">
+        <value>No sold assets yet</value>
+    </data>
+    <data name="SoldAssetHistory_NoSoldAssets_Detail" xml:space="preserve">
+        <value>Assets you mark as sold will appear here with their sale date.</value>
+    </data>
+    <data name="SoldAssetHistory_LoadError" xml:space="preserve">
+        <value>Could not load sold assets</value>
+    </data>
+    <data name="SoldAssetHistory_LoadError_Detail" xml:space="preserve">
+        <value>Check your data and try again. If the problem persists, contact support.</value>
+    </data>
+    <data name="SoldAssetHistory_RestoreAsset" xml:space="preserve">
+        <value>Restore Asset</value>
+    </data>
+    <data name="SoldAssetHistory_Close" xml:space="preserve">
+        <value>Close</value>
+    </data>
+    <data name="SoldAssetHistory_MarkAsSold" xml:space="preserve">
+        <value>Mark as Sold</value>
+    </data>
+    <data name="SoldAssetHistory_History" xml:space="preserve">
+        <value>History</value>
+    </data>
+    <data name="SoldAssetHistory_DateSold_Title" xml:space="preserve">
+        <value>Date Sold</value>
+    </data>
+    <data name="SoldAssetHistory_DateSold_Prompt" xml:space="preserve">
+        <value>When was this asset sold?</value>
+    </data>
+    <data name="SoldAssetHistory_DateSold_Label" xml:space="preserve">
+        <value>Date Sold:</value>
+    </data>
+    <data name="SoldAssetHistory_MarkAsSoldConfirmation_Title" xml:space="preserve">
+        <value>Mark as Sold?</value>
+    </data>
+    <data name="SoldAssetHistory_MarkAsSoldConfirmation_Message" xml:space="preserve">
+        <value>This asset will be hidden from the active Assets view and moved to History.</value>
+    </data>
+    <data name="SoldAssetHistory_RestoreConfirmation_Title" xml:space="preserve">
+        <value>Restore Asset?</value>
+    </data>
+    <data name="SoldAssetHistory_RestoreConfirmation_Message" xml:space="preserve">
+        <value>Restore this asset to the active Assets view?</value>
+    </data>
+    <data name="SoldAssetHistory_RecordProceeds_Title" xml:space="preserve">
+        <value>Record proceeds?</value>
+    </data>
+    <data name="SoldAssetHistory_RecordProceeds_Message" xml:space="preserve">
+        <value>Would you like to record a transaction for the sale proceeds?</value>
+    </data>
     <data name="SatsLabel" xml:space="preserve">
         <value>sats</value>
     </data>

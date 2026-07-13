@@ -5595,6 +5595,132 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string SoldAssetHistory_Title {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_Title", resourceCulture);
+            }
+        }
+        
+        public static string SoldAssetHistory_Column_Name {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_Column_Name", resourceCulture);
+            }
+        }
+        
+        public static string SoldAssetHistory_Column_Type {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_Column_Type", resourceCulture);
+            }
+        }
+        
+        public static string SoldAssetHistory_Column_DateSold {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_Column_DateSold", resourceCulture);
+            }
+        }
+        
+        public static string SoldAssetHistory_NoSoldAssets {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_NoSoldAssets", resourceCulture);
+            }
+        }
+        
+        public static string SoldAssetHistory_NoSoldAssets_Detail {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_NoSoldAssets_Detail", resourceCulture);
+            }
+        }
+        
+        public static string SoldAssetHistory_LoadError {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_LoadError", resourceCulture);
+            }
+        }
+        
+        public static string SoldAssetHistory_LoadError_Detail {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_LoadError_Detail", resourceCulture);
+            }
+        }
+        
+        public static string SoldAssetHistory_RestoreAsset {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_RestoreAsset", resourceCulture);
+            }
+        }
+        
+        public static string SoldAssetHistory_Close {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_Close", resourceCulture);
+            }
+        }
+        
+        public static string SoldAssetHistory_MarkAsSold {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_MarkAsSold", resourceCulture);
+            }
+        }
+        
+        public static string SoldAssetHistory_History {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_History", resourceCulture);
+            }
+        }
+        
+        public static string SoldAssetHistory_DateSold_Title {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_DateSold_Title", resourceCulture);
+            }
+        }
+        
+        public static string SoldAssetHistory_DateSold_Prompt {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_DateSold_Prompt", resourceCulture);
+            }
+        }
+        
+        public static string SoldAssetHistory_DateSold_Label {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_DateSold_Label", resourceCulture);
+            }
+        }
+        
+        public static string SoldAssetHistory_MarkAsSoldConfirmation_Title {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_MarkAsSoldConfirmation_Title", resourceCulture);
+            }
+        }
+        
+        public static string SoldAssetHistory_MarkAsSoldConfirmation_Message {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_MarkAsSoldConfirmation_Message", resourceCulture);
+            }
+        }
+        
+        public static string SoldAssetHistory_RestoreConfirmation_Title {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_RestoreConfirmation_Title", resourceCulture);
+            }
+        }
+        
+        public static string SoldAssetHistory_RestoreConfirmation_Message {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_RestoreConfirmation_Message", resourceCulture);
+            }
+        }
+        
+        public static string SoldAssetHistory_RecordProceeds_Title {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_RecordProceeds_Title", resourceCulture);
+            }
+        }
+        
+        public static string SoldAssetHistory_RecordProceeds_Message {
+            get {
+                return ResourceManager.GetString("SoldAssetHistory_RecordProceeds_Message", resourceCulture);
+            }
+        }
+        
         public static string SatsLabel {
             get {
                 return ResourceManager.GetString("SatsLabel", resourceCulture);

@@ -2845,7 +2845,70 @@
         <value>¿Eliminar el snapshot del {0}? Los cálculos volverán al snapshot anterior.</value>
     </data>
     <data name="LoanStateHistory_DeleteError" xml:space="preserve">
-        <value>No se pudo eliminar el snapshot: {0}. Intente nuevamente.</value>
+        <value>Error al eliminar el snapshot: {0}. Inténtalo de nuevo.</value>
+    </data>
+    <data name="SoldAssetHistory_Title" xml:space="preserve">
+        <value>Historial de Activos Vendidos</value>
+    </data>
+    <data name="SoldAssetHistory_Column_Name" xml:space="preserve">
+        <value>Nombre</value>
+    </data>
+    <data name="SoldAssetHistory_Column_Type" xml:space="preserve">
+        <value>Tipo</value>
+    </data>
+    <data name="SoldAssetHistory_Column_DateSold" xml:space="preserve">
+        <value>Fecha de Venta</value>
+    </data>
+    <data name="SoldAssetHistory_NoSoldAssets" xml:space="preserve">
+        <value>Aún no hay activos vendidos</value>
+    </data>
+    <data name="SoldAssetHistory_NoSoldAssets_Detail" xml:space="preserve">
+        <value>Los activos que marques como vendidos aparecerán aquí con su fecha de venta.</value>
+    </data>
+    <data name="SoldAssetHistory_LoadError" xml:space="preserve">
+        <value>No se pudieron cargar los activos vendidos</value>
+    </data>
+    <data name="SoldAssetHistory_LoadError_Detail" xml:space="preserve">
+        <value>Verifica tus datos e intenta nuevamente. Si el problema persiste, contacta a soporte.</value>
+    </data>
+    <data name="SoldAssetHistory_RestoreAsset" xml:space="preserve">
+        <value>Restaurar Activo</value>
+    </data>
+    <data name="SoldAssetHistory_Close" xml:space="preserve">
+        <value>Cerrar</value>
+    </data>
+    <data name="SoldAssetHistory_MarkAsSold" xml:space="preserve">
+        <value>Marcar como Vendido</value>
+    </data>
+    <data name="SoldAssetHistory_History" xml:space="preserve">
+        <value>Historial</value>
+    </data>
+    <data name="SoldAssetHistory_DateSold_Title" xml:space="preserve">
+        <value>Fecha de Venta</value>
+    </data>
+    <data name="SoldAssetHistory_DateSold_Prompt" xml:space="preserve">
+        <value>¿Cuándo se vendió este activo?</value>
+    </data>
+    <data name="SoldAssetHistory_DateSold_Label" xml:space="preserve">
+        <value>Fecha de Venta:</value>
+    </data>
+    <data name="SoldAssetHistory_MarkAsSoldConfirmation_Title" xml:space="preserve">
+        <value>¿Marcar como Vendido?</value>
+    </data>
+    <data name="SoldAssetHistory_MarkAsSoldConfirmation_Message" xml:space="preserve">
+        <value>Este activo se ocultará de la vista de Activos activos y se moverá al Historial.</value>
+    </data>
+    <data name="SoldAssetHistory_RestoreConfirmation_Title" xml:space="preserve">
+        <value>¿Restaurar Activo?</value>
+    </data>
+    <data name="SoldAssetHistory_RestoreConfirmation_Message" xml:space="preserve">
+        <value>¿Restaurar este activo a la vista de Activos activos?</value>
+    </data>
+    <data name="SoldAssetHistory_RecordProceeds_Title" xml:space="preserve">
+        <value>¿Registrar ingreso?</value>
+    </data>
+    <data name="SoldAssetHistory_RecordProceeds_Message" xml:space="preserve">
+        <value>¿Deseas registrar una transacción por el valor recibido de la venta?</value>
     </data>
     <data name="SatsLabel" xml:space="preserve">
         <value>sats</value>
