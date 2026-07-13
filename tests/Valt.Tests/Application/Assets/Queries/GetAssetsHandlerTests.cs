@@ -16,10 +16,15 @@ public class GetAssetsHandlerTests : DatabaseTest
         var asset3 = AssetBuilder.ACryptoAsset("ETH", 2500m, 2)
             .WithVisible(false)
             .Build();
+        var soldAsset = AssetBuilder.ACryptoAsset("SOL", 150m, 5)
+            .WithSold(true)
+            .WithDateSold(new DateOnly(2025, 1, 15))
+            .Build();
 
         await _assetRepository.SaveAsync(asset1);
         await _assetRepository.SaveAsync(asset2);
         await _assetRepository.SaveAsync(asset3);
+        await _assetRepository.SaveAsync(soldAsset);
     }
 
     [SetUp]
@@ -36,6 +41,7 @@ public class GetAssetsHandlerTests : DatabaseTest
         var result = await _handler.HandleAsync(query);
 
         Assert.That(result, Has.Count.EqualTo(3));
+        Assert.That(result.Any(a => a.Name == "SOL Crypto"), Is.False, "Sold asset should not be in active list");
     }
 
     [Test]

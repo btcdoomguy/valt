@@ -167,6 +167,34 @@ public class GetAssetSummaryHandlerTests : DatabaseTest
             "The fiat-collateral position should continue to contribute only its PnL");
     }
 
+    [Test]
+    public async Task HandleAsync_ExcludesSoldAssets_FromTotals()
+    {
+        var soldAsset = AssetBuilder.AStockAsset("SOLD", 1000m, 10)
+            .WithSold(true)
+            .WithDateSold(new DateOnly(2025, 1, 15))
+            .Build();
+        await _assetRepository.SaveAsync(soldAsset);
+
+        var expectedTotalValue = BtcPnl() + FiatPnl();
+
+        var query = new GetAssetSummaryQuery
+        {
+            MainCurrencyCode = "USD",
+            BtcPriceUsd = BtcCurrentPrice,
+            FiatRates = new Dictionary<string, decimal> { ["USD"] = 1m }
+        };
+
+        var result = await _handler.HandleAsync(query);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.TotalAssets, Is.EqualTo(2), "Sold asset should not be counted in TotalAssets");
+            Assert.That(result.VisibleAssets, Is.EqualTo(2), "Sold asset should not be counted in VisibleAssets");
+            Assert.That(result.TotalValueInMainCurrency, Is.EqualTo(expectedTotalValue), "Sold asset value should not be included in total");
+        });
+    }
+
     private decimal BtcPnl()
     {
         var details = (LeveragedPositionDetails)AssetBuilder.AnAsset()
