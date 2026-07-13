@@ -5679,12 +5679,6 @@ namespace Valt.UI.Lang {
             }
         }
         
-        public static string SoldAssetHistory_DateSold_Label {
-            get {
-                return ResourceManager.GetString("SoldAssetHistory_DateSold_Label", resourceCulture);
-            }
-        }
-        
         public static string SoldAssetHistory_MarkAsSoldConfirmation_Title {
             get {
                 return ResourceManager.GetString("SoldAssetHistory_MarkAsSoldConfirmation_Title", resourceCulture);

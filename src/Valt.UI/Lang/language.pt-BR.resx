@@ -2889,9 +2889,6 @@
     <data name="SoldAssetHistory_DateSold_Prompt" xml:space="preserve">
         <value>Quando este ativo foi vendido?</value>
     </data>
-    <data name="SoldAssetHistory_DateSold_Label" xml:space="preserve">
-        <value>Data da Venda:</value>
-    </data>
     <data name="SoldAssetHistory_MarkAsSoldConfirmation_Title" xml:space="preserve">
         <value>Marcar como Vendido?</value>
     </data>

@@ -123,10 +123,12 @@
                             <!-- Date Sold metadata row -->
                             <Grid ColumnDefinitions="Auto, *">
                                 <TextBlock Grid.Column="0"
-                                           Text="{x:Static lang:language.SoldAssetHistory_DateSold_Label}"
                                            FontSize="{DynamicResource FontSizeSmall}"
                                            Foreground="{DynamicResource AssetCardLabelBrush}"
-                                           Margin="0,0,8,0" />
+                                           Margin="0,0,8,0">
+                                    <Run Text="{x:Static lang:language.SoldAssetHistory_DateSold_Title}" />
+                                    <Run Text=":" />
+                                </TextBlock>
                                 <TextBlock Grid.Column="1"
                                            Text="{Binding SelectedSoldAsset.DateSoldFormatted}"
                                            FontSize="{DynamicResource FontSizeSmall}"

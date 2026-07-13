@@ -2892,9 +2892,6 @@
     <data name="SoldAssetHistory_DateSold_Prompt" xml:space="preserve">
         <value>When was this asset sold?</value>
     </data>
-    <data name="SoldAssetHistory_DateSold_Label" xml:space="preserve">
-        <value>Date Sold:</value>
-    </data>
     <data name="SoldAssetHistory_MarkAsSoldConfirmation_Title" xml:space="preserve">
         <value>Mark as Sold?</value>
     </data>
