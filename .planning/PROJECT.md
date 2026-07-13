@@ -30,16 +30,16 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - ✓ **HTTP-01**: `IHttpClientFactory` is registered in DI and all `new HttpClient()` sites use named/typed clients — Phase 13
 - ✓ **HTTP-02**: Price providers and update checkers share a consistent HTTP client lifetime and configuration — Phase 13
 - ✓ **HTTP-03**: Existing provider tests continue to pass against the factory-based clients — Phase 13
+- ✓ Add a `Sold` flag and `Date Sold` to assets — Phase 29
+- ✓ Hide sold assets from the main Assets view and exclude them from totals/calculations — Phase 29
+- ✓ Provide Undo Sell action to restore the asset to the active view — Phase 29
+- ✓ Prompt for Date Sold when not provided during the sell action — Phase 29
 
 ### Active
 
-- [ ] Add a `Sold` flag and `Date Sold` to assets
-- [ ] Hide sold assets from the main Assets view and exclude them from totals/calculations
 - [ ] Add a History button on the Assets toolbar to access sold assets
 - [ ] Build a History screen listing sold assets with their sale date
 - [ ] Show per-type asset details summary in the History screen when an asset is selected
-- [ ] Provide Undo Sell action to restore the asset to the active view
-- [ ] Prompt for Date Sold when not provided during the sell action
 - [ ] Update Assets documentation and MCP tool exposure for sold assets
 
 
@@ -108,4 +108,4 @@ This document evolves at phase transitions and milestone boundaries.
 - Optional Date Sold prompt when not provided at sale time
 
 ---
-*Last updated: 2026-07-13 after starting milestone v0.5 Asset Sold History*
+*Last updated: 2026-07-13 after Phase 29 completion — domain sold-state foundation, active-view filtering, and gap fixes delivered*
