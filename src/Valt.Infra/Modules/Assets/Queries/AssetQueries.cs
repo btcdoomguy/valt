@@ -20,8 +20,21 @@ internal sealed class AssetQueries : IAssetQueries
     {
         var entities = _localDatabase.GetAssets()
             .FindAll()
+            .Where(x => !x.IsSold)
             .OrderByDescending(x => x.Visible)
             .ThenBy(x => x.DisplayOrder)
+            .ThenBy(x => x.Name)
+            .ToList();
+
+        var dtos = entities.Select(MapToDto).ToList();
+        return Task.FromResult<IReadOnlyList<AssetDTO>>(dtos);
+    }
+
+    public Task<IReadOnlyList<AssetDTO>> GetSoldAsync()
+    {
+        var entities = _localDatabase.GetAssets()
+            .Find(x => x.IsSold)
+            .OrderByDescending(x => x.DateSold)
             .ThenBy(x => x.Name)
             .ToList();
 
@@ -52,7 +65,7 @@ internal sealed class AssetQueries : IAssetQueries
         var entities = _localDatabase.GetAssets().FindAll().ToList();
 
         var includedAssets = entities
-            .Where(x => x.IncludeInNetWorth)
+            .Where(x => x.IncludeInNetWorth && !x.IsSold)
             .Select(e => e.AsDomainObject())
             .ToList();
 
@@ -71,8 +84,8 @@ internal sealed class AssetQueries : IAssetQueries
 
         var summary = new AssetSummaryDTO
         {
-            TotalAssets = entities.Count,
-            VisibleAssets = entities.Count(x => x.Visible),
+            TotalAssets = entities.Count(x => !x.IsSold),
+            VisibleAssets = entities.Count(x => x.Visible && !x.IsSold),
             AssetsIncludedInNetWorth = includedAssets.Count,
             ValuesByCurrency = valuesByCurrency,
             TotalAssetsValueInMainCurrency = Math.Round(totalAssetsValueInMainCurrency, 2),
@@ -207,6 +220,9 @@ internal sealed class AssetQueries : IAssetQueries
             CreatedAt = entity.CreatedAt,
             DisplayOrder = entity.DisplayOrder,
             GroupId = entity.GroupId?.ToString(),
+            IsSold = entity.IsSold,
+            DateSold = entity.DateSold,
+            PreviousVisibility = entity.PreviousVisibility,
             CurrentPrice = asset.GetCurrentPrice(),
             CurrentValue = asset.GetCurrentValue(),
             CurrencyCode = asset.GetCurrencyCode()
