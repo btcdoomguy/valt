@@ -54,6 +54,7 @@ using Valt.UI.Views.Main.Modals.Tips;
 using Valt.UI.Views.Main.Modals.UpdateLoanState;
 using Valt.UI.Views.Main.Modals.LoanStateHistory;
 using Valt.UI.Views.Main.Modals.SoldAssetHistory;
+using Valt.UI.Views.Main.Modals.DateSoldPrompt;
 using Valt.UI.Views.Main.Tabs.Transactions;
 
 namespace Valt.UI;
@@ -154,6 +155,7 @@ public static class Extensions
         services.AddTransient<UpdateLoanStateViewModel>();
         services.AddTransient<LoanStateHistoryViewModel>();
         services.AddTransient<SoldAssetHistoryViewModel>();
+        services.AddTransient<DateSoldPromptViewModel>();
 
         //other
         services.AddSingleton<IInitialCategoryNameLanguageProvider, InitialCategoryNameLanguageProvider>();
@@ -303,6 +305,10 @@ public static class Extensions
                 ApplicationModalNames.SoldAssetHistory => new SoldAssetHistoryView()
                 {
                     DataContext = services.GetRequiredService<SoldAssetHistoryViewModel>(),
+                },
+                ApplicationModalNames.DateSoldPrompt => new DateSoldPromptView()
+                {
+                    DataContext = services.GetRequiredService<DateSoldPromptViewModel>(),
                 },
                 _ => throw new ArgumentOutOfRangeException(nameof(modalNames), modalNames, null)
             };

@@ -1,0 +1,62 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:lang="clr-namespace:Valt.UI.Lang"
+        xmlns:dateSoldPrompt="clr-namespace:Valt.UI.Views.Main.Modals.DateSoldPrompt"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Views.Main.Modals.DateSoldPrompt.DateSoldPromptView"
+        Title="{Binding WindowTitle}"
+        x:DataType="dateSoldPrompt:DateSoldPromptViewModel"
+        d:DesignWidth="400"
+        d:DesignHeight="300"
+        MinWidth="400"
+        MinHeight="300"
+        MaxWidth="400"
+        MaxHeight="300"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <dateSoldPrompt:DateSoldPromptViewModel />
+    </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CancelCommand}" />
+    </Window.KeyBindings>
+    <Border>
+        <Grid RowDefinitions="Auto, *, Auto">
+            <userControls:CustomTitleBar Grid.Row="0" Title="{Binding WindowTitle}"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+
+            <Border Grid.Row="1" Margin="10" Padding="10">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="When was this asset sold?"
+                               FontSize="{DynamicResource FontSizeMedium}" />
+                    <userControls:DateCalendarSelector Date="{Binding DateSold, Mode=TwoWay}">
+                        <userControls:DateCalendarSelector.AllowedSelectorModes>
+                            <userControls:DateCalendarSelectorMode>Day</userControls:DateCalendarSelectorMode>
+                        </userControls:DateCalendarSelector.AllowedSelectorModes>
+                    </userControls:DateCalendarSelector>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Row="2"
+                    Classes="form-fields-area"
+                    Margin="10"
+                    Padding="10">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                    <Button Content="{x:Static lang:language.OkButton}"
+                            Command="{Binding OkCommand}"
+                            Classes="primary"
+                            Width="100" />
+                    <Button Content="{x:Static lang:language.CancelButton}"
+                            Command="{Binding CancelCommand}"
+                            Width="100" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>
