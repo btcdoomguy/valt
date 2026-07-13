@@ -714,6 +714,17 @@ public class AssetTools
     }
 
     /// <summary>
+    /// Gets the latest recorded state of a BTC-backed loan.
+    /// </summary>
+    [McpServerTool, Description("Get the latest recorded state of a BTC-backed loan")]
+    public static async Task<LoanStateDTO?> GetLatestLoanState(
+        IQueryDispatcher queryDispatcher,
+        [Description("The asset ID")] string assetId)
+    {
+        return await queryDispatcher.DispatchAsync(new GetLatestLoanStateQuery { AssetId = assetId });
+    }
+
+    /// <summary>
     /// Marks an asset as sold on the given date.
     /// </summary>
     [McpServerTool, Description("Marks an asset as sold on the given date (defaults to today).")]
