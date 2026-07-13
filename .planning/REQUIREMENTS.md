@@ -74,24 +74,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ASSET-01 | Phase 1 | Pending |
-| ASSET-02 | Phase 1 | Pending |
-| ASSET-03 | Phase 1 | Pending |
-| ASSET-04 | Phase 1 | Pending |
-| ASSET-05 | Phase 1 | Pending |
-| ASSET-06 | Phase 1 | Pending |
-| HIST-01 | Phase 2 | Pending |
-| HIST-02 | Phase 2 | Pending |
-| HIST-03 | Phase 2 | Pending |
-| HIST-04 | Phase 2 | Pending |
-| MCP-01 | Phase 3 | Pending |
-| MCP-02 | Phase 3 | Pending |
-| MCP-03 | Phase 3 | Pending |
-| DOCS-01 | Phase 3 | Pending |
-| DOCS-02 | Phase 3 | Pending |
-| TEST-01 | Phase 1 | Pending |
-| TEST-02 | Phase 1 | Pending |
-| TEST-03 | Phase 3 | Pending |
+| ASSET-01 | Phase 29 | Pending |
+| ASSET-02 | Phase 29 | Pending |
+| ASSET-03 | Phase 29 | Pending |
+| ASSET-04 | Phase 29 | Pending |
+| ASSET-05 | Phase 29 | Pending |
+| ASSET-06 | Phase 29 | Pending |
+| HIST-01 | Phase 30 | Pending |
+| HIST-02 | Phase 30 | Pending |
+| HIST-03 | Phase 30 | Pending |
+| HIST-04 | Phase 30 | Pending |
+| MCP-01 | Phase 31 | Pending |
+| MCP-02 | Phase 31 | Pending |
+| MCP-03 | Phase 31 | Pending |
+| DOCS-01 | Phase 31 | Pending |
+| DOCS-02 | Phase 31 | Pending |
+| TEST-01 | Phase 29 | Pending |
+| TEST-02 | Phase 29 | Pending |
+| TEST-03 | Phase 31 | Pending |
 
 **Coverage:**
 - v1 requirements: 18 total
