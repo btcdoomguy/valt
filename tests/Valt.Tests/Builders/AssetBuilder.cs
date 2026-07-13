@@ -16,6 +16,9 @@ public class AssetBuilder
     private Icon _icon = Icon.Empty;
     private bool _includeInNetWorth = true;
     private bool _visible = true;
+    private bool _isSold = false;
+    private DateOnly? _dateSold = null;
+    private bool _previousVisibility = true;
     private DateTime _lastPriceUpdateAt = DateTime.UtcNow;
     private DateTime _createdAt = DateTime.UtcNow;
     private int _displayOrder = 0;
@@ -97,6 +100,24 @@ public class AssetBuilder
         return this;
     }
 
+    public AssetBuilder WithSold(bool isSold)
+    {
+        _isSold = isSold;
+        return this;
+    }
+
+    public AssetBuilder WithDateSold(DateOnly? dateSold)
+    {
+        _dateSold = dateSold;
+        return this;
+    }
+
+    public AssetBuilder WithPreviousVisibility(bool previousVisibility)
+    {
+        _previousVisibility = previousVisibility;
+        return this;
+    }
+
     public AssetBuilder WithLastPriceUpdateAt(DateTime lastPriceUpdateAt)
     {
         _lastPriceUpdateAt = lastPriceUpdateAt;
@@ -130,7 +151,7 @@ public class AssetBuilder
     public Asset Build()
     {
         return Asset.Create(_id, _name, _details, _icon, _includeInNetWorth, _visible,
-            _lastPriceUpdateAt, _createdAt, _displayOrder, _groupId, _version);
+            _lastPriceUpdateAt, _createdAt, _displayOrder, _groupId, _version, _isSold, _dateSold, _previousVisibility);
     }
 
     // Static factory methods
