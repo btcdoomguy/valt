@@ -1,20 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v0.5
-milestone_name: Asset Sold History
-current_phase: 5
-status: Awaiting next milestone
-stopped_at: Completed 31-05-PLAN.md
-last_updated: "2026-07-14T22:45:33.957Z"
+milestone: v0.6
+milestone_name: Documentation Site Refresh
+status: planning
+last_updated: "2026-07-14T23:24:37.001Z"
 last_activity: 2026-07-14
-last_activity_desc: Milestone v0.5 completed and archived
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 12
-  completed_plans: 12
-  percent: 100
-current_phase_name: MCP, Localization, Documentation, and Verification
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # STATE.md
@@ -28,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-07-14)
 
 ## Current Position
 
-Phase: Milestone v0.5 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-07-14 — Milestone v0.5 completed and archived
+Status: Defining requirements
+Last activity: 2026-07-14 — Milestone v0.6 started
 
 ## Performance Metrics
 

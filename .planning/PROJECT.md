@@ -47,14 +47,28 @@ Users can see their entire financial picture — cash flow, investments, and loa
 
 ### Active
 
-- [ ] v0.6 milestone goals — TBD during next milestone planning.
+- [ ] v0.6 milestone goals — Documentation Site Refresh: update public Valt docs to reflect v0.5 features, fix outdated content, and add missing pages.
 
-### Out of Scope
+## Out of Scope
 
-- v0.4 quality/hardening items (async void cleanup, HttpClient factory, background job throttling, LiteDB index centralization, god-VM refactor, live-API test isolation, handler unit tests) — deferred to a future quality milestone; v0.5 is focused on user-facing Asset Sold History
+- v0.4 quality/hardening items (async void cleanup, HttpClient factory, background job throttling, LiteDB index centralization, god-VM refactor, live-API test isolation, handler unit tests) — deferred to a future quality milestone; v0.6 is focused on documentation
 - Recording sale price, capital gains, or tax lot information — out of scope for v0.5; sold history is for record-keeping only
 - Real-time price streaming or automated sell detection — manual sale action only
 - Mobile or web port — not in scope
+- Changes to the Valt application code itself — documentation site only; no new app features
+
+## Current Milestone: v0.6 Documentation Site Refresh
+
+**Goal:** Bring the public Valt documentation site (`valt-docs`) up to date with all features shipped through v0.5, fix factual errors, and add missing pages.
+
+**Target features:**
+- Rewrite the **Assets** page to include Asset Sold History (Mark as Sold, Date Sold, History screen, Undo Sale) and BTC-backed Loans (collateral, APR, LTV, loan-state timeline).
+- Update the **Reports** page with custom BTC price simulation and current dashboard/wealth/loan summaries.
+- Complete the **Goals** page with missing goal types (`SaveFiat`, `SavingsRate`, `NetWorthBtc`) and price-data behavior.
+- Update the **MCP Server** page with the full tool list including AssetTools, loan-state tools, and sold-asset tools.
+- Fix factual errors in Installation (SQLite → LiteDB), FAQ, and Getting Started.
+- Enhance the **Fixed Expenses** page with record states, yearly overview, and range handling.
+- Consider new pages: Settings & Configuration, Asset Groups.
 
 ## Current State
 
@@ -62,16 +76,11 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - **Phases 29-31 are complete:** 12 plans, 27 tasks.
 - **All 18 v0.5 requirements are validated** and traceable to phases.
 - **Deferred items:** 6 (see STATE.md Deferred Items).
-- **Known gaps:** Two pre-existing live-API integration tests fail with `403 Forbidden` (CoinGecko / BitcoinDominance providers) in the current environment; failures are unrelated to v0.5 and are deferred.
-- **Next milestone:** v0.6 is in planning.
+- **v0.6 milestone planning started** on 2026-07-14; focus is the public documentation site.
 
 ## Next Milestone Goals
 
-- **v0.6 — TBD**
-- Candidate goals carried forward from v0.5 deferrals and v2 requirements:
-  - Address v0.4 quality/hardening items (async void cleanup, god-VM refactor, live-API test isolation, handler unit tests).
-  - History enhancements: filter by year or asset type, bulk mark sold.
-  - Advanced sale tracking: sale price, proceeds, commission, realized capital gains/losses, tax-lot tracking.
+- **v0.7 — TBD** (to be defined after v0.6 documentation milestone completes).
 
 ## Context
 
@@ -124,4 +133,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-14 after v0.5 milestone closure — Asset Sold History shipped, planning v0.6*
+*Last updated: 2026-07-14 after starting v0.6 milestone planning — Documentation Site Refresh*
