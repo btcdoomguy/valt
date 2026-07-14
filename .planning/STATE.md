@@ -6,9 +6,9 @@ current_phase: 31
 current_phase_name: MCP, Localization, Documentation, and Verification
 status: in progress
 stopped_at: Completed 31-04-PLAN.md
-last_updated: "2026-07-14T13:45:34.000Z"
+last_updated: "2026-07-14T15:28:39.000Z"
 last_activity: 2026-07-14
-last_activity_desc: Completed quick task 260714-exz - The History page displays the description on the grid in a very weird format, check the picture: /home/vmabellini/Pictures/valt3
+last_activity_desc: Completed quick task 260714-hbv - it is still bad. take a look at /home/vmabellini/Pictures/valt3/new.png. it should align properly. just remove the icon and render the description as plain text. also, the button Restore Asset should not occupy the entire horizontal space
 progress:
   total_phases: 3
   completed_phases: 2
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 Phase: 31 — MCP, Localization, Documentation, and Verification
 Plan: 04 complete; next plan 05
 Status: In Progress
-Last activity: 2026-07-14 - Completed quick task 260714-exz: The History page displays the description on the grid in a very weird format, check the picture: /home/vmabellini/Pictures/valt3
+Last activity: 2026-07-14 - Completed quick task 260714-hbv: it is still bad. take a look at /home/vmabellini/Pictures/valt3/new.png. it should align properly. just remove the icon and render the description as plain text. also, the button Restore Asset should not occupy the entire horizontal space
 
 Progress: [█████████░] 92%
 
@@ -109,6 +109,7 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260714-exz | The History page displays the description on the grid in a very weird format, check the picture: /home/vmabellini/Pictures/valt3 | 2026-07-14 | 87a83ae | [260714-exz-the-history-page-displays-the-descriptio](./quick/260714-exz-the-history-page-displays-the-descriptio/) |
+| 260714-hbv | it is still bad. take a look at /home/vmabellini/Pictures/valt3/new.png. it should align properly. just remove the icon and render the description as plain text. also, the button Restore Asset should not occupy the entire horizontal space | 2026-07-14 | 4607275 | [260714-hbv-it-is-still-bad-take-a-look-at-home-vmab](./quick/260714-hbv-it-is-still-bad-take-a-look-at-home-vmab/) |
 
 ## Deferred Items
 
