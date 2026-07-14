@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 Phase: 31 — MCP, Localization, Documentation, and Verification
 Plan: 04 complete; next plan 05
 Status: In Progress
-Last activity: 2026-07-14 - Completed quick task 260714-i1p: when I mark as sold, the system asks for date but only month/year. it should use a date picker like the one on the transaction tab to also pick the day
+Last activity: 2026-07-14 - Completed quick task 260714-kzm: Update Avalonia nuget packages from 12.0.3 to 12.1.0, research breaking changes first
 
 Progress: [█████████░] 92%
 
@@ -111,6 +111,7 @@ None yet.
 | 260714-exz | The History page displays the description on the grid in a very weird format, check the picture: /home/vmabellini/Pictures/valt3 | 2026-07-14 | 87a83ae | [260714-exz-the-history-page-displays-the-descriptio](./quick/260714-exz-the-history-page-displays-the-descriptio/) |
 | 260714-hbv | it is still bad. take a look at /home/vmabellini/Pictures/valt3/new.png. it should align properly. just remove the icon and render the description as plain text. also, the button Restore Asset should not occupy the entire horizontal space | 2026-07-14 | 4607275 | [260714-hbv-it-is-still-bad-take-a-look-at-home-vmab](./quick/260714-hbv-it-is-still-bad-take-a-look-at-home-vmab/) |
 | 260714-i1p | when I mark as sold, the system asks for date but only month/year. it should use a date picker like the one on the transaction tab to also pick the day | 2026-07-14 | d79acfa | [260714-i1p-when-i-mark-as-sold-the-system-asks-for-](./quick/260714-i1p-when-i-mark-as-sold-the-system-asks-for-/) |
+| 260714-kzm | Update Avalonia nuget packages from 12.0.3 to 12.1.0, research breaking changes first | 2026-07-14 | 36ddfe7 | [260714-kzm-update-avalonia-nuget-packages-from-12-0](./quick/260714-kzm-update-avalonia-nuget-packages-from-12-0/) |
 
 ## Deferred Items
 
