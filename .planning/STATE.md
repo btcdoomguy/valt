@@ -4,17 +4,17 @@ milestone: v0.5
 milestone_name: Asset Sold History
 current_phase: 31
 current_phase_name: MCP, Localization, Documentation, and Verification
-status: ready to plan
-stopped_at: Phase 31 context gathered
-last_updated: "2026-07-13T22:16:55.184Z"
-last_activity: 2026-07-13
-last_activity_desc: Phase 30 complete, transitioned to Phase 31
+status: in progress
+stopped_at: Completed 31-04-PLAN.md
+last_updated: "2026-07-14T13:45:34.000Z"
+last_activity: 2026-07-14
+last_activity_desc: Completed quick task 260714-exz - The History page displays the description on the grid in a very weird format, check the picture: /home/vmabellini/Pictures/valt3
 progress:
   total_phases: 3
   completed_phases: 2
-  total_plans: 7
-  completed_plans: 7
-  percent: 67
+  total_plans: 12
+  completed_plans: 11
+  percent: 92
 ---
 
 # STATE.md
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 ## Current Position
 
 Phase: 31 — MCP, Localization, Documentation, and Verification
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-07-13 — Phase 30 complete, transitioned to Phase 31
+Plan: 04 complete; next plan 05
+Status: In Progress
+Last activity: 2026-07-14 - Completed quick task 260714-exz: The History page displays the description on the grid in a very weird format, check the picture: /home/vmabellini/Pictures/valt3
 
-Progress: [████████░░] 75%
+Progress: [█████████░] 92%
 
 ## Performance Metrics
 
@@ -63,6 +63,10 @@ Progress: [████████░░] 75%
 | Phase 30-history-ui-and-details-reuse P01 | 11min | 3 tasks | 9 files |
 | Phase 30-history-ui-and-details-reuse P02 | 6 min | 3 tasks | 7 files |
 | Phase 30 P03 | 15 | 3 tasks | 2 files |
+| Phase 31-mcp-localization-documentation-and-verification P01 | 5min | 2 tasks | 1 files |
+| Phase 31 P02 | 20min | 3 tasks | 10 files |
+| Phase 31 P03 | 5 min | 1 task | 1 file |
+| Phase 31-mcp-localization-documentation-and-verification P04 | 8 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -89,6 +93,8 @@ Recent decisions affecting current work:
 - [Phase 30-history-ui-and-details-reuse]: Combined Tasks 2 and 3 into a single commit to keep the build green — Renaming the command in the ViewModel alone broke the XAML binding until the view was also updated, so both changes were committed together.
 - [Phase ?]: Reused CloseDialog typed-result mechanism instead of adding AssetSummaryUpdatedMessage subscription to AssetsViewModel to avoid coupling and refresh loops — Modal result is more explicit and avoids potential infinite loops since AssetsViewModel also sends AssetSummaryUpdatedMessage after its own loads
 - [Phase ?]: Left AssetSummaryUpdatedMessage broadcast in modal for other listeners while making caller-side refresh authoritative for active Assets list — Keeps unrelated totals/listeners updated without making the Assets tab depend on the message for its own refresh
+- [Phase ?]: Removed the unplanned SoldAssetHistory_DateSold_Label key and used SoldAssetHistory_DateSold_Title with a literal colon via Run elements to match the plan's 20-key list and Title+colon pattern.
+- [Phase 31-03]: Updated Asset module docs as a first-class deliverable tied to v0.5 feature completeness, keeping the Domain/Application/UI/MCP sections in sync with the sold-state feature.
 
 ### Pending Todos
 
@@ -97,6 +103,12 @@ None yet.
 ### Blockers/Concerns
 
 None yet.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260714-exz | The History page displays the description on the grid in a very weird format, check the picture: /home/vmabellini/Pictures/valt3 | 2026-07-14 | 87a83ae | [260714-exz-the-history-page-displays-the-descriptio](./quick/260714-exz-the-history-page-displays-the-descriptio/) |
 
 ## Deferred Items
 
@@ -108,6 +120,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-13T22:16:55.180Z
-Stopped at: Phase 31 context gathered
-Resume file: .planning/phases/31-mcp-localization-documentation-and-verification/31-CONTEXT.md
+Last session: 2026-07-13T23:43:20.000Z
+Stopped at: Completed 31-04-PLAN.md
+Resume file: None
