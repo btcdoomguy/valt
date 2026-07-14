@@ -11,6 +11,7 @@ using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Assets.Commands.UndoAssetSale;
 using Valt.App.Modules.Assets.DTOs;
 using Valt.App.Modules.Assets.Queries.GetSoldAssets;
+using Valt.Core.Common;
 using Valt.Infra.Kernel;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
@@ -46,13 +47,13 @@ public partial class SoldAssetHistoryViewModel : ValtModalViewModel
     {
         if (!Design.IsDesignMode) return;
 
-        SoldAssets.Add(CreateDesignTimeItem("1", "Apple Inc.", 0, "Stock", "\xE8F5", "AAPL", 100m, new DateOnly(2024, 6, 1)));
-        SoldAssets.Add(CreateDesignTimeItem("2", "Bitcoin ETF", 1, "ETF", "\xE8F5", "IBIT", 1000m, new DateOnly(2024, 5, 15)));
-        SoldAssets.Add(CreateDesignTimeItem("3", "Beach House", 3, "Real Estate", "\xE88A", null, null, new DateOnly(2024, 4, 20), 450000m, "123 Ocean Drive, Miami FL"));
+        SoldAssets.Add(CreateDesignTimeItem("1", "Apple Inc.", 0, "Stock", Icon.Empty, "AAPL", 100m, new DateOnly(2024, 6, 1)));
+        SoldAssets.Add(CreateDesignTimeItem("2", "Bitcoin ETF", 1, "ETF", Icon.Empty, "IBIT", 1000m, new DateOnly(2024, 5, 15)));
+        SoldAssets.Add(CreateDesignTimeItem("3", "Beach House", 3, "Real Estate", Icon.Empty, null, null, new DateOnly(2024, 4, 20), 450000m, "123 Ocean Drive, Miami FL"));
     }
 
     private static SoldAssetItemViewModel CreateDesignTimeItem(
-        string id, string name, int assetTypeId, string assetTypeName, string icon, string? symbol, decimal? quantity, DateOnly dateSold, decimal? currentValue = null, string? address = null)
+        string id, string name, int assetTypeId, string assetTypeName, Icon iconValue, string? symbol, decimal? quantity, DateOnly dateSold, decimal? currentValue = null, string? address = null)
     {
         var value = currentValue ?? (quantity.HasValue && symbol is not null ? 1000m : 0m);
         var dto = new AssetDTO
@@ -61,7 +62,7 @@ public partial class SoldAssetHistoryViewModel : ValtModalViewModel
             Name = name,
             AssetTypeId = assetTypeId,
             AssetTypeName = assetTypeName,
-            Icon = icon,
+            Icon = iconValue.ToString(),
             IncludeInNetWorth = true,
             Visible = true,
             LastPriceUpdateAt = DateTime.Now,
@@ -178,7 +179,7 @@ public partial class SoldAssetHistoryViewModel : ValtModalViewModel
         public string Id { get; init; } = string.Empty;
         public string Name { get; init; } = string.Empty;
         public string AssetTypeName { get; init; } = string.Empty;
-        public string Icon { get; init; } = string.Empty;
+        public Icon Icon { get; init; } = Icon.Empty;
         public DateOnly DateSold { get; init; } = DateOnly.MinValue;
         public string DateSoldFormatted { get; init; } = string.Empty;
         public AssetViewModel AssetDetails { get; }
@@ -188,7 +189,7 @@ public partial class SoldAssetHistoryViewModel : ValtModalViewModel
             Id = dto.Id;
             Name = dto.Name;
             AssetTypeName = dto.AssetTypeName;
-            Icon = dto.Icon;
+            Icon = Icon.RestoreFromId(dto.Icon);
             DateSold = dto.DateSold ?? DateOnly.MinValue;
             DateSoldFormatted = DateSold.ToShortDateString();
             AssetDetails = new AssetViewModel(dto, mainCurrencyCode);
