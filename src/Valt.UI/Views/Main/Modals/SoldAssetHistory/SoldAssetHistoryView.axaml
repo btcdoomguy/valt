@@ -56,7 +56,7 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate DataType="soldAssetHistory:SoldAssetHistoryViewModel+SoldAssetItemViewModel">
                                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                                <TextBlock Text="{Binding Icon}"
+                                                <TextBlock Text="{Binding Icon.Unicode}"
                                                            FontFamily="{StaticResource MaterialDesign}"
                                                            FontSize="16" />
                                                 <TextBlock Text="{Binding Name}" />
