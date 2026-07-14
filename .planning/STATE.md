@@ -2,38 +2,36 @@
 gsd_state_version: 1.0
 milestone: v0.5
 milestone_name: Asset Sold History
-current_phase: 31
-current_phase_name: MCP, Localization, Documentation, and Verification
-status: complete
+current_phase: 5
+status: Awaiting next milestone
 stopped_at: Completed 31-05-PLAN.md
-last_updated: "2026-07-14T22:19:50.119Z"
+last_updated: "2026-07-14T22:45:33.957Z"
 last_activity: 2026-07-14
-last_activity_desc: "Completed 31-05-PLAN.md: end-to-end verification gate and manual UI smoke test sign-off for v0.5 Asset Sold History"
+last_activity_desc: Milestone v0.5 completed and archived
 progress:
   total_phases: 3
   completed_phases: 3
   total_plans: 12
   completed_plans: 12
   percent: 100
+current_phase_name: MCP, Localization, Documentation, and Verification
 ---
 
 # STATE.md
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-07-13)
+See: .planning/PROJECT.md (updated 2026-07-14)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 31 — MCP, Localization, Documentation, and Verification
+**Current focus:** Planning v0.6 — next milestone goals TBD.
 
 ## Current Position
 
-Phase: 31 — MCP, Localization, Documentation, and Verification  
-Plan: 05 complete; Phase 31 complete  
-Status: **Complete**  
-Last activity: 2026-07-14 - Completed 31-05-PLAN.md: end-to-end verification gate and manual UI smoke test sign-off for v0.5 Asset Sold History
-
-Progress: [██████████] 100%
+Phase: Milestone v0.5 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-07-14 — Milestone v0.5 completed and archived
 
 ## Performance Metrics
 
@@ -122,6 +120,12 @@ Items acknowledged and carried forward from previous milestone close:
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
 | Quality | v0.4 quality/hardening items (async void cleanup, god-VM refactor, live-API test isolation, handler unit tests) | Deferred | v0.5 |
+| Debug Session | empty-loan-context — Current Loan Context formatted properties are computed read-only properties | Investigating | v0.5 |
+| Debug Session | translation-gaps — UpdateLoanState UI strings added to neutral resx file not code-generated | Diagnosed | v0.5 |
+| Debug Session | visual-layout — hardcoded input widths exceed available column space and button widths | Diagnosed | v0.5 |
+| Quick Task | 001-copy-modal-perf | Unknown | v0.5 |
+| Quick Task | reports-summary-simulation | Missing | v0.5 |
+| Quick Task | 260616-rcu-fix-stock-asset-edit-modal-not-loading-s | Unknown | v0.5 |
 
 ## Session Continuity
 
@@ -133,3 +137,7 @@ Resume file: None
 
 - Phase 31 complete; v0.5 Asset Sold History milestone is ready for `/gsd-verify-work` and milestone closure.
 - Two pre-existing live-API integration tests (`CoinGeckoProviderTests`, `BitcoinDominanceProviderTests`) failed with HTTP 403 during the final full test gate. They are unrelated to v0.5 and are logged in the phase deferred-items file.
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone

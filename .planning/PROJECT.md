@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Valt is a personal budget management desktop application for bitcoiners, built with .NET and Avalonia UI. It tracks fiat and bitcoin accounts, transactions, external investments (assets), and displays values in bitcoin terms.
+Valt is a personal budget management desktop application for bitcoiners, built with .NET and Avalonia UI. It tracks fiat and bitcoin accounts, transactions, external investments (assets), and displays values in bitcoin terms. As of v0.5, users can also mark assets as sold, keep a record in a dedicated Asset Sold History screen, and undo a sale to restore the asset to the active view.
 
 ## Core Value
 
@@ -30,48 +30,58 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - ✓ **HTTP-01**: `IHttpClientFactory` is registered in DI and all `new HttpClient()` sites use named/typed clients — Phase 13
 - ✓ **HTTP-02**: Price providers and update checkers share a consistent HTTP client lifetime and configuration — Phase 13
 - ✓ **HTTP-03**: Existing provider tests continue to pass against the factory-based clients — Phase 13
-- ✓ Add a `Sold` flag and `Date Sold` to assets — Phase 29
-- ✓ Hide sold assets from the main Assets view and exclude them from totals/calculations — Phase 29
-- ✓ Provide Undo Sell action to restore the asset to the active view — Phase 29
-- ✓ Prompt for Date Sold when not provided during the sell action — Phase 29
-
-- ✓ Add a History button on the Assets toolbar to access sold assets — Phase 30
-- ✓ Build a History screen listing sold assets with their sale date — Phase 30
-- ✓ Show per-type asset details summary in the History screen when an asset is selected — Phase 30
-- ✓ Undo Sell action restores the asset to the active view and refreshes the Assets tab — Phase 30
-- ✓ **MCP-01**: AI assistant can mark an asset as sold via MCP tool — Phase 31
-- ✓ **MCP-02**: AI assistant can undo a sale via MCP tool — Phase 31
-- ✓ **MCP-03**: AI assistant can list sold assets via MCP tool — Phase 31
-- ✓ **DOCS-01**: All new Asset Sold History user-facing strings are localized in `language.resx`, `language.pt-BR.resx`, and `language.es.resx` — Phase 31
-- ✓ **DOCS-02**: `.claude/docs/assets.md` updated with sold-history behavior and MCP impact — Phase 31
-- ✓ Complete end-to-end verification of mark sold, history browse, details panel, undo, and totals refresh — Phase 31
+- ✓ Add a `Sold` flag and `Date Sold` to assets — v0.5 (Phase 29)
+- ✓ Hide sold assets from the main Assets view and exclude them from totals/calculations — v0.5 (Phase 29)
+- ✓ Provide Undo Sell action to restore the asset to the active view — v0.5 (Phase 29)
+- ✓ Prompt for Date Sold when not provided during the sell action — v0.5 (Phase 29)
+- ✓ Add a History button on the Assets toolbar to access sold assets — v0.5 (Phase 30)
+- ✓ Build a History screen listing sold assets with their sale date — v0.5 (Phase 30)
+- ✓ Show per-type asset details summary in the History screen when an asset is selected — v0.5 (Phase 30)
+- ✓ Undo Sell action restores the asset to the active view and refreshes the Assets tab — v0.5 (Phase 30)
+- ✓ **MCP-01**: AI assistant can mark an asset as sold via MCP tool — v0.5 (Phase 31)
+- ✓ **MCP-02**: AI assistant can undo a sale via MCP tool — v0.5 (Phase 31)
+- ✓ **MCP-03**: AI assistant can list sold assets via MCP tool — v0.5 (Phase 31)
+- ✓ **DOCS-01**: All new Asset Sold History user-facing strings are localized in `language.resx`, `language.pt-BR.resx`, and `language.es.resx` — v0.5 (Phase 31)
+- ✓ **DOCS-02**: `.claude/docs/assets.md` updated with sold-history behavior and MCP impact — v0.5 (Phase 31)
+- ✓ Complete end-to-end verification of mark sold, history browse, details panel, undo, and totals refresh — v0.5 (Phase 31)
 
 ### Active
 
-_None — all v0.5 requirements are validated. The milestone is ready for `/gsd-verify-work`._
-
+- [ ] v0.6 milestone goals — TBD during next milestone planning.
 
 ### Out of Scope
 
 - v0.4 quality/hardening items (async void cleanup, HttpClient factory, background job throttling, LiteDB index centralization, god-VM refactor, live-API test isolation, handler unit tests) — deferred to a future quality milestone; v0.5 is focused on user-facing Asset Sold History
-- Replacing LiteDB or Avalonia — would require its own roadmap
-- Full MCP server redesign — security review only; redesign deferred to a later milestone
 - Recording sale price, capital gains, or tax lot information — out of scope for v0.5; sold history is for record-keeping only
 - Real-time price streaming or automated sell detection — manual sale action only
 - Mobile or web port — not in scope
 
+## Current State
+
+- **v0.5 Asset Sold History shipped** on 2026-07-14.
+- **Phases 29-31 are complete:** 12 plans, 27 tasks.
+- **All 18 v0.5 requirements are validated** and traceable to phases.
+- **Deferred items:** 6 (see STATE.md Deferred Items).
+- **Known gaps:** Two pre-existing live-API integration tests fail with `403 Forbidden` (CoinGecko / BitcoinDominance providers) in the current environment; failures are unrelated to v0.5 and are deferred.
+- **Next milestone:** v0.6 is in planning.
+
+## Next Milestone Goals
+
+- **v0.6 — TBD**
+- Candidate goals carried forward from v0.5 deferrals and v2 requirements:
+  - Address v0.4 quality/hardening items (async void cleanup, god-VM refactor, live-API test isolation, handler unit tests).
+  - History enhancements: filter by year or asset type, bulk mark sold.
+  - Advanced sale tracking: sale price, proceeds, commission, realized capital gains/losses, tax-lot tracking.
+
 ## Context
 
-Valt uses a layered architecture: Valt.Core (domain), Valt.App (CQRS), Valt.Infra (LiteDB persistence), and Valt.UI (Avalonia). The v0.4 milestone addressed quality and performance hardening. v0.5 introduces a user-facing Asset Sold History feature that lets users retain records of disposed assets without losing them entirely.
-
-Key focus areas for this milestone: adding a `Sold` flag and `Date Sold` to the asset domain, filtering sold assets out of active queries and totals, building a History screen with per-type details and an Undo Sell action, and updating documentation and MCP tooling accordingly.
+Valt uses a layered architecture: Valt.Core (domain), Valt.App (CQRS), Valt.Infra (LiteDB persistence), and Valt.UI (Avalonia). The v0.4 milestone addressed quality and performance hardening. v0.5 introduced a user-facing Asset Sold History feature that lets users retain records of disposed assets without losing them entirely. The feature spans the domain (sold-state properties), application (commands and queries), infrastructure (persistence and price-update filtering), UI (History modal and Date Sold prompt), MCP tooling, localization, and documentation.
 
 ## Constraints
 
 - **Tech stack**: .NET, Avalonia UI, LiteDB, CommunityToolkit.Mvvm — changes must fit existing patterns
 - **Test framework**: NUnit with NSubstitute; builders and `DatabaseTest`/`IntegrationTest` bases must remain supported
 - **Backward compatibility**: Existing user databases and price databases must continue to work without migration
-- **Scope discipline**: This is a hardening/quality milestone; new features are explicitly out of scope
 - **Risk management**: UI restructuring must be done in vertical slices (VM + XAML + tests) to avoid broken bindings
 
 ## Key Decisions
@@ -84,6 +94,17 @@ Key focus areas for this milestone: adding a `Sold` flag and `Date Sold` to the 
 | Store history inside `BtcLoanDetails` JSON | Reuses existing `AssetDetailsSerializer` mechanism; avoids new collection complexity | Snapshots persisted as JSON array inside `BtcLoanDetailsDto` — Phase 6 |
 | Two-step ViewModel simplification (services first, child-VMs second) | Builder extraction is low-risk and testable; child-VM restructuring requires XAML changes and carries binding risk | Phases 17-20 extract services; Phases 21-24 restructure VMs and XAML |
 | Skip research for v0.4 | No new features or external integrations; scope is refactor and hardening of existing code | — |
+| Add `IsSold` and `DateSold` as first-class properties on the `Asset` aggregate and `AssetEntity` | First-class properties keep sold-state behavior explicit and queryable; avoids hidden JSON blob semantics | Domain, persistence, and tests all use `IsSold`, `DateSold`, `PreviousVisibility` — v0.5 (Phase 29) |
+| Filter sold assets at the query layer (`IAssetQueries`) | Centralizes semantics so the UI, reports, MCP, and background jobs all share the same active/sold definition | `GetAllAsync` returns active assets only; `GetSoldAsync` returns sold assets — v0.5 (Phase 29) |
+| Reuse the existing `AssetViewModel` and `AssetDTO` mapping for the History details panel | Avoids duplicating per-type layout logic and keeps the History card consistent with the main asset card | `SoldAssetDetailsCard` binds to `AssetViewModel` — v0.5 (Phase 30) |
+| Keep `IsSold` independent from `Visible` | Ensures undo restores the prior visibility state rather than conflating sold-state with visibility | `MarkAsSold` captures `PreviousVisibility`; `UndoSale` restores `Visible` — v0.5 (Phase 29) |
+| Keep `Asset.New` backward-compatible with optional sold-state defaults | Existing call sites continue to compile without modification | `isSold: false`, `dateSold: null`, `previousVisibility: true` defaults — v0.5 (Phase 29) |
+| Reuse `AssetUpdatedEvent` for sold-state changes | Avoids expanding the event surface in the foundational plan | `MarkAsSold` and `UndoSale` emit `AssetUpdatedEvent` — v0.5 (Phase 29) |
+| Store `DateSold` as `DateOnly?` directly on `AssetEntity` | Matches the domain model; round-trip test proves LiteDB serialization | Date-only serialization verified — v0.5 (Phase 29) |
+| Inject `IClock` into `MarkAssetAsSoldValidator` and `MarkAssetAsSoldHandler` | Keeps future-date rejection and default-to-today behavior testable and deterministic | Unit tests use `FakeClock` — v0.5 (Phase 29) |
+| Place the `AssetPriceUpdaterJob` sold-asset skip guard in `ShouldUpdatePrice` | Keeps the `IAssetRepository` contract stable and the data-fetch behavior consistent with other consumers | `ShouldUpdatePrice` returns `false` when `asset.IsSold` — v0.5 (Phase 29) |
+| Return structured dialog result from `SoldAssetHistory` modal | Caller-side refresh is explicit and avoids coupling `AssetsViewModel` to internal modal messages | `WasRestored` flag drives active-list refresh — v0.5 (Phase 30) |
+| Use `SoldAssetHistory_DateSold_Title` with a literal colon via `Run` elements | Avoids an unplanned extra resource key and matches the existing Title+colon pattern | `_Label` key removed; 20-key set preserved — v0.5 (Phase 31) |
 
 ## Evolution
 
@@ -102,18 +123,5 @@ This document evolves at phase transitions and milestone boundaries.
 3. Audit Out of Scope — reasons still valid?
 4. Update Context with current state
 
-## Current Milestone: v0.5 Asset Sold History
-
-**Goal:** Let users mark assets as sold, record the sale date, hide them from the active Assets view and calculations, browse sold assets in a dedicated History screen, inspect per-type details, and undo a sale to restore the asset.
-
-**Target features:**
-- Mark assets as sold with a recorded Date Sold
-- Hide sold assets from the main Assets tab and exclude them from totals/calculations
-- Add a History button on the Assets toolbar for accessing sold assets
-- History screen lists sold assets with their sale date
-- Selecting a sold asset shows a full details summary panel tailored to the asset type
-- Undo Sell action restores the asset to the main view
-- Optional Date Sold prompt when not provided at sale time
-
 ---
-*Last updated: 2026-07-13 after Phase 30 completion — History UI, Mark as Sold flow, and undo-to-refresh gap closure delivered*
+*Last updated: 2026-07-14 after v0.5 milestone closure — Asset Sold History shipped, planning v0.6*
