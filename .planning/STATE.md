@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v0.6
 milestone_name: Documentation Site Refresh
 status: planning
-last_updated: "2026-07-14T23:24:37.001Z"
+last_updated: "2026-07-14T23:30:00.000Z"
 last_activity: 2026-07-14
 progress:
-  total_phases: 0
+  total_phases: 7
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-14)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Planning v0.6 — next milestone goals TBD.
+**Current focus:** Planning v0.6 — Documentation Site Refresh: update public Valt docs to reflect v0.5 features, fix outdated content, and add missing pages.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 32 — Factual Fixes and Cross-Page Accuracy
 Plan: —
-Status: Defining requirements
-Last activity: 2026-07-14 — Milestone v0.6 started
+Status: planning
+Last activity: 2026-07-14 — v0.6 roadmap created; Phase 32 ready for planning
 
 ## Performance Metrics
 
