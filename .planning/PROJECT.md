@@ -39,10 +39,16 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - ✓ Build a History screen listing sold assets with their sale date — Phase 30
 - ✓ Show per-type asset details summary in the History screen when an asset is selected — Phase 30
 - ✓ Undo Sell action restores the asset to the active view and refreshes the Assets tab — Phase 30
+- ✓ **MCP-01**: AI assistant can mark an asset as sold via MCP tool — Phase 31
+- ✓ **MCP-02**: AI assistant can undo a sale via MCP tool — Phase 31
+- ✓ **MCP-03**: AI assistant can list sold assets via MCP tool — Phase 31
+- ✓ **DOCS-01**: All new Asset Sold History user-facing strings are localized in `language.resx`, `language.pt-BR.resx`, and `language.es.resx` — Phase 31
+- ✓ **DOCS-02**: `.claude/docs/assets.md` updated with sold-history behavior and MCP impact — Phase 31
+- ✓ Complete end-to-end verification of mark sold, history browse, details panel, undo, and totals refresh — Phase 31
 
 ### Active
 
-- [ ] Update Assets documentation and MCP tool exposure for sold assets
+_None — all v0.5 requirements are validated. The milestone is ready for `/gsd-verify-work`._
 
 
 ### Out of Scope

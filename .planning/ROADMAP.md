@@ -16,7 +16,7 @@ Let users mark assets as sold, record the sale date, hide them from the active A
 
 - [x] **Phase 29: Domain, Persistence, and Active-View Filtering** - Add sold state to the asset aggregate, persistence, and queries; ensure sold assets are excluded from active views, totals, and price updates. (completed 2026-07-13)
 - [x] **Phase 30: History UI and Details Reuse** - Build the History modal with sold-asset listing, per-type details panel, and Undo Sell action. (completed 2026-07-13)
-- [ ] **Phase 31: MCP, Localization, Documentation, and Verification** - Expose sold-asset operations through MCP, localize new strings, update documentation, and run end-to-end verification.
+- [x] **Phase 31: MCP, Localization, Documentation, and Verification** - Expose sold-asset operations through MCP, localize new strings, update documentation, and run end-to-end verification.
 
 ## Phase Details
 
@@ -97,7 +97,7 @@ Plans:
 3. Asset documentation is updated with sold-history behavior and MCP impact.
 4. End-to-end verification passes for mark sold, history browse, details panel, undo, and totals refresh.
 
-**Plans:** 4/5 plans executed
+**Plans:** 5/5 plans complete
 
 Plans:
 **Wave 1**
@@ -112,7 +112,7 @@ Plans:
 
 **Wave 3** *(depends on Wave 2 completion and localization)*
 
-- [ ] 31-05-PLAN.md — End-to-end verification: build/test gate and manual UI smoke test
+- [x] 31-05-PLAN.md — End-to-end verification: build/test gate and manual UI smoke test
 
 ## Progress
 
@@ -123,11 +123,11 @@ Phases execute in numeric order: 29 → 30 → 31
 |-------|----------------|--------|-----------|
 | 29. Domain, Persistence, and Active-View Filtering | 4/4 | Complete    | 2026-07-13 |
 | 30. History UI and Details Reuse | 3/3 | Complete    | 2026-07-13 |
-| 31. MCP, Localization, Documentation, and Verification | 4/5 | In Progress|  |
+| 31. MCP, Localization, Documentation, and Verification | 5/5 | Complete   | 2026-07-14 |
 
 **Total phases:** 3
 **Total v1 requirements mapped:** 18
 **Coverage:** 18/18 ✓
 
 ---
-*Last updated: 2026-07-13 after milestone v0.5 roadmap creation*
+*Last updated: 2026-07-14 after Phase 31 completion — v0.5 milestone ready for verification*

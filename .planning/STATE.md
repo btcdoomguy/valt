@@ -4,17 +4,17 @@ milestone: v0.5
 milestone_name: Asset Sold History
 current_phase: 31
 current_phase_name: MCP, Localization, Documentation, and Verification
-status: in progress
-stopped_at: Completed 31-04-PLAN.md
-last_updated: "2026-07-14T15:59:39.000Z"
+status: complete
+stopped_at: Completed 31-05-PLAN.md
+last_updated: "2026-07-14T22:19:50.119Z"
 last_activity: 2026-07-14
-last_activity_desc: Completed quick task 260714-i1p - when I mark as sold, the system asks for date but only month/year. it should use a date picker like the one on the transaction tab to also pick the day
+last_activity_desc: "Completed 31-05-PLAN.md: end-to-end verification gate and manual UI smoke test sign-off for v0.5 Asset Sold History"
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 12
-  completed_plans: 11
-  percent: 92
+  completed_plans: 12
+  percent: 100
 ---
 
 # STATE.md
@@ -28,18 +28,18 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 
 ## Current Position
 
-Phase: 31 — MCP, Localization, Documentation, and Verification
-Plan: 04 complete; next plan 05
-Status: In Progress
-Last activity: 2026-07-14 - Completed quick task 260714-kzm: Update Avalonia nuget packages from 12.0.3 to 12.1.0, research breaking changes first
+Phase: 31 — MCP, Localization, Documentation, and Verification  
+Plan: 05 complete; Phase 31 complete  
+Status: **Complete**  
+Last activity: 2026-07-14 - Completed 31-05-PLAN.md: end-to-end verification gate and manual UI smoke test sign-off for v0.5 Asset Sold History
 
-Progress: [█████████░] 92%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 8
+- Total plans completed: 12
 - Average duration: 18 min
 - Total execution time: 18 min
 
@@ -47,9 +47,9 @@ Progress: [█████████░] 92%
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| Phase 29 | 1/4 | 18 min | 18 min |
-| 29 | 4 | - | - |
-| 30 | 3 | - | - |
+| Phase 29 | 4/4 | 18 min | 18 min |
+| Phase 30 | 3/3 | - | - |
+| Phase 31 | 5/5 | - | - |
 
 **Recent Trend:**
 
@@ -67,6 +67,7 @@ Progress: [█████████░] 92%
 | Phase 31 P02 | 20min | 3 tasks | 10 files |
 | Phase 31 P03 | 5 min | 1 task | 1 file |
 | Phase 31-mcp-localization-documentation-and-verification P04 | 8 | 1 tasks | 2 files |
+| Phase 31-mcp-localization-documentation-and-verification P05 | 3 min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -95,6 +96,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Left AssetSummaryUpdatedMessage broadcast in modal for other listeners while making caller-side refresh authoritative for active Assets list — Keeps unrelated totals/listeners updated without making the Assets tab depend on the message for its own refresh
 - [Phase ?]: Removed the unplanned SoldAssetHistory_DateSold_Label key and used SoldAssetHistory_DateSold_Title with a literal colon via Run elements to match the plan's 20-key list and Title+colon pattern.
 - [Phase 31-03]: Updated Asset module docs as a first-class deliverable tied to v0.5 feature completeness, keeping the Domain/Application/UI/MCP sections in sync with the sold-state feature.
+- [Phase 31-05]: v0.5 Asset Sold History milestone is ready for `/gsd-verify-work`: all feature tests pass and the user has signed off the end-to-end UI smoke test.
 
 ### Pending Todos
 
@@ -123,6 +125,11 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-13T23:43:20.000Z
-Stopped at: Completed 31-04-PLAN.md
+Last session: 2026-07-14T22:19:50.115Z
+Stopped at: Completed 31-05-PLAN.md
 Resume file: None
+
+## Notes
+
+- Phase 31 complete; v0.5 Asset Sold History milestone is ready for `/gsd-verify-work` and milestone closure.
+- Two pre-existing live-API integration tests (`CoinGeckoProviderTests`, `BitcoinDominanceProviderTests`) failed with HTTP 403 during the final full test gate. They are unrelated to v0.5 and are logged in the phase deferred-items file.
