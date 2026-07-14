@@ -18,27 +18,27 @@ Requirements for the Asset Sold History milestone. Each maps to roadmap phases.
 
 ### History Screen
 
-- [ ] **HIST-01**: User can open a History screen from the Assets toolbar (beside Add Asset and Manage Groups)
-- [ ] **HIST-02**: History screen lists sold assets sorted by `Date Sold` descending with name, type, and date sold
-- [ ] **HIST-03**: Selecting a sold asset in History shows a per-type details summary using the same mapping as the main asset card
-- [ ] **HIST-04**: User can undo a sale directly from the History screen
+- [x] **HIST-01**: User can open a History screen from the Assets toolbar (beside Add Asset and Manage Groups)
+- [x] **HIST-02**: History screen lists sold assets sorted by `Date Sold` descending with name, type, and date sold
+- [x] **HIST-03**: Selecting a sold asset in History shows a per-type details summary using the same mapping as the main asset card
+- [x] **HIST-04**: User can undo a sale directly from the History screen
 
 ### MCP Tools
 
-- [ ] **MCP-01**: AI assistant can mark an asset as sold via MCP tool
-- [ ] **MCP-02**: AI assistant can undo a sale via MCP tool
-- [ ] **MCP-03**: AI assistant can list sold assets via MCP tool
+- [x] **MCP-01**: AI assistant can mark an asset as sold via MCP tool
+- [x] **MCP-02**: AI assistant can undo a sale via MCP tool
+- [x] **MCP-03**: AI assistant can list sold assets via MCP tool
 
 ### Localization & Documentation
 
-- [ ] **DOCS-01**: All new user-facing strings are localized in `language.resx`, `language.pt-BR.resx`, and `language.es.resx`
-- [ ] **DOCS-02**: `.claude/docs/assets.md` is updated with sold-history behavior and MCP impact
+- [x] **DOCS-01**: All new user-facing strings are localized in `language.resx`, `language.pt-BR.resx`, and `language.es.resx`
+- [x] **DOCS-02**: `.claude/docs/assets.md` is updated with sold-history behavior and MCP impact
 
 ### Verification
 
 - [x] **TEST-01**: Unit tests cover `SellAsset` and `UndoSellAsset` command validation and state changes
 - [x] **TEST-02**: Query tests verify active-asset and sold-asset filters and totals exclusion
-- [ ] **TEST-03**: End-to-end verification covers mark sold, history browse, details panel, undo, and totals refresh
+- [x] **TEST-03**: End-to-end verification covers mark sold, history browse, details panel, undo, and totals refresh
 
 ## v2 Requirements
 
@@ -80,18 +80,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ASSET-04 | Phase 29 | Complete |
 | ASSET-05 | Phase 29 | Complete |
 | ASSET-06 | Phase 29 | Complete |
-| HIST-01 | Phase 30 | Pending |
-| HIST-02 | Phase 30 | Pending |
-| HIST-03 | Phase 30 | Pending |
-| HIST-04 | Phase 30 | Pending |
-| MCP-01 | Phase 31 | Pending |
-| MCP-02 | Phase 31 | Pending |
-| MCP-03 | Phase 31 | Pending |
-| DOCS-01 | Phase 31 | Pending |
-| DOCS-02 | Phase 31 | Pending |
+| HIST-01 | Phase 30 | Complete |
+| HIST-02 | Phase 30 | Complete |
+| HIST-03 | Phase 30 | Complete |
+| HIST-04 | Phase 30 | Complete |
+| MCP-01 | Phase 31 | Complete |
+| MCP-02 | Phase 31 | Complete |
+| MCP-03 | Phase 31 | Complete |
+| DOCS-01 | Phase 31 | Complete |
+| DOCS-02 | Phase 31 | Complete |
 | TEST-01 | Phase 29 | Complete |
 | TEST-02 | Phase 29 | Complete |
-| TEST-03 | Phase 31 | Pending |
+| TEST-03 | Phase 31 | Complete |
 
 **Coverage:**
 

@@ -97,18 +97,18 @@ Plans:
 3. Asset documentation is updated with sold-history behavior and MCP impact.
 4. End-to-end verification passes for mark sold, history browse, details panel, undo, and totals refresh.
 
-**Plans:** 5/5 plans
+**Plans:** 4/5 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 31-01-PLAN.md — Add sold-state MCP tools (MarkAssetAsSold, UndoAssetSale, ListSoldAssets)
-- [ ] 31-02-PLAN.md — Localize new sold-asset UI strings in resx files and AXAML/ViewModels
-- [ ] 31-03-PLAN.md — Update Asset module documentation with sold-history workflow and MCP tools
+- [x] 31-01-PLAN.md — Add sold-state MCP tools (MarkAssetAsSold, UndoAssetSale, ListSoldAssets)
+- [x] 31-02-PLAN.md — Localize new sold-asset UI strings in resx files and AXAML/ViewModels
+- [x] 31-03-PLAN.md — Update Asset module documentation with sold-history workflow and MCP tools
 
 **Wave 2** *(depends on Wave 1 completion)*
 
-- [ ] 31-04-PLAN.md — Add integration tests for sold-state MCP tools
+- [x] 31-04-PLAN.md — Add integration tests for sold-state MCP tools
 
 **Wave 3** *(depends on Wave 2 completion and localization)*
 
@@ -123,7 +123,7 @@ Phases execute in numeric order: 29 → 30 → 31
 |-------|----------------|--------|-----------|
 | 29. Domain, Persistence, and Active-View Filtering | 4/4 | Complete    | 2026-07-13 |
 | 30. History UI and Details Reuse | 3/3 | Complete    | 2026-07-13 |
-| 31. MCP, Localization, Documentation, and Verification | 0/5 | Not started | - |
+| 31. MCP, Localization, Documentation, and Verification | 4/5 | In Progress|  |
 
 **Total phases:** 3
 **Total v1 requirements mapped:** 18
