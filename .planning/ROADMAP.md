@@ -18,7 +18,7 @@
 
 ### 🚧 v0.6 — Documentation Site Refresh (Planned)
 
-- [ ] **Phase 32: Factual Fixes and Cross-Page Accuracy** — 5 requirements
+- [x] **Phase 32: Factual Fixes and Cross-Page Accuracy** — 5 requirements (completed 2026-07-15)
 - [ ] **Phase 33: Assets Page Rewrite** — 3 requirements
 - [ ] **Phase 34: Reports Page Update** — 3 requirements
 - [ ] **Phase 35: Goals Page Completion** — 3 requirements
@@ -41,14 +41,14 @@
   4. The Assets page enumerates all nine current asset types, including `BtcLoan` and `BtcLending`.
   5. The Reports page accurately describes the current export behavior and removes any outdated "in development" note if the feature is available.
 
-**Plans**: 1/2 plans executed
+**Plans**: 2/2 plans complete
 **Wave 1**
 
 - [x] 32-01-PLAN.md — Correct Installation, FAQ, Getting Started, Assets, and Reports bilingual pages
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 32-02-PLAN.md — Update REQUIREMENTS.md, ROADMAP.md, and .claude/docs/assets.md; run final MkDocs build
+- [x] 32-02-PLAN.md — Update REQUIREMENTS.md, ROADMAP.md, and .claude/docs/assets.md; run final MkDocs build
 
 ### Phase 33: Assets Page Rewrite
 
@@ -138,7 +138,7 @@
 | 29. Domain, Persistence, and Active-View Filtering | v0.5 | 4/4 | Complete | 2026-07-13 |
 | 30. History UI and Details Reuse | v0.5 | 3/3 | Complete | 2026-07-13 |
 | 31. MCP, Localization, Documentation, and Verification | v0.5 | 5/5 | Complete | 2026-07-14 |
-| 32. Factual Fixes and Cross-Page Accuracy | v0.6 | 1/2 | In Progress|  |
+| 32. Factual Fixes and Cross-Page Accuracy | v0.6 | 2/2 | Complete   | 2026-07-15 |
 | 33. Assets Page Rewrite | v0.6 | 0/0 | Not started | - |
 | 34. Reports Page Update | v0.6 | 0/0 | Not started | - |
 | 35. Goals Page Completion | v0.6 | 0/0 | Not started | - |

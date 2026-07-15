@@ -52,7 +52,7 @@
 ### Quality Assurance
 
 - [ ] **QA-01**: Every content change in a Portuguese page is mirrored in the corresponding English `.en.md` file.
-- [ ] **QA-02**: The documentation site builds successfully with `mkdocs build` without errors or broken internal links.
+- [x] **QA-02**: The documentation site builds successfully with `mkdocs build` without errors or broken internal links.
 - [ ] **QA-03**: A content review checklist is applied to all updated pages for accuracy, completeness, and tone.
 
 ## v2 Requirements
@@ -100,7 +100,7 @@
 | NAV-02 | Phase 38 | Pending |
 | NAV-03 | Phase 38 | Pending |
 | QA-01 | Phase 38 | Pending |
-| QA-02 | Phase 38 | Pending |
+| QA-02 | Phase 38 | Complete |
 | QA-03 | Phase 38 | Pending |
 
 **Coverage:**
