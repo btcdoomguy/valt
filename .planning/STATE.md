@@ -3,18 +3,18 @@ gsd_state_version: 1.0
 milestone: v0.6
 milestone_name: — Documentation Site Refresh
 current_phase: 33
-current_phase_name: Assets Page Rewrite
-status: ready to plan
-stopped_at: Phase 33 context gathered
-last_updated: "2026-07-15T16:25:57.007Z"
+status: completed
+stopped_at: Completed 33-02-PLAN.md
+last_updated: "2026-07-15T20:28:50.122Z"
 last_activity: 2026-07-15
-last_activity_desc: Phase 32 complete, transitioned to Phase 33
+last_activity_desc: Phase 33 marked complete
 progress:
   total_phases: 7
-  completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
-  percent: 14
+  completed_phases: 2
+  total_plans: 5
+  completed_plans: 5
+  percent: 29
+current_phase_name: Assets Page Rewrite
 ---
 
 # STATE.md
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-07-15)
 
 ## Current Position
 
-Phase: 33 — Assets Page Rewrite
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-07-15 — Phase 32 complete, transitioned to Phase 33
+Phase: 33 — COMPLETE
+Plan: 3 of 3
+Status: Phase 33 complete
+Last activity: 2026-07-15 — Phase 33 marked complete
 
 ## Performance Metrics
 
@@ -69,6 +69,9 @@ Last activity: 2026-07-15 — Phase 32 complete, transitioned to Phase 33
 | Phase 31-mcp-localization-documentation-and-verification P05 | 3 min | 2 tasks | 5 files |
 | Phase 32 P01 | 20min | 3 tasks | 11 files |
 | Phase 32 P02 | 5 min | 2 tasks | 2 files |
+| Phase 33 P01 | 12 min | 2 tasks | 2 files |
+| Phase 33 P02 | 5min | 2 tasks | 1 files |
+| Phase 33-assets-page-rewrite P03 | 4min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -101,6 +104,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Code wins over stale requirements docs: updated REQUIREMENTS.md ACC-03 and ACC-04 to match the four main tabs and nine asset types found in the Valt application code.
 - [Phase ?]: All public docs terminology mirrors the app language files (language.resx / language.pt-BR.resx) to avoid UI/docs drift.
 - [Phase ?]: Code wins over stale planning docs: updated ROADMAP.md success criteria and .claude/docs/assets.md to match the four main tabs and nine asset types found in the Valt application code. — When planning docs conflict with the code, correct the docs to reflect the code. This keeps ROADMAP.md success criteria and the internal Assets module doc authoritative for future phases.
+- [Phase ?]: Added Record Proceeds prompt note to Mark as Sold section because app language files and AssetsViewModel.cs confirm it is a real wired feature. — Content accuracy: the prompt exists in language.resx / language.pt-BR.resx and is invoked in AssetsViewModel.cs after MarkAssetAsSoldCommand succeeds.
 
 ### Pending Todos
 
@@ -135,9 +139,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-15T16:25:57.001Z
-Stopped at: Phase 33 context gathered
-Resume file: .planning/phases/33-assets-page-rewrite/33-CONTEXT.md
+Last session: 2026-07-15T20:24:26.786Z
+Stopped at: Completed 33-02-PLAN.md
+Resume file: None
 
 ## Notes
 

@@ -19,7 +19,7 @@
 ### 🚧 v0.6 — Documentation Site Refresh (Planned)
 
 - [x] **Phase 32: Factual Fixes and Cross-Page Accuracy** — 5 requirements (completed 2026-07-15)
-- [ ] **Phase 33: Assets Page Rewrite** — 3 requirements
+- [x] **Phase 33: Assets Page Rewrite** — 3 requirements (completed 2026-07-15)
 - [ ] **Phase 34: Reports Page Update** — 3 requirements
 - [ ] **Phase 35: Goals Page Completion** — 3 requirements
 - [ ] **Phase 36: Fixed Expenses Page Enhancement** — 3 requirements
@@ -61,7 +61,15 @@
   2. A reader can understand BTC-backed loans, including collateral, APR, LTV, liquidation, margin call, and the loan-state timeline.
   3. A reader can see how Asset Groups organize assets in the UI and what grouping means for navigation and totals.
 
-**Plans**: TBD
+**Plans**: 3/3 plans complete
+**Wave 1**
+
+- [x] 33-01-PLAN.md — Rewrite Portuguese Assets page with Mark as Sold, Asset Sold History, BTC-backed Loans, and Asset Groups
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [x] 33-02-PLAN.md — Mirror Portuguese changes to English Assets page
+- [x] 33-03-PLAN.md — Run MkDocs strict build, heading parity, and content review
 
 ### Phase 34: Reports Page Update
 
@@ -139,7 +147,7 @@
 | 30. History UI and Details Reuse | v0.5 | 3/3 | Complete | 2026-07-13 |
 | 31. MCP, Localization, Documentation, and Verification | v0.5 | 5/5 | Complete | 2026-07-14 |
 | 32. Factual Fixes and Cross-Page Accuracy | v0.6 | 2/2 | Complete    | 2026-07-15 |
-| 33. Assets Page Rewrite | v0.6 | 0/0 | Not started | - |
+| 33. Assets Page Rewrite | v0.6 | 3/3 | Complete   | 2026-07-15 |
 | 34. Reports Page Update | v0.6 | 0/0 | Not started | - |
 | 35. Goals Page Completion | v0.6 | 0/0 | Not started | - |
 | 36. Fixed Expenses Page Enhancement | v0.6 | 0/0 | Not started | - |

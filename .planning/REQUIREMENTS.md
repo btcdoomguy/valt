@@ -15,9 +15,9 @@
 
 ### Feature Coverage — Assets
 
-- [ ] **AST-01**: The Assets page documents the Asset Sold History feature, including Mark as Sold, Date Sold, History screen, and Undo Sale.
-- [ ] **AST-02**: The Assets page documents BTC-backed loans, including collateral, APR, LTV, liquidation, margin call, and the loan-state timeline.
-- [ ] **AST-03**: The Assets page documents Asset Groups and how assets are grouped in the UI.
+- [x] **AST-01**: The Assets page documents the Asset Sold History feature, including Mark as Sold, Date Sold, History screen, and Undo Sale.
+- [x] **AST-02**: The Assets page documents BTC-backed loans, including collateral, APR, LTV, liquidation, margin call, and the loan-state timeline.
+- [x] **AST-03**: The Assets page documents Asset Groups and how assets are grouped in the UI.
 
 ### Feature Coverage — Reports
 
@@ -51,9 +51,9 @@
 
 ### Quality Assurance
 
-- [ ] **QA-01**: Every content change in a Portuguese page is mirrored in the corresponding English `.en.md` file.
+- [x] **QA-01**: Every content change in a Portuguese page is mirrored in the corresponding English `.en.md` file.
 - [x] **QA-02**: The documentation site builds successfully with `mkdocs build` without errors or broken internal links.
-- [ ] **QA-03**: A content review checklist is applied to all updated pages for accuracy, completeness, and tone.
+- [x] **QA-03**: A content review checklist is applied to all updated pages for accuracy, completeness, and tone.
 
 ## v2 Requirements
 
@@ -81,9 +81,9 @@
 | ACC-03 | Phase 32 | Complete |
 | ACC-04 | Phase 32 | Complete |
 | ACC-05 | Phase 32 | Complete |
-| AST-01 | Phase 33 | Pending |
-| AST-02 | Phase 33 | Pending |
-| AST-03 | Phase 33 | Pending |
+| AST-01 | Phase 33 | Complete |
+| AST-02 | Phase 33 | Complete |
+| AST-03 | Phase 33 | Complete |
 | RPT-01 | Phase 34 | Pending |
 | RPT-02 | Phase 34 | Pending |
 | RPT-03 | Phase 34 | Pending |
@@ -99,9 +99,9 @@
 | NAV-01 | Phase 38 | Pending |
 | NAV-02 | Phase 38 | Pending |
 | NAV-03 | Phase 38 | Pending |
-| QA-01 | Phase 38 | Pending |
+| QA-01 | Phase 38 | Complete |
 | QA-02 | Phase 38 | Complete |
-| QA-03 | Phase 38 | Pending |
+| QA-03 | Phase 38 | Complete |
 
 **Coverage:**
 
