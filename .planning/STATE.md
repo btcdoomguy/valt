@@ -4,8 +4,8 @@ milestone: v0.6
 milestone_name: — Documentation Site Refresh
 current_phase: 33
 current_phase_name: Assets Page Rewrite
-status: verifying
-stopped_at: Session resumed, proceeding to execute 32-01
+status: ready to plan
+stopped_at: Phase 32 complete, ready to plan Phase 33
 last_updated: "2026-07-15T15:47:09.590Z"
 last_activity: 2026-07-15
 last_activity_desc: Phase 32 complete, transitioned to Phase 33
@@ -21,23 +21,23 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-07-14)
+See: .planning/PROJECT.md (updated 2026-07-15)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 32 — Factual Fixes and Cross-Page Accuracy
+**Current focus:** Phase 33 — Assets Page Rewrite
 
 ## Current Position
 
 Phase: 33 — Assets Page Rewrite
 Plan: Not started
-Status: Phase complete — ready for verification
+Status: Ready to plan
 Last activity: 2026-07-15 — Phase 32 complete, transitioned to Phase 33
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 16
+- Total plans completed: 14
 - Average duration: 18 min
 - Total execution time: 43 min
 
@@ -49,7 +49,6 @@ Last activity: 2026-07-15 — Phase 32 complete, transitioned to Phase 33
 | Phase 30 | 3/3 | - | - |
 | Phase 31 | 5/5 | - | - |
 | Phase 32 | 2/2 | 25 min | 12.5 min |
-| 32 | 2 | - | - |
 
 **Recent Trend:**
 
@@ -136,9 +135,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-15T15:33:01.495Z
-Stopped at: Session resumed, proceeding to execute 32-01
-Resume file: .planning/phases/32-factual-fixes-and-cross-page-accuracy/32-01-PLAN.md
+Last session: 2026-07-15T15:47:09.590Z
+Stopped at: Phase 32 complete, ready to plan Phase 33
+Resume file: None
 
 ## Notes
 
