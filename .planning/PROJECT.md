@@ -73,10 +73,10 @@ Users can see their entire financial picture — cash flow, investments, and loa
 ## Current State
 
 - **v0.5 Asset Sold History shipped** on 2026-07-14.
-- **Phases 29-31 are complete:** 12 plans, 27 tasks.
-- **All 18 v0.5 requirements are validated** and traceable to phases.
+- **Phase 32 complete** on 2026-07-15 — Factual errors corrected on Installation, FAQ, Getting Started, Assets, and Reports public docs; internal requirements and roadmap aligned; MkDocs site builds cleanly.
+- **Phase 33 ready** — Assets Page Rewrite: document Asset Sold History, BTC-backed loans, and Asset Groups.
 - **Deferred items:** 6 (see STATE.md Deferred Items).
-- **v0.6 milestone planning started** on 2026-07-14; focus is the public documentation site.
+- **v0.6 milestone in progress** — 1 of 7 phases complete.
 
 ## Next Milestone Goals
 
@@ -133,4 +133,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-14 after starting v0.6 milestone planning — Documentation Site Refresh*
+*Last updated: 2026-07-15 after completing Phase 32 — Factual Fixes and Cross-Page Accuracy*
