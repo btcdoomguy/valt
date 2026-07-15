@@ -138,7 +138,7 @@
 | 29. Domain, Persistence, and Active-View Filtering | v0.5 | 4/4 | Complete | 2026-07-13 |
 | 30. History UI and Details Reuse | v0.5 | 3/3 | Complete | 2026-07-13 |
 | 31. MCP, Localization, Documentation, and Verification | v0.5 | 5/5 | Complete | 2026-07-14 |
-| 32. Factual Fixes and Cross-Page Accuracy | v0.6 | 2/2 | Complete   | 2026-07-15 |
+| 32. Factual Fixes and Cross-Page Accuracy | v0.6 | 2/2 | Complete    | 2026-07-15 |
 | 33. Assets Page Rewrite | v0.6 | 0/0 | Not started | - |
 | 34. Reports Page Update | v0.6 | 0/0 | Not started | - |
 | 35. Goals Page Completion | v0.6 | 0/0 | Not started | - |
