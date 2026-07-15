@@ -82,7 +82,14 @@
   2. A reader can understand the current dashboard components, including wealth summary, BTC stack, and leverage/loan summary.
   3. A reader can see an accurate description of report export behavior.
 
-**Plans**: TBD
+**Plans**: 2 plans
+**Wave 1**
+
+- [ ] 34-01-PLAN.md — Rewrite Portuguese Reports page with current dashboard, BTC price simulation, and export note
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 34-02-PLAN.md — Mirror Portuguese rewrite to English Reports page and run final MkDocs build
 
 ### Phase 35: Goals Page Completion
 
