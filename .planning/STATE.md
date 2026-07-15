@@ -5,8 +5,8 @@ milestone_name: — Documentation Site Refresh
 current_phase: 33
 current_phase_name: Assets Page Rewrite
 status: ready to plan
-stopped_at: Phase 32 complete, ready to plan Phase 33
-last_updated: "2026-07-15T15:47:09.590Z"
+stopped_at: Phase 33 context gathered
+last_updated: "2026-07-15T16:25:57.007Z"
 last_activity: 2026-07-15
 last_activity_desc: Phase 32 complete, transitioned to Phase 33
 progress:
@@ -135,9 +135,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-15T15:47:09.590Z
-Stopped at: Phase 32 complete, ready to plan Phase 33
-Resume file: None
+Last session: 2026-07-15T16:25:57.001Z
+Stopped at: Phase 33 context gathered
+Resume file: .planning/phases/33-assets-page-rewrite/33-CONTEXT.md
 
 ## Notes
 
