@@ -37,8 +37,8 @@
 
   1. A reader on the Installation page sees LiteDB named as the local database instead of SQLite.
   2. The FAQ page no longer claims there is no automatic import functionality.
-  3. The Getting Started page lists all five current main tabs: Transactions, Reports, Average Price, Assets, and Goals.
-  4. The Assets page enumerates all eight current asset types, including `BtcLoan`.
+  3. The Getting Started page lists all four current main tabs: Transactions, Reports, Average Prices, and Assets.
+  4. The Assets page enumerates all nine current asset types, including `BtcLoan` and `BtcLending`.
   5. The Reports page accurately describes the current export behavior and removes any outdated "in development" note if the feature is available.
 
 **Plans**: 1/2 plans executed

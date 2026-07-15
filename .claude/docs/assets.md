@@ -1,6 +1,6 @@
 # Assets Module
 
-Tracks external investments (stocks, ETFs, crypto, real estate, leveraged positions, BTC-backed loans) separately from budget accounts, with automatic value calculations and multi-currency support.
+Tracks external investments (stocks, ETFs, crypto, real estate, leveraged positions, BTC-backed loans, and BTC lending) separately from budget accounts, with automatic value calculations and multi-currency support.
 
 ## Domain Layer (Valt.Core/Modules/Assets/)
 
@@ -51,6 +51,7 @@ Aggregate root for managing external investments.
 | 5 | LeveragedPosition | LeveragedPositionDetails |
 | 6 | Custom | BasicAssetDetails |
 | 7 | BtcLoan | BtcLoanDetails |
+| 8 | BtcLending | BtcLendingDetails |
 
 ### Asset Details (IAssetDetails implementations)
 
