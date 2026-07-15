@@ -7,11 +7,11 @@
 
 ### Content Accuracy
 
-- [ ] **ACC-01**: The Installation page correctly states that Valt uses LiteDB as its local database (not SQLite).
-- [ ] **ACC-02**: The FAQ page no longer claims there is no automatic import functionality.
-- [ ] **ACC-03**: The Getting Started page lists all current main application tabs (Transactions, Reports, Average Price, Assets, Goals).
-- [ ] **ACC-04**: The Assets page correctly lists all eight current asset types, including `BtcLoan`.
-- [ ] **ACC-05**: The Reports page removes the outdated "in development" note for report export if the feature is available, or accurately describes its current status.
+- [x] **ACC-01**: The Installation page correctly states that Valt uses LiteDB as its local database (not SQLite).
+- [x] **ACC-02**: The FAQ page no longer claims there is no automatic import functionality.
+- [x] **ACC-03**: The Getting Started page lists all current main application tabs (Transactions, Reports, Average Prices, Assets).
+- [x] **ACC-04**: The Assets page correctly lists all nine current asset types, including `BtcLoan` and `BtcLending`.
+- [x] **ACC-05**: The Reports page removes the outdated "in development" note for report export if the feature is available, or accurately describes its current status.
 
 ### Feature Coverage — Assets
 
@@ -76,11 +76,11 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ACC-01 | Phase 32 | Pending |
-| ACC-02 | Phase 32 | Pending |
-| ACC-03 | Phase 32 | Pending |
-| ACC-04 | Phase 32 | Pending |
-| ACC-05 | Phase 32 | Pending |
+| ACC-01 | Phase 32 | Complete |
+| ACC-02 | Phase 32 | Complete |
+| ACC-03 | Phase 32 | Complete |
+| ACC-04 | Phase 32 | Complete |
+| ACC-05 | Phase 32 | Complete |
 | AST-01 | Phase 33 | Pending |
 | AST-02 | Phase 33 | Pending |
 | AST-03 | Phase 33 | Pending |
@@ -104,6 +104,7 @@
 | QA-03 | Phase 38 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 26 total
 - Mapped to phases: 26
 - Unmapped: 0 ✓

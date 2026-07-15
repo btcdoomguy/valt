@@ -1,15 +1,19 @@
 ---
 gsd_state_version: 1.0
 milestone: v0.6
-milestone_name: Documentation Site Refresh
-status: planning
-last_updated: "2026-07-14T23:30:00.000Z"
-last_activity: 2026-07-14
+milestone_name: — Documentation Site Refresh
+current_phase: 32
+current_phase_name: Factual Fixes and Cross-Page Accuracy
+status: executing
+stopped_at: Phase 32 context gathered
+last_updated: "2026-07-15T15:25:40.234Z"
+last_activity: 2026-07-15
+last_activity_desc: Phase 32 execution started
 progress:
   total_phases: 7
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 2
+  completed_plans: 1
   percent: 0
 ---
 
@@ -20,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-14)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Planning v0.6 — Documentation Site Refresh: update public Valt docs to reflect v0.5 features, fix outdated content, and add missing pages.
+**Current focus:** Phase 32 — Factual Fixes and Cross-Page Accuracy
 
 ## Current Position
 
-Phase: 32 — Factual Fixes and Cross-Page Accuracy
-Plan: —
-Status: planning
-Last activity: 2026-07-14 — v0.6 roadmap created; Phase 32 ready for planning
+Phase: 32 (Factual Fixes and Cross-Page Accuracy) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
+Last activity: 2026-07-15 — Phase 32 execution started
 
 ## Performance Metrics
 
@@ -62,6 +66,7 @@ Last activity: 2026-07-14 — v0.6 roadmap created; Phase 32 ready for planning
 | Phase 31 P03 | 5 min | 1 task | 1 file |
 | Phase 31-mcp-localization-documentation-and-verification P04 | 8 | 1 tasks | 2 files |
 | Phase 31-mcp-localization-documentation-and-verification P05 | 3 min | 2 tasks | 5 files |
+| Phase 32 P01 | 20min | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -91,6 +96,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Removed the unplanned SoldAssetHistory_DateSold_Label key and used SoldAssetHistory_DateSold_Title with a literal colon via Run elements to match the plan's 20-key list and Title+colon pattern.
 - [Phase 31-03]: Updated Asset module docs as a first-class deliverable tied to v0.5 feature completeness, keeping the Domain/Application/UI/MCP sections in sync with the sold-state feature.
 - [Phase 31-05]: v0.5 Asset Sold History milestone is ready for `/gsd-verify-work`: all feature tests pass and the user has signed off the end-to-end UI smoke test.
+- [Phase ?]: Code wins over stale requirements docs: updated REQUIREMENTS.md ACC-03 and ACC-04 to match the four main tabs and nine asset types found in the Valt application code.
+- [Phase ?]: All public docs terminology mirrors the app language files (language.resx / language.pt-BR.resx) to avoid UI/docs drift.
 
 ### Pending Todos
 
@@ -125,9 +132,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-14T22:19:50.115Z
-Stopped at: Completed 31-05-PLAN.md
-Resume file: None
+Last session: 2026-07-15T15:25:10.127Z
+Stopped at: Session resumed, proceeding to execute 32-01
+Resume file: .planning/phases/32-factual-fixes-and-cross-page-accuracy/32-01-PLAN.md
 
 ## Notes
 
