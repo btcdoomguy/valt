@@ -4,17 +4,17 @@ milestone: v0.6
 milestone_name: — Documentation Site Refresh
 current_phase: 36
 current_phase_name: fixed-expenses-page-enhancement
-status: executing
+status: verifying
 stopped_at: Phase 36 context gathered
-last_updated: "2026-07-16T22:04:30.522Z"
+last_updated: "2026-07-16T22:16:57.575Z"
 last_activity: 2026-07-16
 last_activity_desc: Phase 36 execution started
 progress:
   total_phases: 7
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 12
-  completed_plans: 11
-  percent: 57
+  completed_plans: 12
+  percent: 71
 ---
 
 # STATE.md
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-15)
 
 Phase: 36 (fixed-expenses-page-enhancement) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-16 — Phase 36 execution started
 
 ## Performance Metrics
@@ -76,6 +76,7 @@ Last activity: 2026-07-16 — Phase 36 execution started
 | Phase 34-reports-page-update P01 | 15 min | 2 tasks | 1 files |
 | Phase 34-reports-page-update P02 | 4 min | 2 tasks | 1 files |
 | Phase 36-fixed-expenses-page-enhancement P01 | 11 min | 3 tasks | 1 files |
+| Phase 36-fixed-expenses-page-enhancement P02 | 3 min | 3 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -113,6 +114,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Documented Posições Alavancadas and Empréstimos BTC as conditional panels visible only when user has corresponding data. — ReportsViewModel binds IsLeveragePositionsVisible and IsBtcLoansVisible based on the presence of visible leveraged positions or active BTC-backed loans.
 - [Phase ?]: Used exact English UI labels from language.resx for the English Reports page mirror — The plan requires app-aligned terminology; this keeps English docs consistent with the English UI and avoids drift.
 - [Phase 36-fixed-expenses-page-enhancement]: Tightened DICAS paragraph to name exact right-click labels Ignorar para essa data and Marcar como pago (old prose covered ignore only vaguely and never mark-as-paid) — Plan optional-tightening clause applied: existing DICAS text did not already cover the right-click mark-as-paid action, so exact labels from language.pt-BR.resx were used while preserving link-to-transaction instructions
+- [Phase 36-fixed-expenses-page-enhancement]: [Phase 36-fixed-expenses-page-enhancement] Mirrored wave-1 TIPS tightening to English page (exact labels Ignore for this date / Mark as paid) for full bilingual parity per QA-01 — Wave 1 rewrote the Portuguese DICAS paragraph with exact right-click labels; mirroring only the three structural additions would leave the English TIPS paragraph stale, violating QA-01 full-mirror requirement.
 
 ### Pending Todos
 
@@ -147,7 +149,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-16T22:04:02.578Z
+Last session: 2026-07-16T22:16:29.618Z
 Stopped at: Phase 36 context gathered
 Resume file: .planning/phases/36-fixed-expenses-page-enhancement/36-CONTEXT.md
 

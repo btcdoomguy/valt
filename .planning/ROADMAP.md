@@ -22,7 +22,7 @@
 - [x] **Phase 33: Assets Page Rewrite** — 3 requirements (completed 2026-07-15)
 - [x] **Phase 34: Reports Page Update** — 3 requirements (completed 2026-07-15)
 - [x] **Phase 35: Goals Page Completion** — 3 requirements (completed 2026-07-16)
-- [ ] **Phase 36: Fixed Expenses Page Enhancement** — 3 requirements
+- [x] **Phase 36: Fixed Expenses Page Enhancement** — 3 requirements (completed 2026-07-16)
 - [ ] **Phase 37: MCP Server Page Update** — 3 requirements
 - [ ] **Phase 38: Navigation, New Pages, and Quality Assurance** — 6 requirements
 
@@ -115,14 +115,14 @@
   2. A reader can understand the yearly overview and how out-of-range records are detected.
   3. A reader understands that a fixed expense is bound to either an account or a currency, not both.
 
-**Plans**: 1/2 plans executed
+**Plans**: 2/2 plans complete
 **Wave 1**
 
 - [x] 36-01-PLAN.md — Update Portuguese Fixed Expenses page with record states, yearly overview, and account-vs-currency note
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 36-02-PLAN.md — Mirror changes to English page, run MkDocs strict build, and update REQUIREMENTS.md
+- [x] 36-02-PLAN.md — Mirror changes to English page, run MkDocs strict build, and update REQUIREMENTS.md
 
 ### Phase 37: MCP Server Page Update
 
@@ -164,7 +164,7 @@
 | 33. Assets Page Rewrite | v0.6 | 3/3 | Complete   | 2026-07-15 |
 | 34. Reports Page Update | v0.6 | 2/2 | Complete   | 2026-07-15 |
 | 35. Goals Page Completion | v0.6 | 3/3 | Complete    | 2026-07-16 |
-| 36. Fixed Expenses Page Enhancement | v0.6 | 1/2 | In Progress|  |
+| 36. Fixed Expenses Page Enhancement | v0.6 | 2/2 | Complete   | 2026-07-16 |
 | 37. MCP Server Page Update | v0.6 | 0/0 | Not started | - |
 | 38. Navigation, New Pages, and Quality Assurance | v0.6 | 0/0 | Not started | - |
 
