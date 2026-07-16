@@ -27,9 +27,9 @@
 
 ### Feature Coverage — Goals
 
-- [ ] **GOAL-01**: The Goals page documents all current goal types, including `SaveFiat`, `SavingsRate`, and `NetWorthBtc`.
-- [ ] **GOAL-02**: The Goals page explains the price-data asterisk behavior for goals that require exchange-rate data.
-- [ ] **GOAL-03**: The Goals page documents automatic recalculation and staleness behavior.
+- [x] **GOAL-01**: The Goals page documents all current goal types, including `SaveFiat`, `SavingsRate`, and `NetWorthBtc`.
+- [x] **GOAL-02**: The Goals page explains the price-data asterisk behavior for goals that require exchange-rate data.
+- [x] **GOAL-03**: The Goals page documents automatic recalculation and staleness behavior.
 
 ### Feature Coverage — Fixed Expenses
 
@@ -87,9 +87,9 @@
 | RPT-01 | Phase 34 | Complete |
 | RPT-02 | Phase 34 | Complete |
 | RPT-03 | Phase 34 | Complete |
-| GOAL-01 | Phase 35 | Pending |
-| GOAL-02 | Phase 35 | Pending |
-| GOAL-03 | Phase 35 | Pending |
+| GOAL-01 | Phase 35 | Complete |
+| GOAL-02 | Phase 35 | Complete |
+| GOAL-03 | Phase 35 | Complete |
 | FXE-01 | Phase 36 | Pending |
 | FXE-02 | Phase 36 | Pending |
 | FXE-03 | Phase 36 | Pending |
