@@ -4,8 +4,8 @@ milestone: v0.6
 milestone_name: — Documentation Site Refresh
 current_phase: 37
 current_phase_name: MCP Server Page Update
-status: verifying
-stopped_at: Phase 36 context gathered
+status: ready_to_plan
+stopped_at: Phase 36 complete, ready to plan Phase 37
 last_updated: "2026-07-16T22:26:07.006Z"
 last_activity: 2026-07-16
 last_activity_desc: Phase 36 complete, transitioned to Phase 37
@@ -24,7 +24,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-15)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 36 — fixed-expenses-page-enhancement
+**Current focus:** Phase 37 — MCP Server Page Update
 
 ## Current Position
 
@@ -150,9 +150,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-16T22:16:29.618Z
-Stopped at: Phase 36 context gathered
-Resume file: .planning/phases/36-fixed-expenses-page-enhancement/36-CONTEXT.md
+Last session: 2026-07-16T22:30:00.000Z
+Stopped at: Phase 36 complete, ready to plan Phase 37
+Resume file: None
 
 ## Notes
 
