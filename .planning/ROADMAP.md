@@ -135,7 +135,14 @@
   2. A reader can see the documented loan-state tools (`AddLoanStateUpdate`, `DeleteLoanStateUpdate`, `GetLoanStateTimeline`, `GetLatestLoanState`) and their parameters.
   3. A reader can see the documented sold-asset tools (`MarkAssetAsSold`, `UndoAssetSale`, `ListSoldAssets`) and their parameters.
 
-**Plans**: TBD
+**Plans**: 0/2 plans
+**Wave 1**
+
+- [ ] 37-01-PLAN.md — Update Portuguese MCP Server page with AssetTools (28 tools, 5 subsections, parameter tables), IndicatorTools, tool-count fix, and Ativos link
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 37-02-PLAN.md — Mirror changes to English page, run MkDocs strict build gate, and update REQUIREMENTS.md
 
 ### Phase 38: Navigation, New Pages, and Quality Assurance
 
@@ -165,12 +172,12 @@
 | 34. Reports Page Update | v0.6 | 2/2 | Complete   | 2026-07-15 |
 | 35. Goals Page Completion | v0.6 | 3/3 | Complete    | 2026-07-16 |
 | 36. Fixed Expenses Page Enhancement | v0.6 | 2/2 | Complete    | 2026-07-16 |
-| 37. MCP Server Page Update | v0.6 | 0/0 | Not started | - |
+| 37. MCP Server Page Update | v0.6 | 0/2 | Planned | - |
 | 38. Navigation, New Pages, and Quality Assurance | v0.6 | 0/0 | Not started | - |
 
 **Total phases:** 10  
-**v0.6 plans:** 0/12 (phases 32-36 planned; 37-38 TBD)  
-**v0.6 tasks:** 0/27 (phases 32-36 planned; 37-38 TBD)
+**v0.6 plans:** 0/14 (phases 32-37 planned; 38 TBD)  
+**v0.6 tasks:** 0/33 (phases 32-37 planned; 38 TBD)
 
 ---
-*Last updated: 2026-07-16 after Phase 36 planning*
+*Last updated: 2026-07-16 after Phase 37 planning*
