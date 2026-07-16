@@ -44,6 +44,9 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - ✓ **DOCS-01**: All new Asset Sold History user-facing strings are localized in `language.resx`, `language.pt-BR.resx`, and `language.es.resx` — v0.5 (Phase 31)
 - ✓ **DOCS-02**: `.claude/docs/assets.md` updated with sold-history behavior and MCP impact — v0.5 (Phase 31)
 - ✓ Complete end-to-end verification of mark sold, history browse, details panel, undo, and totals refresh — v0.5 (Phase 31)
+- ✓ **FXE-01**: Fixed Expenses page documents record states (Paid, ManuallyPaid, Ignored, Empty) — v0.6 (Phase 36)
+- ✓ **FXE-02**: Fixed Expenses page documents the yearly overview and out-of-range detection — v0.6 (Phase 36)
+- ✓ **FXE-03**: Fixed Expenses page clarifies account-vs-currency binding exclusivity — v0.6 (Phase 36)
 
 ### Active
 
@@ -74,9 +77,10 @@ Users can see their entire financial picture — cash flow, investments, and loa
 
 - **v0.5 Asset Sold History shipped** on 2026-07-14.
 - **Phase 32 complete** on 2026-07-15 — Factual errors corrected on Installation, FAQ, Getting Started, Assets, and Reports public docs; internal requirements and roadmap aligned; MkDocs site builds cleanly.
-- **Phase 33 ready** — Assets Page Rewrite: document Asset Sold History, BTC-backed loans, and Asset Groups.
+- **Phase 36 complete** on 2026-07-16 — Fixed Expenses page enhanced in both languages: record-states table, yearly overview with out-of-range detection, account-vs-currency exclusivity note; `mkdocs build --strict` clean.
+- **Phase 37 ready** — MCP Server Page Update.
 - **Deferred items:** 6 (see STATE.md Deferred Items).
-- **v0.6 milestone in progress** — 1 of 7 phases complete.
+- **v0.6 milestone in progress** — 5 of 7 phases complete.
 
 ## Next Milestone Goals
 
@@ -133,4 +137,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-15 after completing Phase 32 — Factual Fixes and Cross-Page Accuracy*
+*Last updated: 2026-07-16 after completing Phase 36 — Fixed Expenses Page Enhancement*
