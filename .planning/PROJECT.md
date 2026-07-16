@@ -47,6 +47,9 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - ✓ **FXE-01**: Fixed Expenses page documents record states (Paid, ManuallyPaid, Ignored, Empty) — v0.6 (Phase 36)
 - ✓ **FXE-02**: Fixed Expenses page documents the yearly overview and out-of-range detection — v0.6 (Phase 36)
 - ✓ **FXE-03**: Fixed Expenses page clarifies account-vs-currency binding exclusivity — v0.6 (Phase 36)
+- ✓ **MCP-01**: MCP Server page documents the AssetTools category (28 tools) — v0.6 (Phase 37)
+- ✓ **MCP-02**: MCP Server page documents loan-state tools with parameters — v0.6 (Phase 37)
+- ✓ **MCP-03**: MCP Server page documents sold-asset tools with parameters — v0.6 (Phase 37)
 
 ### Active
 
@@ -77,10 +80,10 @@ Users can see their entire financial picture — cash flow, investments, and loa
 
 - **v0.5 Asset Sold History shipped** on 2026-07-14.
 - **Phase 32 complete** on 2026-07-15 — Factual errors corrected on Installation, FAQ, Getting Started, Assets, and Reports public docs; internal requirements and roadmap aligned; MkDocs site builds cleanly.
-- **Phase 36 complete** on 2026-07-16 — Fixed Expenses page enhanced in both languages: record-states table, yearly overview with out-of-range detection, account-vs-currency exclusivity note; `mkdocs build --strict` clean.
-- **Phase 37 ready** — MCP Server Page Update.
+- **Phase 37 complete** on 2026-07-16 — MCP Server page lists the complete current toolset in both languages: AssetTools (28 tools with parameter tables for loan-state and sold-asset tools) and IndicatorTools added; tool-count claim corrected to 80+.
+- **Phase 38 ready** — Navigation, New Pages, and Quality Assurance (final v0.6 phase; owns the deferred pre-existing tool-name drift review).
 - **Deferred items:** 6 (see STATE.md Deferred Items).
-- **v0.6 milestone in progress** — 5 of 7 phases complete.
+- **v0.6 milestone in progress** — 6 of 7 phases complete.
 
 ## Next Milestone Goals
 
@@ -137,4 +140,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-16 after completing Phase 36 — Fixed Expenses Page Enhancement*
+*Last updated: 2026-07-16 after completing Phase 37 — MCP Server Page Update*
