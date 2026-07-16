@@ -4,9 +4,9 @@ milestone: v0.6
 milestone_name: — Documentation Site Refresh
 current_phase: 37
 current_phase_name: MCP Server Page Update
-status: ready_to_plan
+status: executing
 stopped_at: Phase 37 context gathered
-last_updated: "2026-07-16T22:33:27.925Z"
+last_updated: "2026-07-16T23:11:49.164Z"
 last_activity: 2026-07-16
 last_activity_desc: Phase 36 complete, transitioned to Phase 37
 progress:
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-15)
 
 Phase: 37 — MCP Server Page Update
 Plan: Not started
-Status: Phase complete — ready for verification
+Status: Ready to execute
 Last activity: 2026-07-16 — Phase 36 complete, transitioned to Phase 37
 
 ## Performance Metrics
