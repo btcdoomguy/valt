@@ -115,7 +115,14 @@
   2. A reader can understand the yearly overview and how out-of-range records are detected.
   3. A reader understands that a fixed expense is bound to either an account or a currency, not both.
 
-**Plans**: TBD
+**Plans**: 2 plans
+**Wave 1**
+
+- [ ] 36-01-PLAN.md — Update Portuguese Fixed Expenses page with record states, yearly overview, and account-vs-currency note
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 36-02-PLAN.md — Mirror changes to English page, run MkDocs strict build, and update REQUIREMENTS.md
 
 ### Phase 37: MCP Server Page Update
 
@@ -157,13 +164,13 @@
 | 33. Assets Page Rewrite | v0.6 | 3/3 | Complete   | 2026-07-15 |
 | 34. Reports Page Update | v0.6 | 2/2 | Complete   | 2026-07-15 |
 | 35. Goals Page Completion | v0.6 | 3/3 | Complete    | 2026-07-16 |
-| 36. Fixed Expenses Page Enhancement | v0.6 | 0/0 | Not started | - |
+| 36. Fixed Expenses Page Enhancement | v0.6 | 0/2 | Not started | - |
 | 37. MCP Server Page Update | v0.6 | 0/0 | Not started | - |
 | 38. Navigation, New Pages, and Quality Assurance | v0.6 | 0/0 | Not started | - |
 
 **Total phases:** 10  
-**v0.6 plans:** 0/0 (not yet planned)  
-**v0.6 tasks:** 0/0 (not yet planned)
+**v0.6 plans:** 0/12 (phases 32-36 planned; 37-38 TBD)  
+**v0.6 tasks:** 0/27 (phases 32-36 planned; 37-38 TBD)
 
 ---
-*Last updated: 2026-07-14 after v0.6 roadmap creation*
+*Last updated: 2026-07-16 after Phase 36 planning*
