@@ -172,7 +172,7 @@
 | 34. Reports Page Update | v0.6 | 2/2 | Complete   | 2026-07-15 |
 | 35. Goals Page Completion | v0.6 | 3/3 | Complete    | 2026-07-16 |
 | 36. Fixed Expenses Page Enhancement | v0.6 | 2/2 | Complete    | 2026-07-16 |
-| 37. MCP Server Page Update | v0.6 | 2/2 | Complete   | 2026-07-16 |
+| 37. MCP Server Page Update | v0.6 | 2/2 | Complete    | 2026-07-16 |
 | 38. Navigation, New Pages, and Quality Assurance | v0.6 | 0/0 | Not started | - |
 
 **Total phases:** 10  
