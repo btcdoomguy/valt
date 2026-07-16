@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v0.6
 milestone_name: — Documentation Site Refresh
-current_phase: 36
-current_phase_name: fixed-expenses-page-enhancement
+current_phase: 37
+current_phase_name: MCP Server Page Update
 status: verifying
 stopped_at: Phase 36 context gathered
-last_updated: "2026-07-16T22:16:57.575Z"
+last_updated: "2026-07-16T22:26:07.006Z"
 last_activity: 2026-07-16
-last_activity_desc: Phase 36 execution started
+last_activity_desc: Phase 36 complete, transitioned to Phase 37
 progress:
   total_phases: 7
   completed_phases: 5
@@ -28,16 +28,16 @@ See: .planning/PROJECT.md (updated 2026-07-15)
 
 ## Current Position
 
-Phase: 36 (fixed-expenses-page-enhancement) — EXECUTING
-Plan: 2 of 2
+Phase: 37 — MCP Server Page Update
+Plan: Not started
 Status: Phase complete — ready for verification
-Last activity: 2026-07-16 — Phase 36 execution started
+Last activity: 2026-07-16 — Phase 36 complete, transitioned to Phase 37
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 17
+- Total plans completed: 19
 - Average duration: 18 min
 - Total execution time: 43 min
 
@@ -50,6 +50,7 @@ Last activity: 2026-07-16 — Phase 36 execution started
 | Phase 31 | 5/5 | - | - |
 | Phase 32 | 2/2 | 25 min | 12.5 min |
 | 35 | 3 | - | - |
+| 36 | 2 | - | - |
 
 **Recent Trend:**
 
