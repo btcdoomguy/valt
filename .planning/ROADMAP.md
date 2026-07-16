@@ -115,10 +115,10 @@
   2. A reader can understand the yearly overview and how out-of-range records are detected.
   3. A reader understands that a fixed expense is bound to either an account or a currency, not both.
 
-**Plans**: 2 plans
+**Plans**: 1/2 plans executed
 **Wave 1**
 
-- [ ] 36-01-PLAN.md — Update Portuguese Fixed Expenses page with record states, yearly overview, and account-vs-currency note
+- [x] 36-01-PLAN.md — Update Portuguese Fixed Expenses page with record states, yearly overview, and account-vs-currency note
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -164,7 +164,7 @@
 | 33. Assets Page Rewrite | v0.6 | 3/3 | Complete   | 2026-07-15 |
 | 34. Reports Page Update | v0.6 | 2/2 | Complete   | 2026-07-15 |
 | 35. Goals Page Completion | v0.6 | 3/3 | Complete    | 2026-07-16 |
-| 36. Fixed Expenses Page Enhancement | v0.6 | 0/2 | Not started | - |
+| 36. Fixed Expenses Page Enhancement | v0.6 | 1/2 | In Progress|  |
 | 37. MCP Server Page Update | v0.6 | 0/0 | Not started | - |
 | 38. Navigation, New Pages, and Quality Assurance | v0.6 | 0/0 | Not started | - |
 

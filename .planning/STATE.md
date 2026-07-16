@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v0.6
 milestone_name: — Documentation Site Refresh
 current_phase: 36
-current_phase_name: Fixed Expenses Page Enhancement
+current_phase_name: fixed-expenses-page-enhancement
 status: executing
 stopped_at: Phase 36 context gathered
-last_updated: "2026-07-16T18:03:09.638Z"
+last_updated: "2026-07-16T22:04:30.522Z"
 last_activity: 2026-07-16
-last_activity_desc: Phase 35 complete, transitioned to Phase 36
+last_activity_desc: Phase 36 execution started
 progress:
   total_phases: 7
   completed_phases: 4
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 12
+  completed_plans: 11
   percent: 57
 ---
 
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-15)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 34 — Reports Page Update
+**Current focus:** Phase 36 — fixed-expenses-page-enhancement
 
 ## Current Position
 
-Phase: 36 — Fixed Expenses Page Enhancement
-Plan: Not started
+Phase: 36 (fixed-expenses-page-enhancement) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
-Last activity: 2026-07-16 — Phase 35 complete, transitioned to Phase 36
+Last activity: 2026-07-16 — Phase 36 execution started
 
 ## Performance Metrics
 
@@ -75,6 +75,7 @@ Last activity: 2026-07-16 — Phase 35 complete, transitioned to Phase 36
 | Phase 33-assets-page-rewrite P03 | 4min | 2 tasks | 2 files |
 | Phase 34-reports-page-update P01 | 15 min | 2 tasks | 1 files |
 | Phase 34-reports-page-update P02 | 4 min | 2 tasks | 1 files |
+| Phase 36-fixed-expenses-page-enhancement P01 | 11 min | 3 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -111,6 +112,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Extended the export note to mention transaction CSV and average-price CSV export from the AvgPrice tab. — CsvExportService exposes both ExportTransactionsAsync and ExportAvgPriceLinesAsync, so the docs should accurately reflect both export paths.
 - [Phase ?]: Documented Posições Alavancadas and Empréstimos BTC as conditional panels visible only when user has corresponding data. — ReportsViewModel binds IsLeveragePositionsVisible and IsBtcLoansVisible based on the presence of visible leveraged positions or active BTC-backed loans.
 - [Phase ?]: Used exact English UI labels from language.resx for the English Reports page mirror — The plan requires app-aligned terminology; this keeps English docs consistent with the English UI and avoids drift.
+- [Phase 36-fixed-expenses-page-enhancement]: Tightened DICAS paragraph to name exact right-click labels Ignorar para essa data and Marcar como pago (old prose covered ignore only vaguely and never mark-as-paid) — Plan optional-tightening clause applied: existing DICAS text did not already cover the right-click mark-as-paid action, so exact labels from language.pt-BR.resx were used while preserving link-to-transaction instructions
 
 ### Pending Todos
 
@@ -145,7 +147,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-16T18:03:09.632Z
+Last session: 2026-07-16T22:04:02.578Z
 Stopped at: Phase 36 context gathered
 Resume file: .planning/phases/36-fixed-expenses-page-enhancement/36-CONTEXT.md
 

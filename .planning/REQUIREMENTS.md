@@ -33,9 +33,9 @@
 
 ### Feature Coverage — Fixed Expenses
 
-- [ ] **FXE-01**: The Fixed Expenses page documents record states (Paid, ManuallyPaid, Ignored, Empty).
-- [ ] **FXE-02**: The Fixed Expenses page documents the yearly overview and out-of-range detection.
-- [ ] **FXE-03**: The Fixed Expenses page clarifies the account-vs-currency binding exclusivity.
+- [x] **FXE-01**: The Fixed Expenses page documents record states (Paid, ManuallyPaid, Ignored, Empty).
+- [x] **FXE-02**: The Fixed Expenses page documents the yearly overview and out-of-range detection.
+- [x] **FXE-03**: The Fixed Expenses page clarifies the account-vs-currency binding exclusivity.
 
 ### Feature Coverage — MCP Server
 
@@ -90,9 +90,9 @@
 | GOAL-01 | Phase 35 | Complete |
 | GOAL-02 | Phase 35 | Complete |
 | GOAL-03 | Phase 35 | Complete |
-| FXE-01 | Phase 36 | Pending |
-| FXE-02 | Phase 36 | Pending |
-| FXE-03 | Phase 36 | Pending |
+| FXE-01 | Phase 36 | Complete |
+| FXE-02 | Phase 36 | Complete |
+| FXE-03 | Phase 36 | Complete |
 | MCP-01 | Phase 37 | Pending |
 | MCP-02 | Phase 37 | Pending |
 | MCP-03 | Phase 37 | Pending |
