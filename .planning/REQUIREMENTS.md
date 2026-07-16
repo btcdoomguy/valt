@@ -39,9 +39,9 @@
 
 ### Feature Coverage — MCP Server
 
-- [ ] **MCP-01**: The MCP Server page documents the `AssetTools` category and its tools.
-- [ ] **MCP-02**: The MCP Server page documents loan-state tools (`AddLoanStateUpdate`, `DeleteLoanStateUpdate`, `GetLoanStateTimeline`, `GetLatestLoanState`).
-- [ ] **MCP-03**: The MCP Server page documents sold-asset tools (`MarkAssetAsSold`, `UndoAssetSale`, `ListSoldAssets`).
+- [x] **MCP-01**: The MCP Server page documents the `AssetTools` category and its tools.
+- [x] **MCP-02**: The MCP Server page documents loan-state tools (`AddLoanStateUpdate`, `DeleteLoanStateUpdate`, `GetLoanStateTimeline`, `GetLatestLoanState`).
+- [x] **MCP-03**: The MCP Server page documents sold-asset tools (`MarkAssetAsSold`, `UndoAssetSale`, `ListSoldAssets`).
 
 ### Structure and Navigation
 
@@ -93,9 +93,9 @@
 | FXE-01 | Phase 36 | Complete |
 | FXE-02 | Phase 36 | Complete |
 | FXE-03 | Phase 36 | Complete |
-| MCP-01 | Phase 37 | Pending |
-| MCP-02 | Phase 37 | Pending |
-| MCP-03 | Phase 37 | Pending |
+| MCP-01 | Phase 37 | Complete |
+| MCP-02 | Phase 37 | Complete |
+| MCP-03 | Phase 37 | Complete |
 | NAV-01 | Phase 38 | Pending |
 | NAV-02 | Phase 38 | Pending |
 | NAV-03 | Phase 38 | Pending |

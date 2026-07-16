@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v0.6
 milestone_name: — Documentation Site Refresh
 current_phase: 37
-current_phase_name: MCP Server Page Update
+current_phase_name: mcp-server-page-update
 status: executing
 stopped_at: Phase 37 context gathered
-last_updated: "2026-07-16T23:11:49.164Z"
+last_updated: "2026-07-16T23:21:27.664Z"
 last_activity: 2026-07-16
-last_activity_desc: Phase 36 complete, transitioned to Phase 37
+last_activity_desc: Phase 37 execution started
 progress:
   total_phases: 7
   completed_phases: 5
-  total_plans: 12
-  completed_plans: 12
+  total_plans: 14
+  completed_plans: 13
   percent: 71
 ---
 
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-15)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 37 — MCP Server Page Update
+**Current focus:** Phase 37 — mcp-server-page-update
 
 ## Current Position
 
-Phase: 37 — MCP Server Page Update
-Plan: Not started
+Phase: 37 (mcp-server-page-update) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
-Last activity: 2026-07-16 — Phase 36 complete, transitioned to Phase 37
+Last activity: 2026-07-16 — Phase 37 execution started
 
 ## Performance Metrics
 
@@ -78,6 +78,7 @@ Last activity: 2026-07-16 — Phase 36 complete, transitioned to Phase 37
 | Phase 34-reports-page-update P02 | 4 min | 2 tasks | 1 files |
 | Phase 36-fixed-expenses-page-enhancement P01 | 11 min | 3 tasks | 1 files |
 | Phase 36-fixed-expenses-page-enhancement P02 | 3 min | 3 tasks | 1 files |
+| Phase 37 P01 | 4 min | 3 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -116,6 +117,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Used exact English UI labels from language.resx for the English Reports page mirror — The plan requires app-aligned terminology; this keeps English docs consistent with the English UI and avoids drift.
 - [Phase 36-fixed-expenses-page-enhancement]: Tightened DICAS paragraph to name exact right-click labels Ignorar para essa data and Marcar como pago (old prose covered ignore only vaguely and never mark-as-paid) — Plan optional-tightening clause applied: existing DICAS text did not already cover the right-click mark-as-paid action, so exact labels from language.pt-BR.resx were used while preserving link-to-transaction instructions
 - [Phase 36-fixed-expenses-page-enhancement]: [Phase 36-fixed-expenses-page-enhancement] Mirrored wave-1 TIPS tightening to English page (exact labels Ignore for this date / Mark as paid) for full bilingual parity per QA-01 — Wave 1 rewrote the Portuguese DICAS paragraph with exact right-click labels; mirroring only the three structural additions would leave the English TIPS paragraph stale, violating QA-01 full-mirror requirement.
+- [Phase ?]: [Phase 37-01]: Appended AssetTools and IndicatorTools sections after CurrencyTools on the Portuguese MCP Server page — Placement discretion D-01: zero disruption to the 8 pre-existing sections; newest categories last matches page evolution.
+- [Phase ?]: [Phase 37-01]: Used RESEARCH Code Examples as copy-paste-grade content verbatim for all 28 AssetTools + IndicatorTools rows — D-05 verbatim-from-code rule: the code is the spec; every tool/parameter name grep-verified in-session against AssetTools.cs (28 tools) and IndicatorTools.cs.
+- [Phase ?]: [Phase 37-01]: Pre-existing MCP doc name drift (CreateDCAGoal, GetAvgPriceProfiles, GetWealthHistory, CreateAccount, AddBitcoinToBitcoinTransfer) left untouched, logged for Phase 38 QA — D-04 scope boundary: no retrofit or name fixes in pre-existing categories; verified byte-identical via diff.
 
 ### Pending Todos
 
@@ -150,7 +154,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-16T22:33:27.919Z
+Last session: 2026-07-16T23:20:15.854Z
 Stopped at: Phase 37 context gathered
 Resume file: .planning/phases/37-mcp-server-page-update/37-CONTEXT.md
 

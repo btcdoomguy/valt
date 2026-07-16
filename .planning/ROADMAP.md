@@ -135,10 +135,10 @@
   2. A reader can see the documented loan-state tools (`AddLoanStateUpdate`, `DeleteLoanStateUpdate`, `GetLoanStateTimeline`, `GetLatestLoanState`) and their parameters.
   3. A reader can see the documented sold-asset tools (`MarkAssetAsSold`, `UndoAssetSale`, `ListSoldAssets`) and their parameters.
 
-**Plans**: 0/2 plans
+**Plans**: 1/2 plans executed
 **Wave 1**
 
-- [ ] 37-01-PLAN.md — Update Portuguese MCP Server page with AssetTools (28 tools, 5 subsections, parameter tables), IndicatorTools, tool-count fix, and Ativos link
+- [x] 37-01-PLAN.md — Update Portuguese MCP Server page with AssetTools (28 tools, 5 subsections, parameter tables), IndicatorTools, tool-count fix, and Ativos link
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -172,7 +172,7 @@
 | 34. Reports Page Update | v0.6 | 2/2 | Complete   | 2026-07-15 |
 | 35. Goals Page Completion | v0.6 | 3/3 | Complete    | 2026-07-16 |
 | 36. Fixed Expenses Page Enhancement | v0.6 | 2/2 | Complete    | 2026-07-16 |
-| 37. MCP Server Page Update | v0.6 | 0/2 | Planned | - |
+| 37. MCP Server Page Update | v0.6 | 1/2 | In Progress|  |
 | 38. Navigation, New Pages, and Quality Assurance | v0.6 | 0/0 | Not started | - |
 
 **Total phases:** 10  
