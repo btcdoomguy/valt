@@ -5,8 +5,8 @@ milestone_name: — Documentation Site Refresh
 current_phase: 37
 current_phase_name: MCP Server Page Update
 status: ready_to_plan
-stopped_at: Phase 36 complete, ready to plan Phase 37
-last_updated: "2026-07-16T22:26:07.006Z"
+stopped_at: Phase 37 context gathered
+last_updated: "2026-07-16T22:33:27.925Z"
 last_activity: 2026-07-16
 last_activity_desc: Phase 36 complete, transitioned to Phase 37
 progress:
@@ -150,9 +150,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-16T22:30:00.000Z
-Stopped at: Phase 36 complete, ready to plan Phase 37
-Resume file: None
+Last session: 2026-07-16T22:33:27.919Z
+Stopped at: Phase 37 context gathered
+Resume file: .planning/phases/37-mcp-server-page-update/37-CONTEXT.md
 
 ## Notes
 
