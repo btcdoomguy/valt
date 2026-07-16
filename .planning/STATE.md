@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v0.6
 milestone_name: — Documentation Site Refresh
-current_phase: 33
-status: executing
-stopped_at: Completed 33-02-PLAN.md
-last_updated: "2026-07-15T22:00:28.695Z"
-last_activity: 2026-07-15
-last_activity_desc: Phase 33 marked complete
+current_phase: 34
+status: completed
+stopped_at: Completed 34-02-PLAN.md
+last_updated: "2026-07-16T00:29:40.796Z"
+last_activity: 2026-07-16
+last_activity_desc: Phase 34 marked complete
 progress:
   total_phases: 7
-  completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
-  percent: 29
-current_phase_name: Assets Page Rewrite
+  completed_phases: 3
+  total_plans: 7
+  completed_plans: 7
+  percent: 43
+current_phase_name: Reports Page Update
 ---
 
 # STATE.md
@@ -24,14 +24,14 @@ current_phase_name: Assets Page Rewrite
 See: .planning/PROJECT.md (updated 2026-07-15)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 33 — Assets Page Rewrite
+**Current focus:** Phase 34 — Reports Page Update
 
 ## Current Position
 
-Phase: 33 — COMPLETE
-Plan: 3 of 3
-Status: Ready to execute
-Last activity: 2026-07-15 — Phase 33 marked complete
+Phase: 34 — COMPLETE
+Plan: 2 of 2
+Status: Phase 34 complete
+Last activity: 2026-07-16 — Phase 34 marked complete
 
 ## Performance Metrics
 
@@ -72,6 +72,8 @@ Last activity: 2026-07-15 — Phase 33 marked complete
 | Phase 33 P01 | 12 min | 2 tasks | 2 files |
 | Phase 33 P02 | 5min | 2 tasks | 1 files |
 | Phase 33-assets-page-rewrite P03 | 4min | 2 tasks | 2 files |
+| Phase 34-reports-page-update P01 | 15 min | 2 tasks | 1 files |
+| Phase 34-reports-page-update P02 | 4 min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -105,6 +107,9 @@ Recent decisions affecting current work:
 - [Phase ?]: All public docs terminology mirrors the app language files (language.resx / language.pt-BR.resx) to avoid UI/docs drift.
 - [Phase ?]: Code wins over stale planning docs: updated ROADMAP.md success criteria and .claude/docs/assets.md to match the four main tabs and nine asset types found in the Valt application code. — When planning docs conflict with the code, correct the docs to reflect the code. This keeps ROADMAP.md success criteria and the internal Assets module doc authoritative for future phases.
 - [Phase ?]: Added Record Proceeds prompt note to Mark as Sold section because app language files and AssetsViewModel.cs confirm it is a real wired feature. — Content accuracy: the prompt exists in language.resx / language.pt-BR.resx and is invoked in AssetsViewModel.cs after MarkAssetAsSoldCommand succeeds.
+- [Phase ?]: Extended the export note to mention transaction CSV and average-price CSV export from the AvgPrice tab. — CsvExportService exposes both ExportTransactionsAsync and ExportAvgPriceLinesAsync, so the docs should accurately reflect both export paths.
+- [Phase ?]: Documented Posições Alavancadas and Empréstimos BTC as conditional panels visible only when user has corresponding data. — ReportsViewModel binds IsLeveragePositionsVisible and IsBtcLoansVisible based on the presence of visible leveraged positions or active BTC-backed loans.
+- [Phase ?]: Used exact English UI labels from language.resx for the English Reports page mirror — The plan requires app-aligned terminology; this keeps English docs consistent with the English UI and avoids drift.
 
 ### Pending Todos
 
@@ -139,8 +144,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-15T20:24:26.786Z
-Stopped at: Completed 33-02-PLAN.md
+Last session: 2026-07-15T23:36:12.908Z
+Stopped at: Completed 34-02-PLAN.md
 Resume file: None
 
 ## Notes

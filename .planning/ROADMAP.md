@@ -20,7 +20,7 @@
 
 - [x] **Phase 32: Factual Fixes and Cross-Page Accuracy** — 5 requirements (completed 2026-07-15)
 - [x] **Phase 33: Assets Page Rewrite** — 3 requirements (completed 2026-07-15)
-- [ ] **Phase 34: Reports Page Update** — 3 requirements
+- [x] **Phase 34: Reports Page Update** — 3 requirements (completed 2026-07-15)
 - [ ] **Phase 35: Goals Page Completion** — 3 requirements
 - [ ] **Phase 36: Fixed Expenses Page Enhancement** — 3 requirements
 - [ ] **Phase 37: MCP Server Page Update** — 3 requirements
@@ -82,14 +82,14 @@
   2. A reader can understand the current dashboard components, including wealth summary, BTC stack, and leverage/loan summary.
   3. A reader can see an accurate description of report export behavior.
 
-**Plans**: 2 plans
+**Plans**: 2/2 plans complete
 **Wave 1**
 
-- [ ] 34-01-PLAN.md — Rewrite Portuguese Reports page with current dashboard, BTC price simulation, and export note
+- [x] 34-01-PLAN.md — Rewrite Portuguese Reports page with current dashboard, BTC price simulation, and export note
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 34-02-PLAN.md — Mirror Portuguese rewrite to English Reports page and run final MkDocs build
+- [x] 34-02-PLAN.md — Mirror Portuguese rewrite to English Reports page and run final MkDocs build
 
 ### Phase 35: Goals Page Completion
 
@@ -155,7 +155,7 @@
 | 31. MCP, Localization, Documentation, and Verification | v0.5 | 5/5 | Complete | 2026-07-14 |
 | 32. Factual Fixes and Cross-Page Accuracy | v0.6 | 2/2 | Complete    | 2026-07-15 |
 | 33. Assets Page Rewrite | v0.6 | 3/3 | Complete   | 2026-07-15 |
-| 34. Reports Page Update | v0.6 | 0/0 | Not started | - |
+| 34. Reports Page Update | v0.6 | 2/2 | Complete   | 2026-07-15 |
 | 35. Goals Page Completion | v0.6 | 0/0 | Not started | - |
 | 36. Fixed Expenses Page Enhancement | v0.6 | 0/0 | Not started | - |
 | 37. MCP Server Page Update | v0.6 | 0/0 | Not started | - |

@@ -21,9 +21,9 @@
 
 ### Feature Coverage — Reports
 
-- [ ] **RPT-01**: The Reports page documents the custom BTC price simulation feature.
-- [ ] **RPT-02**: The Reports page documents the current dashboard components, including wealth summary, BTC stack, and leverage/loan summary.
-- [ ] **RPT-03**: The Reports page accurately describes report export behavior.
+- [x] **RPT-01**: The Reports page documents the custom BTC price simulation feature.
+- [x] **RPT-02**: The Reports page documents the current dashboard components, including wealth summary, BTC stack, and leverage/loan summary.
+- [x] **RPT-03**: The Reports page accurately describes report export behavior.
 
 ### Feature Coverage — Goals
 
@@ -84,9 +84,9 @@
 | AST-01 | Phase 33 | Complete |
 | AST-02 | Phase 33 | Complete |
 | AST-03 | Phase 33 | Complete |
-| RPT-01 | Phase 34 | Pending |
-| RPT-02 | Phase 34 | Pending |
-| RPT-03 | Phase 34 | Pending |
+| RPT-01 | Phase 34 | Complete |
+| RPT-02 | Phase 34 | Complete |
+| RPT-03 | Phase 34 | Complete |
 | GOAL-01 | Phase 35 | Pending |
 | GOAL-02 | Phase 35 | Pending |
 | GOAL-03 | Phase 35 | Pending |
