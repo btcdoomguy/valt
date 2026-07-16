@@ -4,17 +4,17 @@ milestone: v0.6
 milestone_name: — Documentation Site Refresh
 current_phase: 37
 current_phase_name: mcp-server-page-update
-status: executing
+status: verifying
 stopped_at: Phase 37 context gathered
-last_updated: "2026-07-16T23:21:27.664Z"
+last_updated: "2026-07-16T23:30:37.938Z"
 last_activity: 2026-07-16
 last_activity_desc: Phase 37 execution started
 progress:
   total_phases: 7
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 14
-  completed_plans: 13
-  percent: 71
+  completed_plans: 14
+  percent: 86
 ---
 
 # STATE.md
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-15)
 
 Phase: 37 (mcp-server-page-update) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-16 — Phase 37 execution started
 
 ## Performance Metrics
@@ -79,6 +79,7 @@ Last activity: 2026-07-16 — Phase 37 execution started
 | Phase 36-fixed-expenses-page-enhancement P01 | 11 min | 3 tasks | 1 files |
 | Phase 36-fixed-expenses-page-enhancement P02 | 3 min | 3 tasks | 1 files |
 | Phase 37 P01 | 4 min | 3 tasks | 1 files |
+| Phase 37-mcp-server-page-update P02 | 3 min | 3 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -120,6 +121,7 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 37-01]: Appended AssetTools and IndicatorTools sections after CurrencyTools on the Portuguese MCP Server page — Placement discretion D-01: zero disruption to the 8 pre-existing sections; newest categories last matches page evolution.
 - [Phase ?]: [Phase 37-01]: Used RESEARCH Code Examples as copy-paste-grade content verbatim for all 28 AssetTools + IndicatorTools rows — D-05 verbatim-from-code rule: the code is the spec; every tool/parameter name grep-verified in-session against AssetTools.cs (28 tools) and IndicatorTools.cs.
 - [Phase ?]: [Phase 37-01]: Pre-existing MCP doc name drift (CreateDCAGoal, GetAvgPriceProfiles, GetWealthHistory, CreateAccount, AddBitcoinToBitcoinTransfer) left untouched, logged for Phase 38 QA — D-04 scope boundary: no retrofit or name fixes in pre-existing categories; verified byte-identical via diff.
+- [Phase 37]: [Phase 37-02]: Mirrored all wave-1 PT additions to the English MCP Server page with full bilingual parity (QA-01) — EN descriptions track code [Description] attributes per D-05; pre-existing EN name drift untouched per D-04; MCP-01/02/03 already flipped to Complete by wave 1 metadata commit, verified in place per orchestrator instruction
 
 ### Pending Todos
 
@@ -154,7 +156,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-16T23:20:15.854Z
+Last session: 2026-07-16T23:28:30.582Z
 Stopped at: Phase 37 context gathered
 Resume file: .planning/phases/37-mcp-server-page-update/37-CONTEXT.md
 

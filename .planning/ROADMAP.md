@@ -23,7 +23,7 @@
 - [x] **Phase 34: Reports Page Update** — 3 requirements (completed 2026-07-15)
 - [x] **Phase 35: Goals Page Completion** — 3 requirements (completed 2026-07-16)
 - [x] **Phase 36: Fixed Expenses Page Enhancement** — 3 requirements (completed 2026-07-16)
-- [ ] **Phase 37: MCP Server Page Update** — 3 requirements
+- [x] **Phase 37: MCP Server Page Update** — 3 requirements (completed 2026-07-16)
 - [ ] **Phase 38: Navigation, New Pages, and Quality Assurance** — 6 requirements
 
 ## Phase Details
@@ -135,14 +135,14 @@
   2. A reader can see the documented loan-state tools (`AddLoanStateUpdate`, `DeleteLoanStateUpdate`, `GetLoanStateTimeline`, `GetLatestLoanState`) and their parameters.
   3. A reader can see the documented sold-asset tools (`MarkAssetAsSold`, `UndoAssetSale`, `ListSoldAssets`) and their parameters.
 
-**Plans**: 1/2 plans executed
+**Plans**: 2/2 plans complete
 **Wave 1**
 
 - [x] 37-01-PLAN.md — Update Portuguese MCP Server page with AssetTools (28 tools, 5 subsections, parameter tables), IndicatorTools, tool-count fix, and Ativos link
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 37-02-PLAN.md — Mirror changes to English page, run MkDocs strict build gate, and update REQUIREMENTS.md
+- [x] 37-02-PLAN.md — Mirror changes to English page, run MkDocs strict build gate, and update REQUIREMENTS.md
 
 ### Phase 38: Navigation, New Pages, and Quality Assurance
 
@@ -172,7 +172,7 @@
 | 34. Reports Page Update | v0.6 | 2/2 | Complete   | 2026-07-15 |
 | 35. Goals Page Completion | v0.6 | 3/3 | Complete    | 2026-07-16 |
 | 36. Fixed Expenses Page Enhancement | v0.6 | 2/2 | Complete    | 2026-07-16 |
-| 37. MCP Server Page Update | v0.6 | 1/2 | In Progress|  |
+| 37. MCP Server Page Update | v0.6 | 2/2 | Complete   | 2026-07-16 |
 | 38. Navigation, New Pages, and Quality Assurance | v0.6 | 0/0 | Not started | - |
 
 **Total phases:** 10  
