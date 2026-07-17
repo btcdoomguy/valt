@@ -124,3 +124,12 @@ None - no external service configuration required.
 ---
 *Phase: 38-navigation-new-pages-and-quality-assurance*
 *Completed: 2026-07-17*
+
+## Self-Check: PASSED
+
+- `38-01-SUMMARY.md` exists at the expected path.
+- valt-docs commits `f1ced87` (page creation) and `505603a` (nav + cross-links) exist in the `valt-docs` repo.
+- valt repo commits `40302ad` (SUMMARY) and `d7e5872` (state/roadmap/requirements) exist in the `valt` repo.
+- Strict MkDocs build exits 0 and reports `Translated 19 navigation elements to 'pt'`.
+- File-vs-nav audit returns 0 orphan pages.
+- All cross-links occur exactly once in their respective files.
