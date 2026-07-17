@@ -4,17 +4,17 @@ milestone: v0.6
 milestone_name: — Documentation Site Refresh
 current_phase: 38
 current_phase_name: Navigation, New Pages, and Quality Assurance
-status: complete
-stopped_at: Completed plan 38-02
-last_updated: "2026-07-17T14:30:30Z"
+status: gaps_found
+stopped_at: Verified Phase 38 — 38-01/38-02 complete, QA-03 pending (38-03 required)
+last_updated: "2026-07-17T14:45:00Z"
 last_activity: 2026-07-17
-last_activity_desc: Completed plan 38-02 (MCP tool-name drift fix)
+last_activity_desc: Verified Phase 38; QA-03 gap found, 38-03 plan required
 progress:
   total_phases: 7
-  completed_phases: 7
-  total_plans: 16
+  completed_phases: 6
+  total_plans: 17
   completed_plans: 16
-  percent: 100
+  percent: 94
 ---
 
 # STATE.md
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-07-15)
 ## Current Position
 
 Phase: 38 — Navigation, New Pages, and Quality Assurance
-Plan: 02 complete
-Status: Complete
-Last activity: 2026-07-17 — Completed plan 38-02 (MCP tool-name drift fix)
+Plan: 01 and 02 verified; 03 required to close QA-03
+Status: Gaps found — QA-03 content review checklist not yet produced
+Last activity: 2026-07-17 — Verified Phase 38; 38-01/38-02 deliverables complete, 38-03 needed
 
 ## Performance Metrics
 
@@ -52,6 +52,7 @@ Last activity: 2026-07-17 — Completed plan 38-02 (MCP tool-name drift fix)
 | 35 | 3 | - | - |
 | 36 | 2 | - | - |
 | 37 | 2 | - | - |
+| Phase 38 | 2/3 | — | — |
 
 **Recent Trend:**
 
@@ -169,8 +170,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-17T14:30:04Z
-Stopped at: Completed plan 38-02
+Last session: 2026-07-17T14:45:00Z
+Stopped at: Verified Phase 38; 38-03 QA plan required to close QA-03
 Resume file: None
 
 ## Notes
@@ -180,4 +181,5 @@ Resume file: None
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Execute 38-03-PLAN.md to produce the `38-QA-CHECKLIST.md` artifact, run the final strict build, and close QA-03.
+- After 38-03 completes, run `/gsd-verify-work` for Phase 38 and mark the milestone v0.6 complete.
