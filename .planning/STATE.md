@@ -6,15 +6,15 @@ current_phase: 38
 current_phase_name: Navigation, New Pages, and Quality Assurance
 status: verifying
 stopped_at: Phase 37 context gathered
-last_updated: "2026-07-16T23:37:37.240Z"
+last_updated: "2026-07-17T14:15:38.628Z"
 last_activity: 2026-07-16
 last_activity_desc: Phase 37 complete, transitioned to Phase 38
 progress:
   total_phases: 7
   completed_phases: 6
-  total_plans: 14
-  completed_plans: 14
-  percent: 86
+  total_plans: 16
+  completed_plans: 15
+  percent: 94
 ---
 
 # STATE.md
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-15)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 37 — mcp-server-page-update
+**Current focus:** Phase 38 — Navigation, New Pages, and Quality Assurance
 
 ## Current Position
 
 Phase: 38 — Navigation, New Pages, and Quality Assurance
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-07-16 — Phase 37 complete, transitioned to Phase 38
+Plan: 01 complete
+Status: In Progress
+Last activity: 2026-07-17 — Completed plan 38-01 (Settings & Configuration page, nav, and cross-links)
 
 ## Performance Metrics
 
@@ -81,6 +81,7 @@ Last activity: 2026-07-16 — Phase 37 complete, transitioned to Phase 38
 | Phase 36-fixed-expenses-page-enhancement P02 | 3 min | 3 tasks | 1 files |
 | Phase 37 P01 | 4 min | 3 tasks | 1 files |
 | Phase 37-mcp-server-page-update P02 | 3 min | 3 tasks | 1 files |
+| Phase 38 P01 | 16 min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -123,6 +124,11 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 37-01]: Used RESEARCH Code Examples as copy-paste-grade content verbatim for all 28 AssetTools + IndicatorTools rows — D-05 verbatim-from-code rule: the code is the spec; every tool/parameter name grep-verified in-session against AssetTools.cs (28 tools) and IndicatorTools.cs.
 - [Phase ?]: [Phase 37-01]: Pre-existing MCP doc name drift (CreateDCAGoal, GetAvgPriceProfiles, GetWealthHistory, CreateAccount, AddBitcoinToBitcoinTransfer) left untouched, logged for Phase 38 QA — D-04 scope boundary: no retrofit or name fixes in pre-existing categories; verified byte-identical via diff.
 - [Phase 37]: [Phase 37-02]: Mirrored all wave-1 PT additions to the English MCP Server page with full bilingual parity (QA-01) — EN descriptions track code [Description] attributes per D-05; pre-existing EN name drift untouched per D-04; MCP-01/02/03 already flipped to Complete by wave 1 metadata commit, verified in place per orchestrator instruction
+- [Phase 38-01]: Created the Settings & Configuration page (NAV-03) rather than deferring it — the app exposes 10+ undocumented settings across three tabs and three existing pages referenced the settings screen without a link target.
+- [Phase 38-01]: Placed the Settings page in the Guide section after Basic Concepts, matching the onboarding flow that ends in app configuration.
+- [Phase 38-01]: Repeated the localhost-only MCP security warning verbatim from the existing MCP page in the Avançado / Advanced section, satisfying the T-38-01 threat mitigation.
+- [Phase 38-01]: Cross-linked the Seu Arquivo de Dados / Your Data File section to Instalação / Installation instead of duplicating backup/password guidance, satisfying T-38-02.
+- [Phase 38-01]: Documented the language combo as listing all system cultures with the three app languages pinned at the top, and the app as translated into three languages (requires restart), matching SettingsViewModel behavior.
 
 ### Pending Todos
 
@@ -157,9 +163,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-16T23:28:30.582Z
-Stopped at: Phase 37 context gathered
-Resume file: .planning/phases/37-mcp-server-page-update/37-CONTEXT.md
+Last session: 2026-07-17T12:01:00Z
+Stopped at: Completed plan 38-01
+Resume file: .planning/phases/38-navigation-new-pages-and-quality-assurance/38-02-PLAN.md
 
 ## Notes
 

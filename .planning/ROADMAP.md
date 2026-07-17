@@ -24,7 +24,7 @@
 - [x] **Phase 35: Goals Page Completion** — 3 requirements (completed 2026-07-16)
 - [x] **Phase 36: Fixed Expenses Page Enhancement** — 3 requirements (completed 2026-07-16)
 - [x] **Phase 37: MCP Server Page Update** — 3 requirements (completed 2026-07-16)
-- [ ] **Phase 38: Navigation, New Pages, and Quality Assurance** — 6 requirements
+- [ ] **Phase 38: Navigation, New Pages, and Quality Assurance** — 6 requirements (1/2 plans complete, 2026-07-17)
 
 ## Phase Details
 
@@ -102,7 +102,16 @@
   2. A reader understands the price-data asterisk behavior for goals that require exchange-rate data.
   3. A reader understands when and how goal progress recalculates automatically and what stale progress means.
 
-**Plans**: TBD
+**Plans**: 1/2 plans complete
+
+**Wave 1** *(parallelizable)*
+
+- [x] 38-01-PLAN.md — Create the Settings & Configuration page, wire it into mkdocs.yml navigation, and convert settings references to cross-links
+- [ ] 38-02-PLAN.md — Fix pre-existing MCP tool-name drift across 7 category tables in both languages
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 38-03-PLAN.md — Run the QA sweep, produce the 38-QA-CHECKLIST.md artifact, and close the phase
 
 ### Phase 36: Fixed Expenses Page Enhancement
 
@@ -158,7 +167,16 @@
   5. The documentation site builds successfully with `mkdocs build` without errors or broken internal links.
   6. A content review checklist is applied to all updated pages for accuracy, completeness, and tone.
 
-**Plans**: TBD
+**Plans**: 1/2 plans complete
+
+**Wave 1** *(parallelizable)*
+
+- [x] 38-01-PLAN.md — Create the Settings & Configuration page, wire it into mkdocs.yml navigation, and convert settings references to cross-links
+- [ ] 38-02-PLAN.md — Fix pre-existing MCP tool-name drift across 7 category tables in both languages
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 38-03-PLAN.md — Run the QA sweep, produce the 38-QA-CHECKLIST.md artifact, and close the phase
 
 ## Progress
 
@@ -173,11 +191,11 @@
 | 35. Goals Page Completion | v0.6 | 3/3 | Complete    | 2026-07-16 |
 | 36. Fixed Expenses Page Enhancement | v0.6 | 2/2 | Complete    | 2026-07-16 |
 | 37. MCP Server Page Update | v0.6 | 2/2 | Complete    | 2026-07-16 |
-| 38. Navigation, New Pages, and Quality Assurance | v0.6 | 0/0 | Not started | - |
+| 38. Navigation, New Pages, and Quality Assurance | v0.6 | 1/2 | In Progress | 2026-07-17 |
 
 **Total phases:** 10  
-**v0.6 plans:** 0/14 (phases 32-37 planned; 38 TBD)  
-**v0.6 tasks:** 0/33 (phases 32-37 planned; 38 TBD)
+**v0.6 plans:** 15/16 (phases 32-37 complete; 38 in progress)  
+**v0.6 tasks:** 0/33 (phase 38 task counts pending)
 
 ---
-*Last updated: 2026-07-16 after Phase 37 planning*
+*Last updated: 2026-07-17 after completing plan 38-01*

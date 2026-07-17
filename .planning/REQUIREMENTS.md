@@ -45,9 +45,9 @@
 
 ### Structure and Navigation
 
-- [ ] **NAV-01**: The `mkdocs.yml` navigation is updated to include any new top-level pages or sections.
-- [ ] **NAV-02**: New or renamed pages have consistent titles in both Portuguese and English navigation translations.
-- [ ] **NAV-03**: A new Settings & Configuration page is added if it is created, or explicitly deferred to a future milestone.
+- [x] **NAV-01**: The `mkdocs.yml` navigation is updated to include any new top-level pages or sections.
+- [x] **NAV-02**: New or renamed pages have consistent titles in both Portuguese and English navigation translations.
+- [x] **NAV-03**: A new Settings & Configuration page is added if it is created, or explicitly deferred to a future milestone.
 
 ### Quality Assurance
 
@@ -96,9 +96,9 @@
 | MCP-01 | Phase 37 | Complete |
 | MCP-02 | Phase 37 | Complete |
 | MCP-03 | Phase 37 | Complete |
-| NAV-01 | Phase 38 | Pending |
-| NAV-02 | Phase 38 | Pending |
-| NAV-03 | Phase 38 | Pending |
+| NAV-01 | Phase 38 | Complete |
+| NAV-02 | Phase 38 | Complete |
+| NAV-03 | Phase 38 | Complete |
 | QA-01 | Phase 38 | Complete |
 | QA-02 | Phase 38 | Complete |
 | QA-03 | Phase 38 | Complete |
