@@ -4,17 +4,17 @@ milestone: v0.6
 milestone_name: — Documentation Site Refresh
 current_phase: 38
 current_phase_name: Navigation, New Pages, and Quality Assurance
-status: verifying
-stopped_at: Phase 37 context gathered
-last_updated: "2026-07-17T14:15:38.628Z"
-last_activity: 2026-07-16
-last_activity_desc: Phase 37 complete, transitioned to Phase 38
+status: complete
+stopped_at: Completed plan 38-02
+last_updated: "2026-07-17T14:30:30Z"
+last_activity: 2026-07-17
+last_activity_desc: Completed plan 38-02 (MCP tool-name drift fix)
 progress:
   total_phases: 7
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 16
-  completed_plans: 15
-  percent: 94
+  completed_plans: 16
+  percent: 100
 ---
 
 # STATE.md
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-07-15)
 ## Current Position
 
 Phase: 38 — Navigation, New Pages, and Quality Assurance
-Plan: 01 complete
-Status: In Progress
-Last activity: 2026-07-17 — Completed plan 38-01 (Settings & Configuration page, nav, and cross-links)
+Plan: 02 complete
+Status: Complete
+Last activity: 2026-07-17 — Completed plan 38-02 (MCP tool-name drift fix)
 
 ## Performance Metrics
 
@@ -82,6 +82,8 @@ Last activity: 2026-07-17 — Completed plan 38-01 (Settings & Configuration pag
 | Phase 37 P01 | 4 min | 3 tasks | 1 files |
 | Phase 37-mcp-server-page-update P02 | 3 min | 3 tasks | 1 files |
 | Phase 38 P01 | 16 min | 3 tasks | 9 files |
+| Phase 38 P02 | 18 min | - tasks | - files |
+| Phase 38 P02 | 18 min | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -129,6 +131,10 @@ Recent decisions affecting current work:
 - [Phase 38-01]: Repeated the localhost-only MCP security warning verbatim from the existing MCP page in the Avançado / Advanced section, satisfying the T-38-01 threat mitigation.
 - [Phase 38-01]: Cross-linked the Seu Arquivo de Dados / Your Data File section to Instalação / Installation instead of duplicating backup/password guidance, satisfying T-38-02.
 - [Phase 38-01]: Documented the language combo as listing all system cultures with the three app languages pinned at the top, and the app as translated into three languages (requires restart), matching SettingsViewModel behavior.
+- [Phase ?]: Replaced 7 drifted MCP tool tables as whole units from RESEARCH Example 1 — Full replacement removes stale descriptions and adds 32 missing real tools, landing documented count at 90 = code truth
+- [Phase ?]: Committed both language files in a single docs(38-02) commit per QA-01 — Bilingual mirror discipline requires PT and EN changes to be committed together
+- [Phase ?]: Left 'mais de 80 ferramentas' / '80+ tools' intro untouched — Post-fix documented count is 90, so the existing claim remains true with no count edit
+- [Phase ?]: Preserved Categorias/Categories section byte-identical — It was the only clean pre-existing category and required no changes
 
 ### Pending Todos
 
@@ -163,9 +169,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-17T12:01:00Z
-Stopped at: Completed plan 38-01
-Resume file: .planning/phases/38-navigation-new-pages-and-quality-assurance/38-02-PLAN.md
+Last session: 2026-07-17T14:30:04Z
+Stopped at: Completed plan 38-02
+Resume file: None
 
 ## Notes
 
