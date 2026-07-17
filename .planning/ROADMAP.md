@@ -170,7 +170,7 @@
   5. The documentation site builds successfully with `mkdocs build` without errors or broken internal links.
   6. A content review checklist is applied to all updated pages for accuracy, completeness, and tone.
 
-**Plans**: 3/3 plans complete
+**Plans**: 2/3 plans executed
 
 **Wave 1** *(parallelizable)*
 
@@ -194,7 +194,7 @@
 | 35. Goals Page Completion | v0.6 | 3/3 | Complete    | 2026-07-16 |
 | 36. Fixed Expenses Page Enhancement | v0.6 | 2/2 | Complete    | 2026-07-16 |
 | 37. MCP Server Page Update | v0.6 | 2/2 | Complete    | 2026-07-16 |
-| 38. Navigation, New Pages, and Quality Assurance | v0.6 | 3/3 | Complete    | 2026-07-17 |
+| 38. Navigation, New Pages, and Quality Assurance | v0.6 | 2/3 | In Progress|  |
 
 **Total phases:** 10  
 **v0.6 plans:** 17/17 (phases 32-38 complete)  
