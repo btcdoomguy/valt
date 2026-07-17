@@ -52,8 +52,8 @@
                         <MenuItem Header="{x:Static lang:language.Assets_Delete}"
                                   Command="{Binding $parent[UserControl].((assets:AssetsViewModel)DataContext).DeleteAssetCommand}"
                                   CommandParameter="{Binding}" />
-                        <MenuItem Header="{x:Static lang:language.Assets_Sell}"
-                                  Command="{Binding $parent[UserControl].((assets:AssetsViewModel)DataContext).SellAssetCommand}"
+                        <MenuItem Header="{x:Static lang:language.SoldAssetHistory_MarkAsSold}"
+                                  Command="{Binding $parent[UserControl].((assets:AssetsViewModel)DataContext).MarkAssetAsSoldCommand}"
                                   CommandParameter="{Binding}" />
                         <Separator />
                         <MenuItem Header="{x:Static lang:language.Assets_UpdateLoanState}"
@@ -333,7 +333,7 @@
                                                Foreground="{DynamicResource AssetCardLabelBrush}"
                                                Margin="0,0,4,0" />
                                     <TextBlock Grid.Column="1"
-                                               Text="{Binding LoanAmountFormatted}"
+                                               Text="{Binding TotalBorrowedFormatted}"
                                                FontSize="{DynamicResource FontSizeXSmall}"
                                                Foreground="{DynamicResource AssetCardTextBrush}" />
                                 </Grid>
@@ -582,6 +582,8 @@
                                 Content="{x:Static lang:language.Assets_Add}" />
                         <Button Command="{Binding AddAssetGroupCommand}"
                                 Content="{x:Static lang:language.Assets_ManageGroups}" />
+                        <Button Command="{Binding OpenHistoryCommand}"
+                                Content="{x:Static lang:language.SoldAssetHistory_History}" />
                     </StackPanel>
                 </Grid>
 

@@ -1,0 +1,103 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+             xmlns:transactionTerms="clr-namespace:Valt.Infra.TransactionTerms;assembly=Valt.Infra"
+             xmlns:local="clr-namespace:Valt.UI.Lang"
+             xmlns:transactionEditor="clr-namespace:Valt.UI.Views.Main.Modals.TransactionEditor"
+             xmlns:childVms="clr-namespace:Valt.UI.Views.Main.Modals.TransactionEditor.ChildViewModels"
+             mc:Ignorable="d"
+             d:DesignWidth="500"
+             d:DesignHeight="200"
+             x:Class="Valt.UI.Views.Main.Modals.TransactionEditor.Views.CreditTransactionEditorView"
+             x:CompileBindings="False">
+    <Design.DataContext>
+        <childVms:CreditTransactionEditorViewModel />
+    </Design.DataContext>
+    <StackPanel Spacing="10">
+        <!-- Name and Category row -->
+        <StackPanel Orientation="Horizontal" Spacing="10">
+            <StackPanel Classes="form-field" Width="250">
+                <TextBlock Text="{x:Static local:language.ManageTransactions_Name}" />
+                <AutoCompleteBox x:Name="AutoCompleteTransactionNameBox"
+                                 TabIndex="0"
+                                 Text="{Binding DataContext.Name, RelativeSource={RelativeSource AncestorType=transactionEditor:TransactionEditorView}, Mode=TwoWay}"
+                                 SelectedItem="{Binding DataContext.TransactionTermResult, RelativeSource={RelativeSource AncestorType=transactionEditor:TransactionEditorView}, Mode=TwoWay}">
+                    <AutoCompleteBox.ItemTemplate>
+                        <DataTemplate DataType="transactionTerms:TransactionTermResult">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                                <TextBlock Text="{Binding CategoryName}" FontStyle="Italic" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </AutoCompleteBox.ItemTemplate>
+                </AutoCompleteBox>
+            </StackPanel>
+            <StackPanel Classes="form-field" Width="210">
+                <TextBlock Text="{x:Static local:language.ManageTransactions_Category}" />
+                <ComboBox ItemsSource="{Binding DataContext.AvailableCategories, RelativeSource={RelativeSource AncestorType=transactionEditor:TransactionEditorView}}"
+                          SelectedItem="{Binding DataContext.Category, RelativeSource={RelativeSource AncestorType=transactionEditor:TransactionEditorView}}"
+                          HorizontalAlignment="Stretch"
+                          IsTextSearchEnabled="True" Height="36" TabIndex="1">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="{DynamicResource MaterialDesign}" FontSize="{DynamicResource FontSizeXXLarge}"
+                                           Text="{Binding Unicode}"
+                                           Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
+                                <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- From Account and Amount row -->
+        <StackPanel Orientation="Horizontal" Spacing="10">
+            <StackPanel Classes="form-field" Width="190">
+                <TextBlock Text="{x:Static local:language.ManageTransactions_From}" />
+                <ComboBox ItemsSource="{Binding AvailableAccounts}"
+                          SelectedItem="{Binding FromAccount}"
+                          IsTextSearchEnabled="True"
+                          HorizontalAlignment="Stretch" Height="36" TabIndex="2">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="{DynamicResource MaterialDesign}" FontSize="{DynamicResource FontSizeXXLarge}"
+                                           Text="{Binding Unicode}"
+                                           Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
+                                <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+            <StackPanel Classes="form-field">
+                <TextBlock Text="{x:Static local:language.ManageTransactions_Amount}" />
+                <Panel>
+                    <userControls:BtcInput x:Name="FromBtc" Focusable="True"
+                        IsVisible="{Binding FromAccountIsBtc}"
+                        IsInputFocused="{Binding IsFromBtcInputFocused, Mode=TwoWay}"
+                        IsBitcoin="{Binding FromBtcIsBitcoinMode, Mode=TwoWay}"
+                        BtcValue="{Binding FromAccountBtcValue, Mode=TwoWay}"
+                        TabIndex="3"
+                        CalculatorCommand="{Binding OpenCalculatorCommand}"
+                        CalculatorCommandParameter="FromBtc"
+                        Width="270"
+                        Height="38" />
+                    <userControls:FiatInput x:Name="FromFiat" Focusable="True"
+                        IsInputFocused="{Binding IsFromFiatInputFocused, Mode=TwoWay}"
+                        IsVisible="{Binding !FromAccountIsBtc}"
+                        FiatValue="{Binding FromAccountFiatValue, Mode=TwoWay}"
+                        TabIndex="4"
+                        CalculatorCommand="{Binding OpenCalculatorCommand}"
+                        CalculatorCommandParameter="FromFiat"
+                        Width="270"
+                        Height="38" />
+                </Panel>
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

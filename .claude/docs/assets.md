@@ -1,6 +1,6 @@
 # Assets Module
 
-Tracks external investments (stocks, ETFs, crypto, real estate, leveraged positions, BTC-backed loans) separately from budget accounts, with automatic value calculations and multi-currency support.
+Tracks external investments (stocks, ETFs, crypto, real estate, leveraged positions, BTC-backed loans, and BTC lending) separately from budget accounts, with automatic value calculations and multi-currency support.
 
 ## Domain Layer (Valt.Core/Modules/Assets/)
 
@@ -9,6 +9,11 @@ Tracks external investments (stocks, ETFs, crypto, real estate, leveraged positi
 **File:** `Asset.cs`
 
 Aggregate root for managing external investments.
+
+**Sold-State Properties:**
+- `IsSold: bool` - Whether the asset has been marked as sold
+- `DateSold: DateOnly?` - The recorded sale date
+- `PreviousVisibility: bool` - The visibility state to restore when a sale is undone
 
 **Properties:**
 - `Name: AssetName` - Display name
@@ -26,6 +31,8 @@ Aggregate root for managing external investments.
 - `UpdatePrice(newPrice)` - Update current price (emits `AssetPriceUpdatedEvent`)
 - `SetVisibility(bool)` - Toggle visibility
 - `SetIncludeInNetWorth(bool)` - Toggle net worth inclusion
+- `MarkAsSold(DateOnly? dateSold)` - Mark the asset as sold, capturing the previous visibility and hiding it from the active view (emits `AssetUpdatedEvent`)
+- `UndoSale()` - Restore a sold asset to the active view by reverting `IsSold`/`DateSold` and restoring `Visible` from `PreviousVisibility` (emits `AssetUpdatedEvent`)
 - `GetCurrentPrice()` - Get price from details
 - `GetCurrentValue()` - Calculate value from details
 - `GetCurrencyCode()` - Get currency from details
@@ -44,6 +51,7 @@ Aggregate root for managing external investments.
 | 5 | LeveragedPosition | LeveragedPositionDetails |
 | 6 | Custom | BasicAssetDetails |
 | 7 | BtcLoan | BtcLoanDetails |
+| 8 | BtcLending | BtcLendingDetails |
 
 ### Asset Details (IAssetDetails implementations)
 
@@ -267,6 +275,54 @@ Validation rules:
 - `EffectiveDate` is required.
 
 The handler removes the matching snapshot; calculations automatically fall back to the previous snapshot or to the immutable setup values.
+
+### Sold-State Commands
+
+**MarkAssetAsSoldCommand** — `Commands/MarkAssetAsSold/`
+
+Marks an asset as sold and hides it from the active view.
+
+```csharp
+public record MarkAssetAsSoldCommand : ICommand
+{
+    public required string AssetId { get; init; }
+    public DateOnly? DateSold { get; init; }
+}
+```
+
+Validation rules:
+- `AssetId` is required.
+- `DateSold` cannot be in the future (compared to the local date).
+
+The handler defaults a missing `DateSold` to the current local date. It then calls `MarkAsSold(effectiveDate)` on the asset, which sets `IsSold = true`, stores the date, captures the previous `Visible` value in `PreviousVisibility`, and sets `Visible = false`. The command returns an error if the asset is already sold.
+
+**UndoAssetSaleCommand** — `Commands/UndoAssetSale/`
+
+Restores a sold asset to the active view.
+
+```csharp
+public record UndoAssetSaleCommand : ICommand
+{
+    public required string AssetId { get; init; }
+}
+```
+
+Validation rules:
+- `AssetId` is required.
+
+The handler loads the asset and returns an error if it is not currently sold. It then calls `asset.UndoSale()`, which clears `IsSold` and `DateSold`, restores `Visible` from `PreviousVisibility`, and resets `PreviousVisibility` to `true`.
+
+### Sold-State Queries
+
+**GetSoldAssetsQuery** — `Queries/GetSoldAssets/`
+
+Returns all assets marked as sold, ordered by `DateSold` descending, then by asset name.
+
+```csharp
+public record GetSoldAssetsQuery : IQuery<IReadOnlyList<AssetDTO>>;
+```
+
+Active assets are not included in this result. The query is consumed by the History UI and by the `ListSoldAssets` MCP tool.
 
 ### Loan-State Queries
 
@@ -493,6 +549,40 @@ DataGrid columns:
 - Total Value in main currency (with currency symbol)
 - Total Value in sats
 
+### Sold Asset History
+
+**File:** `Views/Main/Modals/SoldAssetHistory/SoldAssetHistoryView.axaml`
+
+A dedicated History screen for browsing and restoring assets that have been marked as sold.
+
+**Access:**
+- The main Assets tab toolbar has a `History` button next to `Add Asset` and `Manage Groups`.
+- The Assets tab context menu provides a `Mark as Sold` action for the selected asset.
+
+**History Modal Layout:**
+- Sold assets are listed in a DataGrid with columns: Name, Type, and Date Sold.
+- Assets are sorted by Date Sold descending (most recent sale first).
+- An empty state is shown when no assets have been sold.
+- Selecting a sold asset shows a per-type details summary on the right/bottom panel.
+
+**Per-Type Details Summary:**
+- The details panel reuses the same `AssetViewModel` mapping as the main asset card (`SoldAssetDetailsCard.axaml`).
+- Net-worth and visibility indicators are hidden in the history context because the asset is sold.
+- The details cover basic assets, real estate, leveraged positions, BTC-backed loans, and BTC lending, matching the main Assets view.
+
+**Restore (Undo) Action:**
+- A `Restore Asset` button undoes the sale for the selected asset.
+- The asset is returned to the active Assets view with its prior `Visible` state restored from `PreviousVisibility`.
+- The active Assets tab and History modal are refreshed after the operation.
+
+**Data Flow:**
+1. User marks an asset as sold from the Assets tab context menu (optionally prompted for a sale date).
+2. The asset disappears from the active Assets tab and is excluded from totals/calculations.
+3. User opens the History screen from the toolbar.
+4. The History modal lists all sold assets via `GetSoldAssetsQuery`.
+5. Selecting an asset shows the per-type details summary.
+6. Clicking `Restore Asset` dispatches `UndoAssetSaleCommand`, returning the asset to the active view.
+
 ## MCP Server Integration
 
 **File:** `Valt.Infra/Mcp/Tools/AssetTools.cs`
@@ -526,6 +616,9 @@ DataGrid columns:
 | `DeleteLoanStateUpdate` | Delete a state snapshot from a BTC-backed loan by effective date |
 | `GetLoanStateTimeline` | Get the full chronological snapshot timeline of a BTC-backed loan |
 | `GetLatestLoanState` | Get the latest recorded state of a BTC-backed loan |
+| `MarkAssetAsSold` | Mark an asset as sold with an optional `yyyy-MM-dd` sale date |
+| `UndoAssetSale` | Revert a sale and restore the asset to the active list |
+| `ListSoldAssets` | List all assets that have been marked as sold |
 
 ## Key Patterns
 

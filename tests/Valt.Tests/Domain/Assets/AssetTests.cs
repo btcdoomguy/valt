@@ -261,6 +261,113 @@ public class AssetTests
 
     #endregion
 
+    #region Sold State Tests
+
+    [Test]
+    public void MarkAsSold_Sets_IsSold_DateSold_Visible_False_And_Captures_PreviousVisibility()
+    {
+        // Arrange
+        var asset = AssetBuilder.AnAsset().WithVisible(true).Build();
+        asset.ClearEvents();
+        var saleDate = new DateOnly(2025, 1, 15);
+
+        // Act
+        asset.MarkAsSold(saleDate);
+
+        // Assert
+        Assert.That(asset.IsSold, Is.True);
+        Assert.That(asset.DateSold, Is.EqualTo(saleDate));
+        Assert.That(asset.Visible, Is.False);
+        Assert.That(asset.PreviousVisibility, Is.True);
+        Assert.That(asset.Events.Count, Is.EqualTo(1));
+        Assert.That(asset.Events.First(), Is.TypeOf<AssetUpdatedEvent>());
+    }
+
+    [Test]
+    public void UndoSale_Restores_PreviousVisibility_And_Clears_Sold_State()
+    {
+        // Arrange
+        var asset = AssetBuilder.AnAsset()
+            .WithVisible(false)
+            .WithPreviousVisibility(true)
+            .WithSold(true)
+            .WithDateSold(new DateOnly(2025, 1, 15))
+            .Build();
+        asset.ClearEvents();
+
+        // Act
+        asset.UndoSale();
+
+        // Assert
+        Assert.That(asset.IsSold, Is.False);
+        Assert.That(asset.DateSold, Is.Null);
+        Assert.That(asset.Visible, Is.True);
+        Assert.That(asset.PreviousVisibility, Is.True);
+        Assert.That(asset.Events.Count, Is.EqualTo(1));
+        Assert.That(asset.Events.First(), Is.TypeOf<AssetUpdatedEvent>());
+    }
+
+    [Test]
+    public void MarkAsSold_Without_Date_Defaults_To_Today()
+    {
+        // Arrange
+        var asset = AssetBuilder.AnAsset().Build();
+        asset.ClearEvents();
+        var today = DateOnly.FromDateTime(DateTime.Today);
+
+        // Act
+        asset.MarkAsSold(null);
+
+        // Assert
+        Assert.That(asset.IsSold, Is.True);
+        Assert.That(asset.DateSold, Is.EqualTo(today));
+        Assert.That(asset.Visible, Is.False);
+    }
+
+    [Test]
+    public void MarkAsSold_Is_Idempotent()
+    {
+        // Arrange
+        var asset = AssetBuilder.AnAsset()
+            .WithVisible(true)
+            .Build();
+        asset.ClearEvents();
+        var firstDate = new DateOnly(2025, 1, 15);
+        asset.MarkAsSold(firstDate);
+        var eventsAfterFirstCall = asset.Events.Count;
+
+        // Act
+        asset.MarkAsSold(new DateOnly(2025, 2, 1));
+
+        // Assert
+        Assert.That(asset.IsSold, Is.True);
+        Assert.That(asset.DateSold, Is.EqualTo(firstDate), "DateSold should not be overwritten on second call");
+        Assert.That(asset.PreviousVisibility, Is.True, "PreviousVisibility should not be overwritten on second call");
+        Assert.That(asset.Events.Count, Is.EqualTo(eventsAfterFirstCall), "No new event should be raised on second call");
+    }
+
+    [Test]
+    public void UndoSale_Is_Idempotent_When_Asset_Not_Sold()
+    {
+        // Arrange
+        var asset = AssetBuilder.AnAsset()
+            .WithVisible(false)
+            .Build();
+        asset.ClearEvents();
+
+        // Act
+        asset.UndoSale();
+
+        // Assert
+        Assert.That(asset.IsSold, Is.False);
+        Assert.That(asset.DateSold, Is.Null);
+        Assert.That(asset.Visible, Is.False, "Visibility should not change when asset is not sold");
+        Assert.That(asset.PreviousVisibility, Is.True);
+        Assert.That(asset.Events.Count, Is.EqualTo(0), "No event should be raised when asset is not sold");
+    }
+
+    #endregion
+
     #region Currency Code Tests
 
     [Test]

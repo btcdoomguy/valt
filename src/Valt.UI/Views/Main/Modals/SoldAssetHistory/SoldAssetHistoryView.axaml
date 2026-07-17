@@ -1,0 +1,152 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:lang="clr-namespace:Valt.UI.Lang"
+        xmlns:soldAssetHistory="clr-namespace:Valt.UI.Views.Main.Modals.SoldAssetHistory"
+        mc:Ignorable="d"
+        x:Class="Valt.UI.Views.Main.Modals.SoldAssetHistory.SoldAssetHistoryView"
+        Title="{Binding WindowTitle}"
+        x:DataType="soldAssetHistory:SoldAssetHistoryViewModel"
+        d:DesignWidth="850"
+        d:DesignHeight="650"
+        MinWidth="850"
+        MinHeight="650"
+        MaxWidth="850"
+        MaxHeight="650"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Design.DataContext>
+        <soldAssetHistory:SoldAssetHistoryViewModel />
+    </Design.DataContext>
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" />
+    </Window.KeyBindings>
+    <Border>
+        <Grid RowDefinitions="Auto, *, Auto">
+            <userControls:CustomTitleBar Grid.Row="0" Title="{Binding WindowTitle}"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+
+            <Grid Grid.Row="1" ColumnDefinitions="*, 350" Margin="10">
+                <!-- Left: sold-asset list -->
+                <Border Grid.Column="0"
+                        Margin="0,0,10,0"
+                        Background="{DynamicResource Background800Brush}"
+                        BorderBrush="{DynamicResource Background600Brush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="10">
+                    <Panel>
+                        <DataGrid IsVisible="{Binding HasSoldAssets}"
+                                  ItemsSource="{Binding SoldAssets}"
+                                  SelectedItem="{Binding SelectedSoldAsset, Mode=TwoWay}"
+                                  SelectionMode="Single"
+                                  CanUserSortColumns="False"
+                                  CanUserResizeColumns="False"
+                                  CanUserReorderColumns="False"
+                                  IsReadOnly="True"
+                                  GridLinesVisibility="All"
+                                  AutoGenerateColumns="False">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="{x:Static lang:language.SoldAssetHistory_Column_Name}"
+                                                    Width="*"
+                                                    Binding="{Binding Name}" />
+                                <DataGridTextColumn Header="{x:Static lang:language.SoldAssetHistory_Column_Type}"
+                                                    Width="120"
+                                                    Binding="{Binding AssetTypeName}" />
+                                <DataGridTextColumn Header="{x:Static lang:language.SoldAssetHistory_Column_DateSold}"
+                                                    Width="120"
+                                                    Binding="{Binding DateSoldFormatted}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- Empty state -->
+                        <StackPanel IsVisible="{Binding HasNoSoldAssets}"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    Spacing="8">
+                            <TextBlock Text="{x:Static lang:language.SoldAssetHistory_NoSoldAssets}"
+                                       FontSize="{DynamicResource FontSizeLarge}"
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Center" />
+                            <TextBlock Text="{x:Static lang:language.SoldAssetHistory_NoSoldAssets_Detail}"
+                                       FontSize="{DynamicResource FontSizeSmall}"
+                                       Foreground="{DynamicResource Text400Brush}"
+                                       TextWrapping="Wrap"
+                                       TextAlignment="Center"
+                                       MaxWidth="300" />
+                        </StackPanel>
+
+                        <!-- Error state -->
+                        <StackPanel IsVisible="{Binding IsLoadingError}"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    Spacing="8">
+                            <TextBlock Text="{x:Static lang:language.SoldAssetHistory_LoadError}"
+                                       FontSize="{DynamicResource FontSizeLarge}"
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Center" />
+                            <TextBlock Text="{Binding ErrorMessage}"
+                                       FontSize="{DynamicResource FontSizeSmall}"
+                                       Foreground="{DynamicResource Text400Brush}"
+                                       TextWrapping="Wrap"
+                                       TextAlignment="Center"
+                                       MaxWidth="300" />
+                        </StackPanel>
+                    </Panel>
+                </Border>
+
+                <!-- Right: details panel -->
+                <Border Grid.Column="1"
+                        Background="{DynamicResource Background800Brush}"
+                        BorderBrush="{DynamicResource Background600Brush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="10">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="12"
+                                    IsVisible="{Binding SelectedSoldAsset, Converter={x:Static ObjectConverters.IsNotNull}}">                        <soldAssetHistory:SoldAssetDetailsCard DataContext="{Binding SelectedSoldAsset.AssetDetails}" />
+
+                            <!-- Date Sold metadata row -->
+                            <Grid ColumnDefinitions="Auto, *">
+                                <TextBlock Grid.Column="0"
+                                           FontSize="{DynamicResource FontSizeSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,8,0">
+                                    <Run Text="{x:Static lang:language.SoldAssetHistory_DateSold_Title}" />
+                                    <Run Text=":" />
+                                </TextBlock>
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding SelectedSoldAsset.DateSoldFormatted}"
+                                           FontSize="{DynamicResource FontSizeSmall}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}" />
+                            </Grid>
+
+                            <Button Content="{x:Static lang:language.SoldAssetHistory_RestoreAsset}"
+                                     Command="{Binding RestoreAssetCommand}"
+                                     Classes="primary"
+                                     HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+
+            <Border Grid.Row="2"
+                    Classes="form-fields-area"
+                    VerticalAlignment="Stretch"
+                    Margin="10"
+                    Padding="10">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="{x:Static lang:language.SoldAssetHistory_Close}"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding CloseCommand}"
+                            Width="100" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

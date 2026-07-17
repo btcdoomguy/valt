@@ -8,9 +8,14 @@ namespace Valt.App.Modules.Assets.Contracts;
 public interface IAssetQueries
 {
     /// <summary>
-    /// Gets all assets, ordered by visibility (visible first), then display order, then name.
+    /// Gets all active assets (not sold), ordered by visibility (visible first), then display order, then name.
     /// </summary>
     Task<IReadOnlyList<AssetDTO>> GetAllAsync();
+
+    /// <summary>
+    /// Gets all sold assets, ordered by date sold descending, then by name.
+    /// </summary>
+    Task<IReadOnlyList<AssetDTO>> GetSoldAsync();
 
     /// <summary>
     /// Gets only visible assets, ordered by display order, then name.

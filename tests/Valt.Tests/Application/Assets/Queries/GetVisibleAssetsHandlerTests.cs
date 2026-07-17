@@ -20,10 +20,16 @@ public class GetVisibleAssetsHandlerTests : DatabaseTest
         var invisibleAsset = AssetBuilder.ACryptoAsset("ETH", 2500m, 2)
             .WithVisible(false)
             .Build();
+        var soldVisibleAsset = AssetBuilder.ACryptoAsset("SOL", 150m, 5)
+            .WithVisible(true)
+            .WithSold(true)
+            .WithDateSold(new DateOnly(2025, 1, 15))
+            .Build();
 
         await _assetRepository.SaveAsync(visibleAsset1);
         await _assetRepository.SaveAsync(visibleAsset2);
         await _assetRepository.SaveAsync(invisibleAsset);
+        await _assetRepository.SaveAsync(soldVisibleAsset);
     }
 
     [SetUp]
@@ -55,5 +61,16 @@ public class GetVisibleAssetsHandlerTests : DatabaseTest
 
         var ethAsset = result.FirstOrDefault(a => a.Name == "ETH Crypto");
         Assert.That(ethAsset, Is.Null);
+    }
+
+    [Test]
+    public async Task HandleAsync_DoesNotReturnSoldAssets()
+    {
+        var query = new GetVisibleAssetsQuery();
+
+        var result = await _handler.HandleAsync(query);
+
+        var soldAsset = result.FirstOrDefault(a => a.Name == "SOL Crypto");
+        Assert.That(soldAsset, Is.Null);
     }
 }

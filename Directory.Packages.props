@@ -8,12 +8,12 @@
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.10" />
     <!-- Avalonia -->
-    <PackageVersion Include="Avalonia" Version="12.0.3" />
-    <PackageVersion Include="Avalonia.Controls.ColorPicker" Version="12.0.3" />
-    <PackageVersion Include="Avalonia.Controls.DataGrid" Version="12.0.0" />
-    <PackageVersion Include="Avalonia.Desktop" Version="12.0.3" />
-    <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.0.3" />
-    <PackageVersion Include="Avalonia.Themes.Fluent" Version="12.0.3" />
+    <PackageVersion Include="Avalonia" Version="12.1.0" />
+    <PackageVersion Include="Avalonia.Controls.ColorPicker" Version="12.1.0" />
+    <PackageVersion Include="Avalonia.Controls.DataGrid" Version="12.1.0" />
+    <PackageVersion Include="Avalonia.Desktop" Version="12.1.0" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.0" />
+    <PackageVersion Include="Avalonia.Themes.Fluent" Version="12.1.0" />
     <!-- MVVM -->
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <!-- Data & Persistence -->
@@ -21,7 +21,7 @@
     <PackageVersion Include="LiteDB" Version="5.0.21" />
     <!-- UI Components -->
     <PackageVersion Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.1.0-dev-365" />
-    <PackageVersion Include="SkiaSharp.NativeAssets.Linux" Version="3.119.4-preview.1.1" />
+    <PackageVersion Include="SkiaSharp.NativeAssets.Linux" Version="3.119.4" />
     <!-- Utilities -->
     <PackageVersion Include="Scrutor" Version="6.1.0" />
     <PackageVersion Include="StringMath" Version="4.1.3" />

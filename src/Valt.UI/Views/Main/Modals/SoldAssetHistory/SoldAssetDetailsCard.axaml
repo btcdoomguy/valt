@@ -1,0 +1,403 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:models="clr-namespace:Valt.UI.Views.Main.Tabs.Assets.Models"
+             xmlns:lang="clr-namespace:Valt.UI.Lang"
+             mc:Ignorable="d"
+             x:Class="Valt.UI.Views.Main.Modals.SoldAssetHistory.SoldAssetDetailsCard"
+             x:DataType="models:AssetViewModel">
+    <Border Background="{DynamicResource AssetCardBackgroundBrush}"
+            CornerRadius="8"
+            BorderThickness="1"
+            BorderBrush="{DynamicResource AssetCardBorderBrush}"
+            ClipToBounds="True">
+        <Grid RowDefinitions="Auto, *">
+            <!-- Title Bar -->
+            <Border Grid.Row="0"
+                    Background="{Binding TitleBarColor, Converter={StaticResource StringToColorBrushConverter}}"
+                    Height="50">
+                <Panel>
+                    <!-- Depth gradient overlay -->
+                    <Border>
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                                <GradientStop Color="#22FFFFFF" Offset="0" />
+                                <GradientStop Color="#00FFFFFF" Offset="1" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                    </Border>
+                    <StackPanel Spacing="1" Margin="12,6">
+                        <TextBlock Text="{Binding Name}"
+                                   FontSize="{DynamicResource FontSizeMedium}"
+                                   Foreground="{Binding TitleBarTextColor, Converter={StaticResource StringToColorBrushConverter}}"
+                                   TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding AssetTypeName}"
+                                   FontSize="{DynamicResource FontSizeXSmall}"
+                                   Foreground="{Binding TitleBarTextColor, Converter={StaticResource StringToColorBrushConverter}}"
+                                   Opacity="0.7" />
+                    </StackPanel>
+                </Panel>
+            </Border>
+
+            <!-- Main Content -->
+            <Border Grid.Row="1" Padding="12,8" Background="{DynamicResource Background900Brush}">
+                <Grid RowDefinitions="*, Auto">
+                    <!-- Type-specific content -->
+                    <StackPanel Grid.Row="0" Spacing="4">
+                        <!-- Basic Asset content (Stock, ETF, Crypto, Commodity, Custom) -->
+                        <StackPanel Spacing="4" IsVisible="{Binding IsBasicAsset}">
+                            <Grid ColumnDefinitions="Auto, *" IsVisible="{Binding Symbol, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Card_Symbol}"
+                                           FontSize="{DynamicResource FontSizeSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,8,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding Symbol}"
+                                           FontSize="{DynamicResource FontSizeSmall}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto, *">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Card_Quantity}"
+                                           FontSize="{DynamicResource FontSizeSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,8,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding QuantityFormatted}"
+                                           FontSize="{DynamicResource FontSizeSmall}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto, *">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Card_Price}"
+                                           FontSize="{DynamicResource FontSizeSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,8,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding CurrentPriceFormatted}"
+                                           FontSize="{DynamicResource FontSizeSmall}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}" />
+                            </Grid>
+                            <StackPanel Spacing="2" IsVisible="{Binding HasAcquisitionData}">
+                                <Grid ColumnDefinitions="Auto, *">
+                                    <TextBlock Grid.Column="0"
+                                               Text="{x:Static lang:language.Assets_Card_PnL}"
+                                               FontSize="{DynamicResource FontSizeSmall}"
+                                               Foreground="{DynamicResource AssetCardLabelBrush}"
+                                               Margin="0,0,8,0" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding PnLFormatted}"
+                                               FontSize="{DynamicResource FontSizeSmall}"
+                                               Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}" />
+                                </Grid>
+                                <TextBlock Text="{Binding PnLPercentageFormatted}"
+                                           FontSize="{DynamicResource FontSizeSmall}"
+                                           Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}"
+                                           HorizontalAlignment="Right" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Real Estate content -->
+                        <StackPanel Spacing="4" IsVisible="{Binding IsRealEstate}">
+                            <TextBlock Text="{Binding Address}"
+                                       FontSize="{DynamicResource FontSizeSmall}"
+                                       Foreground="{DynamicResource AssetCardTextBrush}"
+                                       TextWrapping="Wrap"
+                                       MaxLines="2"
+                                       IsVisible="{Binding Address, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                            <Grid ColumnDefinitions="Auto, *" IsVisible="{Binding MonthlyRentalIncome, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Card_Rent}"
+                                           FontSize="{DynamicResource FontSizeSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,8,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding MonthlyRentalIncomeFormatted}"
+                                           FontSize="{DynamicResource FontSizeSmall}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}" />
+                            </Grid>
+                            <StackPanel Spacing="2" IsVisible="{Binding HasAcquisitionData}">
+                                <Grid ColumnDefinitions="Auto, *">
+                                    <TextBlock Grid.Column="0"
+                                               Text="{x:Static lang:language.Assets_Card_PnL}"
+                                               FontSize="{DynamicResource FontSizeSmall}"
+                                               Foreground="{DynamicResource AssetCardLabelBrush}"
+                                               Margin="0,0,8,0" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding PnLFormatted}"
+                                               FontSize="{DynamicResource FontSizeSmall}"
+                                               Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}" />
+                                </Grid>
+                                <TextBlock Text="{Binding PnLPercentageFormatted}"
+                                           FontSize="{DynamicResource FontSizeSmall}"
+                                           Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}"
+                                           HorizontalAlignment="Right" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Leveraged Position content -->
+                        <StackPanel Spacing="3" IsVisible="{Binding IsLeveragedPosition}">
+                            <Grid ColumnDefinitions="*, *">
+                                <TextBlock Grid.Column="0"
+                                           Text="{Binding PositionDirection}"
+                                           FontSize="{DynamicResource FontSizeMedium}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding LeverageFormatted}"
+                                           FontSize="{DynamicResource FontSizeMedium}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}"
+                                           HorizontalAlignment="Right" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto, *">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Card_Collateral_Leveraged}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,4,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding CollateralFormatted}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto, *">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Card_Position}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,4,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding PositionSizeFormatted}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto, *">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Card_Entry}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,4,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding EntryPriceFormatted}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto, *">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Card_Liquidation}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,4,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding LiquidationPriceFormatted}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto, *">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Card_Distance}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,4,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding DistanceToLiquidationFormatted}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}" />
+                            </Grid>
+                            <TextBlock Text="{Binding PnLPercentageFormatted}"
+                                       FontSize="{DynamicResource FontSizeSmall}"
+                                       Foreground="{Binding PnLColor, Converter={StaticResource StringToColorBrushConverter}}"
+                                       HorizontalAlignment="Right"
+                                       Margin="0,4,0,0" />
+                            <Border Background="{DynamicResource SemanticNegative500Brush}"
+                                    CornerRadius="4"
+                                    Padding="6,2"
+                                    HorizontalAlignment="Center"
+                                    IsVisible="{Binding IsAtRisk}">
+                                <TextBlock Text="{x:Static lang:language.Assets_Card_AtRisk}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="White"
+                                           FontWeight="Bold" />
+                            </Border>
+                        </StackPanel>
+
+                        <!-- BTC Loan content -->
+                        <StackPanel Spacing="3" IsVisible="{Binding IsBtcLoan}">
+                            <Grid ColumnDefinitions="Auto, *">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Card_Collateral}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,4,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding CollateralSatsFormatted}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto, *">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Card_LoanAmount}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,4,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding TotalBorrowedFormatted}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto, *">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Card_TotalDebt}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,4,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding TotalDebtFormatted}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="#F44336"
+                                           FontWeight="SemiBold" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto, *">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Card_AccruedInterest}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,4,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding AccruedInterestFormatted}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto, *">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Card_APR}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,4,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding AprFormatted}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto, *">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Card_LTV}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,4,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding CurrentLtvFormatted}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{Binding LoanHealthColor, Converter={StaticResource StringToColorBrushConverter}}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto, *">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Card_DaysUntilRepayment}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,4,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding DaysUntilRepaymentFormatted}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}" />
+                            </Grid>
+                            <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                                <Border Background="{Binding LoanHealthColor, Converter={StaticResource StringToColorBrushConverter}}"
+                                        CornerRadius="4"
+                                        Padding="6,2">
+                                    <TextBlock Text="{Binding LoanHealthStatusName}"
+                                               FontSize="{DynamicResource FontSizeXSmall}"
+                                               Foreground="White"
+                                               FontWeight="Bold" />
+                                </Border>
+                                <Border Background="#757575"
+                                        CornerRadius="4"
+                                        Padding="6,2"
+                                        IsVisible="{Binding LoanStatusName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                    <TextBlock Text="{Binding LoanStatusName}"
+                                               FontSize="{DynamicResource FontSizeXSmall}"
+                                               Foreground="White"
+                                               FontWeight="SemiBold" />
+                                </Border>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- BTC Lending content -->
+                        <StackPanel Spacing="3" IsVisible="{Binding IsBtcLending}">
+                            <Grid ColumnDefinitions="Auto, *">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Card_BorrowerPlatform}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,4,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding BorrowerOrPlatformName}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto, *">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Card_AmountLent}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,4,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding AmountLentFormatted}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto, *">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Card_EarnedInterest}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,4,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding EarnedInterestFormatted}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="#4CAF50" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto, *">
+                                <TextBlock Grid.Column="0"
+                                           Text="{x:Static lang:language.Assets_Card_DaysUntilRepayment}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardLabelBrush}"
+                                           Margin="0,0,4,0" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding DaysUntilRepaymentFormatted}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="{DynamicResource AssetCardTextBrush}" />
+                            </Grid>
+                            <Border Background="#757575"
+                                    CornerRadius="4"
+                                    Padding="6,2"
+                                    HorizontalAlignment="Center"
+                                    IsVisible="{Binding LoanStatusName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                <TextBlock Text="{Binding LoanStatusName}"
+                                           FontSize="{DynamicResource FontSizeXSmall}"
+                                           Foreground="White"
+                                           FontWeight="SemiBold" />
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Value display -->
+                    <StackPanel Grid.Row="1" Margin="0,8,0,0">
+                        <Border Height="1" Background="{DynamicResource AssetCardSeparatorBrush}" Margin="0,0,0,8" />
+                        <TextBlock Text="{Binding ValueLabel}"
+                                   FontSize="{DynamicResource FontSizeXSmall}"
+                                   Foreground="{DynamicResource AssetCardMutedBrush}"
+                                   HorizontalAlignment="Center"
+                                   IsVisible="{Binding HasValueLabel}" />
+                        <TextBlock Text="{Binding DisplayValueFormatted}"
+                                   FontSize="{DynamicResource FontSizeXLarge}"
+                                   Foreground="{Binding ValueColor, Converter={StaticResource StringToColorBrushConverter}}"
+                                   HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

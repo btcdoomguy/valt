@@ -43,6 +43,7 @@ public class BtcLoanDetailsTests
         decimal currentTotalDebt,
         long? collateralSats = null,
         decimal? loanAmount = null,
+        decimal? totalBorrowed = null,
         decimal? apr = null,
         decimal? liquidationLtv = null,
         decimal? marginCallLtv = null,
@@ -52,14 +53,15 @@ public class BtcLoanDetailsTests
         decimal? currentBtcPrice = null,
         string? note = null)
     {
-        var totalBorrowed = loanAmount ?? loan.LoanAmount;
+        var actualLoanAmount = loanAmount ?? loan.LoanAmount;
+        var actualTotalBorrowed = totalBorrowed ?? actualLoanAmount;
         var actualFees = fees ?? loan.Fees;
-        var interest = Math.Max(0m, currentTotalDebt - totalBorrowed - actualFees);
+        var interest = Math.Max(0m, currentTotalDebt - actualTotalBorrowed - actualFees);
 
         return new LoanStateSnapshot(
             platformName: loan.PlatformName,
             collateralSats: collateralSats ?? loan.CollateralSats,
-            loanAmount: totalBorrowed,
+            loanAmount: actualLoanAmount,
             currencyCode: loan.CurrencyCode,
             apr: apr ?? loan.Apr,
             initialLtv: loan.InitialLtv,
@@ -71,7 +73,7 @@ public class BtcLoanDetailsTests
             status: status ?? loan.Status,
             currentBtcPriceInLoanCurrency: currentBtcPrice ?? loan.CurrentBtcPriceInLoanCurrency,
             fixedTotalDebt: loan.FixedTotalDebt,
-            totalBorrowed: totalBorrowed,
+            totalBorrowed: actualTotalBorrowed,
             interestAccruedUntilDate: interest,
             effectiveDate: effectiveDate,
             note: note);
@@ -866,6 +868,22 @@ public class BtcLoanDetailsTests
         // Collateral value = 0.5 BTC * $50,000 = $25,000
         // LTV = 15,000 / 25,000 * 100 = 60%
         Assert.That(details.CalculateCurrentLtv(50_000m), Is.EqualTo(60m));
+    }
+
+    [Test]
+    public void Should_Use_TotalBorrowed_From_Latest_Snapshot_For_Current_Ltv()
+    {
+        var loan = CreateDefaultDetails(currentBtcPrice: 50_000m);
+
+        var details = loan.WithAddedSnapshot(CreateSnapshot(
+            loan,
+            new DateOnly(2025, 6, 1),
+            20_000m,
+            totalBorrowed: 20_000m));
+
+        // Collateral value = 1 BTC * $50,000 = $50,000
+        // Updated total borrowed = 20,000, LTV = 20,000 / 50,000 * 100 = 40%
+        Assert.That(details.CalculateCurrentLtv(50_000m), Is.EqualTo(40m));
     }
 
     [Test]

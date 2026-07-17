@@ -80,4 +80,9 @@ public record AssetDTO
     public decimal? AcquisitionPrice { get; init; }
     public decimal? PnL { get; init; }
     public decimal? PnLPercentage { get; init; }
+
+    // Sold-state fields
+    public bool IsSold { get; init; }
+    public DateOnly? DateSold { get; init; }
+    public bool PreviousVisibility { get; init; }
 }

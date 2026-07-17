@@ -125,6 +125,10 @@ internal sealed class AssetPriceUpdaterJob : IBackgroundJob
 
     private static bool ShouldUpdatePrice(Asset asset)
     {
+        // Skip sold assets
+        if (asset.IsSold)
+            return false;
+
         var (priceSource, symbol, _) = GetPriceInfo(asset);
 
         // Skip manual price sources

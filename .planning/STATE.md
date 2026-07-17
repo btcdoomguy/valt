@@ -1,170 +1,188 @@
 ---
 gsd_state_version: 1.0
-milestone: v0.4
-milestone_name: Quality & Performance
-current_phase: 20
-current_phase_name: reports-dashboard-builders
-status: gap_closure_complete
-stopped_at: Phase 20 blocking-call gap fixed; verification guard restored
-last_updated: "2026-07-03T00:00:00.000Z"
-last_activity: 2026-07-03
-last_activity_desc: Closed Phase 20 verification gap - removed GetAwaiter().GetResult() from Reports dashboard panel VMs
+milestone: v0.6
+milestone_name: — Documentation Site Refresh
+current_phase: 6
+status: Awaiting next milestone
+stopped_at: Verified Phase 38; 38-03 QA plan required to close QA-03
+last_updated: "2026-07-17T15:03:40.960Z"
+last_activity: 2026-07-17
+last_activity_desc: Milestone v0.6 completed and archived
 progress:
-  total_phases: 18
-  completed_phases: 9
-  total_plans: 18
-  completed_plans: 18
-  percent: 28
+  total_phases: 7
+  completed_phases: 7
+  total_plans: 17
+  completed_plans: 17
+  percent: 100
+current_phase_name: Navigation, New Pages, and Quality Assurance
 ---
 
 # STATE.md
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-19)
+See: .planning/PROJECT.md (updated 2026-07-15)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 20 — reports-dashboard-builders
+**Current focus:** Planning next milestone (v0.7 — TBD)
 
 ## Current Position
 
-Phase: 20 (reports-dashboard-builders) — GAPS FOUND
-Plan: 2 of 2
-Status: Verification found gaps; awaiting gap closure planning
-Last activity: 2026-07-01 — Phase 20 verification found gaps
+Phase: Milestone v0.6 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-07-17 — Milestone v0.6 completed and archived
 
-Progress: [██        ] 28%
+## Performance Metrics
+
+**Velocity:**
+
+- Total plans completed: 21
+- Average duration: 18 min
+- Total execution time: 43 min
+
+**By Phase:**
+
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| Phase 29 | 4/4 | 18 min | 18 min |
+| Phase 30 | 3/3 | - | - |
+| Phase 31 | 5/5 | - | - |
+| Phase 32 | 2/2 | 25 min | 12.5 min |
+| 35 | 3 | - | - |
+| 36 | 2 | - | - |
+| 37 | 2 | - | - |
+| Phase 38 | 2/3 | — | — |
+
+**Recent Trend:**
+
+- Last 5 plans: 18 min
+- Trend: —
+
+*Updated after each plan completion*
+| Phase 29 P02 | 8min | 3 tasks | 9 files |
+| Phase 29 P03 | 5min | 3 tasks | 8 files |
+| Phase 29 P04 | 5min | 2 tasks | 2 files |
+| Phase 30-history-ui-and-details-reuse P01 | 11min | 3 tasks | 9 files |
+| Phase 30-history-ui-and-details-reuse P02 | 6 min | 3 tasks | 7 files |
+| Phase 30 P03 | 15 | 3 tasks | 2 files |
+| Phase 31-mcp-localization-documentation-and-verification P01 | 5min | 2 tasks | 1 files |
+| Phase 31 P02 | 20min | 3 tasks | 10 files |
+| Phase 31 P03 | 5 min | 1 task | 1 file |
+| Phase 31-mcp-localization-documentation-and-verification P04 | 8 | 1 tasks | 2 files |
+| Phase 31-mcp-localization-documentation-and-verification P05 | 3 min | 2 tasks | 5 files |
+| Phase 32 P01 | 20min | 3 tasks | 11 files |
+| Phase 32 P02 | 5 min | 2 tasks | 2 files |
+| Phase 33 P01 | 12 min | 2 tasks | 2 files |
+| Phase 33 P02 | 5min | 2 tasks | 1 files |
+| Phase 33-assets-page-rewrite P03 | 4min | 2 tasks | 2 files |
+| Phase 34-reports-page-update P01 | 15 min | 2 tasks | 1 files |
+| Phase 34-reports-page-update P02 | 4 min | 2 tasks | 1 files |
+| Phase 36-fixed-expenses-page-enhancement P01 | 11 min | 3 tasks | 1 files |
+| Phase 36-fixed-expenses-page-enhancement P02 | 3 min | 3 tasks | 1 files |
+| Phase 37 P01 | 4 min | 3 tasks | 1 files |
+| Phase 37-mcp-server-page-update P02 | 3 min | 3 tasks | 1 files |
+| Phase 38 P01 | 16 min | 3 tasks | 9 files |
+| Phase 38 P02 | 18 min | - tasks | - files |
+| Phase 38 P02 | 18 min | 3 tasks | 2 files |
+| Phase 38 P03 | 7 min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
 ### Decisions
 
-- Latest recorded loan state snapshot wins for current-value calculations
-- Initial loan setup values are immutable
-- Existing loans are auto-seeded with an initial state entry
-- Loan state history is stored inside `BtcLoanDetails` JSON
-- Seeded `CurrentTotalDebt` must match the `LoanStartDate` effective date (`LoanAmount + Fees` or `FixedTotalDebt`)
-- Missing `EffectiveDate` or `LoanStartDate` in persisted snapshots is invalid and must throw
-- Persisted dates are parsed with `CultureInfo.InvariantCulture`
-- Duplicate effective dates in the constructor-supplied snapshot list are invalid
-- `UpdateLoanStateViewModel` falls back to `AssetDTO` setup values when no loan-state snapshot exists
-- `FiatValue` properties on the update modal use `[Required]` only; `[Range]` is omitted because `FiatValue` does not implement `IComparable`
-- English-only localization for new strings in Phase 08; pt-BR/es translations for UpdateLoanState_* and Assets_UpdateLoanState keys are added in Phase 08 gap closure (revised D-07) instead of deferred to Phase 10
-- `language.Designer.cs` is maintained manually in this environment because `PublicResXFileCodeGenerator` does not run on Linux builds
-- [Phase ?]: Created a dedicated SatsLabel key instead of reusing Reports.Statistics.MedianExpensesSatsLabel because the existing key is a full chart label, not a unit suffix.
-- [Phase ?]: Used 'sats' as the universal pt-BR/es translation, matching the project's existing Bitcoin terminology.
-- [Phase 10-polish-verification]: Wrapped DateOnly.ParseExact in try/catch per threat model T-10-02-01 — Returns clean error messages instead of propagating FormatException to MCP clients for invalid yyyy-MM-dd input
-- [Phase 10-polish-verification]: Force-added gitignored 09-VERIFICATION.md and 09-UAT.md — Preserves Phase 9 runtime verification evidence in git history alongside tracker update, consistent with tracked 08-VERIFICATION.md/08-UAT.md
-- [Phase 11-safe-fire-and-forget]: Migrated all existing SafeFireAndForget call sites during Task 2 to keep the build green, not only TaskExtensions.cs
-- [Phase 11-safe-fire-and-forget]: Used a custom TestLogger instead of ILogger.Received() because LogError and LogDebug are extension methods that NSubstitute cannot intercept
-- [Phase ?]: Tasks 1 and 2 already satisfied by 11-01; only TransactionEditor lifecycle moved in 11-02. — Verification of existing call sites showed all SafeFireAndForget replacements and constructor injections were already in place from Plan 11-01.
-- [Phase ?]: Preserved BackgroundJobManager.StopAll() in OnShutdownRequested before awaiting MainViewModel.OnClosingAsync to avoid shutdown regression
-- [Phase ?]: Used explicit HandleRemovedCurrenciesAsync helper because IFireAndForgetTaskRunner.RunAsync accepts Task, not Func<Task>
-- [Phase ?]: Retained intentional async void OnShutdownRequested because Avalonia ShutdownRequestedEventArgs has no deferral and the plan requires this signature
-- [Phase ?]: Grouped HTTP consumers into five named client profiles (GitHubApi, CoinGecko, Indicator, PriceProvider, UpdateDownload) to keep the registry small while preserving timeouts and headers. — Avoids an unbounded named-client registry while keeping timeouts and headers centralized.
-- [Phase ?]: Added HttpClientTestFactory in 13-01 rather than deferring to 13-02 because provider constructor changes broke test compilation and blocked the solution build. — Necessary Rule 3 auto-fix to keep dotnet build Valt.sln green after constructor signature changes.
-- [Phase 13]: Reused PriceProvider named client for AboutViewModel donation-address fetch to avoid adding a sixth named client — AboutViewModel loads donation addresses from a short raw URL; the 30 s PriceProvider timeout is acceptable and keeps the named-client registry small
-- [Phase 13]: Kept parameterless design-time constructors in UpdateIndicatorViewModel and AboutViewModel with null-forgiving IHttpClientFactory defaults — Avalonia XAML designer requires parameterless constructors; null-forgiving assignment keeps nullable analysis happy
-- [Phase 14-01]: Moved notification abstractions (INotification, INotificationPublisher, INotificationHandler<>) to Valt.App.Kernel.Notifications so App-layer command handlers can publish events without referencing Valt.Infra
-- [Phase 14-01]: Retained Valt.Infra.Kernel.Notifications namespace for NotificationPublisher concrete class and handlers to minimize churn
-- [Phase 14-01]: Updated LayerDependencyTests.Notifications_Should_Not_Be_Abstract to scan both AppAssembly and InfraAssembly using NetArchTest.Types.InAssemblies
-- [Phase 14-02]: Used real BackgroundJobManager with a fake IBackgroundJob in handler tests because BackgroundJobManager is sealed and cannot be substituted with NSubstitute
-- [Phase 14-02]: Updated AGENTS.md Background Jobs table to reflect the new 120-second GoalProgressUpdaterJob interval so project guidance stays in sync
-- [Phase 14-03]: App command handlers must not reference BackgroundJobManager or IGoalProgressState; they publish GoalProgressUpdateRequested via INotificationPublisher
-- [Phase 14-03]: Infra handler GoalProgressUpdateRequestedHandler owns MarkAsStale() + TriggerJobManually(BackgroundJobSystemNames.GoalProgressUpdater)
-- [Phase 14-03]: CopyGoalsFromLastMonthHandler publishes notification only when copiedCount > 0
-- [Phase 14-03]: Reused real BackgroundJobManager + fake IBackgroundJob test harness for GoalProgressUpdateRequestedHandlerTests because BackgroundJobManager is sealed
-- [Phase ?]: Explicit EnsureIndexes() call in ChangeDatabasePassword — The acceptance criterion requires ChangeDatabasePassword to contain a call to EnsureIndexes(). Although OpenDatabase(filePath, newPassword) already invokes EnsureIndexes(), adding an explicit call keeps the method self-describing and satisfies the criterion.
-- [Phase ?]: Preserve existing index inventory exactly — Moving rather than modifying indexes guarantees no regression in query behavior or index coverage. New indexes are out of scope for this hardening phase.
-- [Phase ?]: Queried LiteDB $indexes system collection — LiteDB 5.0.21 ILiteCollection<T> does not expose GetIndexes(); used $indexes system collection instead.
-- [Phase ?]: Asserted BSON-mapped index expressions — LiteDB persists BSON-mapped field names in $indexes, so assertions use mapped names rather than C# property names.
-- [Phase 17-transaction-editor-builder]: Kept ITransactionDetailsBuilder in Valt.UI layer to preserve App-layer dependency boundary and keep form-state records with presentation concerns.
-- [Phase ?]: Preserved TransactionEditorViewModel parameterless design-time constructor unchanged so Avalonia designer continues to work. — Avoids breaking Avalonia XAML designer instantiation.
-- [Phase ?]: Kept the asset form builder in Valt.UI to preserve the App-layer dependency boundary
-- [Phase 18-manage-asset-builder]: Accepted 18-01 implementation as complete — All acceptance criteria in 18-02-PLAN.md are satisfied by the existing commits from Plan 18-01; no additional source changes were required for Plan 18-02.
-- [Phase 18-manage-asset-builder]: Deferred live-API test failures to Phase 25 — Two full-suite failures (BitcoinDominanceProviderTests and CoinGeckoProviderTests) are pre-existing network/TEST-01 debt scheduled for Phase 25 and are unrelated to the asset form builder refactor.
-- [Phase 20]: Kept panels passive: no subscriptions to RatesState, AccountsTotalState, CustomBtcPriceState, or messenger events so ReportsViewModel remains the single coordinator. — Avoids double refreshes and keeps ReportsViewModel as the sole coordinator per RESEARCH.md anti-pattern guidance.
-- [Phase 20]: Unit tests invoke synchronous Refresh() directly to avoid Avalonia dispatcher coupling. — Matches RESEARCH.md Pitfall 4 guidance and keeps panel VM tests deterministic without UI thread dependency.
-- [Phase 20]: Exposed Data/IsLoading/IsVisible and INotifyPropertyChanged on panel interfaces so ReportsViewModel can forward state without coupling to concrete DashboardPanelViewModel types. — The original interfaces only exposed AllTimeHighFiatValue and RefreshAsync. Adding observable state lets the coordinator subscribe and forward panel properties directly, and lets tests mock panels by interface as the plan intended.
-- [Phase 20]: Used interface mocks in ReportsViewModelTests per the plan's guidance, relying on the expanded interface contract. — Keeping tests aligned with the plan's mock-by-interface approach avoids concrete constructor setup and matches the new interface contract.
+Decisions are logged in PROJECT.md Key Decisions table.
+Recent decisions affecting current work:
 
-### Blockers
+- [v0.5 research]: Add `IsSold` and `DateSold` as first-class properties on the `Asset` aggregate root and `AssetEntity`, not inside the JSON details blob.
+- [v0.5 research]: Filter sold assets at the query layer (`IAssetQueries`) so the UI, reports, MCP, and background jobs all share the same semantics.
+- [v0.5 research]: Reuse the existing `AssetViewModel` and `AssetDTO` mapping for the History details panel.
+- [v0.5 research]: Keep `IsSold` independent from `Visible` so the two concepts do not collide on undo or filtering.
+- [Phase 29]: Asset.New kept backward-compatible optional parameters with sold-state defaults — Existing Asset.New call sites must continue to compile without modification. Added optional parameters with active defaults (isSold: false, dateSold: null, previousVisibility: true).
+- [Phase 29]: Reused AssetUpdatedEvent instead of introducing new event types — Existing state-change methods (SetVisibility, SetIncludeInNetWorth) emit AssetUpdatedEvent. New MarkAsSold/UndoSale methods follow the same pattern to avoid expanding the event surface in this foundational plan.
+- [Phase 29]: DateSold stored as DateOnly? directly on AssetEntity, verified by round-trip test — D-01 specifies DateOnly? on the entity. Research warned that LiteDB BSON natively supports DateTime, not DateOnly. The round-trip repository test proves DateOnly? serializes correctly for this codebase.
+- [Phase 29]: Followed SetAssetVisibility command/validator/handler pattern for MarkAssetAsSold and UndoAssetSale
+- [Phase 29]: Injected IClock into MarkAssetAsSoldValidator and Handler for future-date rejection and default-to-today behavior
+- [Phase ?]: Filtered active vs. sold assets at the IAssetQueries layer so UI, reports, and MCP share the same semantics — Centralizing the filter in the query layer prevents consumers from diverging on sold-state semantics.
+- [Phase ?]: Made AssetDTO sold-state fields non-required to avoid breaking existing design-time sample data and with expressions — Non-required init-only properties preserve existing object initializers and record with-expressions that do not set the new fields.
+- [Phase ?]: Kept the AssetPriceUpdaterJob sold-asset skip guard in ShouldUpdatePrice so the IAssetRepository contract remains unfiltered — The plan called for an unfiltered repository call with filtering in ShouldUpdatePrice; placing the guard there avoids changing the IAssetRepository contract and keeps the job's data-fetch behavior consistent with other consumers.
+- [Phase 30-history-ui-and-details-reuse]: Hardcoded English language strings for the new History UI; Phase 31 will add the corresponding resx entries.
+- [Phase 30-history-ui-and-details-reuse]: Reused the existing AssetViewModel and AssetDTO mapping for the details card, keeping NetWorth/Visibility indicators hidden.
+- [Phase 30-history-ui-and-details-reuse]: Hardcoded English strings for new user-facing text — Phase 31 will add the corresponding resx entries.
+- [Phase 30-history-ui-and-details-reuse]: Combined Tasks 2 and 3 into a single commit to keep the build green — Renaming the command in the ViewModel alone broke the XAML binding until the view was also updated, so both changes were committed together.
+- [Phase ?]: Reused CloseDialog typed-result mechanism instead of adding AssetSummaryUpdatedMessage subscription to AssetsViewModel to avoid coupling and refresh loops — Modal result is more explicit and avoids potential infinite loops since AssetsViewModel also sends AssetSummaryUpdatedMessage after its own loads
+- [Phase ?]: Left AssetSummaryUpdatedMessage broadcast in modal for other listeners while making caller-side refresh authoritative for active Assets list — Keeps unrelated totals/listeners updated without making the Assets tab depend on the message for its own refresh
+- [Phase ?]: Removed the unplanned SoldAssetHistory_DateSold_Label key and used SoldAssetHistory_DateSold_Title with a literal colon via Run elements to match the plan's 20-key list and Title+colon pattern.
+- [Phase 31-03]: Updated Asset module docs as a first-class deliverable tied to v0.5 feature completeness, keeping the Domain/Application/UI/MCP sections in sync with the sold-state feature.
+- [Phase 31-05]: v0.5 Asset Sold History milestone is ready for `/gsd-verify-work`: all feature tests pass and the user has signed off the end-to-end UI smoke test.
+- [Phase ?]: Code wins over stale requirements docs: updated REQUIREMENTS.md ACC-03 and ACC-04 to match the four main tabs and nine asset types found in the Valt application code.
+- [Phase ?]: All public docs terminology mirrors the app language files (language.resx / language.pt-BR.resx) to avoid UI/docs drift.
+- [Phase ?]: Code wins over stale planning docs: updated ROADMAP.md success criteria and .claude/docs/assets.md to match the four main tabs and nine asset types found in the Valt application code. — When planning docs conflict with the code, correct the docs to reflect the code. This keeps ROADMAP.md success criteria and the internal Assets module doc authoritative for future phases.
+- [Phase ?]: Added Record Proceeds prompt note to Mark as Sold section because app language files and AssetsViewModel.cs confirm it is a real wired feature. — Content accuracy: the prompt exists in language.resx / language.pt-BR.resx and is invoked in AssetsViewModel.cs after MarkAssetAsSoldCommand succeeds.
+- [Phase ?]: Extended the export note to mention transaction CSV and average-price CSV export from the AvgPrice tab. — CsvExportService exposes both ExportTransactionsAsync and ExportAvgPriceLinesAsync, so the docs should accurately reflect both export paths.
+- [Phase ?]: Documented Posições Alavancadas and Empréstimos BTC as conditional panels visible only when user has corresponding data. — ReportsViewModel binds IsLeveragePositionsVisible and IsBtcLoansVisible based on the presence of visible leveraged positions or active BTC-backed loans.
+- [Phase ?]: Used exact English UI labels from language.resx for the English Reports page mirror — The plan requires app-aligned terminology; this keeps English docs consistent with the English UI and avoids drift.
+- [Phase 36-fixed-expenses-page-enhancement]: Tightened DICAS paragraph to name exact right-click labels Ignorar para essa data and Marcar como pago (old prose covered ignore only vaguely and never mark-as-paid) — Plan optional-tightening clause applied: existing DICAS text did not already cover the right-click mark-as-paid action, so exact labels from language.pt-BR.resx were used while preserving link-to-transaction instructions
+- [Phase 36-fixed-expenses-page-enhancement]: [Phase 36-fixed-expenses-page-enhancement] Mirrored wave-1 TIPS tightening to English page (exact labels Ignore for this date / Mark as paid) for full bilingual parity per QA-01 — Wave 1 rewrote the Portuguese DICAS paragraph with exact right-click labels; mirroring only the three structural additions would leave the English TIPS paragraph stale, violating QA-01 full-mirror requirement.
+- [Phase ?]: [Phase 37-01]: Appended AssetTools and IndicatorTools sections after CurrencyTools on the Portuguese MCP Server page — Placement discretion D-01: zero disruption to the 8 pre-existing sections; newest categories last matches page evolution.
+- [Phase ?]: [Phase 37-01]: Used RESEARCH Code Examples as copy-paste-grade content verbatim for all 28 AssetTools + IndicatorTools rows — D-05 verbatim-from-code rule: the code is the spec; every tool/parameter name grep-verified in-session against AssetTools.cs (28 tools) and IndicatorTools.cs.
+- [Phase ?]: [Phase 37-01]: Pre-existing MCP doc name drift (CreateDCAGoal, GetAvgPriceProfiles, GetWealthHistory, CreateAccount, AddBitcoinToBitcoinTransfer) left untouched, logged for Phase 38 QA — D-04 scope boundary: no retrofit or name fixes in pre-existing categories; verified byte-identical via diff.
+- [Phase 37]: [Phase 37-02]: Mirrored all wave-1 PT additions to the English MCP Server page with full bilingual parity (QA-01) — EN descriptions track code [Description] attributes per D-05; pre-existing EN name drift untouched per D-04; MCP-01/02/03 already flipped to Complete by wave 1 metadata commit, verified in place per orchestrator instruction
+- [Phase 38-01]: Created the Settings & Configuration page (NAV-03) rather than deferring it — the app exposes 10+ undocumented settings across three tabs and three existing pages referenced the settings screen without a link target.
+- [Phase 38-01]: Placed the Settings page in the Guide section after Basic Concepts, matching the onboarding flow that ends in app configuration.
+- [Phase 38-01]: Repeated the localhost-only MCP security warning verbatim from the existing MCP page in the Avançado / Advanced section, satisfying the T-38-01 threat mitigation.
+- [Phase 38-01]: Cross-linked the Seu Arquivo de Dados / Your Data File section to Instalação / Installation instead of duplicating backup/password guidance, satisfying T-38-02.
+- [Phase 38-01]: Documented the language combo as listing all system cultures with the three app languages pinned at the top, and the app as translated into three languages (requires restart), matching SettingsViewModel behavior.
+- [Phase ?]: Replaced 7 drifted MCP tool tables as whole units from RESEARCH Example 1 — Full replacement removes stale descriptions and adds 32 missing real tools, landing documented count at 90 = code truth
+- [Phase ?]: Committed both language files in a single docs(38-02) commit per QA-01 — Bilingual mirror discipline requires PT and EN changes to be committed together
+- [Phase ?]: Left 'mais de 80 ferramentas' / '80+ tools' intro untouched — Post-fix documented count is 90, so the existing claim remains true with no count edit
+- [Phase ?]: Preserved Categorias/Categories section byte-identical — It was the only clean pre-existing category and required no changes
 
-(None)
+### Pending Todos
 
-### Concerns / Carried Debt
+None yet.
 
-(None — Phase 09 runtime UI checks were completed and passed during Phase 10 end-to-end verification; see 09-UAT.md and 09-VERIFICATION.md.)
+### Blockers/Concerns
+
+None yet.
 
 ### Quick Tasks Completed
 
 | # | Description | Date | Commit | Directory |
-|---|---|------|--------|-----------|
-| 260702-fx3 | Restore Loan and Leverage panels in Reports tab | 2026-07-02 | 0d43acb | [260702-fx3-reports-loan-leverage-panels-visibility](./quick/260702-fx3-reports-loan-leverage-panels-visibility/) |
-| 260702-ed9 | Restore Loan and Leverage panels in Assets tab | 2026-07-02 | 8c8fc82 | [260702-ed9-after-the-latest-changes-the-loan-and-le](./quick/260702-ed9-after-the-latest-changes-the-loan-and-le/) |
-| 260616-rcu | Fix Stock asset edit modal not loading stored acquisition date | 2026-06-16 | be0b8b3 | [260616-rcu-fix-stock-asset-edit-modal-not-loading-s](./quick/260616-rcu-fix-stock-asset-edit-modal-not-loading-s/) |
-| 260619-fix-loan-snapshot-edit | Fix editing original BTC loan data after snapshots exist | 2026-06-19 | f8bdf78 | [260619-fix-loan-snapshot-edit](./quick/260619-fix-loan-snapshot-edit/) |
-| 260628-pgi | Fix NullReferenceException in BtcInput when copying a transaction | 2026-06-28 | d2f8685 | [260628-pgi-fix-nullreferenceexception-in-btcinput-w](./quick/260628-pgi-fix-nullreferenceexception-in-btcinput-w/) |
-| 260628-pol | Fix NullReferenceException in FiatInput when editing/copying a transaction | 2026-06-28 | 7a39a6c | [260628-pol-fix-nullreferenceexception-in-fiatinput-](./quick/260628-pol-fix-nullreferenceexception-in-fiatinput-/) |
-| 260630-e2j | Fix Assets tab LONG BTC-collateral leveraged position total in Transactions tab totals summary | 2026-06-30 | ea3405e, 0364ffe | [260630-e2j-fix-assets-tab-long-position-total-in-tr](./quick/260630-e2j-fix-assets-tab-long-position-total-in-tr/) |
+|---|-------------|------|--------|-----------|
+| 260714-exz | The History page displays the description on the grid in a very weird format, check the picture: /home/vmabellini/Pictures/valt3 | 2026-07-14 | 87a83ae | [260714-exz-the-history-page-displays-the-descriptio](./quick/260714-exz-the-history-page-displays-the-descriptio/) |
+| 260714-hbv | it is still bad. take a look at /home/vmabellini/Pictures/valt3/new.png. it should align properly. just remove the icon and render the description as plain text. also, the button Restore Asset should not occupy the entire horizontal space | 2026-07-14 | 4607275 | [260714-hbv-it-is-still-bad-take-a-look-at-home-vmab](./quick/260714-hbv-it-is-still-bad-take-a-look-at-home-vmab/) |
+| 260714-i1p | when I mark as sold, the system asks for date but only month/year. it should use a date picker like the one on the transaction tab to also pick the day | 2026-07-14 | d79acfa | [260714-i1p-when-i-mark-as-sold-the-system-asks-for-](./quick/260714-i1p-when-i-mark-as-sold-the-system-asks-for-/) |
+| 260714-kzm | Update Avalonia nuget packages from 12.0.3 to 12.1.0, research breaking changes first | 2026-07-14 | 36ddfe7 | [260714-kzm-update-avalonia-nuget-packages-from-12-0](./quick/260714-kzm-update-avalonia-nuget-packages-from-12-0/) |
 
-### Todos
+## Deferred Items
 
-(None)
+Items acknowledged and deferred at v0.6 milestone close (2026-07-17):
 
-### Completed Plans
+| Category | Item | Status | Deferred At |
+|----------|------|--------|-------------|
+| Quality | v0.4 quality/hardening items (async void cleanup, god-VM refactor, live-API test isolation, handler unit tests) | Deferred | v0.6 |
+| Debug Session | empty-loan-context — Current Loan Context formatted properties are computed read-only properties | Investigating | v0.6 |
+| Debug Session | translation-gaps — UpdateLoanState UI strings added to neutral resx file not code-generated | Diagnosed | v0.6 |
+| Debug Session | visual-layout — hardcoded input widths exceed available column space and button widths | Diagnosed | v0.6 |
+| Quick Task | 001-copy-modal-perf | Unknown | v0.6 |
+| Quick Task | reports-summary-simulation | Missing | v0.6 |
+| Quick Task | 260616-rcu-fix-stock-asset-edit-modal-not-loading-s | Unknown | v0.6 |
 
-- 06-01 — LoanStateSnapshot value object & immutable storage
-- 06-02 — Snapshot-driven calculations & query consumer verification
-- 06-03 — Snapshot persistence & legacy auto-seeding
-- 06-04 — Domain & serializer test coverage
-- 06-05 — Close serializer & domain validation gaps
-- 06-06 — Correct & extend test coverage
-- 08-01 — Update Loan State screen modal, wiring, and ViewModel tests
-- 08-02 — Localize Update Loan State context menu, modal labels, and validation message keys
-- 08-03 — Fix Current Loan Context refresh, localized validation messages, and modal layout
-- 09-01 — Build Loan State History modal, ViewModel, DI registration, and localization
-- 09-02 — Wire Assets tab context menu and Update Loan State "View History" link
-- 09-03 — Add LoanStateHistoryViewModel unit tests
-- 11-01 — Introduce IFireAndForgetTaskRunner, replace SafeFireAndForget extension, register in DI, add runner tests
-- 13-01 — Register IHttpClientFactory and named clients; migrate infrastructure HTTP consumers
-- 13-02 — Refactor UI ViewModels and update provider/crawler tests for factory-based clients
-- 14-01 — Move notification abstractions from Valt.Infra to Valt.App; update all consumers and architecture tests
-- 14-02 — Wire Infra goal domain-event handlers to trigger GoalProgressUpdaterJob and raise interval to 120s
-- 14-03 — Bridge App command handlers to Infra job triggering via GoalProgressUpdateRequested notification
+_Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-03 executed; the QA-03 gap is closed by 38-QA-CHECKLIST.md._
 
 ## Session Continuity
 
-Last session: 2026-07-03T00:00:00.000Z
-Stopped at: Phase 20 gap closed — blocking calls removed from LeveragePositionsPanelViewModel and BtcLoansPanelViewModel; architecture guard and panel tests pass
-Resume file: .planning/phases/20-reports-dashboard-builders/20-VERIFICATION.md
+Last session: 2026-07-17T15:03:00Z
+Stopped at: v0.6 milestone closed; ready to start v0.7 planning
+Resume file: None
 
-## Performance Metrics
+## Notes
 
-| Phase | Plan | Duration | Notes |
-|-------|------|----------|-------|
-| Phase 08 P03 | 2 min | 2 tasks | 2 files |
+- v0.6 Documentation Site Refresh milestone shipped on 2026-07-17.
+- All 7 v0.6 phases (32–38) complete; 17/17 plans finished; strict MkDocs build green.
+- 7 deferred items acknowledged at v0.6 close (see Deferred Items).
 
-| Phase | Plan | Duration | Notes |
-|-------|------|----------|-------|
-| Phase 10 | 4 plans | - | planned localization, MCP audit, docs, verification |
-| Phase 10-polish-verification P01 | 12min | 3 tasks | 5 files |
-| Phase 10-polish-verification P02 | 18 min | 2 tasks | 2 files |
-| Phase 10-polish-verification P03 | 12min | 3 tasks | 1 files |
-| Phase 10-polish-verification P04 | 9min | 3 tasks | 5 files |
-| Phase 11 P01 | 20 | 3 tasks | 13 files |
-| Phase 11-safe-fire-and-forget P02 | 11min | 3 tasks | 2 files |
-| Phase 11 P03 | 8min | 3 tasks | 8 files |
-| Phase 13 P01 | 7min | 3 tasks | 24 files |
-| Phase 13 P02 | 2min | 3 tasks | 2 files |
-| Phase 14 P01 | 9min | 3 tasks | 63 files |
-| Phase 14 P02 | 13min | 3 tasks | 9 files |
-| Phase 14 P03 | 5min | 3 tasks | 7 files |
-| Phase 16 P01 | 4min | 2 tasks | 2 files |
-| Phase 16 P02 | 8min | 2 tasks | 2 files |
-| Phase 17-transaction-editor-builder P01 | 3min | 3 tasks | 4 files |
-| Phase 17-transaction-editor-builder P02 | 4min | 3 tasks | 2 files |
-| Phase 18-manage-asset-builder P01 | 15min | 3 tasks | 8 files |
-| Phase 18-manage-asset-builder P02 | 5min | 3 tasks | 0 files |
-| Phase 20 P01 | 9min | 3 tasks | 6 files |
-| Phase 20 P02 | 8min | 3 tasks | 6 files |
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone

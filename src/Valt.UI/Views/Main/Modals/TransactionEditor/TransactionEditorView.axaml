@@ -3,9 +3,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:userControls="clr-namespace:Valt.UI.UserControls"
-        xmlns:transactionTerms="clr-namespace:Valt.Infra.TransactionTerms;assembly=Valt.Infra"
         xmlns:local="clr-namespace:Valt.UI.Lang"
         xmlns:manageTransactions1="clr-namespace:Valt.UI.Views.Main.Modals.TransactionEditor"
+        xmlns:childVms="clr-namespace:Valt.UI.Views.Main.Modals.TransactionEditor.ChildViewModels"
+        xmlns:views="clr-namespace:Valt.UI.Views.Main.Modals.TransactionEditor.Views"
         mc:Ignorable="d"
         d:DesignWidth="820"
         d:DesignHeight="455"
@@ -35,7 +36,7 @@
 
             <!-- Buttons at bottom -->
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10" Margin="0, 0, 0, 5">
-                <Button Width="100" TabIndex="13" Content="{x:Static local:language.OkButton}"
+                <Button Width="100" TabIndex="13" Content="{Binding OkButtonLabel}"
                         HorizontalContentAlignment="Center"
                         Command="{Binding OkCommand}"
                         IsDefault="True" />
@@ -57,7 +58,8 @@
                                 <StackPanel Orientation="Horizontal" Spacing="10">
                                     <Button Classes="transaction-option debt" Width="120" IsTabStop="False"
                                             Classes.selected="{Binding DebtSelected}"
-                                            Command="{Binding SwitchToDebtCommand}">
+                                            Command="{Binding SwitchToDebtCommand}"
+                                            AutomationProperties.Name="{x:Static local:language.ManageTransactions_Debt}">
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                             <Label Classes="icon" Content="&#xE15B;" />
                                             <Label Content="{x:Static local:language.ManageTransactions_Debt}" />
@@ -65,7 +67,8 @@
                                     </Button>
                                     <Button Classes="transaction-option credit" Width="120" IsTabStop="False"
                                             Classes.selected="{Binding CreditSelected}"
-                                            Command="{Binding SwitchToCreditCommand}">
+                                            Command="{Binding SwitchToCreditCommand}"
+                                            AutomationProperties.Name="{x:Static local:language.ManageTransactions_Credit}">
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                             <Label Classes="icon" Content="&#xE145;" />
                                             <Label Content="{x:Static local:language.ManageTransactions_Credit}" />
@@ -73,7 +76,8 @@
                                     </Button>
                                     <Button Classes="transaction-option transfer" Width="120" IsTabStop="False"
                                             Classes.selected="{Binding TransferSelected}"
-                                            Command="{Binding SwitchToTransferCommand}">
+                                            Command="{Binding SwitchToTransferCommand}"
+                                            AutomationProperties.Name="{x:Static local:language.ManageTransactions_Transfer}">
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                             <Label Classes="icon" Content="&#xEB70;" />
                                             <Label Content="{x:Static local:language.ManageTransactions_Transfer}" />
@@ -102,163 +106,20 @@
                                         Command="{Binding NextDayCommand}" />
                             </StackPanel>
 
-                            <!-- Name and Category row -->
-                            <StackPanel Orientation="Horizontal" Spacing="10">
-                                <StackPanel Classes="form-field" Width="250">
-                                    <TextBlock Text="{x:Static local:language.ManageTransactions_Name}" />
-                                    <AutoCompleteBox x:Name="AutoCompleteTransactionNameBox"
-                                                     DropDownClosed="AutoCompleteTransactionNameBox_OnDropDownClosed"
-                                                     TabIndex="0"
-                                                     Text="{Binding Name, Mode=TwoWay}"
-                                                     SelectedItem="{Binding TransactionTermResult, Mode=TwoWay}">
-                                        <AutoCompleteBox.ItemTemplate>
-                                            <DataTemplate DataType="transactionTerms:TransactionTermResult">
-                                                <StackPanel>
-                                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" />
-                                                    <TextBlock Text="{Binding CategoryName}" FontStyle="Italic" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </AutoCompleteBox.ItemTemplate>
-                                    </AutoCompleteBox>
-                                </StackPanel>
-                                <StackPanel Classes="form-field" Width="210">
-                                    <TextBlock Text="{x:Static local:language.ManageTransactions_Category}" />
-                                    <ComboBox ItemsSource="{Binding AvailableCategories}"
-                                              SelectedItem="{Binding Category}"
-                                              HorizontalAlignment="Stretch"
-                                              IsTextSearchEnabled="True" Height="36" TabIndex="1">
-                                        <ComboBox.ItemTemplate>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock FontFamily="{DynamicResource MaterialDesign}" FontSize="{DynamicResource FontSizeXXLarge}"
-                                                               Text="{Binding Unicode}"
-                                                               Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
-                                                    <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </ComboBox.ItemTemplate>
-                                    </ComboBox>
-                                </StackPanel>
-                            </StackPanel>
-
-                            <!-- From Account and Amount row -->
-                            <StackPanel Orientation="Horizontal" Spacing="10">
-                                <StackPanel Classes="form-field" Width="190">
-                                    <TextBlock Text="{x:Static local:language.ManageTransactions_From}" />
-                                    <ComboBox ItemsSource="{Binding AvailableAccounts}"
-                                              SelectedItem="{Binding FromAccount}"
-                                              IsTextSearchEnabled="True"
-                                              HorizontalAlignment="Stretch" Height="36" TabIndex="2">
-                                        <ComboBox.ItemTemplate>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock FontFamily="{DynamicResource MaterialDesign}" FontSize="{DynamicResource FontSizeXXLarge}"
-                                                               Text="{Binding Unicode}"
-                                                               Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
-                                                    <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </ComboBox.ItemTemplate>
-                                    </ComboBox>
-                                </StackPanel>
-                                <StackPanel Classes="form-field">
-                                    <TextBlock Text="{x:Static local:language.ManageTransactions_Amount}" />
-                                    <Panel>
-                                        <userControls:BtcInput x:Name="FromBtc" Focusable="True"
-                                            IsVisible="{Binding FromAccountIsBtc}"
-                                            IsInputFocused="{Binding IsFromBtcInputFocused, Mode=TwoWay}"
-                                            IsBitcoin="{Binding FromBtcIsBitcoinMode, Mode=TwoWay}"
-                                            BtcValue="{Binding FromAccountBtcValue, Mode=TwoWay}"
-                                            TabIndex="3"
-                                            CalculatorCommand="{Binding OpenCalculatorCommand}"
-                                            CalculatorCommandParameter="FromBtc"
-                                            Width="270"
-                                            Height="38" />
-                                        <userControls:FiatInput x:Name="FromFiat" Focusable="True"
-                                            IsInputFocused="{Binding IsFromFiatInputFocused, Mode=TwoWay}"
-                                            IsVisible="{Binding !FromAccountIsBtc}"
-                                            FiatValue="{Binding FromAccountFiatValue, Mode=TwoWay}"
-                                            TabIndex="4"
-                                            CalculatorCommand="{Binding OpenCalculatorCommand}"
-                                            CalculatorCommandParameter="FromFiat"
-                                            Width="270"
-                                            Height="38" />
-                                    </Panel>
-                                </StackPanel>
-                            </StackPanel>
-
-                            <!-- Installments section (Debt mode only, Add mode only) -->
-                            <StackPanel Orientation="Horizontal" Spacing="10"
-                                        IsVisible="{Binding ShowInstallmentsOption}">
-                                <CheckBox Content="{x:Static local:language.ManageTransactions_UseInstallments}"
-                                          IsChecked="{Binding UseInstallments}"
-                                          VerticalAlignment="Center"
-                                          TabIndex="5" />
-                                <NumericUpDown IsVisible="{Binding ShowInstallmentCount}"
-                                               Value="{Binding InstallmentCount}"
-                                               Minimum="2" Maximum="72" Width="120"
-                                               FormatString="0"
-                                               Increment="1"
-                                               VerticalAlignment="Center"
-                                               TabIndex="6" />
-                                <TextBlock IsVisible="{Binding ShowInstallmentCount}"
-                                           Text="{Binding InstallmentValueText}"
-                                           VerticalAlignment="Center"
-                                           Opacity="0.7" />
-                            </StackPanel>
-
-                            <!-- To Account and Amount row (Transfer only) -->
-                            <StackPanel Orientation="Horizontal" Spacing="10">
-                                <StackPanel Classes="form-field" Width="190" IsVisible="{Binding TransferSelected}">
-                                    <TextBlock Text="{x:Static local:language.ManageTransactions_To}" />
-                                    <ComboBox ItemsSource="{Binding AvailableAccounts}"
-                                              SelectedItem="{Binding ToAccount}"
-                                              HorizontalAlignment="Stretch"
-                                              IsTextSearchEnabled="True" Height="36" TabIndex="7">
-                                        <ComboBox.ItemTemplate>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock FontFamily="{DynamicResource MaterialDesign}" FontSize="{DynamicResource FontSizeXXLarge}"
-                                                               Text="{Binding Unicode}"
-                                                               Foreground="{Binding Color, Converter={StaticResource SystemDrawingColorToBrushConverter}}" />
-                                                    <TextBlock Padding="2, 4, 0, 0" Text="{Binding Name}" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </ComboBox.ItemTemplate>
-                                    </ComboBox>
-                                </StackPanel>
-                                <StackPanel Classes="form-field" IsVisible="{Binding ShowTransferValueField}">
-                                    <StackPanel Orientation="Horizontal" Spacing="4">
-                                        <TextBlock Text="{x:Static local:language.ManageTransactions_Amount}" />
-                                        <StackPanel Orientation="Horizontal" Margin="8, -10, 0, 0">
-                                            <Label FontFamily="{DynamicResource MaterialDesign}" FontSize="{DynamicResource FontSizeMedium}"
-                                                   Classes="icon" Content="&#xEB70;" Padding="0" />
-                                            <Label FontSize="{DynamicResource FontSizeXSmall}" Content="{Binding TransferRate}" Padding="8,0,0,0" />
-                                        </StackPanel>
-                                    </StackPanel>
-                                    <Panel>
-                                        <userControls:BtcInput x:Name="ToBtc"
-                                            IsVisible="{Binding ToAccountIsBtc}"
-                                            IsInputFocused="{Binding IsToBtcInputFocused, Mode=TwoWay}"
-                                            IsBitcoin="{Binding ToBtcIsBitcoinMode, Mode=TwoWay}"
-                                            BtcValue="{Binding ToAccountBtcValue, Mode=TwoWay}"
-                                            TabIndex="8"
-                                            CalculatorCommand="{Binding OpenCalculatorCommand}"
-                                            CalculatorCommandParameter="ToBtc"
-                                            Width="270"
-                                            Height="38" />
-                                        <userControls:FiatInput x:Name="ToFiat"
-                                            TabIndex="9"
-                                            IsVisible="{Binding !ToAccountIsBtc}"
-                                            IsInputFocused="{Binding IsToFiatInputFocused, Mode=TwoWay}"
-                                            FiatValue="{Binding ToAccountFiatValue, Mode=TwoWay}"
-                                            CalculatorCommand="{Binding OpenCalculatorCommand}"
-                                            CalculatorCommandParameter="ToFiat"
-                                            Width="270"
-                                            Height="38" />
-                                    </Panel>
-                                </StackPanel>
-                            </StackPanel>
+                            <!-- Child view content -->
+                            <ContentControl x:Name="ChildContentControl" Content="{Binding ActiveChildViewModel}">
+                                <ContentControl.DataTemplates>
+                                    <DataTemplate DataType="childVms:DebtTransactionEditorViewModel">
+                                        <views:DebtTransactionEditorView />
+                                    </DataTemplate>
+                                    <DataTemplate DataType="childVms:CreditTransactionEditorViewModel">
+                                        <views:CreditTransactionEditorView />
+                                    </DataTemplate>
+                                    <DataTemplate DataType="childVms:TransferTransactionEditorViewModel">
+                                        <views:TransferTransactionEditorView />
+                                    </DataTemplate>
+                                </ContentControl.DataTemplates>
+                            </ContentControl>
                         </StackPanel>
 
                         <!-- Help icon -->

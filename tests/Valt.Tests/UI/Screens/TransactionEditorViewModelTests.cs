@@ -14,9 +14,11 @@ using Valt.Core.Modules.Budget.Transactions;
 using Valt.Infra.Settings;
 using Valt.Tests.Builders;
 using Valt.UI.Base;
+using Valt.UI.Lang;
 using Valt.UI.State;
 using Valt.UI.Services;
 using Valt.UI.Views.Main.Modals.TransactionEditor;
+using Valt.UI.Views.Main.Modals.TransactionEditor.ChildViewModels;
 
 namespace Valt.Tests.UI.Screens;
 
@@ -27,6 +29,7 @@ public class TransactionEditorViewModelTests : DatabaseTest
     private IQueryDispatcher _queryDispatcher;
     private IFireAndForgetTaskRunner _runner;
     private ILogger<TransactionEditorViewModel> _logger;
+    private ILoggerFactory _loggerFactory;
     private List<AccountDTO> _accounts;
     private List<CategoryDTO> _categories;
 
@@ -37,6 +40,8 @@ public class TransactionEditorViewModelTests : DatabaseTest
         _queryDispatcher = Substitute.For<IQueryDispatcher>();
         _runner = Substitute.For<IFireAndForgetTaskRunner>();
         _logger = Substitute.For<ILogger<TransactionEditorViewModel>>();
+        _loggerFactory = Substitute.For<ILoggerFactory>();
+        _loggerFactory.CreateLogger(Arg.Any<string>()).Returns(Substitute.For<ILogger>());
         _accounts = [];
         _categories = [];
 
@@ -46,6 +51,12 @@ public class TransactionEditorViewModelTests : DatabaseTest
 
         _queryDispatcher.DispatchAsync(Arg.Any<GetCategoriesQuery>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => Task.FromResult(new CategoriesDTO(_categories.ToList())));
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _loggerFactory?.Dispose();
     }
 
     private TransactionEditorViewModel CreateInstance()
@@ -64,6 +75,7 @@ public class TransactionEditorViewModelTests : DatabaseTest
             lastTransactionDateState,
             _runner,
             _logger,
+            _loggerFactory,
             new TransactionDetailsBuilder());
     }
 
@@ -111,6 +123,7 @@ public class TransactionEditorViewModelTests : DatabaseTest
         model.SwitchToDebtCommand.Execute(null);
 
         Assert.That(model.SelectedMode, Is.EqualTo(TransactionTypes.Debt));
+        Assert.That(model.ActiveChildViewModel, Is.InstanceOf<DebtTransactionEditorViewModel>());
     }
 
     [Test]
@@ -121,6 +134,7 @@ public class TransactionEditorViewModelTests : DatabaseTest
         model.SwitchToCreditCommand.Execute(null);
 
         Assert.That(model.SelectedMode, Is.EqualTo(TransactionTypes.Credit));
+        Assert.That(model.ActiveChildViewModel, Is.InstanceOf<CreditTransactionEditorViewModel>());
     }
 
     [Test]
@@ -131,6 +145,7 @@ public class TransactionEditorViewModelTests : DatabaseTest
         model.SwitchToTransferCommand.Execute(null);
 
         Assert.That(model.SelectedMode, Is.EqualTo(TransactionTypes.Transfer));
+        Assert.That(model.ActiveChildViewModel, Is.InstanceOf<TransferTransactionEditorViewModel>());
     }
 
     [Test]
@@ -143,9 +158,11 @@ public class TransactionEditorViewModelTests : DatabaseTest
 
         await model.OnBindParameterAsync();
 
-        model.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromFiatAccountId);
+        model.SwitchToTransferCommand.Execute(null);
+        model.ActiveChildViewModel!.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromFiatAccountId);
 
-        Assert.That(model.CurrentAccountMode, Is.EqualTo("Fiat"));
+        var transfer = (TransferTransactionEditorViewModel)model.ActiveChildViewModel;
+        Assert.That(transfer.CurrentAccountMode, Is.EqualTo("Fiat"));
     }
 
     [Test]
@@ -158,9 +175,11 @@ public class TransactionEditorViewModelTests : DatabaseTest
 
         await model.OnBindParameterAsync();
 
-        model.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromBtcAccountId);
+        model.SwitchToTransferCommand.Execute(null);
+        model.ActiveChildViewModel!.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromBtcAccountId);
 
-        Assert.That(model.CurrentAccountMode, Is.EqualTo("Bitcoin"));
+        var transfer = (TransferTransactionEditorViewModel)model.ActiveChildViewModel;
+        Assert.That(transfer.CurrentAccountMode, Is.EqualTo("Bitcoin"));
     }
 
     [Test]
@@ -176,13 +195,15 @@ public class TransactionEditorViewModelTests : DatabaseTest
 
         await model.OnBindParameterAsync();
 
-        model.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromBtcAccountId);
-        model.ToAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == toBtcAccountId);
+        model.SwitchToTransferCommand.Execute(null);
+        model.ActiveChildViewModel!.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromBtcAccountId);
+        var transfer = (TransferTransactionEditorViewModel)model.ActiveChildViewModel;
+        transfer.ToAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == toBtcAccountId);
 
-        Assert.That(model.CurrentAccountMode, Is.EqualTo("BitcoinToBitcoin"));
-        Assert.That(model.FromAccountIsBtc, Is.True);
-        Assert.That(model.ToAccountIsBtc, Is.True);
-        Assert.That(model.ShowTransferValueField, Is.False);
+        Assert.That(transfer.CurrentAccountMode, Is.EqualTo("BitcoinToBitcoin"));
+        Assert.That(transfer.FromAccountIsBtc, Is.True);
+        Assert.That(transfer.ToAccountIsBtc, Is.True);
+        Assert.That(transfer.ShowTransferValueField, Is.False);
     }
 
     [Test]
@@ -198,16 +219,18 @@ public class TransactionEditorViewModelTests : DatabaseTest
 
         await model.OnBindParameterAsync();
 
-        model.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromBtcAccountId);
-        model.ToAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == toFiatAccountId);
+        model.ActiveChildViewModel!.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromBtcAccountId);
 
         model.SwitchToTransferCommand.Execute(null);
 
-        Assert.That(model.CurrentAccountMode, Is.EqualTo("BitcoinToFiat"));
-        Assert.That(model.FromAccountIsBtc, Is.True);
-        Assert.That(model.ToAccountIsBtc, Is.False);
+        var transfer = (TransferTransactionEditorViewModel)model.ActiveChildViewModel;
+        transfer.ToAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == toFiatAccountId);
+
+        Assert.That(transfer.CurrentAccountMode, Is.EqualTo("BitcoinToFiat"));
+        Assert.That(transfer.FromAccountIsBtc, Is.True);
+        Assert.That(transfer.ToAccountIsBtc, Is.False);
         Assert.That(model.SelectedMode, Is.EqualTo(TransactionTypes.Transfer));
-        Assert.That(model.ShowTransferValueField, Is.True);
+        Assert.That(transfer.ShowTransferValueField, Is.True);
     }
 
     [Test]
@@ -223,16 +246,18 @@ public class TransactionEditorViewModelTests : DatabaseTest
 
         await model.OnBindParameterAsync();
 
-        model.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromFiatAccountId);
-        model.ToAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == toBtcAccountId);
+        model.ActiveChildViewModel!.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromFiatAccountId);
 
         model.SwitchToTransferCommand.Execute(null);
 
-        Assert.That(model.CurrentAccountMode, Is.EqualTo("FiatToBitcoin"));
-        Assert.That(model.FromAccountIsBtc, Is.False);
-        Assert.That(model.ToAccountIsBtc, Is.True);
+        var transfer = (TransferTransactionEditorViewModel)model.ActiveChildViewModel;
+        transfer.ToAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == toBtcAccountId);
+
+        Assert.That(transfer.CurrentAccountMode, Is.EqualTo("FiatToBitcoin"));
+        Assert.That(transfer.FromAccountIsBtc, Is.False);
+        Assert.That(transfer.ToAccountIsBtc, Is.True);
         Assert.That(model.SelectedMode, Is.EqualTo(TransactionTypes.Transfer));
-        Assert.That(model.ShowTransferValueField, Is.True);
+        Assert.That(transfer.ShowTransferValueField, Is.True);
     }
 
     [Test]
@@ -248,20 +273,64 @@ public class TransactionEditorViewModelTests : DatabaseTest
 
         await model.OnBindParameterAsync();
 
-        var propertiesChanged = new List<string>();
-        model.PropertyChanged += (sender, args) => propertiesChanged.Add(args.PropertyName!);
+        model.ActiveChildViewModel!.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromFiatAccountId);
+        model.SwitchToTransferCommand.Execute(null);
+        var transfer = (TransferTransactionEditorViewModel)model.ActiveChildViewModel;
+        transfer.ToAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == toFiatAccountId);
 
-        model.FromAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == fromFiatAccountId);
-        model.ToAccount = model.AvailableAccounts.SingleOrDefault(x => x.Id == toFiatAccountId);
+        Assert.That(transfer.CurrentAccountMode, Is.EqualTo("FiatToFiat"));
+        Assert.That(transfer.FromAccountIsBtc, Is.False);
+        Assert.That(transfer.ToAccountIsBtc, Is.False);
+        Assert.That(model.SelectedMode, Is.EqualTo(TransactionTypes.Transfer));
+        Assert.That(transfer.ShowTransferValueField, Is.False);
+    }
 
+    [Test]
+    public async Task TransactionEditorViewModel_OnBindParameterAsync_ShouldSetActiveChild()
+    {
+        var model = CreateInstance();
+
+        await model.OnBindParameterAsync();
+
+        Assert.That(model.ActiveChildViewModel, Is.Not.Null);
+        Assert.That(model.ActiveChildViewModel, Is.InstanceOf<DebtTransactionEditorViewModel>());
+    }
+
+    [Test]
+    public void TransactionEditorViewModel_OkButtonLabel_ShouldBeOkForDebt_WhenAdding()
+    {
+        var model = CreateInstance();
+        model.SwitchToDebtCommand.Execute(null);
+
+        Assert.That(model.OkButtonLabel, Is.EqualTo(language.TransactionEditor_Ok));
+    }
+
+    [Test]
+    public void TransactionEditorViewModel_OkButtonLabel_ShouldBeSaveForDebt_WhenEditing()
+    {
+        var model = CreateInstance();
+        model.SwitchToDebtCommand.Execute(null);
+        typeof(TransactionEditorViewModel).GetField("_transactionId", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.SetValue(model, new TransactionId("test-id"));
+
+        Assert.That(model.OkButtonLabel, Is.EqualTo(language.TransactionEditor_Save));
+    }
+
+    [Test]
+    public void TransactionEditorViewModel_OkButtonLabel_ShouldBeOkForTransfer_WhenAdding()
+    {
+        var model = CreateInstance();
         model.SwitchToTransferCommand.Execute(null);
 
-        Assert.That(model.CurrentAccountMode, Is.EqualTo("FiatToFiat"));
-        Assert.That(propertiesChanged, Contains.Item(nameof(model.FromAccountIsBtc)));
-        Assert.That(propertiesChanged, Contains.Item(nameof(model.ToAccountIsBtc)));
-        Assert.That(model.FromAccountIsBtc, Is.False);
-        Assert.That(model.ToAccountIsBtc, Is.False);
-        Assert.That(model.SelectedMode, Is.EqualTo(TransactionTypes.Transfer));
-        Assert.That(model.ShowTransferValueField, Is.False);
+        Assert.That(model.OkButtonLabel, Is.EqualTo(language.TransactionEditor_Ok));
+    }
+
+    [Test]
+    public void TransactionEditorViewModel_OkButtonLabel_ShouldBeSaveForTransfer_WhenEditing()
+    {
+        var model = CreateInstance();
+        model.SwitchToTransferCommand.Execute(null);
+        typeof(TransactionEditorViewModel).GetField("_transactionId", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.SetValue(model, new TransactionId("test-id"));
+
+        Assert.That(model.OkButtonLabel, Is.EqualTo(language.TransactionEditor_Save));
     }
 }
