@@ -83,6 +83,16 @@ public sealed class BackgroundJobManager : IAsyncDisposable
         var tasks = _jobInfos.Values
             .Select(j => j.StopAsync());
         await Task.WhenAll(tasks);
+
+        // Reset state on all stopped jobs so they start fresh next time
+        foreach (var job in _jobInfos)
+        {
+            job.Key.ResetState();
+        }
+
+        // Clear the map so the next StartAll creates fresh CancellationTokenSource
+        // instances instead of reusing canceled ones.
+        _ctsMap.Clear();
     }
 
     public async Task StopJobsByTypeAsync(BackgroundJobTypes jobType)
