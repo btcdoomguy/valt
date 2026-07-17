@@ -24,7 +24,7 @@ current_phase_name: Navigation, New Pages, and Quality Assurance
 See: .planning/PROJECT.md (updated 2026-07-15)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 38 — Navigation, New Pages, and Quality Assurance
+**Current focus:** Planning next milestone (v0.7 — TBD)
 
 ## Current Position
 
