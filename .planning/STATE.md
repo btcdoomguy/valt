@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v0.6
 milestone_name: — Documentation Site Refresh
-current_phase: 38
-current_phase_name: Navigation, New Pages, and Quality Assurance
-status: complete
-stopped_at: Completed Phase 38 — 38-03 QA sweep finished, QA-03 satisfied, v0.6 milestone closed
-last_updated: "2026-07-17T14:54:37.229Z"
+current_phase: 6
+status: Awaiting next milestone
+stopped_at: Verified Phase 38; 38-03 QA plan required to close QA-03
+last_updated: "2026-07-17T15:03:40.960Z"
 last_activity: 2026-07-17
-last_activity_desc: Completed 38-03 QA sweep; strict build, nav audit, and parity checks passed
+last_activity_desc: Milestone v0.6 completed and archived
 progress:
   total_phases: 7
   completed_phases: 7
   total_plans: 17
   completed_plans: 17
   percent: 100
+current_phase_name: Navigation, New Pages, and Quality Assurance
 ---
 
 # STATE.md
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-07-15)
 
 ## Current Position
 
-Phase: 38 — Navigation, New Pages, and Quality Assurance
-Plan: 03 complete; Phase 38 and v0.6 milestone closed
-Status: Complete — QA-03 content review checklist committed; all final gates green
-Last activity: 2026-07-17 — Completed 38-03 QA sweep; strict build, nav audit, and parity checks passed
+Phase: Milestone v0.6 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-07-17 — Milestone v0.6 completed and archived
 
 ## Performance Metrics
 
@@ -157,30 +157,32 @@ None yet.
 
 ## Deferred Items
 
-Items acknowledged and carried forward from previous milestone close:
+Items acknowledged and deferred at v0.6 milestone close (2026-07-17):
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| Quality | v0.4 quality/hardening items (async void cleanup, god-VM refactor, live-API test isolation, handler unit tests) | Deferred | v0.5 |
-| Debug Session | empty-loan-context — Current Loan Context formatted properties are computed read-only properties | Investigating | v0.5 |
-| Debug Session | translation-gaps — UpdateLoanState UI strings added to neutral resx file not code-generated | Diagnosed | v0.5 |
-| Debug Session | visual-layout — hardcoded input widths exceed available column space and button widths | Diagnosed | v0.5 |
-| Quick Task | 001-copy-modal-perf | Unknown | v0.5 |
-| Quick Task | reports-summary-simulation | Missing | v0.5 |
-| Quick Task | 260616-rcu-fix-stock-asset-edit-modal-not-loading-s | Unknown | v0.5 |
+| Quality | v0.4 quality/hardening items (async void cleanup, god-VM refactor, live-API test isolation, handler unit tests) | Deferred | v0.6 |
+| Debug Session | empty-loan-context — Current Loan Context formatted properties are computed read-only properties | Investigating | v0.6 |
+| Debug Session | translation-gaps — UpdateLoanState UI strings added to neutral resx file not code-generated | Diagnosed | v0.6 |
+| Debug Session | visual-layout — hardcoded input widths exceed available column space and button widths | Diagnosed | v0.6 |
+| Quick Task | 001-copy-modal-perf | Unknown | v0.6 |
+| Quick Task | reports-summary-simulation | Missing | v0.6 |
+| Quick Task | 260616-rcu-fix-stock-asset-edit-modal-not-loading-s | Unknown | v0.6 |
+
+_Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-03 executed; the QA-03 gap is closed by 38-QA-CHECKLIST.md._
 
 ## Session Continuity
 
-Last session: 2026-07-17T14:54:07.532Z
-Stopped at: Verified Phase 38; 38-03 QA plan required to close QA-03
+Last session: 2026-07-17T15:03:00Z
+Stopped at: v0.6 milestone closed; ready to start v0.7 planning
 Resume file: None
 
 ## Notes
 
-- Phase 31 complete; v0.5 Asset Sold History milestone is ready for `/gsd-verify-work` and milestone closure.
-- Two pre-existing live-API integration tests (`CoinGeckoProviderTests`, `BitcoinDominanceProviderTests`) failed with HTTP 403 during the final full test gate. They are unrelated to v0.5 and are logged in the phase deferred-items file.
+- v0.6 Documentation Site Refresh milestone shipped on 2026-07-17.
+- All 7 v0.6 phases (32–38) complete; 17/17 plans finished; strict MkDocs build green.
+- 7 deferred items acknowledged at v0.6 close (see Deferred Items).
 
 ## Operator Next Steps
 
-- Phase 38 is complete; v0.6 Documentation Site Refresh milestone is ready for `/gsd-verify-work` and `/gsd-complete-milestone`.
-- After 38-03 completes, run `/gsd-verify-work` for Phase 38 and mark the milestone v0.6 complete.
+- Start the next milestone with /gsd-new-milestone

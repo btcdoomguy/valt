@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Valt is a personal budget management desktop application for bitcoiners, built with .NET and Avalonia UI. It tracks fiat and bitcoin accounts, transactions, external investments (assets), and displays values in bitcoin terms. As of v0.5, users can also mark assets as sold, keep a record in a dedicated Asset Sold History screen, and undo a sale to restore the asset to the active view.
+Valt is a personal budget management desktop application for bitcoiners, built with .NET and Avalonia UI. It tracks fiat and bitcoin accounts, transactions, external investments (assets), and displays values in bitcoin terms. As of v0.5, users can also mark assets as sold, keep a record in a dedicated Asset Sold History screen, and undo a sale to restore the asset to the active view. As of v0.6, the public Valt documentation site has been refreshed to reflect all shipped features, correct factual errors, and add missing pages including Settings & Configuration.
 
 ## Core Value
 
@@ -50,44 +50,36 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - ✓ **MCP-01**: MCP Server page documents the AssetTools category (28 tools) — v0.6 (Phase 37)
 - ✓ **MCP-02**: MCP Server page documents loan-state tools with parameters — v0.6 (Phase 37)
 - ✓ **MCP-03**: MCP Server page documents sold-asset tools with parameters — v0.6 (Phase 37)
+- ✓ **NAV-01**: `mkdocs.yml` navigation updated to include new Settings page — v0.6 (Phase 38)
+- ✓ **NAV-02**: New page titles consistent in Portuguese and English navigation translations — v0.6 (Phase 38)
+- ✓ **NAV-03**: Settings & Configuration page created and linked — v0.6 (Phase 38)
+- ✓ **QA-01**: Every Portuguese content change mirrored in English `.en.md` files — v0.6 (Phases 32-38)
+- ✓ **QA-02**: Documentation site builds strictly with no errors or broken internal links — v0.6 (Phases 32-38)
+- ✓ **QA-03**: Content review checklist applied to all updated pages — v0.6 (Phase 38)
 
 ### Active
 
-- [ ] v0.6 milestone goals — Documentation Site Refresh: update public Valt docs to reflect v0.5 features, fix outdated content, and add missing pages.
+- [ ] v0.7 milestone goals — TBD (define with `/gsd-new-milestone`).
 
 ## Out of Scope
 
-- v0.4 quality/hardening items (async void cleanup, HttpClient factory, background job throttling, LiteDB index centralization, god-VM refactor, live-API test isolation, handler unit tests) — deferred to a future quality milestone; v0.6 is focused on documentation
+- v0.4 quality/hardening items (async void cleanup, HttpClient factory, background job throttling, LiteDB index centralization, god-VM refactor, live-API test isolation, handler unit tests) — still deferred to a future quality milestone; v0.6 did not address app code
 - Recording sale price, capital gains, or tax lot information — out of scope for v0.5; sold history is for record-keeping only
 - Real-time price streaming or automated sell detection — manual sale action only
 - Mobile or web port — not in scope
-- Changes to the Valt application code itself — documentation site only; no new app features
-
-## Current Milestone: v0.6 Documentation Site Refresh
-
-**Goal:** Bring the public Valt documentation site (`valt-docs`) up to date with all features shipped through v0.5, fix factual errors, and add missing pages.
-
-**Target features:**
-- Rewrite the **Assets** page to include Asset Sold History (Mark as Sold, Date Sold, History screen, Undo Sale) and BTC-backed Loans (collateral, APR, LTV, loan-state timeline).
-- Update the **Reports** page with custom BTC price simulation and current dashboard/wealth/loan summaries.
-- Complete the **Goals** page with missing goal types (`SaveFiat`, `SavingsRate`, `NetWorthBtc`) and price-data behavior.
-- Update the **MCP Server** page with the full tool list including AssetTools, loan-state tools, and sold-asset tools.
-- Fix factual errors in Installation (SQLite → LiteDB), FAQ, and Getting Started.
-- Enhance the **Fixed Expenses** page with record states, yearly overview, and range handling.
-- Consider new pages: Settings & Configuration, Asset Groups.
+- Changes to the Valt application code itself — v0.6 was documentation-only; no new app features
 
 ## Current State
 
 - **v0.5 Asset Sold History shipped** on 2026-07-14.
-- **Phase 32 complete** on 2026-07-15 — Factual errors corrected on Installation, FAQ, Getting Started, Assets, and Reports public docs; internal requirements and roadmap aligned; MkDocs site builds cleanly.
-- **Phase 37 complete** on 2026-07-16 — MCP Server page lists the complete current toolset in both languages: AssetTools (28 tools with parameter tables for loan-state and sold-asset tools) and IndicatorTools added; tool-count claim corrected to 80+.
-- **Phase 38 ready** — Navigation, New Pages, and Quality Assurance (final v0.6 phase; owns the deferred pre-existing tool-name drift review).
-- **Deferred items:** 6 (see STATE.md Deferred Items).
-- **v0.6 milestone in progress** — 6 of 7 phases complete.
+- **v0.6 Documentation Site Refresh shipped** on 2026-07-17 — all public Valt docs updated through v0.5 features, factual errors corrected, missing pages added (Settings & Configuration), navigation updated, and a full content review checklist applied to 18 documentation files.
+- **Deferred items:** 7 (see STATE.md Deferred Items) — v0.4 quality/hardening work and three debug sessions/quick tasks carried forward.
+- **v0.6 milestone complete** — 7 of 7 phases, 17 of 17 plans, 42 tasks.
 
 ## Next Milestone Goals
 
-- **v0.7 — TBD** (to be defined after v0.6 documentation milestone completes).
+- **v0.7 — TBD** (to be defined via `/gsd-new-milestone`).
+- Strong candidate: address the v0.4 quality/hardening deferred items (async void cleanup, HttpClient factory centralization, background job throttling, LiteDB index centralization, god-VM refactor, live-API test isolation, handler unit tests).
 
 ## Context
 
@@ -121,6 +113,11 @@ Valt uses a layered architecture: Valt.Core (domain), Valt.App (CQRS), Valt.Infr
 | Place the `AssetPriceUpdaterJob` sold-asset skip guard in `ShouldUpdatePrice` | Keeps the `IAssetRepository` contract stable and the data-fetch behavior consistent with other consumers | `ShouldUpdatePrice` returns `false` when `asset.IsSold` — v0.5 (Phase 29) |
 | Return structured dialog result from `SoldAssetHistory` modal | Caller-side refresh is explicit and avoids coupling `AssetsViewModel` to internal modal messages | `WasRestored` flag drives active-list refresh — v0.5 (Phase 30) |
 | Use `SoldAssetHistory_DateSold_Title` with a literal colon via `Run` elements | Avoids an unplanned extra resource key and matches the existing Title+colon pattern | `_Label` key removed; 20-key set preserved — v0.5 (Phase 31) |
+| Document public docs terminology from app language files to avoid UI/docs drift | Keeps English/Portuguese public docs aligned with the actual Valt UI strings | `.claude/docs/assets.md` and ROADMAP.md updated to match `language.resx`/`language.pt-BR.resx` — v0.6 (Phase 32) |
+| Code wins over stale planning docs when conflicts arise | Ensures planning artifacts remain authoritative and accurate for future phases | Updated REQUIREMENTS.md, ROADMAP.md, and `.claude/docs/assets.md` to match code reality — v0.6 (Phase 32) |
+| Use exact app-verbatim labels in documentation pages | Prevents drift between the UI and public docs; uses the app's language files as the source of truth | Fixed Expenses and Settings pages use labels directly from `language.resx`/`language.pt-BR.resx` — v0.6 (Phases 36, 38) |
+| Replace drifted MCP tool tables as whole units from code-verified research | Full replacement removes stale descriptions and adds 32 missing real tools, landing documented count at 90 = code truth | 7 pre-existing category tables replaced in both languages; 28 phantom names eliminated — v0.6 (Phase 38) |
+| Apply a 12-check content review matrix to all v0.6 documentation files | Satisfies QA-03 and creates an auditable artifact for future docs work | `38-QA-CHECKLIST.md` created with 18 files × 12 checks — v0.6 (Phase 38) |
 
 ## Evolution
 
@@ -140,4 +137,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-16 after completing Phase 37 — MCP Server Page Update*
+*Last updated: 2026-07-17 after completing v0.6 Documentation Site Refresh milestone*
