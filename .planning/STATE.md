@@ -4,17 +4,17 @@ milestone: v0.6
 milestone_name: — Documentation Site Refresh
 current_phase: 38
 current_phase_name: Navigation, New Pages, and Quality Assurance
-status: gaps_found
-stopped_at: Verified Phase 38 — 38-01/38-02 complete, QA-03 pending (38-03 required)
-last_updated: "2026-07-17T14:45:00Z"
+status: complete
+stopped_at: Completed Phase 38 — 38-03 QA sweep finished, QA-03 satisfied, v0.6 milestone closed
+last_updated: "2026-07-17T14:46:48Z"
 last_activity: 2026-07-17
-last_activity_desc: Verified Phase 38; QA-03 gap found, 38-03 plan required
+last_activity_desc: Completed 38-03 QA sweep; Phase 38 and v0.6 milestone complete
 progress:
   total_phases: 7
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 17
-  completed_plans: 16
-  percent: 94
+  completed_plans: 17
+  percent: 100
 ---
 
 # STATE.md
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-07-15)
 ## Current Position
 
 Phase: 38 — Navigation, New Pages, and Quality Assurance
-Plan: 01 and 02 verified; 03 required to close QA-03
-Status: Gaps found — QA-03 content review checklist not yet produced
-Last activity: 2026-07-17 — Verified Phase 38; 38-01/38-02 deliverables complete, 38-03 needed
+Plan: 03 complete; Phase 38 and v0.6 milestone closed
+Status: Complete — QA-03 content review checklist committed; all final gates green
+Last activity: 2026-07-17 — Completed 38-03 QA sweep; strict build, nav audit, and parity checks passed
 
 ## Performance Metrics
 
@@ -181,5 +181,5 @@ Resume file: None
 
 ## Operator Next Steps
 
-- Execute 38-03-PLAN.md to produce the `38-QA-CHECKLIST.md` artifact, run the final strict build, and close QA-03.
+- Phase 38 is complete; v0.6 Documentation Site Refresh milestone is ready for `/gsd-verify-work` and `/gsd-complete-milestone`.
 - After 38-03 completes, run `/gsd-verify-work` for Phase 38 and mark the milestone v0.6 complete.

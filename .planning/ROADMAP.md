@@ -24,7 +24,7 @@
 - [x] **Phase 35: Goals Page Completion** — 3 requirements (completed 2026-07-16)
 - [x] **Phase 36: Fixed Expenses Page Enhancement** — 3 requirements (completed 2026-07-16)
 - [x] **Phase 37: MCP Server Page Update** — 3 requirements (completed 2026-07-16)
-- [ ] **Phase 38: Navigation, New Pages, and Quality Assurance** — 6 requirements (2/3 plans complete, 38-03 QA sweep pending, 2026-07-17)
+- [x] **Phase 38: Navigation, New Pages, and Quality Assurance** — 6 requirements (3/3 plans complete, completed 2026-07-17)
 
 ## Phase Details
 
@@ -170,7 +170,7 @@
   5. The documentation site builds successfully with `mkdocs build` without errors or broken internal links.
   6. A content review checklist is applied to all updated pages for accuracy, completeness, and tone.
 
-**Plans**: 2/3 plans complete
+**Plans**: 3/3 plans complete
 
 **Wave 1** *(parallelizable)*
 
@@ -179,7 +179,7 @@
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 38-03-PLAN.md — Run the QA sweep, produce the 38-QA-CHECKLIST.md artifact, and close the phase
+- [x] 38-03-PLAN.md — Run the QA sweep, produce the 38-QA-CHECKLIST.md artifact, and close the phase
 
 ## Progress
 
@@ -194,11 +194,11 @@
 | 35. Goals Page Completion | v0.6 | 3/3 | Complete    | 2026-07-16 |
 | 36. Fixed Expenses Page Enhancement | v0.6 | 2/2 | Complete    | 2026-07-16 |
 | 37. MCP Server Page Update | v0.6 | 2/2 | Complete    | 2026-07-16 |
-| 38. Navigation, New Pages, and Quality Assurance | v0.6 | 2/3 | QA-03 pending   | 2026-07-17 |
+| 38. Navigation, New Pages, and Quality Assurance | v0.6 | 3/3 | Complete    | 2026-07-17 |
 
 **Total phases:** 10  
-**v0.6 plans:** 16/17 (phases 32-38, 38-03 pending)  
+**v0.6 plans:** 17/17 (phases 32-38 complete)  
 **v0.6 tasks:** 6/33 (phase 38 task counts: 3 + 3)
 
 ---
-*Last updated: 2026-07-17 after verification found QA-03 gap*
+*Last updated: 2026-07-17 after 38-03 QA sweep completed the v0.6 milestone*
