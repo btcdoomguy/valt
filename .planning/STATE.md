@@ -7,7 +7,7 @@ status: Awaiting next milestone
 stopped_at: Verified Phase 38; 38-03 QA plan required to close QA-03
 last_updated: "2026-07-17T15:03:40.960Z"
 last_activity: 2026-07-17
-last_activity_desc: Milestone v0.6 completed and archived
+last_activity_desc: Completed quick task 260717-iqe: after I close a database, when I try to open another one the app got stuck because all background services are stopped
 progress:
   total_phases: 7
   completed_phases: 7
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-07-15)
 Phase: Milestone v0.6 complete
 Plan: —
 Status: Awaiting next milestone
-Last activity: 2026-07-17 — Milestone v0.6 completed and archived
+Last activity: 2026-07-17 — Completed quick task 260717-iqe: after I close a database, when I try to open another one the app got stuck because all background services are stopped
 
 ## Performance Metrics
 
@@ -154,6 +154,7 @@ None yet.
 | 260714-hbv | it is still bad. take a look at /home/vmabellini/Pictures/valt3/new.png. it should align properly. just remove the icon and render the description as plain text. also, the button Restore Asset should not occupy the entire horizontal space | 2026-07-14 | 4607275 | [260714-hbv-it-is-still-bad-take-a-look-at-home-vmab](./quick/260714-hbv-it-is-still-bad-take-a-look-at-home-vmab/) |
 | 260714-i1p | when I mark as sold, the system asks for date but only month/year. it should use a date picker like the one on the transaction tab to also pick the day | 2026-07-14 | d79acfa | [260714-i1p-when-i-mark-as-sold-the-system-asks-for-](./quick/260714-i1p-when-i-mark-as-sold-the-system-asks-for-/) |
 | 260714-kzm | Update Avalonia nuget packages from 12.0.3 to 12.1.0, research breaking changes first | 2026-07-14 | 36ddfe7 | [260714-kzm-update-avalonia-nuget-packages-from-12-0](./quick/260714-kzm-update-avalonia-nuget-packages-from-12-0/) |
+| 260717-iqe | after I close a database, when I try to open another one the app got stuck because all background services are stopped | 2026-07-17 | 6ffdf19 | [260717-iqe-after-i-close-a-database-when-i-try-to-o](./quick/260717-iqe-after-i-close-a-database-when-i-try-to-o/) |
 
 ## Deferred Items
 
