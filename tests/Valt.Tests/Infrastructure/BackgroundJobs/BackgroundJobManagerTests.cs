@@ -95,6 +95,37 @@ public class BackgroundJobManagerTests
         Assert.That(jobInfo.State, Is.EqualTo(BackgroundJobState.Stopped));
     }
 
+    [Test]
+    public async Task StopAll_Should_Allow_Jobs_To_Be_Restarted_And_Triggered()
+    {
+        // Arrange
+        var job = new TestJob();
+        await using var manager = new BackgroundJobManager([job]);
+        await manager.StartAllJobsAsync(BackgroundJobTypes.ValtDatabase, triggerInitialRun: false);
+        await manager.StopAll();
+
+        // Act: Restart the same jobs after StopAll, simulating database close/open cycle.
+        await manager.StartAllJobsAsync(BackgroundJobTypes.ValtDatabase, triggerInitialRun: false);
+
+        using var triggerCts = new CancellationTokenSource();
+        var triggerTask = manager.TriggerJobAndWaitAsync(BackgroundJobSystemNames.Foo, triggerCts.Token);
+        var timeoutTask = Task.Delay(TimeSpan.FromSeconds(5), triggerCts.Token);
+
+        var completedTask = await Task.WhenAny(triggerTask, timeoutTask);
+        if (completedTask != triggerTask)
+        {
+            triggerCts.Cancel();
+            Assert.Fail("TriggerJobAndWaitAsync did not complete within timeout; job likely stuck after StopAll.");
+        }
+
+        await triggerTask;
+
+        // Assert
+        var jobInfo = manager.GetJobInfos().First();
+        Assert.That(jobInfo.State, Is.EqualTo(BackgroundJobState.Ok));
+        Assert.That(job.RunCount, Is.EqualTo(1));
+    }
+
     #endregion
 
     #region Manual Trigger Tests
