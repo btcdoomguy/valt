@@ -56,6 +56,59 @@
 
 ---
 
+## Milestone: v0.6 — Documentation Site Refresh
+
+**Shipped:** 2026-07-17
+**Phases:** 7 | **Plans:** 17 | **Tasks:** 42
+
+### What Was Built
+
+- Updated public Valt documentation (`valt-docs`) to reflect all features shipped through v0.5, including the Assets page rewrite with Asset Sold History and BTC-backed Loans, the Reports page with custom BTC price simulation, the Goals page with all current goal types, and the Fixed Expenses page with record states.
+- Corrected factual errors across Installation (SQLite → LiteDB), FAQ, Getting Started, Assets, and Reports pages in both Portuguese and English.
+- Updated the MCP Server page to document the complete current toolset (90 tools), including AssetTools, loan-state tools, and sold-asset tools.
+- Created a new Settings & Configuration page in both languages, wired it into the MkDocs navigation with dual `nav_translations`, and converted existing bare settings references into cross-links.
+- Fixed pre-existing MCP tool-name drift by replacing 7 category tables with code-verified names, eliminating 28 phantom tool names and adding 32 missing real tools.
+- Applied a 12-check content review matrix to all 18 v0.6 documentation files and produced the `38-QA-CHECKLIST.md` artifact.
+- Verified the documentation site builds cleanly with `mkdocs build --strict` and reports 19 translated navigation elements.
+
+### What Worked
+
+- **Two-repo protocol** (app changes in `valt`, docs changes in `valt-docs`) kept documentation commits isolated and reviewable.
+- **App-verbatim labels** from `language.resx` / `language.pt-BR.resx` prevented UI/docs drift and made the docs immediately credible to users.
+- **Copy-paste-grade research examples** for the MCP tool tables eliminated hand-rolled errors and made the 28-phantom-name fix reliable.
+- **Strict build gate** plus bilingual heading/table-row parity checks caught broken links and structural mismatches early.
+- **Per-category `<!-- Source: -->` evidence comments** made it easy to trace doc content back to the source code.
+
+### What Was Inefficient
+
+- The `38-VERIFICATION.md` file was generated before the 38-03 QA sweep plan was executed, so the audit tool continued to report a stale `gaps_found` status even after QA-03 was closed. Future verification artifacts should be regenerated after gap-closure plans complete.
+- `ROADMAP.md` was briefly corrupted during the 38-03 metadata update (Phase 35 details were overwritten with Phase 38 plan entries). This was caught and fixed, but it suggests ROADMAP edits should be validated with a diff before commit.
+- The full v0.6 scope lived in a single ROADMAP file with detailed Phase Details; archiving collapsed the file and improved readability, but this should happen at the end of the milestone rather than mid-stream.
+
+### Patterns Established
+
+- **Two-repo commit protocol:** planning metadata in `valt`, docs content in `valt-docs`, with explicit `docs(XX-YY):` prefixes.
+- **Bilingual parity checks:** heading count and table-row count must match between `.md` and `.en.md` files before a plan closes.
+- **Code-verified tables:** MCP tool tables and similar reference tables must be copied verbatim from research examples that were grep-verified against source code, never hand-rolled.
+- **QA checklist artifact:** final documentation phase must produce a `XX-QA-CHECKLIST.md` covering all touched files with accuracy, completeness, and tone checks.
+- **Nav translation verification:** `mkdocs build` log must show the expected number of translated navigation elements (e.g., 19 for pt).
+
+### Key Lessons
+
+1. Public docs should mirror the app language files, not paraphrase them; exact labels prevent drift.
+2. When a verification report finds gaps, regenerate it after the gap-closure plan so the audit artifact reflects reality.
+3. Large reference tables (e.g., MCP tools) are high-risk for stale data; replace them as whole units from verified sources rather than editing individual cells.
+4. The final phase of a docs milestone should explicitly own the QA checklist; do not assume earlier phases will cover it.
+5. Archive the completed milestone's ROADMAP details immediately after close to keep the active roadmap readable.
+
+### Cost Observations
+
+- Model mix: primarily k2p7 (execution phase and milestone close)
+- Sessions: not tracked
+- Notable: The v0.6 milestone was documentation-only and completed in 7 sequential phases over 3 days; the final QA sweep plan (38-03) added only ~7 minutes but was essential to close QA-03.
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -63,17 +116,21 @@
 | Milestone | Sessions | Phases | Key Change |
 |-----------|----------|--------|------------|
 | v0.5 | — | 3 | Explicit localization phase moved after UI implementation; future milestones should stub resx keys during UI construction. |
+| v0.6 | — | 7 | Documentation-only milestone adopted a two-repo protocol and a final QA checklist phase to ensure every touched file is reviewed. |
 
 ### Cumulative Quality
 
 | Milestone | Tests | Coverage | Zero-Dep Additions |
 |-----------|-------|----------|-------------------|
 | v0.5 | 1666+ | — | 0 |
+| v0.6 | — | — | 0 |
 
 ### Top Lessons (Verified Across Milestones)
 
 1. Centralizing read-model filters prevents consumers from diverging on state semantics.
 2. Reusing existing ViewModel/DTO mapping for new UI surfaces reduces duplication and keeps designs consistent.
-3. MCP tool classes are high-risk edit targets; review diffs carefully to avoid accidental deletions.
+3. MCP tool classes and reference tables are high-risk edit targets; review diffs carefully and replace from verified sources.
+4. App-verbatim labels in documentation prevent UI/docs drift and improve trust.
+5. A final QA checklist phase is cost-effective insurance for docs milestones.
 
 ---
