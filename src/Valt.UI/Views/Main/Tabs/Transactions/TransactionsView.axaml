@@ -33,7 +33,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- Left Column -->
-        <Panel Grid.Column="0">
+        <Panel Grid.Column="0" Margin="10, 0, 0, 0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="130" />
@@ -44,8 +44,9 @@
                 <Border Grid.Row="0"
                         Background="{DynamicResource Background900Brush}"
                         BorderBrush="{DynamicResource Background700Brush}"
-                        Padding="10, 6"
-                        BorderThickness="1">
+                        Padding="10, 4"
+                        BorderThickness="1"
+                        CornerRadius="5">
                     <Border.Styles>
                         <Style Selector="TextBlock.wealth-label">
                             <Setter Property="FontSize" Value="{DynamicResource FontSizeNormal}" />
@@ -125,7 +126,19 @@
 
                 <!-- Accounts List -->
                 <Grid Grid.Row="1" RowDefinitions="30, *" Margin="0, 0, 0, 10">
-                    <StackPanel Grid.Row="0" Background="Black">
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button FontSize="{DynamicResource FontSizeSmall}" Classes="transparent link"
+                                VerticalAlignment="Stretch"
+                                Content="{x:Static local:language.Transactions_AddNew}">
+                            <Button.Flyout>
+                                <MenuFlyout>
+                                    <MenuItem Header="{x:Static local:language.Transactions_AddAccount}"
+                                              Command="{Binding AddAccountCommand}" />
+                                    <MenuItem Header="{x:Static local:language.Transactions_AddAccountGroup}"
+                                              Command="{Binding AddAccountGroupCommand}" />
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
                         <Button FontSize="{DynamicResource FontSizeSmall}" Classes="transparent link" HorizontalAlignment="Right"
                                 HorizontalContentAlignment="Right"
                                 VerticalAlignment="Stretch" Command="{Binding SelectAllAccountsCommand}"
@@ -147,11 +160,11 @@
                         <ListBox.DataTemplates>
                             <!-- Group Header Template -->
                             <DataTemplate DataType="{x:Type models:AccountGroupHeaderViewModel}">
-                                <Border Background="{DynamicResource Background800Brush}"
+                                <Border BorderThickness="0, 0, 0, 1"
                                         BorderBrush="{DynamicResource Background600Brush}"
-                                        BorderThickness="0,0,0,1"
+                                        Background="{DynamicResource Background800Brush}"
                                         Padding="8,4"
-                                        Margin="-5,-5,-5,0">
+                                        Margin="0,0,0,0">
                                     <Border.ContextMenu>
                                         <ContextMenu x:DataType="models:AccountGroupHeaderViewModel">
                                             <MenuItem Header="{x:Static local:language.Transactions_EditGroup}"
@@ -173,12 +186,12 @@
                                         <TextBlock Grid.Column="0"
                                                    Text="{Binding Name}"
                                                    FontSize="{DynamicResource FontSizeSmall}"
-                                                   Foreground="{DynamicResource Text400Brush}"
+                                                   Foreground="{DynamicResource Text200Brush}"
                                                    VerticalAlignment="Center" />
                                         <TextBlock Grid.Column="1"
                                                    Text="{Binding FormattedTotal}"
                                                    FontSize="{DynamicResource FontSizeSmall}"
-                                                   Foreground="{DynamicResource Text300Brush}"
+                                                   Foreground="{DynamicResource Text100Brush}"
                                                    VerticalAlignment="Center"
                                                    HorizontalAlignment="Right"
                                                    IsVisible="{Binding HasTotal}" />
@@ -230,23 +243,6 @@
                         </ListBox.DataTemplates>
                     </ListBox>
                 </Grid>
-
-                <Border Grid.Row="1"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Bottom"
-                        Padding="10"
-                        Margin="0,0,10,18">
-                    <Button Classes="rounded" Content="&#xE145;">
-                        <Button.Flyout>
-                            <MenuFlyout>
-                                <MenuItem Header="{x:Static local:language.Transactions_AddAccount}"
-                                          Command="{Binding AddAccountCommand}" />
-                                <MenuItem Header="{x:Static local:language.Transactions_AddAccountGroup}"
-                                          Command="{Binding AddAccountGroupCommand}" />
-                            </MenuFlyout>
-                        </Button.Flyout>
-                    </Button>
-                </Border>
             </Grid>
         </Panel>
 
