@@ -51,7 +51,11 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
   2. User can view burn rate — average daily spend and projected month-end total compared against the median
   3. User can view the fixed vs variable expense ratio per month (FixedExpenses vs actual transactions)
   4. New panels render sensible zero/empty states when no transaction data exists for the period
-**Plans**: TBD
+**Plans**: 4 plans
+- [ ] 39-01-PLAN.md — Savings rate + burn rate query backend (SpendingAnalytics module, tests)
+- [ ] 39-02-PLAN.md — Fixed vs variable query backend (Paid-record join, tests)
+- [ ] 39-03-PLAN.md — Burn rate dashboard card UI (RowItem foreground, panel VM, wiring)
+- [ ] 39-04-PLAN.md — Savings rate + fixed/variable chart sections UI (chart-data classes, wiring, empty states)
 **UI hint**: yes
 
 ### Phase 40: BTC-Denominated Metrics Reports & UI
@@ -114,7 +118,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 | 36. Fixed Expenses Page Enhancement | v0.6 | 2/2 | Complete | 2026-07-16 |
 | 37. MCP Server Page Update | v0.6 | 2/2 | Complete | 2026-07-16 |
 | 38. Navigation, New Pages, and Quality Assurance | v0.6 | 3/3 | Complete | 2026-07-17 |
-| 39. Spending Analytics Reports & UI | v0.7 | 0/0 | Not started | - |
+| 39. Spending Analytics Reports & UI | v0.7 | 0/4 | Planned | - |
 | 40. BTC-Denominated Metrics Reports & UI | v0.7 | 0/0 | Not started | - |
 | 41. Wealth & Performance Reports & UI | v0.7 | 0/0 | Not started | - |
 | 42. Loans & Leverage Reports & UI | v0.7 | 0/0 | Not started | - |
