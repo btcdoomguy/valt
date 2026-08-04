@@ -26,6 +26,7 @@ public partial class ReportsViewModel
         _simulatedPricesPanel = null!;
         _leveragePanel = null!;
         _btcLoansPanel = null!;
+        _burnRatePanel = null!;
 
         _secureModeState = new SecureModeState()
         {

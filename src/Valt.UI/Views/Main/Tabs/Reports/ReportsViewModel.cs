@@ -82,6 +82,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly SimulatedPricesPanelViewModel _simulatedPricesPanel;
     private readonly ILeveragePositionsPanelViewModel _leveragePanel;
     private readonly IBtcLoansPanelViewModel _btcLoansPanel;
+    private readonly BurnRatePanelViewModel _burnRatePanel;
 
     // Cached provider for the lifetime of the tab being active
     private IReportDataProvider? _cachedProvider;
@@ -97,6 +98,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private DashboardData _statisticsData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _simulatedPricesData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _indicatorsData = DashboardData.Empty;
+    [ObservableProperty] private DashboardData _burnRateData = DashboardData.Empty;
     [ObservableProperty] private AvaloniaList<MonthlyReportItemViewModel> _monthlyReportItems = new();
     [ObservableProperty] private MonthlyTotalsChartData _monthlyTotalsChartData = new();
     [ObservableProperty] private ExpensesByCategoryChartData _expensesByCategoryChartData = new();
@@ -115,6 +117,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private bool _isLeveragePositionsVisible;
     [ObservableProperty] private bool _isBtcLoansLoading = true;
     [ObservableProperty] private bool _isBtcLoansVisible;
+    [ObservableProperty] private bool _isBurnRateLoading = true;
+    [ObservableProperty] private bool _isBurnRateVisible;
     [ObservableProperty] private bool _isStatisticsLoading = true;
     [ObservableProperty] private bool _isSimulatedPricesLoading = true;
     [ObservableProperty] private bool _isIndicatorsLoading = true;
@@ -176,7 +180,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         BtcStackPanelViewModel btcStackPanel,
         SimulatedPricesPanelViewModel simulatedPricesPanel,
         ILeveragePositionsPanelViewModel leveragePanel,
-        IBtcLoansPanelViewModel btcLoansPanel)
+        IBtcLoansPanelViewModel btcLoansPanel,
+        BurnRatePanelViewModel burnRatePanel)
     {
         _allTimeHighReport = allTimeHighReport;
         _maxBtcStackReport = maxBtcStackReport;
@@ -205,6 +210,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _simulatedPricesPanel = simulatedPricesPanel;
         _leveragePanel = leveragePanel;
         _btcLoansPanel = btcLoansPanel;
+        _burnRatePanel = burnRatePanel;
 
         _wealthPanel.PropertyChanged += OnWealthPanelPropertyChanged;
         _btcStackPanel.PropertyChanged += OnBtcStackPanelPropertyChanged;
@@ -212,6 +218,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _indicatorsPanel.PropertyChanged += OnIndicatorsPanelPropertyChanged;
         _leveragePanel.PropertyChanged += OnLeveragePanelPropertyChanged;
         _btcLoansPanel.PropertyChanged += OnBtcLoansPanelPropertyChanged;
+        _burnRatePanel.PropertyChanged += OnBurnRatePanelPropertyChanged;
 
         SimulateButtonText = language.Reports_SimulateButton;
         UpdateCurrentBtcPriceFormatted();
@@ -241,10 +248,12 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     IsIncomeByCategoriesLoading = true;
                     IsWealthOverviewLoading = true;
                     IsBtcLoansLoading = true;
+                    IsBurnRateLoading = true;
                     // Reload data when currency changes
                     ReloadDataAndFetchAllReportsAsync().FireAndForgetSafeAsync(_runner, _logger);
                     _simulatedPricesPanel.Refresh();
                     _btcLoansPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+                    _burnRatePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
                     break;
             }
         });
@@ -256,6 +265,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         {
             _leveragePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
             _btcLoansPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+            _burnRatePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
         });
 
         WeakReferenceMessenger.Default.Register<IndicatorsUpdatedMessage>(this, (recipient, message) =>
@@ -285,6 +295,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         LoadDataAndFetchAllReportsAsync()
             .ContinueWith(_ => _leveragePanel.RefreshAsync(), TaskScheduler.Default)
             .ContinueWith(_ => _btcLoansPanel.RefreshAsync(), TaskScheduler.Default)
+            .ContinueWith(_ => _burnRatePanel.RefreshAsync(), TaskScheduler.Default)
             .FireAndForgetSafeAsync(_runner, _logger);
         _wealthPanel.Refresh();
         _btcStackPanel.Refresh();
@@ -811,6 +822,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _simulatedPricesPanel.Refresh();
         _leveragePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
         _btcLoansPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+        _burnRatePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
     }
 
     private decimal GetCurrentBtcPriceInMainFiat()
@@ -1008,6 +1020,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             Dispatcher.UIThread.Post(_simulatedPricesPanel.Refresh);
             _leveragePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
             _btcLoansPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+            _burnRatePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
         }
     }
 
@@ -1078,6 +1091,16 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             IsBtcLoansVisible = _btcLoansPanel.IsVisible;
     }
 
+    private void OnBurnRatePanelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(DashboardPanelViewModel.Data))
+            BurnRateData = _burnRatePanel.Data;
+        else if (e.PropertyName == nameof(DashboardPanelViewModel.IsLoading))
+            IsBurnRateLoading = _burnRatePanel.IsLoading;
+        else if (e.PropertyName == nameof(DashboardPanelViewModel.IsVisible))
+            IsBurnRateVisible = _burnRatePanel.IsVisible;
+    }
+
     #endregion
 
     private void UpdateIndicatorsData(IndicatorSnapshot snapshot)
@@ -1103,6 +1126,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _indicatorsPanel.PropertyChanged -= OnIndicatorsPanelPropertyChanged;
         _leveragePanel.PropertyChanged -= OnLeveragePanelPropertyChanged;
         _btcLoansPanel.PropertyChanged -= OnBtcLoansPanelPropertyChanged;
+        _burnRatePanel.PropertyChanged -= OnBurnRatePanelPropertyChanged;
 
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
         WeakReferenceMessenger.Default.Unregister<AssetSummaryUpdatedMessage>(this);

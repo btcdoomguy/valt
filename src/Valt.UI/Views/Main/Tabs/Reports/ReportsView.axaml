@@ -114,6 +114,17 @@
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    IsVisible="{Binding IsStatisticsLoading}" />
                     </Grid>
+                    <!-- Burn Rate Dashboard -->
+                    <Grid MinHeight="150"
+                          IsVisible="{Binding IsBurnRateVisible}"
+                          reports1:DashboardGridPanel.RowSpan="{Binding BurnRateData.IsLarge, Converter={x:Static reports1:DashboardGridPanel.IsLargeToRowSpanConverter}}">
+                        <Panel IsVisible="{Binding !IsBurnRateLoading}">
+                            <reports1:DashboardDataUserControl DataContext="{Binding BurnRateData}" />
+                        </Panel>
+                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   IsVisible="{Binding IsBurnRateLoading}" />
+                    </Grid>
                     <!-- Indicators Dashboard -->
                     <Grid MinHeight="150"
                           reports1:DashboardGridPanel.RowSpan="{Binding IndicatorsData.IsLarge, Converter={x:Static reports1:DashboardGridPanel.IsLargeToRowSpanConverter}}">

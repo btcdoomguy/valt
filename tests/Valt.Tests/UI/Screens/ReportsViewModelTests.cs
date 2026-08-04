@@ -54,6 +54,7 @@ public class ReportsViewModelTests
     private ILogger<ReportsViewModel> _logger = null!;
     private ILeveragePositionsPanelViewModel _leveragePanel = null!;
     private IBtcLoansPanelViewModel _btcLoansPanel = null!;
+    private BurnRatePanelViewModel _burnRatePanel = null!;
     private IAllTimeHighReport _allTimeHighReport = null!;
     private IMaxBtcStackReport _maxBtcStackReport = null!;
     private IMonthlyTotalsReport _monthlyTotalsReport = null!;
@@ -66,6 +67,7 @@ public class ReportsViewModelTests
     private ILogger<WealthPanelViewModel> _wealthLogger = null!;
     private ILogger<BtcStackPanelViewModel> _btcStackLogger = null!;
     private ILogger<SimulatedPricesPanelViewModel> _simulatedPricesLogger = null!;
+    private ILogger<BurnRatePanelViewModel> _burnRateLogger = null!;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -112,6 +114,9 @@ public class ReportsViewModelTests
 
         _leveragePanel = Substitute.For<ILeveragePositionsPanelViewModel>();
         _btcLoansPanel = Substitute.For<IBtcLoansPanelViewModel>();
+        _burnRateLogger = Substitute.For<ILogger<BurnRatePanelViewModel>>();
+        _burnRatePanel = new BurnRatePanelViewModel(
+            _queryDispatcher, _accountsTotalState, _currencySettings, _burnRateLogger);
 
         _logger = Substitute.For<ILogger<ReportsViewModel>>();
         _allTimeHighReport = Substitute.For<IAllTimeHighReport>();
@@ -195,7 +200,8 @@ public class ReportsViewModelTests
             _btcStackPanel,
             _simulatedPricesPanel,
             _leveragePanel,
-            _btcLoansPanel);
+            _btcLoansPanel,
+            _burnRatePanel);
     }
 
     [Test]
@@ -248,11 +254,14 @@ public class ReportsViewModelTests
         // Arrange
         var leverageLogger = Substitute.For<ILogger<LeveragePositionsPanelViewModel>>();
         var btcLoansLogger = Substitute.For<ILogger<BtcLoansPanelViewModel>>();
+        var burnRateLogger = Substitute.For<ILogger<BurnRatePanelViewModel>>();
 
         var realLeveragePanel = new LeveragePositionsPanelViewModel(
             _queryDispatcher, _accountsTotalState, _ratesState, _customBtcPriceState, _currencySettings, leverageLogger);
         var realBtcLoansPanel = new BtcLoansPanelViewModel(
             _queryDispatcher, _accountsTotalState, _ratesState, _customBtcPriceState, _currencySettings, btcLoansLogger);
+        var realBurnRatePanel = new BurnRatePanelViewModel(
+            _queryDispatcher, _accountsTotalState, _currencySettings, burnRateLogger);
 
         var viewModel = new ReportsViewModel(
             _allTimeHighReport,
@@ -281,7 +290,8 @@ public class ReportsViewModelTests
             _btcStackPanel,
             _simulatedPricesPanel,
             realLeveragePanel,
-            realBtcLoansPanel);
+            realBtcLoansPanel,
+            realBurnRatePanel);
 
         // Act
         var leverageEventCount = 0;
@@ -305,6 +315,12 @@ public class ReportsViewModelTests
         realBtcLoansPanel.IsVisible = false;
         Assert.That(viewModel.IsBtcLoansVisible, Is.False, "After BTC loans panel hidden");
 
+        realBurnRatePanel.IsVisible = true;
+        Assert.That(viewModel.IsBurnRateVisible, Is.True, "After burn rate panel shown");
+
+        realBurnRatePanel.IsVisible = false;
+        Assert.That(viewModel.IsBurnRateVisible, Is.False, "After burn rate panel hidden");
+
         // Assert
         Assert.That(leverageEventCount, Is.GreaterThan(0), "Leverage panel should raise PropertyChanged");
     }
@@ -315,11 +331,14 @@ public class ReportsViewModelTests
         // Arrange
         var leverageLogger = Substitute.For<ILogger<LeveragePositionsPanelViewModel>>();
         var btcLoansLogger = Substitute.For<ILogger<BtcLoansPanelViewModel>>();
+        var burnRateLogger = Substitute.For<ILogger<BurnRatePanelViewModel>>();
 
         var realLeveragePanel = new LeveragePositionsPanelViewModel(
             _queryDispatcher, _accountsTotalState, _ratesState, _customBtcPriceState, _currencySettings, leverageLogger);
         var realBtcLoansPanel = new BtcLoansPanelViewModel(
             _queryDispatcher, _accountsTotalState, _ratesState, _customBtcPriceState, _currencySettings, btcLoansLogger);
+        var realBurnRatePanel = new BurnRatePanelViewModel(
+            _queryDispatcher, _accountsTotalState, _currencySettings, burnRateLogger);
 
         // Act
         var viewModel = new ReportsViewModel(
@@ -349,12 +368,15 @@ public class ReportsViewModelTests
             _btcStackPanel,
             _simulatedPricesPanel,
             realLeveragePanel,
-            realBtcLoansPanel);
+            realBtcLoansPanel,
+            realBurnRatePanel);
 
         // Assert
         Assert.That(viewModel.IsLeveragePositionsVisible, Is.EqualTo(realLeveragePanel.IsVisible),
             "ReportsViewModel should reflect the panel's initial visibility");
         Assert.That(viewModel.IsBtcLoansVisible, Is.EqualTo(realBtcLoansPanel.IsVisible),
+            "ReportsViewModel should reflect the panel's initial visibility");
+        Assert.That(viewModel.IsBurnRateVisible, Is.EqualTo(realBurnRatePanel.IsVisible),
             "ReportsViewModel should reflect the panel's initial visibility");
     }
 }
