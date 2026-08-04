@@ -27,9 +27,6 @@ public class BurnRateQueriesTests : DatabaseTest
     private AccountEntity _brlAccount = null!;
     private CategoryId _categoryId = null!;
 
-    [OneTimeSetUp]
-    public void OneTimeSetUp() => IdGenerator.Configure(new LiteDbIdProvider());
-
     protected override Task SeedDatabase()
     {
         _categoryId = IdGenerator.Generate();
@@ -53,6 +50,12 @@ public class BurnRateQueriesTests : DatabaseTest
         }
 
         return base.SeedDatabase();
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _localDatabase.GetTransactions().DeleteAll();
     }
 
     [Test]

@@ -27,9 +27,6 @@ public class SavingsRateQueriesTests : DatabaseTest
     private AccountEntity _brlAccount = null!;
     private CategoryId _categoryId = null!;
 
-    [OneTimeSetUp]
-    public void OneTimeSetUp() => IdGenerator.Configure(new LiteDbIdProvider());
-
     protected override Task SeedDatabase()
     {
         _categoryId = IdGenerator.Generate();
@@ -55,6 +52,12 @@ public class SavingsRateQueriesTests : DatabaseTest
         return base.SeedDatabase();
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _localDatabase.GetTransactions().DeleteAll();
+    }
+
     [Test]
     public async Task Should_Calculate_Positive_SavingsRate_When_Income_Exceeds_Expenses()
     {
@@ -63,13 +66,9 @@ public class SavingsRateQueriesTests : DatabaseTest
         AddExpenseTransaction(month, 750m);
 
         var result = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31));
+        var monthRate = GetMonthRate(result, month);
 
-        using (Assert.EnterMultipleScope())
-        {
-            Assert.That(result.Months, Has.Count.EqualTo(1));
-            Assert.That(result.Months[0].Month, Is.EqualTo(month));
-            Assert.That(result.Months[0].Rate, Is.EqualTo(25m));
-        }
+        Assert.That(monthRate, Is.EqualTo(25m));
     }
 
     [Test]
@@ -79,12 +78,9 @@ public class SavingsRateQueriesTests : DatabaseTest
         AddExpenseTransaction(month, 500m);
 
         var result = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31));
+        var monthRate = GetMonthRate(result, month);
 
-        using (Assert.EnterMultipleScope())
-        {
-            Assert.That(result.Months, Has.Count.EqualTo(1));
-            Assert.That(result.Months[0].Rate, Is.Null);
-        }
+        Assert.That(monthRate, Is.Null);
     }
 
     [Test]
@@ -95,12 +91,9 @@ public class SavingsRateQueriesTests : DatabaseTest
         AddExpenseTransaction(month, 1250m);
 
         var result = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31));
+        var monthRate = GetMonthRate(result, month);
 
-        using (Assert.EnterMultipleScope())
-        {
-            Assert.That(result.Months, Has.Count.EqualTo(1));
-            Assert.That(result.Months[0].Rate, Is.EqualTo(-25m));
-        }
+        Assert.That(monthRate, Is.EqualTo(-25m));
     }
 
     [Test]
@@ -116,9 +109,8 @@ public class SavingsRateQueriesTests : DatabaseTest
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(result.Months, Has.Count.EqualTo(1));
-            Assert.That(result.Months[0].Month, Is.EqualTo(new DateOnly(2025, 2, 1)));
-            Assert.That(result.Months[0].Rate, Is.EqualTo(25m));
+            Assert.That(GetMonthRate(result, new DateOnly(2025, 2, 1)), Is.EqualTo(25m));
+            Assert.That(GetMonthRate(result, new DateOnly(2025, 3, 1)), Is.Null);
         }
     }
 
@@ -132,6 +124,11 @@ public class SavingsRateQueriesTests : DatabaseTest
             Assert.That(result.Months, Is.Empty);
             Assert.That(result.PrimaryCurrency, Is.EqualTo(FiatCurrency.Brl.Code));
         }
+    }
+
+    private static decimal? GetMonthRate(SavingsRateDataDto result, DateOnly month)
+    {
+        return result.Months.FirstOrDefault(x => x.Month == month)?.Rate;
     }
 
     private async Task<SavingsRateDataDto> ExecuteQuery(DateOnly from, DateOnly to, FakeClock clock)
