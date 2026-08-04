@@ -1,8 +1,11 @@
+using System.Reflection;
 using CommunityToolkit.Mvvm.Messaging;
 using LiteDB;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Valt.App.Kernel.Queries;
+using Valt.App.Modules.SpendingAnalytics.DTOs;
+using Valt.App.Modules.SpendingAnalytics.Queries;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Kernel.Factories;
 using Valt.Infra.Crawlers.Indicators;
@@ -25,6 +28,7 @@ using Valt.Infra.Settings;
 using Valt.UI.Services;
 using Valt.UI.Base;
 using Valt.UI.State;
+using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Tabs.Reports;
 using Valt.UI.Views.Main.Tabs.Reports.Panels;
 
@@ -130,6 +134,16 @@ public class ReportsViewModelTests
         ConfigureDefaultLocalDatabaseBehavior();
         ConfigureDefaultConfigurationManagerBehavior();
         ConfigureDefaultClockBehavior();
+        ConfigureDefaultQueryDispatcherBehavior();
+    }
+
+    private void ConfigureDefaultQueryDispatcherBehavior()
+    {
+        _queryDispatcher.DispatchAsync(Arg.Any<GetSavingsRateQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<SavingsRateDataDto>(new InvalidOperationException("Savings rate fetch triggered")));
+
+        _queryDispatcher.DispatchAsync(Arg.Any<GetFixedVsVariableQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<FixedVsVariableDataDto>(new InvalidOperationException("Fixed vs variable fetch triggered")));
     }
 
     [TearDown]
@@ -378,5 +392,56 @@ public class ReportsViewModelTests
             "ReportsViewModel should reflect the panel's initial visibility");
         Assert.That(viewModel.IsBurnRateVisible, Is.EqualTo(realBurnRatePanel.IsVisible),
             "ReportsViewModel should reflect the panel's initial visibility");
+    }
+
+    [Test]
+    public void Constructor_Should_Initialize_SavingsRate_And_FixedVsVariable_Loading_Flags()
+    {
+        // Act
+        var viewModel = CreateViewModel();
+
+        // Assert
+        Assert.That(viewModel.IsSavingsRateLoading, Is.True, "Savings rate loading flag should start true");
+        Assert.That(viewModel.IsFixedVsVariableLoading, Is.True, "Fixed vs variable loading flag should start true");
+    }
+
+    [Test]
+    public void Constructor_Should_Expose_SavingsRate_Chart_Data()
+    {
+        // Act
+        var viewModel = CreateViewModel();
+
+        // Assert
+        Assert.That(viewModel.SavingsRateChartData, Is.Not.Null);
+    }
+
+    [Test]
+    public void Constructor_Should_Expose_FixedVsVariable_Chart_Data()
+    {
+        // Act
+        var viewModel = CreateViewModel();
+
+        // Assert
+        Assert.That(viewModel.FixedVsVariableChartData, Is.Not.Null);
+    }
+
+    [Test]
+    public void HasNoFixedExpenses_Flag_Exposes_Hint_Box_Path()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        var propertyChanged = false;
+        viewModel.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(ReportsViewModel.HasNoFixedExpenses))
+                propertyChanged = true;
+        };
+
+        // Act
+        viewModel.HasNoFixedExpenses = true;
+
+        // Assert
+        Assert.That(viewModel.HasNoFixedExpenses, Is.True);
+        Assert.That(propertyChanged, Is.True, "PropertyChanged should be raised for HasNoFixedExpenses");
     }
 }
