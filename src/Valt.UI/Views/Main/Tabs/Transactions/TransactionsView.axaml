@@ -127,9 +127,10 @@
                 <!-- Accounts List -->
                 <Grid Grid.Row="1" RowDefinitions="30, *" Margin="0, 0, 0, 10">
                     <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button FontSize="{DynamicResource FontSizeSmall}" Classes="transparent link"
-                                VerticalAlignment="Stretch"
-                                Content="{x:Static local:language.Transactions_AddNew}">
+                        <Button Classes="panel-header-icon"
+                                Margin="4, 0, 0, 0"
+                                ToolTip.Tip="{x:Static local:language.Transactions_AddNew}"
+                                Content="&#xE145;">
                             <Button.Flyout>
                                 <MenuFlyout>
                                     <MenuItem Header="{x:Static local:language.Transactions_AddAccount}"
@@ -139,10 +140,11 @@
                                 </MenuFlyout>
                             </Button.Flyout>
                         </Button>
-                        <Button FontSize="{DynamicResource FontSizeSmall}" Classes="transparent link" HorizontalAlignment="Right"
-                                HorizontalContentAlignment="Right"
-                                VerticalAlignment="Stretch" Command="{Binding SelectAllAccountsCommand}"
-                                Content="{x:Static local:language.Transactions_ViewAllAccounts}" />
+                        <Button Classes="panel-header-icon"
+                                Margin="4, 0, 0, 0"
+                                ToolTip.Tip="{x:Static local:language.Transactions_ViewAllAccounts}"
+                                Command="{Binding SelectAllAccountsCommand}"
+                                Content="&#xE8F4;" />
                     </StackPanel>
                     <ListBox Grid.Row="1"
                              x:Name="AccountsList"
