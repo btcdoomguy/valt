@@ -518,6 +518,12 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Transactions.ViewAllAccounts", resourceCulture);
             }
         }
+
+        public static string Transactions_AddNew {
+            get {
+                return ResourceManager.GetString("Transactions.AddNew", resourceCulture);
+            }
+        }
         
         public static string Transactions_Edit {
             get {

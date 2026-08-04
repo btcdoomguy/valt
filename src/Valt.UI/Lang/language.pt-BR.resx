@@ -301,7 +301,10 @@
         <value>Total (em BTC)</value>
     </data>
     <data name="Transactions.ViewAllAccounts" xml:space="preserve">
-        <value>Ver todas as contas</value>
+        <value>Ver todas</value>
+    </data>
+    <data name="Transactions.AddNew" xml:space="preserve">
+        <value>Adicionar nova</value>
     </data>
     <data name="Main.Menu" xml:space="preserve">
         <value>Gerenciar</value>

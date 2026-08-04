@@ -258,7 +258,10 @@
         <value>Total (as BTC)</value>
     </data>
     <data name="Transactions.ViewAllAccounts" xml:space="preserve">
-        <value>View all accounts</value>
+        <value>View all</value>
+    </data>
+    <data name="Transactions.AddNew" xml:space="preserve">
+        <value>Add new</value>
     </data>
     <data name="Transactions.Edit" xml:space="preserve">
         <value>Edit</value>
