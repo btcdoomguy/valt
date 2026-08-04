@@ -74,24 +74,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SPA-01 | TBD | Pending |
-| SPA-02 | TBD | Pending |
-| SPA-03 | TBD | Pending |
-| BTC-01 | TBD | Pending |
-| BTC-02 | TBD | Pending |
-| BTC-03 | TBD | Pending |
-| WLT-01 | TBD | Pending |
-| WLT-02 | TBD | Pending |
-| WLT-03 | TBD | Pending |
-| WLT-04 | TBD | Pending |
-| LON-01 | TBD | Pending |
-| LON-02 | TBD | Pending |
+| SPA-01 | Phase 39 | Pending |
+| SPA-02 | Phase 39 | Pending |
+| SPA-03 | Phase 39 | Pending |
+| BTC-01 | Phase 40 | Pending |
+| BTC-02 | Phase 40 | Pending |
+| BTC-03 | Phase 40 | Pending |
+| WLT-01 | Phase 41 | Pending |
+| WLT-02 | Phase 41 | Pending |
+| WLT-03 | Phase 41 | Pending |
+| WLT-04 | Phase 41 | Pending |
+| LON-01 | Phase 42 | Pending |
+| LON-02 | Phase 42 | Pending |
 
 **Coverage:**
 - v0.7 requirements: 12 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 12 ⚠️
+- Mapped to phases: 12 ✓
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-08-04*
-*Last updated: 2026-08-04 after initial definition*
+*Last updated: 2026-08-04 after v0.7 roadmap creation*

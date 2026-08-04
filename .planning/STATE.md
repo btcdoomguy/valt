@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v0.7
 milestone_name: Insights & Metrics Expansion
 status: planning
-last_updated: "2026-08-04T16:18:14.080Z"
+last_updated: "2026-08-04T17:30:00.000Z"
 last_activity: 2026-08-04
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-15)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Planning next milestone (v0.7 — TBD)
+**Current focus:** v0.7 Insights & Metrics Expansion — Phase 39: Spending Analytics Reports & UI
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 39 — Spending Analytics Reports & UI (not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-08-04 — Milestone v0.7 started
+Status: Roadmap created — ready to plan Phase 39
+Last activity: 2026-08-04 — v0.7 roadmap created (5 phases, 12/12 requirements mapped)
 
 ## Performance Metrics
 
@@ -172,8 +172,8 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-07-17T15:03:00Z
-Stopped at: v0.6 milestone closed; ready to start v0.7 planning
+Last session: 2026-08-04T17:30:00Z
+Stopped at: v0.7 roadmap created; awaiting user approval before planning Phase 39
 Resume file: None
 
 ## Notes
@@ -181,7 +181,8 @@ Resume file: None
 - v0.6 Documentation Site Refresh milestone shipped on 2026-07-17.
 - All 7 v0.6 phases (32–38) complete; 17/17 plans finished; strict MkDocs build green.
 - 7 deferred items acknowledged at v0.6 close (see Deferred Items).
+- v0.7 roadmap defined 2026-08-04: Phases 39-43, 12/12 requirements mapped (SPA-01..03, BTC-01..03, WLT-01..04, LON-01..02).
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Plan the first v0.7 phase with /gsd-plan-phase 39
