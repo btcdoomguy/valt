@@ -1,20 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v0.6
-milestone_name: — Documentation Site Refresh
-current_phase: 6
-status: Awaiting next milestone
-stopped_at: Verified Phase 38; 38-03 QA plan required to close QA-03
-last_updated: "2026-07-17T15:03:40.960Z"
-last_activity: 2026-07-17
-last_activity_desc: Completed quick task 260717-iqe: after I close a database, when I try to open another one the app got stuck because all background services are stopped
+milestone: v0.7
+milestone_name: Insights & Metrics Expansion
+status: planning
+last_updated: "2026-08-04T16:18:14.080Z"
+last_activity: 2026-08-04
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 17
-  completed_plans: 17
-  percent: 100
-current_phase_name: Navigation, New Pages, and Quality Assurance
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # STATE.md
@@ -28,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-07-15)
 
 ## Current Position
 
-Phase: Milestone v0.6 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-08-04 — Completed quick task 260804-fox: TransactionsView header buttons converted to icons (+ / eye)
+Status: Defining requirements
+Last activity: 2026-08-04 — Milestone v0.7 started
 
 ## Performance Metrics
 
