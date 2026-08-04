@@ -249,6 +249,7 @@ public class FixedVsVariableQueriesTests : DatabaseTest
     {
         var fixedExpense = FixedExpenseBuilder.AFixedExpenseWithCurrency(FiatCurrency.Brl)
             .WithName("Test Fixed Expense")
+            .WithFixedAmountRange(100m, FixedExpensePeriods.Monthly, new DateOnly(2025, 1, 1), 1)
             .Build();
         _localDatabase.GetFixedExpenses().Insert(fixedExpense);
         return fixedExpense;

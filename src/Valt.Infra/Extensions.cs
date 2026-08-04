@@ -280,6 +280,7 @@ public static class Extensions
         services.AddSingleton<ISpendingEvolutionQueries, SpendingEvolutionQueries>();
         services.AddSingleton<ISavingsRateQueries, SavingsRateQueries>();
         services.AddSingleton<IBurnRateQueries, BurnRateQueries>();
+        services.AddSingleton<IFixedVsVariableQueries, FixedVsVariableQueries>();
 
         return services;
     }
