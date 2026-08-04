@@ -5822,5 +5822,23 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports_BurnRate_Empty", resourceCulture);
             }
         }
+        
+        public static string Reports_SavingsRate_Title {
+            get {
+                return ResourceManager.GetString("Reports_SavingsRate_Title", resourceCulture);
+            }
+        }
+        
+        public static string Reports_SavingsRate_EmptyHeading {
+            get {
+                return ResourceManager.GetString("Reports_SavingsRate_EmptyHeading", resourceCulture);
+            }
+        }
+        
+        public static string Reports_SavingsRate_EmptyBody {
+            get {
+                return ResourceManager.GetString("Reports_SavingsRate_EmptyBody", resourceCulture);
+            }
+        }
     }
 }

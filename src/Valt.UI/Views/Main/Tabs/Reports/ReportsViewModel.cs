@@ -17,6 +17,8 @@ using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Assets.DTOs;
 using Valt.App.Modules.Assets.Queries.GetBtcLoansDashboard;
+using Valt.App.Modules.SpendingAnalytics.DTOs;
+using Valt.App.Modules.SpendingAnalytics.Queries;
 using Valt.App.Modules.Assets.Queries.GetVisibleAssets;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
@@ -148,6 +150,10 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
     // Income by category
     [ObservableProperty] private IncomeByCategoryChartData _incomeByCategoryChartData = new();
+    [ObservableProperty] private SavingsRateChartData _savingsRateChartData = new();
+
+    [ObservableProperty] private bool _isSavingsRateLoading = true;
+    [ObservableProperty] private bool _isSavingsRateEmpty;
 
     private CancellationTokenSource? _filterDebounceTokenSource;
     private const int FilterDebounceDelayMs = 300;
@@ -369,6 +375,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             FetchMonthlyTotalsAsync(provider),
             FetchExpensesByCategoryAsync(provider),
             FetchIncomeByCategoryAsync(provider),
+            FetchSavingsRateAsync(provider),
             FetchAllTimeHighDataAsync(provider),
             FetchMaxBtcStackDataAsync(provider),
             FetchStatisticsDataAsync(provider),
@@ -470,7 +477,14 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         if (!_ready) return;
 
         IsMonthlyTotalsLoading = true;
-        FetchMonthlyTotalsWithProviderAsync().FireAndForgetSafeAsync(_runner, _logger);
+        IsSavingsRateLoading = true;
+        FetchMonthlyTotalsAndSavingsRateWithProviderAsync().FireAndForgetSafeAsync(_runner, _logger);
+    }
+
+    private async Task FetchMonthlyTotalsAndSavingsRateWithProviderAsync()
+    {
+        var provider = await GetOrCreateProviderAsync();
+        await Task.WhenAll(FetchMonthlyTotalsAsync(provider), FetchSavingsRateAsync(provider));
     }
 
     private async Task FetchMonthlyTotalsWithProviderAsync()
@@ -953,6 +967,30 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
     }
 
+    private async Task FetchSavingsRateAsync(IReportDataProvider provider)
+    {
+        try
+        {
+            var data = await _queryDispatcher.DispatchAsync(new GetSavingsRateQuery
+            {
+                From = DateOnly.FromDateTime(FilterRange.Start),
+                To = DateOnly.FromDateTime(FilterRange.End)
+            });
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                SavingsRateChartData.RefreshChart(data);
+                IsSavingsRateEmpty = data.Months.Count == 0;
+                IsSavingsRateLoading = false;
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching savings rate");
+            await Dispatcher.UIThread.InvokeAsync(() => { IsSavingsRateLoading = false; });
+        }
+    }
+
     private async Task FetchWealthOverviewAsync(IReportDataProvider provider)
     {
         try
@@ -1135,6 +1173,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         MonthlyTotalsChartData.Dispose();
         ExpensesByCategoryChartData.Dispose();
         IncomeByCategoryChartData.Dispose();
+        SavingsRateChartData.Dispose();
         WealthOverviewChartData.Dispose();
 
         // Clear the provider on dispose
