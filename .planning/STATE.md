@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-07-15)
 Phase: Milestone v0.6 complete
 Plan: —
 Status: Awaiting next milestone
-Last activity: 2026-08-04 — Completed quick task 260804-f94: TransactionsView left column buttons ("View All" caption + "Add new" button)
+Last activity: 2026-08-04 — Completed quick task 260804-fox: TransactionsView header buttons converted to icons (+ / eye)
 
 ## Performance Metrics
 
@@ -156,6 +156,7 @@ None yet.
 | 260714-kzm | Update Avalonia nuget packages from 12.0.3 to 12.1.0, research breaking changes first | 2026-07-14 | 36ddfe7 | [260714-kzm-update-avalonia-nuget-packages-from-12-0](./quick/260714-kzm-update-avalonia-nuget-packages-from-12-0/) |
 | 260717-iqe | after I close a database, when I try to open another one the app got stuck because all background services are stopped | 2026-07-17 | 6ffdf19 | [260717-iqe-after-i-close-a-database-when-i-try-to-o](./quick/260717-iqe-after-i-close-a-database-when-i-try-to-o/) |
 | 260804-f94 | TransactionsView left column: shorten "View All Accounts" to "View All" and move plus-icon add button to a labeled "Add new" button beside it | 2026-08-04 | 29aed14 | [260804-f94-transactions-left-column-buttons](./quick/260804-f94-transactions-left-column-buttons/) |
+| 260804-fox | TransactionsView left column: convert "Add new" and "View all" buttons to icon buttons (+ and eye) matching Fixed Expenses/Goals panel style | 2026-08-04 | 9cbef83 | [260804-fox-transactions-buttons-icons](./quick/260804-fox-transactions-buttons-icons/) |
 
 ## Deferred Items
 
