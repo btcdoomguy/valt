@@ -43,65 +43,89 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 ## Phase Details
 
 ### Phase 39: Spending Analytics Reports & UI
+
 **Goal**: Users can understand their spending behavior — how much they save, how fast they burn cash, and how rigid their expense structure is
 **Depends on**: Nothing (first v0.7 phase)
 **Requirements**: SPA-01, SPA-02, SPA-03
 **Success Criteria** (what must be TRUE):
+
   1. User can view monthly savings rate ((income − expenses) / income) with a trend over time in the Reports tab
   2. User can view burn rate — average daily spend and projected month-end total compared against the median
   3. User can view the fixed vs variable expense ratio per month (FixedExpenses vs actual transactions)
   4. New panels render sensible zero/empty states when no transaction data exists for the period
-**Plans**: 4 plans
-- [ ] 39-01-PLAN.md — Savings rate + burn rate query backend (SpendingAnalytics module, tests)
+
+**Plans**: 1/4 plans executed
+**Wave 1**
+
+- [x] 39-01-PLAN.md — Savings rate + burn rate query backend (SpendingAnalytics module, tests)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 39-02-PLAN.md — Fixed vs variable query backend (Paid-record join, tests)
 - [ ] 39-03-PLAN.md — Burn rate dashboard card UI (RowItem foreground, panel VM, wiring)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 39-04-PLAN.md — Savings rate + fixed/variable chart sections UI (chart-data classes, wiring, empty states)
+
 **UI hint**: yes
 
 ### Phase 40: BTC-Denominated Metrics Reports & UI
+
 **Goal**: Users can see their income and spending denominated in sats, including how fast their stack is growing
 **Depends on**: Phase 39
 **Requirements**: BTC-01, BTC-02, BTC-03
 **Success Criteria** (what must be TRUE):
+
   1. User can view sats earned per month, with income converted at receipt-date rates
   2. User can view sats spent per month and broken down per category
   3. User can view stack velocity — net sats accumulated per month — as a trend chart
   4. Metrics honor the existing Reports tab filters (date range, accounts, categories)
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 41: Wealth & Performance Reports & UI
+
 **Goal**: Users can evaluate their long-term wealth performance in both fiat and BTC terms
 **Depends on**: Phase 39
 **Requirements**: WLT-01, WLT-02, WLT-03, WLT-04
 **Success Criteria** (what must be TRUE):
+
   1. User can view net worth CAGR / compound growth in fiat and BTC terms
   2. User can view fiat vs BTC allocation % over time
   3. User can view best and worst months ranked by wealth delta
   4. User can view days under water (time since the all-time high)
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 42: Loans & Leverage Reports & UI
+
 **Goal**: Users can see the true cost and evolving risk of their BTC-backed loans
 **Depends on**: Phase 39
 **Requirements**: LON-01, LON-02
 **Success Criteria** (what must be TRUE):
+
   1. User can view total interest/fees paid with a per-month breakdown derived from the loan state timeline
   2. User can view the liquidation-price distance trend over time
   3. Loan panels appear only when the user has active BTC-backed loans, consistent with the existing conditional dashboard panels
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 43: MCP, Localization, Documentation & Verification
+
 **Goal**: The new v0.7 metrics are AI-accessible, fully localized, documented, and verified end-to-end
 **Depends on**: Phases 39, 40, 41, 42
 **Requirements**: None (cross-cutting milestone completion phase)
 **Success Criteria** (what must be TRUE):
+
   1. AI assistant can query each new v0.7 metric through MCP report tools
   2. All new user-facing strings are available in English, Portuguese (pt-BR), and Spanish
   3. `.claude/docs/reports.md` documents the new reports, UI panels, and MCP tools
   4. Full test suite is green and every new Reports tab panel is verified end-to-end with real data
+
 **Plans**: TBD
 
 ## Progress
@@ -118,7 +142,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 | 36. Fixed Expenses Page Enhancement | v0.6 | 2/2 | Complete | 2026-07-16 |
 | 37. MCP Server Page Update | v0.6 | 2/2 | Complete | 2026-07-16 |
 | 38. Navigation, New Pages, and Quality Assurance | v0.6 | 3/3 | Complete | 2026-07-17 |
-| 39. Spending Analytics Reports & UI | v0.7 | 0/4 | Planned | - |
+| 39. Spending Analytics Reports & UI | v0.7 | 1/4 | In Progress|  |
 | 40. BTC-Denominated Metrics Reports & UI | v0.7 | 0/0 | Not started | - |
 | 41. Wealth & Performance Reports & UI | v0.7 | 0/0 | Not started | - |
 | 42. Loans & Leverage Reports & UI | v0.7 | 0/0 | Not started | - |

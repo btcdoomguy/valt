@@ -9,8 +9,8 @@ New analytics derived from existing app data, surfaced in the Reports tab. Each 
 
 ### Spending Analytics
 
-- [ ] **SPA-01**: User can view monthly savings rate ((income − expenses) / income) with trend over time
-- [ ] **SPA-02**: User can view burn rate — average daily spend and projected month-end total vs median
+- [x] **SPA-01**: User can view monthly savings rate ((income − expenses) / income) with trend over time
+- [x] **SPA-02**: User can view burn rate — average daily spend and projected month-end total vs median
 - [ ] **SPA-03**: User can view fixed vs variable expense ratio per month (FixedExpenses vs actual transactions)
 
 ### BTC-Denominated Metrics
@@ -74,8 +74,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SPA-01 | Phase 39 | Pending |
-| SPA-02 | Phase 39 | Pending |
+| SPA-01 | Phase 39 | Complete |
+| SPA-02 | Phase 39 | Complete |
 | SPA-03 | Phase 39 | Pending |
 | BTC-01 | Phase 40 | Pending |
 | BTC-02 | Phase 40 | Pending |
@@ -88,6 +88,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LON-02 | Phase 42 | Pending |
 
 **Coverage:**
+
 - v0.7 requirements: 12 total
 - Mapped to phases: 12 ✓
 - Unmapped: 0 ✓

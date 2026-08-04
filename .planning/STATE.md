@@ -2,14 +2,18 @@
 gsd_state_version: 1.0
 milestone: v0.7
 milestone_name: Insights & Metrics Expansion
-status: planning
-last_updated: "2026-08-04T17:30:00.000Z"
+current_phase: 39
+current_phase_name: spending-analytics-reports-ui
+status: executing
+stopped_at: Completed 39-01-PLAN.md
+last_updated: "2026-08-04T22:23:08.673Z"
 last_activity: 2026-08-04
+last_activity_desc: Phase 39 execution started
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 4
+  completed_plans: 1
   percent: 0
 ---
 
@@ -20,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-15)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** v0.7 Insights & Metrics Expansion — Phase 39: Spending Analytics Reports & UI
+**Current focus:** Phase 39 — spending-analytics-reports-ui
 
 ## Current Position
 
-Phase: 39 — Spending Analytics Reports & UI (not started)
-Plan: —
-Status: Roadmap created — ready to plan Phase 39
-Last activity: 2026-08-04 — v0.7 roadmap created (5 phases, 12/12 requirements mapped)
+Phase: 39 (spending-analytics-reports-ui) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
+Last activity: 2026-08-04 — Phase 39 execution started
 
 ## Performance Metrics
 
@@ -82,6 +86,7 @@ Last activity: 2026-08-04 — v0.7 roadmap created (5 phases, 12/12 requirements
 | Phase 38 P02 | 18 min | - tasks | - files |
 | Phase 38 P02 | 18 min | 3 tasks | 2 files |
 | Phase 38 P03 | 7 min | 3 tasks | 4 files |
+| Phase 39 P01 | 11 min | 3 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -133,6 +138,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Committed both language files in a single docs(38-02) commit per QA-01 — Bilingual mirror discipline requires PT and EN changes to be committed together
 - [Phase ?]: Left 'mais de 80 ferramentas' / '80+ tools' intro untouched — Post-fix documented count is 90, so the existing claim remains true with no count edit
 - [Phase ?]: Preserved Categorias/Categories section byte-identical — It was the only clean pre-existing category and required no changes
+- [Phase 39]: Savings rate uses AllIncomeInFiat/AllExpensesInFiat from IMonthlyTotalsReport — Matches existing Monthly totals panel numbers and avoids a second income/expense aggregation (D-01).
+- [Phase 39]: Burn rate median is read from IStatisticsReport.MedianMonthlyExpenses — Reuses the existing 12-month median calculation instead of recomputing it (D-13).
+- [Phase 39]: Burn rate projection is gated to day >= 5 — User-specified threshold to avoid early-month projection noise (D-15).
 
 ### Pending Todos
 
@@ -172,8 +180,8 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-08-04T17:30:00Z
-Stopped at: v0.7 roadmap created; awaiting user approval before planning Phase 39
+Last session: 2026-08-04T22:23:08.668Z
+Stopped at: Completed 39-01-PLAN.md
 Resume file: None
 
 ## Notes
