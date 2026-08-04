@@ -443,6 +443,79 @@
                     </Grid>
                 </StackPanel>
             </Expander>
+            <!--Fixed vs variable expenses-->
+            <Expander Classes="section" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsExpanded="True">
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Classes="section-header-icon" Text="&#xE9E6;" />
+                        <TextBlock Classes="section-header" Text="{x:Static lang:language.Reports_FixedVariable_Title}" />
+                    </StackPanel>
+                </Expander.Header>
+                <StackPanel Orientation="Vertical">
+                    <Grid MinHeight="400">
+                        <Panel IsVisible="{Binding !IsFixedVsVariableLoading}">
+                            <Border Classes="hint-box"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    IsVisible="{Binding HasNoFixedExpenses}">
+                                <StackPanel Orientation="Vertical" Spacing="8">
+                                    <TextBlock Text="{x:Static lang:language.Reports_FixedVariable_EmptyNoneHeading}"
+                                               FontSize="{DynamicResource FontSizeLarge}"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource Text200Brush}"
+                                               HorizontalAlignment="Center" />
+                                    <TextBlock Text="{x:Static lang:language.Reports_FixedVariable_EmptyNoneBody}"
+                                               FontSize="{DynamicResource FontSizeNormal}"
+                                               Foreground="{DynamicResource Text400Brush}"
+                                               TextWrapping="Wrap"
+                                               TextAlignment="Center"
+                                               MaxWidth="500"
+                                               HorizontalAlignment="Center" />
+                                </StackPanel>
+                            </Border>
+                            <Panel IsVisible="{Binding !HasNoFixedExpenses}">
+                                <Border Background="{DynamicResource Background900Brush}"
+                                        BorderBrush="{DynamicResource Background700Brush}"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="10"
+                                        IsVisible="{Binding !IsFixedVsVariableEmpty}">
+                                    <avalonia:CartesianChart
+                                        x:Name="FixedVsVariableChart"
+                                        Background="{DynamicResource Background900Brush}"
+                                        Series="{Binding FixedVsVariableChartData.Series}"
+                                        XAxes="{Binding FixedVsVariableChartData.XAxes}"
+                                        YAxes="{Binding FixedVsVariableChartData.YAxes}"
+                                        LegendPosition="Top"
+                                        LegendTextSize="13"
+                                        TooltipTextSize="12"
+                                        ZoomMode="None"
+                                        Height="400"
+                                        Margin="20, 10, 20, 10">
+                                    </avalonia:CartesianChart>
+                                </Border>
+                                <Border Classes="hint-box"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        IsVisible="{Binding IsFixedVsVariableEmpty}">
+                                    <StackPanel Orientation="Vertical" Spacing="8">
+                                        <TextBlock Text="{x:Static lang:language.Reports_FixedVariable_EmptyPeriod}"
+                                                   FontSize="{DynamicResource FontSizeNormal}"
+                                                   Foreground="{DynamicResource Text400Brush}"
+                                                   TextWrapping="Wrap"
+                                                   TextAlignment="Center"
+                                                   MaxWidth="500"
+                                                   HorizontalAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+                            </Panel>
+                        </Panel>
+                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   IsVisible="{Binding IsFixedVsVariableLoading}" />
+                    </Grid>
+                </StackPanel>
+            </Expander>
             <!--Categories-->
             <Expander Classes="section" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsExpanded="True">
                 <Expander.Header>

@@ -151,9 +151,13 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     // Income by category
     [ObservableProperty] private IncomeByCategoryChartData _incomeByCategoryChartData = new();
     [ObservableProperty] private SavingsRateChartData _savingsRateChartData = new();
+    [ObservableProperty] private FixedVsVariableChartData _fixedVsVariableChartData = new();
 
     [ObservableProperty] private bool _isSavingsRateLoading = true;
     [ObservableProperty] private bool _isSavingsRateEmpty;
+    [ObservableProperty] private bool _isFixedVsVariableLoading = true;
+    [ObservableProperty] private bool _isFixedVsVariableEmpty;
+    [ObservableProperty] private bool _hasNoFixedExpenses;
 
     private CancellationTokenSource? _filterDebounceTokenSource;
     private const int FilterDebounceDelayMs = 300;
@@ -376,6 +380,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             FetchExpensesByCategoryAsync(provider),
             FetchIncomeByCategoryAsync(provider),
             FetchSavingsRateAsync(provider),
+            FetchFixedVsVariableAsync(provider),
             FetchAllTimeHighDataAsync(provider),
             FetchMaxBtcStackDataAsync(provider),
             FetchStatisticsDataAsync(provider),
@@ -478,13 +483,17 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         IsMonthlyTotalsLoading = true;
         IsSavingsRateLoading = true;
-        FetchMonthlyTotalsAndSavingsRateWithProviderAsync().FireAndForgetSafeAsync(_runner, _logger);
+        IsFixedVsVariableLoading = true;
+        FetchReportsWithDateRangeFilterAsync().FireAndForgetSafeAsync(_runner, _logger);
     }
 
-    private async Task FetchMonthlyTotalsAndSavingsRateWithProviderAsync()
+    private async Task FetchReportsWithDateRangeFilterAsync()
     {
         var provider = await GetOrCreateProviderAsync();
-        await Task.WhenAll(FetchMonthlyTotalsAsync(provider), FetchSavingsRateAsync(provider));
+        await Task.WhenAll(
+            FetchMonthlyTotalsAsync(provider),
+            FetchSavingsRateAsync(provider),
+            FetchFixedVsVariableAsync(provider));
     }
 
     private async Task FetchMonthlyTotalsWithProviderAsync()
@@ -991,6 +1000,36 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
     }
 
+    private async Task FetchFixedVsVariableAsync(IReportDataProvider provider)
+    {
+        try
+        {
+            var data = await _queryDispatcher.DispatchAsync(new GetFixedVsVariableQuery
+            {
+                From = DateOnly.FromDateTime(FilterRange.Start),
+                To = DateOnly.FromDateTime(FilterRange.End)
+            });
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                HasNoFixedExpenses = data.HasNoFixedExpenses;
+                IsFixedVsVariableEmpty = data.Months.Count == 0 && !data.HasNoFixedExpenses;
+
+                if (!data.HasNoFixedExpenses)
+                {
+                    FixedVsVariableChartData.RefreshChart(data);
+                }
+
+                IsFixedVsVariableLoading = false;
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching fixed vs variable expenses");
+            await Dispatcher.UIThread.InvokeAsync(() => { IsFixedVsVariableLoading = false; });
+        }
+    }
+
     private async Task FetchWealthOverviewAsync(IReportDataProvider provider)
     {
         try
@@ -1174,6 +1213,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         ExpensesByCategoryChartData.Dispose();
         IncomeByCategoryChartData.Dispose();
         SavingsRateChartData.Dispose();
+        FixedVsVariableChartData.Dispose();
         WealthOverviewChartData.Dispose();
 
         // Clear the provider on dispose

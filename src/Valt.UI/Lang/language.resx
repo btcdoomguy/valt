@@ -2979,4 +2979,22 @@
     <data name="Reports_SavingsRate_EmptyBody" xml:space="preserve">
         <value>Add income and expense transactions to see your monthly savings rate.</value>
     </data>
+    <data name="Reports_FixedVariable_Title" xml:space="preserve">
+        <value>Fixed vs variable expenses</value>
+    </data>
+    <data name="Reports_FixedVariable_Fixed" xml:space="preserve">
+        <value>Fixed</value>
+    </data>
+    <data name="Reports_FixedVariable_Variable" xml:space="preserve">
+        <value>Variable</value>
+    </data>
+    <data name="Reports_FixedVariable_EmptyNoneHeading" xml:space="preserve">
+        <value>No fixed expenses registered</value>
+    </data>
+    <data name="Reports_FixedVariable_EmptyNoneBody" xml:space="preserve">
+        <value>Register fixed expenses in the Fixed Expenses tab to unlock this breakdown.</value>
+    </data>
+    <data name="Reports_FixedVariable_EmptyPeriod" xml:space="preserve">
+        <value>No expense data for this period — add transactions or widen the date range.</value>
+    </data>
 </root>

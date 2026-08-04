@@ -5840,5 +5840,41 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports_SavingsRate_EmptyBody", resourceCulture);
             }
         }
+        
+        public static string Reports_FixedVariable_Title {
+            get {
+                return ResourceManager.GetString("Reports_FixedVariable_Title", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedVariable_Fixed {
+            get {
+                return ResourceManager.GetString("Reports_FixedVariable_Fixed", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedVariable_Variable {
+            get {
+                return ResourceManager.GetString("Reports_FixedVariable_Variable", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedVariable_EmptyNoneHeading {
+            get {
+                return ResourceManager.GetString("Reports_FixedVariable_EmptyNoneHeading", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedVariable_EmptyNoneBody {
+            get {
+                return ResourceManager.GetString("Reports_FixedVariable_EmptyNoneBody", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedVariable_EmptyPeriod {
+            get {
+                return ResourceManager.GetString("Reports_FixedVariable_EmptyPeriod", resourceCulture);
+            }
+        }
     }
 }
