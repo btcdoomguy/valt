@@ -5768,5 +5768,59 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Validation_FeesRequired", resourceCulture);
             }
         }
+        
+        public static string Reports_BurnRate_Title {
+            get {
+                return ResourceManager.GetString("Reports_BurnRate_Title", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BurnRate_SpentSoFar {
+            get {
+                return ResourceManager.GetString("Reports_BurnRate_SpentSoFar", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BurnRate_AvgDaily {
+            get {
+                return ResourceManager.GetString("Reports_BurnRate_AvgDaily", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BurnRate_Projected {
+            get {
+                return ResourceManager.GetString("Reports_BurnRate_Projected", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BurnRate_MedianMonth {
+            get {
+                return ResourceManager.GetString("Reports_BurnRate_MedianMonth", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BurnRate_VsMedian {
+            get {
+                return ResourceManager.GetString("Reports_BurnRate_VsMedian", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BurnRate_VsMedian_Tooltip {
+            get {
+                return ResourceManager.GetString("Reports_BurnRate_VsMedian_Tooltip", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BurnRate_EarlyNote {
+            get {
+                return ResourceManager.GetString("Reports_BurnRate_EarlyNote", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BurnRate_Empty {
+            get {
+                return ResourceManager.GetString("Reports_BurnRate_Empty", resourceCulture);
+            }
+        }
     }
 }

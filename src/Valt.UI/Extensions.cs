@@ -87,6 +87,7 @@ public static class Extensions
         services.AddSingleton<ILeveragePositionsPanelViewModel>(sp => sp.GetRequiredService<LeveragePositionsPanelViewModel>());
         services.AddSingleton<BtcLoansPanelViewModel>();
         services.AddSingleton<IBtcLoansPanelViewModel>(sp => sp.GetRequiredService<BtcLoansPanelViewModel>());
+        services.AddSingleton<BurnRatePanelViewModel>();
         //factory method for pages
         services.AddSingleton<Func<MainViewTabNames, ValtTabViewModel>>(services => pageNames =>
         {

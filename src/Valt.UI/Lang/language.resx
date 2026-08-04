@@ -2943,4 +2943,31 @@
     <data name="Validation_FeesRequired" xml:space="preserve">
         <value>Fees are required</value>
     </data>
+    <data name="Reports_BurnRate_Title" xml:space="preserve">
+        <value>Burn rate</value>
+    </data>
+    <data name="Reports_BurnRate_SpentSoFar" xml:space="preserve">
+        <value>Spent so far (this month)</value>
+    </data>
+    <data name="Reports_BurnRate_AvgDaily" xml:space="preserve">
+        <value>Avg daily spend</value>
+    </data>
+    <data name="Reports_BurnRate_Projected" xml:space="preserve">
+        <value>Projected month-end</value>
+    </data>
+    <data name="Reports_BurnRate_MedianMonth" xml:space="preserve">
+        <value>Median month (12 mo)</value>
+    </data>
+    <data name="Reports_BurnRate_VsMedian" xml:space="preserve">
+        <value>vs median</value>
+    </data>
+    <data name="Reports_BurnRate_VsMedian_Tooltip" xml:space="preserve">
+        <value>Projected month-end spend compared to your median monthly spend over the last 12 months.</value>
+    </data>
+    <data name="Reports_BurnRate_EarlyNote" xml:space="preserve">
+        <value>Projection available from day 5</value>
+    </data>
+    <data name="Reports_BurnRate_Empty" xml:space="preserve">
+        <value>No expenses recorded this month — add expense transactions to see your burn rate.</value>
+    </data>
 </root>
