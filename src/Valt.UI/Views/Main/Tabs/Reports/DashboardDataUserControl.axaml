@@ -118,7 +118,7 @@
                                                    Text="{Binding RightText}"
                                                    FontSize="{DynamicResource FontSizeSmall}"
                                                    FontWeight="Medium"
-                                                   Foreground="{DynamicResource Text100Brush}"
+                                                   Foreground="{Binding RightTextForeground, TargetNullValue={DynamicResource Text100Brush}, FallbackValue={DynamicResource Text100Brush}}"
                                                    DockPanel.Dock="Right"
                                                    Padding="0, 4, 10, 0"
                                                    HorizontalAlignment="Right"
