@@ -179,6 +179,8 @@ public class ReportsViewModelTests
             .Returns(new List<string>());
         _configurationManager.GetStatisticsExcludedCategoryIds()
             .Returns(new List<string>());
+        _configurationManager.GetReportsAnalyticsCategoryFilterExcludedIds()
+            .Returns(new List<string>());
     }
 
     private void ConfigureDefaultClockBehavior()
@@ -448,5 +450,74 @@ public class ReportsViewModelTests
         // Assert
         Assert.That(viewModel.HasNoFixedExpenses, Is.True);
         Assert.That(propertyChanged, Is.True, "PropertyChanged should be raised for HasNoFixedExpenses");
+    }
+
+    [Test]
+    public void OpenReportsCategoryFilterConfigCommand_Exists_After_Construction()
+    {
+        // Act
+        var viewModel = CreateViewModel();
+
+        // Assert
+        Assert.That(viewModel.OpenReportsCategoryFilterConfigCommand, Is.Not.Null,
+            "OpenReportsCategoryFilterConfigCommand should be created by the constructor");
+    }
+
+    [Test]
+    public void GetSelectedAnalyticsCategoryIds_Returns_Available_Minus_Excluded()
+    {
+        // Arrange
+        var excludedId = "507f1f77bcf86cd799439012";
+        _configurationManager.GetReportsAnalyticsCategoryFilterExcludedIds()
+            .Returns(new List<string> { excludedId });
+
+        var categories = Substitute.For<ILiteCollection<CategoryEntity>>();
+        categories.FindAll().Returns(new List<CategoryEntity>
+        {
+            new() { Id = new ObjectId("507f1f77bcf86cd799439011"), Name = "Category 1" },
+            new() { Id = new ObjectId(excludedId), Name = "Category 2" },
+            new() { Id = new ObjectId("507f1f77bcf86cd799439013"), Name = "Category 3" }
+        });
+        _localDatabase.GetCategories().Returns(categories);
+
+        var viewModel = CreateViewModel();
+
+        // Act - use reflection to access private helper
+        var method = typeof(ReportsViewModel).GetMethod(
+            "GetSelectedAnalyticsCategoryIds",
+            BindingFlags.NonPublic | BindingFlags.Instance);
+        var result = (string[])method!.Invoke(viewModel, null)!;
+
+        // Assert
+        Assert.That(result, Is.EquivalentTo(new[] { "507f1f77bcf86cd799439011", "507f1f77bcf86cd799439013" }),
+            "Selected analytics category IDs should exclude the configured excluded ID");
+    }
+
+    [Test]
+    public void BurnRatePanelViewModel_SetCategoryFilter_Stores_Ids_And_RefreshAsync_Passes_Them_To_Query()
+    {
+        // Arrange
+        var categoryIds = new[] { "cat-1", "cat-3" };
+        GetBurnRateQuery? capturedQuery = null;
+        _queryDispatcher.DispatchAsync(Arg.Do<GetBurnRateQuery>(q => capturedQuery = q), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(new BurnRateDataDto
+            {
+                HasData = false,
+                SpentSoFar = 0m,
+                AvgDailySpend = 0m,
+                MedianMonthlyExpenses = 0m,
+                DayOfMonth = 15,
+                PrimaryCurrency = "USD"
+            }));
+
+        _burnRatePanel.SetCategoryFilter(categoryIds);
+
+        // Act
+        _burnRatePanel.RefreshAsync();
+
+        // Assert
+        Assert.That(capturedQuery, Is.Not.Null, "RefreshAsync should dispatch GetBurnRateQuery");
+        Assert.That(capturedQuery!.CategoryIds, Is.EquivalentTo(categoryIds),
+            "GetBurnRateQuery.CategoryIds should contain the IDs set by SetCategoryFilter");
     }
 }
