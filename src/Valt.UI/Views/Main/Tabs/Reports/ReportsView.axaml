@@ -24,27 +24,27 @@
     <UserControl.Resources>
         <converters:WealthOverviewPeriodConverter x:Key="WealthOverviewPeriodConverter" />
     </UserControl.Resources>
-    <Grid>
-        <ScrollViewer IsVisible="{Binding !IsSecureModeEnabled}" Margin="0, 8, 0, 0">
+    <Grid RowDefinitions="Auto,*">
+        <Grid Grid.Row="0" IsVisible="{Binding !IsSecureModeEnabled}" Margin="0,8,16,0">
+            <Button Classes="transparent"
+                    Padding="4"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Command="{Binding OpenReportsCategoryFilterConfigCommand}"
+                    ToolTip.Tip="{x:Static lang:language.Reports_CategoryFilter_Tooltip}">
+                <TextBlock FontFamily="{DynamicResource MaterialDesign}" Text="&#xE8B8;" FontSize="18"
+                           Foreground="{DynamicResource Text300Brush}" />
+            </Button>
+        </Grid>
+        <ScrollViewer Grid.Row="1" IsVisible="{Binding !IsSecureModeEnabled}" Margin="0, 8, 0, 0">
         <StackPanel Margin="16">
             <!--Summary-->
             <Expander Classes="section" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsExpanded="True">
                 <Expander.Header>
-                    <Grid ColumnDefinitions="*,Auto">
-                        <StackPanel Grid.Column="0" Orientation="Horizontal">
-                            <TextBlock Classes="section-header-icon" Text="&#xE1B1;" />
-                            <TextBlock Classes="section-header" Text="{x:Static lang:language.Reports_Summary}" />
-                        </StackPanel>
-                        <Button Grid.Column="1"
-                                Classes="transparent"
-                                Padding="4"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Center"
-                                Command="{Binding OpenReportsCategoryFilterConfigCommand}">
-                            <TextBlock FontFamily="{DynamicResource MaterialDesign}" Text="&#xE3D3;" FontSize="18"
-                                       Foreground="{DynamicResource Text300Brush}" />
-                        </Button>
-                    </Grid>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Classes="section-header-icon" Text="&#xE1B1;" />
+                        <TextBlock Classes="section-header" Text="{x:Static lang:language.Reports_Summary}" />
+                    </StackPanel>
                 </Expander.Header>
                 
                 <StackPanel>
@@ -679,7 +679,7 @@
         </StackPanel>
         </ScrollViewer>
         <!-- Secure Mode Overlay -->
-        <Border IsVisible="{Binding IsSecureModeEnabled}"
+        <Border Grid.Row="1" IsVisible="{Binding IsSecureModeEnabled}"
                 Background="{DynamicResource Background800Brush}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch">

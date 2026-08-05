@@ -2991,7 +2991,7 @@
     <data name="Reports_FixedVariable_EmptyNoneBody" xml:space="preserve">
         <value>Registre despesas fixas na aba Despesas Fixas para desbloquear este detalhamento.</value>
     </data>
-    <data name="Reports_FixedVariable_EmptyPeriod" xml:space="preserve">
-        <value>Nenhum dado de despesa para este período — adicione transações ou amplie o intervalo de datas.</value>
+    <data name="Reports_CategoryFilter_Tooltip" xml:space="preserve">
+        <value>Configurar categorias excluídas de todos os relatórios analíticos</value>
     </data>
 </root>

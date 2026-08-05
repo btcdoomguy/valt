@@ -5894,5 +5894,11 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports_CategoryFilter_Config_ExcludedCategories", resourceCulture);
             }
         }
+        
+        public static string Reports_CategoryFilter_Tooltip {
+            get {
+                return ResourceManager.GetString("Reports_CategoryFilter_Tooltip", resourceCulture);
+            }
+        }
     }
 }

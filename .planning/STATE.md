@@ -5,10 +5,10 @@ milestone_name: Insights & Metrics Expansion
 current_phase: 40
 current_phase_name: BTC-Denominated Metrics Reports & UI
 status: verifying
-stopped_at: Completed 39-01-PLAN.md
-last_updated: "2026-08-05T00:22:09.030Z"
+stopped_at: Phase 39 gap closure complete; Phase 40 ready
+last_updated: "2026-08-05T13:30:00.000Z"
 last_activity: 2026-08-05
-last_activity_desc: Phase 39 complete, transitioned to Phase 40
+last_activity_desc: Completed gap closure plans 39-05 and 39-06 for Phase 39
 progress:
   total_phases: 5
   completed_phases: 1
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-15)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 39 — spending-analytics-reports-ui
+**Current focus:** Phase 40 — BTC-Denominated Metrics Reports & UI
 
 ## Current Position
 
 Phase: 40 — BTC-Denominated Metrics Reports & UI
 Plan: Not started
 Status: Phase complete — ready for verification
-Last activity: 2026-08-05 — Completed quick task 260804-u3u: add pt-BR and es translations for Phase 39 Reports strings
+Last activity: 2026-08-05 — Completed gap closure plans 39-05 and 39-06 (Phase 39 now 6/6)
 
 ## Performance Metrics
 
@@ -53,7 +53,7 @@ Last activity: 2026-08-05 — Completed quick task 260804-u3u: add pt-BR and es 
 | 36 | 2 | - | - |
 | 37 | 2 | - | - |
 | Phase 38 | 2/3 | — | — |
-| 39 | 4 | - | - |
+| 39 | 6/6 | - | - |
 
 **Recent Trend:**
 

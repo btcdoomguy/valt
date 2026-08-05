@@ -2991,7 +2991,7 @@
     <data name="Reports_FixedVariable_EmptyNoneBody" xml:space="preserve">
         <value>Registre gastos fijos en la pestaña Gastos Fijos para desbloquear este desglose.</value>
     </data>
-    <data name="Reports_FixedVariable_EmptyPeriod" xml:space="preserve">
-        <value>No hay datos de gastos para este período — agregue transacciones o amplíe el rango de fechas.</value>
+    <data name="Reports_CategoryFilter_Tooltip" xml:space="preserve">
+        <value>Configurar categorías excluidas de todos los informes analíticos</value>
     </data>
 </root>
