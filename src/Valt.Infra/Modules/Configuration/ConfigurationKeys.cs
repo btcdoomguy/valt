@@ -10,5 +10,6 @@ internal static class ConfigurationKeys
     public static string IncomeCategoryFilterExcluded => "IncomeCategoryFilterExcluded";
     public static string SpendingEvolutionCategoryFilterExcluded => "SpendingEvolutionCategoryFilterExcluded";
     public static string SpendingEvolutionAccountFilterExcluded => "SpendingEvolutionAccountFilterExcluded";
+    public static string ReportsAnalyticsCategoryFilterExcluded => "ReportsAnalyticsCategoryFilterExcluded";
     public static string SimulatedPrices => "SimulatedPrices";
 }

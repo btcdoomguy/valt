@@ -382,6 +382,38 @@ public class ConfigurationManager : IConfigurationManager
         _localDatabase.GetConfiguration().Upsert(config);
     }
 
+    public List<string> GetReportsAnalyticsCategoryFilterExcludedIds()
+    {
+        var config = _localDatabase.GetConfiguration()
+            .FindOne(x => x.Key == ConfigurationKeys.ReportsAnalyticsCategoryFilterExcluded);
+
+        if (config is null || string.IsNullOrWhiteSpace(config.Value))
+            return new List<string>();
+
+        return config.Value.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(id => id.Trim())
+            .Distinct()
+            .ToList();
+    }
+
+    public void SetReportsAnalyticsCategoryFilterExcludedIds(IEnumerable<string> categoryIds)
+    {
+        var config = _localDatabase.GetConfiguration()
+            .FindOne(x => x.Key == ConfigurationKeys.ReportsAnalyticsCategoryFilterExcluded);
+
+        if (config is null)
+            config = new ConfigurationEntity { Key = ConfigurationKeys.ReportsAnalyticsCategoryFilterExcluded };
+
+        var distinctIds = categoryIds
+            .Where(id => !string.IsNullOrWhiteSpace(id))
+            .Select(id => id.Trim())
+            .Distinct();
+
+        config.Value = string.Join(",", distinctIds);
+
+        _localDatabase.GetConfiguration().Upsert(config);
+    }
+
     private static readonly List<SimulatedPriceLineConfig> DefaultSimulatedPriceLines =
     [
         new(SimulatedPriceType.Percentage, 50),
