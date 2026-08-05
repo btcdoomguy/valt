@@ -2555,6 +2555,15 @@
     <data name="Reports.CategoryFilter.SaveSuccess" xml:space="preserve">
         <value>Filtro padrão salvo</value>
     </data>
+    <data name="Reports_CategoryFilter_Config_Title" xml:space="preserve">
+        <value>Filtro de categorias dos relatórios analíticos</value>
+    </data>
+    <data name="Reports_CategoryFilter_Config_Description" xml:space="preserve">
+        <value>Selecione as categorias que deseja excluir das análises de taxa de economia, taxa de queima, despesas fixas vs variáveis e estatísticas.</value>
+    </data>
+    <data name="Reports_CategoryFilter_Config_ExcludedCategories" xml:space="preserve">
+        <value>Categorias excluídas</value>
+    </data>
     <data name="Reports.SimulatedPrices.Title" xml:space="preserve">
         <value>Preços Simulados</value>
     </data>

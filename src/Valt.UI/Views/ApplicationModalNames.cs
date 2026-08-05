@@ -23,7 +23,7 @@ public enum ApplicationModalNames
     ManageGoal = 19,
     ConversionCalculator = 20,
     ManageAccountGroup = 21,
-    StatisticsConfig = 22,
+    // StatisticsConfig = 22, // removed - replaced by centralized ReportsCategoryFilterConfig
     ManageAsset = 23,
     ManageAssetGroup = 30,
     ManageAssetGroupsList = 31,

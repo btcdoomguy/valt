@@ -42,7 +42,6 @@ using Valt.UI.Views.Main.Modals.ConversionCalculator;
 using Valt.UI.Views.Main.Modals.ManageAccountGroup;
 using Valt.UI.Views.Main.Modals.ManageAssetGroup;
 using Valt.UI.Views.Main.Modals.ManageAssetGroupsList;
-using Valt.UI.Views.Main.Modals.StatisticsConfig;
 using Valt.UI.Views.Main.Modals.ManageAsset;
 using Valt.UI.Views.Main.Modals.LeverageSimulator;
 using Valt.UI.UserControls;
@@ -145,7 +144,6 @@ public static class Extensions
         services.AddTransient<ManageAccountGroupViewModel>();
         services.AddTransient<ManageAssetGroupViewModel>();
         services.AddTransient<ManageAssetGroupsListViewModel>();
-        services.AddTransient<StatisticsConfigViewModel>();
         services.AddTransient<ManageAssetViewModel>();
         services.AddTransient<LeverageSimulatorViewModel>();
         services.AddTransient<PriceHistoryViewModel>();
@@ -260,10 +258,6 @@ public static class Extensions
                 ApplicationModalNames.ManageAssetGroupsList => new ManageAssetGroupsListView()
                 {
                     DataContext = services.GetRequiredService<ManageAssetGroupsListViewModel>(),
-                },
-                ApplicationModalNames.StatisticsConfig => new StatisticsConfigView()
-                {
-                    DataContext = services.GetRequiredService<StatisticsConfigViewModel>(),
                 },
                 ApplicationModalNames.ManageAsset => new ManageAssetView()
                 {

@@ -2555,6 +2555,15 @@
     <data name="Reports.CategoryFilter.SaveSuccess" xml:space="preserve">
         <value>Filtro predeterminado guardado</value>
     </data>
+    <data name="Reports_CategoryFilter_Config_Title" xml:space="preserve">
+        <value>Filtro de categorías de informes analíticos</value>
+    </data>
+    <data name="Reports_CategoryFilter_Config_Description" xml:space="preserve">
+        <value>Seleccione las categorías que desea excluir de los análisis de tasa de ahorro, tasa de quema, gastos fijos vs variables y estadísticas.</value>
+    </data>
+    <data name="Reports_CategoryFilter_Config_ExcludedCategories" xml:space="preserve">
+        <value>Categorías excluidas</value>
+    </data>
     <data name="Reports.SimulatedPrices.Title" xml:space="preserve">
         <value>Precios Simulados</value>
     </data>
