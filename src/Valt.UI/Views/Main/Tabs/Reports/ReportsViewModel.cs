@@ -50,6 +50,7 @@ using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Modals.SimulatedPricesConfig;
 using Valt.UI.Views.Main.Modals.FixedPriceConfig;
 using Valt.UI.Views.Main.Modals.StatisticsConfig;
+using Valt.UI.Views.Main.Modals.ReportsCategoryFilterConfig;
 using Valt.UI.Views.Main.Tabs.Reports.Models;
 using Valt.UI.Views.Main.Tabs.Reports.Panels;
 
@@ -88,6 +89,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
     // Cached provider for the lifetime of the tab being active
     private IReportDataProvider? _cachedProvider;
+
+    // Cached excluded category IDs for analytics panels
+    private IReadOnlySet<string> _analyticsExcludedCategoryIds = new HashSet<string>();
 
     // Cached ATH fiat value for reuse by leverage positions panel
     private decimal? _allTimeHighFiatValue;
@@ -241,6 +245,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         CategoryFilterRange = new DateRange(currentMonth, currentMonth.AddMonths(1).AddDays(-1));
 
         PrepareAccountsAndCategoriesList();
+        LoadReportsAnalyticsCategoryFilter();
 
         SelectedAccounts.CollectionChanged += OnSelectedFiltersChanged;
         SelectedCategories.CollectionChanged += OnSelectedFiltersChanged;
@@ -263,6 +268,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     ReloadDataAndFetchAllReportsAsync().FireAndForgetSafeAsync(_runner, _logger);
                     _simulatedPricesPanel.Refresh();
                     _btcLoansPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+                    _burnRatePanel.SetCategoryFilter(GetSelectedAnalyticsCategoryIds());
                     _burnRatePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
                     break;
             }
@@ -275,6 +281,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         {
             _leveragePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
             _btcLoansPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+            _burnRatePanel.SetCategoryFilter(GetSelectedAnalyticsCategoryIds());
             _burnRatePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
         });
 
@@ -296,6 +303,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         try
         {
             PrepareAccountsAndCategoriesList();
+            LoadReportsAnalyticsCategoryFilter();
         }
         finally
         {
@@ -307,6 +315,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             {
                 await _leveragePanel.RefreshAsync();
                 await _btcLoansPanel.RefreshAsync();
+                _burnRatePanel.SetCategoryFilter(GetSelectedAnalyticsCategoryIds());
                 await _burnRatePanel.RefreshAsync();
             }, TaskScheduler.Default)
             .Unwrap()
@@ -426,6 +435,23 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             foreach (var item in toRemove)
                 SelectedCategories.Remove(item);
         }
+    }
+
+    private void LoadReportsAnalyticsCategoryFilter()
+    {
+        var excludedIds = _configurationManager.GetReportsAnalyticsCategoryFilterExcludedIds();
+        _analyticsExcludedCategoryIds = excludedIds.ToHashSet();
+    }
+
+    private string[] GetSelectedAnalyticsCategoryIds()
+    {
+        if (_analyticsExcludedCategoryIds.Count == 0)
+            return Array.Empty<string>();
+
+        return AvailableCategories
+            .Where(c => !_analyticsExcludedCategoryIds.Contains(c.Id))
+            .Select(c => c.Id)
+            .ToArray();
     }
 
     private IEnumerable<SelectItem> GetFilterableAccounts()
@@ -742,6 +768,28 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     }
 
     [RelayCommand]
+    private async Task OpenReportsCategoryFilterConfig()
+    {
+        var ownerWindow = GetUserControlOwnerWindow?.Invoke();
+        if (ownerWindow is null)
+            return;
+
+        var modal = (ReportsCategoryFilterConfigView)await _modalFactory.CreateAsync(
+            ApplicationModalNames.ReportsCategoryFilterConfig,
+            ownerWindow);
+
+        var result = await modal.ShowDialogSafeAsync<ReportsCategoryFilterConfigViewModel.Response?>(ownerWindow);
+
+        if (result?.Ok == true)
+        {
+            LoadReportsAnalyticsCategoryFilter();
+            await FetchReportsWithDateRangeFilterAsync();
+            _burnRatePanel.SetCategoryFilter(GetSelectedAnalyticsCategoryIds());
+            await _burnRatePanel.RefreshAsync();
+        }
+    }
+
+    [RelayCommand]
     private async Task OpenStatisticsConfig()
     {
         var ownerWindow = GetUserControlOwnerWindow?.Invoke();
@@ -847,9 +895,10 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _wealthPanel.Refresh();
         _btcStackPanel.Refresh();
         _simulatedPricesPanel.Refresh();
-        _leveragePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
-        _btcLoansPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
-        _burnRatePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+            _leveragePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+            _btcLoansPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+            _burnRatePanel.SetCategoryFilter(GetSelectedAnalyticsCategoryIds());
+            _burnRatePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
     }
 
     private decimal GetCurrentBtcPriceInMainFiat()
@@ -987,7 +1036,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             var data = await _queryDispatcher.DispatchAsync(new GetSavingsRateQuery
             {
                 From = DateOnly.FromDateTime(FilterRange.Start),
-                To = DateOnly.FromDateTime(FilterRange.End)
+                To = DateOnly.FromDateTime(FilterRange.End),
+                CategoryIds = GetSelectedAnalyticsCategoryIds()
             });
 
             await Dispatcher.UIThread.InvokeAsync(() =>
@@ -1015,7 +1065,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             var data = await _queryDispatcher.DispatchAsync(new GetFixedVsVariableQuery
             {
                 From = DateOnly.FromDateTime(FilterRange.Start),
-                To = DateOnly.FromDateTime(FilterRange.End)
+                To = DateOnly.FromDateTime(FilterRange.End),
+                CategoryIds = GetSelectedAnalyticsCategoryIds()
             });
 
             await Dispatcher.UIThread.InvokeAsync(() =>
@@ -1108,9 +1159,10 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             Dispatcher.UIThread.Post(_wealthPanel.Refresh);
             Dispatcher.UIThread.Post(_btcStackPanel.Refresh);
             Dispatcher.UIThread.Post(_simulatedPricesPanel.Refresh);
-            _leveragePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
-            _btcLoansPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
-            _burnRatePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+        _leveragePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+        _btcLoansPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+        _burnRatePanel.SetCategoryFilter(GetSelectedAnalyticsCategoryIds());
+        _burnRatePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
         }
     }
 

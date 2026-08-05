@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Queries;
@@ -24,6 +26,8 @@ public partial class BurnRatePanelViewModel : DashboardPanelViewModel
     private readonly CurrencySettings _currencySettings;
     private readonly ILogger<BurnRatePanelViewModel> _logger;
 
+    private IReadOnlyList<string> _selectedCategoryIds = Array.Empty<string>();
+
     public BurnRatePanelViewModel(
         IQueryDispatcher queryDispatcher,
         AccountsTotalState accountsTotalState,
@@ -37,6 +41,11 @@ public partial class BurnRatePanelViewModel : DashboardPanelViewModel
         _logger = logger;
     }
 
+    public void SetCategoryFilter(IReadOnlyList<string> selectedCategoryIds)
+    {
+        _selectedCategoryIds = selectedCategoryIds ?? Array.Empty<string>();
+    }
+
     public override async Task RefreshAsync()
     {
         try
@@ -45,7 +54,8 @@ public partial class BurnRatePanelViewModel : DashboardPanelViewModel
 
             var dto = await _queryDispatcher.DispatchAsync(new GetBurnRateQuery
             {
-                CurrentWealthInFiat = _accountsTotalState.CurrentWealth.AllWealthInMainFiatCurrency
+                CurrentWealthInFiat = _accountsTotalState.CurrentWealth.AllWealthInMainFiatCurrency,
+                CategoryIds = _selectedCategoryIds.ToArray()
             });
 
             var fiatCurrency = FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency);
