@@ -240,29 +240,31 @@ public class ReportsViewModelTests
     }
 
     [Test]
-    public void Initialize_Should_Refresh_LeveragePanel()
+    public async Task Initialize_Should_Refresh_LeveragePanel()
     {
         // Arrange
         var viewModel = CreateViewModel();
 
         // Act
         viewModel.Initialize();
+        await Task.Delay(100);
 
         // Assert
-        _leveragePanel.Received(1).RefreshAsync();
+        _ = _leveragePanel.Received(1).RefreshAsync();
     }
 
     [Test]
-    public void Initialize_Should_Refresh_BtcLoansPanel()
+    public async Task Initialize_Should_Refresh_BtcLoansPanel()
     {
         // Arrange
         var viewModel = CreateViewModel();
 
         // Act
         viewModel.Initialize();
+        await Task.Delay(100);
 
         // Assert
-        _btcLoansPanel.Received(1).RefreshAsync();
+        _ = _btcLoansPanel.Received(1).RefreshAsync();
     }
 
     [Test]
