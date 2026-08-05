@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Avalonia.Controls;
+using Valt.App.Modules.SpendingAnalytics.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Budget.Categories;
@@ -364,5 +365,30 @@ public partial class ReportsViewModel
         IsAllTimeHighLoading = false;
         IsMonthlyTotalsLoading = false;
         IsSpendingByCategoriesLoading = false;
+        IsSavingsRateLoading = false;
+        IsFixedVsVariableLoading = false;
+
+        SavingsRateChartData.RefreshChart(new SavingsRateDataDto()
+        {
+            PrimaryCurrency = "BRL",
+            Months = new List<SavingsRateMonthDto>
+            {
+                new() { Month = new DateOnly(2025, 1, 1), Rate = 25.5m },
+                new() { Month = new DateOnly(2025, 2, 1), Rate = null },
+                new() { Month = new DateOnly(2025, 3, 1), Rate = -10.0m }
+            }
+        });
+
+        FixedVsVariableChartData.RefreshChart(new FixedVsVariableDataDto()
+        {
+            PrimaryCurrency = "BRL",
+            HasNoFixedExpenses = false,
+            Months = new List<FixedVsVariableMonthDto>
+            {
+                new() { Month = new DateOnly(2025, 1, 1), FixedTotal = 5000.0m, VariableTotal = 8000.0m },
+                new() { Month = new DateOnly(2025, 2, 1), FixedTotal = 5200.0m, VariableTotal = 7500.0m },
+                new() { Month = new DateOnly(2025, 3, 1), FixedTotal = 4800.0m, VariableTotal = 9000.0m }
+            }
+        });
     }
 }
