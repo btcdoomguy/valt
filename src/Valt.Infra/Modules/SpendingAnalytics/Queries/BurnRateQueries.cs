@@ -57,8 +57,9 @@ public class BurnRateQueries : IBurnRateQueries
 
         try
         {
+            var excludedCategoryIds = GetExcludedCategoryIds(query, provider);
             var mtdRange = new DateOnlyRange(new DateOnly(today.Year, today.Month, 1), today);
-            var mtd = await _monthlyTotalsReport.GetAsync(today, mtdRange, currency, provider);
+            var mtd = await _monthlyTotalsReport.GetAsync(today, mtdRange, currency, provider, excludedCategoryIds);
             var spentMtd = Math.Abs(mtd.Total.AllExpensesInFiat);
 
             if (spentMtd == 0)
@@ -70,7 +71,7 @@ public class BurnRateQueries : IBurnRateQueries
             var daysInMonth = DateTime.DaysInMonth(today.Year, today.Month);
             decimal? projected = today.Day >= 5 ? avgDaily * daysInMonth : null;
 
-            var stats = await _statisticsReport.GetAsync(currency, query.CurrentWealthInFiat, provider);
+            var stats = await _statisticsReport.GetAsync(currency, query.CurrentWealthInFiat, provider, excludedCategoryIds);
             var median = stats.MedianMonthlyExpenses.Value;
 
             decimal? vsMedian = projected.HasValue && median > 0
@@ -93,5 +94,19 @@ public class BurnRateQueries : IBurnRateQueries
         {
             return emptyDto;
         }
+    }
+
+    private static IReadOnlySet<string>? GetExcludedCategoryIds(GetBurnRateQuery query, IReportDataProvider provider)
+    {
+        if (query.CategoryIds.Length == 0)
+            return null;
+
+        var selectedIds = query.CategoryIds.ToHashSet();
+        var excluded = provider.Categories.Keys
+            .Select(id => id.ToString())
+            .Where(id => !selectedIds.Contains(id))
+            .ToHashSet();
+
+        return excluded.Count > 0 ? excluded : null;
     }
 }

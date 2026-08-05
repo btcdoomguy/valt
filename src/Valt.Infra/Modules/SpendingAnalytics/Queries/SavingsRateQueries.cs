@@ -47,11 +47,13 @@ public class SavingsRateQueries : ISavingsRateQueries
         {
             var today = _clock.GetCurrentLocalDate();
             var firstOfCurrentMonth = new DateOnly(today.Year, today.Month, 1);
+            var excludedCategoryIds = GetExcludedCategoryIds(query, provider);
             var monthlyTotals = await _monthlyTotalsReport.GetAsync(
                 today,
                 new DateOnlyRange(query.From, query.To),
                 currency,
-                provider);
+                provider,
+                excludedCategoryIds);
 
             var months = new List<SavingsRateMonthDto>();
             foreach (var item in monthlyTotals.Items)
@@ -95,5 +97,19 @@ public class SavingsRateQueries : ISavingsRateQueries
                 PrimaryCurrency = currency.Code
             };
         }
+    }
+
+    private static IReadOnlySet<string>? GetExcludedCategoryIds(GetSavingsRateQuery query, IReportDataProvider provider)
+    {
+        if (query.CategoryIds.Length == 0)
+            return null;
+
+        var selectedIds = query.CategoryIds.ToHashSet();
+        var excluded = provider.Categories.Keys
+            .Select(id => id.ToString())
+            .Where(id => !selectedIds.Contains(id))
+            .ToHashSet();
+
+        return excluded.Count > 0 ? excluded : null;
     }
 }
