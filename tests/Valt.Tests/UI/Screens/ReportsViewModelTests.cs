@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Messaging;
 using LiteDB;
 using Microsoft.Extensions.Logging;
@@ -6,6 +7,7 @@ using NSubstitute;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.SpendingAnalytics.DTOs;
 using Valt.App.Modules.SpendingAnalytics.Queries;
+using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Kernel.Factories;
 using Valt.Infra.Crawlers.Indicators;
@@ -519,5 +521,59 @@ public class ReportsViewModelTests
         Assert.That(capturedQuery, Is.Not.Null, "RefreshAsync should dispatch GetBurnRateQuery");
         Assert.That(capturedQuery!.CategoryIds, Is.EquivalentTo(categoryIds),
             "GetBurnRateQuery.CategoryIds should contain the IDs set by SetCategoryFilter");
+    }
+
+    [Test]
+    public void StatisticsData_Does_Not_Expose_Configuration_Command()
+    {
+        // Act
+        var viewModel = CreateViewModel();
+
+        // Assert
+        Assert.That(viewModel.StatisticsData.HasConfiguration, Is.False,
+            "Statistics dashboard should not expose a configuration command");
+    }
+
+    [Test]
+    public async Task FetchStatisticsDataAsync_Passes_Centralized_Excluded_Category_Ids()
+    {
+        // Arrange
+        var excludedId = "507f1f77bcf86cd799439012";
+        _configurationManager.GetReportsAnalyticsCategoryFilterExcludedIds()
+            .Returns(new List<string> { excludedId });
+
+        var viewModel = CreateViewModel();
+
+        IReadOnlySet<string>? capturedExcludedIds = null;
+        _statisticsReport.GetAsync(
+                Arg.Any<FiatCurrency>(),
+                Arg.Any<decimal>(),
+                Arg.Any<IReportDataProvider>(),
+                Arg.Do<IReadOnlySet<string>?>(ids => capturedExcludedIds = ids))
+            .Returns(Task.FromResult(new StatisticsData
+            {
+                MedianMonthlyExpenses = FiatValue.New(0m),
+                Currency = FiatCurrency.Usd,
+                WealthCoverageMonths = 0,
+                WealthCoverageFormatted = "N/A",
+                HasMedianMonthlyExpensesPreviousPeriod = false,
+                HasMedianMonthlyExpensesSats = false
+            }));
+
+        var provider = Substitute.For<IReportDataProvider>();
+        var method = typeof(ReportsViewModel).GetMethod(
+            "FetchStatisticsDataAsync",
+            BindingFlags.NonPublic | BindingFlags.Instance);
+
+        // Act
+        await (Task)method!.Invoke(viewModel, new object[] { provider })!;
+
+        // Assert
+        Assert.That(capturedExcludedIds, Is.Not.Null,
+            "Statistics report should receive excluded category IDs");
+        Assert.That(capturedExcludedIds, Does.Contain(excludedId),
+            "Statistics report should receive the centralized excluded category ID");
+        Assert.That(viewModel.StatisticsData.HasConfiguration, Is.False,
+            "Statistics dashboard should not expose a configuration command after fetch");
     }
 }
