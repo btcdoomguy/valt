@@ -2940,4 +2940,58 @@
     <data name="Validation_FeesRequired" xml:space="preserve">
         <value>Las comisiones son obligatorias</value>
     </data>
+    <data name="Reports_BurnRate_Title" xml:space="preserve">
+        <value>Tasa de quema</value>
+    </data>
+    <data name="Reports_BurnRate_SpentSoFar" xml:space="preserve">
+        <value>Gasto hasta ahora (este mes)</value>
+    </data>
+    <data name="Reports_BurnRate_AvgDaily" xml:space="preserve">
+        <value>Gasto promedio diario</value>
+    </data>
+    <data name="Reports_BurnRate_Projected" xml:space="preserve">
+        <value>Proyección fin de mes</value>
+    </data>
+    <data name="Reports_BurnRate_MedianMonth" xml:space="preserve">
+        <value>Mediana mensual (12 meses)</value>
+    </data>
+    <data name="Reports_BurnRate_VsMedian" xml:space="preserve">
+        <value>vs mediana</value>
+    </data>
+    <data name="Reports_BurnRate_VsMedian_Tooltip" xml:space="preserve">
+        <value>Gasto proyectado a fin de mes comparado con su gasto mensual mediano en los últimos 12 meses.</value>
+    </data>
+    <data name="Reports_BurnRate_EarlyNote" xml:space="preserve">
+        <value>Proyección disponible desde el día 5</value>
+    </data>
+    <data name="Reports_BurnRate_Empty" xml:space="preserve">
+        <value>No se registraron gastos este mes — agregue transacciones de gasto para ver su tasa de quema.</value>
+    </data>
+    <data name="Reports_SavingsRate_Title" xml:space="preserve">
+        <value>Tasa de ahorro</value>
+    </data>
+    <data name="Reports_SavingsRate_EmptyHeading" xml:space="preserve">
+        <value>Aún no hay datos de ahorro</value>
+    </data>
+    <data name="Reports_SavingsRate_EmptyBody" xml:space="preserve">
+        <value>Agregue transacciones de ingresos y gastos para ver su tasa de ahorro mensual.</value>
+    </data>
+    <data name="Reports_FixedVariable_Title" xml:space="preserve">
+        <value>Gastos fijos vs variables</value>
+    </data>
+    <data name="Reports_FixedVariable_Fixed" xml:space="preserve">
+        <value>Fijo</value>
+    </data>
+    <data name="Reports_FixedVariable_Variable" xml:space="preserve">
+        <value>Variable</value>
+    </data>
+    <data name="Reports_FixedVariable_EmptyNoneHeading" xml:space="preserve">
+        <value>No hay gastos fijos registrados</value>
+    </data>
+    <data name="Reports_FixedVariable_EmptyNoneBody" xml:space="preserve">
+        <value>Registre gastos fijos en la pestaña Gastos Fijos para desbloquear este desglose.</value>
+    </data>
+    <data name="Reports_FixedVariable_EmptyPeriod" xml:space="preserve">
+        <value>No hay datos de gastos para este período — agregue transacciones o amplíe el rango de fechas.</value>
+    </data>
 </root>

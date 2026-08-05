@@ -2940,4 +2940,58 @@
     <data name="Validation_FeesRequired" xml:space="preserve">
         <value>Taxas são obrigatórias</value>
     </data>
+    <data name="Reports_BurnRate_Title" xml:space="preserve">
+        <value>Taxa de queima</value>
+    </data>
+    <data name="Reports_BurnRate_SpentSoFar" xml:space="preserve">
+        <value>Gasto até agora (este mês)</value>
+    </data>
+    <data name="Reports_BurnRate_AvgDaily" xml:space="preserve">
+        <value>Gasto médio diário</value>
+    </data>
+    <data name="Reports_BurnRate_Projected" xml:space="preserve">
+        <value>Projeção no fim do mês</value>
+    </data>
+    <data name="Reports_BurnRate_MedianMonth" xml:space="preserve">
+        <value>Mediana mensal (12 meses)</value>
+    </data>
+    <data name="Reports_BurnRate_VsMedian" xml:space="preserve">
+        <value>vs mediana</value>
+    </data>
+    <data name="Reports_BurnRate_VsMedian_Tooltip" xml:space="preserve">
+        <value>Gasto projetado no fim do mês comparado ao seu gasto mensal mediano nos últimos 12 meses.</value>
+    </data>
+    <data name="Reports_BurnRate_EarlyNote" xml:space="preserve">
+        <value>Projeção disponível a partir do dia 5</value>
+    </data>
+    <data name="Reports_BurnRate_Empty" xml:space="preserve">
+        <value>Nenhuma despesa registrada este mês — adicione transações de despesa para ver sua taxa de queima.</value>
+    </data>
+    <data name="Reports_SavingsRate_Title" xml:space="preserve">
+        <value>Taxa de economia</value>
+    </data>
+    <data name="Reports_SavingsRate_EmptyHeading" xml:space="preserve">
+        <value>Ainda não há dados de economia</value>
+    </data>
+    <data name="Reports_SavingsRate_EmptyBody" xml:space="preserve">
+        <value>Adicione transações de receita e despesa para ver sua taxa de economia mensal.</value>
+    </data>
+    <data name="Reports_FixedVariable_Title" xml:space="preserve">
+        <value>Despesas fixas vs variáveis</value>
+    </data>
+    <data name="Reports_FixedVariable_Fixed" xml:space="preserve">
+        <value>Fixo</value>
+    </data>
+    <data name="Reports_FixedVariable_Variable" xml:space="preserve">
+        <value>Variável</value>
+    </data>
+    <data name="Reports_FixedVariable_EmptyNoneHeading" xml:space="preserve">
+        <value>Nenhuma despesa fixa registrada</value>
+    </data>
+    <data name="Reports_FixedVariable_EmptyNoneBody" xml:space="preserve">
+        <value>Registre despesas fixas na aba Despesas Fixas para desbloquear este detalhamento.</value>
+    </data>
+    <data name="Reports_FixedVariable_EmptyPeriod" xml:space="preserve">
+        <value>Nenhum dado de despesa para este período — adicione transações ou amplie o intervalo de datas.</value>
+    </data>
 </root>
