@@ -49,7 +49,6 @@ using static Valt.UI.State.AccountsTotalState;
 using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Modals.SimulatedPricesConfig;
 using Valt.UI.Views.Main.Modals.FixedPriceConfig;
-using Valt.UI.Views.Main.Modals.StatisticsConfig;
 using Valt.UI.Views.Main.Modals.ReportsCategoryFilterConfig;
 using Valt.UI.Views.Main.Tabs.Reports.Models;
 using Valt.UI.Views.Main.Tabs.Reports.Panels;
@@ -694,8 +693,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             // Get current wealth in main fiat currency
             var currentWealthInFiat = currentWealth.AllWealthInMainFiatCurrency;
 
-            // Get excluded category IDs from configuration
-            var excludedCategoryIds = _configurationManager.GetStatisticsExcludedCategoryIds().ToHashSet();
+            // Use the centralized analytics excluded category set
+            var excludedCategoryIds = _analyticsExcludedCategoryIds;
 
             var statisticsData = await _statisticsReport.GetAsync(
                 fiatCurrency,
@@ -746,7 +745,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
             rows.Add(new RowItem(language.Reports_Statistics_WealthCoverage, statisticsData.WealthCoverageFormatted, TooltipContent.Text(language.Reports_Statistics_WealthCoverage_Tooltip)));
 
-            StatisticsData = new DashboardData(language.Reports_Statistics_Title, rows, OpenStatisticsConfigCommand, "\uE4FC");
+            StatisticsData = new DashboardData(language.Reports_Statistics_Title, rows, Icon: "\uE4FC");
 
             IsStatisticsLoading = false;
         }
@@ -758,8 +757,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     {
                         new(language.Error, ex.Message)
                     },
-                OpenStatisticsConfigCommand,
-                "\uE4FC");
+                Icon: "\uE4FC");
         }
         finally
         {
@@ -784,30 +782,11 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         {
             LoadReportsAnalyticsCategoryFilter();
             await FetchReportsWithDateRangeFilterAsync();
-            _burnRatePanel.SetCategoryFilter(GetSelectedAnalyticsCategoryIds());
-            await _burnRatePanel.RefreshAsync();
-        }
-    }
-
-    [RelayCommand]
-    private async Task OpenStatisticsConfig()
-    {
-        var ownerWindow = GetUserControlOwnerWindow?.Invoke();
-        if (ownerWindow is null)
-            return;
-
-        var modal = (StatisticsConfigView)await _modalFactory.CreateAsync(
-            ApplicationModalNames.StatisticsConfig,
-            ownerWindow);
-
-        var result = await modal.ShowDialogSafeAsync<StatisticsConfigViewModel.Response?>(ownerWindow);
-
-        // Refresh statistics after config change
-        if (result?.Ok == true)
-        {
             IsStatisticsLoading = true;
             var provider = await GetOrCreateProviderAsync();
             await FetchStatisticsDataAsync(provider);
+            _burnRatePanel.SetCategoryFilter(GetSelectedAnalyticsCategoryIds());
+            await _burnRatePanel.RefreshAsync();
         }
     }
 
