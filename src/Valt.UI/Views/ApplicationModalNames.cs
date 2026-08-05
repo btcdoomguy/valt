@@ -37,5 +37,6 @@ public enum ApplicationModalNames
     UpdateLoanState = 37,
     LoanStateHistory = 38,
     SoldAssetHistory = 39,
-    DateSoldPrompt = 40
+    DateSoldPrompt = 40,
+    ReportsCategoryFilterConfig = 41
 }
