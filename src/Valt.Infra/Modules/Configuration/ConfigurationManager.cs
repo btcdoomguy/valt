@@ -387,13 +387,26 @@ public class ConfigurationManager : IConfigurationManager
         var config = _localDatabase.GetConfiguration()
             .FindOne(x => x.Key == ConfigurationKeys.ReportsAnalyticsCategoryFilterExcluded);
 
-        if (config is null || string.IsNullOrWhiteSpace(config.Value))
-            return new List<string>();
+        var values = config is null || string.IsNullOrWhiteSpace(config.Value)
+            ? new List<string>()
+            : config.Value.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(id => id.Trim())
+                .Distinct()
+                .ToList();
 
-        return config.Value.Split(',', StringSplitOptions.RemoveEmptyEntries)
-            .Select(id => id.Trim())
-            .Distinct()
-            .ToList();
+        if (values.Count > 0)
+            return values;
+
+        // Transparently migrate legacy StatisticsExcludedCategories settings
+        // so existing users do not lose their category exclusions.
+        var legacyValues = GetStatisticsExcludedCategoryIds();
+        if (legacyValues.Count > 0)
+        {
+            SetReportsAnalyticsCategoryFilterExcludedIds(legacyValues);
+            return legacyValues;
+        }
+
+        return new List<string>();
     }
 
     public void SetReportsAnalyticsCategoryFilterExcludedIds(IEnumerable<string> categoryIds)
