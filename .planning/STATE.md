@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-07-15)
 Phase: 40 — BTC-Denominated Metrics Reports & UI
 Plan: Not started
 Status: Phase complete — ready for verification
-Last activity: 2026-08-05 — Completed quick task 260804-tyf: restore DashboardData right-text foreground color
+Last activity: 2026-08-05 — Completed quick task 260804-u3u: add pt-BR and es translations for Phase 39 Reports strings
 
 ## Performance Metrics
 
@@ -167,6 +167,7 @@ None yet.
 | 260714-kzm | Update Avalonia nuget packages from 12.0.3 to 12.1.0, research breaking changes first | 2026-07-14 | 36ddfe7 | [260714-kzm-update-avalonia-nuget-packages-from-12-0](./quick/260714-kzm-update-avalonia-nuget-packages-from-12-0/) |
 | 260717-iqe | after I close a database, when I try to open another one the app got stuck because all background services are stopped | 2026-07-17 | 6ffdf19 | [260717-iqe-after-i-close-a-database-when-i-try-to-o](./quick/260717-iqe-after-i-close-a-database-when-i-try-to-o/) |
 | 260804-f94 | TransactionsView left column: shorten "View All Accounts" to "View All" and move plus-icon add button to a labeled "Add new" button beside it | 2026-08-04 | 29aed14 | [260804-f94-transactions-left-column-buttons](./quick/260804-f94-transactions-left-column-buttons/) |
+| 260804-u3u | Add pt-BR and es translations for the new Phase 39 Reports strings (Burn Rate, Savings Rate, Fixed vs Variable) | 2026-08-05 | 502281f | [260804-u3u-add-pt-br-and-es-translations-for-the-ne](./quick/260804-u3u-add-pt-br-and-es-translations-for-the-ne/) |
 | 260804-tyf | Restore DashboardData right-text foreground color to previous Text100Brush after RowItem.RightTextForeground change | 2026-08-05 | 15b7aa0 | [260804-tyf-restore-dashboarddata-right-text-foregro](./quick/260804-tyf-restore-dashboarddata-right-text-foregro/) |
 
 ## Deferred Items
