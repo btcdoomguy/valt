@@ -219,7 +219,52 @@ public class FixedVsVariableQueriesTests : DatabaseTest
         return result.Months.FirstOrDefault(x => x.Month == month);
     }
 
+    [Test]
+    public async Task Should_Reduce_Fixed_Total_When_Category_Filter_Includes_Only_One_Category()
+    {
+        var categoryA = IdGenerator.Generate();
+        var categoryB = IdGenerator.Generate();
+
+        var month = new DateOnly(2025, 1, 1);
+        var fixedExpense = AddFixedExpense();
+        var transactionA = AddBrlExpense(new DateOnly(2025, 1, 10), 300m, categoryA);
+        var transactionB = AddBrlExpense(new DateOnly(2025, 1, 15), 700m, categoryB);
+        AddFixedExpenseRecord(fixedExpense, transactionA, FixedExpenseRecordState.Paid);
+        AddFixedExpenseRecord(fixedExpense, transactionB, FixedExpenseRecordState.Paid);
+
+        var withBoth = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31),
+            [categoryA.ToString(), categoryB.ToString()]);
+        var withOnlyA = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31),
+            [categoryA.ToString()]);
+
+        var bothMonth = GetMonth(withBoth, month);
+        var onlyAMonth = GetMonth(withOnlyA, month);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(bothMonth, Is.Not.Null);
+            Assert.That(bothMonth!.FixedTotal, Is.EqualTo(1000m));
+            Assert.That(onlyAMonth, Is.Not.Null);
+            Assert.That(onlyAMonth!.FixedTotal, Is.EqualTo(300m));
+        }
+    }
+
     private async Task<FixedVsVariableDataDto> ExecuteQuery(DateOnly from, DateOnly to, FakeClock clock)
+    {
+        return await ExecuteQuery(from, to, clock, []);
+    }
+
+    private async Task<FixedVsVariableDataDto> ExecuteQuery(DateOnly from, DateOnly to, DateTime clockDate)
+    {
+        return await ExecuteQuery(from, to, new FakeClock(clockDate), []);
+    }
+
+    private async Task<FixedVsVariableDataDto> ExecuteQuery(DateOnly from, DateOnly to, DateTime clockDate, string[] categoryIds)
+    {
+        return await ExecuteQuery(from, to, new FakeClock(clockDate), categoryIds);
+    }
+
+    private async Task<FixedVsVariableDataDto> ExecuteQuery(DateOnly from, DateOnly to, FakeClock clock, string[] categoryIds)
     {
         var currencySettings = new CurrencySettings(_localDatabase, Substitute.For<INotificationPublisher>())
         {
@@ -236,13 +281,9 @@ public class FixedVsVariableQueriesTests : DatabaseTest
         {
             From = from,
             To = to,
-            AccountIds = [_brlAccount.Id.ToString(), _eurAccount.Id.ToString(), _btcAccount.Id.ToString()]
+            AccountIds = [_brlAccount.Id.ToString(), _eurAccount.Id.ToString(), _btcAccount.Id.ToString()],
+            CategoryIds = categoryIds
         });
-    }
-
-    private async Task<FixedVsVariableDataDto> ExecuteQuery(DateOnly from, DateOnly to, DateTime clockDate)
-    {
-        return await ExecuteQuery(from, to, new FakeClock(clockDate));
     }
 
     private FixedExpenseEntity AddFixedExpense()
@@ -255,12 +296,12 @@ public class FixedVsVariableQueriesTests : DatabaseTest
         return fixedExpense;
     }
 
-    private TransactionEntity AddBrlExpense(DateOnly date, decimal amount)
+    private TransactionEntity AddBrlExpense(DateOnly date, decimal amount, CategoryId categoryId)
     {
         var entity = new TransactionBuilder()
         {
             Id = IdGenerator.Generate(),
-            CategoryId = _categoryId,
+            CategoryId = categoryId,
             Date = date,
             Name = $"BRL Expense {date}",
             AutoSatAmountDetails = AutoSatAmountDetails.Pending,
@@ -268,6 +309,11 @@ public class FixedVsVariableQueriesTests : DatabaseTest
         }.Build();
         _localDatabase.GetTransactions().Insert(entity);
         return entity;
+    }
+
+    private TransactionEntity AddBrlExpense(DateOnly date, decimal amount)
+    {
+        return AddBrlExpense(date, amount, _categoryId);
     }
 
     private TransactionEntity AddEurExpense(DateOnly date, decimal amount)

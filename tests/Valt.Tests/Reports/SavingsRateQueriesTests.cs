@@ -131,7 +131,33 @@ public class SavingsRateQueriesTests : DatabaseTest
         return result.Months.FirstOrDefault(x => x.Month == month)?.Rate;
     }
 
-    private async Task<SavingsRateDataDto> ExecuteQuery(DateOnly from, DateOnly to, FakeClock clock)
+    [Test]
+    public async Task Should_Change_Rate_When_Category_Filter_Excludes_One_Category()
+    {
+        var categoryA = IdGenerator.Generate();
+        var categoryB = IdGenerator.Generate();
+        InsertCategory(categoryA);
+        InsertCategory(categoryB);
+
+        var month = new DateOnly(2025, 1, 1);
+        AddIncomeTransaction(month, 1000m, categoryA);
+        AddExpenseTransaction(month, 500m, categoryB);
+
+        var clock = new FakeClock(new DateTime(2025, 12, 31));
+
+        var withBoth = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), clock,
+            [categoryA.ToString(), categoryB.ToString()]);
+        var withOnlyA = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), clock,
+            [categoryA.ToString()]);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(GetMonthRate(withBoth, month), Is.EqualTo(50m));
+            Assert.That(GetMonthRate(withOnlyA, month), Is.EqualTo(100m));
+        }
+    }
+
+    private async Task<SavingsRateDataDto> ExecuteQuery(DateOnly from, DateOnly to, FakeClock clock, string[] categoryIds)
     {
         var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
         var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
@@ -146,21 +172,40 @@ public class SavingsRateQueriesTests : DatabaseTest
         {
             From = from,
             To = to,
-            AccountIds = [_brlAccount.Id.ToString()]
+            AccountIds = [_brlAccount.Id.ToString()],
+            CategoryIds = categoryIds
         });
+    }
+
+    private async Task<SavingsRateDataDto> ExecuteQuery(DateOnly from, DateOnly to, FakeClock clock)
+    {
+        return await ExecuteQuery(from, to, clock, []);
     }
 
     private async Task<SavingsRateDataDto> ExecuteQuery(DateOnly from, DateOnly to, DateTime clockDate)
     {
-        return await ExecuteQuery(from, to, new FakeClock(clockDate));
+        return await ExecuteQuery(from, to, new FakeClock(clockDate), []);
     }
 
-    private void AddIncomeTransaction(DateOnly month, decimal amount)
+    private async Task<SavingsRateDataDto> ExecuteQuery(DateOnly from, DateOnly to, DateTime clockDate, string[] categoryIds)
+    {
+        return await ExecuteQuery(from, to, new FakeClock(clockDate), categoryIds);
+    }
+
+    private void InsertCategory(CategoryId id)
+    {
+        _localDatabase.GetCategories().Insert(CategoryBuilder.ACategory()
+            .WithId(id)
+            .WithName($"Category {id}")
+            .Build());
+    }
+
+    private void AddIncomeTransaction(DateOnly month, decimal amount, CategoryId categoryId)
     {
         _localDatabase.GetTransactions().Insert(new TransactionBuilder()
         {
             Id = IdGenerator.Generate(),
-            CategoryId = _categoryId,
+            CategoryId = categoryId,
             Date = new DateOnly(month.Year, month.Month, 10),
             Name = $"Income {month}",
             AutoSatAmountDetails = AutoSatAmountDetails.Pending,
@@ -168,16 +213,26 @@ public class SavingsRateQueriesTests : DatabaseTest
         }.Build());
     }
 
-    private void AddExpenseTransaction(DateOnly month, decimal amount)
+    private void AddIncomeTransaction(DateOnly month, decimal amount)
+    {
+        AddIncomeTransaction(month, amount, _categoryId);
+    }
+
+    private void AddExpenseTransaction(DateOnly month, decimal amount, CategoryId categoryId)
     {
         _localDatabase.GetTransactions().Insert(new TransactionBuilder()
         {
             Id = IdGenerator.Generate(),
-            CategoryId = _categoryId,
+            CategoryId = categoryId,
             Date = new DateOnly(month.Year, month.Month, 15),
             Name = $"Expense {month}",
             AutoSatAmountDetails = AutoSatAmountDetails.Pending,
             TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), amount, false)
         }.Build());
+    }
+
+    private void AddExpenseTransaction(DateOnly month, decimal amount)
+    {
+        AddExpenseTransaction(month, amount, _categoryId);
     }
 }

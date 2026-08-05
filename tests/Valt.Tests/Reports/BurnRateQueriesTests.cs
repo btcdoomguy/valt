@@ -154,7 +154,29 @@ public class BurnRateQueriesTests : DatabaseTest
         }
     }
 
-    private async Task<BurnRateDataDto> ExecuteQuery(FakeClock clock, decimal currentWealth)
+    [Test]
+    public async Task Should_Reduce_SpentSoFar_When_Category_Filter_Excludes_One_Category()
+    {
+        var categoryA = IdGenerator.Generate();
+        var categoryB = IdGenerator.Generate();
+        InsertCategory(categoryA);
+        InsertCategory(categoryB);
+
+        var clock = new FakeClock(new DateTime(2025, 3, 15));
+        AddExpenseTransaction(new DateOnly(2025, 3, 10), 300m, categoryA);
+        AddExpenseTransaction(new DateOnly(2025, 3, 12), 700m, categoryB);
+
+        var withBoth = await ExecuteQuery(clock, 10000m, [categoryA.ToString(), categoryB.ToString()]);
+        var withOnlyA = await ExecuteQuery(clock, 10000m, [categoryA.ToString()]);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(withBoth.SpentSoFar, Is.EqualTo(1000m));
+            Assert.That(withOnlyA.SpentSoFar, Is.EqualTo(300m));
+        }
+    }
+
+    private async Task<BurnRateDataDto> ExecuteQuery(FakeClock clock, decimal currentWealth, string[] categoryIds)
     {
         var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
         var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
@@ -168,20 +190,39 @@ public class BurnRateQueriesTests : DatabaseTest
         return await sut.GetBurnRateAsync(new GetBurnRateQuery
         {
             CurrentWealthInFiat = currentWealth,
-            AccountIds = [_brlAccount.Id.ToString()]
+            AccountIds = [_brlAccount.Id.ToString()],
+            CategoryIds = categoryIds
         });
     }
 
-    private void AddExpenseTransaction(DateOnly date, decimal amount)
+    private async Task<BurnRateDataDto> ExecuteQuery(FakeClock clock, decimal currentWealth)
+    {
+        return await ExecuteQuery(clock, currentWealth, []);
+    }
+
+    private void InsertCategory(CategoryId id)
+    {
+        _localDatabase.GetCategories().Insert(CategoryBuilder.ACategory()
+            .WithId(id)
+            .WithName($"Category {id}")
+            .Build());
+    }
+
+    private void AddExpenseTransaction(DateOnly date, decimal amount, CategoryId categoryId)
     {
         _localDatabase.GetTransactions().Insert(new TransactionBuilder()
         {
             Id = IdGenerator.Generate(),
-            CategoryId = _categoryId,
+            CategoryId = categoryId,
             Date = date,
             Name = $"Expense {date}",
             AutoSatAmountDetails = AutoSatAmountDetails.Pending,
             TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), amount, false)
         }.Build());
+    }
+
+    private void AddExpenseTransaction(DateOnly date, decimal amount)
+    {
+        AddExpenseTransaction(date, amount, _categoryId);
     }
 }
