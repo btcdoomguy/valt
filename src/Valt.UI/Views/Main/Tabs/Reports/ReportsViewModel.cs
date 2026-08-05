@@ -303,9 +303,13 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
 
         LoadDataAndFetchAllReportsAsync()
-            .ContinueWith(_ => _leveragePanel.RefreshAsync(), TaskScheduler.Default)
-            .ContinueWith(_ => _btcLoansPanel.RefreshAsync(), TaskScheduler.Default)
-            .ContinueWith(_ => _burnRatePanel.RefreshAsync(), TaskScheduler.Default)
+            .ContinueWith(async _ =>
+            {
+                await _leveragePanel.RefreshAsync();
+                await _btcLoansPanel.RefreshAsync();
+                await _burnRatePanel.RefreshAsync();
+            }, TaskScheduler.Default)
+            .Unwrap()
             .FireAndForgetSafeAsync(_runner, _logger);
         _wealthPanel.Refresh();
         _btcStackPanel.Refresh();
@@ -996,7 +1000,11 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching savings rate");
-            await Dispatcher.UIThread.InvokeAsync(() => { IsSavingsRateLoading = false; });
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                IsSavingsRateEmpty = false;
+                IsSavingsRateLoading = false;
+            });
         }
     }
 
@@ -1026,7 +1034,12 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching fixed vs variable expenses");
-            await Dispatcher.UIThread.InvokeAsync(() => { IsFixedVsVariableLoading = false; });
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                HasNoFixedExpenses = false;
+                IsFixedVsVariableEmpty = false;
+                IsFixedVsVariableLoading = false;
+            });
         }
     }
 

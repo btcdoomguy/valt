@@ -25,6 +25,8 @@ public class FixedVsVariableChartData : IDisposable
     private static readonly SKColor LegendTextColor = SKColor.Parse("#eeebe8");  // Text200
     private static readonly SKColor ChartBackground = SKColor.Parse("#333333");  // Background800
 
+    public string PrimaryCurrency { get; set; } = FiatCurrency.Usd.Code;
+
     public SolidColorPaint LegendTextPaint { get; } = new(LegendTextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) };
     public SolidColorPaint TooltipTextPaint { get; } = new(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) };
     public SolidColorPaint TooltipBackgroundPaint { get; } = new(ChartBackground);
@@ -67,9 +69,9 @@ public class FixedVsVariableChartData : IDisposable
         };
     }
 
-    private static string FiatLabeler(double value)
+    private string FiatLabeler(double value)
     {
-        return CurrencyDisplay.FormatFiat((decimal)value, FiatCurrency.Usd.Code);
+        return CurrencyDisplay.FormatFiat((decimal)value, PrimaryCurrency);
     }
 
     private StackedColumnSeries<double> CreateFixedSeries() => new()
@@ -90,6 +92,8 @@ public class FixedVsVariableChartData : IDisposable
 
     public void RefreshChart(FixedVsVariableDataDto data)
     {
+        PrimaryCurrency = data.PrimaryCurrency;
+
         FixedValues.Clear();
         VariableValues.Clear();
         MonthLabels.Clear();
@@ -135,6 +139,9 @@ public class FixedVsVariableChartData : IDisposable
 
     public void Dispose()
     {
+        (LegendTextPaint as IDisposable)?.Dispose();
+        (TooltipTextPaint as IDisposable)?.Dispose();
+        (TooltipBackgroundPaint as IDisposable)?.Dispose();
         DisposeSeries();
         Series.Clear();
         MonthLabels.Clear();

@@ -4,17 +4,17 @@ milestone: v0.7
 milestone_name: Insights & Metrics Expansion
 current_phase: 39
 current_phase_name: spending-analytics-reports-ui
-status: executing
-stopped_at: Completed 39-01-PLAN.md
-last_updated: "2026-08-04T22:23:08.673Z"
+status: verifying
+stopped_at: Completed 39-03-PLAN.md
+last_updated: "2026-08-05T00:02:53.642Z"
 last_activity: 2026-08-04
 last_activity_desc: Phase 39 execution started
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 4
-  completed_plans: 1
-  percent: 0
+  completed_plans: 4
+  percent: 20
 ---
 
 # STATE.md
@@ -29,8 +29,8 @@ See: .planning/PROJECT.md (updated 2026-07-15)
 ## Current Position
 
 Phase: 39 (spending-analytics-reports-ui) — EXECUTING
-Plan: 2 of 4
-Status: Ready to execute
+Plan: 4 of 4
+Status: Phase complete — ready for verification
 Last activity: 2026-08-04 — Phase 39 execution started
 
 ## Performance Metrics
@@ -87,6 +87,7 @@ Last activity: 2026-08-04 — Phase 39 execution started
 | Phase 38 P02 | 18 min | 3 tasks | 2 files |
 | Phase 38 P03 | 7 min | 3 tasks | 4 files |
 | Phase 39 P01 | 11 min | 3 tasks | 13 files |
+| Phase 39 P03 | 10 | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -141,6 +142,11 @@ Recent decisions affecting current work:
 - [Phase 39]: Savings rate uses AllIncomeInFiat/AllExpensesInFiat from IMonthlyTotalsReport — Matches existing Monthly totals panel numbers and avoids a second income/expense aggregation (D-01).
 - [Phase 39]: Burn rate median is read from IStatisticsReport.MedianMonthlyExpenses — Reuses the existing 12-month median calculation instead of recomputing it (D-13).
 - [Phase 39]: Burn rate projection is gated to day >= 5 — User-specified threshold to avoid early-month projection noise (D-15).
+- [Phase ?]: 39-03: Followed existing BtcLoans/Leverage panel wiring for ReportsViewModel observables, refresh triggers, and disposal
+- [Phase ?]: 39-03: Placed burn rate card after Statistics card in DashboardGridPanel per UI-SPEC default ordering
+- [Phase ?]: 39-03: Used English-only resx strings (D-21); pt-BR/es files untouched for Phase 43 localization pass
+- [Phase ?]: 39-03: Used TransactionGridResources.Credit for projection <= median and Debt for projection > median, matching MonthlyReportItemViewModel convention
+- [Phase ?]: 39-03: Kept burn-rate card always visible (IsVisible=true) even on empty/error states, unlike conditional BtcLoans/Leverage panels
 
 ### Pending Todos
 
@@ -180,7 +186,7 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-08-04T22:23:08.668Z
+Last session: 2026-08-05T00:02:53.636Z
 Stopped at: Completed 39-01-PLAN.md
 Resume file: None
 

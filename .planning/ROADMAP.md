@@ -34,7 +34,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 
 ### 🚧 v0.7 Insights & Metrics Expansion (Phases 39-43)
 
-- [ ] **Phase 39: Spending Analytics Reports & UI** — Savings rate, burn rate, and fixed vs variable ratio in the Reports tab
+- [x] **Phase 39: Spending Analytics Reports & UI** — Savings rate, burn rate, and fixed vs variable ratio in the Reports tab (completed 2026-08-05)
 - [ ] **Phase 40: BTC-Denominated Metrics Reports & UI** — Sats earned, sats spent (month + per category), and stack velocity
 - [ ] **Phase 41: Wealth & Performance Reports & UI** — Net worth CAGR, fiat vs BTC allocation, best/worst months, days under water
 - [ ] **Phase 42: Loans & Leverage Reports & UI** — Interest/fees paid and liquidation-price distance trend
@@ -54,19 +54,19 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
   3. User can view the fixed vs variable expense ratio per month (FixedExpenses vs actual transactions)
   4. New panels render sensible zero/empty states when no transaction data exists for the period
 
-**Plans**: 1/4 plans executed
+**Plans**: 4/4 plans complete
 **Wave 1**
 
 - [x] 39-01-PLAN.md — Savings rate + burn rate query backend (SpendingAnalytics module, tests)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 39-02-PLAN.md — Fixed vs variable query backend (Paid-record join, tests)
-- [ ] 39-03-PLAN.md — Burn rate dashboard card UI (RowItem foreground, panel VM, wiring)
+- [x] 39-02-PLAN.md — Fixed vs variable query backend (Paid-record join, tests)
+- [x] 39-03-PLAN.md — Burn rate dashboard card UI (RowItem foreground, panel VM, wiring)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 39-04-PLAN.md — Savings rate + fixed/variable chart sections UI (chart-data classes, wiring, empty states)
+- [x] 39-04-PLAN.md — Savings rate + fixed/variable chart sections UI (chart-data classes, wiring, empty states)
 
 **UI hint**: yes
 
@@ -142,7 +142,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 | 36. Fixed Expenses Page Enhancement | v0.6 | 2/2 | Complete | 2026-07-16 |
 | 37. MCP Server Page Update | v0.6 | 2/2 | Complete | 2026-07-16 |
 | 38. Navigation, New Pages, and Quality Assurance | v0.6 | 3/3 | Complete | 2026-07-17 |
-| 39. Spending Analytics Reports & UI | v0.7 | 1/4 | In Progress|  |
+| 39. Spending Analytics Reports & UI | v0.7 | 4/4 | Complete   | 2026-08-05 |
 | 40. BTC-Denominated Metrics Reports & UI | v0.7 | 0/0 | Not started | - |
 | 41. Wealth & Performance Reports & UI | v0.7 | 0/0 | Not started | - |
 | 42. Loans & Leverage Reports & UI | v0.7 | 0/0 | Not started | - |

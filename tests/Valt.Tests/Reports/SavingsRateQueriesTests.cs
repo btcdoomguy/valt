@@ -140,7 +140,7 @@ public class SavingsRateQueriesTests : DatabaseTest
             MainFiatCurrency = FiatCurrency.Brl.Code
         };
         var factory = new ReportDataProviderFactory(_priceDatabase, _localDatabase, clock);
-        var sut = new SavingsRateQueries(factory, monthlyTotalsReport, statisticsReport, clock, currencySettings);
+        var sut = new SavingsRateQueries(factory, monthlyTotalsReport, clock, currencySettings);
 
         return await sut.GetSavingsRateAsync(new GetSavingsRateQuery
         {

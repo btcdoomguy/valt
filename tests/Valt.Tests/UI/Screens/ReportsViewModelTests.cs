@@ -31,6 +31,7 @@ using Valt.UI.State;
 using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Tabs.Reports;
 using Valt.UI.Views.Main.Tabs.Reports.Panels;
+using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
 namespace Valt.Tests.UI.Screens;
 
@@ -82,6 +83,8 @@ public class ReportsViewModelTests
     [SetUp]
     public void SetUp()
     {
+        TransactionGridResources.InitializeForTesting();
+
         WeakReferenceMessenger.Default.Reset();
 
         _runner = Substitute.For<IFireAndForgetTaskRunner>();

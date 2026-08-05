@@ -20,7 +20,6 @@ public class SavingsRateQueries : ISavingsRateQueries
     public SavingsRateQueries(
         IReportDataProviderFactory reportDataProviderFactory,
         IMonthlyTotalsReport monthlyTotalsReport,
-        IStatisticsReport statisticsReport,
         IClock clock,
         CurrencySettings currencySettings)
     {

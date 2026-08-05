@@ -124,6 +124,9 @@ public class SavingsRateChartData : IDisposable
 
     public void Dispose()
     {
+        (LegendTextPaint as IDisposable)?.Dispose();
+        (TooltipTextPaint as IDisposable)?.Dispose();
+        (TooltipBackgroundPaint as IDisposable)?.Dispose();
         DisposeSeries();
         Series.Clear();
         RateValues.Clear();
