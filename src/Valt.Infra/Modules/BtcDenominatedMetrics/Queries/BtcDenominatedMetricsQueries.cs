@@ -64,8 +64,11 @@ public class BtcDenominatedMetricsQueries : IBtcDenominatedMetricsQueries
             if (selectedCategoryIds is not null && !selectedCategoryIds.Contains(transaction.CategoryId))
                 continue;
 
-            // Internal transfers between the user's own accounts are excluded from earned/spent (D-04).
-            if (transaction.ToAccountId is { } toId && provider.Accounts.ContainsKey(toId))
+            // Internal transfers (FiatToFiat / BitcoinToBitcoin) between the user's own accounts are excluded
+            // from earned/spent and velocity (D-04). BTC purchases and sales are not transfers (D-01, D-09).
+            if (transaction.Type is TransactionEntityType.FiatToFiat or TransactionEntityType.BitcoinToBitcoin
+                && transaction.ToAccountId is { } toId
+                && provider.Accounts.ContainsKey(toId))
                 continue;
 
             // Transactions with no exact BTC price for the transaction date are silently skipped (D-06, D-07).
@@ -122,17 +125,23 @@ public class BtcDenominatedMetricsQueries : IBtcDenominatedMetricsQueries
             monthlyData[yearMonth] = current;
         }
 
-        var sortedMonths = monthlyData
-            .OrderBy(x => x.Key.Year)
-            .ThenBy(x => x.Key.Month)
-            .Select(x => new BtcDenominatedMetricsMonthDto
+        var startMonth = new DateOnly(query.From.Year, query.From.Month, 1);
+        var endMonth = new DateOnly(query.To.Year, query.To.Month, 1);
+        var sortedMonths = new List<BtcDenominatedMetricsMonthDto>();
+        for (var month = startMonth; month <= endMonth; month = month.AddMonths(1))
+        {
+            var key = (month.Year, month.Month);
+            var aggregation = monthlyData.TryGetValue(key, out var current)
+                ? current
+                : new MonthSatsAggregation();
+            sortedMonths.Add(new BtcDenominatedMetricsMonthDto
             {
-                Month = new DateOnly(x.Key.Year, x.Key.Month, 1),
-                SatsEarned = x.Value.SatsEarned,
-                SatsSpent = x.Value.SatsSpent,
-                StackVelocity = x.Value.SatsEarned - x.Value.SatsSpent + x.Value.BtcPurchases - x.Value.BtcSales
-            })
-            .ToList();
+                Month = month,
+                SatsEarned = aggregation.SatsEarned,
+                SatsSpent = aggregation.SatsSpent,
+                StackVelocity = aggregation.SatsEarned - aggregation.SatsSpent + aggregation.BtcPurchases - aggregation.BtcSales
+            });
+        }
 
         var spentByCategory = categorySatsSpent
             .Where(x => x.Value > 0)
