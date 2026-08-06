@@ -3003,4 +3003,43 @@
     <data name="Reports_CategoryFilter_Tooltip" xml:space="preserve">
         <value>Configurar categorías excluidas de todos los informes analíticos</value>
     </data>
+    <data name="Reports_BtcMetrics_Earned" xml:space="preserve">
+        <value>Earned</value>
+    </data>
+    <data name="Reports_BtcMetrics_Spent" xml:space="preserve">
+        <value>Spent</value>
+    </data>
+    <data name="Reports_BtcMetrics_Title" xml:space="preserve">
+        <value>Sats earned &amp; spent</value>
+    </data>
+    <data name="Reports_BtcMetrics_MonthlyLabel" xml:space="preserve">
+        <value>Monthly</value>
+    </data>
+    <data name="Reports_BtcMetrics_CategoryLabel" xml:space="preserve">
+        <value>By category</value>
+    </data>
+    <data name="Reports_BtcMetrics_EmptyHeading" xml:space="preserve">
+        <value>No sats flow yet</value>
+    </data>
+    <data name="Reports_BtcMetrics_EmptyBody" xml:space="preserve">
+        <value>Add income or expense transactions to see how many sats you earned and spent.</value>
+    </data>
+    <data name="Reports_BtcMetrics_ErrorTitle" xml:space="preserve">
+        <value>Could not load BTC metrics.</value>
+    </data>
+    <data name="Reports_BtcMetrics_ErrorBody" xml:space="preserve">
+        <value>Check your data file or try again later.</value>
+    </data>
+    <data name="Reports_StackVelocity_Title" xml:space="preserve">
+        <value>Stack velocity</value>
+    </data>
+    <data name="Reports_StackVelocity_Velocity" xml:space="preserve">
+        <value>Velocity</value>
+    </data>
+    <data name="Reports_StackVelocity_EmptyHeading" xml:space="preserve">
+        <value>No stack velocity yet</value>
+    </data>
+    <data name="Reports_StackVelocity_EmptyBody" xml:space="preserve">
+        <value>Add income, expenses, or BTC trades to see your net sats trend.</value>
+    </data>
 </root>
