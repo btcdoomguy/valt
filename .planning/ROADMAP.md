@@ -54,7 +54,8 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
   3. User can view the fixed vs variable expense ratio per month (FixedExpenses vs actual transactions)
   4. New panels render sensible zero/empty states when no transaction data exists for the period
 
-**Plans**: 4/4 plans complete
+**Plans**: 8/8 plans complete
+
 **Wave 1**
 
 - [x] 39-01-PLAN.md — Savings rate + burn rate query backend (SpendingAnalytics module, tests)
@@ -67,6 +68,13 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 **Wave 3** *(blocked on Wave 2 completion)*
 
 - [x] 39-04-PLAN.md — Savings rate + fixed/variable chart sections UI (chart-data classes, wiring, empty states)
+
+**Gap Closure** *(completed 2026-08-05)*
+
+- [x] 39-05-PLAN.md — Backend category filter persistence and query wiring
+- [x] 39-06-PLAN.md — UI centralized category filter button and wiring
+- [x] 39-07-PLAN.md — Adjust filter placement and extend to Statistics dashboard
+- [x] 39-08-PLAN.md — Migrate legacy Statistics excluded-category settings to centralized filter
 
 **UI hint**: yes
 
@@ -82,7 +90,16 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
   3. User can view stack velocity — net sats accumulated per month — as a trend chart
   4. Metrics honor the existing Reports tab filters (date range, accounts, categories)
 
-**Plans**: TBD
+**Plans**: 2 plans
+
+**Wave 1**
+
+- [ ] 40-01-PLAN.md — BTC-denominated metrics backend and Reports-tab UI (tracer slice)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 40-02-PLAN.md — Sats spent per category breakdown and comprehensive tests
+
 **UI hint**: yes
 
 ### Phase 41: Wealth & Performance Reports & UI
