@@ -5,16 +5,16 @@ milestone_name: Insights & Metrics Expansion
 current_phase: 40
 current_phase_name: BTC-Denominated Metrics Reports & UI
 status: executing
-stopped_at: Phase 40 UI-SPEC approved
-last_updated: "2026-08-06T00:47:32.034Z"
-last_activity: 2026-08-05
-last_activity_desc: Completed gap closure plan 39-07 (Phase 39 now 7/7)
+stopped_at: Completed 40-btc-denominated-metrics-reports-ui-01-PLAN.md
+last_updated: "2026-08-06T14:32:56.163Z"
+last_activity: 2026-08-06
+last_activity_desc: Completed plan 40-01
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 10
-  completed_plans: 8
-  percent: 20
+  completed_plans: 9
+  percent: 90
 ---
 
 # STATE.md
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-07-15)
 
 ## Current Position
 
-Phase: 40 — BTC-Denominated Metrics Reports & UI
-Plan: Not started
+Phase: 40 (BTC-Denominated Metrics Reports & UI) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
-Last activity: 2026-08-05 — Completed gap closure plan 39-07 (Phase 39 now 7/7)
+Last activity: 2026-08-06 — Phase 40 execution started
 
 ## Performance Metrics
 
@@ -89,6 +89,11 @@ Last activity: 2026-08-05 — Completed gap closure plan 39-07 (Phase 39 now 7/7
 | Phase 38 P03 | 7 min | 3 tasks | 4 files |
 | Phase 39 P01 | 11 min | 3 tasks | 13 files |
 | Phase 39 P03 | 10 | 3 tasks | 9 files |
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 40-btc-denominated-metrics-reports-ui P01 | 15 | 3 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -148,6 +153,10 @@ Recent decisions affecting current work:
 - [Phase ?]: 39-03: Used English-only resx strings (D-21); pt-BR/es files untouched for Phase 43 localization pass
 - [Phase ?]: 39-03: Used TransactionGridResources.Credit for projection <= median and Debt for projection > median, matching MonthlyReportItemViewModel convention
 - [Phase ?]: 39-03: Kept burn-rate card always visible (IsVisible=true) even on empty/error states, unlike conditional BtcLoans/Leverage panels
+- [Phase ?]: [40-01] Mirrored the SpendingEvolution/SavingsRate module layout for BtcDenominatedMetrics to keep the App/Infra split consistent.
+- [Phase ?]: [40-01] Added the Earned/Spent/Velocity series-name language keys in Task 2 so chart-data classes could compile before Task 3 localization.
+- [Phase ?]: [40-01] Added error-state observables (IsBtcMetricsError, IsStackVelocityError) in Task 3 to keep the ViewModel wiring task focused on data flow.
+- [Phase ?]: [40-01] Left SpentByCategory empty in the query DTO; per-category breakdown intentionally deferred to Plan 40-02.
 
 ### Pending Todos
 
@@ -188,9 +197,9 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-08-05T23:07:18.232Z
-Stopped at: Phase 40 UI-SPEC approved
-Resume file: /home/vmabellini/RiderProjects/valt/.planning/phases/40-btc-denominated-metrics-reports-ui/40-UI-SPEC.md
+Last session: 2026-08-06T14:32:55.736Z
+Stopped at: Completed 40-btc-denominated-metrics-reports-ui-01-PLAN.md
+Resume file: None
 
 ## Notes
 

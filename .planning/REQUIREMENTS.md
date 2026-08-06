@@ -15,9 +15,9 @@ New analytics derived from existing app data, surfaced in the Reports tab. Each 
 
 ### BTC-Denominated Metrics
 
-- [ ] **BTC-01**: User can view sats earned per month (income converted at receipt-date rates)
-- [ ] **BTC-02**: User can view sats spent per month and per category
-- [ ] **BTC-03**: User can view stack velocity — net sats accumulated per month with trend chart
+- [x] **BTC-01**: User can view sats earned per month (income converted at receipt-date rates)
+- [x] **BTC-02**: User can view sats spent per month and per category
+- [x] **BTC-03**: User can view stack velocity — net sats accumulated per month with trend chart
 
 ### Wealth & Performance
 
@@ -77,9 +77,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SPA-01 | Phase 39 | Complete |
 | SPA-02 | Phase 39 | Complete |
 | SPA-03 | Phase 39 | Complete |
-| BTC-01 | Phase 40 | Pending |
-| BTC-02 | Phase 40 | Pending |
-| BTC-03 | Phase 40 | Pending |
+| BTC-01 | Phase 40 | Complete |
+| BTC-02 | Phase 40 | Complete |
+| BTC-03 | Phase 40 | Complete |
 | WLT-01 | Phase 41 | Pending |
 | WLT-02 | Phase 41 | Pending |
 | WLT-03 | Phase 41 | Pending |

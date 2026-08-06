@@ -35,7 +35,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 ### 🚧 v0.7 Insights & Metrics Expansion (Phases 39-43)
 
 - [x] **Phase 39: Spending Analytics Reports & UI** — Savings rate, burn rate, and fixed vs variable ratio in the Reports tab (completed 2026-08-05)
-- [ ] **Phase 40: BTC-Denominated Metrics Reports & UI** — Sats earned, sats spent (month + per category), and stack velocity
+  - [x] **Phase 40: BTC-Denominated Metrics Reports & UI** — Sats earned, sats spent (month + per category), and stack velocity
 - [ ] **Phase 41: Wealth & Performance Reports & UI** — Net worth CAGR, fiat vs BTC allocation, best/worst months, days under water
 - [ ] **Phase 42: Loans & Leverage Reports & UI** — Interest/fees paid and liquidation-price distance trend
 - [ ] **Phase 43: MCP, Localization, Documentation & Verification** — Tool exposure, 3-language strings, module docs, end-to-end sign-off
@@ -90,11 +90,11 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
   3. User can view stack velocity — net sats accumulated per month — as a trend chart
   4. Metrics honor the existing Reports tab filters (date range, accounts, categories)
 
-**Plans**: 2 plans
+**Plans**: 1/2 plans executed
 
 **Wave 1**
 
-- [ ] 40-01-PLAN.md — BTC-denominated metrics backend and Reports-tab UI (tracer slice)
+- [x] 40-01-PLAN.md — BTC-denominated metrics backend and Reports-tab UI (tracer slice)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -160,14 +160,14 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 | 37. MCP Server Page Update | v0.6 | 2/2 | Complete | 2026-07-16 |
 | 38. Navigation, New Pages, and Quality Assurance | v0.6 | 3/3 | Complete | 2026-07-17 |
 | 39. Spending Analytics Reports & UI | v0.7 | 4/4 | Complete    | 2026-08-05 |
-| 40. BTC-Denominated Metrics Reports & UI | v0.7 | 0/0 | Not started | - |
+| 40. BTC-Denominated Metrics Reports & UI | v0.7 | 1/2 | In Progress|  |
 | 41. Wealth & Performance Reports & UI | v0.7 | 0/0 | Not started | - |
 | 42. Loans & Leverage Reports & UI | v0.7 | 0/0 | Not started | - |
 | 43. MCP, Localization, Documentation & Verification | v0.7 | 0/0 | Not started | - |
 
 **Total phases:** 15 (10 complete, 5 planned)  
-**v0.7 plans:** 0/0 (not yet planned)  
-**v0.7 tasks:** 0/0 (not yet planned)
+**v0.7 plans:** 1/2 (in progress)  
+**v0.7 tasks:** 3/3 (plan 40-01 complete)
 
 ---
 *Last updated: 2026-08-04 after creating v0.7 roadmap*
