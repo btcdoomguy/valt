@@ -578,6 +578,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         IsSpendingByCategoriesLoading = true;
         IsIncomeByCategoriesLoading = true;
+        IsBtcMetricsLoading = true;
+        IsStackVelocityLoading = true;
         DebouncedFetchCategoriesAsync(_filterDebounceTokenSource.Token).FireAndForgetSafeAsync(_runner, _logger);
     }
 
@@ -589,7 +591,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             var provider = await GetOrCreateProviderAsync();
             await Task.WhenAll(
                 FetchExpensesByCategoryAsync(provider),
-                FetchIncomeByCategoryAsync(provider));
+                FetchIncomeByCategoryAsync(provider),
+                FetchBtcDenominatedMetricsAsync(provider),
+                FetchStackVelocityAsync(provider));
         }
         catch (TaskCanceledException)
         {
@@ -1100,7 +1104,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             {
                 From = DateOnly.FromDateTime(FilterRange.Start),
                 To = DateOnly.FromDateTime(FilterRange.End),
-                CategoryIds = GetSelectedAnalyticsCategoryIds()
+                CategoryIds = GetSelectedAnalyticsCategoryIds(),
+                AccountIds = SelectedAccounts.Select(x => x.Id.ToString()).ToArray()
             });
 
             _lastBtcMetricsData = data;
@@ -1153,7 +1158,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             {
                 From = DateOnly.FromDateTime(FilterRange.Start),
                 To = DateOnly.FromDateTime(FilterRange.End),
-                CategoryIds = GetSelectedAnalyticsCategoryIds()
+                CategoryIds = GetSelectedAnalyticsCategoryIds(),
+                AccountIds = SelectedAccounts.Select(x => x.Id.ToString()).ToArray()
             });
 
             await Dispatcher.UIThread.InvokeAsync(() =>
