@@ -2997,6 +2997,15 @@
     <data name="Reports_FixedVariable_EmptyPeriod" xml:space="preserve">
         <value>No expense data for this period — add transactions or widen the date range.</value>
     </data>
+    <data name="Reports_BtcMetrics_Earned" xml:space="preserve">
+        <value>Earned</value>
+    </data>
+    <data name="Reports_BtcMetrics_Spent" xml:space="preserve">
+        <value>Spent</value>
+    </data>
+    <data name="Reports_StackVelocity_Velocity" xml:space="preserve">
+        <value>Velocity</value>
+    </data>
     <data name="Reports_CategoryFilter_Config_Title" xml:space="preserve">
         <value>Reports analytics category filter</value>
     </data>

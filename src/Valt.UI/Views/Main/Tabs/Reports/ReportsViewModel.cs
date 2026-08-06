@@ -17,6 +17,8 @@ using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Assets.DTOs;
 using Valt.App.Modules.Assets.Queries.GetBtcLoansDashboard;
+using Valt.App.Modules.BtcDenominatedMetrics.DTOs;
+using Valt.App.Modules.BtcDenominatedMetrics.Queries;
 using Valt.App.Modules.SpendingAnalytics.DTOs;
 using Valt.App.Modules.SpendingAnalytics.Queries;
 using Valt.App.Modules.Assets.Queries.GetVisibleAssets;
@@ -155,12 +157,18 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private IncomeByCategoryChartData _incomeByCategoryChartData = new();
     [ObservableProperty] private SavingsRateChartData _savingsRateChartData = new();
     [ObservableProperty] private FixedVsVariableChartData _fixedVsVariableChartData = new();
+    [ObservableProperty] private BtcDenominatedMetricsChartData _btcDenominatedMetricsChartData = new();
+    [ObservableProperty] private StackVelocityChartData _stackVelocityChartData = new();
 
     [ObservableProperty] private bool _isSavingsRateLoading = true;
     [ObservableProperty] private bool _isSavingsRateEmpty;
     [ObservableProperty] private bool _isFixedVsVariableLoading = true;
     [ObservableProperty] private bool _isFixedVsVariableEmpty;
     [ObservableProperty] private bool _hasNoFixedExpenses;
+    [ObservableProperty] private bool _isBtcMetricsLoading = true;
+    [ObservableProperty] private bool _isStackVelocityLoading = true;
+    [ObservableProperty] private bool _isBtcMetricsEmpty;
+    [ObservableProperty] private bool _isStackVelocityEmpty;
 
     private CancellationTokenSource? _filterDebounceTokenSource;
     private const int FilterDebounceDelayMs = 300;
@@ -393,6 +401,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             FetchIncomeByCategoryAsync(provider),
             FetchSavingsRateAsync(provider),
             FetchFixedVsVariableAsync(provider),
+            FetchBtcDenominatedMetricsAsync(provider),
+            FetchStackVelocityAsync(provider),
             FetchAllTimeHighDataAsync(provider),
             FetchMaxBtcStackDataAsync(provider),
             FetchStatisticsDataAsync(provider),
@@ -513,6 +523,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         IsMonthlyTotalsLoading = true;
         IsSavingsRateLoading = true;
         IsFixedVsVariableLoading = true;
+        IsBtcMetricsLoading = true;
+        IsStackVelocityLoading = true;
         FetchReportsWithDateRangeFilterAsync().FireAndForgetSafeAsync(_runner, _logger);
     }
 
@@ -522,7 +534,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         await Task.WhenAll(
             FetchMonthlyTotalsAsync(provider),
             FetchSavingsRateAsync(provider),
-            FetchFixedVsVariableAsync(provider));
+            FetchFixedVsVariableAsync(provider),
+            FetchBtcDenominatedMetricsAsync(provider),
+            FetchStackVelocityAsync(provider));
     }
 
     private async Task FetchMonthlyTotalsWithProviderAsync()
@@ -1073,6 +1087,64 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
     }
 
+    private async Task FetchBtcDenominatedMetricsAsync(IReportDataProvider provider)
+    {
+        try
+        {
+            var data = await _queryDispatcher.DispatchAsync(new GetBtcDenominatedMetricsQuery
+            {
+                From = DateOnly.FromDateTime(FilterRange.Start),
+                To = DateOnly.FromDateTime(FilterRange.End),
+                CategoryIds = GetSelectedAnalyticsCategoryIds()
+            });
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                BtcDenominatedMetricsChartData.RefreshChart(data);
+                IsBtcMetricsEmpty = data.Months.Count == 0;
+                IsBtcMetricsLoading = false;
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching BTC denominated metrics");
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                IsBtcMetricsEmpty = false;
+                IsBtcMetricsLoading = false;
+            });
+        }
+    }
+
+    private async Task FetchStackVelocityAsync(IReportDataProvider provider)
+    {
+        try
+        {
+            var data = await _queryDispatcher.DispatchAsync(new GetBtcDenominatedMetricsQuery
+            {
+                From = DateOnly.FromDateTime(FilterRange.Start),
+                To = DateOnly.FromDateTime(FilterRange.End),
+                CategoryIds = GetSelectedAnalyticsCategoryIds()
+            });
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                StackVelocityChartData.RefreshChart(data);
+                IsStackVelocityEmpty = data.Months.Count == 0;
+                IsStackVelocityLoading = false;
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching stack velocity");
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                IsStackVelocityEmpty = false;
+                IsStackVelocityLoading = false;
+            });
+        }
+    }
+
     private async Task FetchWealthOverviewAsync(IReportDataProvider provider)
     {
         try
@@ -1258,6 +1330,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         IncomeByCategoryChartData.Dispose();
         SavingsRateChartData.Dispose();
         FixedVsVariableChartData.Dispose();
+        BtcDenominatedMetricsChartData.Dispose();
+        StackVelocityChartData.Dispose();
         WealthOverviewChartData.Dispose();
 
         // Clear the provider on dispose

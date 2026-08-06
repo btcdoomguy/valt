@@ -5900,5 +5900,23 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports_CategoryFilter_Tooltip", resourceCulture);
             }
         }
+        
+        public static string Reports_BtcMetrics_Earned {
+            get {
+                return ResourceManager.GetString("Reports_BtcMetrics_Earned", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcMetrics_Spent {
+            get {
+                return ResourceManager.GetString("Reports_BtcMetrics_Spent", resourceCulture);
+            }
+        }
+        
+        public static string Reports_StackVelocity_Velocity {
+            get {
+                return ResourceManager.GetString("Reports_StackVelocity_Velocity", resourceCulture);
+            }
+        }
     }
 }
