@@ -169,6 +169,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private bool _isStackVelocityLoading = true;
     [ObservableProperty] private bool _isBtcMetricsEmpty;
     [ObservableProperty] private bool _isStackVelocityEmpty;
+    [ObservableProperty] private bool _isBtcMetricsError;
+    [ObservableProperty] private bool _isStackVelocityError;
 
     private CancellationTokenSource? _filterDebounceTokenSource;
     private const int FilterDebounceDelayMs = 300;
@@ -1102,6 +1104,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             {
                 BtcDenominatedMetricsChartData.RefreshChart(data);
                 IsBtcMetricsEmpty = data.Months.Count == 0;
+                IsBtcMetricsError = false;
                 IsBtcMetricsLoading = false;
             });
         }
@@ -1111,6 +1114,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 IsBtcMetricsEmpty = false;
+                IsBtcMetricsError = true;
                 IsBtcMetricsLoading = false;
             });
         }
@@ -1131,6 +1135,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             {
                 StackVelocityChartData.RefreshChart(data);
                 IsStackVelocityEmpty = data.Months.Count == 0;
+                IsStackVelocityError = false;
                 IsStackVelocityLoading = false;
             });
         }
@@ -1140,6 +1145,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 IsStackVelocityEmpty = false;
+                IsStackVelocityError = true;
                 IsStackVelocityLoading = false;
             });
         }

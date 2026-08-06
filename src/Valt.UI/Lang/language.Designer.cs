@@ -5913,9 +5913,69 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string Reports_BtcMetrics_Title {
+            get {
+                return ResourceManager.GetString("Reports_BtcMetrics_Title", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcMetrics_MonthlyLabel {
+            get {
+                return ResourceManager.GetString("Reports_BtcMetrics_MonthlyLabel", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcMetrics_CategoryLabel {
+            get {
+                return ResourceManager.GetString("Reports_BtcMetrics_CategoryLabel", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcMetrics_EmptyHeading {
+            get {
+                return ResourceManager.GetString("Reports_BtcMetrics_EmptyHeading", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcMetrics_EmptyBody {
+            get {
+                return ResourceManager.GetString("Reports_BtcMetrics_EmptyBody", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcMetrics_ErrorTitle {
+            get {
+                return ResourceManager.GetString("Reports_BtcMetrics_ErrorTitle", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcMetrics_ErrorBody {
+            get {
+                return ResourceManager.GetString("Reports_BtcMetrics_ErrorBody", resourceCulture);
+            }
+        }
+        
+        public static string Reports_StackVelocity_Title {
+            get {
+                return ResourceManager.GetString("Reports_StackVelocity_Title", resourceCulture);
+            }
+        }
+        
         public static string Reports_StackVelocity_Velocity {
             get {
                 return ResourceManager.GetString("Reports_StackVelocity_Velocity", resourceCulture);
+            }
+        }
+        
+        public static string Reports_StackVelocity_EmptyHeading {
+            get {
+                return ResourceManager.GetString("Reports_StackVelocity_EmptyHeading", resourceCulture);
+            }
+        }
+        
+        public static string Reports_StackVelocity_EmptyBody {
+            get {
+                return ResourceManager.GetString("Reports_StackVelocity_EmptyBody", resourceCulture);
             }
         }
     }
