@@ -1113,7 +1113,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 RefreshBtcMetricsChartForCurrentView();
-                IsBtcMetricsEmpty = data.Months.Count == 0;
+                IsBtcMetricsEmpty = IsBtcMetricsCategoryView ? data.SpentByCategory.Count == 0 : data.Months.Count == 0;
                 IsBtcMetricsError = false;
                 IsBtcMetricsLoading = false;
             });
@@ -1145,6 +1145,11 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     {
         Dispatcher.UIThread.Post(() =>
         {
+            if (_lastBtcMetricsData is not null)
+            {
+                IsBtcMetricsEmpty = IsBtcMetricsCategoryView ? _lastBtcMetricsData.SpentByCategory.Count == 0 : _lastBtcMetricsData.Months.Count == 0;
+            }
+
             RefreshBtcMetricsChartForCurrentView();
             OnPropertyChanged(nameof(BtcDenominatedMetricsChartData));
         });
