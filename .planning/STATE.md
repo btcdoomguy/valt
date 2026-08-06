@@ -4,16 +4,16 @@ milestone: v0.7
 milestone_name: Insights & Metrics Expansion
 current_phase: 40
 current_phase_name: BTC-Denominated Metrics Reports & UI
-status: verifying
-stopped_at: Completed 39-01-PLAN.md
-last_updated: "2026-08-05T00:22:09.030Z"
+status: executing
+stopped_at: Phase 40 UI-SPEC approved
+last_updated: "2026-08-06T00:47:32.034Z"
 last_activity: 2026-08-05
-last_activity_desc: Phase 39 complete, transitioned to Phase 40
+last_activity_desc: Completed gap closure plan 39-07 (Phase 39 now 7/7)
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
+  total_plans: 10
+  completed_plans: 8
   percent: 20
 ---
 
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-15)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 39 — spending-analytics-reports-ui
+**Current focus:** Phase 40 — BTC-Denominated Metrics Reports & UI
 
 ## Current Position
 
 Phase: 40 — BTC-Denominated Metrics Reports & UI
 Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-08-05 — Completed quick task 260804-u3u: add pt-BR and es translations for Phase 39 Reports strings
+Status: Ready to execute
+Last activity: 2026-08-05 — Completed gap closure plan 39-07 (Phase 39 now 7/7)
 
 ## Performance Metrics
 
@@ -53,7 +53,7 @@ Last activity: 2026-08-05 — Completed quick task 260804-u3u: add pt-BR and es 
 | 36 | 2 | - | - |
 | 37 | 2 | - | - |
 | Phase 38 | 2/3 | — | — |
-| 39 | 4 | - | - |
+| 39 | 8/8 | - | - |
 
 **Recent Trend:**
 
@@ -188,9 +188,9 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-08-05T00:02:53.636Z
-Stopped at: Completed 39-01-PLAN.md
-Resume file: None
+Last session: 2026-08-05T23:07:18.232Z
+Stopped at: Phase 40 UI-SPEC approved
+Resume file: /home/vmabellini/RiderProjects/valt/.planning/phases/40-btc-denominated-metrics-reports-ui/40-UI-SPEC.md
 
 ## Notes
 
