@@ -90,7 +90,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
   3. User can view stack velocity — net sats accumulated per month — as a trend chart
   4. Metrics honor the existing Reports tab filters (date range, accounts, categories)
 
-**Plans**: 1/2 plans executed
+**Plans**: 2/2 plans executed
 
 **Wave 1**
 
@@ -98,7 +98,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 40-02-PLAN.md — Sats spent per category breakdown and comprehensive tests
+- [x] 40-02-PLAN.md — Sats spent per category breakdown and comprehensive tests
 
 **UI hint**: yes
 
@@ -160,14 +160,14 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 | 37. MCP Server Page Update | v0.6 | 2/2 | Complete | 2026-07-16 |
 | 38. Navigation, New Pages, and Quality Assurance | v0.6 | 3/3 | Complete | 2026-07-17 |
 | 39. Spending Analytics Reports & UI | v0.7 | 4/4 | Complete    | 2026-08-05 |
-| 40. BTC-Denominated Metrics Reports & UI | v0.7 | 1/2 | In Progress|  |
+| 40. BTC-Denominated Metrics Reports & UI | v0.7 | 2/2 | Complete | 2026-08-06 |
 | 41. Wealth & Performance Reports & UI | v0.7 | 0/0 | Not started | - |
 | 42. Loans & Leverage Reports & UI | v0.7 | 0/0 | Not started | - |
 | 43. MCP, Localization, Documentation & Verification | v0.7 | 0/0 | Not started | - |
 
-**Total phases:** 15 (10 complete, 5 planned)  
-**v0.7 plans:** 1/2 (in progress)  
-**v0.7 tasks:** 3/3 (plan 40-01 complete)
+**Total phases:** 15 (11 complete, 4 planned)  
+**v0.7 plans:** 2/2 (complete)  
+**v0.7 tasks:** 6/6 (Phase 40 complete)
 
 ---
-*Last updated: 2026-08-04 after creating v0.7 roadmap*
+*Last updated: 2026-08-06 after completing Phase 40 execution*

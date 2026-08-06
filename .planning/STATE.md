@@ -4,17 +4,17 @@ milestone: v0.7
 milestone_name: Insights & Metrics Expansion
 current_phase: 40
 current_phase_name: BTC-Denominated Metrics Reports & UI
-status: executing
-stopped_at: Completed 40-btc-denominated-metrics-reports-ui-01-PLAN.md
-last_updated: "2026-08-06T14:32:56.163Z"
+status: verifying
+stopped_at: Completed 40-btc-denominated-metrics-reports-ui-02-PLAN.md
+last_updated: "2026-08-06T15:19:15.281Z"
 last_activity: 2026-08-06
-last_activity_desc: Completed plan 40-01
+last_activity_desc: Phase 40 execution started
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 10
   completed_plans: 9
-  percent: 90
+  percent: 20
 ---
 
 # STATE.md
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-15)
 
 Phase: 40 (BTC-Denominated Metrics Reports & UI) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-08-06 — Phase 40 execution started
 
 ## Performance Metrics
@@ -94,6 +94,7 @@ Last activity: 2026-08-06 — Phase 40 execution started
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 40-btc-denominated-metrics-reports-ui P01 | 15 | 3 tasks | 13 files |
+| Phase 40-btc-denominated-metrics-reports-ui P02 | 25min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -157,6 +158,9 @@ Recent decisions affecting current work:
 - [Phase ?]: [40-01] Added the Earned/Spent/Velocity series-name language keys in Task 2 so chart-data classes could compile before Task 3 localization.
 - [Phase ?]: [40-01] Added error-state observables (IsBtcMetricsError, IsStackVelocityError) in Task 3 to keep the ViewModel wiring task focused on data flow.
 - [Phase ?]: [40-01] Left SpentByCategory empty in the query DTO; per-category breakdown intentionally deferred to Plan 40-02.
+- [Phase ?]: [40-02] Emit a zero-value month for every month in the date range so the stack velocity line chart has no gaps (D-11).
+- [Phase ?]: [40-02] Narrow internal-transfer exclusion to FiatToFiat/BitcoinToBitcoin only, so BTC purchases and sales contribute to stack velocity (D-09).
+- [Phase ?]: [40-02] Added English placeholders for new BTC metrics strings to pt-BR and es resx files now; full translations remain Phase 43 work per D-19, but all three language files must contain the keys per AGENTS.md.
 
 ### Pending Todos
 
@@ -197,8 +201,8 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-08-06T14:32:55.736Z
-Stopped at: Completed 40-btc-denominated-metrics-reports-ui-01-PLAN.md
+Last session: 2026-08-06T15:19:15.270Z
+Stopped at: Completed 40-btc-denominated-metrics-reports-ui-02-PLAN.md
 Resume file: None
 
 ## Notes
