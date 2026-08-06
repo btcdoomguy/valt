@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using LiveChartsCore;
 using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
@@ -23,20 +25,29 @@ public class BtcDenominatedMetricsChartData : IDisposable
     private static readonly SKColor LegendTextColor = SKColor.Parse("#eeebe8");  // Text200
     private static readonly SKColor ChartBackground = SKColor.Parse("#333333");  // Background800
 
+    private const int MinChartHeight = 300;
+    private const int HeightPerCategory = 40;
+
     public SolidColorPaint LegendTextPaint { get; } = new(LegendTextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) };
     public SolidColorPaint TooltipTextPaint { get; } = new(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) };
     public SolidColorPaint TooltipBackgroundPaint { get; } = new(ChartBackground);
 
     public ObservableCollection<ISeries> Series { get; } = new();
     public ObservableCollection<string> MonthLabels { get; } = new();
+    public ObservableCollection<string> CategoryLabels { get; } = new();
     public ObservableCollection<double> EarnedValues { get; } = new();
     public ObservableCollection<double> SpentValues { get; } = new();
 
     public Axis[] XAxes { get; } = new Axis[1];
     public Axis[] YAxes { get; } = new Axis[1];
+    public Axis[] CategoryXAxes { get; } = new Axis[1];
+    public Axis[] CategoryYAxes { get; } = new Axis[1];
+
+    public double ChartHeight { get; private set; } = MinChartHeight;
 
     private StackedColumnSeries<double>? _earnedSeries;
     private StackedColumnSeries<double>? _spentSeries;
+    private RowSeries<double>? _categoryRowSeries;
 
     public BtcDenominatedMetricsChartData()
     {
@@ -61,6 +72,25 @@ public class BtcDenominatedMetricsChartData : IDisposable
             TextSize = 12,
             SeparatorsPaint = new SolidColorPaint(GridColor.WithAlpha(40)) { StrokeThickness = 1 },
             MinZoomDelta = 1
+        };
+
+        CategoryXAxes[0] = new Axis
+        {
+            Labeler = SatsLabeler,
+            LabelsPaint = new SolidColorPaint(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) },
+            TextSize = 12,
+            SeparatorsPaint = new SolidColorPaint(GridColor.WithAlpha(40)) { StrokeThickness = 1 },
+            MinZoomDelta = 1
+        };
+
+        CategoryYAxes[0] = new Axis
+        {
+            Labels = CategoryLabels,
+            LabelsPaint = new SolidColorPaint(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) },
+            TextSize = 12,
+            SeparatorsPaint = new SolidColorPaint(GridColor.WithAlpha(40)) { StrokeThickness = 1 },
+            MinStep = 1,
+            ForceStepToMin = true
         };
     }
 
@@ -115,6 +145,59 @@ public class BtcDenominatedMetricsChartData : IDisposable
         Series.Add(_spentSeries);
     }
 
+    public void RefreshCategoryChart(IReadOnlyList<SatsSpentByCategoryDto> items)
+    {
+        CategoryLabels.Clear();
+
+        DisposeSeries();
+        Series.Clear();
+
+        // Sort by magnitude descending (largest spenders first) for the row chart
+        var sortedItems = items
+            .OrderByDescending(x => x.SatsTotal)
+            .ToList();
+
+        ChartHeight = Math.Max(MinChartHeight, sortedItems.Count * HeightPerCategory);
+
+        foreach (var item in sortedItems)
+        {
+            CategoryLabels.Add(item.CategoryName);
+        }
+
+        var values = sortedItems.Select(x => (double)x.SatsTotal).ToList();
+        var colors = sortedItems
+            .Select(x =>
+            {
+                if (string.IsNullOrWhiteSpace(x.IconColor) || !int.TryParse(x.IconColor, System.Globalization.NumberStyles.HexNumber, null, out var argb))
+                    return TextColor;
+
+                return new SKColor((uint)argb).WithAlpha(255);
+            })
+            .ToList();
+
+        _categoryRowSeries = new RowSeries<double>
+        {
+            Values = values,
+            DataLabelsPaint = new SolidColorPaint(SKColors.White) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) },
+            DataLabelsSize = 12,
+            DataLabelsPosition = DataLabelsPosition.End,
+            DataLabelsFormatter = point => CurrencyDisplay.FormatSatsAsNumber((long)(double)point.Model),
+            XToolTipLabelFormatter = point => CurrencyDisplay.FormatSatsAsNumber((long)(double)point.Model),
+            YToolTipLabelFormatter = _ => null!,
+            Padding = 2
+        };
+
+        _categoryRowSeries.PointMeasured += point =>
+        {
+            if (point.Visual is null) return;
+            var index = point.Index;
+            if (index < colors.Count)
+                point.Visual.Fill = new SolidColorPaint(colors[index]);
+        };
+
+        Series.Add(_categoryRowSeries);
+    }
+
     private void DisposeSeries()
     {
         if (_earnedSeries is not null)
@@ -128,6 +211,13 @@ public class BtcDenominatedMetricsChartData : IDisposable
             (_spentSeries.Fill as IDisposable)?.Dispose();
             _spentSeries = null;
         }
+
+        if (_categoryRowSeries is not null)
+        {
+            (_categoryRowSeries.Fill as IDisposable)?.Dispose();
+            (_categoryRowSeries.DataLabelsPaint as IDisposable)?.Dispose();
+            _categoryRowSeries = null;
+        }
     }
 
     public void Dispose()
@@ -138,6 +228,7 @@ public class BtcDenominatedMetricsChartData : IDisposable
         DisposeSeries();
         Series.Clear();
         MonthLabels.Clear();
+        CategoryLabels.Clear();
         EarnedValues.Clear();
         SpentValues.Clear();
     }

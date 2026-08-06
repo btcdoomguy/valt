@@ -171,6 +171,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private bool _isStackVelocityEmpty;
     [ObservableProperty] private bool _isBtcMetricsError;
     [ObservableProperty] private bool _isStackVelocityError;
+    [ObservableProperty] private bool _isBtcMetricsCategoryView;
+
+    private BtcDenominatedMetricsDataDto? _lastBtcMetricsData;
 
     private CancellationTokenSource? _filterDebounceTokenSource;
     private const int FilterDebounceDelayMs = 300;
@@ -1100,9 +1103,11 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 CategoryIds = GetSelectedAnalyticsCategoryIds()
             });
 
+            _lastBtcMetricsData = data;
+
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                BtcDenominatedMetricsChartData.RefreshChart(data);
+                RefreshBtcMetricsChartForCurrentView();
                 IsBtcMetricsEmpty = data.Months.Count == 0;
                 IsBtcMetricsError = false;
                 IsBtcMetricsLoading = false;
@@ -1118,6 +1123,26 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 IsBtcMetricsLoading = false;
             });
         }
+    }
+
+    private void RefreshBtcMetricsChartForCurrentView()
+    {
+        if (_lastBtcMetricsData is null)
+            return;
+
+        if (IsBtcMetricsCategoryView)
+            BtcDenominatedMetricsChartData.RefreshCategoryChart(_lastBtcMetricsData.SpentByCategory);
+        else
+            BtcDenominatedMetricsChartData.RefreshChart(_lastBtcMetricsData);
+    }
+
+    partial void OnIsBtcMetricsCategoryViewChanged(bool value)
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            RefreshBtcMetricsChartForCurrentView();
+            OnPropertyChanged(nameof(BtcDenominatedMetricsChartData));
+        });
     }
 
     private async Task FetchStackVelocityAsync(IReportDataProvider provider)
