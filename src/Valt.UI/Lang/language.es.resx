@@ -2976,15 +2976,6 @@
     <data name="Reports_BurnRate_Empty" xml:space="preserve">
         <value>No se registraron gastos este mes — agregue transacciones de gasto para ver su tasa de quema.</value>
     </data>
-    <data name="Reports_SavingsRate_Title" xml:space="preserve">
-        <value>Tasa de ahorro</value>
-    </data>
-    <data name="Reports_SavingsRate_EmptyHeading" xml:space="preserve">
-        <value>Aún no hay datos de ahorro</value>
-    </data>
-    <data name="Reports_SavingsRate_EmptyBody" xml:space="preserve">
-        <value>Agregue transacciones de ingresos y gastos para ver su tasa de ahorro mensual.</value>
-    </data>
     <data name="Reports_FixedVariable_Title" xml:space="preserve">
         <value>Gastos fijos vs variables</value>
     </data>
@@ -3004,31 +2995,25 @@
         <value>Configurar categorías excluidas de todos los informes analíticos</value>
     </data>
     <data name="Reports_BtcMetrics_Earned" xml:space="preserve">
-        <value>Earned</value>
+        <value>Ganados</value>
     </data>
     <data name="Reports_BtcMetrics_Spent" xml:space="preserve">
-        <value>Spent</value>
+        <value>Gastados</value>
     </data>
     <data name="Reports_BtcMetrics_Title" xml:space="preserve">
-        <value>Sats earned &amp; spent</value>
-    </data>
-    <data name="Reports_BtcMetrics_MonthlyLabel" xml:space="preserve">
-        <value>Monthly</value>
-    </data>
-    <data name="Reports_BtcMetrics_CategoryLabel" xml:space="preserve">
-        <value>By category</value>
+        <value>Sats ganados y gastados</value>
     </data>
     <data name="Reports_BtcMetrics_EmptyHeading" xml:space="preserve">
-        <value>No sats flow yet</value>
+        <value>Aún no hay flujo de sats</value>
     </data>
     <data name="Reports_BtcMetrics_EmptyBody" xml:space="preserve">
-        <value>Add income or expense transactions to see how many sats you earned and spent.</value>
+        <value>Agrega ingresos o gastos para ver cuántos sats ganaste y gastaste.</value>
     </data>
     <data name="Reports_BtcMetrics_ErrorTitle" xml:space="preserve">
-        <value>Could not load BTC metrics.</value>
+        <value>No se pudieron cargar las métricas de BTC.</value>
     </data>
     <data name="Reports_BtcMetrics_ErrorBody" xml:space="preserve">
-        <value>Check your data file or try again later.</value>
+        <value>Verifica tu archivo de datos o inténtalo de nuevo más tarde.</value>
     </data>
     <data name="Reports_StackVelocity_Title" xml:space="preserve">
         <value>Stack velocity</value>
@@ -3041,5 +3026,23 @@
     </data>
     <data name="Reports_StackVelocity_EmptyBody" xml:space="preserve">
         <value>Add income, expenses, or BTC trades to see your net sats trend.</value>
+    </data>
+    <data name="Reports_WealthOverview_Description" xml:space="preserve">
+        <value>Rastrea tu patrimonio total a lo largo del tiempo, separando saldos en fiat y bitcoin. Reprocesa tus transacciones día a día y convierte todos los valores a tu moneda principal usando precios históricos de BTC y fiat.</value>
+    </data>
+    <data name="Reports_MonthlyTotals_Description" xml:space="preserve">
+        <value>Una instantánea mes a mes de tu patrimonio y flujo de caja. Muestra el patrimonio total, cambios respecto al mes/año anterior, además de ingresos, gastos y movimientos de bitcoin.</value>
+    </data>
+    <data name="Reports_FixedVariable_Description" xml:space="preserve">
+        <value>Compara gastos fijos (vinculados a registros de gastos fijos pagados) con gastos variables (todos los demás débitos) cada mes. Los montos se convierten a tu moneda principal.</value>
+    </data>
+    <data name="Reports_BtcMetrics_Description" xml:space="preserve">
+        <value>Muestra cuántos satoshis ganaste y gastaste cada mes. Los ingresos y gastos en fiat se convierten a sats usando el precio de BTC en la fecha de cada transacción.</value>
+    </data>
+    <data name="Reports_StackVelocity_Description" xml:space="preserve">
+        <value>Mide el crecimiento neto de tu stack de bitcoin cada mes: satoshis ganados menos satoshis gastados, más compras de BTC y menos ventas de BTC.</value>
+    </data>
+    <data name="Reports_ByCategories_Description" xml:space="preserve">
+        <value>Desglosa tus ingresos y gastos por categoría para el período seleccionado. Usa los filtros para incluir o excluir cuentas y categorías específicas.</value>
     </data>
 </root>

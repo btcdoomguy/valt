@@ -5823,24 +5823,6 @@ namespace Valt.UI.Lang {
             }
         }
         
-        public static string Reports_SavingsRate_Title {
-            get {
-                return ResourceManager.GetString("Reports_SavingsRate_Title", resourceCulture);
-            }
-        }
-        
-        public static string Reports_SavingsRate_EmptyHeading {
-            get {
-                return ResourceManager.GetString("Reports_SavingsRate_EmptyHeading", resourceCulture);
-            }
-        }
-        
-        public static string Reports_SavingsRate_EmptyBody {
-            get {
-                return ResourceManager.GetString("Reports_SavingsRate_EmptyBody", resourceCulture);
-            }
-        }
-        
         public static string Reports_FixedVariable_Title {
             get {
                 return ResourceManager.GetString("Reports_FixedVariable_Title", resourceCulture);
@@ -5919,18 +5901,6 @@ namespace Valt.UI.Lang {
             }
         }
         
-        public static string Reports_BtcMetrics_MonthlyLabel {
-            get {
-                return ResourceManager.GetString("Reports_BtcMetrics_MonthlyLabel", resourceCulture);
-            }
-        }
-        
-        public static string Reports_BtcMetrics_CategoryLabel {
-            get {
-                return ResourceManager.GetString("Reports_BtcMetrics_CategoryLabel", resourceCulture);
-            }
-        }
-        
         public static string Reports_BtcMetrics_EmptyHeading {
             get {
                 return ResourceManager.GetString("Reports_BtcMetrics_EmptyHeading", resourceCulture);
@@ -5976,6 +5946,42 @@ namespace Valt.UI.Lang {
         public static string Reports_StackVelocity_EmptyBody {
             get {
                 return ResourceManager.GetString("Reports_StackVelocity_EmptyBody", resourceCulture);
+            }
+        }
+        
+        public static string Reports_WealthOverview_Description {
+            get {
+                return ResourceManager.GetString("Reports_WealthOverview_Description", resourceCulture);
+            }
+        }
+        
+        public static string Reports_MonthlyTotals_Description {
+            get {
+                return ResourceManager.GetString("Reports_MonthlyTotals_Description", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedVariable_Description {
+            get {
+                return ResourceManager.GetString("Reports_FixedVariable_Description", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcMetrics_Description {
+            get {
+                return ResourceManager.GetString("Reports_BtcMetrics_Description", resourceCulture);
+            }
+        }
+        
+        public static string Reports_StackVelocity_Description {
+            get {
+                return ResourceManager.GetString("Reports_StackVelocity_Description", resourceCulture);
+            }
+        }
+        
+        public static string Reports_ByCategories_Description {
+            get {
+                return ResourceManager.GetString("Reports_ByCategories_Description", resourceCulture);
             }
         }
     }

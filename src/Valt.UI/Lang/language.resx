@@ -2970,15 +2970,6 @@
     <data name="Reports_BurnRate_Empty" xml:space="preserve">
         <value>No expenses recorded this month — add expense transactions to see your burn rate.</value>
     </data>
-    <data name="Reports_SavingsRate_Title" xml:space="preserve">
-        <value>Savings rate</value>
-    </data>
-    <data name="Reports_SavingsRate_EmptyHeading" xml:space="preserve">
-        <value>No savings data yet</value>
-    </data>
-    <data name="Reports_SavingsRate_EmptyBody" xml:space="preserve">
-        <value>Add income and expense transactions to see your monthly savings rate.</value>
-    </data>
     <data name="Reports_FixedVariable_Title" xml:space="preserve">
         <value>Fixed vs variable expenses</value>
     </data>
@@ -3005,12 +2996,6 @@
     </data>
     <data name="Reports_BtcMetrics_Title" xml:space="preserve">
         <value>Sats earned &amp; spent</value>
-    </data>
-    <data name="Reports_BtcMetrics_MonthlyLabel" xml:space="preserve">
-        <value>Monthly</value>
-    </data>
-    <data name="Reports_BtcMetrics_CategoryLabel" xml:space="preserve">
-        <value>By category</value>
     </data>
     <data name="Reports_BtcMetrics_EmptyHeading" xml:space="preserve">
         <value>No sats flow yet</value>
@@ -3044,5 +3029,23 @@
     </data>
     <data name="Reports_CategoryFilter_Tooltip" xml:space="preserve">
         <value>Configure categories excluded from all reports analytics</value>
+    </data>
+    <data name="Reports_WealthOverview_Description" xml:space="preserve">
+        <value>Tracks your total wealth over time, splitting it between fiat and bitcoin balances. It replays your transactions day by day and converts all values to your main currency using historical BTC and fiat prices.</value>
+    </data>
+    <data name="Reports_MonthlyTotals_Description" xml:space="preserve">
+        <value>A month-by-month snapshot of your wealth and cash flow. It shows total wealth, changes versus the previous month/year, plus income, expenses, and bitcoin movements.</value>
+    </data>
+    <data name="Reports_FixedVariable_Description" xml:space="preserve">
+        <value>Compares fixed expenses (linked to paid fixed-expense records) against variable expenses (all other debits) each month. Amounts are converted to your main currency.</value>
+    </data>
+    <data name="Reports_BtcMetrics_Description" xml:space="preserve">
+        <value>Shows how many satoshis you earned and spent each month. Fiat income/expenses are converted to sats using the BTC price on each transaction date.</value>
+    </data>
+    <data name="Reports_StackVelocity_Description" xml:space="preserve">
+        <value>Measures your net bitcoin stack growth each month: sats earned minus sats spent, plus BTC purchases and minus BTC sales.</value>
+    </data>
+    <data name="Reports_ByCategories_Description" xml:space="preserve">
+        <value>Breaks down your income and expenses by category for the selected period. Use the filters to include or exclude specific accounts and categories.</value>
     </data>
 </root>

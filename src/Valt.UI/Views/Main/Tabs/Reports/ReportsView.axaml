@@ -190,6 +190,12 @@
                     </StackPanel>
                 </Expander.Header>
                 <StackPanel Orientation="Vertical">
+                    <TextBlock Text="{x:Static lang:language.Reports_WealthOverview_Description}"
+                               FontSize="{DynamicResource FontSizeSmall}"
+                               Foreground="{DynamicResource Text500Brush}"
+                               TextWrapping="Wrap"
+                               MaxWidth="900"
+                               Margin="0,0,0,12" />
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10" HorizontalAlignment="Center" Spacing="10">
                         <ComboBox SelectedItem="{Binding SelectedWealthOverviewPeriod}" MinWidth="150">
                             <ComboBox.ItemTemplate>
@@ -243,11 +249,17 @@
             <Expander Classes="section" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsExpanded="True">
                 <Expander.Header>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Classes="section-header-icon" Text="&#xE6DF;" />
+                        <TextBlock Classes="section-header-icon" Text="&#xE24B;" />
                         <TextBlock Classes="section-header" Text="{x:Static lang:language.Reports_MonthlyTotals}" />
                     </StackPanel>
                 </Expander.Header>
                 <StackPanel Orientation="Vertical">
+                    <TextBlock Text="{x:Static lang:language.Reports_MonthlyTotals_Description}"
+                               FontSize="{DynamicResource FontSizeSmall}"
+                               Foreground="{DynamicResource Text500Brush}"
+                               TextWrapping="Wrap"
+                               MaxWidth="900"
+                               Margin="0,0,0,12" />
                     <userControls:DateCalendarSelector HorizontalContentAlignment="Center"
                                                        Height="60"
                                                        Date="{Binding FilterMainDate}"
@@ -397,63 +409,6 @@
                                Margin="0, 5, 0, 0" />
                 </StackPanel>
             </Expander>
-            <!--Savings rate-->
-            <Expander Classes="section" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsExpanded="True">
-                <Expander.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Classes="section-header-icon" Text="&#xE2EB;" />
-                        <TextBlock Classes="section-header" Text="{x:Static lang:language.Reports_SavingsRate_Title}" />
-                    </StackPanel>
-                </Expander.Header>
-                <StackPanel Orientation="Vertical">
-                    <Grid MinHeight="400">
-                        <Panel IsVisible="{Binding !IsSavingsRateLoading}">
-                            <Border Background="{DynamicResource Background900Brush}"
-                                    BorderBrush="{DynamicResource Background700Brush}"
-                                    BorderThickness="1"
-                                    CornerRadius="4"
-                                    Padding="10"
-                                    IsVisible="{Binding !IsSavingsRateEmpty}">
-                                <avalonia:CartesianChart
-                                    x:Name="SavingsRateChart"
-                                    Background="{DynamicResource Background900Brush}"
-                                    Series="{Binding SavingsRateChartData.Series}"
-                                    XAxes="{Binding SavingsRateChartData.XAxes}"
-                                    YAxes="{Binding SavingsRateChartData.YAxes}"
-                                    LegendPosition="Top"
-                                    LegendTextSize="13"
-                                    TooltipTextSize="12"
-                                    ZoomMode="None"
-                                    Height="400"
-                                    Margin="20, 10, 20, 10">
-                                </avalonia:CartesianChart>
-                            </Border>
-                            <Border Classes="hint-box"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Center"
-                                    IsVisible="{Binding IsSavingsRateEmpty}">
-                                <StackPanel Orientation="Vertical" Spacing="8">
-                                    <TextBlock Text="{x:Static lang:language.Reports_SavingsRate_EmptyHeading}"
-                                               FontSize="{DynamicResource FontSizeLarge}"
-                                               FontWeight="SemiBold"
-                                               Foreground="{DynamicResource Text200Brush}"
-                                               HorizontalAlignment="Center" />
-                                    <TextBlock Text="{x:Static lang:language.Reports_SavingsRate_EmptyBody}"
-                                               FontSize="{DynamicResource FontSizeNormal}"
-                                               Foreground="{DynamicResource Text400Brush}"
-                                               TextWrapping="Wrap"
-                                               TextAlignment="Center"
-                                               MaxWidth="500"
-                                               HorizontalAlignment="Center" />
-                                </StackPanel>
-                            </Border>
-                        </Panel>
-                        <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   IsVisible="{Binding IsSavingsRateLoading}" />
-                    </Grid>
-                </StackPanel>
-            </Expander>
             <!--Fixed vs variable expenses-->
             <Expander Classes="section" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsExpanded="True">
                 <Expander.Header>
@@ -463,6 +418,12 @@
                     </StackPanel>
                 </Expander.Header>
                 <StackPanel Orientation="Vertical">
+                    <TextBlock Text="{x:Static lang:language.Reports_FixedVariable_Description}"
+                               FontSize="{DynamicResource FontSizeSmall}"
+                               Foreground="{DynamicResource Text500Brush}"
+                               TextWrapping="Wrap"
+                               MaxWidth="900"
+                               Margin="0,0,0,12" />
                     <Grid MinHeight="400">
                         <Panel IsVisible="{Binding !IsFixedVsVariableLoading}">
                             <Border Classes="hint-box"
@@ -536,71 +497,35 @@
                     </StackPanel>
                 </Expander.Header>
                 <StackPanel Orientation="Vertical">
-                    <StackPanel Orientation="Horizontal"
-                                HorizontalAlignment="Center"
-                                Spacing="8"
-                                Margin="0,0,0,10"
-                                IsVisible="{Binding !IsBtcMetricsLoading}">
-                        <TextBlock Text="{x:Static lang:language.Reports_BtcMetrics_MonthlyLabel}"
-                                   FontSize="{DynamicResource FontSizeSmall}"
-                                   Foreground="{DynamicResource Text300Brush}"
-                                   VerticalAlignment="Center" />
-                        <ToggleSwitch IsChecked="{Binding IsBtcMetricsCategoryView, Mode=TwoWay}"
-                                      VerticalAlignment="Center" />
-                        <TextBlock Text="{x:Static lang:language.Reports_BtcMetrics_CategoryLabel}"
-                                   FontSize="{DynamicResource FontSizeSmall}"
-                                   Foreground="{DynamicResource Text300Brush}"
-                                   VerticalAlignment="Center" />
-                    </StackPanel>
+                    <TextBlock Text="{x:Static lang:language.Reports_BtcMetrics_Description}"
+                               FontSize="{DynamicResource FontSizeSmall}"
+                               Foreground="{DynamicResource Text500Brush}"
+                               TextWrapping="Wrap"
+                               MaxWidth="900"
+                               Margin="0,0,0,12" />
                     <Grid MinHeight="400">
                         <Panel IsVisible="{Binding !IsBtcMetricsLoading}">
                             <Panel IsVisible="{Binding !IsBtcMetricsError}">
-                                <Panel IsVisible="{Binding !IsBtcMetricsCategoryView}">
-                                    <Border Background="{DynamicResource Background900Brush}"
-                                            BorderBrush="{DynamicResource Background700Brush}"
-                                            BorderThickness="1"
-                                            CornerRadius="4"
-                                            Padding="10"
-                                            IsVisible="{Binding !IsBtcMetricsEmpty}">
-                                        <avalonia:CartesianChart
-                                            x:Name="BtcDenominatedMetricsChart"
-                                            Background="{DynamicResource Background900Brush}"
-                                            Series="{Binding BtcDenominatedMetricsChartData.Series}"
-                                            XAxes="{Binding BtcDenominatedMetricsChartData.XAxes}"
-                                            YAxes="{Binding BtcDenominatedMetricsChartData.YAxes}"
-                                            LegendPosition="Top"
-                                            LegendTextSize="13"
-                                            TooltipTextSize="12"
-                                            ZoomMode="None"
-                                            Height="400"
-                                            Margin="20, 10, 20, 10">
-                                        </avalonia:CartesianChart>
-                                    </Border>
-                                </Panel>
-                                <Panel IsVisible="{Binding IsBtcMetricsCategoryView}">
-                                    <Border Background="{DynamicResource Background900Brush}"
-                                            BorderBrush="{DynamicResource Background700Brush}"
-                                            BorderThickness="1"
-                                            CornerRadius="4"
-                                            Padding="10"
-                                            IsVisible="{Binding !IsBtcMetricsEmpty}">
-                                        <ScrollViewer MaxHeight="600"
-                                                      VerticalScrollBarVisibility="Auto"
-                                                      HorizontalScrollBarVisibility="Disabled">
-                                            <avalonia:CartesianChart
-                                                x:Name="BtcDenominatedMetricsCategoryChart"
-                                                Background="{DynamicResource Background900Brush}"
-                                                Height="{Binding BtcDenominatedMetricsChartData.ChartHeight}"
-                                                Series="{Binding BtcDenominatedMetricsChartData.Series}"
-                                                XAxes="{Binding BtcDenominatedMetricsChartData.CategoryXAxes}"
-                                                YAxes="{Binding BtcDenominatedMetricsChartData.CategoryYAxes}"
-                                                TooltipTextSize="12"
-                                                ZoomMode="None"
-                                                Margin="20, 10, 20, 10">
-                                            </avalonia:CartesianChart>
-                                        </ScrollViewer>
-                                    </Border>
-                                </Panel>
+                                <Border Background="{DynamicResource Background900Brush}"
+                                        BorderBrush="{DynamicResource Background700Brush}"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="10"
+                                        IsVisible="{Binding !IsBtcMetricsEmpty}">
+                                    <avalonia:CartesianChart
+                                        x:Name="BtcDenominatedMetricsChart"
+                                        Background="{DynamicResource Background900Brush}"
+                                        Series="{Binding BtcDenominatedMetricsChartData.Series}"
+                                        XAxes="{Binding BtcDenominatedMetricsChartData.XAxes}"
+                                        YAxes="{Binding BtcDenominatedMetricsChartData.YAxes}"
+                                        LegendPosition="Top"
+                                        LegendTextSize="13"
+                                        TooltipTextSize="12"
+                                        ZoomMode="None"
+                                        Height="400"
+                                        Margin="20, 10, 20, 10">
+                                    </avalonia:CartesianChart>
+                                </Border>
                                 <Border Classes="hint-box"
                                         VerticalAlignment="Center"
                                         HorizontalAlignment="Center"
@@ -656,6 +581,12 @@
                     </StackPanel>
                 </Expander.Header>
                 <StackPanel Orientation="Vertical">
+                    <TextBlock Text="{x:Static lang:language.Reports_StackVelocity_Description}"
+                               FontSize="{DynamicResource FontSizeSmall}"
+                               Foreground="{DynamicResource Text500Brush}"
+                               TextWrapping="Wrap"
+                               MaxWidth="900"
+                               Margin="0,0,0,12" />
                     <Grid MinHeight="400">
                         <Panel IsVisible="{Binding !IsStackVelocityLoading}">
                             <Panel IsVisible="{Binding !IsStackVelocityError}">
@@ -734,6 +665,12 @@
                     </StackPanel>
                 </Expander.Header>
                 <StackPanel Orientation="Vertical">
+                    <TextBlock Text="{x:Static lang:language.Reports_ByCategories_Description}"
+                               FontSize="{DynamicResource FontSizeSmall}"
+                               Foreground="{DynamicResource Text500Brush}"
+                               TextWrapping="Wrap"
+                               MaxWidth="900"
+                               Margin="0,0,0,12" />
                     <userControls:DateCalendarSelector HorizontalContentAlignment="Center"
                                                        Height="60"
                                                        Date="{Binding CategoryFilterMainDate}"
