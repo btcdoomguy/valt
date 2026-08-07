@@ -155,13 +155,10 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
     // Income by category
     [ObservableProperty] private IncomeByCategoryChartData _incomeByCategoryChartData = new();
-    [ObservableProperty] private SavingsRateChartData _savingsRateChartData = new();
     [ObservableProperty] private FixedVsVariableChartData _fixedVsVariableChartData = new();
     [ObservableProperty] private BtcDenominatedMetricsChartData _btcDenominatedMetricsChartData = new();
     [ObservableProperty] private StackVelocityChartData _stackVelocityChartData = new();
 
-    [ObservableProperty] private bool _isSavingsRateLoading = true;
-    [ObservableProperty] private bool _isSavingsRateEmpty;
     [ObservableProperty] private bool _isFixedVsVariableLoading = true;
     [ObservableProperty] private bool _isFixedVsVariableEmpty;
     [ObservableProperty] private bool _hasNoFixedExpenses;
@@ -171,7 +168,6 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private bool _isStackVelocityEmpty;
     [ObservableProperty] private bool _isBtcMetricsError;
     [ObservableProperty] private bool _isStackVelocityError;
-    [ObservableProperty] private bool _isBtcMetricsCategoryView;
 
     private BtcDenominatedMetricsDataDto? _lastBtcMetricsData;
 
@@ -404,7 +400,6 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             FetchMonthlyTotalsAsync(provider),
             FetchExpensesByCategoryAsync(provider),
             FetchIncomeByCategoryAsync(provider),
-            FetchSavingsRateAsync(provider),
             FetchFixedVsVariableAsync(provider),
             FetchBtcDenominatedMetricsAsync(provider),
             FetchStackVelocityAsync(provider),
@@ -526,7 +521,6 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         if (!_ready) return;
 
         IsMonthlyTotalsLoading = true;
-        IsSavingsRateLoading = true;
         IsFixedVsVariableLoading = true;
         IsBtcMetricsLoading = true;
         IsStackVelocityLoading = true;
@@ -538,7 +532,6 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         var provider = await GetOrCreateProviderAsync();
         await Task.WhenAll(
             FetchMonthlyTotalsAsync(provider),
-            FetchSavingsRateAsync(provider),
             FetchFixedVsVariableAsync(provider),
             FetchBtcDenominatedMetricsAsync(provider),
             FetchStackVelocityAsync(provider));
@@ -654,7 +647,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 new(language.Reports_AllTimeHigh_AllTimeHigh,
                     $"{CurrencyDisplay.FormatFiat(allTimeHighData.Value, fiatCurrency.Code)}"),
                 new(language.Reports_AllTimeHigh_Date, allTimeHighData.Date.ToString()),
-                new(language.Reports_AllTimeHigh_DeclineFromAth, $"{allTimeHighData.DeclineFromAth}%")
+                new(language.Reports_AllTimeHigh_DeclineFromAth, $"{allTimeHighData.DeclineFromAth}%",
+                    RightTextForeground: DashboardDataBrushes.ForAthDifference(allTimeHighData.DeclineFromAth))
             };
 
             if (allTimeHighData.MaxDrawdownDate.HasValue && allTimeHighData.MaxDrawdownPercent.HasValue)
@@ -741,7 +735,10 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 {
                     var evolutionSign = statisticsData.MedianMonthlyExpensesEvolution.Value >= 0 ? "+" : "";
                     var evolutionFormatted = $"{evolutionSign}{statisticsData.MedianMonthlyExpensesEvolution.Value}%";
-                    rows.Add(new RowItem(language.Reports_Statistics_MedianExpensesEvolution, evolutionFormatted, TooltipContent.Text(language.Reports_Statistics_MedianExpensesEvolution_Tooltip)));
+                    var evolutionBrush = DashboardDataBrushes.ForYoYEvolution(statisticsData.MedianMonthlyExpensesEvolution.Value);
+                    rows.Add(new RowItem(language.Reports_Statistics_MedianExpensesEvolution, evolutionFormatted,
+                        TooltipContent.Text(language.Reports_Statistics_MedianExpensesEvolution_Tooltip),
+                        RightTextForeground: evolutionBrush));
                 }
             }
 
@@ -761,7 +758,10 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     {
                         var satEvolutionSign = statisticsData.MedianMonthlyExpensesSatsEvolution.Value >= 0 ? "+" : "";
                         var satEvolutionFormatted = $"{satEvolutionSign}{statisticsData.MedianMonthlyExpensesSatsEvolution.Value}%";
-                        rows.Add(new RowItem(language.Reports_Statistics_MedianExpensesSatsEvolution, satEvolutionFormatted, TooltipContent.Text(language.Reports_Statistics_MedianExpensesSatsEvolution_Tooltip)));
+                        var satEvolutionBrush = DashboardDataBrushes.ForYoYEvolution(statisticsData.MedianMonthlyExpensesSatsEvolution.Value);
+                        rows.Add(new RowItem(language.Reports_Statistics_MedianExpensesSatsEvolution, satEvolutionFormatted,
+                            TooltipContent.Text(language.Reports_Statistics_MedianExpensesSatsEvolution_Tooltip),
+                            RightTextForeground: satEvolutionBrush));
                     }
                 }
             }
@@ -1031,35 +1031,6 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
     }
 
-    private async Task FetchSavingsRateAsync(IReportDataProvider provider)
-    {
-        try
-        {
-            var data = await _queryDispatcher.DispatchAsync(new GetSavingsRateQuery
-            {
-                From = DateOnly.FromDateTime(FilterRange.Start),
-                To = DateOnly.FromDateTime(FilterRange.End),
-                CategoryIds = GetSelectedAnalyticsCategoryIds()
-            });
-
-            await Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                SavingsRateChartData.RefreshChart(data);
-                IsSavingsRateEmpty = data.Months.Count == 0;
-                IsSavingsRateLoading = false;
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error fetching savings rate");
-            await Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                IsSavingsRateEmpty = false;
-                IsSavingsRateLoading = false;
-            });
-        }
-    }
-
     private async Task FetchFixedVsVariableAsync(IReportDataProvider provider)
     {
         try
@@ -1112,8 +1083,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                RefreshBtcMetricsChartForCurrentView();
-                IsBtcMetricsEmpty = IsBtcMetricsCategoryView ? data.SpentByCategory.Count == 0 : data.Months.Count == 0;
+                BtcDenominatedMetricsChartData.RefreshChart(data);
+                IsBtcMetricsEmpty = data.Months.Count == 0;
                 IsBtcMetricsError = false;
                 IsBtcMetricsLoading = false;
             });
@@ -1128,31 +1099,6 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 IsBtcMetricsLoading = false;
             });
         }
-    }
-
-    private void RefreshBtcMetricsChartForCurrentView()
-    {
-        if (_lastBtcMetricsData is null)
-            return;
-
-        if (IsBtcMetricsCategoryView)
-            BtcDenominatedMetricsChartData.RefreshCategoryChart(_lastBtcMetricsData.SpentByCategory);
-        else
-            BtcDenominatedMetricsChartData.RefreshChart(_lastBtcMetricsData);
-    }
-
-    partial void OnIsBtcMetricsCategoryViewChanged(bool value)
-    {
-        Dispatcher.UIThread.Post(() =>
-        {
-            if (_lastBtcMetricsData is not null)
-            {
-                IsBtcMetricsEmpty = IsBtcMetricsCategoryView ? _lastBtcMetricsData.SpentByCategory.Count == 0 : _lastBtcMetricsData.Months.Count == 0;
-            }
-
-            RefreshBtcMetricsChartForCurrentView();
-            OnPropertyChanged(nameof(BtcDenominatedMetricsChartData));
-        });
     }
 
     private async Task FetchStackVelocityAsync(IReportDataProvider provider)
@@ -1370,7 +1316,6 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         MonthlyTotalsChartData.Dispose();
         ExpensesByCategoryChartData.Dispose();
         IncomeByCategoryChartData.Dispose();
-        SavingsRateChartData.Dispose();
         FixedVsVariableChartData.Dispose();
         BtcDenominatedMetricsChartData.Dispose();
         StackVelocityChartData.Dispose();

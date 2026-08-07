@@ -47,7 +47,8 @@ public partial class IndicatorsPanelViewModel : DashboardPanelViewModel
                     new TooltipLine([new TooltipRun("1.0", Bold: true), new TooltipRun(": fair value")]),
                     new TooltipLine([new TooltipRun("< 0.8", Bold: true), new TooltipRun(": buying opportunity")]),
                 ]),
-                Url: "https://charts.bitcoin.com/mayer.html"));
+                Url: "https://charts.bitcoin.com/mayer.html",
+                RightTextForeground: DashboardDataBrushes.ForMayerMultiple(snapshot.MayerMultiple.Multiple)));
 
         if (snapshot.RainbowChart is not null)
             rows.Add(new RowItem(language.Reports_Indicators_RainbowChart,
@@ -67,7 +68,8 @@ public partial class IndicatorsPanelViewModel : DashboardPanelViewModel
                     new TooltipLine([new TooltipRun("51\u201375", Bold: true), new TooltipRun(": Greed")]),
                     new TooltipLine([new TooltipRun("76\u2013100", Bold: true), new TooltipRun(": Extreme Greed (sell)")]),
                 ]),
-                Url: "https://alternative.me/crypto/fear-and-greed-index/"));
+                Url: "https://alternative.me/crypto/fear-and-greed-index/",
+                RightTextForeground: DashboardDataBrushes.ForFearAndGreed(snapshot.FearAndGreed.Value)));
 
         if (snapshot.BitcoinDominance is not null)
             rows.Add(new RowItem(language.Reports_Indicators_BtcDominance,

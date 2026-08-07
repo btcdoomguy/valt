@@ -179,7 +179,8 @@ public partial class LeveragePositionsPanelViewModel : DashboardPanelViewModel, 
             {
                 new(language.Reports_LeveragePositions_LeveragedStack, leveragedStackFormatted, TooltipContent.Text(language.Reports_LeveragePositions_LeveragedStack_Tooltip)),
                 new(language.Reports_LeveragePositions_LeverageExposure, exposureFormatted),
-                new(language.Reports_LeveragePositions_LeveragePercentage, leveragePercentFormatted, TooltipContent.Text(language.Reports_LeveragePositions_LeveragePercentage_Tooltip)),
+                new(language.Reports_LeveragePositions_LeveragePercentage, leveragePercentFormatted, TooltipContent.Text(language.Reports_LeveragePositions_LeveragePercentage_Tooltip),
+                    RightTextForeground: DashboardDataBrushes.ForLeverage(leveragePercentage)),
                 new(language.Reports_LeveragePositions_PositionCount, positionCountFormatted),
                 new(language.Reports_LeveragePositions_CurrentResult, pnlFiatFormatted),
                 new(language.Reports_LeveragePositions_CurrentResultBtc, pnlBtcFormatted)

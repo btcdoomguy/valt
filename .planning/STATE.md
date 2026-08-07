@@ -3,18 +3,18 @@ gsd_state_version: 1.0
 milestone: v0.7
 milestone_name: Insights & Metrics Expansion
 current_phase: 40
-current_phase_name: BTC-Denominated Metrics Reports & UI
-status: verifying
-stopped_at: Completed 40-btc-denominated-metrics-reports-ui-02-PLAN.md
-last_updated: "2026-08-06T15:19:15.281Z"
+current_phase_name: btc-denominated-metrics-reports-ui
+status: executing
+stopped_at: Completed 40-btc-denominated-metrics-reports-ui-04-PLAN.md
+last_updated: "2026-08-06T19:13:51.145Z"
 last_activity: 2026-08-06
 last_activity_desc: Phase 40 execution started
 progress:
   total_phases: 5
-  completed_phases: 1
-  total_plans: 10
-  completed_plans: 9
-  percent: 20
+  completed_phases: 2
+  total_plans: 12
+  completed_plans: 12
+  percent: 40
 ---
 
 # STATE.md
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-15)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 40 — BTC-Denominated Metrics Reports & UI
+**Current focus:** Phase 40 — btc-denominated-metrics-reports-ui
 
 ## Current Position
 
-Phase: 40 (BTC-Denominated Metrics Reports & UI) — EXECUTING
-Plan: 2 of 2
-Status: Phase complete — ready for verification
-Last activity: 2026-08-06 — Phase 40 execution started
+Phase: 40 (btc-denominated-metrics-reports-ui) — COMPLETE
+Plan: 4 of 4
+Status: Phase complete, ready for Phase 41
+Last activity: 2026-08-06 — Completed 40-04 gap-closure plan
 
 ## Performance Metrics
 
@@ -95,6 +95,8 @@ Last activity: 2026-08-06 — Phase 40 execution started
 |------|----------|-------|-------|
 | Phase 40-btc-denominated-metrics-reports-ui P01 | 15 | 3 tasks | 13 files |
 | Phase 40-btc-denominated-metrics-reports-ui P02 | 25min | 3 tasks | 7 files |
+| Phase 40 P03 | 5min | 1 tasks | 1 files |
+| Phase 40 P04 | 10min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -201,8 +203,8 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-08-06T15:19:15.270Z
-Stopped at: Completed 40-btc-denominated-metrics-reports-ui-02-PLAN.md
+Last session: 2026-08-06T19:13:51.133Z
+Stopped at: Completed 40-btc-denominated-metrics-reports-ui-04-PLAN.md
 Resume file: None
 
 ## Notes
