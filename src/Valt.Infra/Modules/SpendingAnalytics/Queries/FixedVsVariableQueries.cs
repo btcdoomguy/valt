@@ -94,22 +94,26 @@ public class FixedVsVariableQueries : IFixedVsVariableQueries
         var transactions = transactionQuery.ToList();
 
         // Aggregate per month, splitting fixed vs variable
-        var today = _clock.GetCurrentLocalDate();
-        var firstOfCurrentMonth = new DateOnly(today.Year, today.Month, 1);
-
         var monthlyData = AggregateByMonth(transactions, accountDict, paidTransactionIds, primaryCurrency, bitcoinPriceUsd, fiatRates);
 
-        var sortedMonths = monthlyData
-            .Where(x => new DateOnly(x.Key.Year, x.Key.Month, 1) < firstOfCurrentMonth)
-            .OrderBy(x => x.Key.Year)
-            .ThenBy(x => x.Key.Month)
-            .Select(x => new FixedVsVariableMonthDto
+        // Emit every month in the requested range so the chart axis stays consistent
+        // even when a month has no transactions (matches BtcDenominatedMetricsQueries).
+        var startMonth = new DateOnly(query.From.Year, query.From.Month, 1);
+        var endMonth = new DateOnly(query.To.Year, query.To.Month, 1);
+        var sortedMonths = new List<FixedVsVariableMonthDto>();
+        for (var month = startMonth; month <= endMonth; month = month.AddMonths(1))
+        {
+            var key = (month.Year, month.Month);
+            var (fixedTotal, variableTotal) = monthlyData.TryGetValue(key, out var current)
+                ? (current.FixedTotal, current.VariableTotal)
+                : (0m, 0m);
+            sortedMonths.Add(new FixedVsVariableMonthDto
             {
-                Month = new DateOnly(x.Key.Year, x.Key.Month, 1),
-                FixedTotal = x.Value.FixedTotal,
-                VariableTotal = x.Value.VariableTotal
-            })
-            .ToList();
+                Month = month,
+                FixedTotal = fixedTotal,
+                VariableTotal = variableTotal
+            });
+        }
 
         return Task.FromResult(new FixedVsVariableDataDto
         {

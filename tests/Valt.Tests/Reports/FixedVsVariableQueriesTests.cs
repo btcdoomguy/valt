@@ -150,7 +150,7 @@ public class FixedVsVariableQueriesTests : DatabaseTest
     }
 
     [Test]
-    public async Task Should_Exclude_Current_Incomplete_Month()
+    public async Task Should_Include_Current_Incomplete_Month()
     {
         var clock = new FakeClock(new DateTime(2025, 3, 15));
         var fixedExpense = AddFixedExpense();
@@ -160,10 +160,18 @@ public class FixedVsVariableQueriesTests : DatabaseTest
 
         var result = await ExecuteQuery(new DateOnly(2025, 1, 1), new DateOnly(2025, 12, 31), clock);
 
+        var february = GetMonth(result, new DateOnly(2025, 2, 1));
+        var march = GetMonth(result, new DateOnly(2025, 3, 1));
+
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(GetMonth(result, new DateOnly(2025, 2, 1)), Is.Not.Null);
-            Assert.That(GetMonth(result, new DateOnly(2025, 3, 1)), Is.Null);
+            Assert.That(result.Months, Has.Count.EqualTo(12));
+            Assert.That(february, Is.Not.Null);
+            Assert.That(february!.FixedTotal, Is.EqualTo(300m));
+            Assert.That(february.VariableTotal, Is.EqualTo(0m));
+            Assert.That(march, Is.Not.Null);
+            Assert.That(march!.FixedTotal, Is.EqualTo(0m));
+            Assert.That(march.VariableTotal, Is.EqualTo(200m));
         }
     }
 
@@ -201,7 +209,7 @@ public class FixedVsVariableQueriesTests : DatabaseTest
     }
 
     [Test]
-    public async Task Should_Return_Empty_Months_When_No_Expense_Transactions_In_Range()
+    public async Task Should_Return_All_Months_When_No_Expense_Transactions_In_Range()
     {
         AddFixedExpense();
 
@@ -210,7 +218,8 @@ public class FixedVsVariableQueriesTests : DatabaseTest
         using (Assert.EnterMultipleScope())
         {
             Assert.That(result.HasNoFixedExpenses, Is.False);
-            Assert.That(result.Months, Is.Empty);
+            Assert.That(result.Months, Has.Count.EqualTo(24));
+            Assert.That(result.Months.All(m => m.FixedTotal == 0m && m.VariableTotal == 0m), Is.True);
         }
     }
 
