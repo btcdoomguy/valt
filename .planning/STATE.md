@@ -7,8 +7,8 @@ current_phase_name: Wealth & Performance Reports & UI
 status: planning
 stopped_at: Completed 40-btc-denominated-metrics-reports-ui-04-PLAN.md
 last_updated: "2026-08-06T22:40:40.068Z"
-last_activity: 2026-08-06
-last_activity_desc: Completed quick task 260806-v3s: Add color-coded thresholds to dashboard data panels
+last_activity: 2026-08-07
+last_activity_desc: Completed quick task 260807-er9: Fix Fixed vs Variable Expenses chart to show all 12 months including current and future months, matching Sats earned & spent chart behavior
 progress:
   total_phases: 5
   completed_phases: 2
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-08-06)
 Phase: 41 — Wealth & Performance Reports & UI
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-08-06 — Completed quick task 260806-v3s: Add color-coded thresholds to dashboard data panels
+Last activity: 2026-08-07 — Completed quick task 260807-er9: Fix Fixed vs Variable Expenses chart to show all 12 months including current and future months, matching Sats earned & spent chart behavior
 
 ## Performance Metrics
 
@@ -188,6 +188,7 @@ None yet.
 | 260804-u3u | Add pt-BR and es translations for the new Phase 39 Reports strings (Burn Rate, Savings Rate, Fixed vs Variable) | 2026-08-05 | 502281f | [260804-u3u-add-pt-br-and-es-translations-for-the-ne](./quick/260804-u3u-add-pt-br-and-es-translations-for-the-ne/) |
 | 260804-tyf | Restore DashboardData right-text foreground color to previous Text100Brush after RowItem.RightTextForeground change | 2026-08-05 | 15b7aa0 | [260804-tyf-restore-dashboarddata-right-text-foregro](./quick/260804-tyf-restore-dashboarddata-right-text-foregro/) |
 | 260806-v3s | Add color-coded thresholds to dashboard data panels: BTC Loans LTVs, stack pledged; Indicators Mayer Multiple and Fear & Greed; All-time high difference; Leverage %; Statistics YoY and Sats YoY evolutions | 2026-08-06 | ae3405f | [260806-v3s-add-color-coded-thresholds-to-dashboard-](./quick/260806-v3s-add-color-coded-thresholds-to-dashboard-/) |
+| 260807-er9 | Fix Fixed vs Variable Expenses chart to show all 12 months including current and future months, matching Sats earned & spent chart behavior | 2026-08-07 | 8aabdca | [260807-er9-fix-fixed-vs-variable-expenses-chart-to-](./quick/260807-er9-fix-fixed-vs-variable-expenses-chart-to-/) |
 
 ## Deferred Items
 
