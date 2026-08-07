@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v0.7
 milestone_name: Insights & Metrics Expansion
-current_phase: 40
-current_phase_name: btc-denominated-metrics-reports-ui
-status: executing
+current_phase: 41
+current_phase_name: Wealth & Performance Reports & UI
+status: planning
 stopped_at: Completed 40-btc-denominated-metrics-reports-ui-04-PLAN.md
-last_updated: "2026-08-06T19:13:51.145Z"
+last_updated: "2026-08-06T22:40:40.068Z"
 last_activity: 2026-08-06
-last_activity_desc: Phase 40 execution started
+last_activity_desc: Completed quick task 260806-v3s: Add color-coded thresholds to dashboard data panels
 progress:
   total_phases: 5
   completed_phases: 2
@@ -21,23 +21,23 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-07-15)
+See: .planning/PROJECT.md (updated 2026-08-06)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 40 — btc-denominated-metrics-reports-ui
+**Current focus:** Phase 41 — Wealth & Performance Reports & UI
 
 ## Current Position
 
-Phase: 40 (btc-denominated-metrics-reports-ui) — COMPLETE
-Plan: 4 of 4
-Status: Phase complete, ready for Phase 41
-Last activity: 2026-08-06 — Completed 40-04 gap-closure plan
+Phase: 41 — Wealth & Performance Reports & UI
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-08-06 — Completed quick task 260806-v3s: Add color-coded thresholds to dashboard data panels
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 25
+- Total plans completed: 11
 - Average duration: 18 min
 - Total execution time: 43 min
 
@@ -54,6 +54,7 @@ Last activity: 2026-08-06 — Completed 40-04 gap-closure plan
 | 37 | 2 | - | - |
 | Phase 38 | 2/3 | — | — |
 | 39 | 8/8 | - | - |
+| 40 | 4/4 | 55 min | 13.75 min |
 
 **Recent Trend:**
 
@@ -156,6 +157,8 @@ Recent decisions affecting current work:
 - [Phase ?]: 39-03: Used English-only resx strings (D-21); pt-BR/es files untouched for Phase 43 localization pass
 - [Phase ?]: 39-03: Used TransactionGridResources.Credit for projection <= median and Debt for projection > median, matching MonthlyReportItemViewModel convention
 - [Phase ?]: 39-03: Kept burn-rate card always visible (IsVisible=true) even on empty/error states, unlike conditional BtcLoans/Leverage panels
+- [Phase 40-04]: Reused `IsBtcMetricsEmpty` for both monthly and category breakdown views so the existing XAML empty-state border needs no second property.
+- [Phase 40-04]: Cached `_lastBtcMetricsData` for the category/monthly toggle so empty-state recomputes without a database round-trip.
 - [Phase ?]: [40-01] Mirrored the SpendingEvolution/SavingsRate module layout for BtcDenominatedMetrics to keep the App/Infra split consistent.
 - [Phase ?]: [40-01] Added the Earned/Spent/Velocity series-name language keys in Task 2 so chart-data classes could compile before Task 3 localization.
 - [Phase ?]: [40-01] Added error-state observables (IsBtcMetricsError, IsStackVelocityError) in Task 3 to keep the ViewModel wiring task focused on data flow.
@@ -184,6 +187,7 @@ None yet.
 | 260804-f94 | TransactionsView left column: shorten "View All Accounts" to "View All" and move plus-icon add button to a labeled "Add new" button beside it | 2026-08-04 | 29aed14 | [260804-f94-transactions-left-column-buttons](./quick/260804-f94-transactions-left-column-buttons/) |
 | 260804-u3u | Add pt-BR and es translations for the new Phase 39 Reports strings (Burn Rate, Savings Rate, Fixed vs Variable) | 2026-08-05 | 502281f | [260804-u3u-add-pt-br-and-es-translations-for-the-ne](./quick/260804-u3u-add-pt-br-and-es-translations-for-the-ne/) |
 | 260804-tyf | Restore DashboardData right-text foreground color to previous Text100Brush after RowItem.RightTextForeground change | 2026-08-05 | 15b7aa0 | [260804-tyf-restore-dashboarddata-right-text-foregro](./quick/260804-tyf-restore-dashboarddata-right-text-foregro/) |
+| 260806-v3s | Add color-coded thresholds to dashboard data panels: BTC Loans LTVs, stack pledged; Indicators Mayer Multiple and Fear & Greed; All-time high difference; Leverage %; Statistics YoY and Sats YoY evolutions | 2026-08-06 | ae3405f | [260806-v3s-add-color-coded-thresholds-to-dashboard-](./quick/260806-v3s-add-color-coded-thresholds-to-dashboard-/) |
 
 ## Deferred Items
 
@@ -203,8 +207,8 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-08-06T19:13:51.133Z
-Stopped at: Completed 40-btc-denominated-metrics-reports-ui-04-PLAN.md
+Last session: 2026-08-06T22:10:57Z
+Stopped at: Phase 40 complete, ready to plan Phase 41
 Resume file: None
 
 ## Notes
@@ -216,4 +220,4 @@ Resume file: None
 
 ## Operator Next Steps
 
-- Plan the first v0.7 phase with /gsd-plan-phase 39
+- Plan the next v0.7 phase with /gsd-plan-phase 41
