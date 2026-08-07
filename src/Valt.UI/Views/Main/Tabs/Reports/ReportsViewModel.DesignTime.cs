@@ -365,19 +365,7 @@ public partial class ReportsViewModel
         IsAllTimeHighLoading = false;
         IsMonthlyTotalsLoading = false;
         IsSpendingByCategoriesLoading = false;
-        IsSavingsRateLoading = false;
         IsFixedVsVariableLoading = false;
-
-        SavingsRateChartData.RefreshChart(new SavingsRateDataDto()
-        {
-            PrimaryCurrency = "BRL",
-            Months = new List<SavingsRateMonthDto>
-            {
-                new() { Month = new DateOnly(2025, 1, 1), Rate = 25.5m },
-                new() { Month = new DateOnly(2025, 2, 1), Rate = null },
-                new() { Month = new DateOnly(2025, 3, 1), Rate = -10.0m }
-            }
-        });
 
         FixedVsVariableChartData.RefreshChart(new FixedVsVariableDataDto()
         {

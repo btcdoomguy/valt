@@ -166,14 +166,14 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 | 37. MCP Server Page Update | v0.6 | 2/2 | Complete | 2026-07-16 |
 | 38. Navigation, New Pages, and Quality Assurance | v0.6 | 3/3 | Complete | 2026-07-17 |
 | 39. Spending Analytics Reports & UI | v0.7 | 4/4 | Complete    | 2026-08-05 |
-| 40. BTC-Denominated Metrics Reports & UI | v0.7 | 4/4 | Complete | 2026-08-06 |
+| 40. BTC-Denominated Metrics Reports & UI | v0.7 | 4/4 | Complete    | 2026-08-06 |
 | 41. Wealth & Performance Reports & UI | v0.7 | 0/0 | Not started | - |
 | 42. Loans & Leverage Reports & UI | v0.7 | 0/0 | Not started | - |
 | 43. MCP, Localization, Documentation & Verification | v0.7 | 0/0 | Not started | - |
 
 **Total phases:** 15 (11 complete, 4 planned)  
-**v0.7 plans:** 12/12 (complete)  
-**v0.7 tasks:** 14/14 (Phase 40 complete)
+**v0.7 plans:** 12/12 (executed)  
+**v0.7 tasks:** 14/14 (Phase 40 executed; human verification pending)
 
 ---
 *Last updated: 2026-08-06 after creating Phase 40 gap-closure plan 40-04*

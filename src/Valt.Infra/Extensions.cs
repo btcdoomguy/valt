@@ -280,7 +280,6 @@ public static class Extensions
         services.AddSingleton<IGoalQueries, GoalQueries>();
         services.AddSingleton<IAssetQueries, AssetQueries>();
         services.AddSingleton<ISpendingEvolutionQueries, SpendingEvolutionQueries>();
-        services.AddSingleton<ISavingsRateQueries, SavingsRateQueries>();
         services.AddSingleton<IBurnRateQueries, BurnRateQueries>();
         services.AddSingleton<IFixedVsVariableQueries, FixedVsVariableQueries>();
         services.AddSingleton<IBtcDenominatedMetricsQueries, BtcDenominatedMetricsQueries>();

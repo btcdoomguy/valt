@@ -5,6 +5,8 @@ namespace Valt.Infra.Modules.Goals.Services;
 
 internal class SavingsRateProgressCalculator : IGoalProgressCalculator
 {
+    private const decimal MaxRateMagnitude = 100m;
+
     private readonly IGoalTransactionReader _transactionReader;
 
     public GoalTypeNames SupportedType => GoalTypeNames.SavingsRate;
@@ -30,6 +32,7 @@ internal class SavingsRateProgressCalculator : IGoalProgressCalculator
         {
             var savings = totalIncome - totalExpenses;
             savingsRate = Math.Round((savings / totalIncome) * 100m, 2);
+            savingsRate = Math.Clamp(savingsRate, -MaxRateMagnitude, MaxRateMagnitude);
         }
 
         var progress = config.TargetPercentage > 0

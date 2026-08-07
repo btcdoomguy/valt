@@ -362,8 +362,8 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
                 bitcoinExpenseTotal,
                 bitcoinPurchaseTotal,
                 bitcoinSaleTotal,
-                allIncomeInFiat,
-                allExpensesInFiat);
+                Math.Round(allIncomeInFiat, 2),
+                Math.Round(allExpensesInFiat, 2));
         }
 
         private static void ResetMonthlyChanges(

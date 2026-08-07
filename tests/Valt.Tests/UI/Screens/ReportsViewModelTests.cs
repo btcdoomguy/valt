@@ -144,9 +144,6 @@ public class ReportsViewModelTests
 
     private void ConfigureDefaultQueryDispatcherBehavior()
     {
-        _queryDispatcher.DispatchAsync(Arg.Any<GetSavingsRateQuery>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromException<SavingsRateDataDto>(new InvalidOperationException("Savings rate fetch triggered")));
-
         _queryDispatcher.DispatchAsync(Arg.Any<GetFixedVsVariableQuery>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromException<FixedVsVariableDataDto>(new InvalidOperationException("Fixed vs variable fetch triggered")));
     }
@@ -401,27 +398,6 @@ public class ReportsViewModelTests
             "ReportsViewModel should reflect the panel's initial visibility");
         Assert.That(viewModel.IsBurnRateVisible, Is.EqualTo(realBurnRatePanel.IsVisible),
             "ReportsViewModel should reflect the panel's initial visibility");
-    }
-
-    [Test]
-    public void Constructor_Should_Initialize_SavingsRate_And_FixedVsVariable_Loading_Flags()
-    {
-        // Act
-        var viewModel = CreateViewModel();
-
-        // Assert
-        Assert.That(viewModel.IsSavingsRateLoading, Is.True, "Savings rate loading flag should start true");
-        Assert.That(viewModel.IsFixedVsVariableLoading, Is.True, "Fixed vs variable loading flag should start true");
-    }
-
-    [Test]
-    public void Constructor_Should_Expose_SavingsRate_Chart_Data()
-    {
-        // Act
-        var viewModel = CreateViewModel();
-
-        // Assert
-        Assert.That(viewModel.SavingsRateChartData, Is.Not.Null);
     }
 
     [Test]

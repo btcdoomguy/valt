@@ -1,4 +1,3 @@
-using System.Drawing;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using Valt.App.Kernel.Notifications;
@@ -229,29 +228,6 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
     }
 
     [Test]
-    public async Task Should_Aggregate_Sats_Spent_By_Category()
-    {
-        var categoryA = InsertCategory("Category A", Icon.RestoreFromId("material;category-a;\ue0a0;" + Color.Red.ToArgb()));
-        var categoryB = InsertCategory("Category B", Icon.RestoreFromId("material;category-b;\ue0a1;" + Color.Blue.ToArgb()));
-
-        var month = new DateOnly(2025, 1, 1);
-        AddExpenseTransaction(month, 1000m, 10, categoryA);
-        AddExpenseTransaction(month, 500m, 15, categoryB);
-
-        var result = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31));
-
-        using (Assert.EnterMultipleScope())
-        {
-            Assert.That(result.SpentByCategory, Has.Count.EqualTo(2));
-            Assert.That(result.SpentByCategory[0].SatsTotal, Is.GreaterThan(result.SpentByCategory[1].SatsTotal));
-            Assert.That(result.SpentByCategory[0].CategoryName, Is.EqualTo("Category A"));
-            Assert.That(result.SpentByCategory[1].CategoryName, Is.EqualTo("Category B"));
-            Assert.That(result.SpentByCategory[0].IconUnicode, Is.EqualTo("E0A0"));
-            Assert.That(result.SpentByCategory[0].IconColor, Is.Not.Null);
-        }
-    }
-
-    [Test]
     public async Task Should_Honor_Category_Exclusion()
     {
         var categoryA = InsertCategory("Category A");
@@ -273,7 +249,6 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
         {
             Assert.That(monthData!.SatsEarned, Is.GreaterThan(0));
             Assert.That(monthData.SatsSpent, Is.EqualTo(0));
-            Assert.That(result.SpentByCategory, Has.Count.EqualTo(0));
         }
     }
 

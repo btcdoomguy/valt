@@ -6,7 +6,6 @@ using Valt.App.Modules.BtcDenominatedMetrics.Queries;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Infra.Modules.Budget.Accounts;
-using Valt.Infra.Modules.Budget.Categories;
 using Valt.Infra.Modules.Budget.Transactions;
 using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
@@ -49,7 +48,6 @@ public class BtcDenominatedMetricsQueries : IBtcDenominatedMetricsQueries
             : null;
 
         var monthlyData = new Dictionary<(int Year, int Month), MonthSatsAggregation>();
-        var categorySatsSpent = new Dictionary<ObjectId, long>();
 
         foreach (var transaction in provider.AllTransactions)
         {
@@ -92,10 +90,7 @@ public class BtcDenominatedMetricsQueries : IBtcDenominatedMetricsQueries
                     if (fiatAmount > 0)
                         current.SatsEarned += sats;
                     else if (fiatAmount < 0)
-                    {
                         current.SatsSpent += sats; // sats is negative for debits
-                        AddCategorySpent(categorySatsSpent, transaction.CategoryId, Math.Abs(sats));
-                    }
                     break;
 
                 case TransactionEntityType.Bitcoin:
@@ -105,10 +100,7 @@ public class BtcDenominatedMetricsQueries : IBtcDenominatedMetricsQueries
                     if (satAmount > 0)
                         current.SatsEarned += satAmount;
                     else if (satAmount < 0)
-                    {
                         current.SatsSpent += satAmount;
-                        AddCategorySpent(categorySatsSpent, transaction.CategoryId, Math.Abs(satAmount));
-                    }
                     break;
 
                 case TransactionEntityType.FiatToBitcoin:
@@ -143,35 +135,11 @@ public class BtcDenominatedMetricsQueries : IBtcDenominatedMetricsQueries
             });
         }
 
-        var spentByCategory = categorySatsSpent
-            .Where(x => x.Value > 0)
-            .Select(x =>
-            {
-                provider.Categories.TryGetValue(x.Key, out var category);
-                var icon = category is not null ? Icon.RestoreFromId(category.Icon ?? string.Empty) : null;
-                return new SatsSpentByCategoryDto
-                {
-                    CategoryId = x.Key.ToString(),
-                    CategoryName = category?.Name ?? string.Empty,
-                    SatsTotal = x.Value,
-                    IconUnicode = icon is not null && icon.Unicode != char.MinValue ? ((int)icon.Unicode).ToString("X4") : null,
-                    IconColor = icon?.Color.ToArgb().ToString("X8")
-                };
-            })
-            .OrderByDescending(x => x.SatsTotal)
-            .ToList();
-
         return new BtcDenominatedMetricsDataDto
         {
             Months = sortedMonths,
-            SpentByCategory = spentByCategory,
             PrimaryCurrency = currency.Code
         };
-    }
-
-    private static void AddCategorySpent(Dictionary<ObjectId, long> categorySatsSpent, ObjectId categoryId, long sats)
-    {
-        categorySatsSpent[categoryId] = categorySatsSpent.GetValueOrDefault(categoryId) + sats;
     }
 
     private static long ConvertFiatToSats(decimal fiatAmount, DateOnly transactionDate, AccountEntity account, IReportDataProvider provider)
