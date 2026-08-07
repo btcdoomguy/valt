@@ -12,6 +12,7 @@ public static class TransactionGridResources
     private static SolidColorBrush? _transferResource;
     private static SolidColorBrush? _futureLineResource;
     private static SolidColorBrush? _regularLineResource;
+    private static SolidColorBrush? _warningResource;
 
     public static void Initialize()
     {
@@ -20,6 +21,7 @@ public static class TransactionGridResources
         _transferResource = GetResource("TransactionAmountTransfer", Colors.Gray);
         _futureLineResource = GetResource("FutureColor", Colors.Gray);
         _regularLineResource = GetResource("RegularColor", Colors.Gray);
+        _warningResource = GetResource("DashboardWarning", Colors.Gray);
     }
 
     /// <summary>
@@ -33,6 +35,7 @@ public static class TransactionGridResources
         _transferResource = new SolidColorBrush(Colors.Blue);
         _futureLineResource = new SolidColorBrush(Colors.Gray);
         _regularLineResource = new SolidColorBrush(Colors.Black);
+        _warningResource = new SolidColorBrush(Colors.Yellow);
     }
 
     private static SolidColorBrush GetResource(string key, Color defaultColor)
@@ -66,6 +69,18 @@ public static class TransactionGridResources
                 throw new InvalidOperationException("Resources not initialized. Call Initialize() first.");
             }
             return _debtResource;
+        }
+    }
+
+    public static SolidColorBrush Warning
+    {
+        get
+        {
+            if (_warningResource is null)
+            {
+                throw new InvalidOperationException("Resources not initialized. Call Initialize() first.");
+            }
+            return _warningResource;
         }
     }
 

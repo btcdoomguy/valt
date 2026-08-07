@@ -1,8 +1,13 @@
+using System.Reflection;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Messaging;
 using LiteDB;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Valt.App.Kernel.Queries;
+using Valt.App.Modules.SpendingAnalytics.DTOs;
+using Valt.App.Modules.SpendingAnalytics.Queries;
+using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Kernel.Factories;
 using Valt.Infra.Crawlers.Indicators;
@@ -25,8 +30,10 @@ using Valt.Infra.Settings;
 using Valt.UI.Services;
 using Valt.UI.Base;
 using Valt.UI.State;
+using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Tabs.Reports;
 using Valt.UI.Views.Main.Tabs.Reports.Panels;
+using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
 namespace Valt.Tests.UI.Screens;
 
@@ -54,6 +61,7 @@ public class ReportsViewModelTests
     private ILogger<ReportsViewModel> _logger = null!;
     private ILeveragePositionsPanelViewModel _leveragePanel = null!;
     private IBtcLoansPanelViewModel _btcLoansPanel = null!;
+    private BurnRatePanelViewModel _burnRatePanel = null!;
     private IAllTimeHighReport _allTimeHighReport = null!;
     private IMaxBtcStackReport _maxBtcStackReport = null!;
     private IMonthlyTotalsReport _monthlyTotalsReport = null!;
@@ -66,6 +74,7 @@ public class ReportsViewModelTests
     private ILogger<WealthPanelViewModel> _wealthLogger = null!;
     private ILogger<BtcStackPanelViewModel> _btcStackLogger = null!;
     private ILogger<SimulatedPricesPanelViewModel> _simulatedPricesLogger = null!;
+    private ILogger<BurnRatePanelViewModel> _burnRateLogger = null!;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -76,6 +85,8 @@ public class ReportsViewModelTests
     [SetUp]
     public void SetUp()
     {
+        TransactionGridResources.InitializeForTesting();
+
         WeakReferenceMessenger.Default.Reset();
 
         _runner = Substitute.For<IFireAndForgetTaskRunner>();
@@ -112,6 +123,9 @@ public class ReportsViewModelTests
 
         _leveragePanel = Substitute.For<ILeveragePositionsPanelViewModel>();
         _btcLoansPanel = Substitute.For<IBtcLoansPanelViewModel>();
+        _burnRateLogger = Substitute.For<ILogger<BurnRatePanelViewModel>>();
+        _burnRatePanel = new BurnRatePanelViewModel(
+            _queryDispatcher, _accountsTotalState, _currencySettings, _burnRateLogger);
 
         _logger = Substitute.For<ILogger<ReportsViewModel>>();
         _allTimeHighReport = Substitute.For<IAllTimeHighReport>();
@@ -125,6 +139,13 @@ public class ReportsViewModelTests
         ConfigureDefaultLocalDatabaseBehavior();
         ConfigureDefaultConfigurationManagerBehavior();
         ConfigureDefaultClockBehavior();
+        ConfigureDefaultQueryDispatcherBehavior();
+    }
+
+    private void ConfigureDefaultQueryDispatcherBehavior()
+    {
+        _queryDispatcher.DispatchAsync(Arg.Any<GetFixedVsVariableQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<FixedVsVariableDataDto>(new InvalidOperationException("Fixed vs variable fetch triggered")));
     }
 
     [TearDown]
@@ -156,6 +177,8 @@ public class ReportsViewModelTests
         _configurationManager.GetExpensesCategoryFilterExcludedIds()
             .Returns(new List<string>());
         _configurationManager.GetStatisticsExcludedCategoryIds()
+            .Returns(new List<string>());
+        _configurationManager.GetReportsAnalyticsCategoryFilterExcludedIds()
             .Returns(new List<string>());
     }
 
@@ -195,7 +218,8 @@ public class ReportsViewModelTests
             _btcStackPanel,
             _simulatedPricesPanel,
             _leveragePanel,
-            _btcLoansPanel);
+            _btcLoansPanel,
+            _burnRatePanel);
     }
 
     [Test]
@@ -217,29 +241,31 @@ public class ReportsViewModelTests
     }
 
     [Test]
-    public void Initialize_Should_Refresh_LeveragePanel()
+    public async Task Initialize_Should_Refresh_LeveragePanel()
     {
         // Arrange
         var viewModel = CreateViewModel();
 
         // Act
         viewModel.Initialize();
+        await Task.Delay(100);
 
         // Assert
-        _leveragePanel.Received(1).RefreshAsync();
+        _ = _leveragePanel.Received(1).RefreshAsync();
     }
 
     [Test]
-    public void Initialize_Should_Refresh_BtcLoansPanel()
+    public async Task Initialize_Should_Refresh_BtcLoansPanel()
     {
         // Arrange
         var viewModel = CreateViewModel();
 
         // Act
         viewModel.Initialize();
+        await Task.Delay(100);
 
         // Assert
-        _btcLoansPanel.Received(1).RefreshAsync();
+        _ = _btcLoansPanel.Received(1).RefreshAsync();
     }
 
     [Test]
@@ -248,11 +274,14 @@ public class ReportsViewModelTests
         // Arrange
         var leverageLogger = Substitute.For<ILogger<LeveragePositionsPanelViewModel>>();
         var btcLoansLogger = Substitute.For<ILogger<BtcLoansPanelViewModel>>();
+        var burnRateLogger = Substitute.For<ILogger<BurnRatePanelViewModel>>();
 
         var realLeveragePanel = new LeveragePositionsPanelViewModel(
             _queryDispatcher, _accountsTotalState, _ratesState, _customBtcPriceState, _currencySettings, leverageLogger);
         var realBtcLoansPanel = new BtcLoansPanelViewModel(
             _queryDispatcher, _accountsTotalState, _ratesState, _customBtcPriceState, _currencySettings, btcLoansLogger);
+        var realBurnRatePanel = new BurnRatePanelViewModel(
+            _queryDispatcher, _accountsTotalState, _currencySettings, burnRateLogger);
 
         var viewModel = new ReportsViewModel(
             _allTimeHighReport,
@@ -281,7 +310,8 @@ public class ReportsViewModelTests
             _btcStackPanel,
             _simulatedPricesPanel,
             realLeveragePanel,
-            realBtcLoansPanel);
+            realBtcLoansPanel,
+            realBurnRatePanel);
 
         // Act
         var leverageEventCount = 0;
@@ -305,6 +335,12 @@ public class ReportsViewModelTests
         realBtcLoansPanel.IsVisible = false;
         Assert.That(viewModel.IsBtcLoansVisible, Is.False, "After BTC loans panel hidden");
 
+        realBurnRatePanel.IsVisible = true;
+        Assert.That(viewModel.IsBurnRateVisible, Is.True, "After burn rate panel shown");
+
+        realBurnRatePanel.IsVisible = false;
+        Assert.That(viewModel.IsBurnRateVisible, Is.False, "After burn rate panel hidden");
+
         // Assert
         Assert.That(leverageEventCount, Is.GreaterThan(0), "Leverage panel should raise PropertyChanged");
     }
@@ -315,11 +351,14 @@ public class ReportsViewModelTests
         // Arrange
         var leverageLogger = Substitute.For<ILogger<LeveragePositionsPanelViewModel>>();
         var btcLoansLogger = Substitute.For<ILogger<BtcLoansPanelViewModel>>();
+        var burnRateLogger = Substitute.For<ILogger<BurnRatePanelViewModel>>();
 
         var realLeveragePanel = new LeveragePositionsPanelViewModel(
             _queryDispatcher, _accountsTotalState, _ratesState, _customBtcPriceState, _currencySettings, leverageLogger);
         var realBtcLoansPanel = new BtcLoansPanelViewModel(
             _queryDispatcher, _accountsTotalState, _ratesState, _customBtcPriceState, _currencySettings, btcLoansLogger);
+        var realBurnRatePanel = new BurnRatePanelViewModel(
+            _queryDispatcher, _accountsTotalState, _currencySettings, burnRateLogger);
 
         // Act
         var viewModel = new ReportsViewModel(
@@ -349,12 +388,168 @@ public class ReportsViewModelTests
             _btcStackPanel,
             _simulatedPricesPanel,
             realLeveragePanel,
-            realBtcLoansPanel);
+            realBtcLoansPanel,
+            realBurnRatePanel);
 
         // Assert
         Assert.That(viewModel.IsLeveragePositionsVisible, Is.EqualTo(realLeveragePanel.IsVisible),
             "ReportsViewModel should reflect the panel's initial visibility");
         Assert.That(viewModel.IsBtcLoansVisible, Is.EqualTo(realBtcLoansPanel.IsVisible),
             "ReportsViewModel should reflect the panel's initial visibility");
+        Assert.That(viewModel.IsBurnRateVisible, Is.EqualTo(realBurnRatePanel.IsVisible),
+            "ReportsViewModel should reflect the panel's initial visibility");
+    }
+
+    [Test]
+    public void Constructor_Should_Expose_FixedVsVariable_Chart_Data()
+    {
+        // Act
+        var viewModel = CreateViewModel();
+
+        // Assert
+        Assert.That(viewModel.FixedVsVariableChartData, Is.Not.Null);
+    }
+
+    [Test]
+    public void HasNoFixedExpenses_Flag_Exposes_Hint_Box_Path()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        var propertyChanged = false;
+        viewModel.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(ReportsViewModel.HasNoFixedExpenses))
+                propertyChanged = true;
+        };
+
+        // Act
+        viewModel.HasNoFixedExpenses = true;
+
+        // Assert
+        Assert.That(viewModel.HasNoFixedExpenses, Is.True);
+        Assert.That(propertyChanged, Is.True, "PropertyChanged should be raised for HasNoFixedExpenses");
+    }
+
+    [Test]
+    public void OpenReportsCategoryFilterConfigCommand_Exists_After_Construction()
+    {
+        // Act
+        var viewModel = CreateViewModel();
+
+        // Assert
+        Assert.That(viewModel.OpenReportsCategoryFilterConfigCommand, Is.Not.Null,
+            "OpenReportsCategoryFilterConfigCommand should be created by the constructor");
+    }
+
+    [Test]
+    public void GetSelectedAnalyticsCategoryIds_Returns_Available_Minus_Excluded()
+    {
+        // Arrange
+        var excludedId = "507f1f77bcf86cd799439012";
+        _configurationManager.GetReportsAnalyticsCategoryFilterExcludedIds()
+            .Returns(new List<string> { excludedId });
+
+        var categories = Substitute.For<ILiteCollection<CategoryEntity>>();
+        categories.FindAll().Returns(new List<CategoryEntity>
+        {
+            new() { Id = new ObjectId("507f1f77bcf86cd799439011"), Name = "Category 1" },
+            new() { Id = new ObjectId(excludedId), Name = "Category 2" },
+            new() { Id = new ObjectId("507f1f77bcf86cd799439013"), Name = "Category 3" }
+        });
+        _localDatabase.GetCategories().Returns(categories);
+
+        var viewModel = CreateViewModel();
+
+        // Act - use reflection to access private helper
+        var method = typeof(ReportsViewModel).GetMethod(
+            "GetSelectedAnalyticsCategoryIds",
+            BindingFlags.NonPublic | BindingFlags.Instance);
+        var result = (string[])method!.Invoke(viewModel, null)!;
+
+        // Assert
+        Assert.That(result, Is.EquivalentTo(new[] { "507f1f77bcf86cd799439011", "507f1f77bcf86cd799439013" }),
+            "Selected analytics category IDs should exclude the configured excluded ID");
+    }
+
+    [Test]
+    public void BurnRatePanelViewModel_SetCategoryFilter_Stores_Ids_And_RefreshAsync_Passes_Them_To_Query()
+    {
+        // Arrange
+        var categoryIds = new[] { "cat-1", "cat-3" };
+        GetBurnRateQuery? capturedQuery = null;
+        _queryDispatcher.DispatchAsync(Arg.Do<GetBurnRateQuery>(q => capturedQuery = q), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(new BurnRateDataDto
+            {
+                HasData = false,
+                SpentSoFar = 0m,
+                AvgDailySpend = 0m,
+                MedianMonthlyExpenses = 0m,
+                DayOfMonth = 15,
+                PrimaryCurrency = "USD"
+            }));
+
+        _burnRatePanel.SetCategoryFilter(categoryIds);
+
+        // Act
+        _burnRatePanel.RefreshAsync();
+
+        // Assert
+        Assert.That(capturedQuery, Is.Not.Null, "RefreshAsync should dispatch GetBurnRateQuery");
+        Assert.That(capturedQuery!.CategoryIds, Is.EquivalentTo(categoryIds),
+            "GetBurnRateQuery.CategoryIds should contain the IDs set by SetCategoryFilter");
+    }
+
+    [Test]
+    public void StatisticsData_Does_Not_Expose_Configuration_Command()
+    {
+        // Act
+        var viewModel = CreateViewModel();
+
+        // Assert
+        Assert.That(viewModel.StatisticsData.HasConfiguration, Is.False,
+            "Statistics dashboard should not expose a configuration command");
+    }
+
+    [Test]
+    public async Task FetchStatisticsDataAsync_Passes_Centralized_Excluded_Category_Ids()
+    {
+        // Arrange
+        var excludedId = "507f1f77bcf86cd799439012";
+        _configurationManager.GetReportsAnalyticsCategoryFilterExcludedIds()
+            .Returns(new List<string> { excludedId });
+
+        var viewModel = CreateViewModel();
+
+        IReadOnlySet<string>? capturedExcludedIds = null;
+        _statisticsReport.GetAsync(
+                Arg.Any<FiatCurrency>(),
+                Arg.Any<decimal>(),
+                Arg.Any<IReportDataProvider>(),
+                Arg.Do<IReadOnlySet<string>?>(ids => capturedExcludedIds = ids))
+            .Returns(Task.FromResult(new StatisticsData
+            {
+                MedianMonthlyExpenses = FiatValue.New(0m),
+                Currency = FiatCurrency.Usd,
+                WealthCoverageMonths = 0,
+                WealthCoverageFormatted = "N/A",
+                HasMedianMonthlyExpensesPreviousPeriod = false,
+                HasMedianMonthlyExpensesSats = false
+            }));
+
+        var provider = Substitute.For<IReportDataProvider>();
+        var method = typeof(ReportsViewModel).GetMethod(
+            "FetchStatisticsDataAsync",
+            BindingFlags.NonPublic | BindingFlags.Instance);
+
+        // Act
+        await (Task)method!.Invoke(viewModel, new object[] { provider })!;
+
+        // Assert
+        Assert.That(capturedExcludedIds, Is.Not.Null,
+            "Statistics report should receive excluded category IDs");
+        Assert.That(capturedExcludedIds, Does.Contain(excludedId),
+            "Statistics report should receive the centralized excluded category ID");
+        Assert.That(viewModel.StatisticsData.HasConfiguration, Is.False,
+            "Statistics dashboard should not expose a configuration command after fetch");
     }
 }

@@ -15,6 +15,7 @@ using Valt.Infra.Settings;
 using Valt.UI.Lang;
 using Valt.UI.State;
 using Valt.UI.Views.Main.Tabs.Reports.Panels;
+using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
 namespace Valt.Tests.UI.Screens;
 
@@ -41,6 +42,8 @@ public class BtcLoansPanelViewModelTests
     [SetUp]
     public void SetUp()
     {
+        TransactionGridResources.InitializeForTesting();
+
         WeakReferenceMessenger.Default.Reset();
 
         _queryDispatcher = Substitute.For<IQueryDispatcher>();

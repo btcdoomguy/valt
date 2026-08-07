@@ -66,9 +66,13 @@ using Valt.Infra.Modules.Reports.IncomeByCategory;
 using Valt.Infra.Modules.Reports.MonthlyTotals;
 using Valt.Infra.Modules.Reports.Statistics;
 using Valt.Infra.Modules.Reports.WealthOverview;
+using Valt.Infra.Modules.BtcDenominatedMetrics.Queries;
 using Valt.Infra.Modules.SpendingEvolution.Queries;
+using Valt.Infra.Modules.SpendingAnalytics.Queries;
 using Valt.Infra.Mcp.Server;
 using Valt.App.Modules.SpendingEvolution.Contracts;
+using Valt.App.Modules.SpendingAnalytics.Contracts;
+using Valt.App.Modules.BtcDenominatedMetrics.Contracts;
 using Valt.Infra.Services.CsvExport;
 using Valt.Infra.Services.CsvImport;
 using Valt.Infra.Services.Updates;
@@ -276,6 +280,9 @@ public static class Extensions
         services.AddSingleton<IGoalQueries, GoalQueries>();
         services.AddSingleton<IAssetQueries, AssetQueries>();
         services.AddSingleton<ISpendingEvolutionQueries, SpendingEvolutionQueries>();
+        services.AddSingleton<IBurnRateQueries, BurnRateQueries>();
+        services.AddSingleton<IFixedVsVariableQueries, FixedVsVariableQueries>();
+        services.AddSingleton<IBtcDenominatedMetricsQueries, BtcDenominatedMetricsQueries>();
 
         return services;
     }

@@ -258,7 +258,10 @@
         <value>Total (as BTC)</value>
     </data>
     <data name="Transactions.ViewAllAccounts" xml:space="preserve">
-        <value>View all accounts</value>
+        <value>View all</value>
+    </data>
+    <data name="Transactions.AddNew" xml:space="preserve">
+        <value>Add new</value>
     </data>
     <data name="Transactions.Edit" xml:space="preserve">
         <value>Edit</value>
@@ -2939,5 +2942,110 @@
     </data>
     <data name="Validation_FeesRequired" xml:space="preserve">
         <value>Fees are required</value>
+    </data>
+    <data name="Reports_BurnRate_Title" xml:space="preserve">
+        <value>Burn rate</value>
+    </data>
+    <data name="Reports_BurnRate_SpentSoFar" xml:space="preserve">
+        <value>Spent so far (this month)</value>
+    </data>
+    <data name="Reports_BurnRate_AvgDaily" xml:space="preserve">
+        <value>Avg daily spend</value>
+    </data>
+    <data name="Reports_BurnRate_Projected" xml:space="preserve">
+        <value>Projected month-end</value>
+    </data>
+    <data name="Reports_BurnRate_MedianMonth" xml:space="preserve">
+        <value>Median month (12 mo)</value>
+    </data>
+    <data name="Reports_BurnRate_VsMedian" xml:space="preserve">
+        <value>vs median</value>
+    </data>
+    <data name="Reports_BurnRate_VsMedian_Tooltip" xml:space="preserve">
+        <value>Projected month-end spend compared to your median monthly spend over the last 12 months.</value>
+    </data>
+    <data name="Reports_BurnRate_EarlyNote" xml:space="preserve">
+        <value>Projection available from day 5</value>
+    </data>
+    <data name="Reports_BurnRate_Empty" xml:space="preserve">
+        <value>No expenses recorded this month — add expense transactions to see your burn rate.</value>
+    </data>
+    <data name="Reports_FixedVariable_Title" xml:space="preserve">
+        <value>Fixed vs variable expenses</value>
+    </data>
+    <data name="Reports_FixedVariable_Fixed" xml:space="preserve">
+        <value>Fixed</value>
+    </data>
+    <data name="Reports_FixedVariable_Variable" xml:space="preserve">
+        <value>Variable</value>
+    </data>
+    <data name="Reports_FixedVariable_EmptyNoneHeading" xml:space="preserve">
+        <value>No fixed expenses registered</value>
+    </data>
+    <data name="Reports_FixedVariable_EmptyNoneBody" xml:space="preserve">
+        <value>Register fixed expenses in the Fixed Expenses tab to unlock this breakdown.</value>
+    </data>
+    <data name="Reports_FixedVariable_EmptyPeriod" xml:space="preserve">
+        <value>No expense data for this period — add transactions or widen the date range.</value>
+    </data>
+    <data name="Reports_BtcMetrics_Earned" xml:space="preserve">
+        <value>Earned</value>
+    </data>
+    <data name="Reports_BtcMetrics_Spent" xml:space="preserve">
+        <value>Spent</value>
+    </data>
+    <data name="Reports_BtcMetrics_Title" xml:space="preserve">
+        <value>Sats earned &amp; spent</value>
+    </data>
+    <data name="Reports_BtcMetrics_EmptyHeading" xml:space="preserve">
+        <value>No sats flow yet</value>
+    </data>
+    <data name="Reports_BtcMetrics_EmptyBody" xml:space="preserve">
+        <value>Add income or expense transactions to see how many sats you earned and spent.</value>
+    </data>
+    <data name="Reports_BtcMetrics_ErrorTitle" xml:space="preserve">
+        <value>Could not load BTC metrics.</value>
+    </data>
+    <data name="Reports_BtcMetrics_ErrorBody" xml:space="preserve">
+        <value>Check your data file or try again later.</value>
+    </data>
+    <data name="Reports_StackVelocity_Title" xml:space="preserve">
+        <value>Stack velocity</value>
+    </data>
+    <data name="Reports_StackVelocity_Velocity" xml:space="preserve">
+        <value>Velocity</value>
+    </data>
+    <data name="Reports_StackVelocity_EmptyHeading" xml:space="preserve">
+        <value>No stack velocity yet</value>
+    </data>
+    <data name="Reports_StackVelocity_EmptyBody" xml:space="preserve">
+        <value>Add income, expenses, or BTC trades to see your net sats trend.</value>
+    </data>
+    <data name="Reports_CategoryFilter_Config_Title" xml:space="preserve">
+        <value>Reports analytics category filter</value>
+    </data>
+    <data name="Reports_CategoryFilter_Config_Description" xml:space="preserve">
+        <value>Select the categories you want to exclude from savings rate, burn rate, fixed vs variable expenses and statistics analytics.</value>
+    </data>
+    <data name="Reports_CategoryFilter_Tooltip" xml:space="preserve">
+        <value>Configure categories excluded from all reports analytics</value>
+    </data>
+    <data name="Reports_WealthOverview_Description" xml:space="preserve">
+        <value>Tracks your total wealth over time, splitting it between fiat and bitcoin balances. It replays your transactions day by day and converts all values to your main currency using historical BTC and fiat prices.</value>
+    </data>
+    <data name="Reports_MonthlyTotals_Description" xml:space="preserve">
+        <value>A month-by-month snapshot of your wealth and cash flow. It shows total wealth, changes versus the previous month/year, plus income, expenses, and bitcoin movements.</value>
+    </data>
+    <data name="Reports_FixedVariable_Description" xml:space="preserve">
+        <value>Compares fixed expenses (linked to paid fixed-expense records) against variable expenses (all other debits) each month. Amounts are converted to your main currency.</value>
+    </data>
+    <data name="Reports_BtcMetrics_Description" xml:space="preserve">
+        <value>Shows how many satoshis you earned and spent each month. Fiat income/expenses are converted to sats using the BTC price on each transaction date.</value>
+    </data>
+    <data name="Reports_StackVelocity_Description" xml:space="preserve">
+        <value>Measures your net bitcoin stack growth each month: sats earned minus sats spent, plus BTC purchases and minus BTC sales.</value>
+    </data>
+    <data name="Reports_ByCategories_Description" xml:space="preserve">
+        <value>Breaks down your income and expenses by category for the selected period. Use the filters to include or exclude specific accounts and categories.</value>
     </data>
 </root>

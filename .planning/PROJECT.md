@@ -59,7 +59,13 @@ Users can see their entire financial picture — cash flow, investments, and loa
 
 ### Active
 
-- [ ] v0.7 milestone goals — TBD (define with `/gsd-new-milestone`).
+- ✓ v0.7 Insights & Metrics Expansion — sats earned/month, sats spent (month + per category), stack velocity — Phase 40
+
+### Active
+
+- [ ] v0.7 Insights & Metrics Expansion — savings rate, burn rate, fixed vs variable ratio
+- [ ] v0.7 Insights & Metrics Expansion — net worth CAGR, fiat vs BTC allocation %, best/worst months, days under water
+- [ ] v0.7 Insights & Metrics Expansion — interest/fees paid (total + monthly), liquidation-price distance trend
 
 ## Out of Scope
 
@@ -76,10 +82,21 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - **Deferred items:** 7 (see STATE.md Deferred Items) — v0.4 quality/hardening work and three debug sessions/quick tasks carried forward.
 - **v0.6 milestone complete** — 7 of 7 phases, 17 of 17 plans, 42 tasks.
 
+## Current Milestone: v0.7 Insights & Metrics Expansion
+
+**Goal:** Extend the Reports tab with new analytics derived from existing data — spending behavior, BTC-denominated flows, wealth performance, and loan costs.
+
+**Target features:**
+- Spending analytics: savings rate, burn rate, fixed vs variable expense ratio
+- BTC-denominated metrics: sats earned/month, sats spent (month + per category), stack velocity
+- Wealth & performance: net worth CAGR, fiat vs BTC allocation %, best/worst months, days under water
+- Loans & leverage: interest/fees paid (total + monthly), liquidation-price distance trend
+
 ## Next Milestone Goals
 
-- **v0.7 — TBD** (to be defined via `/gsd-new-milestone`).
-- Strong candidate: address the v0.4 quality/hardening deferred items (async void cleanup, HttpClient factory centralization, background job throttling, LiteDB index centralization, god-VM refactor, live-API test isolation, handler unit tests).
+- **v0.7 — Insights & Metrics Expansion** (defined 2026-08-04, phases 39+)
+- Future candidate: address the v0.4 quality/hardening deferred items (async void cleanup, HttpClient factory centralization, background job throttling, LiteDB index centralization, god-VM refactor, live-API test isolation, handler unit tests).
+- Deferred v0.7 candidates (v2): spending patterns heatmap, top-N expenses, category trend lines, hindsight cost, DCA consistency, rolling averages, debt-to-wealth ratio, goal forecasting, cost-basis/profit reports, account analytics.
 
 ## Context
 
@@ -118,6 +135,8 @@ Valt uses a layered architecture: Valt.Core (domain), Valt.App (CQRS), Valt.Infr
 | Use exact app-verbatim labels in documentation pages | Prevents drift between the UI and public docs; uses the app's language files as the source of truth | Fixed Expenses and Settings pages use labels directly from `language.resx`/`language.pt-BR.resx` — v0.6 (Phases 36, 38) |
 | Replace drifted MCP tool tables as whole units from code-verified research | Full replacement removes stale descriptions and adds 32 missing real tools, landing documented count at 90 = code truth | 7 pre-existing category tables replaced in both languages; 28 phantom names eliminated — v0.6 (Phase 38) |
 | Apply a 12-check content review matrix to all v0.6 documentation files | Satisfies QA-03 and creates an auditable artifact for future docs work | `38-QA-CHECKLIST.md` created with 18 files × 12 checks — v0.6 (Phase 38) |
+| Reused `IsBtcMetricsEmpty` for both monthly and category breakdown views | Avoids a second empty-state property and keeps the existing XAML border binding unchanged | `ReportsViewModel` toggles `IsBtcMetricsEmpty` between `Months.Count` and `SpentByCategory.Count` — Phase 40 |
+| Cache `_lastBtcMetricsData` for category/monthly toggle empty-state recompute | Switches views instantly without a database round-trip | Toggle handler recomputes empty state from cached DTO — Phase 40 |
 
 ## Evolution
 
@@ -137,4 +156,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-17 after completing v0.6 Documentation Site Refresh milestone*
+*Last updated: 2026-08-06 after Phase 40*

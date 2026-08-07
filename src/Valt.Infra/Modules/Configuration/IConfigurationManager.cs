@@ -105,6 +105,16 @@ public interface IConfigurationManager
     /// </summary>
     void SetSpendingEvolutionAccountFilterExcludedIds(IEnumerable<string> accountIds);
 
+    /// <summary>
+    /// Gets the list of category IDs excluded from the reports analytics filter.
+    /// </summary>
+    List<string> GetReportsAnalyticsCategoryFilterExcludedIds();
+
+    /// <summary>
+    /// Sets the list of category IDs to exclude from the reports analytics filter.
+    /// </summary>
+    void SetReportsAnalyticsCategoryFilterExcludedIds(IEnumerable<string> categoryIds);
+
     List<SimulatedPriceLineConfig> GetSimulatedPriceLines();
     void SetSimulatedPriceLines(IEnumerable<SimulatedPriceLineConfig> lines);
 }

@@ -518,6 +518,12 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Transactions.ViewAllAccounts", resourceCulture);
             }
         }
+
+        public static string Transactions_AddNew {
+            get {
+                return ResourceManager.GetString("Transactions.AddNew", resourceCulture);
+            }
+        }
         
         public static string Transactions_Edit {
             get {
@@ -5760,6 +5766,222 @@ namespace Valt.UI.Lang {
         public static string Validation_FeesRequired {
             get {
                 return ResourceManager.GetString("Validation_FeesRequired", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BurnRate_Title {
+            get {
+                return ResourceManager.GetString("Reports_BurnRate_Title", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BurnRate_SpentSoFar {
+            get {
+                return ResourceManager.GetString("Reports_BurnRate_SpentSoFar", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BurnRate_AvgDaily {
+            get {
+                return ResourceManager.GetString("Reports_BurnRate_AvgDaily", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BurnRate_Projected {
+            get {
+                return ResourceManager.GetString("Reports_BurnRate_Projected", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BurnRate_MedianMonth {
+            get {
+                return ResourceManager.GetString("Reports_BurnRate_MedianMonth", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BurnRate_VsMedian {
+            get {
+                return ResourceManager.GetString("Reports_BurnRate_VsMedian", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BurnRate_VsMedian_Tooltip {
+            get {
+                return ResourceManager.GetString("Reports_BurnRate_VsMedian_Tooltip", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BurnRate_EarlyNote {
+            get {
+                return ResourceManager.GetString("Reports_BurnRate_EarlyNote", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BurnRate_Empty {
+            get {
+                return ResourceManager.GetString("Reports_BurnRate_Empty", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedVariable_Title {
+            get {
+                return ResourceManager.GetString("Reports_FixedVariable_Title", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedVariable_Fixed {
+            get {
+                return ResourceManager.GetString("Reports_FixedVariable_Fixed", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedVariable_Variable {
+            get {
+                return ResourceManager.GetString("Reports_FixedVariable_Variable", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedVariable_EmptyNoneHeading {
+            get {
+                return ResourceManager.GetString("Reports_FixedVariable_EmptyNoneHeading", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedVariable_EmptyNoneBody {
+            get {
+                return ResourceManager.GetString("Reports_FixedVariable_EmptyNoneBody", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedVariable_EmptyPeriod {
+            get {
+                return ResourceManager.GetString("Reports_FixedVariable_EmptyPeriod", resourceCulture);
+            }
+        }
+        
+        public static string Reports_CategoryFilter_Config_Title {
+            get {
+                return ResourceManager.GetString("Reports_CategoryFilter_Config_Title", resourceCulture);
+            }
+        }
+        
+        public static string Reports_CategoryFilter_Config_Description {
+            get {
+                return ResourceManager.GetString("Reports_CategoryFilter_Config_Description", resourceCulture);
+            }
+        }
+        
+        public static string Reports_CategoryFilter_Config_ExcludedCategories {
+            get {
+                return ResourceManager.GetString("Reports_CategoryFilter_Config_ExcludedCategories", resourceCulture);
+            }
+        }
+        
+        public static string Reports_CategoryFilter_Tooltip {
+            get {
+                return ResourceManager.GetString("Reports_CategoryFilter_Tooltip", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcMetrics_Earned {
+            get {
+                return ResourceManager.GetString("Reports_BtcMetrics_Earned", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcMetrics_Spent {
+            get {
+                return ResourceManager.GetString("Reports_BtcMetrics_Spent", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcMetrics_Title {
+            get {
+                return ResourceManager.GetString("Reports_BtcMetrics_Title", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcMetrics_EmptyHeading {
+            get {
+                return ResourceManager.GetString("Reports_BtcMetrics_EmptyHeading", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcMetrics_EmptyBody {
+            get {
+                return ResourceManager.GetString("Reports_BtcMetrics_EmptyBody", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcMetrics_ErrorTitle {
+            get {
+                return ResourceManager.GetString("Reports_BtcMetrics_ErrorTitle", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcMetrics_ErrorBody {
+            get {
+                return ResourceManager.GetString("Reports_BtcMetrics_ErrorBody", resourceCulture);
+            }
+        }
+        
+        public static string Reports_StackVelocity_Title {
+            get {
+                return ResourceManager.GetString("Reports_StackVelocity_Title", resourceCulture);
+            }
+        }
+        
+        public static string Reports_StackVelocity_Velocity {
+            get {
+                return ResourceManager.GetString("Reports_StackVelocity_Velocity", resourceCulture);
+            }
+        }
+        
+        public static string Reports_StackVelocity_EmptyHeading {
+            get {
+                return ResourceManager.GetString("Reports_StackVelocity_EmptyHeading", resourceCulture);
+            }
+        }
+        
+        public static string Reports_StackVelocity_EmptyBody {
+            get {
+                return ResourceManager.GetString("Reports_StackVelocity_EmptyBody", resourceCulture);
+            }
+        }
+        
+        public static string Reports_WealthOverview_Description {
+            get {
+                return ResourceManager.GetString("Reports_WealthOverview_Description", resourceCulture);
+            }
+        }
+        
+        public static string Reports_MonthlyTotals_Description {
+            get {
+                return ResourceManager.GetString("Reports_MonthlyTotals_Description", resourceCulture);
+            }
+        }
+        
+        public static string Reports_FixedVariable_Description {
+            get {
+                return ResourceManager.GetString("Reports_FixedVariable_Description", resourceCulture);
+            }
+        }
+        
+        public static string Reports_BtcMetrics_Description {
+            get {
+                return ResourceManager.GetString("Reports_BtcMetrics_Description", resourceCulture);
+            }
+        }
+        
+        public static string Reports_StackVelocity_Description {
+            get {
+                return ResourceManager.GetString("Reports_StackVelocity_Description", resourceCulture);
+            }
+        }
+        
+        public static string Reports_ByCategories_Description {
+            get {
+                return ResourceManager.GetString("Reports_ByCategories_Description", resourceCulture);
             }
         }
     }

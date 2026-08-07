@@ -32,6 +32,7 @@
     <SolidColorBrush x:Key="TransactionAmountCredit" Color="{DynamicResource CreditBaseColor}" />
     <SolidColorBrush x:Key="TransactionAmountDebt" Color="{DynamicResource DebtBaseColor}" />
     <SolidColorBrush x:Key="TransactionAmountTransfer" Color="{DynamicResource TransferBaseColor}" />
+    <SolidColorBrush x:Key="DashboardWarning" Color="{DynamicResource SemanticWarning500Color}" />
     <SolidColorBrush x:Key="RegularColor" Color="{DynamicResource Text100Color}" />
     <SolidColorBrush x:Key="FutureColor" Color="{DynamicResource Text400Color}" />
 

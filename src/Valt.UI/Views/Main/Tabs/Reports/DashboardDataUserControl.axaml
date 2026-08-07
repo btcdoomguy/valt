@@ -118,7 +118,7 @@
                                                    Text="{Binding RightText}"
                                                    FontSize="{DynamicResource FontSizeSmall}"
                                                    FontWeight="Medium"
-                                                   Foreground="{DynamicResource Text100Brush}"
+                                                    Foreground="{Binding RightTextForeground, Converter={x:Static vm:DashboardDataConverters.BrushOrDefaultConverter}}"
                                                    DockPanel.Dock="Right"
                                                    Padding="0, 4, 10, 0"
                                                    HorizontalAlignment="Right"

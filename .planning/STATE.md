@@ -1,43 +1,43 @@
 ---
 gsd_state_version: 1.0
-milestone: v0.6
-milestone_name: — Documentation Site Refresh
-current_phase: 6
-status: Awaiting next milestone
-stopped_at: Verified Phase 38; 38-03 QA plan required to close QA-03
-last_updated: "2026-07-17T15:03:40.960Z"
-last_activity: 2026-07-17
-last_activity_desc: Completed quick task 260717-iqe: after I close a database, when I try to open another one the app got stuck because all background services are stopped
+milestone: v0.7
+milestone_name: Insights & Metrics Expansion
+current_phase: 41
+current_phase_name: Wealth & Performance Reports & UI
+status: planning
+stopped_at: Completed 40-btc-denominated-metrics-reports-ui-04-PLAN.md
+last_updated: "2026-08-06T22:40:40.068Z"
+last_activity: 2026-08-07
+last_activity_desc: Completed quick task 260807-ff0: Add explanatory labels to Reports tab panels with full translations
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 17
-  completed_plans: 17
-  percent: 100
-current_phase_name: Navigation, New Pages, and Quality Assurance
+  total_phases: 5
+  completed_phases: 2
+  total_plans: 12
+  completed_plans: 12
+  percent: 40
 ---
 
 # STATE.md
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-07-15)
+See: .planning/PROJECT.md (updated 2026-08-06)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Planning next milestone (v0.7 — TBD)
+**Current focus:** Phase 41 — Wealth & Performance Reports & UI
 
 ## Current Position
 
-Phase: Milestone v0.6 complete
-Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-07-17 — Completed quick task 260717-iqe: after I close a database, when I try to open another one the app got stuck because all background services are stopped
+Phase: 41 — Wealth & Performance Reports & UI
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-08-07 — Completed quick task 260807-ff0: Add explanatory labels to Reports tab panels with full translations
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 21
+- Total plans completed: 11
 - Average duration: 18 min
 - Total execution time: 43 min
 
@@ -53,6 +53,8 @@ Last activity: 2026-07-17 — Completed quick task 260717-iqe: after I close a d
 | 36 | 2 | - | - |
 | 37 | 2 | - | - |
 | Phase 38 | 2/3 | — | — |
+| 39 | 8/8 | - | - |
+| 40 | 4/4 | 55 min | 13.75 min |
 
 **Recent Trend:**
 
@@ -86,6 +88,16 @@ Last activity: 2026-07-17 — Completed quick task 260717-iqe: after I close a d
 | Phase 38 P02 | 18 min | - tasks | - files |
 | Phase 38 P02 | 18 min | 3 tasks | 2 files |
 | Phase 38 P03 | 7 min | 3 tasks | 4 files |
+| Phase 39 P01 | 11 min | 3 tasks | 13 files |
+| Phase 39 P03 | 10 | 3 tasks | 9 files |
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 40-btc-denominated-metrics-reports-ui P01 | 15 | 3 tasks | 13 files |
+| Phase 40-btc-denominated-metrics-reports-ui P02 | 25min | 3 tasks | 7 files |
+| Phase 40 P03 | 5min | 1 tasks | 1 files |
+| Phase 40 P04 | 10min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -137,6 +149,23 @@ Recent decisions affecting current work:
 - [Phase ?]: Committed both language files in a single docs(38-02) commit per QA-01 — Bilingual mirror discipline requires PT and EN changes to be committed together
 - [Phase ?]: Left 'mais de 80 ferramentas' / '80+ tools' intro untouched — Post-fix documented count is 90, so the existing claim remains true with no count edit
 - [Phase ?]: Preserved Categorias/Categories section byte-identical — It was the only clean pre-existing category and required no changes
+- [Phase 39]: Savings rate uses AllIncomeInFiat/AllExpensesInFiat from IMonthlyTotalsReport — Matches existing Monthly totals panel numbers and avoids a second income/expense aggregation (D-01).
+- [Phase 39]: Burn rate median is read from IStatisticsReport.MedianMonthlyExpenses — Reuses the existing 12-month median calculation instead of recomputing it (D-13).
+- [Phase 39]: Burn rate projection is gated to day >= 5 — User-specified threshold to avoid early-month projection noise (D-15).
+- [Phase ?]: 39-03: Followed existing BtcLoans/Leverage panel wiring for ReportsViewModel observables, refresh triggers, and disposal
+- [Phase ?]: 39-03: Placed burn rate card after Statistics card in DashboardGridPanel per UI-SPEC default ordering
+- [Phase ?]: 39-03: Used English-only resx strings (D-21); pt-BR/es files untouched for Phase 43 localization pass
+- [Phase ?]: 39-03: Used TransactionGridResources.Credit for projection <= median and Debt for projection > median, matching MonthlyReportItemViewModel convention
+- [Phase ?]: 39-03: Kept burn-rate card always visible (IsVisible=true) even on empty/error states, unlike conditional BtcLoans/Leverage panels
+- [Phase 40-04]: Reused `IsBtcMetricsEmpty` for both monthly and category breakdown views so the existing XAML empty-state border needs no second property.
+- [Phase 40-04]: Cached `_lastBtcMetricsData` for the category/monthly toggle so empty-state recomputes without a database round-trip.
+- [Phase ?]: [40-01] Mirrored the SpendingEvolution/SavingsRate module layout for BtcDenominatedMetrics to keep the App/Infra split consistent.
+- [Phase ?]: [40-01] Added the Earned/Spent/Velocity series-name language keys in Task 2 so chart-data classes could compile before Task 3 localization.
+- [Phase ?]: [40-01] Added error-state observables (IsBtcMetricsError, IsStackVelocityError) in Task 3 to keep the ViewModel wiring task focused on data flow.
+- [Phase ?]: [40-01] Left SpentByCategory empty in the query DTO; per-category breakdown intentionally deferred to Plan 40-02.
+- [Phase ?]: [40-02] Emit a zero-value month for every month in the date range so the stack velocity line chart has no gaps (D-11).
+- [Phase ?]: [40-02] Narrow internal-transfer exclusion to FiatToFiat/BitcoinToBitcoin only, so BTC purchases and sales contribute to stack velocity (D-09).
+- [Phase ?]: [40-02] Added English placeholders for new BTC metrics strings to pt-BR and es resx files now; full translations remain Phase 43 work per D-19, but all three language files must contain the keys per AGENTS.md.
 
 ### Pending Todos
 
@@ -155,6 +184,12 @@ None yet.
 | 260714-i1p | when I mark as sold, the system asks for date but only month/year. it should use a date picker like the one on the transaction tab to also pick the day | 2026-07-14 | d79acfa | [260714-i1p-when-i-mark-as-sold-the-system-asks-for-](./quick/260714-i1p-when-i-mark-as-sold-the-system-asks-for-/) |
 | 260714-kzm | Update Avalonia nuget packages from 12.0.3 to 12.1.0, research breaking changes first | 2026-07-14 | 36ddfe7 | [260714-kzm-update-avalonia-nuget-packages-from-12-0](./quick/260714-kzm-update-avalonia-nuget-packages-from-12-0/) |
 | 260717-iqe | after I close a database, when I try to open another one the app got stuck because all background services are stopped | 2026-07-17 | 6ffdf19 | [260717-iqe-after-i-close-a-database-when-i-try-to-o](./quick/260717-iqe-after-i-close-a-database-when-i-try-to-o/) |
+| 260804-f94 | TransactionsView left column: shorten "View All Accounts" to "View All" and move plus-icon add button to a labeled "Add new" button beside it | 2026-08-04 | 29aed14 | [260804-f94-transactions-left-column-buttons](./quick/260804-f94-transactions-left-column-buttons/) |
+| 260804-u3u | Add pt-BR and es translations for the new Phase 39 Reports strings (Burn Rate, Savings Rate, Fixed vs Variable) | 2026-08-05 | 502281f | [260804-u3u-add-pt-br-and-es-translations-for-the-ne](./quick/260804-u3u-add-pt-br-and-es-translations-for-the-ne/) |
+| 260804-tyf | Restore DashboardData right-text foreground color to previous Text100Brush after RowItem.RightTextForeground change | 2026-08-05 | 15b7aa0 | [260804-tyf-restore-dashboarddata-right-text-foregro](./quick/260804-tyf-restore-dashboarddata-right-text-foregro/) |
+| 260806-v3s | Add color-coded thresholds to dashboard data panels: BTC Loans LTVs, stack pledged; Indicators Mayer Multiple and Fear & Greed; All-time high difference; Leverage %; Statistics YoY and Sats YoY evolutions | 2026-08-06 | ae3405f | [260806-v3s-add-color-coded-thresholds-to-dashboard-](./quick/260806-v3s-add-color-coded-thresholds-to-dashboard-/) |
+| 260807-er9 | Fix Fixed vs Variable Expenses chart to show all 12 months including current and future months, matching Sats earned & spent chart behavior | 2026-08-07 | 8aabdca | [260807-er9-fix-fixed-vs-variable-expenses-chart-to-](./quick/260807-er9-fix-fixed-vs-variable-expenses-chart-to-/) |
+| 260807-ff0 | Add explanatory labels to Reports tab panels with full translations | 2026-08-07 | 386175f | [260807-ff0-add-explanatory-labels-to-reports-tab-pa](./quick/260807-ff0-add-explanatory-labels-to-reports-tab-pa/) |
 
 ## Deferred Items
 
@@ -174,8 +209,8 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-07-17T15:03:00Z
-Stopped at: v0.6 milestone closed; ready to start v0.7 planning
+Last session: 2026-08-06T22:10:57Z
+Stopped at: Phase 40 complete, ready to plan Phase 41
 Resume file: None
 
 ## Notes
@@ -183,7 +218,8 @@ Resume file: None
 - v0.6 Documentation Site Refresh milestone shipped on 2026-07-17.
 - All 7 v0.6 phases (32–38) complete; 17/17 plans finished; strict MkDocs build green.
 - 7 deferred items acknowledged at v0.6 close (see Deferred Items).
+- v0.7 roadmap defined 2026-08-04: Phases 39-43, 12/12 requirements mapped (SPA-01..03, BTC-01..03, WLT-01..04, LON-01..02).
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Plan the next v0.7 phase with /gsd-plan-phase 41

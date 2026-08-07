@@ -17,6 +17,10 @@ using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Assets.DTOs;
 using Valt.App.Modules.Assets.Queries.GetBtcLoansDashboard;
+using Valt.App.Modules.BtcDenominatedMetrics.DTOs;
+using Valt.App.Modules.BtcDenominatedMetrics.Queries;
+using Valt.App.Modules.SpendingAnalytics.DTOs;
+using Valt.App.Modules.SpendingAnalytics.Queries;
 using Valt.App.Modules.Assets.Queries.GetVisibleAssets;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
@@ -47,7 +51,7 @@ using static Valt.UI.State.AccountsTotalState;
 using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Modals.SimulatedPricesConfig;
 using Valt.UI.Views.Main.Modals.FixedPriceConfig;
-using Valt.UI.Views.Main.Modals.StatisticsConfig;
+using Valt.UI.Views.Main.Modals.ReportsCategoryFilterConfig;
 using Valt.UI.Views.Main.Tabs.Reports.Models;
 using Valt.UI.Views.Main.Tabs.Reports.Panels;
 
@@ -82,9 +86,13 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly SimulatedPricesPanelViewModel _simulatedPricesPanel;
     private readonly ILeveragePositionsPanelViewModel _leveragePanel;
     private readonly IBtcLoansPanelViewModel _btcLoansPanel;
+    private readonly BurnRatePanelViewModel _burnRatePanel;
 
     // Cached provider for the lifetime of the tab being active
     private IReportDataProvider? _cachedProvider;
+
+    // Cached excluded category IDs for analytics panels
+    private IReadOnlySet<string> _analyticsExcludedCategoryIds = new HashSet<string>();
 
     // Cached ATH fiat value for reuse by leverage positions panel
     private decimal? _allTimeHighFiatValue;
@@ -97,6 +105,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private DashboardData _statisticsData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _simulatedPricesData = DashboardData.Empty;
     [ObservableProperty] private DashboardData _indicatorsData = DashboardData.Empty;
+    [ObservableProperty] private DashboardData _burnRateData = DashboardData.Empty;
     [ObservableProperty] private AvaloniaList<MonthlyReportItemViewModel> _monthlyReportItems = new();
     [ObservableProperty] private MonthlyTotalsChartData _monthlyTotalsChartData = new();
     [ObservableProperty] private ExpensesByCategoryChartData _expensesByCategoryChartData = new();
@@ -115,6 +124,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     [ObservableProperty] private bool _isLeveragePositionsVisible;
     [ObservableProperty] private bool _isBtcLoansLoading = true;
     [ObservableProperty] private bool _isBtcLoansVisible;
+    [ObservableProperty] private bool _isBurnRateLoading = true;
+    [ObservableProperty] private bool _isBurnRateVisible;
     [ObservableProperty] private bool _isStatisticsLoading = true;
     [ObservableProperty] private bool _isSimulatedPricesLoading = true;
     [ObservableProperty] private bool _isIndicatorsLoading = true;
@@ -144,6 +155,21 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
     // Income by category
     [ObservableProperty] private IncomeByCategoryChartData _incomeByCategoryChartData = new();
+    [ObservableProperty] private FixedVsVariableChartData _fixedVsVariableChartData = new();
+    [ObservableProperty] private BtcDenominatedMetricsChartData _btcDenominatedMetricsChartData = new();
+    [ObservableProperty] private StackVelocityChartData _stackVelocityChartData = new();
+
+    [ObservableProperty] private bool _isFixedVsVariableLoading = true;
+    [ObservableProperty] private bool _isFixedVsVariableEmpty;
+    [ObservableProperty] private bool _hasNoFixedExpenses;
+    [ObservableProperty] private bool _isBtcMetricsLoading = true;
+    [ObservableProperty] private bool _isStackVelocityLoading = true;
+    [ObservableProperty] private bool _isBtcMetricsEmpty;
+    [ObservableProperty] private bool _isStackVelocityEmpty;
+    [ObservableProperty] private bool _isBtcMetricsError;
+    [ObservableProperty] private bool _isStackVelocityError;
+
+    private BtcDenominatedMetricsDataDto? _lastBtcMetricsData;
 
     private CancellationTokenSource? _filterDebounceTokenSource;
     private const int FilterDebounceDelayMs = 300;
@@ -176,7 +202,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         BtcStackPanelViewModel btcStackPanel,
         SimulatedPricesPanelViewModel simulatedPricesPanel,
         ILeveragePositionsPanelViewModel leveragePanel,
-        IBtcLoansPanelViewModel btcLoansPanel)
+        IBtcLoansPanelViewModel btcLoansPanel,
+        BurnRatePanelViewModel burnRatePanel)
     {
         _allTimeHighReport = allTimeHighReport;
         _maxBtcStackReport = maxBtcStackReport;
@@ -205,6 +232,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _simulatedPricesPanel = simulatedPricesPanel;
         _leveragePanel = leveragePanel;
         _btcLoansPanel = btcLoansPanel;
+        _burnRatePanel = burnRatePanel;
 
         _wealthPanel.PropertyChanged += OnWealthPanelPropertyChanged;
         _btcStackPanel.PropertyChanged += OnBtcStackPanelPropertyChanged;
@@ -212,6 +240,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _indicatorsPanel.PropertyChanged += OnIndicatorsPanelPropertyChanged;
         _leveragePanel.PropertyChanged += OnLeveragePanelPropertyChanged;
         _btcLoansPanel.PropertyChanged += OnBtcLoansPanelPropertyChanged;
+        _burnRatePanel.PropertyChanged += OnBurnRatePanelPropertyChanged;
 
         SimulateButtonText = language.Reports_SimulateButton;
         UpdateCurrentBtcPriceFormatted();
@@ -224,6 +253,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         CategoryFilterRange = new DateRange(currentMonth, currentMonth.AddMonths(1).AddDays(-1));
 
         PrepareAccountsAndCategoriesList();
+        LoadReportsAnalyticsCategoryFilter();
 
         SelectedAccounts.CollectionChanged += OnSelectedFiltersChanged;
         SelectedCategories.CollectionChanged += OnSelectedFiltersChanged;
@@ -241,10 +271,13 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     IsIncomeByCategoriesLoading = true;
                     IsWealthOverviewLoading = true;
                     IsBtcLoansLoading = true;
+                    IsBurnRateLoading = true;
                     // Reload data when currency changes
                     ReloadDataAndFetchAllReportsAsync().FireAndForgetSafeAsync(_runner, _logger);
                     _simulatedPricesPanel.Refresh();
                     _btcLoansPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+                    _burnRatePanel.SetCategoryFilter(GetSelectedAnalyticsCategoryIds());
+                    _burnRatePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
                     break;
             }
         });
@@ -256,6 +289,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         {
             _leveragePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
             _btcLoansPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+            _burnRatePanel.SetCategoryFilter(GetSelectedAnalyticsCategoryIds());
+            _burnRatePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
         });
 
         WeakReferenceMessenger.Default.Register<IndicatorsUpdatedMessage>(this, (recipient, message) =>
@@ -276,6 +311,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         try
         {
             PrepareAccountsAndCategoriesList();
+            LoadReportsAnalyticsCategoryFilter();
         }
         finally
         {
@@ -283,8 +319,14 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
 
         LoadDataAndFetchAllReportsAsync()
-            .ContinueWith(_ => _leveragePanel.RefreshAsync(), TaskScheduler.Default)
-            .ContinueWith(_ => _btcLoansPanel.RefreshAsync(), TaskScheduler.Default)
+            .ContinueWith(async _ =>
+            {
+                await _leveragePanel.RefreshAsync();
+                await _btcLoansPanel.RefreshAsync();
+                _burnRatePanel.SetCategoryFilter(GetSelectedAnalyticsCategoryIds());
+                await _burnRatePanel.RefreshAsync();
+            }, TaskScheduler.Default)
+            .Unwrap()
             .FireAndForgetSafeAsync(_runner, _logger);
         _wealthPanel.Refresh();
         _btcStackPanel.Refresh();
@@ -358,6 +400,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             FetchMonthlyTotalsAsync(provider),
             FetchExpensesByCategoryAsync(provider),
             FetchIncomeByCategoryAsync(provider),
+            FetchFixedVsVariableAsync(provider),
+            FetchBtcDenominatedMetricsAsync(provider),
+            FetchStackVelocityAsync(provider),
             FetchAllTimeHighDataAsync(provider),
             FetchMaxBtcStackDataAsync(provider),
             FetchStatisticsDataAsync(provider),
@@ -399,6 +444,23 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             foreach (var item in toRemove)
                 SelectedCategories.Remove(item);
         }
+    }
+
+    private void LoadReportsAnalyticsCategoryFilter()
+    {
+        var excludedIds = _configurationManager.GetReportsAnalyticsCategoryFilterExcludedIds();
+        _analyticsExcludedCategoryIds = excludedIds.ToHashSet();
+    }
+
+    private string[] GetSelectedAnalyticsCategoryIds()
+    {
+        if (_analyticsExcludedCategoryIds.Count == 0)
+            return Array.Empty<string>();
+
+        return AvailableCategories
+            .Where(c => !_analyticsExcludedCategoryIds.Contains(c.Id))
+            .Select(c => c.Id)
+            .ToArray();
     }
 
     private IEnumerable<SelectItem> GetFilterableAccounts()
@@ -459,7 +521,20 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         if (!_ready) return;
 
         IsMonthlyTotalsLoading = true;
-        FetchMonthlyTotalsWithProviderAsync().FireAndForgetSafeAsync(_runner, _logger);
+        IsFixedVsVariableLoading = true;
+        IsBtcMetricsLoading = true;
+        IsStackVelocityLoading = true;
+        FetchReportsWithDateRangeFilterAsync().FireAndForgetSafeAsync(_runner, _logger);
+    }
+
+    private async Task FetchReportsWithDateRangeFilterAsync()
+    {
+        var provider = await GetOrCreateProviderAsync();
+        await Task.WhenAll(
+            FetchMonthlyTotalsAsync(provider),
+            FetchFixedVsVariableAsync(provider),
+            FetchBtcDenominatedMetricsAsync(provider),
+            FetchStackVelocityAsync(provider));
     }
 
     private async Task FetchMonthlyTotalsWithProviderAsync()
@@ -496,6 +571,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         IsSpendingByCategoriesLoading = true;
         IsIncomeByCategoriesLoading = true;
+        IsBtcMetricsLoading = true;
+        IsStackVelocityLoading = true;
         DebouncedFetchCategoriesAsync(_filterDebounceTokenSource.Token).FireAndForgetSafeAsync(_runner, _logger);
     }
 
@@ -507,7 +584,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             var provider = await GetOrCreateProviderAsync();
             await Task.WhenAll(
                 FetchExpensesByCategoryAsync(provider),
-                FetchIncomeByCategoryAsync(provider));
+                FetchIncomeByCategoryAsync(provider),
+                FetchBtcDenominatedMetricsAsync(provider),
+                FetchStackVelocityAsync(provider));
         }
         catch (TaskCanceledException)
         {
@@ -568,7 +647,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 new(language.Reports_AllTimeHigh_AllTimeHigh,
                     $"{CurrencyDisplay.FormatFiat(allTimeHighData.Value, fiatCurrency.Code)}"),
                 new(language.Reports_AllTimeHigh_Date, allTimeHighData.Date.ToString()),
-                new(language.Reports_AllTimeHigh_DeclineFromAth, $"{allTimeHighData.DeclineFromAth}%")
+                new(language.Reports_AllTimeHigh_DeclineFromAth, $"{allTimeHighData.DeclineFromAth}%",
+                    RightTextForeground: DashboardDataBrushes.ForAthDifference(allTimeHighData.DeclineFromAth))
             };
 
             if (allTimeHighData.MaxDrawdownDate.HasValue && allTimeHighData.MaxDrawdownPercent.HasValue)
@@ -630,8 +710,8 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             // Get current wealth in main fiat currency
             var currentWealthInFiat = currentWealth.AllWealthInMainFiatCurrency;
 
-            // Get excluded category IDs from configuration
-            var excludedCategoryIds = _configurationManager.GetStatisticsExcludedCategoryIds().ToHashSet();
+            // Use the centralized analytics excluded category set
+            var excludedCategoryIds = _analyticsExcludedCategoryIds;
 
             var statisticsData = await _statisticsReport.GetAsync(
                 fiatCurrency,
@@ -655,7 +735,10 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 {
                     var evolutionSign = statisticsData.MedianMonthlyExpensesEvolution.Value >= 0 ? "+" : "";
                     var evolutionFormatted = $"{evolutionSign}{statisticsData.MedianMonthlyExpensesEvolution.Value}%";
-                    rows.Add(new RowItem(language.Reports_Statistics_MedianExpensesEvolution, evolutionFormatted, TooltipContent.Text(language.Reports_Statistics_MedianExpensesEvolution_Tooltip)));
+                    var evolutionBrush = DashboardDataBrushes.ForYoYEvolution(statisticsData.MedianMonthlyExpensesEvolution.Value);
+                    rows.Add(new RowItem(language.Reports_Statistics_MedianExpensesEvolution, evolutionFormatted,
+                        TooltipContent.Text(language.Reports_Statistics_MedianExpensesEvolution_Tooltip),
+                        RightTextForeground: evolutionBrush));
                 }
             }
 
@@ -675,14 +758,17 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     {
                         var satEvolutionSign = statisticsData.MedianMonthlyExpensesSatsEvolution.Value >= 0 ? "+" : "";
                         var satEvolutionFormatted = $"{satEvolutionSign}{statisticsData.MedianMonthlyExpensesSatsEvolution.Value}%";
-                        rows.Add(new RowItem(language.Reports_Statistics_MedianExpensesSatsEvolution, satEvolutionFormatted, TooltipContent.Text(language.Reports_Statistics_MedianExpensesSatsEvolution_Tooltip)));
+                        var satEvolutionBrush = DashboardDataBrushes.ForYoYEvolution(statisticsData.MedianMonthlyExpensesSatsEvolution.Value);
+                        rows.Add(new RowItem(language.Reports_Statistics_MedianExpensesSatsEvolution, satEvolutionFormatted,
+                            TooltipContent.Text(language.Reports_Statistics_MedianExpensesSatsEvolution_Tooltip),
+                            RightTextForeground: satEvolutionBrush));
                     }
                 }
             }
 
             rows.Add(new RowItem(language.Reports_Statistics_WealthCoverage, statisticsData.WealthCoverageFormatted, TooltipContent.Text(language.Reports_Statistics_WealthCoverage_Tooltip)));
 
-            StatisticsData = new DashboardData(language.Reports_Statistics_Title, rows, OpenStatisticsConfigCommand, "\uE4FC");
+            StatisticsData = new DashboardData(language.Reports_Statistics_Title, rows, Icon: "\uE4FC");
 
             IsStatisticsLoading = false;
         }
@@ -694,8 +780,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                     {
                         new(language.Error, ex.Message)
                     },
-                OpenStatisticsConfigCommand,
-                "\uE4FC");
+                Icon: "\uE4FC");
         }
         finally
         {
@@ -704,24 +789,27 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     }
 
     [RelayCommand]
-    private async Task OpenStatisticsConfig()
+    private async Task OpenReportsCategoryFilterConfig()
     {
         var ownerWindow = GetUserControlOwnerWindow?.Invoke();
         if (ownerWindow is null)
             return;
 
-        var modal = (StatisticsConfigView)await _modalFactory.CreateAsync(
-            ApplicationModalNames.StatisticsConfig,
+        var modal = (ReportsCategoryFilterConfigView)await _modalFactory.CreateAsync(
+            ApplicationModalNames.ReportsCategoryFilterConfig,
             ownerWindow);
 
-        var result = await modal.ShowDialogSafeAsync<StatisticsConfigViewModel.Response?>(ownerWindow);
+        var result = await modal.ShowDialogSafeAsync<ReportsCategoryFilterConfigViewModel.Response?>(ownerWindow);
 
-        // Refresh statistics after config change
         if (result?.Ok == true)
         {
+            LoadReportsAnalyticsCategoryFilter();
+            await FetchReportsWithDateRangeFilterAsync();
             IsStatisticsLoading = true;
             var provider = await GetOrCreateProviderAsync();
             await FetchStatisticsDataAsync(provider);
+            _burnRatePanel.SetCategoryFilter(GetSelectedAnalyticsCategoryIds());
+            await _burnRatePanel.RefreshAsync();
         }
     }
 
@@ -809,8 +897,10 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _wealthPanel.Refresh();
         _btcStackPanel.Refresh();
         _simulatedPricesPanel.Refresh();
-        _leveragePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
-        _btcLoansPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+            _leveragePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+            _btcLoansPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+            _burnRatePanel.SetCategoryFilter(GetSelectedAnalyticsCategoryIds());
+            _burnRatePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
     }
 
     private decimal GetCurrentBtcPriceInMainFiat()
@@ -941,6 +1031,108 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
     }
 
+    private async Task FetchFixedVsVariableAsync(IReportDataProvider provider)
+    {
+        try
+        {
+            var data = await _queryDispatcher.DispatchAsync(new GetFixedVsVariableQuery
+            {
+                From = DateOnly.FromDateTime(FilterRange.Start),
+                To = DateOnly.FromDateTime(FilterRange.End),
+                CategoryIds = GetSelectedAnalyticsCategoryIds()
+            });
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                HasNoFixedExpenses = data.HasNoFixedExpenses;
+                IsFixedVsVariableEmpty = data.Months.Count == 0 && !data.HasNoFixedExpenses;
+
+                if (!data.HasNoFixedExpenses)
+                {
+                    FixedVsVariableChartData.RefreshChart(data);
+                }
+
+                IsFixedVsVariableLoading = false;
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching fixed vs variable expenses");
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                HasNoFixedExpenses = false;
+                IsFixedVsVariableEmpty = false;
+                IsFixedVsVariableLoading = false;
+            });
+        }
+    }
+
+    private async Task FetchBtcDenominatedMetricsAsync(IReportDataProvider provider)
+    {
+        try
+        {
+            var data = await _queryDispatcher.DispatchAsync(new GetBtcDenominatedMetricsQuery
+            {
+                From = DateOnly.FromDateTime(FilterRange.Start),
+                To = DateOnly.FromDateTime(FilterRange.End),
+                CategoryIds = GetSelectedAnalyticsCategoryIds(),
+                AccountIds = SelectedAccounts.Select(x => x.Id.ToString()).ToArray()
+            });
+
+            _lastBtcMetricsData = data;
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                BtcDenominatedMetricsChartData.RefreshChart(data);
+                IsBtcMetricsEmpty = data.Months.Count == 0;
+                IsBtcMetricsError = false;
+                IsBtcMetricsLoading = false;
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching BTC denominated metrics");
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                IsBtcMetricsEmpty = false;
+                IsBtcMetricsError = true;
+                IsBtcMetricsLoading = false;
+            });
+        }
+    }
+
+    private async Task FetchStackVelocityAsync(IReportDataProvider provider)
+    {
+        try
+        {
+            var data = await _queryDispatcher.DispatchAsync(new GetBtcDenominatedMetricsQuery
+            {
+                From = DateOnly.FromDateTime(FilterRange.Start),
+                To = DateOnly.FromDateTime(FilterRange.End),
+                CategoryIds = GetSelectedAnalyticsCategoryIds(),
+                AccountIds = SelectedAccounts.Select(x => x.Id.ToString()).ToArray()
+            });
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                StackVelocityChartData.RefreshChart(data);
+                IsStackVelocityEmpty = data.Months.Count == 0;
+                IsStackVelocityError = false;
+                IsStackVelocityLoading = false;
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching stack velocity");
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                IsStackVelocityEmpty = false;
+                IsStackVelocityError = true;
+                IsStackVelocityLoading = false;
+            });
+        }
+    }
+
     private async Task FetchWealthOverviewAsync(IReportDataProvider provider)
     {
         try
@@ -1006,8 +1198,10 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             Dispatcher.UIThread.Post(_wealthPanel.Refresh);
             Dispatcher.UIThread.Post(_btcStackPanel.Refresh);
             Dispatcher.UIThread.Post(_simulatedPricesPanel.Refresh);
-            _leveragePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
-            _btcLoansPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+        _leveragePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+        _btcLoansPanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
+        _burnRatePanel.SetCategoryFilter(GetSelectedAnalyticsCategoryIds());
+        _burnRatePanel.RefreshAsync().FireAndForgetSafeAsync(_runner, _logger);
         }
     }
 
@@ -1078,6 +1272,16 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             IsBtcLoansVisible = _btcLoansPanel.IsVisible;
     }
 
+    private void OnBurnRatePanelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(DashboardPanelViewModel.Data))
+            BurnRateData = _burnRatePanel.Data;
+        else if (e.PropertyName == nameof(DashboardPanelViewModel.IsLoading))
+            IsBurnRateLoading = _burnRatePanel.IsLoading;
+        else if (e.PropertyName == nameof(DashboardPanelViewModel.IsVisible))
+            IsBurnRateVisible = _burnRatePanel.IsVisible;
+    }
+
     #endregion
 
     private void UpdateIndicatorsData(IndicatorSnapshot snapshot)
@@ -1103,6 +1307,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _indicatorsPanel.PropertyChanged -= OnIndicatorsPanelPropertyChanged;
         _leveragePanel.PropertyChanged -= OnLeveragePanelPropertyChanged;
         _btcLoansPanel.PropertyChanged -= OnBtcLoansPanelPropertyChanged;
+        _burnRatePanel.PropertyChanged -= OnBurnRatePanelPropertyChanged;
 
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
         WeakReferenceMessenger.Default.Unregister<AssetSummaryUpdatedMessage>(this);
@@ -1111,6 +1316,9 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         MonthlyTotalsChartData.Dispose();
         ExpensesByCategoryChartData.Dispose();
         IncomeByCategoryChartData.Dispose();
+        FixedVsVariableChartData.Dispose();
+        BtcDenominatedMetricsChartData.Dispose();
+        StackVelocityChartData.Dispose();
         WealthOverviewChartData.Dispose();
 
         // Clear the provider on dispose

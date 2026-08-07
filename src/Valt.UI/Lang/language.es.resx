@@ -253,7 +253,10 @@
         <value>Total (en BTC)</value>
     </data>
     <data name="Transactions.ViewAllAccounts" xml:space="preserve">
-        <value>Ver todas las cuentas</value>
+        <value>Ver todas</value>
+    </data>
+    <data name="Transactions.AddNew" xml:space="preserve">
+        <value>Agregar nueva</value>
     </data>
     <data name="Transactions.Edit" xml:space="preserve">
         <value>Editar</value>
@@ -2552,6 +2555,15 @@
     <data name="Reports.CategoryFilter.SaveSuccess" xml:space="preserve">
         <value>Filtro predeterminado guardado</value>
     </data>
+    <data name="Reports_CategoryFilter_Config_Title" xml:space="preserve">
+        <value>Filtro de categorías de informes analíticos</value>
+    </data>
+    <data name="Reports_CategoryFilter_Config_Description" xml:space="preserve">
+        <value>Seleccione las categorías que desea excluir de los análisis de tasa de ahorro, tasa de quema, gastos fijos vs variables y estadísticas.</value>
+    </data>
+    <data name="Reports_CategoryFilter_Config_ExcludedCategories" xml:space="preserve">
+        <value>Categorías excluidas</value>
+    </data>
     <data name="Reports.SimulatedPrices.Title" xml:space="preserve">
         <value>Precios Simulados</value>
     </data>
@@ -2936,5 +2948,101 @@
     </data>
     <data name="Validation_FeesRequired" xml:space="preserve">
         <value>Las comisiones son obligatorias</value>
+    </data>
+    <data name="Reports_BurnRate_Title" xml:space="preserve">
+        <value>Tasa de quema</value>
+    </data>
+    <data name="Reports_BurnRate_SpentSoFar" xml:space="preserve">
+        <value>Gasto hasta ahora (este mes)</value>
+    </data>
+    <data name="Reports_BurnRate_AvgDaily" xml:space="preserve">
+        <value>Gasto promedio diario</value>
+    </data>
+    <data name="Reports_BurnRate_Projected" xml:space="preserve">
+        <value>Proyección fin de mes</value>
+    </data>
+    <data name="Reports_BurnRate_MedianMonth" xml:space="preserve">
+        <value>Mediana mensual (12 meses)</value>
+    </data>
+    <data name="Reports_BurnRate_VsMedian" xml:space="preserve">
+        <value>vs mediana</value>
+    </data>
+    <data name="Reports_BurnRate_VsMedian_Tooltip" xml:space="preserve">
+        <value>Gasto proyectado a fin de mes comparado con su gasto mensual mediano en los últimos 12 meses.</value>
+    </data>
+    <data name="Reports_BurnRate_EarlyNote" xml:space="preserve">
+        <value>Proyección disponible desde el día 5</value>
+    </data>
+    <data name="Reports_BurnRate_Empty" xml:space="preserve">
+        <value>No se registraron gastos este mes — agregue transacciones de gasto para ver su tasa de quema.</value>
+    </data>
+    <data name="Reports_FixedVariable_Title" xml:space="preserve">
+        <value>Gastos fijos vs variables</value>
+    </data>
+    <data name="Reports_FixedVariable_Fixed" xml:space="preserve">
+        <value>Fijo</value>
+    </data>
+    <data name="Reports_FixedVariable_Variable" xml:space="preserve">
+        <value>Variable</value>
+    </data>
+    <data name="Reports_FixedVariable_EmptyNoneHeading" xml:space="preserve">
+        <value>No hay gastos fijos registrados</value>
+    </data>
+    <data name="Reports_FixedVariable_EmptyNoneBody" xml:space="preserve">
+        <value>Registre gastos fijos en la pestaña Gastos Fijos para desbloquear este desglose.</value>
+    </data>
+    <data name="Reports_CategoryFilter_Tooltip" xml:space="preserve">
+        <value>Configurar categorías excluidas de todos los informes analíticos</value>
+    </data>
+    <data name="Reports_BtcMetrics_Earned" xml:space="preserve">
+        <value>Ganados</value>
+    </data>
+    <data name="Reports_BtcMetrics_Spent" xml:space="preserve">
+        <value>Gastados</value>
+    </data>
+    <data name="Reports_BtcMetrics_Title" xml:space="preserve">
+        <value>Sats ganados y gastados</value>
+    </data>
+    <data name="Reports_BtcMetrics_EmptyHeading" xml:space="preserve">
+        <value>Aún no hay flujo de sats</value>
+    </data>
+    <data name="Reports_BtcMetrics_EmptyBody" xml:space="preserve">
+        <value>Agrega ingresos o gastos para ver cuántos sats ganaste y gastaste.</value>
+    </data>
+    <data name="Reports_BtcMetrics_ErrorTitle" xml:space="preserve">
+        <value>No se pudieron cargar las métricas de BTC.</value>
+    </data>
+    <data name="Reports_BtcMetrics_ErrorBody" xml:space="preserve">
+        <value>Verifica tu archivo de datos o inténtalo de nuevo más tarde.</value>
+    </data>
+    <data name="Reports_StackVelocity_Title" xml:space="preserve">
+        <value>Stack velocity</value>
+    </data>
+    <data name="Reports_StackVelocity_Velocity" xml:space="preserve">
+        <value>Velocity</value>
+    </data>
+    <data name="Reports_StackVelocity_EmptyHeading" xml:space="preserve">
+        <value>No stack velocity yet</value>
+    </data>
+    <data name="Reports_StackVelocity_EmptyBody" xml:space="preserve">
+        <value>Add income, expenses, or BTC trades to see your net sats trend.</value>
+    </data>
+    <data name="Reports_WealthOverview_Description" xml:space="preserve">
+        <value>Rastrea tu patrimonio total a lo largo del tiempo, separando saldos en fiat y bitcoin. Reprocesa tus transacciones día a día y convierte todos los valores a tu moneda principal usando precios históricos de BTC y fiat.</value>
+    </data>
+    <data name="Reports_MonthlyTotals_Description" xml:space="preserve">
+        <value>Una instantánea mes a mes de tu patrimonio y flujo de caja. Muestra el patrimonio total, cambios respecto al mes/año anterior, además de ingresos, gastos y movimientos de bitcoin.</value>
+    </data>
+    <data name="Reports_FixedVariable_Description" xml:space="preserve">
+        <value>Compara gastos fijos (vinculados a registros de gastos fijos pagados) con gastos variables (todos los demás débitos) cada mes. Los montos se convierten a tu moneda principal.</value>
+    </data>
+    <data name="Reports_BtcMetrics_Description" xml:space="preserve">
+        <value>Muestra cuántos satoshis ganaste y gastaste cada mes. Los ingresos y gastos en fiat se convierten a sats usando el precio de BTC en la fecha de cada transacción.</value>
+    </data>
+    <data name="Reports_StackVelocity_Description" xml:space="preserve">
+        <value>Mide el crecimiento neto de tu stack de bitcoin cada mes: satoshis ganados menos satoshis gastados, más compras de BTC y menos ventas de BTC.</value>
+    </data>
+    <data name="Reports_ByCategories_Description" xml:space="preserve">
+        <value>Desglosa tus ingresos y gastos por categoría para el período seleccionado. Usa los filtros para incluir o excluir cuentas y categorías específicas.</value>
     </data>
 </root>

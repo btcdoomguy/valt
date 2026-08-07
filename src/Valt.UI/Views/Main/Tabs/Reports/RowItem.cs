@@ -1,8 +1,9 @@
 using Avalonia.Controls;
+using Avalonia.Media;
 
 namespace Valt.UI.Views.Main.Tabs.Reports;
 
-public record RowItem(string LeftText, string RightText, Control? Tooltip = null, string? Url = null, bool IsSeparator = false)
+public record RowItem(string LeftText, string RightText, Control? Tooltip = null, string? Url = null, bool IsSeparator = false, IBrush? RightTextForeground = null)
 {
     public bool HasUrl => !string.IsNullOrEmpty(Url);
 
