@@ -120,8 +120,12 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
   3. User can view best and worst months ranked by wealth delta
   4. User can view days under water (time since the all-time high)
 
-**Plans**: TBD
+**Plans**: 1+ planned; Wave 1 tracer covers WLT-04 (days under water). Subsequent plans for WLT-01/WLT-03 and WLT-02 to follow.
 **UI hint**: yes
+
+**Wave 1**
+
+- [ ] 41-01-PLAN.md — Days under water: asset-aware ATH report and dashboard row
 
 ### Phase 42: Loans & Leverage Reports & UI
 
