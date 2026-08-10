@@ -647,6 +647,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 new(language.Reports_AllTimeHigh_AllTimeHigh,
                     $"{CurrencyDisplay.FormatFiat(allTimeHighData.Value, fiatCurrency.Code)}"),
                 new(language.Reports_AllTimeHigh_Date, allTimeHighData.Date.ToString()),
+                new(language.Reports_AllTimeHigh_DaysUnderWater, allTimeHighData.DaysUnderWater.ToString()),
                 new(language.Reports_AllTimeHigh_DeclineFromAth, $"{allTimeHighData.DeclineFromAth}%",
                     RightTextForeground: DashboardDataBrushes.ForAthDifference(allTimeHighData.DeclineFromAth))
             };

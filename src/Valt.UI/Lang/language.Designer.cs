@@ -1665,6 +1665,12 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string Reports_AllTimeHigh_DaysUnderWater {
+            get {
+                return ResourceManager.GetString("Reports.AllTimeHigh.DaysUnderWater", resourceCulture);
+            }
+        }
+        
         public static string Reports_Wealth_Title {
             get {
                 return ResourceManager.GetString("Reports.Wealth.Title", resourceCulture);
