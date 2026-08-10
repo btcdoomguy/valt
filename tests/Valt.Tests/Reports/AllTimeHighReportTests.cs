@@ -285,4 +285,143 @@ public class AllTimeHighReportTests : DatabaseTest
             _localDatabase.GetTransactions().DeleteAll();
         }
     }
+
+    [Test]
+    public async Task Should_Include_Active_NetWorth_Asset_In_AllTimeHigh()
+    {
+        var clock = new FakeClock(new DateTime(2025, 12, 31));
+
+        var assetQueries = Substitute.For<IAssetQueries>();
+        assetQueries.GetAllAsync().Returns(Task.FromResult<IReadOnlyList<AssetDTO>>(new List<AssetDTO>
+        {
+            CreateAssetDto(
+                currencyCode: FiatCurrency.Usd.Code,
+                currentValue: 1000m,
+                includeInNetWorth: true,
+                createdAt: new DateTime(2025, 1, 1))
+        }));
+
+        var allTimeHighReport = new AllTimeHighReport(clock, assetQueries);
+
+        try
+        {
+            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
+            {
+                Name = "Test",
+                CategoryId = new CategoryId(),
+                Date = new DateOnly(2025, 2, 1),
+                TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
+            }.Build());
+
+            var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+            var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(result.Currency, Is.EqualTo(FiatCurrency.Brl));
+                // BRL account 1100 + USD asset 1000 converted to BRL at 5.5 = 5500
+                Assert.That(result.Value.Value, Is.EqualTo(6600m));
+                Assert.That(result.Date, Is.EqualTo(new DateOnly(2025, 2, 1)));
+                Assert.That(result.DaysUnderWater, Is.GreaterThan(0));
+                Assert.That(result.HasAccountsWithoutTransactions, Is.True);
+            }
+        }
+        finally
+        {
+            _localDatabase.GetTransactions().DeleteAll();
+        }
+    }
+
+    [Test]
+    public async Task Should_Exclude_NonNetWorth_And_Sold_Assets_From_AllTimeHigh()
+    {
+        var clock = new FakeClock(new DateTime(2025, 12, 31));
+
+        var assetQueries = Substitute.For<IAssetQueries>();
+        assetQueries.GetAllAsync().Returns(Task.FromResult<IReadOnlyList<AssetDTO>>(new List<AssetDTO>
+        {
+            CreateAssetDto(
+                currencyCode: FiatCurrency.Usd.Code,
+                currentValue: 1_000_000m,
+                includeInNetWorth: false,
+                createdAt: new DateTime(2025, 1, 1)),
+            CreateAssetDto(
+                currencyCode: FiatCurrency.Usd.Code,
+                currentValue: 1_000_000m,
+                includeInNetWorth: true,
+                createdAt: new DateTime(2025, 1, 1),
+                dateSold: new DateOnly(2025, 1, 15))
+        }));
+
+        var allTimeHighReport = new AllTimeHighReport(clock, assetQueries);
+
+        try
+        {
+            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
+            {
+                Name = "Test",
+                CategoryId = new CategoryId(),
+                Date = new DateOnly(2025, 2, 1),
+                TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
+            }.Build());
+
+            var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+            var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
+            using (Assert.EnterMultipleScope())
+            {
+                // Only the BRL account transaction contributes; assets are excluded
+                Assert.That(result.Value.Value, Is.EqualTo(1100m));
+                Assert.That(result.Date, Is.EqualTo(new DateOnly(2025, 2, 1)));
+            }
+        }
+        finally
+        {
+            _localDatabase.GetTransactions().DeleteAll();
+        }
+    }
+
+    [Test]
+    public async Task Should_Calculate_DaysUnderWater_Based_On_Peak_Date()
+    {
+        var clock = new FakeClock(new DateTime(2025, 12, 31));
+        var allTimeHighReport = new AllTimeHighReport(clock, CreateEmptyAssetQueries());
+
+        try
+        {
+            // Peak occurs on the report end date: DaysUnderWater should be zero
+            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
+            {
+                Name = "End date deposit",
+                CategoryId = new CategoryId(),
+                Date = new DateOnly(2025, 12, 30),
+                TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
+            }.Build());
+
+            var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+            var endDatePeakResult = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
+
+            _localDatabase.GetTransactions().DeleteAll();
+
+            // Peak occurs earlier: DaysUnderWater should be positive
+            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
+            {
+                Name = "Earlier deposit",
+                CategoryId = new CategoryId(),
+                Date = new DateOnly(2025, 2, 1),
+                TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
+            }.Build());
+
+            provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+            var earlierPeakResult = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(endDatePeakResult.DaysUnderWater, Is.EqualTo(0));
+                Assert.That(earlierPeakResult.DaysUnderWater, Is.EqualTo(332));
+            }
+        }
+        finally
+        {
+            _localDatabase.GetTransactions().DeleteAll();
+        }
+    }
 }
