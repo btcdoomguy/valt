@@ -30,7 +30,7 @@ public partial class TransactionEditorView : ValtBaseWindow
             var childView = ChildContentControl?.GetVisualDescendants().OfType<ITransactionEditorChildView>().FirstOrDefault();
             if (childView is null) return;
 
-            if (viewModel.TransactionFixedExpenseReference is not null)
+            if (viewModel.TransactionFixedExpenseReference is not null || viewModel.IsCopyTransaction)
             {
                 childView.FocusAmountInput();
             }

@@ -103,6 +103,8 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel
 
     [ObservableProperty] private string _windowTitle = language.ManageTransactions_AddTitle;
 
+    [ObservableProperty] private bool _isCopyTransaction;
+
     public bool IsBoundToFixedExpense => TransactionFixedExpenseReference is not null;
 
     public string BoundToFixedExpenseCaption => TransactionFixedExpenseReference is not null && FixedExpense is not null
@@ -176,6 +178,8 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel
             SetActiveChild(TransactionTypes.Debt);
             return;
         }
+
+        IsCopyTransaction = request.CopyTransaction;
 
         if (request.TransactionId is not null)
             await OnBindParameterForEditingAsync(request);
