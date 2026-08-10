@@ -198,19 +198,31 @@ internal class AllTimeHighReport : IAllTimeHighReport
 
             var hasAccountsWithoutTransactions = _provider.Accounts.Values.Any(account => !accountCurrentScanDateTotals.ContainsKey(account.Id));
 
-            var declineFromAth = Math.Round((Math.Round(lastDayFiatValue / allTimeHighCurrentFiatValue - 1, 4) * 100), 2);
-
-            // Calculate max drawdown percentage (if there was a drawdown after ATH)
+            // Guard against non-positive ATH (no wealth peak found). Without this guard,
+            // declineFromAth would divide by zero and DaysUnderWater would be computed from
+            // DateOnly.MinValue.
+            int daysUnderWater;
+            var declineFromAth = decimal.Zero;
             DateOnly? maxDrawdownDateResult = null;
             decimal? maxDrawdownPercent = null;
 
-            if (maxDrawdownDate != DateOnly.MinValue && maxDrawdownValue < allTimeHighCurrentFiatValue)
+            if (allTimeHighCurrentFiatValue > 0)
             {
-                maxDrawdownDateResult = maxDrawdownDate;
-                maxDrawdownPercent = Math.Round((Math.Round(maxDrawdownValue / allTimeHighCurrentFiatValue - 1, 4) * 100), 2);
-            }
+                declineFromAth = Math.Round((Math.Round(lastDayFiatValue / allTimeHighCurrentFiatValue - 1, 4) * 100), 2);
+                daysUnderWater = _endDate.DayNumber - allTimeHighCurrentDate.DayNumber;
 
-            var daysUnderWater = _endDate.DayNumber - allTimeHighCurrentDate.DayNumber;
+                if (maxDrawdownDate != DateOnly.MinValue && maxDrawdownValue < allTimeHighCurrentFiatValue)
+                {
+                    maxDrawdownDateResult = maxDrawdownDate;
+                    maxDrawdownPercent = Math.Round((Math.Round(maxDrawdownValue / allTimeHighCurrentFiatValue - 1, 4) * 100), 2);
+                }
+            }
+            else
+            {
+                allTimeHighCurrentDate = _endDate;
+                allTimeHighCurrentFiatValue = decimal.Zero;
+                daysUnderWater = 0;
+            }
 
             return Task.FromResult(new AllTimeHighData(allTimeHighCurrentDate, _currency,
                 allTimeHighCurrentFiatValue, declineFromAth)
@@ -244,8 +256,12 @@ internal class AllTimeHighReport : IAllTimeHighReport
 
                 if (IsBtcCurrency(asset.CurrencyCode))
                 {
-                    // Convert BTC value to USD, then to target fiat currency
-                    var valueOnUsd = assetValue * _provider.GetUsdBitcoinPriceAt(currentScanDate);
+                    // Convert BTC/SATS value to USD, then to target fiat currency.
+                    // SATS are denominated in satoshis, so normalize to BTC first.
+                    var valueInBtc = string.Equals(asset.CurrencyCode, "SATS", StringComparison.OrdinalIgnoreCase)
+                        ? assetValue / SatoshisPerBitcoin
+                        : assetValue;
+                    var valueOnUsd = valueInBtc * _provider.GetUsdBitcoinPriceAt(currentScanDate);
                     total += _provider.GetFiatRateAt(currentScanDate, _currency) * valueOnUsd;
                 }
                 else

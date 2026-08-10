@@ -424,4 +424,100 @@ public class AllTimeHighReportTests : DatabaseTest
             _localDatabase.GetTransactions().DeleteAll();
         }
     }
+
+    [Test]
+    public async Task Should_Handle_Sats_Denominated_Asset()
+    {
+        var clock = new FakeClock(new DateTime(2025, 12, 31));
+
+        var assetQueries = Substitute.For<IAssetQueries>();
+        assetQueries.GetAllAsync().Returns(Task.FromResult<IReadOnlyList<AssetDTO>>(new List<AssetDTO>
+        {
+            CreateAssetDto(
+                currencyCode: "SATS",
+                currentValue: 100_000_000m, // 1 BTC in satoshis
+                includeInNetWorth: true,
+                createdAt: new DateTime(2025, 1, 1))
+        }));
+
+        var allTimeHighReport = new AllTimeHighReport(clock, assetQueries);
+
+        try
+        {
+            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
+            {
+                Name = "Test",
+                CategoryId = new CategoryId(),
+                Date = new DateOnly(2025, 2, 1),
+                TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
+            }.Build());
+
+            var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+            var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
+            using (Assert.EnterMultipleScope())
+            {
+                // BRL account 1100 + SATS asset (1 BTC) converted to BRL at 5.5 = 550000
+                Assert.That(result.Value.Value, Is.EqualTo(551100m));
+                Assert.That(result.Date, Is.EqualTo(new DateOnly(2025, 2, 1)));
+            }
+        }
+        finally
+        {
+            _localDatabase.GetTransactions().DeleteAll();
+        }
+    }
+
+    [Test]
+    public async Task Should_Guard_NonPositive_Wealth()
+    {
+        var clock = new FakeClock(new DateTime(2025, 12, 31));
+        var allTimeHighReport = new AllTimeHighReport(clock, CreateEmptyAssetQueries());
+
+        try
+        {
+            // Zero out all seeded account balances so no positive wealth peak exists
+            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
+            {
+                Name = "Zero BRL",
+                CategoryId = new CategoryId(),
+                Date = new DateOnly(2025, 2, 1),
+                TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 1000m, false)
+            }.Build());
+            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
+            {
+                Name = "Zero USD",
+                CategoryId = new CategoryId(),
+                Date = new DateOnly(2025, 2, 1),
+                TransactionDetails = new FiatDetails(_usdAccount.Id.ToString(), 1000m, false)
+            }.Build());
+            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
+            {
+                Name = "Zero EUR",
+                CategoryId = new CategoryId(),
+                Date = new DateOnly(2025, 2, 1),
+                TransactionDetails = new FiatDetails(_eurAccount.Id.ToString(), 1000m, false)
+            }.Build());
+            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
+            {
+                Name = "Zero BTC",
+                CategoryId = new CategoryId(),
+                Date = new DateOnly(2025, 2, 1),
+                TransactionDetails = new BitcoinDetails(_btcAccount.Id.ToString(), BtcValue.ParseBitcoin(1), false)
+            }.Build());
+
+            var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+            var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(result.Value.Value, Is.EqualTo(0m));
+                Assert.That(result.Date, Is.EqualTo(new DateOnly(2025, 12, 30)));
+                Assert.That(result.DaysUnderWater, Is.EqualTo(0));
+                Assert.That(result.DeclineFromAth, Is.EqualTo(0m));
+            }
+        }
+        finally
+        {
+            _localDatabase.GetTransactions().DeleteAll();
+        }
+    }
 }

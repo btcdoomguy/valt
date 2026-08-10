@@ -200,7 +200,8 @@ public class ReportTools
             DeclineFromAthPercent = data.DeclineFromAth,
             MaxDrawdownDate = data.MaxDrawdownDate?.ToString("yyyy-MM-dd"),
             MaxDrawdownPercent = data.MaxDrawdownPercent,
-            HasAccountsWithoutTransactions = data.HasAccountsWithoutTransactions
+            HasAccountsWithoutTransactions = data.HasAccountsWithoutTransactions,
+            DaysUnderWater = data.DaysUnderWater
         };
     }
 
@@ -351,6 +352,7 @@ public class AllTimeHighResultDto
     public string? MaxDrawdownDate { get; init; }
     public decimal? MaxDrawdownPercent { get; init; }
     public required bool HasAccountsWithoutTransactions { get; init; }
+    public required int DaysUnderWater { get; init; }
 }
 
 public class MaxBtcStackResultDto
