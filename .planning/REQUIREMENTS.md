@@ -24,7 +24,7 @@ New analytics derived from existing app data, surfaced in the Reports tab. Each 
 - [ ] **WLT-01**: User can view net worth CAGR / compound growth in fiat and BTC terms
 - [ ] **WLT-02**: User can view fiat vs BTC allocation % over time
 - [ ] **WLT-03**: User can view best and worst months ranked by wealth delta
-- [ ] **WLT-04**: User can view days under water (time since all-time high)
+- [x] **WLT-04**: User can view days under water (time since all-time high)
 
 ### Loans & Leverage
 
@@ -83,7 +83,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WLT-01 | Phase 41 | Pending |
 | WLT-02 | Phase 41 | Pending |
 | WLT-03 | Phase 41 | Pending |
-| WLT-04 | Phase 41 | Pending |
+| WLT-04 | Phase 41 | Complete |
 | LON-01 | Phase 42 | Pending |
 | LON-02 | Phase 42 | Pending |
 

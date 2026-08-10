@@ -4,17 +4,17 @@ milestone: v0.7
 milestone_name: Insights & Metrics Expansion
 current_phase: 41
 current_phase_name: Wealth & Performance Reports & UI
-status: planning
-stopped_at: Phase 41 context gathered
-last_updated: "2026-08-10T16:31:50.039Z"
-last_activity: 2026-08-07
-last_activity_desc: "Completed quick task 260807-ff0: Add explanatory labels to Reports tab panels with full translations"
+status: verifying
+stopped_at: Completed 41-01-PLAN.md (WLT-04 tracer)
+last_updated: "2026-08-10T18:07:40.982Z"
+last_activity: 2026-08-10
+last_activity_desc: Phase 41 execution started
 progress:
   total_phases: 5
-  completed_phases: 2
-  total_plans: 12
-  completed_plans: 12
-  percent: 40
+  completed_phases: 3
+  total_plans: 13
+  completed_plans: 13
+  percent: 60
 ---
 
 # STATE.md
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-08-06)
 
 ## Current Position
 
-Phase: 41 — Wealth & Performance Reports & UI
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-08-07 — Completed quick task 260807-ff0: Add explanatory labels to Reports tab panels with full translations
+Phase: 41 (Wealth & Performance Reports & UI) — EXECUTING
+Plan: 1 of 1
+Status: Phase complete — ready for verification
+Last activity: 2026-08-10 — Phase 41 execution started
 
 ## Performance Metrics
 
@@ -98,6 +98,7 @@ Last activity: 2026-08-07 — Completed quick task 260807-ff0: Add explanatory l
 | Phase 40-btc-denominated-metrics-reports-ui P02 | 25min | 3 tasks | 7 files |
 | Phase 40 P03 | 5min | 1 tasks | 1 files |
 | Phase 40 P04 | 10min | 2 tasks | 1 files |
+| Phase 41 P01 | 15 | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -166,6 +167,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [40-02] Emit a zero-value month for every month in the date range so the stack velocity line chart has no gaps (D-11).
 - [Phase ?]: [40-02] Narrow internal-transfer exclusion to FiatToFiat/BitcoinToBitcoin only, so BTC purchases and sales contribute to stack velocity (D-09).
 - [Phase ?]: [40-02] Added English placeholders for new BTC metrics strings to pt-BR and es resx files now; full translations remain Phase 43 work per D-19, but all three language files must contain the keys per AGENTS.md.
+- [Phase ?]: Asset value approximation: used AssetDTO.CurrentValue for every active day because historical asset prices are not available; documented as approximation in a code comment.
+- [Phase ?]: English-only UI string added now; pt-BR/es localization deferred to Phase 43 per D-14.
 
 ### Pending Todos
 
@@ -209,9 +212,9 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-08-10T16:31:50.025Z
-Stopped at: Phase 41 context gathered
-Resume file: .planning/phases/41-wealth-performance-reports-ui/41-CONTEXT.md
+Last session: 2026-08-10T18:07:40.971Z
+Stopped at: Completed 41-01-PLAN.md (WLT-04 tracer)
+Resume file: None
 
 ## Notes
 
