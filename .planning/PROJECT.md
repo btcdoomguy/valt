@@ -81,6 +81,7 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - **v0.6 Documentation Site Refresh shipped** on 2026-07-17 — all public Valt docs updated through v0.5 features, factual errors corrected, missing pages added (Settings & Configuration), navigation updated, and a full content review checklist applied to 18 documentation files.
 - **Deferred items:** 7 (see STATE.md Deferred Items) — v0.4 quality/hardening work and three debug sessions/quick tasks carried forward.
 - **v0.6 milestone complete** — 7 of 7 phases, 17 of 17 plans, 42 tasks.
+- **Phase 41 (WLT-04) complete** — asset-aware All Time High report with active net-worth assets and a "days under water" row in the existing ATH dashboard panel.
 
 ## Current Milestone: v0.7 Insights & Metrics Expansion
 
