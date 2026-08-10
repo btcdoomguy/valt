@@ -36,7 +36,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 
 - [x] **Phase 39: Spending Analytics Reports & UI** — Savings rate, burn rate, and fixed vs variable ratio in the Reports tab (completed 2026-08-05)
   - [x] **Phase 40: BTC-Denominated Metrics Reports & UI** — Sats earned, sats spent (month + per category), and stack velocity
-- [ ] **Phase 41: Wealth & Performance Reports & UI** — Net worth CAGR, fiat vs BTC allocation, best/worst months, days under water
+- [x] **Phase 41: Wealth & Performance Reports & UI** — Net worth CAGR, fiat vs BTC allocation, best/worst months, days under water (completed 2026-08-10)
 - [ ] **Phase 42: Loans & Leverage Reports & UI** — Interest/fees paid and liquidation-price distance trend
 - [ ] **Phase 43: MCP, Localization, Documentation & Verification** — Tool exposure, 3-language strings, module docs, end-to-end sign-off
 
@@ -171,7 +171,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 | 38. Navigation, New Pages, and Quality Assurance | v0.6 | 3/3 | Complete | 2026-07-17 |
 | 39. Spending Analytics Reports & UI | v0.7 | 4/4 | Complete    | 2026-08-05 |
 | 40. BTC-Denominated Metrics Reports & UI | v0.7 | 4/4 | Complete    | 2026-08-06 |
-| 41. Wealth & Performance Reports & UI | v0.7 | 1/1 | In Progress|  |
+| 41. Wealth & Performance Reports & UI | v0.7 | 1/1 | Complete    | 2026-08-10 |
 | 42. Loans & Leverage Reports & UI | v0.7 | 0/0 | Not started | - |
 | 43. MCP, Localization, Documentation & Verification | v0.7 | 0/0 | Not started | - |
 
