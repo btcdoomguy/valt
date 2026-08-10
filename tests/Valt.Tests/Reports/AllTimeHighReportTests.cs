@@ -1,4 +1,6 @@
 using NSubstitute;
+using Valt.App.Modules.Assets.Contracts;
+using Valt.App.Modules.Assets.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Modules.Budget.Accounts;
@@ -20,6 +22,41 @@ public class AllTimeHighReportTests : DatabaseTest
     private AccountEntity _usdAccount = null!;
     private AccountEntity _brlAccount = null!;
     private AccountEntity _eurAccount = null!;
+
+    private static IAssetQueries CreateEmptyAssetQueries()
+    {
+        var queries = Substitute.For<IAssetQueries>();
+        queries.GetAllAsync().Returns(Task.FromResult<IReadOnlyList<AssetDTO>>(new List<AssetDTO>()));
+        return queries;
+    }
+
+    private static AssetDTO CreateAssetDto(
+        string currencyCode,
+        decimal currentValue,
+        bool includeInNetWorth = true,
+        DateTime? createdAt = null,
+        DateOnly? dateSold = null)
+    {
+        return new AssetDTO
+        {
+            Id = AssetBuilder.AnAsset().Build().Id.Value,
+            Name = "Test Asset",
+            AssetTypeId = 1,
+            AssetTypeName = "Stock",
+            Icon = string.Empty,
+            IncludeInNetWorth = includeInNetWorth,
+            Visible = true,
+            LastPriceUpdateAt = DateTime.UtcNow,
+            CreatedAt = createdAt ?? DateTime.UtcNow,
+            DisplayOrder = 0,
+            CurrentPrice = currentValue,
+            CurrentValue = currentValue,
+            CurrencyCode = currencyCode,
+            IsSold = dateSold.HasValue,
+            DateSold = dateSold,
+            PreviousVisibility = true
+        };
+    }
 
     protected override Task SeedDatabase()
     {
@@ -91,7 +128,7 @@ public class AllTimeHighReportTests : DatabaseTest
     {
         var clock = new FakeClock(new DateTime(2025, 12, 31));
         var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-        var allTimeHighReport = new AllTimeHighReport(clock);
+        var allTimeHighReport = new AllTimeHighReport(clock, CreateEmptyAssetQueries());
 
         Assert.ThrowsAsync<ApplicationException>(() => allTimeHighReport.GetAsync(FiatCurrency.Brl, provider));
     }
@@ -100,7 +137,7 @@ public class AllTimeHighReportTests : DatabaseTest
     public async Task Should_Get_Incomplete_AllTimeHigh_For_FiatCurrency()
     {
         var clock = new FakeClock(new DateTime(2025, 12, 31));
-        var allTimeHighReport = new AllTimeHighReport(clock);
+        var allTimeHighReport = new AllTimeHighReport(clock, CreateEmptyAssetQueries());
 
         try
         {
@@ -132,7 +169,7 @@ public class AllTimeHighReportTests : DatabaseTest
     public async Task Should_Get_Complete_AllTimeHigh_For_FiatCurrency()
     {
         var clock = new FakeClock(new DateTime(2025, 12, 31));
-        var allTimeHighReport = new AllTimeHighReport(clock);
+        var allTimeHighReport = new AllTimeHighReport(clock, CreateEmptyAssetQueries());
 
         try
         {
@@ -188,7 +225,7 @@ public class AllTimeHighReportTests : DatabaseTest
     public async Task Should_Properly_Calculate_AllTimeHigh_For_FiatCurrency_After_Rate_Change()
     {
         var clock = new FakeClock(new DateTime(2025, 12, 31));
-        var allTimeHighReport = new AllTimeHighReport(clock);
+        var allTimeHighReport = new AllTimeHighReport(clock, CreateEmptyAssetQueries());
 
         try
         {

@@ -1,4 +1,6 @@
 using LiteDB;
+using Valt.App.Modules.Assets.Contracts;
+using Valt.App.Modules.Assets.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Infra.Modules.Budget.Accounts;
@@ -9,13 +11,15 @@ namespace Valt.Infra.Modules.Reports.AllTimeHigh;
 internal class AllTimeHighReport : IAllTimeHighReport
 {
     private readonly IClock _clock;
+    private readonly IAssetQueries _assetQueries;
 
-    public AllTimeHighReport(IClock clock)
+    public AllTimeHighReport(IClock clock, IAssetQueries assetQueries)
     {
         _clock = clock;
+        _assetQueries = assetQueries;
     }
 
-    public Task<AllTimeHighData> GetAsync(FiatCurrency currency, IReportDataProvider provider)
+    public async Task<AllTimeHighData> GetAsync(FiatCurrency currency, IReportDataProvider provider)
     {
         if (provider.AllTransactions.Count == 0)
             throw new ApplicationException("No transactions found");
@@ -23,9 +27,10 @@ internal class AllTimeHighReport : IAllTimeHighReport
         // Discard the current day because rates are not closed yet
         var maxDate = _clock.GetCurrentLocalDate().AddDays(-1);
 
-        var calculator = new Calculator(currency, provider, provider.MinTransactionDate, maxDate);
+        var assets = await _assetQueries.GetAllAsync();
+        var calculator = new Calculator(currency, provider, provider.MinTransactionDate, maxDate, assets);
 
-        return calculator.CalculateAsync();
+        return await calculator.CalculateAsync();
     }
 
     private class Calculator
@@ -36,17 +41,20 @@ internal class AllTimeHighReport : IAllTimeHighReport
         private readonly IReportDataProvider _provider;
         private readonly DateOnly _startDate;
         private readonly DateOnly _endDate;
+        private readonly IReadOnlyList<AssetDTO> _assets;
 
         public Calculator(
             FiatCurrency currency,
             IReportDataProvider provider,
             DateOnly startDate,
-            DateOnly endDate)
+            DateOnly endDate,
+            IReadOnlyList<AssetDTO> assets)
         {
             _currency = currency;
             _provider = provider;
             _startDate = startDate;
             _endDate = endDate;
+            _assets = assets;
         }
 
         public Task<AllTimeHighData> CalculateAsync()
@@ -164,6 +172,11 @@ internal class AllTimeHighReport : IAllTimeHighReport
                     }
                 }
 
+                // Approximation: include active net-worth assets using their latest known value.
+                // Historical asset prices are not available, so CurrentValue is applied for every
+                // day the asset is active. This matches the dashboard's current-wealth definition.
+                dateTotal += CalculateActiveAssetsValue(currentScanDate);
+
                 if (currentScanDate == _endDate)
                     lastDayFiatValue = dateTotal;
 
@@ -197,13 +210,60 @@ internal class AllTimeHighReport : IAllTimeHighReport
                 maxDrawdownPercent = Math.Round((Math.Round(maxDrawdownValue / allTimeHighCurrentFiatValue - 1, 4) * 100), 2);
             }
 
+            var daysUnderWater = _endDate.DayNumber - allTimeHighCurrentDate.DayNumber;
+
             return Task.FromResult(new AllTimeHighData(allTimeHighCurrentDate, _currency,
                 allTimeHighCurrentFiatValue, declineFromAth)
             {
                 HasAccountsWithoutTransactions = hasAccountsWithoutTransactions,
                 MaxDrawdownDate = maxDrawdownDateResult,
-                MaxDrawdownPercent = maxDrawdownPercent
+                MaxDrawdownPercent = maxDrawdownPercent,
+                DaysUnderWater = daysUnderWater
             });
+        }
+
+        private decimal CalculateActiveAssetsValue(DateOnly currentScanDate)
+        {
+            var total = 0m;
+
+            foreach (var asset in _assets)
+            {
+                if (!asset.IncludeInNetWorth)
+                    continue;
+
+                var assetCreatedAt = DateOnly.FromDateTime(asset.CreatedAt);
+                if (assetCreatedAt > currentScanDate)
+                    continue;
+
+                if (asset.DateSold.HasValue && currentScanDate > asset.DateSold.Value)
+                    continue;
+
+                var assetValue = asset.CurrentValue;
+                if (assetValue == 0)
+                    continue;
+
+                if (IsBtcCurrency(asset.CurrencyCode))
+                {
+                    // Convert BTC value to USD, then to target fiat currency
+                    var valueOnUsd = assetValue * _provider.GetUsdBitcoinPriceAt(currentScanDate);
+                    total += _provider.GetFiatRateAt(currentScanDate, _currency) * valueOnUsd;
+                }
+                else
+                {
+                    // Convert fiat value to USD, then to target fiat currency
+                    var sourceCurrency = FiatCurrency.GetFromCode(asset.CurrencyCode);
+                    var valueOnUsd = assetValue / _provider.GetFiatRateAt(currentScanDate, sourceCurrency);
+                    total += _provider.GetFiatRateAt(currentScanDate, _currency) * valueOnUsd;
+                }
+            }
+
+            return total;
+        }
+
+        private static bool IsBtcCurrency(string currencyCode)
+        {
+            return string.Equals(currencyCode, "BTC", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(currencyCode, "SATS", StringComparison.OrdinalIgnoreCase);
         }
     }
 }
