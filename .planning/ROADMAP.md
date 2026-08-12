@@ -37,7 +37,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 - [x] **Phase 39: Spending Analytics Reports & UI** — Savings rate, burn rate, and fixed vs variable ratio in the Reports tab (completed 2026-08-05)
   - [x] **Phase 40: BTC-Denominated Metrics Reports & UI** — Sats earned, sats spent (month + per category), and stack velocity
 - [x] **Phase 41: Wealth & Performance Reports & UI** — Net worth CAGR, fiat vs BTC allocation, best/worst months, days under water (completed 2026-08-10)
-- [ ] **Phase 42: Loans & Leverage Reports & UI** — Interest/fees paid and liquidation-price distance trend
+- [x] **Phase 42: Loans & Leverage Reports & UI** — Interest/fees paid and liquidation-price distance trend
 - [ ] **Phase 43: MCP, Localization, Documentation & Verification** — Tool exposure, 3-language strings, module docs, end-to-end sign-off
 
 ## Phase Details
@@ -138,7 +138,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
   2. User can view the liquidation-price distance trend over time
   3. Loan panels appear only when the user has active BTC-backed loans, consistent with the existing conditional dashboard panels
 
-**Plans**: 1/3 plans executed
+**Plans**: 4/4 plans complete
 **UI hint**: yes
 
 **Wave 1**
@@ -147,8 +147,12 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 42-02-PLAN.md — Backend tests and edge-case hardening
-- [ ] 42-03-PLAN.md — ViewModel tests and full-suite verification
+- [x] 42-02-PLAN.md — Backend tests and edge-case hardening
+- [x] 42-03-PLAN.md — ViewModel tests and full-suite verification
+
+**Gap Closure** *(completed 2026-08-12)*
+
+- [x] 42-04-PLAN.md — Fix monthly cost compounding bug and add regression test
 
 ### Phase 43: MCP, Localization, Documentation & Verification
 
@@ -181,7 +185,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 | 39. Spending Analytics Reports & UI | v0.7 | 4/4 | Complete    | 2026-08-05 |
 | 40. BTC-Denominated Metrics Reports & UI | v0.7 | 4/4 | Complete    | 2026-08-06 |
 | 41. Wealth & Performance Reports & UI | v0.7 | 1/1 | Complete    | 2026-08-10 |
-| 42. Loans & Leverage Reports & UI | v0.7 | 1/3 | In Progress|  |
+| 42. Loans & Leverage Reports & UI | v0.7 | 4/4 | Complete    | 2026-08-12 |
 | 43. MCP, Localization, Documentation & Verification | v0.7 | 0/0 | Not started | - |
 
 **Total phases:** 15 (11 complete, 4 planned)  
@@ -189,4 +193,4 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 **v0.7 tasks:** 14/14 (Phase 40 executed; human verification pending)
 
 ---
-*Last updated: 2026-08-06 after creating Phase 40 gap-closure plan 40-04*
+*Last updated: 2026-08-12 after completing Phase 42 plan 42-04*

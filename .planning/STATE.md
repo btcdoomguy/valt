@@ -3,18 +3,18 @@ gsd_state_version: 1.0
 milestone: v0.7
 milestone_name: Insights & Metrics Expansion
 current_phase: 42
-current_phase_name: Loans & Leverage Reports & UI
+current_phase_name: loans-leverage-reports-ui
 status: executing
-stopped_at: Phase 42 context gathered
-last_updated: "2026-08-12T00:05:20.095Z"
-last_activity: 2026-08-11
-last_activity_desc: Phase 42 execution started
+stopped_at: Completed 42-04-PLAN.md
+last_updated: "2026-08-12T14:59:03Z"
+last_activity: 2026-08-12
+last_activity_desc: Completed Phase 42 plan 42-04 (loan cost compounding fix + regression test)
 progress:
   total_phases: 5
-  completed_phases: 3
-  total_plans: 16
-  completed_plans: 16
-  percent: 100
+  completed_phases: 4
+  total_plans: 17
+  completed_plans: 17
+  percent: 80
 ---
 
 # STATE.md
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-06)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 42 — Loans & Leverage Reports & UI
+**Current focus:** Phase 42 — loans-leverage-reports-ui
 
 ## Current Position
 
-Phase: 42 (Loans & Leverage Reports & UI) — COMPLETE
-Plan: 3 of 3
-Status: All plans complete; ready for verification
-Last activity: 2026-08-11 — Plan 42-03 complete
+Phase: 42 (loans-leverage-reports-ui) — COMPLETE
+Plan: 4 of 4 complete
+Status: Phase complete; gap G-42-2 closed
+Last activity: 2026-08-12 — Completed 42-04 plan (loan cost compounding fix + regression test)
 
 ## Performance Metrics
 
@@ -103,6 +103,7 @@ Last activity: 2026-08-11 — Plan 42-03 complete
 | Phase 42 P01 | 45 | 3 tasks | 14 files |
 | Phase 42 P02 | 55 | 2 tasks | 2 files |
 | Phase 42 P03 | 50 | 2 tasks | 2 files |
+| Phase 42 P04 | 5min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -174,6 +175,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Asset value approximation: used AssetDTO.CurrentValue for every active day because historical asset prices are not available; documented as approximation in a code comment.
 - [Phase ?]: English-only UI string added now; pt-BR/es localization deferred to Phase 43 per D-14.
 
+- [Phase 42-04]: Convert each loan's monthly interest and fees individually to the main currency before accumulating, following the dashboard's per-loan conversion pattern — prevents compounding re-conversion when multiple active loans use different currencies.
+- [Phase 42-04]: Scoped conversion try/catch to a single loan's contribution so a missing fiat rate zeros only that loan's cost for the month, not the entire month's combined cost.
+
 ### Pending Todos
 
 None yet.
@@ -216,9 +220,9 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-08-11T21:12:00.536Z
-Stopped at: Phase 42 planned; 3 plans ready to execute
-Resume file: /home/vmabellini/RiderProjects/valt/.planning/phases/42-loans-leverage-reports-ui/42-01-PLAN.md
+Last session: 2026-08-12T14:59:03Z
+Stopped at: Completed 42-04-PLAN.md
+Resume file: None
 
 ## Notes
 
@@ -226,7 +230,8 @@ Resume file: /home/vmabellini/RiderProjects/valt/.planning/phases/42-loans-lever
 - All 7 v0.6 phases (32–38) complete; 17/17 plans finished; strict MkDocs build green.
 - 7 deferred items acknowledged at v0.6 close (see Deferred Items).
 - v0.7 roadmap defined 2026-08-04: Phases 39-43, 12/12 requirements mapped (SPA-01..03, BTC-01..03, WLT-01..04, LON-01..02).
+- Phase 42 (loans-leverage-reports-ui) is now complete: 4/4 plans finished, gap G-42-2 closed.
 
 ## Operator Next Steps
 
-- Execute Phase 42 with /gsd-execute-phase 42
+- Phase 43 (MCP, Localization, Documentation & Verification) is the next phase for v0.7.
