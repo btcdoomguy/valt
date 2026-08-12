@@ -1,5 +1,8 @@
 using System.ComponentModel;
 using ModelContextProtocol.Server;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.SpendingAnalytics.DTOs;
+using Valt.App.Modules.SpendingAnalytics.Queries;
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Categories;
@@ -260,6 +263,79 @@ public class ReportTools
         };
     }
 
+    /// <summary>
+    /// Gets spending analytics including burn rate and fixed vs variable expenses.
+    /// </summary>
+    [McpServerTool, Description("Get spending analytics including burn rate and fixed vs variable expenses for a date range")]
+    public static async Task<SpendingAnalyticsResultDto> GetSpendingAnalytics(
+        IQueryDispatcher dispatcher,
+        [Description("Start date of the range (format: yyyy-MM-dd)")] string startDate,
+        [Description("End date of the range (format: yyyy-MM-dd)")] string endDate,
+        [Description("Currency code (e.g., 'USD', 'BRL')")] string currencyCode,
+        [Description("Current total wealth in the specified fiat currency")] decimal currentWealthInFiat,
+        [Description("Optional filter by account IDs (comma-separated)")] string? accountIds = null,
+        [Description("Optional filter by category IDs (comma-separated)")] string? categoryIds = null)
+    {
+        var from = DateOnly.Parse(startDate);
+        var to = DateOnly.Parse(endDate);
+        _ = FiatCurrency.GetFromCode(currencyCode);
+
+        var burnRateTask = dispatcher.DispatchAsync(new GetBurnRateQuery
+        {
+            CurrentWealthInFiat = currentWealthInFiat,
+            AccountIds = ParseOptionalIds(accountIds),
+            CategoryIds = ParseOptionalIds(categoryIds)
+        });
+
+        var fixedVsVariableTask = dispatcher.DispatchAsync(new GetFixedVsVariableQuery
+        {
+            From = from,
+            To = to,
+            AccountIds = ParseOptionalIds(accountIds),
+            CategoryIds = ParseOptionalIds(categoryIds)
+        });
+
+        await Task.WhenAll(burnRateTask, fixedVsVariableTask);
+
+        var burnRate = await burnRateTask;
+        var fixedVsVariable = await fixedVsVariableTask;
+
+        return new SpendingAnalyticsResultDto
+        {
+            Currency = currencyCode,
+            BurnRate = new BurnRateResultDto
+            {
+                HasData = burnRate.HasData,
+                SpentSoFar = burnRate.SpentSoFar,
+                AvgDailySpend = burnRate.AvgDailySpend,
+                ProjectedMonthEnd = burnRate.ProjectedMonthEnd,
+                MedianMonthlyExpenses = burnRate.MedianMonthlyExpenses,
+                VsMedianPercent = burnRate.VsMedianPercent,
+                DayOfMonth = burnRate.DayOfMonth,
+                PrimaryCurrency = burnRate.PrimaryCurrency
+            },
+            FixedVsVariable = new FixedVsVariableResultDto
+            {
+                Months = fixedVsVariable.Months.Select(m => new FixedVsVariableMonthResultDto
+                {
+                    Month = m.Month.ToString("yyyy-MM-dd"),
+                    FixedTotal = m.FixedTotal,
+                    VariableTotal = m.VariableTotal
+                }).ToList(),
+                HasNoFixedExpenses = fixedVsVariable.HasNoFixedExpenses,
+                PrimaryCurrency = fixedVsVariable.PrimaryCurrency
+            }
+        };
+    }
+
+    private static string[] ParseOptionalIds(string? ids)
+    {
+        if (string.IsNullOrWhiteSpace(ids))
+            return [];
+
+        return ids.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    }
+
     private static IEnumerable<AccountId> ParseAccountIds(string? ids)
     {
         if (string.IsNullOrWhiteSpace(ids))
@@ -280,6 +356,39 @@ public class ReportTools
 }
 
 #region DTOs
+
+public class SpendingAnalyticsResultDto
+{
+    public required string Currency { get; init; }
+    public required BurnRateResultDto BurnRate { get; init; }
+    public required FixedVsVariableResultDto FixedVsVariable { get; init; }
+}
+
+public class BurnRateResultDto
+{
+    public required bool HasData { get; init; }
+    public required decimal SpentSoFar { get; init; }
+    public required decimal AvgDailySpend { get; init; }
+    public decimal? ProjectedMonthEnd { get; init; }
+    public required decimal MedianMonthlyExpenses { get; init; }
+    public decimal? VsMedianPercent { get; init; }
+    public required int DayOfMonth { get; init; }
+    public required string PrimaryCurrency { get; init; }
+}
+
+public class FixedVsVariableResultDto
+{
+    public required IReadOnlyList<FixedVsVariableMonthResultDto> Months { get; init; }
+    public required bool HasNoFixedExpenses { get; init; }
+    public required string PrimaryCurrency { get; init; }
+}
+
+public class FixedVsVariableMonthResultDto
+{
+    public required string Month { get; init; }
+    public required decimal FixedTotal { get; init; }
+    public required decimal VariableTotal { get; init; }
+}
 
 public class MonthlyTotalsResultDto
 {
