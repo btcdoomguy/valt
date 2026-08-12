@@ -823,7 +823,10 @@
         <value>Máxima caída</value>
     </data>
     <data name="Reports.AllTimeHigh.BtcPriceToHitAth" xml:space="preserve">
-        <value>Precio de BTC para ATH</value>
+        <value>Precio de BTC para alcanzar ATH</value>
+    </data>
+    <data name="Reports.AllTimeHigh.DaysUnderWater" xml:space="preserve">
+        <value>Días bajo el agua</value>
     </data>
     <data name="Reports.Wealth.Title" xml:space="preserve">
         <value>Patrimonio</value>
@@ -2991,6 +2994,9 @@
     <data name="Reports_FixedVariable_EmptyNoneBody" xml:space="preserve">
         <value>Registre gastos fijos en la pestaña Gastos Fijos para desbloquear este desglose.</value>
     </data>
+    <data name="Reports_FixedVariable_EmptyPeriod" xml:space="preserve">
+        <value>No hay datos de gastos para este período — agregue transacciones o amplíe el rango de fechas.</value>
+    </data>
     <data name="Reports_CategoryFilter_Tooltip" xml:space="preserve">
         <value>Configurar categorías excluidas de todos los informes analíticos</value>
     </data>
@@ -3044,5 +3050,32 @@
     </data>
     <data name="Reports_ByCategories_Description" xml:space="preserve">
         <value>Desglosa tus ingresos y gastos por categoría para el período seleccionado. Usa los filtros para incluir o excluir cuentas y categorías específicas.</value>
+    </data>
+    <data name="Reports_LoanReports_Title" xml:space="preserve">
+        <value>Informes de Préstamos y Apalancamiento</value>
+    </data>
+    <data name="Reports_LoanReports_CostDescription" xml:space="preserve">
+        <value>Total de intereses y comisiones pagados en tus préstamos garantizados en BTC, mes a mes.</value>
+    </data>
+    <data name="Reports_LoanReports_CostSeries" xml:space="preserve">
+        <value>Intereses + comisiones</value>
+    </data>
+    <data name="Reports_LoanReports_DistanceDescription" xml:space="preserve">
+        <value>Qué tan cerca está tu préstamo activo más riesgoso de la liquidación, en puntos porcentuales de LTV.</value>
+    </data>
+    <data name="Reports_LoanReports_DistanceSeries" xml:space="preserve">
+        <value>Más cerca de la liquidación</value>
+    </data>
+    <data name="Reports_LoanReports_EmptyHeading" xml:space="preserve">
+        <value>No hay préstamos garantizados en BTC activos</value>
+    </data>
+    <data name="Reports_LoanReports_EmptyBody" xml:space="preserve">
+        <value>Agrega un préstamo garantizado en BTC en la pestaña Activos para ver intereses, comisiones y riesgo de liquidación a lo largo del tiempo.</value>
+    </data>
+    <data name="Reports_LoanReports_ErrorTitle" xml:space="preserve">
+        <value>No se pudieron cargar los informes de préstamos</value>
+    </data>
+    <data name="Reports_LoanReports_ErrorBody" xml:space="preserve">
+        <value>Verifica tu archivo de datos o inténtalo de nuevo. Si el problema persiste, reinicia la aplicación.</value>
     </data>
 </root>

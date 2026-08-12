@@ -3030,6 +3030,9 @@
     <data name="Reports_CategoryFilter_Config_Description" xml:space="preserve">
         <value>Select the categories you want to exclude from savings rate, burn rate, fixed vs variable expenses and statistics analytics.</value>
     </data>
+    <data name="Reports_CategoryFilter_Config_ExcludedCategories" xml:space="preserve">
+        <value>Excluded categories</value>
+    </data>
     <data name="Reports_CategoryFilter_Tooltip" xml:space="preserve">
         <value>Configure categories excluded from all reports analytics</value>
     </data>
