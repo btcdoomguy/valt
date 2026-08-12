@@ -32,7 +32,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 
 </details>
 
-### 🚧 v0.7 Insights & Metrics Expansion (Phases 39-43)
+### ✅ v0.7 Insights & Metrics Expansion (Phases 39-43) — COMPLETED 2026-08-12
 
 - [x] **Phase 39: Spending Analytics Reports & UI** — Savings rate, burn rate, and fixed vs variable ratio in the Reports tab (completed 2026-08-05)
   - [x] **Phase 40: BTC-Denominated Metrics Reports & UI** — Sats earned, sats spent (month + per category), and stack velocity
