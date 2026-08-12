@@ -1,3 +1,4 @@
+using LiteDB;
 using Valt.App.Modules.SpendingAnalytics.Contracts;
 using Valt.App.Modules.SpendingAnalytics.DTOs;
 using Valt.App.Modules.SpendingAnalytics.Queries;
@@ -35,8 +36,15 @@ public class BurnRateQueries : IBurnRateQueries
     public async Task<BurnRateDataDto> GetBurnRateAsync(GetBurnRateQuery query)
     {
         var currency = FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency);
-        var provider = await _reportDataProviderFactory.CreateAsync();
+        IReportDataProvider provider = await _reportDataProviderFactory.CreateAsync();
         var today = _clock.GetCurrentLocalDate();
+
+        if (query.AccountIds.Length > 0)
+        {
+            provider = new AccountFilteredReportDataProvider(
+                provider,
+                query.AccountIds.Select(id => new ObjectId(id)));
+        }
 
         var emptyDto = new BurnRateDataDto
         {
