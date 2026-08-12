@@ -5240,7 +5240,85 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Tips.NextButton", resourceCulture);
             }
         }
-
+        
+        public static string Tips_Message_Assets {
+            get {
+                return ResourceManager.GetString("Tips.Message.Assets", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_AvgPrice {
+            get {
+                return ResourceManager.GetString("Tips.Message.AvgPrice", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_BulkEdit {
+            get {
+                return ResourceManager.GetString("Tips.Message.BulkEdit", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_DateNavigation {
+            get {
+                return ResourceManager.GetString("Tips.Message.DateNavigation", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_FixedExpenseHistory {
+            get {
+                return ResourceManager.GetString("Tips.Message.FixedExpenseHistory", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_FixedExpensePriceHistory {
+            get {
+                return ResourceManager.GetString("Tips.Message.FixedExpensePriceHistory", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_FixedExpenses {
+            get {
+                return ResourceManager.GetString("Tips.Message.FixedExpenses", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_Goals {
+            get {
+                return ResourceManager.GetString("Tips.Message.Goals", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_Leverage {
+            get {
+                return ResourceManager.GetString("Tips.Message.Leverage", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_LinkTransaction {
+            get {
+                return ResourceManager.GetString("Tips.Message.LinkTransaction", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_McpIntegration {
+            get {
+                return ResourceManager.GetString("Tips.Message.McpIntegration", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_Reports {
+            get {
+                return ResourceManager.GetString("Tips.Message.Reports", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_ReportsLongTerm {
+            get {
+                return ResourceManager.GetString("Tips.Message.ReportsLongTerm", resourceCulture);
+            }
+        }
+        
         public static string FixedExpenseOverview_Title {
             get {
                 return ResourceManager.GetString("FixedExpenseOverview.Title", resourceCulture);
