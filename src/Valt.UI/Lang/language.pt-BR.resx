@@ -3022,16 +3022,16 @@
         <value>Verifique seu arquivo de dados ou tente novamente mais tarde.</value>
     </data>
     <data name="Reports_StackVelocity_Title" xml:space="preserve">
-        <value>Stack velocity</value>
+        <value>Velocidade da stack</value>
     </data>
     <data name="Reports_StackVelocity_Velocity" xml:space="preserve">
-        <value>Velocity</value>
+        <value>Velocidade</value>
     </data>
     <data name="Reports_StackVelocity_EmptyHeading" xml:space="preserve">
-        <value>No stack velocity yet</value>
+        <value>Sem velocidade da stack ainda</value>
     </data>
     <data name="Reports_StackVelocity_EmptyBody" xml:space="preserve">
-        <value>Add income, expenses, or BTC trades to see your net sats trend.</value>
+        <value>Adicione receitas, despesas ou negociações de BTC para ver a tendência líquida dos seus sats.</value>
     </data>
     <data name="Reports_WealthOverview_Description" xml:space="preserve">
         <value>Acompanha seu patrimônio total ao longo do tempo, separando saldos em fiat e bitcoin. Ele reprocessa suas transações dia a dia e converte todos os valores para sua moeda principal usando preços históricos de BTC e fiat.</value>
