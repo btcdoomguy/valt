@@ -971,7 +971,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 filter,
                 provider);
 
-            await Dispatcher.UIThread.InvokeAsync(() =>
+            await RunOnUiThread(() =>
             {
                 ExpensesByCategoryChartData.RefreshChart(expensesByCategoryData);
                 IsSpendingByCategoriesLoading = false;
@@ -980,7 +980,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching expenses by category");
-            await Dispatcher.UIThread.InvokeAsync(() => { IsSpendingByCategoriesLoading = false; });
+            await RunOnUiThread(() => { IsSpendingByCategoriesLoading = false; });
         }
     }
 
@@ -1000,7 +1000,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 filter,
                 provider);
 
-            await Dispatcher.UIThread.InvokeAsync(() =>
+            await RunOnUiThread(() =>
             {
                 IncomeByCategoryChartData.RefreshChart(incomeByCategoryData);
                 IsIncomeByCategoriesLoading = false;
@@ -1009,7 +1009,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching income by category");
-            await Dispatcher.UIThread.InvokeAsync(() => { IsIncomeByCategoriesLoading = false; });
+            await RunOnUiThread(() => { IsIncomeByCategoriesLoading = false; });
         }
     }
 
@@ -1023,7 +1023,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 FiatCurrency.GetFromCode(_currencySettings.MainFiatCurrency),
                 provider);
 
-            await Dispatcher.UIThread.InvokeAsync(() =>
+            await RunOnUiThread(() =>
             {
                 MonthlyTotalsChartData.RefreshChart(monthlyTotalsData);
 
@@ -1041,7 +1041,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching monthly totals");
-            await Dispatcher.UIThread.InvokeAsync(() => { IsMonthlyTotalsLoading = false; });
+            await RunOnUiThread(() => { IsMonthlyTotalsLoading = false; });
         }
     }
 
@@ -1056,7 +1056,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 CategoryIds = GetSelectedAnalyticsCategoryIds()
             });
 
-            await Dispatcher.UIThread.InvokeAsync(() =>
+            await RunOnUiThread(() =>
             {
                 HasNoFixedExpenses = data.HasNoFixedExpenses;
                 IsFixedVsVariableEmpty = data.Months.Count == 0 && !data.HasNoFixedExpenses;
@@ -1072,7 +1072,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching fixed vs variable expenses");
-            await Dispatcher.UIThread.InvokeAsync(() =>
+            await RunOnUiThread(() =>
             {
                 HasNoFixedExpenses = false;
                 IsFixedVsVariableEmpty = false;
@@ -1095,7 +1095,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
             _lastBtcMetricsData = data;
 
-            await Dispatcher.UIThread.InvokeAsync(() =>
+            await RunOnUiThread(() =>
             {
                 BtcDenominatedMetricsChartData.RefreshChart(data);
                 IsBtcMetricsEmpty = data.Months.Count == 0;
@@ -1106,7 +1106,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching BTC denominated metrics");
-            await Dispatcher.UIThread.InvokeAsync(() =>
+            await RunOnUiThread(() =>
             {
                 IsBtcMetricsEmpty = false;
                 IsBtcMetricsError = true;
@@ -1127,7 +1127,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 AccountIds = SelectedAccounts.Select(x => x.Id.ToString()).ToArray()
             });
 
-            await Dispatcher.UIThread.InvokeAsync(() =>
+            await RunOnUiThread(() =>
             {
                 StackVelocityChartData.RefreshChart(data);
                 IsStackVelocityEmpty = data.Months.Count == 0;
@@ -1138,13 +1138,18 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching stack velocity");
-            await Dispatcher.UIThread.InvokeAsync(() =>
+            await RunOnUiThread(() =>
             {
                 IsStackVelocityEmpty = false;
                 IsStackVelocityError = true;
                 IsStackVelocityLoading = false;
             });
         }
+    }
+
+    protected virtual async Task RunOnUiThread(Action action)
+    {
+        await Dispatcher.UIThread.InvokeAsync(action);
     }
 
     private async Task FetchLoanReportsAsync(IReportDataProvider provider)
@@ -1158,7 +1163,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 CustomBtcPriceUsd = _customBtcPriceState.CustomBtcPriceUsd
             });
 
-            await Dispatcher.UIThread.InvokeAsync(() =>
+            await RunOnUiThread(() =>
             {
                 IsLoanReportsVisible = data.HasActiveLoans;
 
@@ -1176,7 +1181,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching loan reports");
-            await Dispatcher.UIThread.InvokeAsync(() =>
+            await RunOnUiThread(() =>
             {
                 IsLoanReportsVisible = false;
                 IsLoanReportsEmpty = false;
@@ -1196,7 +1201,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 provider,
                 SelectedWealthOverviewMaxElements);
 
-            await Dispatcher.UIThread.InvokeAsync(() =>
+            await RunOnUiThread(() =>
             {
                 WealthOverviewChartData.RefreshChart(wealthOverviewData);
                 IsWealthOverviewLoading = false;
@@ -1205,7 +1210,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching wealth overview");
-            await Dispatcher.UIThread.InvokeAsync(() => { IsWealthOverviewLoading = false; });
+            await RunOnUiThread(() => { IsWealthOverviewLoading = false; });
         }
     }
 
