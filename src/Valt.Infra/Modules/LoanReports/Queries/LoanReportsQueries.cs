@@ -94,33 +94,40 @@ public class LoanReportsQueries : ILoanReportsQueries
                 var accrualEndCandidate = nextSnapshot?.EffectiveDate ?? monthEnd;
                 var accrualEnd = accrualEndCandidate < effectiveToday ? accrualEndCandidate : effectiveToday;
 
+                var loanInterest = 0m;
                 if (accrualEnd >= accrualStart && !effectiveSnapshot.FixedTotalDebt.HasValue)
                 {
                     var days = accrualEnd.DayNumber - accrualStart.DayNumber + 1;
-                    interest += Math.Round(effectiveSnapshot.TotalBorrowed * effectiveSnapshot.Apr / 365 * days, 2);
+                    loanInterest = Math.Round(effectiveSnapshot.TotalBorrowed * effectiveSnapshot.Apr / 365 * days, 2);
                 }
 
                 // Fees from all snapshots effective inside this month (only if loan active at month-end)
+                var loanFees = 0m;
                 foreach (var snapshot in loanTimeline.Snapshots)
                 {
                     if (snapshot.EffectiveDate.Year == month.Year && snapshot.EffectiveDate.Month == month.Month)
                     {
-                        fees += snapshot.Fees;
+                        loanFees += snapshot.Fees;
                     }
                 }
 
-                // Convert interest and fees from the loan currency to the main currency
+                // Convert this loan's interest and fees to the main currency before adding to the monthly totals
+                decimal convertedInterest;
+                decimal convertedFees;
                 try
                 {
-                    interest = ConvertToMainCurrency(interest, effectiveSnapshot.CurrencyCode, monthEnd, provider);
-                    fees = ConvertToMainCurrency(fees, effectiveSnapshot.CurrencyCode, monthEnd, provider);
+                    convertedInterest = ConvertToMainCurrency(loanInterest, effectiveSnapshot.CurrencyCode, monthEnd, provider);
+                    convertedFees = ConvertToMainCurrency(loanFees, effectiveSnapshot.CurrencyCode, monthEnd, provider);
                 }
                 catch
                 {
-                    // Missing conversion rate for this loan/month: zero out its cost contribution
-                    interest = 0m;
-                    fees = 0m;
+                    // Missing conversion rate for this loan/month: zero out only this loan's contribution
+                    convertedInterest = 0m;
+                    convertedFees = 0m;
                 }
+
+                interest += convertedInterest;
+                fees += convertedFees;
 
                 // Distance calculation at month-end
                 var distance = CalculateDistanceToLiquidation(effectiveSnapshot, monthEnd, provider, query.CustomBtcPriceUsd);
