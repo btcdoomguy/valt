@@ -4,7 +4,7 @@
 
 - ✅ **v0.5 Asset Sold History** — Phases 29-31 (shipped 2026-07-14)
 - ✅ **v0.6 Documentation Site Refresh** — Phases 32-38 (shipped 2026-07-17)
-- 🚧 **v0.7 Insights & Metrics Expansion** — Phases 39-43 (planned)
+- ✅ **v0.7 Insights & Metrics Expansion** — Phases 39-43 (completed 2026-08-12)
 
 ## Phases
 
@@ -38,7 +38,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
   - [x] **Phase 40: BTC-Denominated Metrics Reports & UI** — Sats earned, sats spent (month + per category), and stack velocity
 - [x] **Phase 41: Wealth & Performance Reports & UI** — Net worth CAGR, fiat vs BTC allocation, best/worst months, days under water (completed 2026-08-10)
 - [x] **Phase 42: Loans & Leverage Reports & UI** — Interest/fees paid and liquidation-price distance trend
-- [ ] **Phase 43: MCP, Localization, Documentation & Verification** — Tool exposure, 3-language strings, module docs, end-to-end sign-off
+- [x] **Phase 43: MCP, Localization, Documentation & Verification** — Tool exposure, 3-language strings, module docs, end-to-end sign-off — completed 2026-08-12
 
 ## Phase Details
 
@@ -166,7 +166,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
   3. `.claude/docs/reports.md` documents the new reports, UI panels, and MCP tools
   4. Full test suite is green and every new Reports tab panel is verified end-to-end with real data
 
-**Plans**: 4/5 plans executed
+**Plans**: 5/5 plans complete
 
 **Wave 1**
 
@@ -180,7 +180,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 **Wave 3** *(blocked on Wave 2 completion)*
 
 - [x] 43-04-PLAN.md — Complete reports.md documentation for all v0.7 categories
-- [ ] 43-05-PLAN.md — Full test suite green + end-to-end UI verification
+- [x] 43-05-PLAN.md — Full test suite green + end-to-end UI verification
 
 ## Progress
 
@@ -200,11 +200,11 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 | 40. BTC-Denominated Metrics Reports & UI | v0.7 | 4/4 | Complete    | 2026-08-06 |
 | 41. Wealth & Performance Reports & UI | v0.7 | 1/1 | Complete    | 2026-08-10 |
 | 42. Loans & Leverage Reports & UI | v0.7 | 4/4 | Complete    | 2026-08-12 |
-| 43. MCP, Localization, Documentation & Verification | v0.7 | 4/5 | In Progress|  |
+| 43. MCP, Localization, Documentation & Verification | v0.7 | 5/5 | Complete | 2026-08-12 |
 
-**Total phases:** 15 (11 complete, 4 planned)  
-**v0.7 plans:** 12/12 (executed)  
-**v0.7 tasks:** 14/14 (Phase 40 executed; human verification pending)
+**Total phases:** 15 (15 complete, 0 planned)  
+**v0.7 plans:** 12/12 (complete)  
+**v0.7 tasks:** 14/14 (complete)
 
 ---
-*Last updated: 2026-08-12 after completing Phase 43 plan 43-01*
+*Last updated: 2026-08-12 after completing Phase 43 plan 43-05*
