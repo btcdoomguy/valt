@@ -16,6 +16,7 @@ using Valt.Infra.Modules.Budget.Transactions;
 using Valt.Infra.Modules.Currency.Services;
 using Valt.Infra.Modules.DataSources.Bitcoin;
 using Valt.Infra.Modules.DataSources.Fiat;
+using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.SpendingAnalytics.Queries;
 using Valt.Infra.Settings;
 using Valt.Tests.Builders;
@@ -279,12 +280,11 @@ public class FixedVsVariableQueriesTests : DatabaseTest
         {
             MainFiatCurrency = FiatCurrency.Brl.Code
         };
+        var factory = new ReportDataProviderFactory(_priceDatabase, _localDatabase, clock);
         var sut = new FixedVsVariableQueries(
             _localDatabase,
-            _priceDatabase,
-            new CurrencyConversionService(),
-            currencySettings,
-            clock);
+            factory,
+            currencySettings);
 
         return await sut.GetFixedVsVariableAsync(new GetFixedVsVariableQuery
         {

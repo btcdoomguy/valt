@@ -2,12 +2,11 @@ using LiteDB;
 using Valt.App.Modules.SpendingEvolution.Contracts;
 using Valt.App.Modules.SpendingEvolution.DTOs;
 using Valt.App.Modules.SpendingEvolution.Queries;
-using Valt.Core.Common;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Transactions;
-using Valt.Infra.Modules.Currency.Services;
+using Valt.Infra.Modules.Reports;
 using Valt.Infra.Settings;
 
 namespace Valt.Infra.Modules.SpendingEvolution.Queries;
@@ -15,23 +14,20 @@ namespace Valt.Infra.Modules.SpendingEvolution.Queries;
 public class SpendingEvolutionQueries : ISpendingEvolutionQueries
 {
     private readonly ILocalDatabase _localDatabase;
-    private readonly IPriceDatabase _priceDatabase;
-    private readonly ICurrencyConversionService _currencyConversionService;
+    private readonly IReportDataProviderFactory _reportDataProviderFactory;
     private readonly CurrencySettings _currencySettings;
 
     public SpendingEvolutionQueries(
         ILocalDatabase localDatabase,
-        IPriceDatabase priceDatabase,
-        ICurrencyConversionService currencyConversionService,
+        IReportDataProviderFactory reportDataProviderFactory,
         CurrencySettings currencySettings)
     {
         _localDatabase = localDatabase;
-        _priceDatabase = priceDatabase;
-        _currencyConversionService = currencyConversionService;
+        _reportDataProviderFactory = reportDataProviderFactory;
         _currencySettings = currencySettings;
     }
 
-    public Task<SpendingEvolutionDataDto> GetSpendingEvolutionAsync(GetSpendingEvolutionQuery query)
+    public async Task<SpendingEvolutionDataDto> GetSpendingEvolutionAsync(GetSpendingEvolutionQuery query)
     {
         // Load accounts
         var allAccountsList = _localDatabase.GetAccounts().FindAll().ToList();
@@ -44,8 +40,7 @@ public class SpendingEvolutionQueries : ISpendingEvolutionQueries
         // Get primary currency
         var primaryCurrency = _currencySettings.MainFiatCurrency;
 
-        // Get latest rates for currency conversion
-        var (bitcoinPriceUsd, fiatRates) = GetLatestRates();
+        var provider = await _reportDataProviderFactory.CreateAsync();
 
         // Build transaction query with LiteDB-side filtering
         var transactionQuery = _localDatabase.GetTransactions().Query();
@@ -77,7 +72,7 @@ public class SpendingEvolutionQueries : ISpendingEvolutionQueries
         var transactions = transactionQuery.ToList();
 
         // Aggregate by month
-        var monthlyData = AggregateBySum(transactions, accountDict, primaryCurrency, bitcoinPriceUsd, fiatRates, this);
+        var monthlyData = AggregateBySum(transactions, accountDict, primaryCurrency, provider);
 
         // Sort by year and month ascending
         var sortedMonths = monthlyData
@@ -92,21 +87,19 @@ public class SpendingEvolutionQueries : ISpendingEvolutionQueries
             })
             .ToList();
 
-        return Task.FromResult(new SpendingEvolutionDataDto
+        return new SpendingEvolutionDataDto
         {
             Months = sortedMonths,
             HasMissingPriceInSats = false,
             PrimaryCurrency = primaryCurrency
-        });
+        };
     }
 
     private static Dictionary<(int Year, int Month), (decimal FiatTotal, long SatsTotal, int TransactionCount)> AggregateBySum(
         List<TransactionEntity> transactions,
         Dictionary<ObjectId, AccountEntity> accountDict,
         string primaryCurrency,
-        decimal? bitcoinPriceUsd,
-        IReadOnlyDictionary<string, decimal>? fiatRates,
-        SpendingEvolutionQueries self)
+        IReportDataProvider provider)
     {
         var monthlyData = new Dictionary<(int Year, int Month), (decimal FiatTotal, long SatsTotal, int TransactionCount)>();
 
@@ -128,7 +121,8 @@ public class SpendingEvolutionQueries : ISpendingEvolutionQueries
             if (transaction.FromFiatAmount.HasValue && transaction.FromFiatAmount.Value < 0)
             {
                 var absoluteFiat = Math.Abs(transaction.FromFiatAmount.Value);
-                var convertedFiat = self.ConvertToPrimaryCurrency(absoluteFiat, account.Currency, primaryCurrency, bitcoinPriceUsd, fiatRates);
+                var transactionDate = DateOnly.FromDateTime(transaction.Date.ToUniversalTime());
+                var convertedFiat = ConvertToPrimaryCurrency(absoluteFiat, account.Currency, transactionDate, primaryCurrency, provider);
                 current.FiatTotal += convertedFiat;
             }
 
@@ -146,57 +140,14 @@ public class SpendingEvolutionQueries : ISpendingEvolutionQueries
         return monthlyData;
     }
 
-    private (decimal? BitcoinPriceUsd, IReadOnlyDictionary<string, decimal>? FiatRates) GetLatestRates()
-    {
-        try
-        {
-            // Get latest Bitcoin price in USD
-            var latestBtc = _priceDatabase.GetBitcoinData()
-                .Query()
-                .OrderByDescending(x => x.Date)
-                .FirstOrDefault();
-
-            decimal? bitcoinPriceUsd = latestBtc?.Price;
-
-            // Get latest fiat rates (most recent entry per currency)
-            var latestFiatDate = _priceDatabase.GetFiatData()
-                .Query()
-                .OrderByDescending(x => x.Date)
-                .Select(x => x.Date)
-                .FirstOrDefault();
-
-            IReadOnlyDictionary<string, decimal>? fiatRates = null;
-
-            if (latestFiatDate != default)
-            {
-                var startDate = latestFiatDate.AddDays(-5);
-                var fiatEntries = _priceDatabase.GetFiatData()
-                    .Find(x => x.Date >= startDate && x.Date <= latestFiatDate)
-                    .GroupBy(x => x.Currency)
-                    .ToDictionary(
-                        g => g.Key,
-                        g => g.OrderByDescending(x => x.Date).First().Price);
-
-                fiatRates = fiatEntries;
-            }
-
-            return (bitcoinPriceUsd, fiatRates);
-        }
-        catch
-        {
-            // If rate lookup fails, return nulls - conversion will return original amount
-            return (null, null);
-        }
-    }
-
-    private decimal ConvertToPrimaryCurrency(decimal amount, string? sourceCurrency, string targetCurrency, decimal? bitcoinPriceUsd, IReadOnlyDictionary<string, decimal>? fiatRates)
+    private static decimal ConvertToPrimaryCurrency(decimal amount, string? sourceCurrency, DateOnly date, string targetCurrency, IReportDataProvider provider)
     {
         if (string.IsNullOrEmpty(sourceCurrency) || sourceCurrency == targetCurrency)
             return amount;
 
         try
         {
-            return _currencyConversionService.Convert(amount, sourceCurrency, targetCurrency, bitcoinPriceUsd, fiatRates);
+            return HistoricalRateConverter.ConvertToFiat(amount, sourceCurrency, targetCurrency, date, provider);
         }
         catch
         {
