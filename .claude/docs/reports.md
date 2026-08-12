@@ -187,6 +187,148 @@ SpendingAnalyticsResultDto
 
 > Note: Savings rate is not exposed by this MCP tool because the shipped v0.7 codebase does not include a dedicated savings-rate query or UI panel.
 
+## BTC-Denominated Metrics
+
+v0.7 adds a BTC-denominated view of income and spending so users can see how many sats they earned, spent, and stacked each month.
+
+### App Layer (`Valt.App/Modules/BtcDenominatedMetrics`)
+
+#### Queries
+
+**`GetBtcDenominatedMetricsQuery`** — Returns month-by-month sats earned, sats spent, and stack velocity.
+
+- `From` / `To` (`DateOnly`) — date range.
+- `CategoryIds` (`string[]`) — optional included-category filter.
+- `AccountIds` (`string[]`) — optional account filter.
+
+#### DTOs
+
+**`BtcDenominatedMetricsDataDto`**
+
+- `Months` (`IReadOnlyList<BtcDenominatedMetricsMonthDto>`) — one entry per month in the requested range.
+- `PrimaryCurrency` (`string`) — main fiat currency code.
+
+**`BtcDenominatedMetricsMonthDto`**
+
+- `Month` (`DateOnly`) — first day of the month.
+- `SatsEarned` (`long`) — income denominated in satoshis.
+- `SatsSpent` (`long`) — expenses denominated in satoshis.
+- `StackVelocity` (`long`) — net sats accumulated (`SatsEarned - SatsSpent`).
+
+**Algorithm:**
+1. Loads transactions in the requested date range, filtered by accounts and categories.
+2. For each income or expense transaction, converts the fiat amount to satoshis using the BTC price on the transaction date.
+3. Aggregates per month: credit transactions become `SatsEarned`, debit transactions become `SatsSpent`.
+4. Computes `StackVelocity` as earned minus spent.
+5. Emits a zero-value month for every month in the range so line charts have no gaps.
+
+### UI Layer
+
+**"Sats earned & spent" chart** — `BtcDenominatedMetricsChartData`
+
+- Stacked column chart with earned (green) and spent (red) series.
+- X-axis shows month labels; Y-axis formats values as sat counts.
+- Refreshes from `GetBtcDenominatedMetricsQuery` results.
+
+**"Stack velocity" chart** — `StackVelocityChartData`
+
+- Line chart showing `StackVelocity` per month.
+- Uses the same query result as the earned/spent chart.
+- Both charts share the same date-range filter and category/account filters.
+
+### MCP Tool
+
+**`ReportTools.GetBtcDenominatedMetrics`** (`src/Valt.Infra/Mcp/Tools/ReportTools.cs`)
+
+Parameters:
+
+- `startDate` / `endDate` (`string`, `yyyy-MM-dd`) — date range.
+- `currencyCode` (`string`) — currency code for consistency with other report tools; the underlying query uses the main fiat currency from settings.
+- `accountIds` / `categoryIds` (`string?`, comma-separated) — optional filters.
+
+Result structure:
+
+```csharp
+BtcDenominatedMetricsResultDto
+  PrimaryCurrency: string
+  IsEmpty: bool
+  Months: BtcDenominatedMetricsMonthResultDto[]
+    Month, SatsEarned, SatsSpent, StackVelocity
+```
+
+> Conversion rule: fiat income/expenses are converted to sats using the BTC price on the transaction date.
+
+## Loan Reports
+
+v0.7 adds loan-specific analytics for BTC-backed loans: monthly interest and fees paid, and the trend of liquidation-price distance over time.
+
+### App Layer (`Valt.App/Modules/LoanReports`)
+
+#### Queries
+
+**`GetLoanReportsQuery`** — Returns monthly loan cost and liquidation-distance data.
+
+- `From` / `To` (`DateOnly`) — date range.
+- `CustomBtcPriceUsd` (`decimal?`) — optional custom BTC price used for liquidation-distance calculations.
+
+#### DTOs
+
+**`LoanReportsDataDto`**
+
+- `PrimaryCurrency` (`string`) — main fiat currency code.
+- `HasActiveLoans` (`bool`) — true when the user has at least one active BTC-backed loan.
+- `CostMonths` (`IReadOnlyList<LoanCostMonthDto>`) — one entry per month.
+- `DistanceMonths` (`IReadOnlyList<LiquidationDistanceMonthDto>`) — one entry per month.
+
+**`LoanCostMonthDto`**
+
+- `Month` (`DateOnly`) — first day of the month.
+- `CombinedCost` (`decimal`) — total interest + fees across all active loans.
+- `Interest` (`decimal`) — interest portion.
+- `Fees` (`decimal`) — fees portion.
+
+**`LiquidationDistanceMonthDto`**
+
+- `Month` (`DateOnly`) — first day of the month.
+- `DistanceToLiquidation` (`decimal`) — percentage distance to the closest liquidation price.
+- `ClosestLoanName` (`string`) — name of the loan with the smallest distance.
+
+**Algorithm:**
+1. Identifies active BTC-backed loans from the asset portfolio.
+2. For each month in the range, walks the loan-state timeline (latest snapshot on or before each day) to accumulate interest and fees.
+3. Converts each loan's contribution individually to the main currency before accumulating, preventing compounding re-conversion when multiple loans use different currencies.
+4. Computes liquidation distance as the percentage gap between the current BTC price and the closest loan's liquidation price; color-codes the line by risk.
+
+### UI Layer
+
+**"Loans & Leverage Reports" section**
+
+- Appears only when `HasActiveLoans` is true; hidden otherwise.
+- **Cost chart** — `LoanCostChartData`: stacked column chart showing combined interest + fees per month.
+- **Liquidation-distance chart** — `LiquidationDistanceChartData`: line chart showing distance-to-liquidation percentage per month, color-coded by risk.
+
+### MCP Tool
+
+**`ReportTools.GetLoanReports`** (`src/Valt.Infra/Mcp/Tools/ReportTools.cs`)
+
+Parameters:
+
+- `startDate` / `endDate` (`string`, `yyyy-MM-dd`) — date range.
+- `currencyCode` (`string`) — main fiat currency code.
+- `customBtcPriceUsd` (`decimal?`) — optional custom BTC price for liquidation-distance calculations.
+
+Result structure:
+
+```csharp
+LoanReportsResultDto
+  PrimaryCurrency: string
+  HasActiveLoans: bool
+  CostMonths: LoanCostMonthResultDto[]
+    Month, CombinedCost, Interest, Fees
+  DistanceMonths: LiquidationDistanceMonthResultDto[]
+    Month, DistanceToLiquidation, ClosestLoanName
+```
+
 ## UI Layer (Valt.UI/Views/Main/Tabs/Reports/)
 
 ### ReportsViewModel
