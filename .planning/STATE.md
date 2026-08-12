@@ -3,18 +3,18 @@ gsd_state_version: 1.0
 milestone: v0.7
 milestone_name: Insights & Metrics Expansion
 current_phase: 42
-current_phase_name: loans-leverage-reports-ui
-status: executing
+status: completed
 stopped_at: Completed 42-04-PLAN.md
-last_updated: "2026-08-12T14:59:03Z"
+last_updated: "2026-08-12T15:12:28.923Z"
 last_activity: 2026-08-12
-last_activity_desc: Completed Phase 42 plan 42-04 (loan cost compounding fix + regression test)
+last_activity_desc: Phase 42 marked complete
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 17
   completed_plans: 17
   percent: 80
+current_phase_name: loans-leverage-reports-ui
 ---
 
 # STATE.md
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-08-06)
 
 ## Current Position
 
-Phase: 42 (loans-leverage-reports-ui) — COMPLETE
+Phase: 42 — COMPLETE
 Plan: 4 of 4 complete
-Status: Phase complete; gap G-42-2 closed
-Last activity: 2026-08-12 — Completed 42-04 plan (loan cost compounding fix + regression test)
+Status: Phase 42 complete
+Last activity: 2026-08-12 — Phase 42 marked complete
 
 ## Performance Metrics
 
