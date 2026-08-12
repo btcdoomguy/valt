@@ -403,6 +403,64 @@ public class LoanReportsQueriesTests : DatabaseTest
         Assert.That(january.Interest, Is.EqualTo(expectedInterest));
     }
 
+    [Test]
+    public async Task Should_Not_Compound_Monthly_Cost_For_Multiple_Mixed_Currency_Loans()
+    {
+        // BRL loan is first alphabetically; the old implementation would re-convert
+        // the running BRL total as if it were USD when processing the second loan.
+        var brlLoan = AssetBuilder.ABtcLoan(
+                platformName: "BRL",
+                collateralSats: 100_000_000,
+                loanAmount: 275_000m,
+                currentBtcPrice: 550_000m)
+            .WithName("BRL Loan")
+            .WithBtcLoanDetails(
+                apr: 0.12m,
+                liquidationLtv: 80m,
+                marginCallLtv: 70m,
+                fees: 0m,
+                status: LoanStatus.Active,
+                currencyCode: FiatCurrency.Brl.Code)
+            .WithSnapshot(new DateOnly(2025, 1, 1), totalBorrowed: 275_000m)
+            .Build();
+
+        var usdLoan = AssetBuilder.ABtcLoan(
+                platformName: "USD",
+                collateralSats: 100_000_000,
+                loanAmount: 50_000m,
+                currentBtcPrice: 100_000m)
+            .WithName("USD Loan")
+            .WithBtcLoanDetails(
+                apr: 0.12m,
+                liquidationLtv: 80m,
+                marginCallLtv: 70m,
+                fees: 0m,
+                status: LoanStatus.Active)
+            .WithSnapshot(new DateOnly(2025, 1, 1), totalBorrowed: 50_000m)
+            .Build();
+
+        await _assetRepository.SaveAsync(brlLoan);
+        await _assetRepository.SaveAsync(usdLoan);
+
+        var result = await ExecuteQuery(new DateOnly(2025, 1, 1), new DateOnly(2025, 1, 31), new DateTime(2025, 1, 31));
+
+        var january = result.CostMonths.Single(m => m.Month == new DateOnly(2025, 1, 1));
+
+        var usdInterest = Math.Round(50_000m * 0.12m / 365m * 31m, 2);
+        var usdInterestInBrl = Math.Round(usdInterest * 5.5m, 2);
+        var brlInterest = Math.Round(275_000m * 0.12m / 365m * 31m, 2);
+        var expectedCombined = usdInterestInBrl + brlInterest;
+
+        // Old implementation: accumulated BRL interest + USD interest, then converted the whole sum as USD.
+        var compoundingBugValue = Math.Round((brlInterest + usdInterest) * 5.5m, 2);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(january.CombinedCost, Is.EqualTo(expectedCombined));
+            Assert.That(january.CombinedCost, Is.Not.EqualTo(compoundingBugValue));
+        }
+    }
+
     private async Task<LoanReportsDataDto> ExecuteQuery(DateOnly from, DateOnly to, DateTime clockDate)
     {
         return await ExecuteQuery(from, to, new FakeClock(clockDate), new CurrencySettings(_localDatabase, Substitute.For<INotificationPublisher>())
