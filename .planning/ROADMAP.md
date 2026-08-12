@@ -166,7 +166,21 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
   3. `.claude/docs/reports.md` documents the new reports, UI panels, and MCP tools
   4. Full test suite is green and every new Reports tab panel is verified end-to-end with real data
 
-**Plans**: TBD
+**Plans**: 5 plans
+
+**Wave 1**
+
+- [ ] 43-01-PLAN.md — Tracer: Spending Analytics MCP tool + localization + docs
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 43-02-PLAN.md — Remaining MCP tools (BTC metrics, loan reports, wealth performance)
+- [ ] 43-03-PLAN.md — Complete pt-BR/es localization and regenerate Designer.cs
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 43-04-PLAN.md — Complete reports.md documentation for all v0.7 categories
+- [ ] 43-05-PLAN.md — Full test suite green + end-to-end UI verification
 
 ## Progress
 
