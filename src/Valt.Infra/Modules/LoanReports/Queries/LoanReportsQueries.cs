@@ -94,9 +94,9 @@ public class LoanReportsQueries : ILoanReportsQueries
                 var accrualEndCandidate = nextSnapshot?.EffectiveDate ?? monthEnd;
                 var accrualEnd = accrualEndCandidate < effectiveToday ? accrualEndCandidate : effectiveToday;
 
-                if (accrualEnd > accrualStart && !effectiveSnapshot.FixedTotalDebt.HasValue)
+                if (accrualEnd >= accrualStart && !effectiveSnapshot.FixedTotalDebt.HasValue)
                 {
-                    var days = accrualEnd.DayNumber - accrualStart.DayNumber;
+                    var days = accrualEnd.DayNumber - accrualStart.DayNumber + 1;
                     interest += Math.Round(effectiveSnapshot.TotalBorrowed * effectiveSnapshot.Apr / 365 * days, 2);
                 }
 
@@ -107,6 +107,19 @@ public class LoanReportsQueries : ILoanReportsQueries
                     {
                         fees += snapshot.Fees;
                     }
+                }
+
+                // Convert interest and fees from the loan currency to the main currency
+                try
+                {
+                    interest = ConvertToMainCurrency(interest, effectiveSnapshot.CurrencyCode, monthEnd, provider);
+                    fees = ConvertToMainCurrency(fees, effectiveSnapshot.CurrencyCode, monthEnd, provider);
+                }
+                catch
+                {
+                    // Missing conversion rate for this loan/month: zero out its cost contribution
+                    interest = 0m;
+                    fees = 0m;
                 }
 
                 // Distance calculation at month-end
@@ -162,7 +175,7 @@ public class LoanReportsQueries : ILoanReportsQueries
             if (collateralValue == 0)
                 return 0m;
 
-            var currentLtv = Math.Round(snapshot.LoanAmount / collateralValue * 100, 2);
+            var currentLtv = Math.Round(snapshot.CurrentTotalDebt / collateralValue * 100, 2);
             var distance = Math.Max(0, snapshot.LiquidationLtv - currentLtv);
 
             return Math.Round(distance, 2);
@@ -172,6 +185,33 @@ public class LoanReportsQueries : ILoanReportsQueries
             // Missing historical rates: clamp to zero distance so the chart stays safe
             return 0m;
         }
+    }
+
+    private decimal ConvertToMainCurrency(decimal amount, string currencyCode, DateOnly date, IReportDataProvider provider)
+    {
+        if (amount == 0)
+            return 0m;
+
+        var mainCurrencyCode = _currencySettings.MainFiatCurrency;
+        if (currencyCode == mainCurrencyCode)
+            return amount;
+
+        var loanCurrency = FiatCurrency.GetFromCode(currencyCode);
+        var loanRate = provider.GetFiatRateAt(date, loanCurrency);
+        if (loanRate == 0)
+            throw new ApplicationException($"Missing fiat rate for {currencyCode}");
+
+        var usdAmount = amount / loanRate;
+
+        if (mainCurrencyCode == FiatCurrency.Usd.Code)
+            return Math.Round(usdAmount, 2);
+
+        var mainCurrency = FiatCurrency.GetFromCode(mainCurrencyCode);
+        var mainRate = provider.GetFiatRateAt(date, mainCurrency);
+        if (mainRate == 0)
+            throw new ApplicationException($"Missing fiat rate for {mainCurrencyCode}");
+
+        return Math.Round(usdAmount * mainRate, 2);
     }
 
     private static LoanReportsDataDto EmptyResult(string mainCurrencyCode) => new()
