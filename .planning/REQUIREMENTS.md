@@ -28,8 +28,8 @@ New analytics derived from existing app data, surfaced in the Reports tab. Each 
 
 ### Loans & Leverage
 
-- [ ] **LON-01**: User can view total interest/fees paid and per-month breakdown from loan state timeline
-- [ ] **LON-02**: User can view liquidation-price distance trend over time
+- [x] **LON-01**: User can view total interest/fees paid and per-month breakdown from loan state timeline
+- [x] **LON-02**: User can view liquidation-price distance trend over time
 
 ## v2 Requirements
 
@@ -84,8 +84,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WLT-02 | Phase 41 | Complete |
 | WLT-03 | Phase 41 | Complete |
 | WLT-04 | Phase 41 | Complete |
-| LON-01 | Phase 42 | Pending |
-| LON-02 | Phase 42 | Pending |
+| LON-01 | Phase 42 | Complete |
+| LON-02 | Phase 42 | Complete |
 
 **Coverage:**
 
@@ -95,4 +95,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-08-04*
-*Last updated: 2026-08-04 after v0.7 roadmap creation*
+*Last updated: 2026-08-12 after Phase 42 completion*
