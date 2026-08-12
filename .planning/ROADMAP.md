@@ -138,8 +138,17 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
   2. User can view the liquidation-price distance trend over time
   3. Loan panels appear only when the user has active BTC-backed loans, consistent with the existing conditional dashboard panels
 
-**Plans**: TBD
+**Plans**: 1/3 plans executed
 **UI hint**: yes
+
+**Wave 1**
+
+- [x] 42-01-PLAN.md — End-to-end Loans & Leverage Reports section (backend + UI tracer)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 42-02-PLAN.md — Backend tests and edge-case hardening
+- [ ] 42-03-PLAN.md — ViewModel tests and full-suite verification
 
 ### Phase 43: MCP, Localization, Documentation & Verification
 
@@ -172,7 +181,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 | 39. Spending Analytics Reports & UI | v0.7 | 4/4 | Complete    | 2026-08-05 |
 | 40. BTC-Denominated Metrics Reports & UI | v0.7 | 4/4 | Complete    | 2026-08-06 |
 | 41. Wealth & Performance Reports & UI | v0.7 | 1/1 | Complete    | 2026-08-10 |
-| 42. Loans & Leverage Reports & UI | v0.7 | 0/0 | Not started | - |
+| 42. Loans & Leverage Reports & UI | v0.7 | 1/3 | In Progress|  |
 | 43. MCP, Localization, Documentation & Verification | v0.7 | 0/0 | Not started | - |
 
 **Total phases:** 15 (11 complete, 4 planned)  
