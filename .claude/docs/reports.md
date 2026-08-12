@@ -95,6 +95,98 @@ Calculates median monthly expenses and wealth coverage.
 - Previous period comparison with evolution percentage
 - Satoshi-based metrics for BTC expenses
 
+## Spending Analytics
+
+v0.7 adds spending-analytics queries in the Application layer and exposes them through the Reports tab and the MCP server.
+
+### App Layer (`Valt.App/Modules/SpendingAnalytics`)
+
+#### Queries
+
+**`GetBurnRateQuery`** — Returns current-month burn-rate metrics.
+
+- `CurrentWealthInFiat` (`decimal`) — total wealth in the main fiat currency, used to compute wealth coverage.
+- `CategoryIds` (`string[]`) — optional excluded-category filter.
+- `AccountIds` (`string[]`) — optional account filter.
+
+**`GetFixedVsVariableQuery`** — Returns a month-by-month fixed vs variable expense breakdown.
+
+- `From` / `To` (`DateOnly`) — date range.
+- `CategoryIds` (`string[]`) — optional included-category filter.
+- `AccountIds` (`string[]`) — optional account filter.
+
+#### DTOs
+
+**`BurnRateDataDto`**
+
+- `HasData` (`bool`) — false when there are no expense transactions in the current month.
+- `SpentSoFar` (`decimal`) — total expenses from the start of the current month through yesterday.
+- `AvgDailySpend` (`decimal`) — `SpentSoFar / DayOfMonth`.
+- `ProjectedMonthEnd` (`decimal?`) — projected full-month spend; only populated on or after day 5 to avoid early-month noise.
+- `MedianMonthlyExpenses` (`decimal`) — 12-month median of monthly expenses.
+- `VsMedianPercent` (`decimal?`) — percent difference between projected month-end and the median.
+- `DayOfMonth` (`int`) — current day of month.
+- `PrimaryCurrency` (`string`) — main fiat currency code.
+
+**`FixedVsVariableDataDto`**
+
+- `Months` (`IReadOnlyList<FixedVsVariableMonthDto>`) — one entry per month in the requested range.
+- `HasNoFixedExpenses` (`bool`) — true when the user has no fixed expenses registered at all.
+- `PrimaryCurrency` (`string`) — main fiat currency code.
+
+**`FixedVsVariableMonthDto`**
+
+- `Month` (`DateOnly`) — first day of the month.
+- `FixedTotal` (`decimal`) — expenses linked to paid fixed-expense records.
+- `VariableTotal` (`decimal`) — all other debit transactions.
+
+### UI Layer
+
+#### Burn Rate Dashboard Card
+
+**`BurnRatePanelViewModel`** (`Valt.UI/Views/Main/Tabs/Reports/Panels/`)
+
+- Dashboard card rendered through `DashboardDataUserControl`.
+- Always visible; shows an empty state when `HasData` is false.
+- Rows: spent so far, average daily spend, projected month-end, median month, vs median.
+- Uses the category filter set by `SetCategoryFilter`.
+
+#### Fixed vs Variable Chart
+
+**`FixedVsVariableChartData`** (`Valt.UI/Views/Main/Tabs/Reports/`)
+
+- Stacked column chart with fixed (blue) and variable (orange) series.
+- Emits one month per row for every month in the requested date range.
+- Displays a "no fixed expenses registered" hint when `HasNoFixedExpenses` is true, or a "no expense data for this period" hint when the series are all zero.
+
+### MCP Tool
+
+**`ReportTools.GetSpendingAnalytics`** (`Valt.Infra/Mcp/Tools/ReportTools.cs`)
+
+Returns a combined `SpendingAnalyticsResultDto` containing both burn-rate and fixed-vs-variable sub-sections.
+
+Parameters:
+
+- `startDate` / `endDate` (`string`, `yyyy-MM-dd`) — date range passed to fixed-vs-variable.
+- `currencyCode` (`string`) — currency code for consistency with other report tools; the underlying queries use the main fiat currency from settings.
+- `currentWealthInFiat` (`decimal`) — passed to burn-rate.
+- `accountIds` / `categoryIds` (`string?`, comma-separated) — optional filters applied to both queries.
+
+Result structure:
+
+```csharp
+SpendingAnalyticsResultDto
+  Currency: string
+  BurnRate: BurnRateResultDto
+    HasData, SpentSoFar, AvgDailySpend, ProjectedMonthEnd,
+    MedianMonthlyExpenses, VsMedianPercent, DayOfMonth, PrimaryCurrency
+  FixedVsVariable: FixedVsVariableResultDto
+    Months: FixedVsVariableMonthResultDto[]
+    HasNoFixedExpenses, PrimaryCurrency
+```
+
+> Note: Savings rate is not exposed by this MCP tool because the shipped v0.7 codebase does not include a dedicated savings-rate query or UI panel.
+
 ## UI Layer (Valt.UI/Views/Main/Tabs/Reports/)
 
 ### ReportsViewModel
@@ -188,6 +280,19 @@ services.AddSingleton<IReportDataProviderFactory, ReportDataProviderFactory>();
 ## File Structure
 
 ```
+src/Valt.App/Modules/SpendingAnalytics/
+├── Queries/
+│   ├── GetBurnRateQuery.cs
+│   ├── GetBurnRateHandler.cs
+│   ├── GetFixedVsVariableQuery.cs
+│   └── GetFixedVsVariableHandler.cs
+├── DTOs/
+│   ├── BurnRateDataDto.cs
+│   └── FixedVsVariableDataDto.cs
+└── Contracts/
+    ├── IBurnRateQueries.cs
+    └── IFixedVsVariableQueries.cs
+
 src/Valt.Infra/Modules/Reports/
 ├── IReportDataProvider.cs
 ├── ReportDataProvider.cs (+ Factory)
@@ -215,6 +320,9 @@ src/Valt.UI/Views/Main/Tabs/Reports/
 ├── DashboardDataUserControl.axaml
 ├── MonthlyTotalsChartData.cs
 ├── ExpensesByCategoryChartData.cs
+├── FixedVsVariableChartData.cs
+├── Panels/
+│   └── BurnRatePanelViewModel.cs
 └── Models/
     └── MonthlyReportItemViewModel.cs
 ```
