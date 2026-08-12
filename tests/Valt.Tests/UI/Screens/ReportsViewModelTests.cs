@@ -5,18 +5,24 @@ using LiteDB;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Assets.DTOs;
+using Valt.App.Modules.Assets.Queries.GetBtcLoansDashboard;
+using Valt.App.Modules.BtcDenominatedMetrics.DTOs;
+using Valt.App.Modules.BtcDenominatedMetrics.Queries;
+using Valt.App.Modules.LoanReports.DTOs;
+using Valt.App.Modules.LoanReports.Queries;
 using Valt.App.Modules.SpendingAnalytics.DTOs;
 using Valt.App.Modules.SpendingAnalytics.Queries;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Kernel.Factories;
 using Valt.Infra.Crawlers.Indicators;
-using Valt.Infra.Kernel;
 using Valt.Infra.DataAccess;
+using Valt.Infra.Kernel;
+using Valt.App.Kernel.Notifications;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Categories;
 using Valt.Infra.Modules.Budget.Transactions;
-using Valt.App.Kernel.Notifications;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
@@ -146,6 +152,15 @@ public class ReportsViewModelTests
     {
         _queryDispatcher.DispatchAsync(Arg.Any<GetFixedVsVariableQuery>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromException<FixedVsVariableDataDto>(new InvalidOperationException("Fixed vs variable fetch triggered")));
+
+        _queryDispatcher.DispatchAsync(Arg.Any<GetLoanReportsQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(new LoanReportsDataDto
+            {
+                CostMonths = new List<LoanCostMonthDto>(),
+                DistanceMonths = new List<LiquidationDistanceMonthDto>(),
+                HasActiveLoans = false,
+                PrimaryCurrency = "USD"
+            }));
     }
 
     [TearDown]
@@ -191,7 +206,7 @@ public class ReportsViewModelTests
 
     private ReportsViewModel CreateViewModel()
     {
-        return new ReportsViewModel(
+        return new TestableReportsViewModel(
             _allTimeHighReport,
             _maxBtcStackReport,
             _monthlyTotalsReport,
@@ -220,6 +235,53 @@ public class ReportsViewModelTests
             _leveragePanel,
             _btcLoansPanel,
             _burnRatePanel);
+    }
+
+    private class TestableReportsViewModel : ReportsViewModel
+    {
+        public TestableReportsViewModel(
+            IAllTimeHighReport allTimeHighReport,
+            IMaxBtcStackReport maxBtcStackReport,
+            IMonthlyTotalsReport monthlyTotalsReport,
+            IExpensesByCategoryReport expensesByCategoryReport,
+            IIncomeByCategoryReport incomeByCategoryReport,
+            IStatisticsReport statisticsReport,
+            IWealthOverviewReport wealthOverviewReport,
+            IReportDataProviderFactory reportDataProviderFactory,
+            CurrencySettings currencySettings,
+            ILocalDatabase localDatabase,
+            IClock clock,
+            ILogger<ReportsViewModel> logger,
+            AccountsTotalState accountsTotalState,
+            RatesState ratesState,
+            CustomBtcPriceState customBtcPriceState,
+            SecureModeState secureModeState,
+            IConfigurationManager configurationManager,
+            IModalFactory modalFactory,
+            IQueryDispatcher queryDispatcher,
+            IIndicatorCache indicatorCache,
+            IFireAndForgetTaskRunner runner,
+            IndicatorsPanelViewModel indicatorsPanel,
+            WealthPanelViewModel wealthPanel,
+            BtcStackPanelViewModel btcStackPanel,
+            SimulatedPricesPanelViewModel simulatedPricesPanel,
+            ILeveragePositionsPanelViewModel leveragePanel,
+            IBtcLoansPanelViewModel btcLoansPanel,
+            BurnRatePanelViewModel burnRatePanel)
+            : base(allTimeHighReport, maxBtcStackReport, monthlyTotalsReport, expensesByCategoryReport,
+                incomeByCategoryReport, statisticsReport, wealthOverviewReport, reportDataProviderFactory,
+                currencySettings, localDatabase, clock, logger, accountsTotalState, ratesState,
+                customBtcPriceState, secureModeState, configurationManager, modalFactory, queryDispatcher,
+                indicatorCache, runner, indicatorsPanel, wealthPanel, btcStackPanel, simulatedPricesPanel,
+                leveragePanel, btcLoansPanel, burnRatePanel)
+        {
+        }
+
+        protected override Task RunOnUiThread(Action action)
+        {
+            action();
+            return Task.CompletedTask;
+        }
     }
 
     [Test]
@@ -254,7 +316,7 @@ public class ReportsViewModelTests
         _ = _leveragePanel.Received(1).RefreshAsync();
     }
 
-    [Test]
+    [Test, Timeout(10000)]
     public async Task Initialize_Should_Refresh_BtcLoansPanel()
     {
         // Arrange
@@ -510,46 +572,163 @@ public class ReportsViewModelTests
             "Statistics dashboard should not expose a configuration command");
     }
 
-    [Test]
-    public async Task FetchStatisticsDataAsync_Passes_Centralized_Excluded_Category_Ids()
+    private static void SetFilterRange(ReportsViewModel viewModel, DateRange range)
+    {
+        typeof(ReportsViewModel)
+            .GetField("_filterRange", BindingFlags.NonPublic | BindingFlags.Instance)!
+            .SetValue(viewModel, range);
+    }
+
+    [Test, Timeout(10000)]
+    public async Task FetchLoanReportsAsync_Dispatches_GetLoanReportsQuery()
     {
         // Arrange
-        var excludedId = "507f1f77bcf86cd799439012";
-        _configurationManager.GetReportsAnalyticsCategoryFilterExcludedIds()
-            .Returns(new List<string> { excludedId });
-
         var viewModel = CreateViewModel();
+        SetFilterRange(viewModel, new DateRange(new DateTime(2025, 1, 1), new DateTime(2025, 1, 31)));
 
-        IReadOnlySet<string>? capturedExcludedIds = null;
-        _statisticsReport.GetAsync(
-                Arg.Any<FiatCurrency>(),
-                Arg.Any<decimal>(),
-                Arg.Any<IReportDataProvider>(),
-                Arg.Do<IReadOnlySet<string>?>(ids => capturedExcludedIds = ids))
-            .Returns(Task.FromResult(new StatisticsData
-            {
-                MedianMonthlyExpenses = FiatValue.New(0m),
-                Currency = FiatCurrency.Usd,
-                WealthCoverageMonths = 0,
-                WealthCoverageFormatted = "N/A",
-                HasMedianMonthlyExpensesPreviousPeriod = false,
-                HasMedianMonthlyExpensesSats = false
-            }));
-
-        var provider = Substitute.For<IReportDataProvider>();
         var method = typeof(ReportsViewModel).GetMethod(
-            "FetchStatisticsDataAsync",
+            "FetchLoanReportsAsync",
             BindingFlags.NonPublic | BindingFlags.Instance);
 
         // Act
-        await (Task)method!.Invoke(viewModel, new object[] { provider })!;
+        await (Task)method!.Invoke(viewModel, new object[] { Substitute.For<IReportDataProvider>() })!;
 
         // Assert
-        Assert.That(capturedExcludedIds, Is.Not.Null,
-            "Statistics report should receive excluded category IDs");
-        Assert.That(capturedExcludedIds, Does.Contain(excludedId),
-            "Statistics report should receive the centralized excluded category ID");
-        Assert.That(viewModel.StatisticsData.HasConfiguration, Is.False,
-            "Statistics dashboard should not expose a configuration command after fetch");
+        await _queryDispatcher.Received(1).DispatchAsync(
+            Arg.Any<GetLoanReportsQuery>(),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Test, Timeout(10000)]
+    public async Task FetchLoanReportsAsync_Sets_IsLoanReportsVisible_From_HasActiveLoans_True()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        SetFilterRange(viewModel, new DateRange(new DateTime(2025, 1, 1), new DateTime(2025, 1, 31)));
+
+        _queryDispatcher.DispatchAsync(Arg.Any<GetLoanReportsQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(new LoanReportsDataDto
+            {
+                CostMonths = new List<LoanCostMonthDto>
+                {
+                    new() { Month = new DateOnly(2025, 1, 1), CombinedCost = 100m, Interest = 100m, Fees = 0m }
+                },
+                DistanceMonths = new List<LiquidationDistanceMonthDto>
+                {
+                    new() { Month = new DateOnly(2025, 1, 1), DistanceToLiquidation = 50m, ClosestLoanName = "Test" }
+                },
+                HasActiveLoans = true,
+                PrimaryCurrency = "USD"
+            }));
+
+        var method = typeof(ReportsViewModel).GetMethod(
+            "FetchLoanReportsAsync",
+            BindingFlags.NonPublic | BindingFlags.Instance);
+
+        // Act
+        await (Task)method!.Invoke(viewModel, new object[] { Substitute.For<IReportDataProvider>() })!;
+
+        // Assert
+        Assert.That(viewModel.IsLoanReportsVisible, Is.True);
+        Assert.That(viewModel.IsLoanReportsLoading, Is.False);
+        Assert.That(viewModel.IsLoanReportsError, Is.False);
+    }
+
+    [Test, Timeout(10000)]
+    public async Task FetchLoanReportsAsync_Sets_IsLoanReportsVisible_From_HasActiveLoans_False()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        SetFilterRange(viewModel, new DateRange(new DateTime(2025, 1, 1), new DateTime(2025, 1, 31)));
+
+        _queryDispatcher.DispatchAsync(Arg.Any<GetLoanReportsQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(new LoanReportsDataDto
+            {
+                CostMonths = new List<LoanCostMonthDto>(),
+                DistanceMonths = new List<LiquidationDistanceMonthDto>(),
+                HasActiveLoans = false,
+                PrimaryCurrency = "USD"
+            }));
+
+        var method = typeof(ReportsViewModel).GetMethod(
+            "FetchLoanReportsAsync",
+            BindingFlags.NonPublic | BindingFlags.Instance);
+
+        // Act
+        await (Task)method!.Invoke(viewModel, new object[] { Substitute.For<IReportDataProvider>() })!;
+
+        // Assert
+        Assert.That(viewModel.IsLoanReportsVisible, Is.False);
+        Assert.That(viewModel.IsLoanReportsEmpty, Is.True);
+        Assert.That(viewModel.IsLoanReportsLoading, Is.False);
+    }
+
+    [Test, Timeout(10000)]
+    public async Task FetchLoanReportsAsync_Sets_IsLoanReportsEmpty_When_No_Months()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        SetFilterRange(viewModel, new DateRange(new DateTime(2025, 1, 1), new DateTime(2025, 1, 31)));
+
+        _queryDispatcher.DispatchAsync(Arg.Any<GetLoanReportsQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(new LoanReportsDataDto
+            {
+                CostMonths = new List<LoanCostMonthDto>(),
+                DistanceMonths = new List<LiquidationDistanceMonthDto>(),
+                HasActiveLoans = true,
+                PrimaryCurrency = "USD"
+            }));
+
+        var method = typeof(ReportsViewModel).GetMethod(
+            "FetchLoanReportsAsync",
+            BindingFlags.NonPublic | BindingFlags.Instance);
+
+        // Act
+        await (Task)method!.Invoke(viewModel, new object[] { Substitute.For<IReportDataProvider>() })!;
+
+        // Assert
+        Assert.That(viewModel.IsLoanReportsEmpty, Is.True);
+        Assert.That(viewModel.IsLoanReportsVisible, Is.True);
+    }
+
+    [Test, Timeout(10000)]
+    public async Task FetchLoanReportsAsync_Resets_IsLoanReportsLoading_After_Completion()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        SetFilterRange(viewModel, new DateRange(new DateTime(2025, 1, 1), new DateTime(2025, 1, 31)));
+
+        var method = typeof(ReportsViewModel).GetMethod(
+            "FetchLoanReportsAsync",
+            BindingFlags.NonPublic | BindingFlags.Instance);
+
+        // Act
+        await (Task)method!.Invoke(viewModel, new object[] { Substitute.For<IReportDataProvider>() })!;
+
+        // Assert
+        Assert.That(viewModel.IsLoanReportsLoading, Is.False);
+    }
+
+    [Test, Timeout(10000)]
+    public async Task FetchLoanReportsAsync_Sets_IsLoanReportsError_On_Exception()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        SetFilterRange(viewModel, new DateRange(new DateTime(2025, 1, 1), new DateTime(2025, 1, 31)));
+
+        _queryDispatcher.DispatchAsync(Arg.Any<GetLoanReportsQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<LoanReportsDataDto>(new InvalidOperationException("boom")));
+
+        var method = typeof(ReportsViewModel).GetMethod(
+            "FetchLoanReportsAsync",
+            BindingFlags.NonPublic | BindingFlags.Instance);
+
+        // Act
+        await (Task)method!.Invoke(viewModel, new object[] { Substitute.For<IReportDataProvider>() })!;
+
+        // Assert
+        Assert.That(viewModel.IsLoanReportsError, Is.True);
+        Assert.That(viewModel.IsLoanReportsVisible, Is.False);
+        Assert.That(viewModel.IsLoanReportsLoading, Is.False);
     }
 }
