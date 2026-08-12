@@ -166,7 +166,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
   3. `.claude/docs/reports.md` documents the new reports, UI panels, and MCP tools
   4. Full test suite is green and every new Reports tab panel is verified end-to-end with real data
 
-**Plans**: 3/5 plans executed
+**Plans**: 4/5 plans executed
 
 **Wave 1**
 
@@ -179,7 +179,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 43-04-PLAN.md — Complete reports.md documentation for all v0.7 categories
+- [x] 43-04-PLAN.md — Complete reports.md documentation for all v0.7 categories
 - [ ] 43-05-PLAN.md — Full test suite green + end-to-end UI verification
 
 ## Progress
@@ -200,7 +200,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 | 40. BTC-Denominated Metrics Reports & UI | v0.7 | 4/4 | Complete    | 2026-08-06 |
 | 41. Wealth & Performance Reports & UI | v0.7 | 1/1 | Complete    | 2026-08-10 |
 | 42. Loans & Leverage Reports & UI | v0.7 | 4/4 | Complete    | 2026-08-12 |
-| 43. MCP, Localization, Documentation & Verification | v0.7 | 3/5 | In Progress|  |
+| 43. MCP, Localization, Documentation & Verification | v0.7 | 4/5 | In Progress|  |
 
 **Total phases:** 15 (11 complete, 4 planned)  
 **v0.7 plans:** 12/12 (executed)  

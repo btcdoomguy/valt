@@ -4,16 +4,16 @@ milestone: v0.7
 milestone_name: Insights & Metrics Expansion
 current_phase: 43
 current_phase_name: mcp-localization-documentation-verification
-status: executing
-stopped_at: Completed 43-03-PLAN.md
-last_updated: "2026-08-12T19:22:36.799Z"
+status: verifying
+stopped_at: Completed 43-04-PLAN.md
+last_updated: "2026-08-12T19:31:07.081Z"
 last_activity: 2026-08-12
 last_activity_desc: Completed 43-02 plan
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 22
-  completed_plans: 20
+  completed_plans: 21
   percent: 80
 ---
 
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-08-06)
 
 Phase: 43 (mcp-localization-documentation-verification) — EXECUTING
 Plan: 5 of 5
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-08-12 — Completed 43-02 plan
 
 ## Performance Metrics
@@ -108,6 +108,7 @@ Last activity: 2026-08-12 — Completed 43-02 plan
 | Phase 43 P02 | 16min | 2 tasks | 2 files |
 | Phase 43-mcp-localization-documentation-verification P02 | 16min | 2 tasks | 2 files |
 | Phase 43 P03 | 5min | 2 tasks | 3 files |
+| Phase 43 P04 | 3min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -187,6 +188,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Omitted savings-rate from the MCP tool because no GetSavingsRateQuery exists in the shipped v0.7 codebase.
 - [Phase ?]: [Phase 43-02]: Omitted unimplemented v0.7 wealth-performance metrics (CAGR, fiat-vs-BTC allocation, best/worst months) from the MCP surface and documented the limitation in the XML doc and integration test.
 - [Phase ?]: [Phase 43-02]: Made SeedPriceData idempotent in ReportToolsTests so multiple MCP report integration tests can share the same IntegrationTest fixture without duplicate-date LiteDB exceptions.
+- [Phase 43]: Explicitly documented WLT-01..03 as not implemented to prevent AI assistants from requesting unimplemented v0.7 metrics. — Satisfies T-43-09 threat mitigation and aligns docs with shipped code.
+- [Phase 43]: Copied query/DTO and MCP tool names directly from source files into .claude/docs/reports.md. — Satisfies T-43-10 drift-mitigation requirement by keeping docs in sync with code contracts.
 
 ### Pending Todos
 
@@ -230,8 +233,8 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-08-12T19:22:36.786Z
-Stopped at: Completed 43-03-PLAN.md
+Last session: 2026-08-12T19:31:07.069Z
+Stopped at: Completed 43-04-PLAN.md
 Resume file: None
 
 ## Notes
