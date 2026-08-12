@@ -204,6 +204,9 @@ public class ReportToolsTests : IntegrationTest
     [Test]
     public async Task GetWealthPerformanceMetrics_WithTransactionData_ReturnsAthAndWealthOverview()
     {
+        // This test verifies only the implemented v0.7 wealth-performance metrics:
+        // days-under-water via the ATH report and monthly wealth overview.
+        // CAGR, fiat-vs-BTC allocation, and best/worst months are not exposed.
         var today = DateOnly.FromDateTime(DateTime.Today);
         var firstOfMonth = new DateOnly(today.Year, today.Month, 1);
 
