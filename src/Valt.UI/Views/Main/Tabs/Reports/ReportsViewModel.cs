@@ -409,8 +409,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             FetchExpensesByCategoryAsync(provider),
             FetchIncomeByCategoryAsync(provider),
             FetchFixedVsVariableAsync(provider),
-            FetchBtcDenominatedMetricsAsync(provider),
-            FetchStackVelocityAsync(provider),
+            FetchBtcMetricsAndStackVelocityAsync(provider),
             FetchLoanReportsAsync(provider),
             FetchAllTimeHighDataAsync(provider),
             FetchMaxBtcStackDataAsync(provider),
@@ -543,8 +542,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         await Task.WhenAll(
             FetchMonthlyTotalsAsync(provider),
             FetchFixedVsVariableAsync(provider),
-            FetchBtcDenominatedMetricsAsync(provider),
-            FetchStackVelocityAsync(provider),
+            FetchBtcMetricsAndStackVelocityAsync(provider),
             FetchLoanReportsAsync(provider));
     }
 
@@ -597,8 +595,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             await Task.WhenAll(
                 FetchExpensesByCategoryAsync(provider),
                 FetchIncomeByCategoryAsync(provider),
-                FetchBtcDenominatedMetricsAsync(provider),
-                FetchStackVelocityAsync(provider),
+                FetchBtcMetricsAndStackVelocityAsync(provider),
                 FetchLoanReportsAsync(provider));
         }
         catch (TaskCanceledException)
@@ -1081,7 +1078,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         }
     }
 
-    private async Task FetchBtcDenominatedMetricsAsync(IReportDataProvider provider)
+    private async Task FetchBtcMetricsAndStackVelocityAsync(IReportDataProvider provider)
     {
         try
         {
@@ -1101,6 +1098,11 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 IsBtcMetricsEmpty = data.Months.Count == 0;
                 IsBtcMetricsError = false;
                 IsBtcMetricsLoading = false;
+
+                StackVelocityChartData.RefreshChart(data);
+                IsStackVelocityEmpty = data.Months.Count == 0;
+                IsStackVelocityError = false;
+                IsStackVelocityLoading = false;
             });
         }
         catch (Exception ex)
@@ -1111,35 +1113,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
                 IsBtcMetricsEmpty = false;
                 IsBtcMetricsError = true;
                 IsBtcMetricsLoading = false;
-            });
-        }
-    }
 
-    private async Task FetchStackVelocityAsync(IReportDataProvider provider)
-    {
-        try
-        {
-            var data = await _queryDispatcher.DispatchAsync(new GetBtcDenominatedMetricsQuery
-            {
-                From = DateOnly.FromDateTime(FilterRange.Start),
-                To = DateOnly.FromDateTime(FilterRange.End),
-                CategoryIds = GetSelectedAnalyticsCategoryIds(),
-                AccountIds = SelectedAccounts.Select(x => x.Id.ToString()).ToArray()
-            });
-
-            await RunOnUiThread(() =>
-            {
-                StackVelocityChartData.RefreshChart(data);
-                IsStackVelocityEmpty = data.Months.Count == 0;
-                IsStackVelocityError = false;
-                IsStackVelocityLoading = false;
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error fetching stack velocity");
-            await RunOnUiThread(() =>
-            {
                 IsStackVelocityEmpty = false;
                 IsStackVelocityError = true;
                 IsStackVelocityLoading = false;
