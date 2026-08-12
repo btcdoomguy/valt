@@ -23,9 +23,9 @@ affects:
 - v0.7 milestone close
 
 actuals:
-  tokens: 1850
+  tokens: 1900
   tasks: 2
-  commits: 1
+  commits: 2
 
 tech-stack:
   added: []
@@ -93,7 +93,7 @@ No source-code changes were required for this verification plan. The task work w
 1. **Task 1: Run the full test suite and fix Phase 43 regressions** - no commit (verification passed, no code changes)
 2. **Task 2: Human end-to-end verification of all new Reports tab panels** - no commit (human sign-off received)
 
-**Plan metadata:** pending
+**Plan metadata:** `6884302` (docs: complete verification plan and mark Phase 43 / v0.7 milestone finished)
 
 ## Files Created/Modified
 
@@ -134,4 +134,9 @@ None - no external service configuration required.
 *Phase: 43-mcp-localization-documentation-verification*
 *Completed: 2026-08-12*
 
-## Self-Check: PENDING
+## Self-Check: PASSED
+
+- [x] `43-05-SUMMARY.md` exists at `.planning/phases/43-mcp-localization-documentation-verification/43-05-SUMMARY.md`
+- [x] Plan metadata commit `6884302` found in git history
+- [x] `.planning/STATE.md` updated to show Phase 43 complete and 22/22 plans finished
+- [x] `.planning/ROADMAP.md` updated to mark Phase 43 and v0.7 milestone complete
