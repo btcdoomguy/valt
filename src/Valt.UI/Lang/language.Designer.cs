@@ -5990,5 +5990,59 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports_ByCategories_Description", resourceCulture);
             }
         }
+        
+        public static string Reports_LoanReports_Title {
+            get {
+                return ResourceManager.GetString("Reports_LoanReports_Title", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LoanReports_CostDescription {
+            get {
+                return ResourceManager.GetString("Reports_LoanReports_CostDescription", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LoanReports_DistanceDescription {
+            get {
+                return ResourceManager.GetString("Reports_LoanReports_DistanceDescription", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LoanReports_EmptyHeading {
+            get {
+                return ResourceManager.GetString("Reports_LoanReports_EmptyHeading", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LoanReports_EmptyBody {
+            get {
+                return ResourceManager.GetString("Reports_LoanReports_EmptyBody", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LoanReports_ErrorTitle {
+            get {
+                return ResourceManager.GetString("Reports_LoanReports_ErrorTitle", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LoanReports_ErrorBody {
+            get {
+                return ResourceManager.GetString("Reports_LoanReports_ErrorBody", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LoanReports_CostSeries {
+            get {
+                return ResourceManager.GetString("Reports_LoanReports_CostSeries", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LoanReports_DistanceSeries {
+            get {
+                return ResourceManager.GetString("Reports_LoanReports_DistanceSeries", resourceCulture);
+            }
+        }
     }
 }

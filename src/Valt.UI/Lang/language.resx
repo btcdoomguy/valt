@@ -3051,4 +3051,31 @@
     <data name="Reports_ByCategories_Description" xml:space="preserve">
         <value>Breaks down your income and expenses by category for the selected period. Use the filters to include or exclude specific accounts and categories.</value>
     </data>
+    <data name="Reports_LoanReports_Title" xml:space="preserve">
+        <value>Loans &amp; Leverage Reports</value>
+    </data>
+    <data name="Reports_LoanReports_CostDescription" xml:space="preserve">
+        <value>Total interest and fees paid on your BTC-backed loans, month by month.</value>
+    </data>
+    <data name="Reports_LoanReports_DistanceDescription" xml:space="preserve">
+        <value>How close your riskiest active loan is to liquidation, in LTV percentage points.</value>
+    </data>
+    <data name="Reports_LoanReports_EmptyHeading" xml:space="preserve">
+        <value>No active BTC-backed loans</value>
+    </data>
+    <data name="Reports_LoanReports_EmptyBody" xml:space="preserve">
+        <value>Add a BTC-backed loan in the Assets tab to see interest, fees, and liquidation risk over time.</value>
+    </data>
+    <data name="Reports_LoanReports_ErrorTitle" xml:space="preserve">
+        <value>Could not load loan reports</value>
+    </data>
+    <data name="Reports_LoanReports_ErrorBody" xml:space="preserve">
+        <value>Check your data file or try again. If the problem persists, restart the app.</value>
+    </data>
+    <data name="Reports_LoanReports_CostSeries" xml:space="preserve">
+        <value>Interest + fees</value>
+    </data>
+    <data name="Reports_LoanReports_DistanceSeries" xml:space="preserve">
+        <value>Closest to liquidation</value>
+    </data>
 </root>
