@@ -131,7 +131,7 @@ public class BtcDenominatedMetricsQueries : IBtcDenominatedMetricsQueries
                 Month = month,
                 SatsEarned = aggregation.SatsEarned,
                 SatsSpent = aggregation.SatsSpent,
-                StackVelocity = aggregation.SatsEarned - aggregation.SatsSpent + aggregation.BtcPurchases - aggregation.BtcSales
+                StackVelocity = aggregation.SatsEarned + aggregation.SatsSpent + aggregation.BtcPurchases + aggregation.BtcSales
             });
         }
 

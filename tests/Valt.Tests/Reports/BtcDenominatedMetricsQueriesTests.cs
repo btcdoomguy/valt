@@ -91,7 +91,7 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
             Assert.That(monthData, Is.Not.Null);
             Assert.That(monthData!.SatsEarned, Is.GreaterThan(0));
             Assert.That(monthData.SatsSpent, Is.LessThan(0));
-            Assert.That(monthData.StackVelocity, Is.EqualTo(monthData.SatsEarned - monthData.SatsSpent));
+            Assert.That(monthData.StackVelocity, Is.EqualTo(monthData.SatsEarned + monthData.SatsSpent));
         }
     }
 
@@ -155,8 +155,8 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
         var result = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31));
         var monthData = GetMonthData(result, month);
 
-        // velocity = 0 - 0 + 100000 - (-50000) = 150000
-        Assert.That(monthData!.StackVelocity, Is.EqualTo(150000L));
+        // velocity = 0 + 0 + 100000 + (-50000) = 50000
+        Assert.That(monthData!.StackVelocity, Is.EqualTo(50000L));
     }
 
     [Test]
