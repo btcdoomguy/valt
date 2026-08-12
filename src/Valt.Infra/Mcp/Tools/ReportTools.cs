@@ -1,6 +1,10 @@
 using System.ComponentModel;
 using ModelContextProtocol.Server;
 using Valt.App.Kernel.Queries;
+using Valt.App.Modules.BtcDenominatedMetrics.DTOs;
+using Valt.App.Modules.BtcDenominatedMetrics.Queries;
+using Valt.App.Modules.LoanReports.DTOs;
+using Valt.App.Modules.LoanReports.Queries;
 using Valt.App.Modules.SpendingAnalytics.DTOs;
 using Valt.App.Modules.SpendingAnalytics.Queries;
 using Valt.Core.Common;
@@ -353,9 +357,132 @@ public class ReportTools
         return ids.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Select(id => new CategoryId(id));
     }
-}
 
-#region DTOs
+    [McpServerTool, Description("Get BTC-denominated metrics including sats earned, sats spent, and stack velocity per month over a date range")]
+    public static async Task<BtcDenominatedMetricsResultDto> GetBtcDenominatedMetrics(
+        IQueryDispatcher dispatcher,
+        [Description("Start date of the range (format: yyyy-MM-dd)")] string startDate,
+        [Description("End date of the range (format: yyyy-MM-dd)")] string endDate,
+        [Description("Currency code (e.g., 'USD', 'BRL')")] string currencyCode,
+        [Description("Optional filter by account IDs (comma-separated)")] string? accountIds = null,
+        [Description("Optional filter by category IDs (comma-separated)")] string? categoryIds = null)
+    {
+        var from = DateOnly.Parse(startDate);
+        var to = DateOnly.Parse(endDate);
+        _ = FiatCurrency.GetFromCode(currencyCode);
+
+        var data = await dispatcher.DispatchAsync(new GetBtcDenominatedMetricsQuery
+        {
+            From = from,
+            To = to,
+            AccountIds = ParseOptionalIds(accountIds),
+            CategoryIds = ParseOptionalIds(categoryIds)
+        });
+
+        return new BtcDenominatedMetricsResultDto
+        {
+            PrimaryCurrency = data.PrimaryCurrency,
+            IsEmpty = data.Months.Count == 0,
+            Months = data.Months.Select(m => new BtcDenominatedMetricsMonthResultDto
+            {
+                Month = m.Month.ToString("yyyy-MM-dd"),
+                SatsEarned = m.SatsEarned,
+                SatsSpent = m.SatsSpent,
+                StackVelocity = m.StackVelocity
+            }).ToList()
+        };
+    }
+
+    /// <summary>
+    /// Gets loan reports including monthly interest, fees, and liquidation-price distance trends.
+    /// </summary>
+    [McpServerTool, Description("Get loan reports including monthly interest/fees and liquidation-price distance trends over a date range")]
+    public static async Task<LoanReportsResultDto> GetLoanReports(
+        IQueryDispatcher dispatcher,
+        [Description("Start date of the range (format: yyyy-MM-dd)")] string startDate,
+        [Description("End date of the range (format: yyyy-MM-dd)")] string endDate,
+        [Description("Currency code (e.g., 'USD', 'BRL')")] string currencyCode,
+        [Description("Optional custom BTC price in USD to use for liquidation-distance calculations")] decimal? customBtcPriceUsd = null)
+    {
+        var from = DateOnly.Parse(startDate);
+        var to = DateOnly.Parse(endDate);
+        _ = FiatCurrency.GetFromCode(currencyCode);
+
+        var data = await dispatcher.DispatchAsync(new GetLoanReportsQuery
+        {
+            From = from,
+            To = to,
+            CustomBtcPriceUsd = customBtcPriceUsd
+        });
+
+        return new LoanReportsResultDto
+        {
+            PrimaryCurrency = data.PrimaryCurrency,
+            HasActiveLoans = data.HasActiveLoans,
+            CostMonths = data.CostMonths.Select(m => new LoanCostMonthResultDto
+            {
+                Month = m.Month.ToString("yyyy-MM-dd"),
+                CombinedCost = m.CombinedCost,
+                Interest = m.Interest,
+                Fees = m.Fees
+            }).ToList(),
+            DistanceMonths = data.DistanceMonths.Select(m => new LiquidationDistanceMonthResultDto
+            {
+                Month = m.Month.ToString("yyyy-MM-dd"),
+                DistanceToLiquidation = m.DistanceToLiquidation,
+                ClosestLoanName = m.ClosestLoanName
+            }).ToList()
+        };
+    }
+
+    /// <summary>
+    /// Gets wealth-performance metrics: days under water via the all-time-high report
+    /// and a monthly wealth-overview series.
+    /// </summary>
+    /// <remarks>
+    /// v0.7 scope note: net-worth CAGR, fiat vs BTC allocation percentage, and best/worst
+    /// months are not implemented in the shipped codebase and are intentionally omitted.
+    /// </remarks>
+    [McpServerTool, Description("Get wealth performance metrics including days under water (ATH) and monthly wealth overview")]
+    public static async Task<WealthPerformanceMetricsResultDto> GetWealthPerformanceMetrics(
+        IReportDataProviderFactory providerFactory,
+        IAllTimeHighReport allTimeHighReport,
+        IWealthOverviewReport wealthOverviewReport,
+        [Description("Currency code (e.g., 'USD', 'BRL')")] string currencyCode,
+        [Description("Maximum number of wealth-overview data points (default: 12)")] int maxDataPoints = 12)
+    {
+        var provider = await providerFactory.CreateAsync();
+        var currency = FiatCurrency.GetFromCode(currencyCode);
+
+        var allTimeHigh = await allTimeHighReport.GetAsync(currency, provider);
+        var wealthOverview = await wealthOverviewReport.GetAsync(WealthOverviewPeriod.Monthly, currency, provider, maxDataPoints);
+
+        return new WealthPerformanceMetricsResultDto
+        {
+            Currency = currencyCode,
+            AllTimeHigh = new AllTimeHighSectionDto
+            {
+                DaysUnderWater = allTimeHigh.DaysUnderWater,
+                AthValue = allTimeHigh.Value.Value,
+                AthDate = allTimeHigh.Date.ToString("yyyy-MM-dd"),
+                DeclineFromAthPercent = allTimeHigh.DeclineFromAth
+            },
+            WealthOverview = new WealthOverviewSectionDto
+            {
+                Currency = wealthOverview.MainCurrency.Code,
+                Period = wealthOverview.Period.ToString(),
+                Items = wealthOverview.Items.Select(i => new WealthOverviewItemResultDto
+                {
+                    PeriodEnd = i.PeriodEnd.ToString("yyyy-MM-dd"),
+                    Label = i.Label,
+                    FiatTotal = i.FiatTotal,
+                    BtcTotal = i.BtcTotal
+                }).ToList()
+            }
+        };
+    }
+
+    #region DTOs
 
 public class SpendingAnalyticsResultDto
 {
@@ -489,4 +616,73 @@ public class StatisticsResultDto
     public decimal? MedianMonthlyExpensesSatsEvolutionPercent { get; init; }
 }
 
+public class BtcDenominatedMetricsResultDto
+{
+    public required string PrimaryCurrency { get; init; }
+    public required bool IsEmpty { get; init; }
+    public required IReadOnlyList<BtcDenominatedMetricsMonthResultDto> Months { get; init; }
+}
+
+public class BtcDenominatedMetricsMonthResultDto
+{
+    public required string Month { get; init; }
+    public required long SatsEarned { get; init; }
+    public required long SatsSpent { get; init; }
+    public required long StackVelocity { get; init; }
+}
+
+public class LoanReportsResultDto
+{
+    public required string PrimaryCurrency { get; init; }
+    public required bool HasActiveLoans { get; init; }
+    public required IReadOnlyList<LoanCostMonthResultDto> CostMonths { get; init; }
+    public required IReadOnlyList<LiquidationDistanceMonthResultDto> DistanceMonths { get; init; }
+}
+
+public class LoanCostMonthResultDto
+{
+    public required string Month { get; init; }
+    public required decimal CombinedCost { get; init; }
+    public required decimal Interest { get; init; }
+    public required decimal Fees { get; init; }
+}
+
+public class LiquidationDistanceMonthResultDto
+{
+    public required string Month { get; init; }
+    public required decimal DistanceToLiquidation { get; init; }
+    public required string ClosestLoanName { get; init; }
+}
+
+public class WealthPerformanceMetricsResultDto
+{
+    public required string Currency { get; init; }
+    public required AllTimeHighSectionDto AllTimeHigh { get; init; }
+    public required WealthOverviewSectionDto WealthOverview { get; init; }
+}
+
+public class AllTimeHighSectionDto
+{
+    public required int DaysUnderWater { get; init; }
+    public required decimal AthValue { get; init; }
+    public required string AthDate { get; init; }
+    public required decimal DeclineFromAthPercent { get; init; }
+}
+
+public class WealthOverviewSectionDto
+{
+    public required string Currency { get; init; }
+    public required string Period { get; init; }
+    public required IReadOnlyList<WealthOverviewItemResultDto> Items { get; init; }
+}
+
+public class WealthOverviewItemResultDto
+{
+    public required string PeriodEnd { get; init; }
+    public required string Label { get; init; }
+    public required decimal FiatTotal { get; init; }
+    public required decimal BtcTotal { get; init; }
+}
+
 #endregion
+}
