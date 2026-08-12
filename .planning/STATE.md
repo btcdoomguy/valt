@@ -5,15 +5,15 @@ milestone_name: Insights & Metrics Expansion
 current_phase: 43
 current_phase_name: mcp-localization-documentation-verification
 status: executing
-stopped_at: Completed 43-01-PLAN.md
-last_updated: "2026-08-12T18:50:56.604Z"
+stopped_at: Completed 43-02-PLAN.md
+last_updated: "2026-08-12T19:12:48.761Z"
 last_activity: 2026-08-12
-last_activity_desc: Phase 42 marked complete
+last_activity_desc: Completed 43-02 plan
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 22
-  completed_plans: 18
+  completed_plans: 19
   percent: 80
 ---
 
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-08-06)
 ## Current Position
 
 Phase: 43 (mcp-localization-documentation-verification) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
-Last activity: 2026-08-12 — Phase 43 execution started
+Last activity: 2026-08-12 — Completed 43-02 plan
 
 ## Performance Metrics
 
@@ -105,6 +105,8 @@ Last activity: 2026-08-12 — Phase 43 execution started
 | Phase 42 P03 | 50 | 2 tasks | 2 files |
 | Phase 42 P04 | 5min | 2 tasks | 2 files |
 | Phase 43 P01 | 18min | 3 tasks | 6 files |
+| Phase 43 P02 | 16min | 2 tasks | 2 files |
+| Phase 43-mcp-localization-documentation-verification P02 | 16min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -182,6 +184,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Added discovered Phase 42 loan-report strings to pt-BR/es while localizing Phase 39 to keep all three language files in sync.
 - [Phase ?]: Did not regenerate language.Designer.cs because the added keys were already exposed by existing static properties.
 - [Phase ?]: Omitted savings-rate from the MCP tool because no GetSavingsRateQuery exists in the shipped v0.7 codebase.
+- [Phase ?]: [Phase 43-02]: Omitted unimplemented v0.7 wealth-performance metrics (CAGR, fiat-vs-BTC allocation, best/worst months) from the MCP surface and documented the limitation in the XML doc and integration test.
+- [Phase ?]: [Phase 43-02]: Made SeedPriceData idempotent in ReportToolsTests so multiple MCP report integration tests can share the same IntegrationTest fixture without duplicate-date LiteDB exceptions.
 
 ### Pending Todos
 
@@ -225,8 +229,8 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-08-12T18:50:34.730Z
-Stopped at: Completed 43-01-PLAN.md
+Last session: 2026-08-12T19:12:48.749Z
+Stopped at: Completed 43-02-PLAN.md
 Resume file: None
 
 ## Notes
