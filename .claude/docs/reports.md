@@ -329,6 +329,72 @@ LoanReportsResultDto
     Month, DistanceToLiquidation, ClosestLoanName
 ```
 
+## Wealth Performance
+
+v0.7 exposes wealth-performance metrics through existing AllTimeHigh and WealthOverview reports, plus the new "days under water" metric on the All Time High dashboard panel.
+
+### Reused Reports
+
+**`IAllTimeHighReport`** → `AllTimeHighData`
+
+Tracks the portfolio's all-time-high wealth value and related drawdown metrics. In v0.7 the data object was extended with:
+
+- `DaysUnderWater` (`int`) — number of whole days between the report end date (yesterday) and the ATH date. Zero when the ATH occurred yesterday; positive otherwise.
+- `MaxDrawdownDate` / `MaxDrawdownPercent` — the deepest drawdown from ATH and when it occurred.
+
+**`IWealthOverviewReport`** → `WealthOverviewData`
+
+Returns total wealth over time in fiat and BTC for a selected period (daily, weekly, monthly, yearly). Each item contains:
+
+- `PeriodEnd` (`DateOnly`) — end of the period.
+- `Label` (`string`) — human-readable period label.
+- `FiatTotal` (`decimal`) — total wealth in the main fiat currency.
+- `BtcTotal` (`decimal`) — total wealth in BTC.
+
+### UI Layer
+
+**All Time High dashboard panel**
+
+- Implemented v0.7 metric: `Reports_AllTimeHigh_DaysUnderWater` row added to the existing All Time High dashboard panel (`ReportsViewModel.FetchAllTimeHighDataAsync`).
+- The row displays the number of days since the portfolio's all-time high.
+
+**Wealth Overview chart**
+
+- Existing `WealthOverviewChartData` continues to render the wealth-over-time series; no new v0.7 chart was added for this category.
+
+### Deferred Metrics
+
+The following wealth-performance metrics are **not implemented** in the shipped v0.7 codebase and belong to the v2 backlog:
+
+- **WLT-01** — Net worth CAGR / compound growth in fiat and BTC terms.
+- **WLT-02** — Fiat vs BTC allocation percentage over time.
+- **WLT-03** — Best and worst months ranked by wealth delta.
+
+> These metrics are intentionally omitted from the MCP tool surface and the Reports tab UI until they are implemented.
+
+### MCP Tool
+
+**`ReportTools.GetWealthPerformanceMetrics`** (`src/Valt.Infra/Mcp/Tools/ReportTools.cs`)
+
+Returns a combined `WealthPerformanceMetricsResultDto` with nested `AllTimeHigh` and `WealthOverview` sections. It reuses the existing reports rather than introducing new queries.
+
+Parameters:
+
+- `currencyCode` (`string`) — main fiat currency code.
+- `maxDataPoints` (`int`, default: 12) — number of wealth-overview items to return.
+
+Result structure:
+
+```csharp
+WealthPerformanceMetricsResultDto
+  Currency: string
+  AllTimeHigh: AllTimeHighSectionDto
+    DaysUnderWater, AthValue, AthDate, DeclineFromAthPercent
+  WealthOverview: WealthOverviewSectionDto
+    Currency, Period, Items: WealthOverviewItemResultDto[]
+      PeriodEnd, Label, FiatTotal, BtcTotal
+```
+
 ## UI Layer (Valt.UI/Views/Main/Tabs/Reports/)
 
 ### ReportsViewModel
@@ -435,6 +501,24 @@ src/Valt.App/Modules/SpendingAnalytics/
     ├── IBurnRateQueries.cs
     └── IFixedVsVariableQueries.cs
 
+src/Valt.App/Modules/BtcDenominatedMetrics/
+├── Queries/
+│   ├── GetBtcDenominatedMetricsQuery.cs
+│   └── GetBtcDenominatedMetricsHandler.cs
+├── DTOs/
+│   └── BtcDenominatedMetricsDataDto.cs
+└── Contracts/
+    └── IBtcDenominatedMetricsQueries.cs
+
+src/Valt.App/Modules/LoanReports/
+├── Queries/
+│   ├── GetLoanReportsQuery.cs
+│   └── GetLoanReportsHandler.cs
+├── DTOs/
+│   └── LoanReportsDataDto.cs
+└── Contracts/
+    └── ILoanReportsQueries.cs
+
 src/Valt.Infra/Modules/Reports/
 ├── IReportDataProvider.cs
 ├── ReportDataProvider.cs (+ Factory)
@@ -463,6 +547,10 @@ src/Valt.UI/Views/Main/Tabs/Reports/
 ├── MonthlyTotalsChartData.cs
 ├── ExpensesByCategoryChartData.cs
 ├── FixedVsVariableChartData.cs
+├── BtcDenominatedMetricsChartData.cs
+├── StackVelocityChartData.cs
+├── LoanCostChartData.cs
+├── LiquidationDistanceChartData.cs
 ├── Panels/
 │   └── BurnRatePanelViewModel.cs
 └── Models/
