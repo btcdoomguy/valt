@@ -1,20 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v0.7
-milestone_name: Insights & Metrics Expansion
-current_phase: 43
-current_phase_name: mcp-localization-documentation-verification
-status: complete
-stopped_at: Completed 43-05-PLAN.md
-last_updated: "2026-08-12T20:00:00.000Z"
-last_activity: 2026-08-12
-last_activity_desc: Completed 43-05 plan
+milestone: v0.8
+milestone_name: BTC Loan Simulator
+status: planning
+last_updated: "2026-08-13T14:42:44.782Z"
+last_activity: 2026-08-13
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 22
-  completed_plans: 22
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # STATE.md
@@ -28,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-08-06)
 
 ## Current Position
 
-Phase: 43 (mcp-localization-documentation-verification) — COMPLETE
-Plan: 5 of 5
-Status: Phase complete — v0.7 milestone ready to close
-Last activity: 2026-08-12 — Completed 43-05 plan
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-08-13 — Milestone v0.8 started
 
 ## Performance Metrics
 

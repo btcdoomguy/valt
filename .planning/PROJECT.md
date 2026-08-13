@@ -66,6 +66,11 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - [ ] v0.7 Insights & Metrics Expansion — savings rate, burn rate, fixed vs variable ratio
 - [ ] v0.7 Insights & Metrics Expansion — net worth CAGR, fiat vs BTC allocation %, best/worst months, days under water
 - [ ] v0.7 Insights & Metrics Expansion — interest/fees paid (total + monthly), liquidation-price distance trend
+- [ ] v0.8 BTC Loan Simulator — input loan parameters (collateral BTC, amount taken, liquidation LTV, start/end dates, interest rate, fees)
+- [ ] v0.8 BTC Loan Simulator — simple or compound interest mode selection
+- [ ] v0.8 BTC Loan Simulator — results panel with total to repay, interest/fees breakdown, fiat and sats values
+- [ ] v0.8 BTC Loan Simulator — cost-over-time schedule until end date
+- [ ] v0.8 BTC Loan Simulator — load existing BTC-backed loan from Assets to prefill fields
 
 ## Out of Scope
 
@@ -83,19 +88,19 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - **v0.6 milestone complete** — 7 of 7 phases, 17 of 17 plans, 42 tasks.
 - **Phase 41 (WLT-04) complete** — asset-aware All Time High report with active net-worth assets and a "days under water" row in the existing ATH dashboard panel.
 
-## Current Milestone: v0.7 Insights & Metrics Expansion
+## Current Milestone: v0.8 BTC Loan Simulator
 
-**Goal:** Extend the Reports tab with new analytics derived from existing data — spending behavior, BTC-denominated flows, wealth performance, and loan costs.
+**Goal:** Add a BTC Loan Simulator tool — a what-if calculator for BTC-backed loans, mirroring the Leverage Simulator layout (inputs left, results right).
 
 **Target features:**
-- Spending analytics: savings rate, burn rate, fixed vs variable expense ratio
-- BTC-denominated metrics: sats earned/month, sats spent (month + per category), stack velocity
-- Wealth & performance: net worth CAGR, fiat vs BTC allocation %, best/worst months, days under water
-- Loans & leverage: interest/fees paid (total + monthly), liquidation-price distance trend
+- Loan inputs: collateral (BTC), amount taken, liquidation LTV, start date, interest rate, fees, end date
+- Interest mode selection: simple or compound
+- Results: total to repay (principal + interest + fees), interest/fees breakdown, in fiat and sats
+- Cost-over-time schedule showing how the debt accrues until the end date
+- Load an existing BTC-backed loan from Assets to prefill the simulator
 
 ## Next Milestone Goals
 
-- **v0.7 — Insights & Metrics Expansion** (defined 2026-08-04, phases 39+)
 - Future candidate: address the v0.4 quality/hardening deferred items (async void cleanup, HttpClient factory centralization, background job throttling, LiteDB index centralization, god-VM refactor, live-API test isolation, handler unit tests).
 - Deferred v0.7 candidates (v2): spending patterns heatmap, top-N expenses, category trend lines, hindsight cost, DCA consistency, rolling averages, debt-to-wealth ratio, goal forecasting, cost-basis/profit reports, account analytics.
 
@@ -157,4 +162,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-06 after Phase 40*
+*Last updated: 2026-08-13 after milestone v0.8 start*
