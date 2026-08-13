@@ -404,6 +404,37 @@ public class LoanReportsQueriesTests : DatabaseTest
     }
 
     [Test]
+    public async Task Should_Accrue_Interest_For_Days_Before_MidMonth_Snapshot_Transition()
+    {
+        var asset = AssetBuilder.ABtcLoan(
+                platformName: "Test",
+                collateralSats: 100_000_000,
+                loanAmount: 50_000m,
+                currentBtcPrice: 100_000m)
+            .WithBtcLoanDetails(
+                apr: 0.12m,
+                liquidationLtv: 80m,
+                marginCallLtv: 70m,
+                fees: 0m,
+                status: LoanStatus.Active)
+            .WithSnapshot(new DateOnly(2025, 1, 10), totalBorrowed: 50_000m)
+            .WithSnapshot(new DateOnly(2025, 2, 10), totalBorrowed: 60_000m)
+            .Build();
+
+        await _assetRepository.SaveAsync(asset);
+
+        var result = await ExecuteQuery(new DateOnly(2025, 2, 1), new DateOnly(2025, 2, 28), new DateTime(2025, 2, 28));
+
+        var february = result.CostMonths.Single(m => m.Month == new DateOnly(2025, 2, 1));
+        // Feb 1-9 (9 days) under the 50k snapshot + Feb 10-28 (19 days) under the 60k snapshot
+        var earlySegment = Math.Round(50_000m * 0.12m / 365m * 9m, 2);
+        var lateSegment = Math.Round(60_000m * 0.12m / 365m * 19m, 2);
+        var expectedInterest = Math.Round((earlySegment + lateSegment) * 5.5m, 2);
+
+        Assert.That(february.Interest, Is.EqualTo(expectedInterest));
+    }
+
+    [Test]
     public async Task Should_Not_Compound_Monthly_Cost_For_Multiple_Mixed_Currency_Loans()
     {
         // BRL loan is first alphabetically; the old implementation would re-convert

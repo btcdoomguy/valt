@@ -85,20 +85,33 @@ public class LoanReportsQueries : ILoanReportsQueries
                 if (effectiveSnapshot is null || effectiveSnapshot.StatusId != (int)LoanStatus.Active)
                     continue;
 
-                var nextSnapshot = loanTimeline.GetNextSnapshot(effectiveSnapshot.EffectiveDate);
-
-                // Interest accrual for the month, capped by next snapshot and today
-                var accrualStart = effectiveSnapshot.EffectiveDate > month
-                    ? effectiveSnapshot.EffectiveDate
-                    : month;
-                var accrualEndCandidate = nextSnapshot?.EffectiveDate ?? monthEnd;
-                var accrualEnd = accrualEndCandidate < effectiveToday ? accrualEndCandidate : effectiveToday;
-
+                // Interest accrual for the month across every snapshot segment that covers
+                // part of the month, capped by today. Each segment spans
+                // [snapshot.EffectiveDate, nextSnapshot.EffectiveDate - 1], so boundary days
+                // are never double-counted and days before a mid-month balance change are
+                // accrued under the previous snapshot's terms.
                 var loanInterest = 0m;
-                if (accrualEnd >= accrualStart && !effectiveSnapshot.FixedTotalDebt.HasValue)
+                for (var i = 0; i < loanTimeline.Snapshots.Count; i++)
                 {
-                    var days = accrualEnd.DayNumber - accrualStart.DayNumber + 1;
-                    loanInterest = Math.Round(effectiveSnapshot.TotalBorrowed * effectiveSnapshot.Apr / 365 * days, 2);
+                    var segmentSnapshot = loanTimeline.Snapshots[i];
+                    if (segmentSnapshot.StatusId != (int)LoanStatus.Active || segmentSnapshot.FixedTotalDebt.HasValue)
+                        continue;
+
+                    var segmentEnd = i + 1 < loanTimeline.Snapshots.Count
+                        ? loanTimeline.Snapshots[i + 1].EffectiveDate.AddDays(-1)
+                        : DateOnly.MaxValue;
+
+                    var accrualStart = segmentSnapshot.EffectiveDate > month
+                        ? segmentSnapshot.EffectiveDate
+                        : month;
+                    var accrualEndCandidate = segmentEnd < monthEnd ? segmentEnd : monthEnd;
+                    var accrualEnd = accrualEndCandidate < effectiveToday ? accrualEndCandidate : effectiveToday;
+
+                    if (accrualEnd >= accrualStart)
+                    {
+                        var days = accrualEnd.DayNumber - accrualStart.DayNumber + 1;
+                        loanInterest += Math.Round(segmentSnapshot.TotalBorrowed * segmentSnapshot.Apr / 365 * days, 2);
+                    }
                 }
 
                 // Fees from all snapshots effective inside this month (only if loan active at month-end)
@@ -243,11 +256,6 @@ public class LoanReportsQueries : ILoanReportsQueries
         public LoanStateSnapshotDTO? GetEffectiveSnapshot(DateOnly asOfDate)
         {
             return Snapshots.LastOrDefault(s => s.EffectiveDate <= asOfDate);
-        }
-
-        public LoanStateSnapshotDTO? GetNextSnapshot(DateOnly afterDate)
-        {
-            return Snapshots.FirstOrDefault(s => s.EffectiveDate > afterDate);
         }
     }
 }
