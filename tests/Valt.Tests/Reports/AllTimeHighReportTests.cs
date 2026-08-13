@@ -93,32 +93,8 @@ public class AllTimeHighReportTests : DatabaseTest
         _localDatabase.GetAccounts().Insert(_eurAccount);
 
         //feed some fake rates
-
-        var initialDate = new DateTime(2025, 01, 01);
-        var finalDate = new DateTime(2025, 12, 31);
-        var currentDate = initialDate;
-        while (currentDate <= finalDate)
-        {
-            _priceDatabase.GetBitcoinData().Insert(new BitcoinDataEntity()
-            {
-                Date = currentDate,
-                Price = 100000m
-            });
-            _priceDatabase.GetFiatData().Insert(new FiatDataEntity()
-            {
-                Date = currentDate,
-                Currency = FiatCurrency.Brl.Code,
-                Price = 5.5m
-            });
-            _priceDatabase.GetFiatData().Insert(new FiatDataEntity()
-            {
-                Date = currentDate,
-                Currency = FiatCurrency.Eur.Code,
-                Price = 0.75m
-            });
-
-            currentDate = currentDate.AddDays(1);
-        }
+        PriceDataBuilder.SeedRange(_priceDatabase, new DateTime(2025, 1, 1), new DateTime(2025, 12, 31), 100000m,
+            (FiatCurrency.Brl.Code, 5.5m), (FiatCurrency.Eur.Code, 0.75m));
 
         return base.SeedDatabase();
     }

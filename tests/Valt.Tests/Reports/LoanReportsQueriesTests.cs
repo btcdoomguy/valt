@@ -44,16 +44,8 @@ public class LoanReportsQueriesTests : DatabaseTest
 
         await _transactionRepository.SaveTransactionAsync(transaction);
 
-        var initialDate = new DateTime(2024, 01, 01);
-        var finalDate = new DateTime(2025, 12, 31);
-        var currentDate = initialDate;
-        while (currentDate <= finalDate)
-        {
-            _priceDatabase.GetBitcoinData().Insert(new BitcoinDataEntity() { Date = currentDate, Price = 100000m });
-            _priceDatabase.GetFiatData().Insert(new FiatDataEntity() { Date = currentDate, Currency = FiatCurrency.Brl.Code, Price = 5.5m });
-            _priceDatabase.GetFiatData().Insert(new FiatDataEntity() { Date = currentDate, Currency = FiatCurrency.Usd.Code, Price = 1m });
-            currentDate = currentDate.AddDays(1);
-        }
+        PriceDataBuilder.SeedRange(_priceDatabase, new DateTime(2024, 1, 1), new DateTime(2025, 12, 31), 100000m,
+            (FiatCurrency.Brl.Code, 5.5m), (FiatCurrency.Usd.Code, 1m));
 
         await base.SeedDatabase();
     }
