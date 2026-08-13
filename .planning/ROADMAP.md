@@ -5,6 +5,7 @@
 - ✅ **v0.5 Asset Sold History** — Phases 29-31 (shipped 2026-07-14)
 - ✅ **v0.6 Documentation Site Refresh** — Phases 32-38 (shipped 2026-07-17)
 - ✅ **v0.7 Insights & Metrics Expansion** — Phases 39-43 (completed 2026-08-12)
+- 🚧 **v0.8 BTC Loan Simulator** — Phases 44-48 (in progress)
 
 ## Phases
 
@@ -39,6 +40,14 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 - [x] **Phase 41: Wealth & Performance Reports & UI** — Net worth CAGR, fiat vs BTC allocation, best/worst months, days under water (completed 2026-08-10)
 - [x] **Phase 42: Loans & Leverage Reports & UI** — Interest/fees paid and liquidation-price distance trend
 - [x] **Phase 43: MCP, Localization, Documentation & Verification** — Tool exposure, 3-language strings, module docs, end-to-end sign-off — completed 2026-08-12
+
+### 🚧 v0.8 BTC Loan Simulator (Phases 44-48) — IN PROGRESS
+
+- [ ] **Phase 44: Core Loan Simulation Calculator** — Pure static interest engine in Valt.Core with act/365 parity against BtcLoanDetails
+- [ ] **Phase 45: Simulator Modal UI (Inputs + Results Panel)** — LoanSimulator modal mirroring the Leverage Simulator with live recalc and fiat+sats results
+- [ ] **Phase 46: Cost-Over-Time Schedule** — Monthly schedule rows (fiat + sats) accruing until the end date
+- [ ] **Phase 47: Prefill from Existing BTC Loan Asset** — Load an existing BTC-backed loan from Assets with a New Simulation sentinel
+- [ ] **Phase 48: MCP, Localization, Documentation & Verification** — simulate_btc_loan tool, 3-language strings, module docs, end-to-end sign-off
 
 ## Phase Details
 
@@ -182,6 +191,82 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 - [x] 43-04-PLAN.md — Complete reports.md documentation for all v0.7 categories
 - [x] 43-05-PLAN.md — Full test suite green + end-to-end UI verification
 
+### Phase 44: Core Loan Simulation Calculator
+
+**Goal**: A pure, fully-tested interest engine exists in Valt.Core that produces numbers identical to the app's tracked-loan math
+**Depends on**: Nothing (first v0.8 phase)
+**Requirements**: SIM-03, SIM-04
+**Success Criteria** (what must be TRUE):
+
+  1. `BtcLoanSimulationCalculator` computes total to repay (principal + interest + fees) and an interest/fees breakdown for both simple and compound interest modes
+  2. Simple-interest mode matches `BtcLoanDetails.CalculateAccruedInterest()` byte-for-byte (act/365, decimal, 2dp rounding), proven by a parity test
+  3. Compound-interest mode accrues on an explicitly documented frequency, with totals that exactly equal the sum of generated schedule rows
+  4. The calculator derives the liquidation BTC price from liquidation LTV and total debt, and the effective fee-inclusive APR
+  5. Edge cases (end ≤ start date, same-day loan, leap-year spans) are covered by unit tests with no database or DI required
+
+**Plans**: TBD
+
+### Phase 45: Simulator Modal UI (Inputs + Results Panel)
+
+**Goal**: Users can open the BTC Loan Simulator from the Tools menu, enter loan parameters, and immediately see the full cost and risk picture in fiat and sats
+**Depends on**: Phase 44
+**Requirements**: SIM-01, SIM-02, SIM-05, SIM-06, SIM-07, SIM-08, SIM-09
+**Success Criteria** (what must be TRUE):
+
+  1. User can open the Loan Simulator modal from the Tools menu and input collateral (BTC), amount taken, liquidation LTV, start date, interest rate, fees, and end date, choosing simple or compound interest mode
+  2. Results recalculate live as any input changes, mirroring the Leverage Simulator behavior
+  3. User can view total to repay (principal + interest + fees) with an interest/fees breakdown, plus the liquidation BTC price and the effective fee-inclusive APR
+  4. User can view all result values in fiat and sats, converted at the current live BTC price from `RatesState`, with a visible conversion-basis label (sats hidden when no price is available)
+  5. User can view distance to liquidation versus the current live BTC price, and switch the display currency via the selector
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 46: Cost-Over-Time Schedule
+
+**Goal**: Users can see how the simulated debt accrues month by month until the end date
+**Depends on**: Phase 44, Phase 45
+**Requirements**: SIM-10
+**Success Criteria** (what must be TRUE):
+
+  1. User can view a monthly schedule (date, accrued interest, cumulative total) from the start date until the end date in the results panel
+  2. Each schedule row shows cumulative totals in both fiat and sats at the same conversion basis as the results panel
+  3. Schedule rows accumulate unrounded so the final row's cumulative total exactly equals the headline total-to-repay figure
+  4. Long loan terms render without row explosion (monthly anchors plus end date, capped row count)
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 47: Prefill from Existing BTC Loan Asset
+
+**Goal**: Users can load one of their real BTC-backed loans into the simulator instead of typing parameters by hand
+**Depends on**: Phase 45
+**Requirements**: SIM-11
+**Success Criteria** (what must be TRUE):
+
+  1. User can pick an existing BTC-backed loan from a dropdown in the simulator and have all input fields prefilled from it
+  2. A "New simulation" sentinel option clears the fields back to a blank simulation
+  3. Prefill uses the loan's effective latest-state snapshot (not just setup fields) for current debt and collateral
+  4. `FixedTotalDebt` loans are handled explicitly — derived APR with an "approximate" indicator, or blocked with an explanation — never silently treated as daily-accruing
+  5. Switching between a prefilled loan and "New simulation" keeps live recalculation working correctly
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 48: MCP, Localization, Documentation & Verification
+
+**Goal**: The simulator is AI-accessible, fully localized, documented, and verified end-to-end
+**Depends on**: Phases 44, 45, 46, 47
+**Requirements**: SIM-12, SIM-13
+**Success Criteria** (what must be TRUE):
+
+  1. AI assistant can run a BTC loan simulation via a static `simulate_btc_loan` MCP tool returning total repay, breakdown, liquidation price, and effective APR
+  2. All new user-facing strings are available in English, Portuguese (pt-BR), and Spanish, with `language.Designer.cs` regenerated
+  3. `.claude/docs/assets.md` (or a dedicated simulator doc) documents the simulator UI, interest modes, prefill semantics, and the MCP tool
+  4. Full test suite is green and the simulator is verified end-to-end: prefill a real loan, toggle interest modes, confirm sats match `RatesState`, and confirm nothing is persisted to the database
+
+**Plans**: TBD
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -201,10 +286,15 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 | 41. Wealth & Performance Reports & UI | v0.7 | 1/1 | Complete    | 2026-08-10 |
 | 42. Loans & Leverage Reports & UI | v0.7 | 4/4 | Complete    | 2026-08-12 |
 | 43. MCP, Localization, Documentation & Verification | v0.7 | 5/5 | Complete | 2026-08-12 |
+| 44. Core Loan Simulation Calculator | v0.8 | 0/? | Not started | - |
+| 45. Simulator Modal UI (Inputs + Results Panel) | v0.8 | 0/? | Not started | - |
+| 46. Cost-Over-Time Schedule | v0.8 | 0/? | Not started | - |
+| 47. Prefill from Existing BTC Loan Asset | v0.8 | 0/? | Not started | - |
+| 48. MCP, Localization, Documentation & Verification | v0.8 | 0/? | Not started | - |
 
-**Total phases:** 15 (15 complete, 0 planned)  
-**v0.7 plans:** 12/12 (complete)  
-**v0.7 tasks:** 14/14 (complete)
+**Total phases:** 20 (15 complete, 5 planned)  
+**v0.8 plans:** 0/? (roadmap defined 2026-08-13)  
+**v0.8 requirements:** 13/13 mapped (SIM-01..SIM-13)
 
 ---
-*Last updated: 2026-08-12 after completing Phase 43 plan 43-05*
+*Last updated: 2026-08-13 after defining the v0.8 roadmap*

@@ -112,19 +112,19 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SIM-01 | — | Pending |
-| SIM-02 | — | Pending |
-| SIM-03 | — | Pending |
-| SIM-04 | — | Pending |
-| SIM-05 | — | Pending |
-| SIM-06 | — | Pending |
-| SIM-07 | — | Pending |
-| SIM-08 | — | Pending |
-| SIM-09 | — | Pending |
-| SIM-10 | — | Pending |
-| SIM-11 | — | Pending |
-| SIM-12 | — | Pending |
-| SIM-13 | — | Pending |
+| SIM-01 | Phase 45 | Pending |
+| SIM-02 | Phase 45 | Pending |
+| SIM-03 | Phase 44 | Pending |
+| SIM-04 | Phase 44 | Pending |
+| SIM-05 | Phase 45 | Pending |
+| SIM-06 | Phase 45 | Pending |
+| SIM-07 | Phase 45 | Pending |
+| SIM-08 | Phase 45 | Pending |
+| SIM-09 | Phase 45 | Pending |
+| SIM-10 | Phase 46 | Pending |
+| SIM-11 | Phase 47 | Pending |
+| SIM-12 | Phase 48 | Pending |
+| SIM-13 | Phase 48 | Pending |
 | SPA-01 | Phase 39 | Complete |
 | SPA-02 | Phase 39 | Complete |
 | SPA-03 | Phase 39 | Complete |
@@ -141,10 +141,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 **Coverage:**
 
 - v0.8 requirements: 13 total
-- Mapped to phases: 0 (roadmap pending)
-- Unmapped: 13 (roadmap pending)
+- Mapped to phases: 13 (SIM-03/04 → Phase 44; SIM-01/02/05–09 → Phase 45; SIM-10 → Phase 46; SIM-11 → Phase 47; SIM-12/13 → Phase 48)
+- Unmapped: 0 ✓
 - v0.7 requirements: 12 total, all Complete ✓
 
 ---
 *Requirements defined: 2026-08-04*
-*Last updated: 2026-08-13 after v0.8 milestone requirements definition*
+*Last updated: 2026-08-13 after v0.8 roadmap creation*

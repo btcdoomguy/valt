@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v0.8
 milestone_name: BTC Loan Simulator
-status: planning
-last_updated: "2026-08-13T14:42:44.782Z"
+status: roadmap_defined
+last_updated: "2026-08-13T00:00:00.000Z"
 last_activity: 2026-08-13
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-06)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 43 — mcp-localization-documentation-verification
+**Current focus:** Phase 44 — core-loan-simulation-calculator
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 44 (not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-08-13 — Milestone v0.8 started
+Status: Roadmap defined, ready to plan Phase 44
+Last activity: 2026-08-13 — v0.8 roadmap created (Phases 44-48, 13/13 requirements mapped)
 
 ## Performance Metrics
 
@@ -229,8 +229,8 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-08-12T20:00:00.000Z
-Stopped at: Completed 43-05-PLAN.md
+Last session: 2026-08-13T00:00:00.000Z
+Stopped at: v0.8 roadmap defined (Phases 44-48)
 Resume file: None
 
 ## Notes
@@ -240,9 +240,9 @@ Resume file: None
 - 7 deferred items acknowledged at v0.6 close (see Deferred Items).
 - v0.7 roadmap defined 2026-08-04: Phases 39-43, 12/12 requirements mapped (SPA-01..03, BTC-01..03, WLT-01..04, LON-01..02).
 - Phase 42 (loans-leverage-reports-ui) is now complete: 4/4 plans finished, gap G-42-2 closed.
+- v0.8 roadmap defined 2026-08-13: Phases 44-48, 13/13 requirements mapped (SIM-01..SIM-13), structure follows research/SUMMARY.md dependency order (engine → UI → schedule → prefill → MCP/localization/docs).
 
 ## Operator Next Steps
 
-- Phase 43 (MCP, Localization, Documentation & Verification) is complete.
-- v0.7 Insights & Metrics Expansion milestone is ready to close.
-- Next: run `/gsd-ship` or close the v0.7 milestone.
+- v0.8 BTC Loan Simulator roadmap is defined (Phases 44-48).
+- Next: run `/gsd-plan-phase 44` (Core Loan Simulation Calculator). Consider `/gsd-discuss-phase 44` first to resolve the compound-frequency question flagged by research.
