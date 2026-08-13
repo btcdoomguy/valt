@@ -6,6 +6,7 @@ using Valt.Infra.Crawlers.LivePriceCrawlers.Bitcoin.Providers;
 namespace Valt.Tests.Infrastructure.Indicators;
 
 [TestFixture]
+[Explicit("Hits live external APIs; subject to network availability and rate limiting")]
 public class BitcoinDominanceProviderTests
 {
     private BitcoinDominanceProvider _provider = null!;

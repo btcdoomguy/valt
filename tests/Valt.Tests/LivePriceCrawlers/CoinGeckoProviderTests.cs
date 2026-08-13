@@ -6,6 +6,7 @@ using Valt.Infra.Kernel.Time;
 namespace Valt.Tests.LivePriceCrawlers;
 
 [TestFixture]
+[Explicit("Hits live external APIs; subject to network availability and rate limiting")]
 public class CoinGeckoProviderTests
 {
     [Test]

@@ -9,6 +9,7 @@ namespace Valt.Tests.LivePriceCrawlers;
 public class CurrencyApiFiatProviderTests
 {
     [Test]
+    [Explicit("Hits live external APIs; subject to network availability and rate limiting")]
     public async Task Should_Get_Prices()
     {
         var provider = new CurrencyApiFiatRateProvider(
@@ -40,6 +41,7 @@ public class CurrencyApiFiatProviderTests
     }
 
     [Test]
+    [Explicit("Hits live external APIs; subject to network availability and rate limiting")]
     public async Task Should_Get_All_Supported_Currencies()
     {
         var provider = new CurrencyApiFiatRateProvider(
@@ -88,6 +90,7 @@ public class CurrencyApiFiatProviderTests
     }
 
     [Test]
+    [Explicit("Hits live external APIs; subject to network availability and rate limiting")]
     public async Task Should_Get_Prices_For_Uyu_And_Pyg()
     {
         var provider = new CurrencyApiFiatRateProvider(
