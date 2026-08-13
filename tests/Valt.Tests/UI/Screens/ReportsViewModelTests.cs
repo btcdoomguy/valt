@@ -591,7 +591,7 @@ public class ReportsViewModelTests
             BindingFlags.NonPublic | BindingFlags.Instance);
 
         // Act
-        await (Task)method!.Invoke(viewModel, new object[] { Substitute.For<IReportDataProvider>() })!;
+        await (Task)method!.Invoke(viewModel, null)!;
 
         // Assert
         await _queryDispatcher.Received(1).DispatchAsync(
@@ -626,7 +626,7 @@ public class ReportsViewModelTests
             BindingFlags.NonPublic | BindingFlags.Instance);
 
         // Act
-        await (Task)method!.Invoke(viewModel, new object[] { Substitute.For<IReportDataProvider>() })!;
+        await (Task)method!.Invoke(viewModel, null)!;
 
         // Assert
         Assert.That(viewModel.IsLoanReportsVisible, Is.True);
@@ -655,7 +655,7 @@ public class ReportsViewModelTests
             BindingFlags.NonPublic | BindingFlags.Instance);
 
         // Act
-        await (Task)method!.Invoke(viewModel, new object[] { Substitute.For<IReportDataProvider>() })!;
+        await (Task)method!.Invoke(viewModel, null)!;
 
         // Assert
         Assert.That(viewModel.IsLoanReportsVisible, Is.False);
@@ -684,7 +684,7 @@ public class ReportsViewModelTests
             BindingFlags.NonPublic | BindingFlags.Instance);
 
         // Act
-        await (Task)method!.Invoke(viewModel, new object[] { Substitute.For<IReportDataProvider>() })!;
+        await (Task)method!.Invoke(viewModel, null)!;
 
         // Assert
         Assert.That(viewModel.IsLoanReportsEmpty, Is.True);
@@ -703,7 +703,7 @@ public class ReportsViewModelTests
             BindingFlags.NonPublic | BindingFlags.Instance);
 
         // Act
-        await (Task)method!.Invoke(viewModel, new object[] { Substitute.For<IReportDataProvider>() })!;
+        await (Task)method!.Invoke(viewModel, null)!;
 
         // Assert
         Assert.That(viewModel.IsLoanReportsLoading, Is.False);
@@ -724,7 +724,7 @@ public class ReportsViewModelTests
             BindingFlags.NonPublic | BindingFlags.Instance);
 
         // Act
-        await (Task)method!.Invoke(viewModel, new object[] { Substitute.For<IReportDataProvider>() })!;
+        await (Task)method!.Invoke(viewModel, null)!;
 
         // Assert
         Assert.That(viewModel.IsLoanReportsError, Is.True);
