@@ -51,7 +51,7 @@ public class AssetToolsSoldStateTests : IntegrationTest
         var asset = AssetBuilder.AStockAsset().Build();
         await _assetRepository.SaveAsync(asset);
 
-        var today = DateOnly.FromDateTime(DateTime.UtcNow).ToString("yyyy-MM-dd");
+        var today = DateOnly.FromDateTime(DateTime.Now).ToString("yyyy-MM-dd");
         var markResult = await AssetTools.MarkAssetAsSold(
             _commandDispatcher, _notificationPublisher, asset.Id.Value, today);
 
@@ -91,7 +91,7 @@ public class AssetToolsSoldStateTests : IntegrationTest
         var asset = AssetBuilder.AStockAsset().Build();
         await _assetRepository.SaveAsync(asset);
 
-        var today = DateOnly.FromDateTime(DateTime.UtcNow).ToString("yyyy-MM-dd");
+        var today = DateOnly.FromDateTime(DateTime.Now).ToString("yyyy-MM-dd");
         var firstResult = await AssetTools.MarkAssetAsSold(
             _commandDispatcher, _notificationPublisher, asset.Id.Value, today);
 
