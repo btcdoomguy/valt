@@ -1,449 +1,267 @@
-# Architecture Research: Asset Sold History
+# Architecture Research
 
-**Domain:** Personal finance desktop application (bitcoin-denominated budget/assets)
-**Researched:** 2026-07-13
-**Confidence:** HIGH
+**Domain:** BTC Loan Simulator feature (what-if calculator) in the Valt desktop app
+**Researched:** 2026-08-13
+**Confidence:** HIGH — based on direct codebase inspection (Leverage Simulator modal, BtcLoanDetails domain, modal plumbing, localization, MCP, tests)
 
-## Executive Summary
-
-Asset Sold History is a state-change feature, not a new entity. It adds a `Sold` flag and a `Date Sold` to the existing `Asset` aggregate, then uses the existing CQRS + LiteDB infrastructure to filter sold assets out of active views and totals while keeping them in a dedicated History screen. The implementation reuses the existing `AssetViewModel` for per-type details, follows the same command/query/validator pattern as the loan-state feature, and requires only additive changes to the entity and DTO shapes.
-
-The recommended architecture keeps `IsSold` and `DateSold` as first-class properties on `Asset`/`AssetEntity` (not inside the JSON details blob), so every query can filter on them without deserializing details. It also keeps `Visible` independent from `Sold`, preserving the user's visibility choice when an asset is sold and later restored.
-
-## Standard Architecture (Existing + New)
+## Standard Architecture
 
 ### System Overview
 
+The feature is an **ephemeral calculator modal** — it persists nothing, migrates nothing, and adds no commands. The only read-path dependency is the existing `GetAssetsQuery` for loan prefill. The calculation core belongs in `Valt.Core` (pure, static), following the established precedent of `FinancialCalculator`, `BtcPriceCalculator`, and `InstallmentDateCalculator`.
+
 ```
-┌──────────────────────────────────────────────────────────────────────┐
-│                              Valt.UI                                  │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐      │
-│  │ AssetsView       │  │ SoldAssetHistory │  │ AssetViewModel   │      │
-│  │ (active list)    │  │ modal            │  │ (details reuse)  │      │
-│  └────────┬─────────┘  └────────┬─────────┘  └──────────────────┘      │
-│           │                      │                                     │
-│           │  GetActiveAssets     │  GetSoldAssets                      │
-│           │  SellAsset           │  UndoSellAsset                      │
-│           ▼                      ▼                                     │
-├──────────────────────────────────────────────────────────────────────┤
-│                              Valt.App                                   │
-│  ┌────────────────────────────────────────────────────────────────┐  │
-│  │  CQRS Handlers                                                 │  │
-│  │  GetActiveAssetsHandler  GetSoldAssetsHandler                 │  │
-│  │  SellAssetHandler        UndoSellAssetHandler                 │  │
-│  │  GetAssetSummaryHandler (excludes sold)                        │  │
-│  └────────────────────────────────────────────────────────────────┘  │
-│           │                      │                                     │
-│           │  IAssetRepository    │  IAssetQueries                      │
-│           ▼                      ▼                                     │
-├──────────────────────────────────────────────────────────────────────┤
-│                             Valt.Infra                                │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────────┐ │
-│  │ AssetEntity  │  │ AssetQueries │  │ AssetDetails │  │ Mcp Tools  │ │
-│  │ (+IsSold,    │  │ (+active/    │  │ Serializer   │  │ AssetTools │ │
-│  │  DateSold)   │  │  sold filters)│  │ (unchanged)  │  │ (+sold ops)│ │
-│  └──────────────┘  └──────────────┘  └──────────────┘  └────────────┘ │
-│           │                      │                                     │
-│           ▼                      ▼                                     │
-├──────────────────────────────────────────────────────────────────────┤
-│                             LiteDB                                    │
-│                        (local + price databases)                       │
-└──────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                           Valt.UI                                │
+│  Tools menu ──► MainViewModel.OpenLoanSimulator (RelayCommand)   │
+│                          │                                       │
+│              IModalLauncher.ShowAsync(ApplicationModalNames.     │
+│                              LoanSimulator = 42, Window)         │
+│                          │                                       │
+│   LoanSimulatorView (axaml) ◄──► LoanSimulatorViewModel          │
+│     inputs left │ results right     (ValtModalViewModel)         │
+│                          │           │                           │
+│         RatesState (BTC/fiat rates)  IQueryDispatcher            │
+└──────────────────────────┼───────────┼───────────────────────────┘
+                           │           │
+┌──────────────────────────┼───────────┼───────────────────────────┤
+│         Valt.App         │           │  Valt.Core                │
+│   GetAssetsQuery ────────┘           │  BtcLoanSimulation-       │
+│   (AssetDTO already has every        │  Calculator (static,      │
+│    BTC-loan field for prefill)       │  pure math + schedule)    │
+│                                      │  BtcLoanInterestMode enum │
+└──────────────────────────────────────┼───────────────────────────┘
+                                       │
+┌──────────────────────────────────────┼───────────────────────────┐
+│  Valt.Infra (MCP)                    ▼                           │
+│  LoanSimulatorTools.SimulateBtcLoan ──► Core calculator directly │
+│  (static tool, NO DI forwarding needed — calculator is pure)     │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 ### Component Responsibilities
 
-| Component | Responsibility | What Changes |
-|-----------|---------------|--------------|
-| `Asset` (Core) | Aggregate root; owns `IsSold`/`DateSold` and mutation rules | Add properties, `Sell()`, `UndoSell()` methods |
-| `AssetEntity` (Infra) | LiteDB persistence shape | Add `IsSold`/`DateSold` Bson fields |
-| `AssetDetailsSerializer` (Infra) | JSON serialization of `IAssetDetails` | **No change** — sold state is not stored in details JSON |
-| `IAssetQueries` / `AssetQueries` (Infra) | Read models and filtering | Add `GetSoldAssetsAsync`, `GetActiveAssetsAsync`; update `GetVisibleAsync` and `GetSummaryAsync` to exclude sold |
-| `SellAssetCommand` (App) | Mark asset sold with a date | New command/handler/validator |
-| `UndoSellAssetCommand` (App) | Restore asset to active view | New command/handler/validator |
-| `GetSoldAssetsQuery` / `GetActiveAssetsQuery` (App) | Read sold-only or active-only assets | New query/handler pairs |
-| `AssetsViewModel` (UI) | Main tab logic | Switch to `GetActiveAssetsQuery`; add History button; change Sell flow from Delete to Sell command |
-| `SoldAssetHistoryViewModel` (UI) | Modal listing sold assets | New modal; reuses `AssetViewModel` for per-type details panel |
-| `AssetViewModel` (UI) | Display model for individual assets | Add `IsSold`, `DateSold`, `DateSoldFormatted` |
-| `AssetTools` (MCP) | AI assistant tools | Add `GetSoldAssets`, `SellAsset`, `UndoSellAsset` |
+| Component | Responsibility | Implementation |
+|-----------|----------------|----------------|
+| `BtcLoanSimulationCalculator` (Core, NEW) | Simple/compound interest math, total debt, fees, cost-over-time schedule, liquidation price | Static class, mirrors `FinancialCalculator` precedent; daily accrual (`APR/365`) consistent with `BtcLoanDetails.CalculateAccruedInterest` |
+| `BtcLoanInterestMode` (Core, NEW) | Simple vs Compound selection | Enum in `Valt.Core/Modules/Assets/` |
+| `LoanScheduleEntry` (Core, NEW) | One row of the schedule (date, accrued interest, total debt) | Immutable record |
+| `LoanSimulatorViewModel` (UI, NEW) | Text inputs, parsing, dropdowns (currency, loan prefill), formatted results, `HasResults` state | `ValtModalViewModel` + CommunityToolkit.Mvvm, clone of `LeverageSimulatorViewModel` shape |
+| `LoanSimulatorView` (UI, NEW) | Two-column layout (inputs left / results right + schedule list) | Clone of `LeverageSimulatorView.axaml` grid (`300, 20, *`) |
+| `GetAssetsQuery` (App, EXISTING) | Prefill source | Reused as-is; filter `AssetTypeId == (int)AssetTypes.BtcLoan` |
+| `LoanSimulatorTools` (Infra/MCP, NEW, optional) | Expose simulation to AI assistants | Static `[McpServerTool]` calling Core calculator; no service forwarding |
 
 ## Recommended Project Structure
 
 ```
 src/
-├── Valt.Core/Modules/Assets/
-│   ├── Asset.cs                          # Add IsSold, DateSold, Sell(), UndoSell()
-│   └── Events/
-│       └── AssetSoldEvent.cs             # Optional: domain event for sold/undo
-├── Valt.App/Modules/Assets/
-│   ├── Commands/
-│   │   ├── SellAsset/
-│   │   │   ├── SellAssetCommand.cs
-│   │   │   ├── SellAssetHandler.cs
-│   │   │   └── SellAssetValidator.cs
-│   │   └── UndoSellAsset/
-│   │       ├── UndoSellAssetCommand.cs
-│   │       ├── UndoSellAssetHandler.cs
-│   │       └── UndoSellAssetValidator.cs
-│   ├── Queries/
-│   │   ├── GetActiveAssets/
-│   │   │   ├── GetActiveAssetsQuery.cs
-│   │   │   └── GetActiveAssetsHandler.cs
-│   │   ├── GetSoldAssets/
-│   │   │   ├── GetSoldAssetsQuery.cs
-│   │   │   └── GetSoldAssetsHandler.cs
-│   │   └── GetAssetSummary/              # Update handler to exclude sold assets
-│   └── DTOs/
-│       └── AssetDTO.cs                   # Add IsSold, DateSold
-├── Valt.Infra/Modules/Assets/
-│   ├── AssetEntity.cs                    # Add IsSold, DateSold fields
-│   ├── Extensions.cs                     # Map IsSold/DateSold in AsEntity/AsDomainObject
-│   ├── Queries/
-│   │   └── AssetQueries.cs               # Add active/sold filters
-│   └── Services/
-│       └── AssetPriceUpdaterJob.cs       # Skip sold assets
-├── Valt.Infra/Mcp/Tools/
-│   └── AssetTools.cs                     # Add sold tools, update summary
-├── Valt.UI/Views/
-│   ├── ApplicationModalNames.cs          # Add SoldAssetHistory
-│   ├── Main/Tabs/Assets/
-│   │   ├── AssetsView.axaml              # Add History toolbar button
-│   │   ├── AssetsViewModel.cs            # Use GetActiveAssetsQuery, new Sell flow
-│   │   └── Models/AssetViewModel.cs       # Add IsSold/DateSold display props
-│   └── Main/Modals/SoldAssetHistory/
-│       ├── SoldAssetHistoryView.axaml
-│       ├── SoldAssetHistoryView.axaml.cs
-│       └── SoldAssetHistoryViewModel.cs
-└── Valt.UI/Lang/
-    ├── language.resx
-    ├── language.pt-BR.resx
-    ├── language.es.resx
-    └── language.Designer.cs
+├── Valt.Core/
+│   └── Modules/Assets/
+│       ├── BtcLoanInterestMode.cs              # NEW: Simple | Compound enum
+│       └── Simulation/                          # NEW folder (or Common/ to match FinancialCalculator)
+│           ├── BtcLoanSimulationCalculator.cs   # NEW: static math entry points
+│           ├── BtcLoanSimulationInput.cs        # NEW: input record
+│           ├── BtcLoanSimulationResult.cs       # NEW: totals + breakdown record
+│           └── LoanScheduleEntry.cs             # NEW: schedule row record
+├── Valt.UI/
+│   ├── Views/ApplicationModalNames.cs           # MODIFIED: + LoanSimulator = 42
+│   ├── Extensions.cs                            # MODIFIED: + AddTransient + factory case
+│   ├── Lang/language.resx / .pt-BR.resx / .es.resx / .Designer.cs  # MODIFIED: Menu_LoanSimulator + LoanSimulator_* keys
+│   └── Views/Main/
+│       ├── MainViewModel.cs                     # MODIFIED: + OpenLoanSimulator RelayCommand
+│       ├── MainView.axaml                       # MODIFIED: + Tools MenuItem
+│       └── Modals/LoanSimulator/                # NEW folder
+│           ├── LoanSimulatorView.axaml
+│           ├── LoanSimulatorView.axaml.cs
+│           └── LoanSimulatorViewModel.cs
+└── Valt.Infra/Mcp/Tools/
+    └── LoanSimulatorTools.cs                    # NEW (optional): [McpServerToolType]
+
+tests/Valt.Tests/
+├── Domain/Assets/Simulation/
+│   └── BtcLoanSimulationCalculatorTests.cs      # NEW: NUnit unit tests (no DB)
+└── UI/ViewModels/MainViewModelModalCommandTests.cs  # MODIFIED: + launcher assertion
 ```
 
 ### Structure Rationale
 
-- **Sold state lives on the aggregate, not in JSON details:** This lets `AssetQueries` filter by `IsSold` without deserializing `DetailsJson`, avoiding a full table scan.
-- **New commands mirror existing toggle commands:** `SellAsset`/`UndoSellAsset` follow the same pattern as `SetAssetVisibility`/`SetAssetIncludeInNetWorth` — load asset, mutate, save, emit event.
-- **Active/Sold queries are separate from `GetAssetsQuery`:** `GetAssetsQuery` keeps its "all tracked assets" semantics (used by MCP and the leverage simulator). The UI main view switches to `GetActiveAssetsQuery` to hide sold assets.
-- **History modal reuses `AssetViewModel`:** It already contains all per-type formatting and display helpers, so the details panel can be a copy of the existing right-side panel from `AssetsView.axaml`.
+- **Core owns the math:** `LeverageSimulatorViewModel` already delegates to `LeveragedPositionDetails` in Core rather than doing math in the VM — the loan simulator must follow the same rule. Pure static calculator = trivially unit-testable, reusable by MCP, and consistent with the "no external deps" Core constraint.
+- **No App-layer changes:** The feature writes nothing. `AssetDTO` already exposes every prefill field (`CollateralSats`, `LoanAmount`, `Apr`, `Fees`, `LoanStartDate`, `RepaymentDate`, `LiquidationLtv`, `CurrencyCode`, `FixedTotalDebt`). Adding a dedicated query would duplicate `GetAssetsQuery` for zero gain.
+- **UI is a mechanical clone of the Leverage Simulator:** same base class, same design-time constructor pattern, same `OnBindParameterAsync` load sequence (currencies → loans → defaults), same `partial void OnXChanged → Recalculate()` reactive pattern, same `IModalLauncher` plumbing.
 
 ## Architectural Patterns
 
-### Pattern 1: State Flag on Aggregate Root
+### Pattern 1: Pure Core Calculator with Record In/Out
 
-**What:** Add a boolean flag and an optional date to the existing aggregate; expose domain methods that mutate the flag and emit an update event.
-
-**When to use:** When a feature only changes the "status" of an entity and does not require a new domain concept (e.g., sold vs. active).
-
-**Trade-offs:** Simple and low-risk; avoids a separate `Sale` table or collection. Does not capture sale price or tax lots — deliberately out of scope for v0.5.
+**What:** All loan math in a static class taking an input record and returning a result record.
+**When to use:** Always, for what-if/simulation logic in this codebase (precedent: `FinancialCalculator`, `BtcPriceCalculator`).
+**Trade-offs:** Slightly more types than inlining in the VM; pays off in testability and MCP reuse.
 
 **Example:**
 ```csharp
-public sealed class Asset : AggregateRoot<AssetId>
+// Valt.Core/Modules/Assets/Simulation/BtcLoanSimulationCalculator.cs
+public static class BtcLoanSimulationCalculator
 {
-    public bool IsSold { get; private set; }
-    public DateOnly? DateSold { get; private set; }
-
-    public void Sell(DateOnly dateSold)
+    public static BtcLoanSimulationResult Simulate(BtcLoanSimulationInput input)
     {
-        IsSold = true;
-        DateSold = dateSold;
-        AddEvent(new AssetUpdatedEvent(this));
-    }
+        var days = input.EndDate.DayNumber - input.StartDate.DayNumber;
+        if (days <= 0) return BtcLoanSimulationResult.Empty(input);
 
-    public void UndoSell()
-    {
-        IsSold = false;
-        DateSold = null;
-        AddEvent(new AssetUpdatedEvent(this));
+        var interest = input.Mode == BtcLoanInterestMode.Simple
+            ? Math.Round(input.Principal * input.Apr / 365m * days, 2)
+            : Math.Round(input.Principal * ((decimal)Math.Pow((double)(1m + input.Apr / 365m), days) - 1m), 2);
+
+        var totalDebt = input.Principal + interest + input.Fees;
+        var schedule = BuildSchedule(input, days);
+        // Liquidation price at end date: TotalDebt / (CollateralBtc * LiquidationLtv)
+        ...
     }
 }
 ```
 
-### Pattern 2: CQRS Command Per State Transition
+**Consistency note:** existing `BtcLoanDetails.CalculateAccruedInterest` uses simple daily accrual (`LoanAmount * Apr / 365 * days`). Compound mode should use **daily compounding** (`(1 + Apr/365)^days`) — the standard for crypto lending — and the difference vs. the app's stored-loan math is intentional (simulator explores modes; stored loans keep their existing semantics).
 
-**What:** Each user action that changes sold state is a command with a dedicated handler, validator, and DTO.
+### Pattern 2: Prefill Dropdown via Existing Query (Leverage Simulator clone)
 
-**When to use:** This is the existing Valt.App pattern; keep using it for consistency.
-
-**Trade-offs:** More files than a simple service method, but gives validation, DI, and MCP exposure for free.
-
-**Example:**
-```csharp
-public record SellAssetCommand : ICommand
-{
-    public required string AssetId { get; init; }
-    public required DateOnly DateSold { get; init; }
-}
-
-internal sealed class SellAssetHandler : ICommandHandler<SellAssetCommand, Unit>
-{
-    public async Task<Result<Unit>> HandleAsync(SellAssetCommand command, CancellationToken ct)
-    {
-        var asset = await _assetRepository.GetByIdAsync(new AssetId(command.AssetId));
-        if (asset is null) return Result<Unit>.NotFound("Asset", command.AssetId);
-        if (asset.IsSold) return Result<Unit>.Failure("ALREADY_SOLD", "Asset is already sold");
-
-        asset.Sell(command.DateSold);
-        await _assetRepository.SaveAsync(asset);
-        return Result<Unit>.Success(Unit.Value);
-    }
-}
-```
-
-### Pattern 3: Query-Driven Active vs. Sold Lists
-
-**What:** The database returns the same `AssetDTO` shape for both active and sold assets; filtering happens at the query layer, not in the UI.
-
-**When to use:** When the same display model is used in two contexts but the underlying filter differs.
-
-**Trade-offs:** Keeps UI ViewModels simple; makes testing easy; ensures MCP and reports use the same filter logic.
+**What:** A `ComboBox` whose first item is "New simulation", followed by BTC-loan assets loaded via `IQueryDispatcher.DispatchAsync(new GetAssetsQuery())`.
+**When to use:** Exact pattern proven in `LeverageSimulatorViewModel.LoadPositionsAsync` / `OnSelectedPositionChanged`.
+**Trade-offs:** Pulls all assets then filters client-side — acceptable (same as Leverage Simulator; asset counts are small).
 
 **Example:**
 ```csharp
-public interface IAssetQueries
-{
-    Task<IReadOnlyList<AssetDTO>> GetActiveAssetsAsync(); // !IsSold
-    Task<IReadOnlyList<AssetDTO>> GetSoldAssetsAsync();   // IsSold
-    Task<IReadOnlyList<AssetDTO>> GetVisibleAsync();      // !IsSold && Visible
-    Task<AssetSummaryDTO> GetSummaryAsync(...);           // !IsSold && IncludeInNetWorth
-}
+var assets = await _queryDispatcher.DispatchAsync(new GetAssetsQuery());
+var loans = assets.Where(a => a.AssetTypeId == (int)AssetTypes.BtcLoan);
+// map into LoanItem { DisplayName, CollateralSats, LoanAmount, Apr, Fees,
+//   LoanStartDate, RepaymentDate, LiquidationLtv, CurrencyCode }
 ```
+
+**Fixed-debt edge case:** loans with `FixedTotalDebt` (HodlHodl-style) have a derived APR — prefill using `BtcLoanDetails.DeriveAprFromFixedDebt(...)` (already in Core) and default to Simple mode.
+
+### Pattern 3: Modal Registration Checklist (all touch points)
+
+Every modal in this app requires the same 6 edits; missing one = runtime failure or dead menu item:
+
+1. `ApplicationModalNames.cs` — add `LoanSimulator = 42` (next free value; 41 is `ReportsCategoryFilterConfig`)
+2. `Extensions.cs` — `services.AddTransient<LoanSimulatorViewModel>();`
+3. `Extensions.cs` modal factory switch — `ApplicationModalNames.LoanSimulator => new LoanSimulatorView() { DataContext = services.GetRequiredService<LoanSimulatorViewModel>() }`
+4. `MainViewModel.cs` — `[RelayCommand] OpenLoanSimulator()` → `_modalLauncher.ShowAsync(ApplicationModalNames.LoanSimulator, Window!)`
+5. `MainView.axaml` — `<MenuItem>` under the Tools menu (next to Leverage Simulator, line ~244); optional KeyBinding (F11 is taken by Leverage Simulator — use F12 or none)
+6. Localization — `Menu_LoanSimulator` + `LoanSimulator_*` keys in all three `.resx` files **and** `language.Designer.cs`
 
 ## Data Flow
 
-### Sell Flow (UI)
+### Simulation Flow (no persistence)
 
 ```
-User right-clicks asset → Sell
+[User types input] → OnXChanged partial method → Recalculate()
     ↓
-AssetsViewModel.SellAssetCommand(asset)
+Parse texts (culture-tolerant TryParseDecimal — copy from LeverageSimulatorViewModel)
     ↓
-TransactionEditor modal (pre-filled with sale value, date defaults to today)
+BtcLoanSimulationCalculator.Simulate(input)        [Valt.Core, pure]
     ↓
-If user saves transaction:
+Format results (fiat via CurrencyCode; sats via RatesState BTC price in that currency)
     ↓
-SellAssetCommand(AssetId, transactionDate)
-    ↓
-SellAssetHandler → Asset.Sell(date) → AssetRepository.SaveAsync(asset)
-    ↓
-LoadAssetsAsync() using GetActiveAssetsQuery
-    ↓
-NotifyAssetSummaryUpdated() → refresh reports/totals
+HasResults = true → right panel + schedule list update
 ```
 
-### Undo Sell Flow (History Screen)
+### Prefill Flow
 
 ```
-User clicks History button on Assets toolbar
+[Modal opens] → OnBindParameterAsync()
     ↓
-SoldAssetHistoryViewModel loads via GetSoldAssetsQuery
+LoadAvailableCurrencies (IConfigurationManager)   ── clone from Leverage Simulator
+LoadLoansAsync (IQueryDispatcher → GetAssetsQuery) ── filter AssetTypes.BtcLoan
     ↓
-User selects sold asset → details panel renders
-    ↓
-User clicks Undo Sell
-    ↓
-UndoSellAssetCommand(AssetId)
-    ↓
-UndoSellAssetHandler → Asset.UndoSell() → AssetRepository.SaveAsync(asset)
-    ↓
-Modal closes, AssetsView refreshes active list, summary updates
+[User selects loan] → OnSelectedLoanChanged → fill text fields → Recalculate()
 ```
 
-### Query Filtering
+### Sats Conversion
 
-```
-GetActiveAssetsAsync:
-  _localDatabase.GetAssets().Find(x => !x.IsSold)
+Same formula the Leverage Simulator uses: `sats = fiatValue / btcPriceInCurrency * 100_000_000`, where `btcPriceInCurrency` derives from `RatesState.BitcoinPrice` (USD) × `RatesState.FiatRates[currency]` for non-USD. Null-rate tolerance is required (prices may not be loaded yet) — fall back gracefully and hide sats outputs.
 
-GetSoldAssetsAsync:
-  _localDatabase.GetAssets().Find(x => x.IsSold)
-    .OrderByDescending(x => x.DateSold)
+### Schedule Granularity
 
-GetSummaryAsync:
-  _localDatabase.GetAssets().Find(x => x.IncludeInNetWorth && !x.IsSold)
-```
-
-### Key Data Flows
-
-1. **Sold assets are never deleted:** They remain in the database with `IsSold=true` and `DateSold` set, so they can be restored and historically referenced.
-2. **Totals and reports exclude sold assets:** `AssetQueries.GetSummaryAsync`, `GetVisibleAsync`, and the new `GetActiveAssetsAsync` all filter `!IsSold`.
-3. **Price updater skips sold assets:** The `AssetPriceUpdaterJob` should not waste API calls on assets that are no longer held.
-4. **MCP sees all assets but can also query sold-only:** `AssetTools.GetAssets` continues to return all tracked assets (including sold, with the new flag); `GetSoldAssets` returns the history list.
+Daily rows explode for multi-year loans. Emit **monthly anchors + the end date** (or every 30 days), each row = `(Date, AccruedInterest, TotalDebt)`. Cap at ~120 rows; this is display data, not a precision instrument.
 
 ## Scaling Considerations
 
-| Scale | Architecture Adjustments |
-|-------|--------------------------|
-| 0–10k assets | Monolithic LiteDB approach is fine. Sold/active filtering is in-memory after a single collection read. |
-| 10k+ assets | Add a LiteDB index on `IsSold` and `DateSold` if query latency becomes noticeable. Consider splitting sold assets to a separate collection only if the history list grows very large. |
-| 100k+ assets | LiteDB is no longer the right tool; this would require a persistence migration, which is explicitly out of scope. |
+Not applicable in the usual sense (single-user desktop, ephemeral calc). Relevant limits:
 
-### Scaling Priorities
-
-1. **First bottleneck:** `AssetQueries.GetSummaryAsync` reads all assets and deserializes details. Excluding sold assets reduces the set but does not change the algorithm. Keep an eye on this if the user accumulates hundreds of sold assets.
-2. **Second bottleneck:** `AssetPriceUpdaterJob` will skip sold assets, so the API call count drops automatically over time.
+| Concern | Approach |
+|---------|----------|
+| Long loan terms (10y+) | Monthly schedule granularity + row cap; compound via `Math.Pow` in double, cast back to decimal (matches codebase rounding style) |
+| Very large sats values | Use `long`/decimal consistently; `BtcValue` conventions already handle this |
+| UI recompute churn | Recalculate per keystroke is fine — math is O(schedule rows), no I/O |
 
 ## Anti-Patterns
 
-### Anti-Pattern 1: Store Sold State Inside DetailsJson
+### Anti-Pattern 1: Math in the ViewModel
 
-**What people do:** Add `IsSold` to `BasicAssetDetailsDto` or another details DTO.
+**What people do:** Implement interest accrual inside `LoanSimulatorViewModel.Recalculate()`.
+**Why it's wrong:** Violates the codebase's own rule (Leverage Simulator delegates to `LeveragedPositionDetails`); makes the math untestable without a VM harness and unusable from MCP.
+**Do this instead:** Static `BtcLoanSimulationCalculator` in Core; VM only parses/formats.
 
-**Why it's wrong:** Every query would need to deserialize the JSON details just to know whether an asset is sold. This breaks the aggregate boundary and makes filtering expensive.
+### Anti-Pattern 2: New CQRS command/query for the simulator
 
-**Do this instead:** Put `IsSold` and `DateSold` on `AssetEntity` and `Asset` directly, alongside `Visible` and `IncludeInNetWorth`.
+**What people do:** Create `SimulateLoanQuery` in Valt.App "because the App layer is the convention."
+**Why it's wrong:** The convention exists to mediate persistence and validation of writes. There is no state here; a query handler would be an empty pass-through. The CLAUDE.md directive ("always use Valt.App for new modules") applies to modules with data, not pure calculators.
+**Do this instead:** Reuse `GetAssetsQuery` for prefill; call the Core calculator directly from VM and MCP.
 
-### Anti-Pattern 2: Reuse the `Visible` Flag for "Sold"
+### Anti-Pattern 3: Skipping one localization file or Designer.cs
 
-**What people do:** Set `Visible=false` on sell and try to remember that it means sold.
+**What people do:** Add keys only to `language.resx`.
+**Why it's wrong:** pt-BR/es builds fall back silently or fail; XAML binds via `{x:Static local:language.X}` which requires the Designer property.
+**Do this instead:** All three `.resx` + `language.Designer.cs` in the same change (project rule).
 
-**Why it's wrong:** It conflates two concepts. A user might want a sold asset to remain visible in a history screen, and an active asset might be hidden via `Visible`. It also makes undo brittle because the previous visibility state is lost.
+### Anti-Pattern 4: Reusing UI DTOs in the MCP tool
 
-**Do this instead:** Keep `IsSold` independent. The main view filters `!IsSold && Visible` (or just `!IsSold` for the full active list), and the history view filters `IsSold`.
-
-### Anti-Pattern 3: Delete the Asset on Sell
-
-**What people do:** Keep the existing `SellAssetCommand` flow that calls `DeleteAssetCommand` after the transaction is saved.
-
-**Why it's wrong:** The asset is gone, so there is no history to display and no undo. This directly contradicts the v0.5 goal.
-
-**Do this instead:** Replace the delete step with `SellAssetCommand`. Existing transactions created by prior sales will still reference the now-kept asset; that is acceptable because the asset is merely marked as sold.
-
-### Anti-Pattern 4: Change `GetAssetsQuery` to Exclude Sold Everywhere
-
-**What people do:** Modify `GetAssetsQuery` to return only active assets, breaking MCP and the leverage simulator.
-
-**Why it's wrong:** `GetAssetsQuery` has "all tracked assets" semantics and is used by MCP and other tools. Changing it silently changes API behavior.
-
-**Do this instead:** Add `GetActiveAssetsQuery` for the main UI and leave `GetAssetsQuery` returning all assets. MCP can keep `GetAssets` and add `GetSoldAssets`.
+**What people do:** Return `AssetDTO` or VM item types from an MCP tool.
+**Why it's wrong:** Project rule: MCP tools define their own DTOs in the tool file.
+**Do this instead:** `LoanSimulationResultDto` local to `LoanSimulatorTools.cs`.
 
 ## Integration Points
 
-### UI Boundaries
+### New vs Modified (explicit)
+
+| Layer | File | New/Modified | Change |
+|-------|------|--------------|--------|
+| Core | `Modules/Assets/Simulation/*` (4 files) | **New** | Calculator, input/result/schedule records, interest-mode enum |
+| App | — | None | Reuse `GetAssetsQuery` + `AssetDTO` as-is |
+| UI | `Views/ApplicationModalNames.cs` | Modified | `LoanSimulator = 42` |
+| UI | `Extensions.cs` | Modified | Transient registration + factory case |
+| UI | `Views/Main/MainViewModel.cs` | Modified | `OpenLoanSimulator` command |
+| UI | `Views/Main/MainView.axaml` | Modified | Tools `MenuItem` (+ optional KeyBinding) |
+| UI | `Views/Main/Modals/LoanSimulator/*` (3 files) | **New** | View, code-behind, ViewModel |
+| UI | `Lang/language.{resx,pt-BR.resx,es.resx,Designer.cs}` | Modified | ~15-20 `LoanSimulator_*` keys + `Menu_LoanSimulator` |
+| Infra | `Mcp/Tools/LoanSimulatorTools.cs` | **New** (optional) | `simulate_btc_loan` tool; static calculator → **no `ForwardServicesFromMainApp` change needed** |
+| Infra DB | — | None | No migration, no new collections |
+| Tests | `Domain/Assets/Simulation/BtcLoanSimulationCalculatorTests.cs` | **New** | NUnit, no DB |
+| Tests | `UI/ViewModels/MainViewModelModalCommandTests.cs` | Modified | Launcher assertion for the new command |
+
+### Internal Boundaries
 
 | Boundary | Communication | Notes |
 |----------|---------------|-------|
-| `AssetsViewModel` ↔ `SoldAssetHistoryViewModel` | Modal launcher (`IModalFactory`) | History modal opens as a dialog; Undo Sell triggers a command and closes the modal. |
-| `AssetsViewModel` ↔ `TransactionEditor` | Modal launcher | Sell flow still pre-fills the transaction editor; the saved transaction date becomes `DateSold`. |
-| `AssetsViewModel` ↔ `AssetSummaryUpdatedMessage` | `WeakReferenceMessenger` | Sell/Undo must publish `AssetSummaryUpdatedMessage` to refresh reports and totals. |
+| VM ↔ Core calculator | Direct static call | No interface needed; calculator is stateless |
+| VM ↔ App (prefill) | `IQueryDispatcher` → `GetAssetsQuery` | Filter `AssetTypes.BtcLoan` in VM, clone Leverage Simulator pattern |
+| VM ↔ RatesState | Constructor-injected singleton | For default price + fiat↔sats conversion |
+| MCP ↔ Core calculator | Direct static call | No DI forwarding (unlike other tools) — the one place the MCP checklist is trivially satisfied |
 
-### Back-End Boundaries
+## Suggested Build Order (dependency-driven)
 
-| Boundary | Communication | Notes |
-|----------|---------------|-------|
-| `AssetQueries` ↔ `AssetEntity` | LiteDB collection query | New `IsSold`/`DateSold` fields are queryable at the entity level. |
-| `SellAssetHandler` ↔ `IAssetRepository` | Repository save | No new repository methods needed; reuse `SaveAsync`. |
-| `AssetPriceUpdaterJob` ↔ `AssetEntity` | Background job read | Add `!IsSold` to the update filter. |
-
-### External Services
-
-No new external services. The price updater skips sold assets, so API usage decreases slightly.
-
-## Build Order
-
-Recommended order, with dependencies shown:
-
-1. **Domain + Persistence** (no UI blockers)
-   - `Asset.cs` — add `IsSold`, `DateSold`, `Sell()`, `UndoSell()`
-   - `AssetEntity.cs` — add `IsSold`, `DateSold` fields
-   - `Extensions.cs` — map new fields in `AsEntity`/`AsDomainObject`
-   - Update `AssetBuilder` with `WithSold()` / `WithDateSold()`
-
-2. **CQRS Commands** (depends on domain)
-   - `SellAssetCommand` / `Handler` / `Validator`
-   - `UndoSellAssetCommand` / `Handler` / `Validator`
-   - Unit tests
-
-3. **CQRS Queries + Infra Filtering** (depends on persistence)
-   - Add `GetActiveAssetsAsync` and `GetSoldAssetsAsync` to `IAssetQueries`
-   - Implement filters in `AssetQueries`
-   - Add `GetActiveAssetsQuery` / `Handler` and `GetSoldAssetsQuery` / `Handler`
-   - Update `GetVisibleAsync` to exclude sold
-   - Update `GetSummaryAsync` to exclude sold
-   - Update `AssetPriceUpdaterJob.ShouldUpdatePrice` to skip sold
-   - Unit tests
-
-4. **AssetDTO + ViewModel Display** (depends on queries)
-   - Add `IsSold`/`DateSold` to `AssetDTO`
-   - Add display properties to `AssetViewModel`
-
-5. **UI Main View Changes** (depends on commands/queries)
-   - `AssetsViewModel` switch to `GetActiveAssetsQuery`
-   - Change `SellAssetCommand` from Delete to `SellAssetCommand`
-   - Add History button and `OpenSoldAssetHistoryCommand`
-   - Update `AssetsView.axaml` toolbar
-   - Add localization strings
-
-6. **Sold Asset History Modal** (depends on AssetViewModel and queries)
-   - `SoldAssetHistoryViewModel` + `View`
-   - `ApplicationModalNames.SoldAssetHistory`
-   - Register view in `Valt.UI/Extensions.cs`
-   - Add localization strings
-
-7. **MCP Tools** (depends on CQRS)
-   - `SellAsset` / `UndoSellAsset` / `GetSoldAssets` in `AssetTools`
-   - Update tool descriptions to mention sold state
-
-8. **Documentation + End-to-End Verification**
-   - Update `.claude/docs/assets.md`
-   - Verify sell, undo, query filtering, totals, and price updater behavior
-
-## Files New vs. Modified
-
-### New Files
-
-| File | Purpose |
-|------|---------|
-| `Valt.App/Modules/Assets/Commands/SellAsset/*` | Mark asset sold |
-| `Valt.App/Modules/Assets/Commands/UndoSellAsset/*` | Restore sold asset |
-| `Valt.App/Modules/Assets/Queries/GetActiveAssets/*` | Active assets for main view |
-| `Valt.App/Modules/Assets/Queries/GetSoldAssets/*` | Sold assets for history |
-| `Valt.UI/Views/Main/Modals/SoldAssetHistory/*` | History modal UI |
-| `Valt.Core/Modules/Assets/Events/AssetSoldEvent.cs` (optional) | Explicit domain event if desired |
-
-### Modified Files
-
-| File | Change |
-|------|--------|
-| `Valt.Core/Modules/Assets/Asset.cs` | Add `IsSold`, `DateSold`, `Sell()`, `UndoSell()` |
-| `Valt.Infra/Modules/Assets/AssetEntity.cs` | Add `IsSold`, `DateSold` fields |
-| `Valt.Infra/Modules/Assets/Extensions.cs` | Map new fields |
-| `Valt.Infra/Modules/Assets/Queries/AssetQueries.cs` | Add filters, update summary |
-| `Valt.App/Modules/Assets/Contracts/IAssetQueries.cs` | Add new query methods |
-| `Valt.App/Modules/Assets/DTOs/AssetDTO.cs` | Add `IsSold`, `DateSold` |
-| `Valt.App/Modules/Assets/Queries/GetAssetSummary/GetAssetSummaryHandler.cs` | Use updated summary query |
-| `Valt.App/Modules/Assets/Queries/GetVisibleAssets/GetVisibleAssetsHandler.cs` | Exclude sold |
-| `Valt.Infra/Modules/Assets/Services/AssetPriceUpdaterJob.cs` | Skip sold assets |
-| `Valt.UI/Views/Main/Tabs/Assets/AssetsViewModel.cs` | Use active query, new Sell flow, History command |
-| `Valt.UI/Views/Main/Tabs/Assets/AssetsView.axaml` | Add History button |
-| `Valt.UI/Views/Main/Tabs/Assets/Models/AssetViewModel.cs` | Add display properties |
-| `Valt.UI/Views/ApplicationModalNames.cs` | Add `SoldAssetHistory` |
-| `Valt.UI/Extensions.cs` | Register new modal view |
-| `Valt.UI/Lang/language.*` | Add strings |
-| `Valt.Infra/Mcp/Tools/AssetTools.cs` | Add sold tools |
-| `tests/Valt.Tests/Builders/AssetBuilder.cs` | Add `WithSold` / `WithDateSold` |
-| `.claude/docs/assets.md` | Document behavior |
-
-## Backward Compatibility Notes
-
-- **No migration required.** Existing `AssetEntity` records in LiteDB will have `IsSold` default to `false` and `DateSold` default to `null` when read. `Extensions.AsDomainObject` should use `entity.IsSold` and parse `entity.DateSold` as nullable, defaulting to `false`/`null` if the fields are missing.
-- **Sold assets from prior versions do not exist.** Before v0.5, selling deleted the asset. Those records are gone, so the new History screen will start empty for existing users.
-- **Existing transactions from prior sales remain.** They are ordinary transactions not tied to an asset, so they do not break.
+1. **Core calculator + enum + records + unit tests** — no dependencies; everything else consumes it. Cover: simple vs compound divergence, zero APR, `end <= start`, fees-only, schedule anchors, liquidation-price-at-end-date, rounding (2dp fiat).
+2. **Localization keys** (3 resx + Designer) — must exist before XAML compiles with `{x:Static}` bindings.
+3. **Modal plumbing** — enum value, DI transient, factory case. Compiles without the view existing only if factory case added together with the view; do 3+4 in one slice.
+4. **View + ViewModel + menu item + MainViewModel command** — one vertical slice (project constraint: VM + XAML together to avoid broken bindings). Clone LeverageSimulatorView layout; add schedule list (ItemsControl/DataGrid) to the right panel.
+5. **MainViewModelModalCommandTests addition** — cheap launcher wiring guard.
+6. **MCP tool (optional)** — independent; thin wrapper over step 1. Update `.claude/docs/` tool tables if added (v0.6 established docs-drift rules).
+7. **E2E verification** — manual: open modal, prefill from a real BTC loan, toggle simple/compound, verify sats values against RatesState price.
 
 ## Sources
 
-- `Valt.Core/Modules/Assets/Asset.cs` — aggregate structure and mutation patterns
-- `Valt.Infra/Modules/Assets/AssetEntity.cs` and `Extensions.cs` — persistence mapping
-- `Valt.Infra/Modules/Assets/Queries/AssetQueries.cs` — query filtering and summary logic
-- `Valt.App/Modules/Assets/Commands/SetAssetVisibility/` — template for simple toggle commands
-- `Valt.App/Modules/Assets/Commands/AddLoanStateUpdate/` — template for date-bearing mutation commands
-- `Valt.UI/Views/Main/Tabs/Assets/AssetsViewModel.cs` and `AssetsView.axaml` — existing sell flow and UI layout
-- `Valt.UI/Views/Main/Modals/LoanStateHistory/LoanStateHistoryViewModel.cs` and `.axaml` — modal history pattern
-- `Valt.Infra/Mcp/Tools/AssetTools.cs` — existing MCP tool patterns
-- `.planning/PROJECT.md` — v0.5 scope and constraints
+- Direct codebase inspection: `src/Valt.UI/Views/Main/Modals/LeverageSimulator/` (View + VM), `src/Valt.Core/Modules/Assets/Details/BtcLoanDetails.cs`, `src/Valt.App/Modules/Assets/DTOs/AssetDTO.cs`, `src/Valt.UI/Extensions.cs`, `src/Valt.UI/Views/ApplicationModalNames.cs`, `src/Valt.UI/Views/Main/MainViewModel.cs` / `MainView.axaml`, `src/Valt.Core/Common/FinancialCalculator.cs`, `tests/Valt.Tests/UI/ViewModels/MainViewModelModalCommandTests.cs`
+- Project conventions: `AGENTS.md` (CQRS, MCP checklist, localization rule, modal MinWidth/MinHeight rule), `.planning/PROJECT.md` v0.8 requirements
 
 ---
-*Architecture research for: Asset Sold History feature integration into Valt v0.5*
-*Researched: 2026-07-13*
+*Architecture research for: BTC Loan Simulator (v0.8) in Valt*
+*Researched: 2026-08-13*
