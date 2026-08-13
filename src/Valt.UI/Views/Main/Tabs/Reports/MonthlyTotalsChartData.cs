@@ -1,7 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Linq;
 using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.Measure;
@@ -14,7 +13,7 @@ using Valt.Infra.Modules.Reports.MonthlyTotals;
 
 namespace Valt.UI.Views.Main.Tabs.Reports;
 
-public class MonthlyTotalsChartData : IDisposable
+public class MonthlyTotalsChartData : ReportChartDataBase
 {
     // Color palette - Fiat (Blue shades from Secondary)
     private static readonly SKColor FiatPrimary = SKColor.Parse("#0566e9");      // Secondary500
@@ -28,48 +27,16 @@ public class MonthlyTotalsChartData : IDisposable
     private static readonly SKColor BtcDark = SKColor.Parse("#e98805");          // Accent500
     private static readonly SKColor BtcFill = SKColor.Parse("#ffa122").WithAlpha(40);
 
-    // Grid and text colors
-    private static readonly SKColor GridColor = SKColor.Parse("#4d4d4d");        // Background700
-    private static readonly SKColor TextColor = SKColor.Parse("#a8a6a4");        // Text400
-    private static readonly SKColor AxisNameColor = SKColor.Parse("#cfccc9");    // Text300
-    private static readonly SKColor LegendTextColor = SKColor.Parse("#eeebe8");  // Text200
-    private static readonly SKColor ChartBackground = SKColor.Parse("#333333");  // Background800
-
     public FiatCurrency FiatCurrency { get; set; } = null!;
 
-    // Chart styling
-    public SolidColorPaint LegendTextPaint { get; } = new(LegendTextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) };
-    public SolidColorPaint TooltipTextPaint { get; } = new(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) };
-    public SolidColorPaint TooltipBackgroundPaint { get; } = new(ChartBackground);
     public ObservableCollection<ObservablePoint> FiatValues { get; } = new();
     public ObservableCollection<ObservablePoint> BtcValues { get; } = new();
-    public ObservableCollection<string> MonthLabels { get; } = new();
-
-    public Axis[] XAxes { get; } = new Axis[1];
-
-    public Axis[] YAxes { get; } = new Axis[2];
-
-    public ObservableCollection<ISeries> Series { get; } = new();
 
     private LineSeries<ObservablePoint>? _fiatSeries;
     private LineSeries<ObservablePoint>? _btcSeries;
 
-    public MonthlyTotalsChartData()
+    public MonthlyTotalsChartData() : base(yAxisCount: 2)
     {
-        XAxes[0] =
-            new Axis
-            {
-                ForceStepToMin = true,
-                MinStep = 1,
-                SeparatorsPaint = new SolidColorPaint(GridColor.WithAlpha(60)) { StrokeThickness = 1 },
-                LabelsPaint = new SolidColorPaint(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) },
-                TextSize = 12,
-                Position = AxisPosition.End,
-                Labels = MonthLabels,
-                LabelsRotation = -45,
-                MinZoomDelta = 1
-            };
-
         YAxes[0] = new Axis
         {
             Name = "Fiat",
@@ -98,7 +65,6 @@ public class MonthlyTotalsChartData : IDisposable
             MinLimit = 0,
             MinZoomDelta = 1
         };
-
     }
 
     private LineSeries<ObservablePoint> CreateFiatSeries() => new()
@@ -143,15 +109,7 @@ public class MonthlyTotalsChartData : IDisposable
         BtcValues.Clear();
         MonthLabels.Clear();
 
-        // Reset X-axis zoom to show all data points when year changes
-        XAxes[0].MinLimit = null;
-        XAxes[0].MaxLimit = null;
-
-        // Dispose and detach the previous series so LiveCharts rebuilds the line
-        // path from scratch — reusing the same series instance leaves stale geometry
-        // after a window resize combined with a data refresh.
-        DisposeSeries();
-        Series.Clear();
+        BeginSeriesRebuild();
 
         for (var index = 0; index < monthlyTotalsData.Items.Count; index++)
         {
@@ -168,33 +126,19 @@ public class MonthlyTotalsChartData : IDisposable
         Series.Add(_btcSeries);
     }
 
-    private void DisposeSeries()
+    protected override void DisposeSeries()
     {
-        if (_fiatSeries is not null)
-        {
-            (_fiatSeries.Stroke as IDisposable)?.Dispose();
-            (_fiatSeries.GeometryStroke as IDisposable)?.Dispose();
-            (_fiatSeries.GeometryFill as IDisposable)?.Dispose();
-            (_fiatSeries.Fill as IDisposable)?.Dispose();
-            _fiatSeries = null;
-        }
+        DisposePaints(_fiatSeries?.Stroke, _fiatSeries?.GeometryStroke, _fiatSeries?.GeometryFill, _fiatSeries?.Fill);
+        _fiatSeries = null;
 
-        if (_btcSeries is not null)
-        {
-            (_btcSeries.Stroke as IDisposable)?.Dispose();
-            (_btcSeries.GeometryStroke as IDisposable)?.Dispose();
-            (_btcSeries.GeometryFill as IDisposable)?.Dispose();
-            (_btcSeries.Fill as IDisposable)?.Dispose();
-            _btcSeries = null;
-        }
+        DisposePaints(_btcSeries?.Stroke, _btcSeries?.GeometryStroke, _btcSeries?.GeometryFill, _btcSeries?.Fill);
+        _btcSeries = null;
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
-        DisposeSeries();
-        Series.Clear();
+        base.Dispose();
         FiatValues.Clear();
         BtcValues.Clear();
-        MonthLabels.Clear();
     }
 }
