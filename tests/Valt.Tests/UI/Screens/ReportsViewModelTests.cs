@@ -316,7 +316,7 @@ public class ReportsViewModelTests
         _ = _leveragePanel.Received(1).RefreshAsync();
     }
 
-    [Test, Timeout(10000)]
+    [Test, CancelAfter(10000)]
     public async Task Initialize_Should_Refresh_BtcLoansPanel()
     {
         // Arrange
@@ -579,7 +579,7 @@ public class ReportsViewModelTests
             .SetValue(viewModel, range);
     }
 
-    [Test, Timeout(10000)]
+    [Test, CancelAfter(10000)]
     public async Task FetchLoanReportsAsync_Dispatches_GetLoanReportsQuery()
     {
         // Arrange
@@ -599,7 +599,7 @@ public class ReportsViewModelTests
             Arg.Any<CancellationToken>());
     }
 
-    [Test, Timeout(10000)]
+    [Test, CancelAfter(10000)]
     public async Task FetchLoanReportsAsync_Sets_IsLoanReportsVisible_From_HasActiveLoans_True()
     {
         // Arrange
@@ -634,7 +634,7 @@ public class ReportsViewModelTests
         Assert.That(viewModel.IsLoanReportsError, Is.False);
     }
 
-    [Test, Timeout(10000)]
+    [Test, CancelAfter(10000)]
     public async Task FetchLoanReportsAsync_Sets_IsLoanReportsVisible_From_HasActiveLoans_False()
     {
         // Arrange
@@ -663,7 +663,7 @@ public class ReportsViewModelTests
         Assert.That(viewModel.IsLoanReportsLoading, Is.False);
     }
 
-    [Test, Timeout(10000)]
+    [Test, CancelAfter(10000)]
     public async Task FetchLoanReportsAsync_Sets_IsLoanReportsEmpty_When_No_Months()
     {
         // Arrange
@@ -691,7 +691,7 @@ public class ReportsViewModelTests
         Assert.That(viewModel.IsLoanReportsVisible, Is.True);
     }
 
-    [Test, Timeout(10000)]
+    [Test, CancelAfter(10000)]
     public async Task FetchLoanReportsAsync_Resets_IsLoanReportsLoading_After_Completion()
     {
         // Arrange
@@ -709,7 +709,7 @@ public class ReportsViewModelTests
         Assert.That(viewModel.IsLoanReportsLoading, Is.False);
     }
 
-    [Test, Timeout(10000)]
+    [Test, CancelAfter(10000)]
     public async Task FetchLoanReportsAsync_Sets_IsLoanReportsError_On_Exception()
     {
         // Arrange
