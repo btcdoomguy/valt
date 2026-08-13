@@ -3,6 +3,35 @@
 **Defined:** 2026-08-04
 **Core Value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
 
+## v0.8 Requirements (BTC Loan Simulator)
+
+A what-if calculator for BTC-backed loans, mirroring the Leverage Simulator layout (inputs left, results right). Accessible from the Tools menu.
+
+### Simulator Core
+
+- [ ] **SIM-01**: User can input loan parameters: collateral (BTC), amount taken, liquidation LTV, start date, interest rate, fees, end date
+- [ ] **SIM-02**: Results recalculate live as inputs change (mirroring Leverage Simulator behavior)
+- [ ] **SIM-03**: User can choose simple or compound interest mode
+- [ ] **SIM-04**: Simple interest mode uses the app's existing act/365 convention (parity with current loan math); compound mode uses daily accrual
+
+### Results Panel
+
+- [ ] **SIM-05**: User can view total to repay (principal + interest + fees) with an interest/fees breakdown
+- [ ] **SIM-06**: User can view all result values in fiat and sats, converted at the current BTC price with a visible conversion basis
+- [ ] **SIM-07**: User can view the liquidation BTC price derived from liquidation LTV and total debt
+- [ ] **SIM-08**: User can view the effective APR (fee-inclusive annualized rate)
+- [ ] **SIM-09**: User can view distance to liquidation versus the current live BTC price
+
+### Cost-over-time Schedule
+
+- [ ] **SIM-10**: User can view a monthly schedule (date, accrued interest, cumulative total in fiat and sats) until the end date
+
+### Integration
+
+- [ ] **SIM-11**: User can load an existing BTC-backed loan from Assets to prefill the simulator, with a "New simulation" option
+- [ ] **SIM-12**: AI assistant can run a BTC loan simulation via an MCP tool
+- [ ] **SIM-13**: All new user-facing strings are localized (en-US, pt-BR, es) and module documentation is updated
+
 ## v0.7 Requirements (Insights & Metrics Expansion)
 
 New analytics derived from existing app data, surfaced in the Reports tab. Each maps to roadmap phases 39+.
@@ -54,6 +83,11 @@ Deferred to a future release. Tracked but not in the v0.7 roadmap.
 
 - **LON-03**: Debt-to-wealth ratio over time
 
+### Simulator
+
+- **SIM-14**: Liquidation price per schedule row (LTV creep over time)
+- **SIM-15**: What-if BTC price slider in the simulator
+
 ### Goals
 
 - **GOL-01**: Forecast goal completion dates from progress velocity
@@ -66,6 +100,10 @@ Deferred to a future release. Tracked but not in the v0.7 roadmap.
 | Cost basis & profit reports (realized/unrealized, cost-basis bands) | Belongs to the AvgPrice module; separate milestone |
 | Account analytics (per-account balance evolution, concentration) | Lower value density than selected metrics |
 | v0.4 quality/hardening items (async void, HttpClient factory, job throttling, LiteDB indexes, god-VM refactor, test isolation, handler tests) | Kept for a dedicated quality milestone; v0.7 stays feature-focused |
+| Amortizing payment schedule in loan simulator | Real BTC loans are interest-only + balloon; amortization adds complexity for a structure users don't have |
+| Simulated BTC price path / liquidation-time projection in loan simulator | Speculative price forecasting; Reports already has custom price simulation |
+| Persisting loan simulations as assets | Pollutes the Assets ledger with hypothetical data; simulator is ephemeral like the Leverage Simulator |
+| Origination fee as percentage input | Flat fee matches existing `BtcLoanDetails.Fees`; two input modes create validation ambiguity |
 | Mobile or web port | Not in scope |
 
 ## Traceability
@@ -74,6 +112,19 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
+| SIM-01 | — | Pending |
+| SIM-02 | — | Pending |
+| SIM-03 | — | Pending |
+| SIM-04 | — | Pending |
+| SIM-05 | — | Pending |
+| SIM-06 | — | Pending |
+| SIM-07 | — | Pending |
+| SIM-08 | — | Pending |
+| SIM-09 | — | Pending |
+| SIM-10 | — | Pending |
+| SIM-11 | — | Pending |
+| SIM-12 | — | Pending |
+| SIM-13 | — | Pending |
 | SPA-01 | Phase 39 | Complete |
 | SPA-02 | Phase 39 | Complete |
 | SPA-03 | Phase 39 | Complete |
@@ -89,10 +140,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 **Coverage:**
 
-- v0.7 requirements: 12 total
-- Mapped to phases: 12 ✓
-- Unmapped: 0 ✓
+- v0.8 requirements: 13 total
+- Mapped to phases: 0 (roadmap pending)
+- Unmapped: 13 (roadmap pending)
+- v0.7 requirements: 12 total, all Complete ✓
 
 ---
 *Requirements defined: 2026-08-04*
-*Last updated: 2026-08-12 after Phase 42 completion*
+*Last updated: 2026-08-13 after v0.8 milestone requirements definition*
