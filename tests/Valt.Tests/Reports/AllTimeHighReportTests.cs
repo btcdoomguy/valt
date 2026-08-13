@@ -123,6 +123,12 @@ public class AllTimeHighReportTests : DatabaseTest
         return base.SeedDatabase();
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _localDatabase.GetTransactions().DeleteAll();
+    }
+
     [Test]
     public void Should_Throw_Error_If_No_Transactions_Found()
     {
@@ -139,29 +145,22 @@ public class AllTimeHighReportTests : DatabaseTest
         var clock = new FakeClock(new DateTime(2025, 12, 31));
         var allTimeHighReport = new AllTimeHighReport(clock, CreateEmptyAssetQueries());
 
-        try
+        _localDatabase.GetTransactions().Insert(new TransactionBuilder()
         {
-            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
-            {
-                Name = "Test",
-                CategoryId = new CategoryId(),
-                Date = new DateOnly(2025, 2, 1),
-                TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
-            }.Build());
+            Name = "Test",
+            CategoryId = new CategoryId(),
+            Date = new DateOnly(2025, 2, 1),
+            TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
+        }.Build());
 
-            var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(result.Currency, Is.EqualTo(FiatCurrency.Brl));
-                Assert.That(result.Value.Value, Is.EqualTo(1100m));
-                Assert.That(result.Date, Is.EqualTo(new DateOnly(2025, 2, 1)));
-                Assert.That(result.HasAccountsWithoutTransactions, Is.True);
-            }
-        }
-        finally
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
+        using (Assert.EnterMultipleScope())
         {
-            _localDatabase.GetTransactions().DeleteAll();
+            Assert.That(result.Currency, Is.EqualTo(FiatCurrency.Brl));
+            Assert.That(result.Value.Value, Is.EqualTo(1100m));
+            Assert.That(result.Date, Is.EqualTo(new DateOnly(2025, 2, 1)));
+            Assert.That(result.HasAccountsWithoutTransactions, Is.True);
         }
     }
 
@@ -171,53 +170,46 @@ public class AllTimeHighReportTests : DatabaseTest
         var clock = new FakeClock(new DateTime(2025, 12, 31));
         var allTimeHighReport = new AllTimeHighReport(clock, CreateEmptyAssetQueries());
 
-        try
+        _localDatabase.GetTransactions().Insert(new TransactionBuilder()
         {
-            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
-            {
-                Name = "Test",
-                CategoryId = new CategoryId(),
-                Date = new DateOnly(2025, 2, 1),
-                TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
-            }.Build());
+            Name = "Test",
+            CategoryId = new CategoryId(),
+            Date = new DateOnly(2025, 2, 1),
+            TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
+        }.Build());
 
-            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
-            {
-                Name = "Test",
-                CategoryId = new CategoryId(),
-                Date = new DateOnly(2025, 3, 1),
-                TransactionDetails = new FiatDetails(_usdAccount.Id.ToString(), 100m, true)
-            }.Build());
-
-            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
-            {
-                Name = "Test",
-                CategoryId = new CategoryId(),
-                Date = new DateOnly(2025, 4, 1),
-                TransactionDetails = new FiatDetails(_eurAccount.Id.ToString(), 100m, true)
-            }.Build());
-
-            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
-            {
-                Name = "Test",
-                CategoryId = new CategoryId(),
-                Date = new DateOnly(2025, 5, 1),
-                TransactionDetails = new BitcoinDetails(_btcAccount.Id.ToString(), BtcValue.ParseBitcoin(1), true)
-            }.Build());
-
-            var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(result.Currency, Is.EqualTo(FiatCurrency.Brl));
-                Assert.That(result.Value.Value, Is.EqualTo(1115216.67m));
-                Assert.That(result.Date, Is.EqualTo(new DateOnly(2025, 5, 1)));
-                Assert.That(result.HasAccountsWithoutTransactions, Is.False);
-            }
-        }
-        finally
+        _localDatabase.GetTransactions().Insert(new TransactionBuilder()
         {
-            _localDatabase.GetTransactions().DeleteAll();
+            Name = "Test",
+            CategoryId = new CategoryId(),
+            Date = new DateOnly(2025, 3, 1),
+            TransactionDetails = new FiatDetails(_usdAccount.Id.ToString(), 100m, true)
+        }.Build());
+
+        _localDatabase.GetTransactions().Insert(new TransactionBuilder()
+        {
+            Name = "Test",
+            CategoryId = new CategoryId(),
+            Date = new DateOnly(2025, 4, 1),
+            TransactionDetails = new FiatDetails(_eurAccount.Id.ToString(), 100m, true)
+        }.Build());
+
+        _localDatabase.GetTransactions().Insert(new TransactionBuilder()
+        {
+            Name = "Test",
+            CategoryId = new CategoryId(),
+            Date = new DateOnly(2025, 5, 1),
+            TransactionDetails = new BitcoinDetails(_btcAccount.Id.ToString(), BtcValue.ParseBitcoin(1), true)
+        }.Build());
+
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.Currency, Is.EqualTo(FiatCurrency.Brl));
+            Assert.That(result.Value.Value, Is.EqualTo(1115216.67m));
+            Assert.That(result.Date, Is.EqualTo(new DateOnly(2025, 5, 1)));
+            Assert.That(result.HasAccountsWithoutTransactions, Is.False);
         }
     }
 
@@ -227,62 +219,55 @@ public class AllTimeHighReportTests : DatabaseTest
         var clock = new FakeClock(new DateTime(2025, 12, 31));
         var allTimeHighReport = new AllTimeHighReport(clock, CreateEmptyAssetQueries());
 
-        try
+        _localDatabase.GetTransactions().Insert(new TransactionBuilder()
         {
-            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
-            {
-                Name = "Test",
-                CategoryId = new CategoryId(),
-                Date = new DateOnly(2025, 2, 1),
-                TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
-            }.Build());
+            Name = "Test",
+            CategoryId = new CategoryId(),
+            Date = new DateOnly(2025, 2, 1),
+            TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
+        }.Build());
 
-            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
-            {
-                Name = "Test",
-                CategoryId = new CategoryId(),
-                Date = new DateOnly(2025, 3, 1),
-                TransactionDetails = new FiatDetails(_usdAccount.Id.ToString(), 100m, true)
-            }.Build());
-
-            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
-            {
-                Name = "Test",
-                CategoryId = new CategoryId(),
-                Date = new DateOnly(2025, 4, 1),
-                TransactionDetails = new FiatDetails(_eurAccount.Id.ToString(), 100m, true)
-            }.Build());
-
-            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
-            {
-                Name = "Test",
-                CategoryId = new CategoryId(),
-                Date = new DateOnly(2025, 5, 1),
-                TransactionDetails = new BitcoinDetails(_btcAccount.Id.ToString(), BtcValue.ParseBitcoin(1), true)
-            }.Build());
-
-            //replace one of the btc rates to a higher one
-            var dateToReplace = _priceDatabase.GetBitcoinData().FindOne(x => x.Date == new DateTime(2025, 6, 1));
-            _priceDatabase.GetBitcoinData().Delete(dateToReplace.Id);
-            _priceDatabase.GetBitcoinData().Insert(new BitcoinDataEntity()
-            {
-                Date = new DateTime(2025, 6, 1),
-                Price = 200000m
-            });
-
-            var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(result.Currency, Is.EqualTo(FiatCurrency.Brl));
-                Assert.That(result.Value.Value, Is.EqualTo(2215216.67m));
-                Assert.That(result.Date, Is.EqualTo(new DateOnly(2025, 6, 1)));
-                Assert.That(result.HasAccountsWithoutTransactions, Is.False);
-            }
-        }
-        finally
+        _localDatabase.GetTransactions().Insert(new TransactionBuilder()
         {
-            _localDatabase.GetTransactions().DeleteAll();
+            Name = "Test",
+            CategoryId = new CategoryId(),
+            Date = new DateOnly(2025, 3, 1),
+            TransactionDetails = new FiatDetails(_usdAccount.Id.ToString(), 100m, true)
+        }.Build());
+
+        _localDatabase.GetTransactions().Insert(new TransactionBuilder()
+        {
+            Name = "Test",
+            CategoryId = new CategoryId(),
+            Date = new DateOnly(2025, 4, 1),
+            TransactionDetails = new FiatDetails(_eurAccount.Id.ToString(), 100m, true)
+        }.Build());
+
+        _localDatabase.GetTransactions().Insert(new TransactionBuilder()
+        {
+            Name = "Test",
+            CategoryId = new CategoryId(),
+            Date = new DateOnly(2025, 5, 1),
+            TransactionDetails = new BitcoinDetails(_btcAccount.Id.ToString(), BtcValue.ParseBitcoin(1), true)
+        }.Build());
+
+        //replace one of the btc rates to a higher one
+        var dateToReplace = _priceDatabase.GetBitcoinData().FindOne(x => x.Date == new DateTime(2025, 6, 1));
+        _priceDatabase.GetBitcoinData().Delete(dateToReplace.Id);
+        _priceDatabase.GetBitcoinData().Insert(new BitcoinDataEntity()
+        {
+            Date = new DateTime(2025, 6, 1),
+            Price = 200000m
+        });
+
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.Currency, Is.EqualTo(FiatCurrency.Brl));
+            Assert.That(result.Value.Value, Is.EqualTo(2215216.67m));
+            Assert.That(result.Date, Is.EqualTo(new DateOnly(2025, 6, 1)));
+            Assert.That(result.HasAccountsWithoutTransactions, Is.False);
         }
     }
 
@@ -303,31 +288,24 @@ public class AllTimeHighReportTests : DatabaseTest
 
         var allTimeHighReport = new AllTimeHighReport(clock, assetQueries);
 
-        try
+        _localDatabase.GetTransactions().Insert(new TransactionBuilder()
         {
-            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
-            {
-                Name = "Test",
-                CategoryId = new CategoryId(),
-                Date = new DateOnly(2025, 2, 1),
-                TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
-            }.Build());
+            Name = "Test",
+            CategoryId = new CategoryId(),
+            Date = new DateOnly(2025, 2, 1),
+            TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
+        }.Build());
 
-            var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(result.Currency, Is.EqualTo(FiatCurrency.Brl));
-                // BRL account 1100 + USD asset 1000 converted to BRL at 5.5 = 5500
-                Assert.That(result.Value.Value, Is.EqualTo(6600m));
-                Assert.That(result.Date, Is.EqualTo(new DateOnly(2025, 2, 1)));
-                Assert.That(result.DaysUnderWater, Is.GreaterThan(0));
-                Assert.That(result.HasAccountsWithoutTransactions, Is.True);
-            }
-        }
-        finally
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
+        using (Assert.EnterMultipleScope())
         {
-            _localDatabase.GetTransactions().DeleteAll();
+            Assert.That(result.Currency, Is.EqualTo(FiatCurrency.Brl));
+            // BRL account 1100 + USD asset 1000 converted to BRL at 5.5 = 5500
+            Assert.That(result.Value.Value, Is.EqualTo(6600m));
+            Assert.That(result.Date, Is.EqualTo(new DateOnly(2025, 2, 1)));
+            Assert.That(result.DaysUnderWater, Is.GreaterThan(0));
+            Assert.That(result.HasAccountsWithoutTransactions, Is.True);
         }
     }
 
@@ -354,28 +332,21 @@ public class AllTimeHighReportTests : DatabaseTest
 
         var allTimeHighReport = new AllTimeHighReport(clock, assetQueries);
 
-        try
+        _localDatabase.GetTransactions().Insert(new TransactionBuilder()
         {
-            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
-            {
-                Name = "Test",
-                CategoryId = new CategoryId(),
-                Date = new DateOnly(2025, 2, 1),
-                TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
-            }.Build());
+            Name = "Test",
+            CategoryId = new CategoryId(),
+            Date = new DateOnly(2025, 2, 1),
+            TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
+        }.Build());
 
-            var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
-            using (Assert.EnterMultipleScope())
-            {
-                // Only the BRL account transaction contributes; assets are excluded
-                Assert.That(result.Value.Value, Is.EqualTo(1100m));
-                Assert.That(result.Date, Is.EqualTo(new DateOnly(2025, 2, 1)));
-            }
-        }
-        finally
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
+        using (Assert.EnterMultipleScope())
         {
-            _localDatabase.GetTransactions().DeleteAll();
+            // Only the BRL account transaction contributes; assets are excluded
+            Assert.That(result.Value.Value, Is.EqualTo(1100m));
+            Assert.That(result.Date, Is.EqualTo(new DateOnly(2025, 2, 1)));
         }
     }
 
@@ -385,43 +356,36 @@ public class AllTimeHighReportTests : DatabaseTest
         var clock = new FakeClock(new DateTime(2025, 12, 31));
         var allTimeHighReport = new AllTimeHighReport(clock, CreateEmptyAssetQueries());
 
-        try
+        // Peak occurs on the report end date: DaysUnderWater should be zero
+        _localDatabase.GetTransactions().Insert(new TransactionBuilder()
         {
-            // Peak occurs on the report end date: DaysUnderWater should be zero
-            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
-            {
-                Name = "End date deposit",
-                CategoryId = new CategoryId(),
-                Date = new DateOnly(2025, 12, 30),
-                TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
-            }.Build());
+            Name = "End date deposit",
+            CategoryId = new CategoryId(),
+            Date = new DateOnly(2025, 12, 30),
+            TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
+        }.Build());
 
-            var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var endDatePeakResult = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var endDatePeakResult = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
 
-            _localDatabase.GetTransactions().DeleteAll();
+        _localDatabase.GetTransactions().DeleteAll();
 
-            // Peak occurs earlier: DaysUnderWater should be positive
-            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
-            {
-                Name = "Earlier deposit",
-                CategoryId = new CategoryId(),
-                Date = new DateOnly(2025, 2, 1),
-                TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
-            }.Build());
-
-            provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var earlierPeakResult = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(endDatePeakResult.DaysUnderWater, Is.EqualTo(0));
-                Assert.That(earlierPeakResult.DaysUnderWater, Is.EqualTo(332));
-            }
-        }
-        finally
+        // Peak occurs earlier: DaysUnderWater should be positive
+        _localDatabase.GetTransactions().Insert(new TransactionBuilder()
         {
-            _localDatabase.GetTransactions().DeleteAll();
+            Name = "Earlier deposit",
+            CategoryId = new CategoryId(),
+            Date = new DateOnly(2025, 2, 1),
+            TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
+        }.Build());
+
+        provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var earlierPeakResult = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(endDatePeakResult.DaysUnderWater, Is.EqualTo(0));
+            Assert.That(earlierPeakResult.DaysUnderWater, Is.EqualTo(332));
         }
     }
 
@@ -442,28 +406,21 @@ public class AllTimeHighReportTests : DatabaseTest
 
         var allTimeHighReport = new AllTimeHighReport(clock, assetQueries);
 
-        try
+        _localDatabase.GetTransactions().Insert(new TransactionBuilder()
         {
-            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
-            {
-                Name = "Test",
-                CategoryId = new CategoryId(),
-                Date = new DateOnly(2025, 2, 1),
-                TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
-            }.Build());
+            Name = "Test",
+            CategoryId = new CategoryId(),
+            Date = new DateOnly(2025, 2, 1),
+            TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 100m, true)
+        }.Build());
 
-            var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
-            using (Assert.EnterMultipleScope())
-            {
-                // BRL account 1100 + SATS asset (1 BTC) converted to BRL at 5.5 = 550000
-                Assert.That(result.Value.Value, Is.EqualTo(551100m));
-                Assert.That(result.Date, Is.EqualTo(new DateOnly(2025, 2, 1)));
-            }
-        }
-        finally
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
+        using (Assert.EnterMultipleScope())
         {
-            _localDatabase.GetTransactions().DeleteAll();
+            // BRL account 1100 + SATS asset (1 BTC) converted to BRL at 5.5 = 550000
+            Assert.That(result.Value.Value, Is.EqualTo(551100m));
+            Assert.That(result.Date, Is.EqualTo(new DateOnly(2025, 2, 1)));
         }
     }
 
@@ -473,51 +430,44 @@ public class AllTimeHighReportTests : DatabaseTest
         var clock = new FakeClock(new DateTime(2025, 12, 31));
         var allTimeHighReport = new AllTimeHighReport(clock, CreateEmptyAssetQueries());
 
-        try
+        // Zero out all seeded account balances so no positive wealth peak exists
+        _localDatabase.GetTransactions().Insert(new TransactionBuilder()
         {
-            // Zero out all seeded account balances so no positive wealth peak exists
-            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
-            {
-                Name = "Zero BRL",
-                CategoryId = new CategoryId(),
-                Date = new DateOnly(2025, 2, 1),
-                TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 1000m, false)
-            }.Build());
-            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
-            {
-                Name = "Zero USD",
-                CategoryId = new CategoryId(),
-                Date = new DateOnly(2025, 2, 1),
-                TransactionDetails = new FiatDetails(_usdAccount.Id.ToString(), 1000m, false)
-            }.Build());
-            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
-            {
-                Name = "Zero EUR",
-                CategoryId = new CategoryId(),
-                Date = new DateOnly(2025, 2, 1),
-                TransactionDetails = new FiatDetails(_eurAccount.Id.ToString(), 1000m, false)
-            }.Build());
-            _localDatabase.GetTransactions().Insert(new TransactionBuilder()
-            {
-                Name = "Zero BTC",
-                CategoryId = new CategoryId(),
-                Date = new DateOnly(2025, 2, 1),
-                TransactionDetails = new BitcoinDetails(_btcAccount.Id.ToString(), BtcValue.ParseBitcoin(1), false)
-            }.Build());
+            Name = "Zero BRL",
+            CategoryId = new CategoryId(),
+            Date = new DateOnly(2025, 2, 1),
+            TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), 1000m, false)
+        }.Build());
+        _localDatabase.GetTransactions().Insert(new TransactionBuilder()
+        {
+            Name = "Zero USD",
+            CategoryId = new CategoryId(),
+            Date = new DateOnly(2025, 2, 1),
+            TransactionDetails = new FiatDetails(_usdAccount.Id.ToString(), 1000m, false)
+        }.Build());
+        _localDatabase.GetTransactions().Insert(new TransactionBuilder()
+        {
+            Name = "Zero EUR",
+            CategoryId = new CategoryId(),
+            Date = new DateOnly(2025, 2, 1),
+            TransactionDetails = new FiatDetails(_eurAccount.Id.ToString(), 1000m, false)
+        }.Build());
+        _localDatabase.GetTransactions().Insert(new TransactionBuilder()
+        {
+            Name = "Zero BTC",
+            CategoryId = new CategoryId(),
+            Date = new DateOnly(2025, 2, 1),
+            TransactionDetails = new BitcoinDetails(_btcAccount.Id.ToString(), BtcValue.ParseBitcoin(1), false)
+        }.Build());
 
-            var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(result.Value.Value, Is.EqualTo(0m));
-                Assert.That(result.Date, Is.EqualTo(new DateOnly(2025, 12, 30)));
-                Assert.That(result.DaysUnderWater, Is.EqualTo(0));
-                Assert.That(result.DeclineFromAth, Is.EqualTo(0m));
-            }
-        }
-        finally
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var result = await allTimeHighReport.GetAsync(FiatCurrency.Brl, provider);
+        using (Assert.EnterMultipleScope())
         {
-            _localDatabase.GetTransactions().DeleteAll();
+            Assert.That(result.Value.Value, Is.EqualTo(0m));
+            Assert.That(result.Date, Is.EqualTo(new DateOnly(2025, 12, 30)));
+            Assert.That(result.DaysUnderWater, Is.EqualTo(0));
+            Assert.That(result.DeclineFromAth, Is.EqualTo(0m));
         }
     }
 }

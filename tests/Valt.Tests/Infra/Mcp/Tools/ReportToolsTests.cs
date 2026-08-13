@@ -55,6 +55,16 @@ public class ReportToolsTests : IntegrationTest
         _currencySettings.MainFiatCurrency = FiatCurrency.Usd.Code;
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _localDatabase.GetAccounts().DeleteAll();
+        _localDatabase.GetTransactions().DeleteAll();
+        _localDatabase.GetFixedExpenses().DeleteAll();
+        _localDatabase.GetFixedExpenseRecords().DeleteAll();
+        _localDatabase.GetAssets().DeleteAll();
+    }
+
     [Test]
     public async Task GetSpendingAnalytics_WithCurrentMonthExpenseAndFixedExpense_ReturnsBurnRateAndFixedVsVariable()
     {

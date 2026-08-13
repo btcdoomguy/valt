@@ -188,14 +188,23 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
         Assert.That(entity, Is.Not.Null);
         _priceDatabase.GetBitcoinData().Delete(entity.Id);
 
-        var result = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31));
-        var monthData = GetMonthData(result, month);
-
-        using (Assert.EnterMultipleScope())
+        try
         {
-            Assert.That(monthData, Is.Not.Null);
-            Assert.That(monthData!.SatsEarned, Is.EqualTo(0));
-            Assert.That(monthData.SatsSpent, Is.EqualTo(0));
+            var result = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31));
+            var monthData = GetMonthData(result, month);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(monthData, Is.Not.Null);
+                Assert.That(monthData!.SatsEarned, Is.EqualTo(0));
+                Assert.That(monthData.SatsSpent, Is.EqualTo(0));
+            }
+        }
+        finally
+        {
+            // Restore the shared fixture price row so later tests in this fixture
+            // do not run against mutated price data
+            _priceDatabase.GetBitcoinData().Insert(new BitcoinDataEntity { Date = transactionDate, Price = 100000m });
         }
     }
 
