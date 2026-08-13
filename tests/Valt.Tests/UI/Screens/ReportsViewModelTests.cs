@@ -306,11 +306,18 @@ public class ReportsViewModelTests
     public async Task Initialize_Should_Refresh_LeveragePanel()
     {
         // Arrange
+        var refreshed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        _leveragePanel.RefreshAsync().Returns(_ =>
+        {
+            refreshed.TrySetResult();
+            return Task.CompletedTask;
+        });
+
         var viewModel = CreateViewModel();
 
         // Act
         viewModel.Initialize();
-        await Task.Delay(100);
+        await refreshed.Task.WaitAsync(TimeSpan.FromSeconds(5));
 
         // Assert
         _ = _leveragePanel.Received(1).RefreshAsync();
@@ -320,11 +327,18 @@ public class ReportsViewModelTests
     public async Task Initialize_Should_Refresh_BtcLoansPanel()
     {
         // Arrange
+        var refreshed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        _btcLoansPanel.RefreshAsync().Returns(_ =>
+        {
+            refreshed.TrySetResult();
+            return Task.CompletedTask;
+        });
+
         var viewModel = CreateViewModel();
 
         // Act
         viewModel.Initialize();
-        await Task.Delay(100);
+        await refreshed.Task.WaitAsync(TimeSpan.FromSeconds(5));
 
         // Assert
         _ = _btcLoansPanel.Received(1).RefreshAsync();
