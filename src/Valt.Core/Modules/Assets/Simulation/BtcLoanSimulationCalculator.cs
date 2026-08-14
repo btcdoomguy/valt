@@ -34,13 +34,10 @@ public static class BtcLoanSimulationCalculator
         switch (input.InterestMode)
         {
             case BtcLoanInterestMode.Simple:
-                interest = CalculateSimpleInterest(principal, input.Apr, days);
-                schedule = GenerateSimpleSchedule(input, principal, fees, days, interest);
+                (interest, schedule) = CalculateSimple(input, principal, fees, days);
                 break;
             case BtcLoanInterestMode.Compound:
-                // Compound mode is implemented in Task 2; for Task 1 fall back to simple math.
-                interest = CalculateSimpleInterest(principal, input.Apr, days);
-                schedule = GenerateSimpleSchedule(input, principal, fees, days, interest);
+                (interest, schedule) = CalculateCompound(input, principal, fees, days);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(input.InterestMode));
@@ -75,31 +72,95 @@ public static class BtcLoanSimulationCalculator
             throw new ArgumentException("Principal amount must be positive", nameof(input.PrincipalAmount));
     }
 
-    private static decimal CalculateSimpleInterest(decimal principal, decimal apr, int days)
-        => Math.Round(principal * apr / 365m * days, 2);
-
-    private static List<LoanScheduleEntry> GenerateSimpleSchedule(
+    private static (decimal Interest, List<LoanScheduleEntry> Schedule) CalculateSimple(
         BtcLoanSimulationInput input,
         decimal principal,
         decimal fees,
-        int days,
-        decimal totalInterest)
+        int days)
     {
         var schedule = new List<LoanScheduleEntry>();
         var startDate = input.StartDate;
         var endDate = input.EndDate;
 
-        var candidate = GetMonthEnd(startDate);
-        while (candidate < endDate)
+        // Emit a row on the start date when it is itself a month-end anchor.
+        if (startDate == GetMonthEnd(startDate))
         {
-            var elapsed = candidate.DayNumber - startDate.DayNumber;
-            var accrued = CalculateSimpleInterest(principal, input.Apr, elapsed);
-            schedule.Add(new LoanScheduleEntry(candidate, accrued, principal + accrued + fees));
-            candidate = GetMonthEnd(candidate.AddDays(1));
+            schedule.Add(new LoanScheduleEntry(startDate, 0m, principal + fees));
         }
 
-        schedule.Add(new LoanScheduleEntry(endDate, totalInterest, principal + totalInterest + fees));
-        return schedule;
+        var totalInterest = Math.Round(principal * input.Apr / 365m * days, 2);
+
+        for (var i = 1; i <= days; i++)
+        {
+            var currentDate = startDate.AddDays(i);
+            if (currentDate == endDate || currentDate == GetMonthEnd(currentDate))
+            {
+                var elapsed = currentDate.DayNumber - startDate.DayNumber;
+                var accrued = Math.Round(principal * input.Apr / 365m * elapsed, 2);
+                schedule.Add(new LoanScheduleEntry(currentDate, accrued, principal + accrued + fees));
+            }
+        }
+
+        // Ensure the closing row uses the headline rounded interest and total.
+        if (schedule.Count == 0 || schedule[^1].Date != endDate)
+        {
+            schedule.Add(new LoanScheduleEntry(endDate, totalInterest, principal + totalInterest + fees));
+        }
+        else
+        {
+            var last = schedule[^1];
+            schedule[^1] = new LoanScheduleEntry(last.Date, totalInterest, principal + totalInterest + fees);
+        }
+
+        return (totalInterest, schedule);
+    }
+
+    private static (decimal Interest, List<LoanScheduleEntry> Schedule) CalculateCompound(
+        BtcLoanSimulationInput input,
+        decimal principal,
+        decimal fees,
+        int days)
+    {
+        var schedule = new List<LoanScheduleEntry>();
+        var startDate = input.StartDate;
+        var endDate = input.EndDate;
+        var runningPrincipal = principal;
+        var accruedInterest = 0m;
+
+        // Emit a row on the start date when it is itself a month-end anchor.
+        if (startDate == GetMonthEnd(startDate))
+        {
+            schedule.Add(new LoanScheduleEntry(startDate, 0m, principal + fees));
+        }
+
+        for (var i = 1; i <= days; i++)
+        {
+            var dailyInterest = runningPrincipal * input.Apr / 365m;
+            accruedInterest += dailyInterest;
+            runningPrincipal += dailyInterest;
+
+            var currentDate = startDate.AddDays(i);
+            if (currentDate == endDate || currentDate == GetMonthEnd(currentDate))
+            {
+                var roundedAccrued = Math.Round(accruedInterest, 2);
+                schedule.Add(new LoanScheduleEntry(currentDate, roundedAccrued, principal + roundedAccrued + fees));
+            }
+        }
+
+        var totalInterest = Math.Round(accruedInterest, 2);
+
+        // Ensure the closing row uses the headline rounded interest and total.
+        if (schedule.Count == 0 || schedule[^1].Date != endDate)
+        {
+            schedule.Add(new LoanScheduleEntry(endDate, totalInterest, principal + totalInterest + fees));
+        }
+        else
+        {
+            var last = schedule[^1];
+            schedule[^1] = new LoanScheduleEntry(last.Date, totalInterest, principal + totalInterest + fees);
+        }
+
+        return (totalInterest, schedule);
     }
 
     private static DateOnly GetMonthEnd(DateOnly date)

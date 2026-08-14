@@ -105,4 +105,122 @@ public class BtcLoanSimulationCalculatorTests
             Assert.That(result.Schedule[^1].CumulativeTotal, Is.EqualTo(expectedTotalRepay));
         });
     }
+
+    [Test]
+    public void CompoundInterest_Should_Exceed_SimpleInterest_For_Multi_Day_Loan()
+    {
+        var startDate = new DateOnly(2025, 1, 1);
+        var endDate = new DateOnly(2025, 3, 31); // 90 days
+
+        var simpleResult = BtcLoanSimulationCalculator.Calculate(new BtcLoanSimulationInput
+        {
+            CollateralSats = 100_000_000L,
+            PrincipalAmount = 25_000m,
+            CurrencyCode = "USD",
+            Apr = 0.12m,
+            LiquidationLtv = 80m,
+            Fees = 100m,
+            StartDate = startDate,
+            EndDate = endDate,
+            InterestMode = BtcLoanInterestMode.Simple
+        });
+
+        var compoundResult = BtcLoanSimulationCalculator.Calculate(new BtcLoanSimulationInput
+        {
+            CollateralSats = 100_000_000L,
+            PrincipalAmount = 25_000m,
+            CurrencyCode = "USD",
+            Apr = 0.12m,
+            LiquidationLtv = 80m,
+            Fees = 100m,
+            StartDate = startDate,
+            EndDate = endDate,
+            InterestMode = BtcLoanInterestMode.Compound
+        });
+
+        Assert.That(compoundResult.TotalRepay, Is.GreaterThan(simpleResult.TotalRepay));
+        Assert.That(compoundResult.Interest, Is.GreaterThan(simpleResult.Interest));
+    }
+
+    [Test]
+    public void Final_Schedule_Row_Should_Equal_TotalRepay_For_Both_Modes()
+    {
+        var startDate = new DateOnly(2025, 1, 1);
+        var endDate = new DateOnly(2025, 4, 15);
+
+        var simpleResult = BtcLoanSimulationCalculator.Calculate(new BtcLoanSimulationInput
+        {
+            CollateralSats = 100_000_000L,
+            PrincipalAmount = 25_000m,
+            CurrencyCode = "USD",
+            Apr = 0.12m,
+            LiquidationLtv = 80m,
+            Fees = 100m,
+            StartDate = startDate,
+            EndDate = endDate,
+            InterestMode = BtcLoanInterestMode.Simple
+        });
+
+        var compoundResult = BtcLoanSimulationCalculator.Calculate(new BtcLoanSimulationInput
+        {
+            CollateralSats = 100_000_000L,
+            PrincipalAmount = 25_000m,
+            CurrencyCode = "USD",
+            Apr = 0.12m,
+            LiquidationLtv = 80m,
+            Fees = 100m,
+            StartDate = startDate,
+            EndDate = endDate,
+            InterestMode = BtcLoanInterestMode.Compound
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(simpleResult.Schedule[^1].CumulativeTotal, Is.EqualTo(simpleResult.TotalRepay));
+            Assert.That(compoundResult.Schedule[^1].CumulativeTotal, Is.EqualTo(compoundResult.TotalRepay));
+        });
+    }
+
+    [Test]
+    public void EffectiveApr_Should_Equal_Nominal_Apr_When_No_Fees()
+    {
+        var startDate = new DateOnly(2025, 1, 1);
+        var endDate = new DateOnly(2025, 1, 31);
+
+        var result = BtcLoanSimulationCalculator.Calculate(new BtcLoanSimulationInput
+        {
+            CollateralSats = 100_000_000L,
+            PrincipalAmount = 25_000m,
+            CurrencyCode = "USD",
+            Apr = 0.12m,
+            LiquidationLtv = 80m,
+            Fees = 0m,
+            StartDate = startDate,
+            EndDate = endDate,
+            InterestMode = BtcLoanInterestMode.Simple
+        });
+
+        Assert.That(result.EffectiveApr, Is.EqualTo(0.12m));
+    }
+
+    [Test]
+    public void LiquidationPrice_Should_Be_Calculated_From_Total_Debt_And_Collateral()
+    {
+        var result = BtcLoanSimulationCalculator.Calculate(new BtcLoanSimulationInput
+        {
+            CollateralSats = 100_000_000L,
+            PrincipalAmount = 25_000m,
+            CurrencyCode = "USD",
+            Apr = 0m,
+            LiquidationLtv = 80m,
+            Fees = 0m,
+            StartDate = new DateOnly(2025, 1, 1),
+            EndDate = new DateOnly(2025, 1, 31),
+            InterestMode = BtcLoanInterestMode.Simple
+        });
+
+        // TotalRepay = 25_000, collateral = 1 BTC, LTV = 80%
+        // Liquidation price = 25_000 / (1 * 0.8) = 31_250
+        Assert.That(result.LiquidationPrice, Is.EqualTo(31_250m));
+    }
 }
