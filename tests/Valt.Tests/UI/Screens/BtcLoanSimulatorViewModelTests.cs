@@ -169,4 +169,211 @@ public class BtcLoanSimulatorViewModelTests
         Assert.That(viewModel.HasResults, Is.False);
         Assert.That(viewModel.TotalRepayFiat, Is.Empty);
     }
+
+    #region SIM-08 Effective APR
+
+    [Test]
+    public void EffectiveApr_WithZeroFeesAnd365DayTerm_IsNominalApr()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        _ratesState.BitcoinPrice = 100_000m;
+        _ratesState.FiatRates = new Dictionary<string, decimal> { ["USD"] = 1m };
+
+        viewModel.SelectedCurrency = FiatCurrency.Usd;
+        viewModel.CollateralBtcValue = BtcValue.ParseBitcoin(1m);
+        viewModel.AmountTakenFiatValue = FiatValue.New(25_000m);
+        viewModel.LiquidationLtvText = "80";
+        viewModel.AprText = "12";
+        viewModel.FeesFiatValue = FiatValue.New(0m);
+        viewModel.StartDate = new DateTime(2024, 1, 1);
+        viewModel.EndDate = new DateTime(2024, 12, 31);
+        viewModel.IsSimple = true;
+
+        // Assert
+        Assert.That(viewModel.EffectiveAprText, Is.EqualTo("12.00%"));
+    }
+
+    #endregion
+
+    #region SIM-09 Distance to liquidation
+
+    [Test]
+    public void DistanceToLiquidation_WhenPriceAboveLiquidation_ShowsPositivePercentage()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        _ratesState.BitcoinPrice = 100_000m;
+        _ratesState.FiatRates = new Dictionary<string, decimal> { ["USD"] = 1m };
+
+        viewModel.SelectedCurrency = FiatCurrency.Usd;
+        viewModel.CollateralBtcValue = BtcValue.ParseBitcoin(1m);
+        viewModel.AmountTakenFiatValue = FiatValue.New(25_000m);
+        viewModel.LiquidationLtvText = "80";
+        viewModel.AprText = "0";
+        viewModel.FeesFiatValue = FiatValue.New(0m);
+        viewModel.StartDate = new DateTime(2024, 1, 1);
+        viewModel.EndDate = new DateTime(2024, 1, 31);
+
+        // Liquidation price = 25,000 / (1 * 0.8) = 31,250
+        // Distance = (100,000 - 31,250) / 31,250 = 2.20 => +220.00%
+        Assert.That(viewModel.DistanceToLiquidation, Does.StartWith("+"));
+        Assert.That(viewModel.DistanceToLiquidation, Does.Contain("220"));
+    }
+
+    [Test]
+    public void DistanceToLiquidationColor_IsRed_WhenPriceAtOrBelowLiquidation()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        _ratesState.BitcoinPrice = 31_000m;
+        _ratesState.FiatRates = new Dictionary<string, decimal> { ["USD"] = 1m };
+
+        viewModel.SelectedCurrency = FiatCurrency.Usd;
+        viewModel.CollateralBtcValue = BtcValue.ParseBitcoin(1m);
+        viewModel.AmountTakenFiatValue = FiatValue.New(25_000m);
+        viewModel.LiquidationLtvText = "80";
+        viewModel.AprText = "0";
+        viewModel.FeesFiatValue = FiatValue.New(0m);
+        viewModel.StartDate = new DateTime(2024, 1, 1);
+        viewModel.EndDate = new DateTime(2024, 1, 31);
+
+        Assert.That(viewModel.DistanceToLiquidationColor, Is.EqualTo("#F44336"));
+    }
+
+    [Test]
+    public void DistanceToLiquidationColor_IsGreen_WhenPriceAboveLiquidation()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        _ratesState.BitcoinPrice = 100_000m;
+        _ratesState.FiatRates = new Dictionary<string, decimal> { ["USD"] = 1m };
+
+        viewModel.SelectedCurrency = FiatCurrency.Usd;
+        viewModel.CollateralBtcValue = BtcValue.ParseBitcoin(1m);
+        viewModel.AmountTakenFiatValue = FiatValue.New(25_000m);
+        viewModel.LiquidationLtvText = "80";
+        viewModel.AprText = "0";
+        viewModel.FeesFiatValue = FiatValue.New(0m);
+        viewModel.StartDate = new DateTime(2024, 1, 1);
+        viewModel.EndDate = new DateTime(2024, 1, 31);
+
+        Assert.That(viewModel.DistanceToLiquidationColor, Is.EqualTo("#4CAF50"));
+    }
+
+    #endregion
+
+    #region Edge-case live recalc
+
+    [Test]
+    public void CurrencyChange_TriggersRecalculate_AndUpdatesCurrencyCode()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        _ratesState.BitcoinPrice = 100_000m;
+        _ratesState.FiatRates = new Dictionary<string, decimal>
+        {
+            ["USD"] = 1m,
+            ["BRL"] = 5m
+        };
+
+        viewModel.SelectedCurrency = FiatCurrency.Usd;
+        viewModel.CollateralBtcValue = BtcValue.ParseBitcoin(1m);
+        viewModel.AmountTakenFiatValue = FiatValue.New(25_000m);
+        viewModel.LiquidationLtvText = "80";
+        viewModel.AprText = "12";
+        viewModel.FeesFiatValue = FiatValue.New(0m);
+        viewModel.StartDate = new DateTime(2024, 1, 1);
+        viewModel.EndDate = new DateTime(2024, 1, 31);
+
+        var usdTotal = viewModel.TotalRepayFiat;
+
+        // Act
+        viewModel.SelectedCurrency = FiatCurrency.Brl;
+
+        // Assert
+        Assert.That(viewModel.CurrencyCode, Is.EqualTo("BRL"));
+        Assert.That(viewModel.CurrencySymbol, Is.EqualTo("R$"));
+        Assert.That(viewModel.TotalRepayFiat, Is.Not.EqualTo(usdTotal));
+    }
+
+    [Test]
+    public void InterestModeToggle_CompoundProducesHigherTotalThanSimple()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        _ratesState.BitcoinPrice = 100_000m;
+        _ratesState.FiatRates = new Dictionary<string, decimal> { ["USD"] = 1m };
+
+        viewModel.SelectedCurrency = FiatCurrency.Usd;
+        viewModel.CollateralBtcValue = BtcValue.ParseBitcoin(1m);
+        viewModel.AmountTakenFiatValue = FiatValue.New(25_000m);
+        viewModel.LiquidationLtvText = "80";
+        viewModel.AprText = "12";
+        viewModel.FeesFiatValue = FiatValue.New(0m);
+        viewModel.StartDate = new DateTime(2024, 1, 1);
+        viewModel.EndDate = new DateTime(2024, 4, 1); // 90 days
+        viewModel.IsSimple = true;
+
+        var simpleTotal = viewModel.TotalRepayFiat;
+
+        // Act
+        viewModel.IsSimple = false;
+
+        // Assert
+        Assert.That(viewModel.TotalRepayFiat, Is.Not.EqualTo(simpleTotal));
+        var simpleValue = decimal.Parse(simpleTotal.Replace("$", "").Replace(",", "").Trim(), CultureInfo.InvariantCulture);
+        var compoundValue = decimal.Parse(viewModel.TotalRepayFiat.Replace("$", "").Replace(",", "").Trim(), CultureInfo.InvariantCulture);
+        Assert.That(compoundValue, Is.GreaterThan(simpleValue));
+    }
+
+    [Test]
+    public void InvalidInputs_ClearResults([Values] InvalidInputScenario scenario)
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        _ratesState.BitcoinPrice = 100_000m;
+        _ratesState.FiatRates = new Dictionary<string, decimal> { ["USD"] = 1m };
+
+        viewModel.SelectedCurrency = FiatCurrency.Usd;
+        viewModel.CollateralBtcValue = BtcValue.ParseBitcoin(1m);
+        viewModel.AmountTakenFiatValue = FiatValue.New(25_000m);
+        viewModel.LiquidationLtvText = "80";
+        viewModel.AprText = "12";
+        viewModel.FeesFiatValue = FiatValue.New(0m);
+        viewModel.StartDate = new DateTime(2024, 1, 1);
+        viewModel.EndDate = new DateTime(2024, 1, 31);
+
+        Assert.That(viewModel.HasResults, Is.True, "precondition: valid inputs should yield results");
+
+        // Act
+        switch (scenario)
+        {
+            case InvalidInputScenario.EmptyCollateral:
+                viewModel.CollateralBtcValue = BtcValue.Empty;
+                break;
+            case InvalidInputScenario.EmptyAmount:
+                viewModel.AmountTakenFiatValue = FiatValue.Empty;
+                break;
+            case InvalidInputScenario.EndDateBeforeStart:
+                viewModel.EndDate = viewModel.StartDate;
+                break;
+            case InvalidInputScenario.LtvOutOfRange:
+                viewModel.LiquidationLtvText = "101";
+                break;
+        }
+
+        // Assert
+        Assert.That(viewModel.HasResults, Is.False);
+    }
+
+    #endregion
+}
+
+public enum InvalidInputScenario
+{
+    EmptyCollateral,
+    EmptyAmount,
+    EndDateBeforeStart,
+    LtvOutOfRange
 }
