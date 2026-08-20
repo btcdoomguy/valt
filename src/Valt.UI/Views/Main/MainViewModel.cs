@@ -382,6 +382,12 @@ public partial class MainViewModel : ValtViewModel, IDisposable
     }
 
     [RelayCommand]
+    private async Task OpenBtcLoanSimulator()
+    {
+        await _modalLauncher.ShowAsync(ApplicationModalNames.BtcLoanSimulator, Window!);
+    }
+
+    [RelayCommand]
     private async Task OpenSpendingEvolution()
     {
         await _modalLauncher.ShowAsync(ApplicationModalNames.SpendingEvolution, Window!);

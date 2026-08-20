@@ -1,0 +1,257 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:vm="clr-namespace:Valt.UI.Views.Main.Modals.BtcLoanSimulator"
+        mc:Ignorable="d"
+        d:DesignWidth="800" d:DesignHeight="760"
+        MinWidth="800"
+        MinHeight="760"
+        MaxWidth="800"
+        MaxHeight="760"
+        x:Class="Valt.UI.Views.Main.Modals.BtcLoanSimulator.BtcLoanSimulatorView"
+        x:DataType="vm:BtcLoanSimulatorViewModel"
+        Title="BTC Loan Simulator"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowDecorations="None"
+        ExtendClientAreaTitleBarHeightHint="0">
+    <Window.Styles>
+        <Style Selector="TextBox.sim-input">
+            <Setter Property="MinHeight" Value="32" />
+            <Setter Property="FontFamily" Value="{DynamicResource GeistMono}" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="TextBlock.label">
+            <Setter Property="Foreground" Value="{DynamicResource Text300Brush}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="0, 8, 0, 3" />
+        </Style>
+        <Style Selector="TextBlock.result-label">
+            <Setter Property="Foreground" Value="{DynamicResource Text300Brush}" />
+            <Setter Property="FontSize" Value="13" />
+        </Style>
+        <Style Selector="TextBlock.result-value">
+            <Setter Property="FontFamily" Value="{DynamicResource GeistMono}" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style Selector="ToggleButton.position-toggle">
+            <Setter Property="MinWidth" Value="80" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="Background" Value="{DynamicResource Background700Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Background500Brush}" />
+        </Style>
+        <Style Selector="ToggleButton.position-toggle:checked /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Accent700Brush}" />
+        </Style>
+    </Window.Styles>
+    <Design.DataContext>
+        <vm:BtcLoanSimulatorViewModel />
+    </Design.DataContext>
+    <Border Name="MainBorder" Focusable="True">
+        <StackPanel Orientation="Vertical">
+            <userControls:CustomTitleBar Title="BTC Loan Simulator"
+                                         TitleBarPressed="CustomTitleBarButtonPressed"
+                                         CloseClick="CustomTitleBarCloseClicked" />
+            <Border Classes="form-fields-area" Padding="20">
+                <Grid ColumnDefinitions="300, 24, *">
+                    <!-- Left column: Inputs -->
+                    <StackPanel Grid.Column="0" Orientation="Vertical">
+                        <!-- Prefill -->
+                        <TextBlock Classes="label" Text="Prefill from existing loan" Margin="0, 0, 0, 3" />
+                        <ComboBox ItemsSource="{Binding AvailablePrefill}"
+                                  SelectedItem="{Binding SelectedPrefill}"
+                                  HorizontalAlignment="Stretch"
+                                  MinHeight="32">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:BtcLoanSimulationItem">
+                                    <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <!-- Currency -->
+                        <TextBlock Classes="label" Text="Currency" />
+                        <ComboBox ItemsSource="{Binding AvailableCurrencies}"
+                                  SelectedItem="{Binding SelectedCurrency}"
+                                  HorizontalAlignment="Stretch"
+                                  MinHeight="32">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock>
+                                        <Run Text="{Binding Code}" />
+                                        <Run Text=" " />
+                                        <Run Text="{Binding Symbol}" />
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <!-- Interest mode -->
+                        <TextBlock Classes="label" Text="Interest mode" />
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <ToggleButton Classes="position-toggle"
+                                          IsChecked="{Binding IsSimple}"
+                                          Command="{Binding SetSimpleCommand}"
+                                          Content="Simple" />
+                            <ToggleButton Classes="position-toggle"
+                                          IsChecked="{Binding !IsSimple}"
+                                          Command="{Binding SetCompoundCommand}"
+                                          Content="Compound" />
+                        </StackPanel>
+
+                        <!-- Collateral -->
+                        <TextBlock Classes="label" Text="Collateral" />
+                        <userControls:BtcInput BtcValue="{Binding CollateralBtcValue, Mode=TwoWay}" />
+
+                        <!-- Amount taken -->
+                        <TextBlock Classes="label" Text="Amount taken" />
+                        <userControls:FiatInput FiatValue="{Binding AmountTakenFiatValue, Mode=TwoWay}"
+                                                 CurrencySymbol="{Binding CurrencySymbol}"
+                                                 SymbolOnRight="{Binding SymbolOnRight}" />
+
+                        <!-- Liquidation LTV -->
+                        <TextBlock Classes="label" Text="Liquidation LTV (%)" TextWrapping="Wrap" />
+                        <TextBox Classes="sim-input" Text="{Binding LiquidationLtvText}" PlaceholderText="0" />
+
+                        <!-- Start date -->
+                        <TextBlock Classes="label" Text="Start date" />
+                        <CalendarDatePicker SelectedDate="{Binding StartDate, Mode=TwoWay}" />
+
+                        <!-- Interest rate (APR) -->
+                        <TextBlock Classes="label" Text="Interest rate (APR) (%)" TextWrapping="Wrap" />
+                        <TextBox Classes="sim-input" Text="{Binding AprText}" PlaceholderText="0.00" />
+
+                        <!-- Fees -->
+                        <TextBlock Classes="label" Text="Fees" />
+                        <userControls:FiatInput FiatValue="{Binding FeesFiatValue, Mode=TwoWay}"
+                                                 CurrencySymbol="{Binding CurrencySymbol}"
+                                                 SymbolOnRight="{Binding SymbolOnRight}" />
+
+                        <!-- End date -->
+                        <TextBlock Classes="label" Text="End date" />
+                        <CalendarDatePicker SelectedDate="{Binding EndDate, Mode=TwoWay}" />
+                    </StackPanel>
+
+                    <!-- Right column: Results -->
+                    <ScrollViewer Grid.Column="2"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch">
+                        <Border Background="{DynamicResource Background900Brush}"
+                                BorderBrush="{DynamicResource Background500Brush}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="20, 15">
+                            <StackPanel Orientation="Vertical" Spacing="5">
+                                <TextBlock Text="Results"
+                                           FontSize="16" FontWeight="SemiBold" Margin="0, 0, 0, 10" />
+
+                                <TextBlock Text="---"
+                                           IsVisible="{Binding !HasResults}"
+                                           Foreground="{DynamicResource Text400Brush}"
+                                           FontSize="14"
+                                           HorizontalAlignment="Center"
+                                           Margin="0, 40, 0, 0" />
+
+                                <StackPanel IsVisible="{Binding HasResults}" Spacing="18">
+                                    <!-- Total to repay -->
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Classes="result-label" Text="Total to repay" />
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <TextBlock Classes="result-value" Text="{Binding TotalRepayFiat}" FontSize="20" />
+                                            <TextBlock Text="{Binding CurrencyCode}" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource Text400Brush}" FontSize="12" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsBtcPriceAvailable}">
+                                            <TextBlock Classes="result-value" Text="{Binding TotalRepaySats}" FontSize="14" />
+                                            <TextBlock Text="sats" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource Text400Brush}" FontSize="12" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <!-- Principal -->
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Classes="result-label" Text="Principal" />
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <TextBlock Classes="result-value" Text="{Binding PrincipalFiat}" />
+                                            <TextBlock Text="{Binding CurrencyCode}" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource Text400Brush}" FontSize="12" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsBtcPriceAvailable}">
+                                            <TextBlock Classes="result-value" Text="{Binding PrincipalSats}" FontSize="14" />
+                                            <TextBlock Text="sats" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource Text400Brush}" FontSize="12" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <!-- Interest -->
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Classes="result-label" Text="Interest" />
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <TextBlock Classes="result-value" Text="{Binding InterestFiat}" />
+                                            <TextBlock Text="{Binding CurrencyCode}" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource Text400Brush}" FontSize="12" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsBtcPriceAvailable}">
+                                            <TextBlock Classes="result-value" Text="{Binding InterestSats}" FontSize="14" />
+                                            <TextBlock Text="sats" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource Text400Brush}" FontSize="12" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <!-- Fees -->
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Classes="result-label" Text="Fees" />
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <TextBlock Classes="result-value" Text="{Binding FeesFiat}" />
+                                            <TextBlock Text="{Binding CurrencyCode}" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource Text400Brush}" FontSize="12" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsBtcPriceAvailable}">
+                                            <TextBlock Classes="result-value" Text="{Binding FeesSats}" FontSize="14" />
+                                            <TextBlock Text="sats" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource Text400Brush}" FontSize="12" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <!-- Liquidation BTC price -->
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Classes="result-label" Text="Liquidation BTC price" />
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <TextBlock Classes="result-value" Text="{Binding LiquidationPriceFiat}" />
+                                            <TextBlock Text="{Binding CurrencyCode}" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource Text400Brush}" FontSize="12" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <!-- Effective APR -->
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Classes="result-label" Text="Effective APR" />
+                                        <TextBlock Classes="result-value" Text="{Binding EffectiveAprText}" />
+                                    </StackPanel>
+
+                                    <!-- Distance to liquidation -->
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Classes="result-label" Text="Distance to liquidation" />
+                                        <TextBlock Classes="result-value"
+                                                   Text="{Binding DistanceToLiquidation}"
+                                                   Foreground="{Binding DistanceToLiquidationColor, Converter={StaticResource StringToColorBrushConverter}}" />
+                                    </StackPanel>
+
+                                    <!-- Conversion basis -->
+                                    <TextBlock Text="{Binding ConversionBasis}"
+                                               FontSize="13"
+                                               Foreground="{DynamicResource Accent500Brush}"
+                                               TextWrapping="Wrap"
+                                               Margin="0, 8, 0, 0" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </StackPanel>
+    </Border>
+</Window>
