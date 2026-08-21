@@ -52,11 +52,12 @@
         <vm:BtcLoanSimulatorViewModel />
     </Design.DataContext>
     <Border Name="MainBorder" Focusable="True">
-        <StackPanel Orientation="Vertical">
-            <userControls:CustomTitleBar Title="{x:Static local:language.BtcLoanSimulator_Title}"
+        <Grid RowDefinitions="Auto,*">
+            <userControls:CustomTitleBar Grid.Row="0"
+                                         Title="{x:Static local:language.BtcLoanSimulator_Title}"
                                          TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
-            <Border Classes="form-fields-area" Padding="20">
+            <Border Grid.Row="1" Classes="form-fields-area" Padding="20">
                 <Grid ColumnDefinitions="300, 24, *">
                     <!-- Left column: Inputs -->
                     <StackPanel Grid.Column="0" Orientation="Vertical">
@@ -130,14 +131,14 @@
                     </StackPanel>
 
                     <!-- Right column: Results -->
-                    <ScrollViewer Grid.Column="2"
-                                  HorizontalAlignment="Stretch"
-                                  VerticalAlignment="Stretch">
-                        <Border Background="{DynamicResource Background900Brush}"
-                                BorderBrush="{DynamicResource Background500Brush}"
-                                BorderThickness="1"
-                                CornerRadius="6"
-                                Padding="20, 15">
+                    <Border Grid.Column="2"
+                            VerticalAlignment="Stretch"
+                            Background="{DynamicResource Background900Brush}"
+                            BorderBrush="{DynamicResource Background500Brush}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="20, 15">
+                        <ScrollViewer>
                             <StackPanel Orientation="Vertical" Spacing="5">
                                 <TextBlock Text="{x:Static local:language.BtcLoanSimulator_Results}"
                                            FontSize="16" FontWeight="SemiBold" Margin="0, 0, 0, 10" />
@@ -242,10 +243,10 @@
                                                Margin="0, 8, 0, 0" />
                                 </StackPanel>
                             </StackPanel>
-                        </Border>
-                    </ScrollViewer>
+                        </ScrollViewer>
+                    </Border>
                 </Grid>
             </Border>
-        </StackPanel>
+        </Grid>
     </Border>
 </Window>
