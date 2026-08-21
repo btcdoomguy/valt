@@ -12,6 +12,7 @@ using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
+using Valt.UI.Lang;
 using Valt.UI.State;
 
 namespace Valt.UI.Views.Main.Modals.BtcLoanSimulator;
@@ -250,7 +251,7 @@ public partial class BtcLoanSimulatorViewModel : ValtModalViewModel
                 DistanceToLiquidationColor = "#4CAF50";
             }
 
-            ConversionBasis = $"1 BTC = {price.ToString("N2", CultureInfo.CurrentUICulture)} {currencyCode}";
+            ConversionBasis = string.Format(language.BtcLoanSimulator_BtcPriceFormat, price.ToString("N2", CultureInfo.CurrentUICulture), currencyCode);
         }
         else
         {
@@ -260,7 +261,7 @@ public partial class BtcLoanSimulatorViewModel : ValtModalViewModel
             FeesSats = string.Empty;
             DistanceToLiquidation = string.Empty;
             DistanceToLiquidationColor = "#4CAF50";
-            ConversionBasis = "Current BTC price unavailable — sats values hidden";
+            ConversionBasis = language.BtcLoanSimulator_PriceUnavailable;
         }
 
         HasResults = true;

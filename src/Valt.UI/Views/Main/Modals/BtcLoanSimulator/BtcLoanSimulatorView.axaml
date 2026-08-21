@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:userControls="clr-namespace:Valt.UI.UserControls"
+        xmlns:local="clr-namespace:Valt.UI.Lang"
         xmlns:vm="clr-namespace:Valt.UI.Views.Main.Modals.BtcLoanSimulator"
         mc:Ignorable="d"
         d:DesignWidth="800" d:DesignHeight="760"
@@ -12,7 +13,7 @@
         MaxHeight="760"
         x:Class="Valt.UI.Views.Main.Modals.BtcLoanSimulator.BtcLoanSimulatorView"
         x:DataType="vm:BtcLoanSimulatorViewModel"
-        Title="BTC Loan Simulator"
+        Title="{x:Static local:language.BtcLoanSimulator_Title}"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
         WindowDecorations="None"
@@ -52,7 +53,7 @@
     </Design.DataContext>
     <Border Name="MainBorder" Focusable="True">
         <StackPanel Orientation="Vertical">
-            <userControls:CustomTitleBar Title="BTC Loan Simulator"
+            <userControls:CustomTitleBar Title="{x:Static local:language.BtcLoanSimulator_Title}"
                                          TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
             <Border Classes="form-fields-area" Padding="20">
@@ -60,7 +61,7 @@
                     <!-- Left column: Inputs -->
                     <StackPanel Grid.Column="0" Orientation="Vertical">
                         <!-- Currency -->
-                        <TextBlock Classes="label" Text="Currency" />
+                        <TextBlock Classes="label" Text="{x:Static local:language.BtcLoanSimulator_Currency}" />
                         <ComboBox ItemsSource="{Binding AvailableCurrencies}"
                                   SelectedItem="{Binding SelectedCurrency}"
                                   HorizontalAlignment="Stretch"
@@ -77,48 +78,54 @@
                         </ComboBox>
 
                         <!-- Interest mode -->
-                        <TextBlock Classes="label" Text="Interest mode" />
+                        <TextBlock Classes="label" Text="{x:Static local:language.BtcLoanSimulator_InterestMode}" />
                         <StackPanel Orientation="Horizontal" Spacing="5">
                             <ToggleButton Classes="position-toggle"
                                           IsChecked="{Binding IsSimple}"
                                           Command="{Binding SetSimpleCommand}"
-                                          Content="Simple" />
+                                          Content="{x:Static local:language.BtcLoanSimulator_Simple}" />
                             <ToggleButton Classes="position-toggle"
                                           IsChecked="{Binding !IsSimple}"
                                           Command="{Binding SetCompoundCommand}"
-                                          Content="Compound" />
+                                          Content="{x:Static local:language.BtcLoanSimulator_Compound}" />
                         </StackPanel>
 
                         <!-- Collateral -->
-                        <TextBlock Classes="label" Text="Collateral" />
+                        <TextBlock Classes="label" Text="{x:Static local:language.BtcLoanSimulator_Collateral}" />
                         <userControls:BtcInput BtcValue="{Binding CollateralBtcValue, Mode=TwoWay}" />
 
                         <!-- Amount taken -->
-                        <TextBlock Classes="label" Text="Amount taken" />
+                        <TextBlock Classes="label" Text="{x:Static local:language.BtcLoanSimulator_AmountTaken}" />
                         <userControls:FiatInput FiatValue="{Binding AmountTakenFiatValue, Mode=TwoWay}"
                                                  CurrencySymbol="{Binding CurrencySymbol}"
                                                  SymbolOnRight="{Binding SymbolOnRight}" />
 
                         <!-- Liquidation LTV -->
-                        <TextBlock Classes="label" Text="Liquidation LTV (%)" TextWrapping="Wrap" />
+                        <TextBlock Classes="label" TextWrapping="Wrap">
+                            <Run Text="{x:Static local:language.BtcLoanSimulator_LiquidationLtv}" />
+                            <Run Text=" (%)" />
+                        </TextBlock>
                         <TextBox Classes="sim-input" Text="{Binding LiquidationLtvText}" PlaceholderText="0" />
 
                         <!-- Start date -->
-                        <TextBlock Classes="label" Text="Start date" />
+                        <TextBlock Classes="label" Text="{x:Static local:language.BtcLoanSimulator_StartDate}" />
                         <CalendarDatePicker SelectedDate="{Binding StartDate, Mode=TwoWay}" />
 
                         <!-- Interest rate (APR) -->
-                        <TextBlock Classes="label" Text="Interest rate (APR) (%)" TextWrapping="Wrap" />
+                        <TextBlock Classes="label" TextWrapping="Wrap">
+                            <Run Text="{x:Static local:language.BtcLoanSimulator_InterestRateApr}" />
+                            <Run Text=" (%)" />
+                        </TextBlock>
                         <TextBox Classes="sim-input" Text="{Binding AprText}" PlaceholderText="0.00" />
 
                         <!-- Fees -->
-                        <TextBlock Classes="label" Text="Fees" />
+                        <TextBlock Classes="label" Text="{x:Static local:language.BtcLoanSimulator_Fees}" />
                         <userControls:FiatInput FiatValue="{Binding FeesFiatValue, Mode=TwoWay}"
                                                  CurrencySymbol="{Binding CurrencySymbol}"
                                                  SymbolOnRight="{Binding SymbolOnRight}" />
 
                         <!-- End date -->
-                        <TextBlock Classes="label" Text="End date" />
+                        <TextBlock Classes="label" Text="{x:Static local:language.BtcLoanSimulator_EndDate}" />
                         <CalendarDatePicker SelectedDate="{Binding EndDate, Mode=TwoWay}" />
                     </StackPanel>
 
@@ -132,7 +139,7 @@
                                 CornerRadius="6"
                                 Padding="20, 15">
                             <StackPanel Orientation="Vertical" Spacing="5">
-                                <TextBlock Text="Results"
+                                <TextBlock Text="{x:Static local:language.BtcLoanSimulator_Results}"
                                            FontSize="16" FontWeight="SemiBold" Margin="0, 0, 0, 10" />
 
                                 <TextBlock Text="---"
@@ -145,7 +152,7 @@
                                 <StackPanel IsVisible="{Binding HasResults}" Spacing="18">
                                     <!-- Total to repay -->
                                     <StackPanel Spacing="2">
-                                        <TextBlock Classes="result-label" Text="Total to repay" />
+                                        <TextBlock Classes="result-label" Text="{x:Static local:language.BtcLoanSimulator_TotalToRepay}" />
                                         <StackPanel Orientation="Horizontal" Spacing="6">
                                             <TextBlock Classes="result-value" Text="{Binding TotalRepayFiat}" FontSize="20" />
                                             <TextBlock Text="{Binding CurrencyCode}" VerticalAlignment="Center"
@@ -160,7 +167,7 @@
 
                                     <!-- Principal -->
                                     <StackPanel Spacing="2">
-                                        <TextBlock Classes="result-label" Text="Principal" />
+                                        <TextBlock Classes="result-label" Text="{x:Static local:language.BtcLoanSimulator_Principal}" />
                                         <StackPanel Orientation="Horizontal" Spacing="6">
                                             <TextBlock Classes="result-value" Text="{Binding PrincipalFiat}" />
                                             <TextBlock Text="{Binding CurrencyCode}" VerticalAlignment="Center"
@@ -175,7 +182,7 @@
 
                                     <!-- Interest -->
                                     <StackPanel Spacing="2">
-                                        <TextBlock Classes="result-label" Text="Interest" />
+                                        <TextBlock Classes="result-label" Text="{x:Static local:language.BtcLoanSimulator_Interest}" />
                                         <StackPanel Orientation="Horizontal" Spacing="6">
                                             <TextBlock Classes="result-value" Text="{Binding InterestFiat}" />
                                             <TextBlock Text="{Binding CurrencyCode}" VerticalAlignment="Center"
@@ -190,7 +197,7 @@
 
                                     <!-- Fees -->
                                     <StackPanel Spacing="2">
-                                        <TextBlock Classes="result-label" Text="Fees" />
+                                        <TextBlock Classes="result-label" Text="{x:Static local:language.BtcLoanSimulator_Fees}" />
                                         <StackPanel Orientation="Horizontal" Spacing="6">
                                             <TextBlock Classes="result-value" Text="{Binding FeesFiat}" />
                                             <TextBlock Text="{Binding CurrencyCode}" VerticalAlignment="Center"
@@ -205,7 +212,7 @@
 
                                     <!-- Liquidation BTC price -->
                                     <StackPanel Spacing="2">
-                                        <TextBlock Classes="result-label" Text="Liquidation BTC price" />
+                                        <TextBlock Classes="result-label" Text="{x:Static local:language.BtcLoanSimulator_LiquidationBtcPrice}" />
                                         <StackPanel Orientation="Horizontal" Spacing="6">
                                             <TextBlock Classes="result-value" Text="{Binding LiquidationPriceFiat}" />
                                             <TextBlock Text="{Binding CurrencyCode}" VerticalAlignment="Center"
@@ -215,13 +222,13 @@
 
                                     <!-- Effective APR -->
                                     <StackPanel Spacing="2">
-                                        <TextBlock Classes="result-label" Text="Effective APR" />
+                                        <TextBlock Classes="result-label" Text="{x:Static local:language.BtcLoanSimulator_EffectiveApr}" />
                                         <TextBlock Classes="result-value" Text="{Binding EffectiveAprText}" />
                                     </StackPanel>
 
                                     <!-- Distance to liquidation -->
                                     <StackPanel Spacing="2">
-                                        <TextBlock Classes="result-label" Text="Distance to liquidation" />
+                                        <TextBlock Classes="result-label" Text="{x:Static local:language.BtcLoanSimulator_DistanceToLiquidation}" />
                                         <TextBlock Classes="result-value"
                                                    Text="{Binding DistanceToLiquidation}"
                                                    Foreground="{Binding DistanceToLiquidationColor, Converter={StaticResource StringToColorBrushConverter}}" />
