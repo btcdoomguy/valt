@@ -47,6 +47,16 @@ public class BtcLoanSimulatorViewModelTests
         => new(_currencySettings, _ratesState, _configManager, _clock);
 
     [Test]
+    public void DefaultInterestMode_IsCompound()
+    {
+        // Arrange & Act
+        var viewModel = CreateViewModel();
+
+        // Assert
+        Assert.That(viewModel.IsSimple, Is.False);
+    }
+
+    [Test]
     public void Recalculate_WithValidInputs_ShowsTotalRepay()
     {
         // Arrange

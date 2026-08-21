@@ -59,19 +59,6 @@
                 <Grid ColumnDefinitions="300, 24, *">
                     <!-- Left column: Inputs -->
                     <StackPanel Grid.Column="0" Orientation="Vertical">
-                        <!-- Prefill -->
-                        <TextBlock Classes="label" Text="Prefill from existing loan" Margin="0, 0, 0, 3" />
-                        <ComboBox ItemsSource="{Binding AvailablePrefill}"
-                                  SelectedItem="{Binding SelectedPrefill}"
-                                  HorizontalAlignment="Stretch"
-                                  MinHeight="32">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate x:DataType="vm:BtcLoanSimulationItem">
-                                    <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-
                         <!-- Currency -->
                         <TextBlock Classes="label" Text="Currency" />
                         <ComboBox ItemsSource="{Binding AvailableCurrencies}"

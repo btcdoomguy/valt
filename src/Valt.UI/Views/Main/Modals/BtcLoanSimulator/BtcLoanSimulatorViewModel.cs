@@ -31,13 +31,11 @@ public partial class BtcLoanSimulatorViewModel : ValtModalViewModel
     [ObservableProperty] private string _aprText = string.Empty;
     [ObservableProperty] private DateTime? _startDate;
     [ObservableProperty] private DateTime? _endDate;
-    [ObservableProperty] private bool _isSimple = true;
+    [ObservableProperty] private bool _isSimple = false;
 
-    // Currency / prefill
+    // Currency
     [ObservableProperty] private FiatCurrency? _selectedCurrency;
-    [ObservableProperty] private BtcLoanSimulationItem? _selectedPrefill;
     public ObservableCollection<FiatCurrency> AvailableCurrencies { get; } = new();
-    public ObservableCollection<BtcLoanSimulationItem> AvailablePrefill { get; } = new();
 
     // Results
     [ObservableProperty] private bool _hasResults;
@@ -82,7 +80,6 @@ public partial class BtcLoanSimulatorViewModel : ValtModalViewModel
 
         LoadAvailableCurrencies();
         SetDefaultDates();
-        InitializePrefill();
     }
 
     private void LoadAvailableCurrencies()
@@ -109,17 +106,6 @@ public partial class BtcLoanSimulatorViewModel : ValtModalViewModel
         var mainCode = _currencySettings?.MainFiatCurrency ?? FiatCurrency.Usd.Code;
         SelectedCurrency = AvailableCurrencies.FirstOrDefault(c => c.Code == mainCode)
             ?? AvailableCurrencies.First();
-    }
-
-    private void InitializePrefill()
-    {
-        AvailablePrefill.Clear();
-        AvailablePrefill.Add(new BtcLoanSimulationItem
-        {
-            DisplayName = "New simulation",
-            IsNewSimulation = true
-        });
-        SelectedPrefill = AvailablePrefill.First();
     }
 
     private void SetDefaultDates()
