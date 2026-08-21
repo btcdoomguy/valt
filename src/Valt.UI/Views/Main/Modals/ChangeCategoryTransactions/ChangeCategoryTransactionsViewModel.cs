@@ -16,6 +16,8 @@ namespace Valt.UI.Views.Main.Modals.ChangeCategoryTransactions;
 
 public partial class ChangeCategoryTransactionsViewModel : ValtModalValidatorViewModel
 {
+    public const string ChangeCategoryMode = "ChangeCategoryOnly";
+
     private readonly ITransactionTermService _transactionTermService;
     private readonly IQueryDispatcher _queryDispatcher;
 
@@ -93,6 +95,17 @@ public partial class ChangeCategoryTransactionsViewModel : ValtModalValidatorVie
         AvailableCategories.Clear();
         foreach (var category in categories)
             AvailableCategories.Add(category);
+    }
+
+    public override Task OnBindParameterAsync()
+    {
+        if (Parameter is string mode && mode == ChangeCategoryMode)
+        {
+            RenameEnabled = false;
+            ChangeCategoryEnabled = true;
+        }
+
+        return Task.CompletedTask;
     }
 
     [RelayCommand]

@@ -103,6 +103,55 @@ public class ChangeCategoryTransactionsViewModelTests
 
     #endregion
 
+    #region Mode Parameter Tests
+
+    [Test]
+    public async Task Should_Enable_Only_Category_When_ChangeCategory_Mode_Is_Provided()
+    {
+        // Arrange
+        var viewModel = CreateInstance();
+        viewModel.Parameter = ChangeCategoryTransactionsViewModel.ChangeCategoryMode;
+
+        // Act
+        await viewModel.OnBindParameterAsync();
+
+        // Assert
+        Assert.That(viewModel.RenameEnabled, Is.False);
+        Assert.That(viewModel.ChangeCategoryEnabled, Is.True);
+    }
+
+    [Test]
+    public async Task Should_Keep_Default_State_When_Parameter_Is_Null()
+    {
+        // Arrange
+        var viewModel = CreateInstance();
+        viewModel.Parameter = null;
+
+        // Act
+        await viewModel.OnBindParameterAsync();
+
+        // Assert
+        Assert.That(viewModel.RenameEnabled, Is.True);
+        Assert.That(viewModel.ChangeCategoryEnabled, Is.False);
+    }
+
+    [Test]
+    public async Task Should_Keep_Default_State_When_Parameter_Is_Unsupported()
+    {
+        // Arrange
+        var viewModel = CreateInstance();
+        viewModel.Parameter = "some-unknown-mode";
+
+        // Act
+        await viewModel.OnBindParameterAsync();
+
+        // Assert
+        Assert.That(viewModel.RenameEnabled, Is.True);
+        Assert.That(viewModel.ChangeCategoryEnabled, Is.False);
+    }
+
+    #endregion
+
     #region Rename Validation Tests
 
     [Test]
