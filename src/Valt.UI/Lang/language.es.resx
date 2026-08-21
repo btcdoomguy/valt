@@ -2513,6 +2513,70 @@
     <data name="LeverageSimulator_Currency" xml:space="preserve">
         <value>Moneda</value>
     </data>
+    <!-- Simulador de Préstamo BTC -->
+    <data name="BtcLoanSimulator_Title" xml:space="preserve">
+        <value>Simulador de Préstamo BTC</value>
+    </data>
+    <data name="BtcLoanSimulator_Currency" xml:space="preserve">
+        <value>Moneda</value>
+    </data>
+    <data name="BtcLoanSimulator_InterestMode" xml:space="preserve">
+        <value>Modalidad de interés</value>
+    </data>
+    <data name="BtcLoanSimulator_Simple" xml:space="preserve">
+        <value>Simple</value>
+    </data>
+    <data name="BtcLoanSimulator_Compound" xml:space="preserve">
+        <value>Compuesto</value>
+    </data>
+    <data name="BtcLoanSimulator_Collateral" xml:space="preserve">
+        <value>Colateral</value>
+    </data>
+    <data name="BtcLoanSimulator_AmountTaken" xml:space="preserve">
+        <value>Monto tomado</value>
+    </data>
+    <data name="BtcLoanSimulator_LiquidationLtv" xml:space="preserve">
+        <value>LTV de liquidación</value>
+    </data>
+    <data name="BtcLoanSimulator_StartDate" xml:space="preserve">
+        <value>Fecha de inicio</value>
+    </data>
+    <data name="BtcLoanSimulator_InterestRateApr" xml:space="preserve">
+        <value>Tasa de interés (APR)</value>
+    </data>
+    <data name="BtcLoanSimulator_Fees" xml:space="preserve">
+        <value>Comisiones</value>
+    </data>
+    <data name="BtcLoanSimulator_EndDate" xml:space="preserve">
+        <value>Fecha de fin</value>
+    </data>
+    <data name="BtcLoanSimulator_Results" xml:space="preserve">
+        <value>Resultados</value>
+    </data>
+    <data name="BtcLoanSimulator_TotalToRepay" xml:space="preserve">
+        <value>Total a pagar</value>
+    </data>
+    <data name="BtcLoanSimulator_Principal" xml:space="preserve">
+        <value>Principal</value>
+    </data>
+    <data name="BtcLoanSimulator_Interest" xml:space="preserve">
+        <value>Intereses</value>
+    </data>
+    <data name="BtcLoanSimulator_LiquidationBtcPrice" xml:space="preserve">
+        <value>Precio de liquidación de BTC</value>
+    </data>
+    <data name="BtcLoanSimulator_EffectiveApr" xml:space="preserve">
+        <value>APR efectiva</value>
+    </data>
+    <data name="BtcLoanSimulator_DistanceToLiquidation" xml:space="preserve">
+        <value>Distancia a liquidación</value>
+    </data>
+    <data name="BtcLoanSimulator_PriceUnavailable" xml:space="preserve">
+        <value>Precio actual de BTC no disponible — valores en sats ocultos</value>
+    </data>
+    <data name="BtcLoanSimulator_BtcPriceFormat" xml:space="preserve">
+        <value>1 BTC = {0} {1}</value>
+    </data>
     <data name="Main.PriceHistory" xml:space="preserve">
         <value>Historial de Precios</value>
     </data>

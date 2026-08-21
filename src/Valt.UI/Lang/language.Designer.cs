@@ -5019,6 +5019,132 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string BtcLoanSimulator_Title {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_Title", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_Currency {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_Currency", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_InterestMode {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_InterestMode", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_Simple {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_Simple", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_Compound {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_Compound", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_Collateral {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_Collateral", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_AmountTaken {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_AmountTaken", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_LiquidationLtv {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_LiquidationLtv", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_StartDate {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_StartDate", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_InterestRateApr {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_InterestRateApr", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_Fees {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_Fees", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_EndDate {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_EndDate", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_Results {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_Results", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_TotalToRepay {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_TotalToRepay", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_Principal {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_Principal", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_Interest {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_Interest", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_LiquidationBtcPrice {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_LiquidationBtcPrice", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_EffectiveApr {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_EffectiveApr", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_DistanceToLiquidation {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_DistanceToLiquidation", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_PriceUnavailable {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_PriceUnavailable", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_BtcPriceFormat {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_BtcPriceFormat", resourceCulture);
+            }
+        }
+
         public static string Main_PriceHistory {
             get {
                 return ResourceManager.GetString("Main.PriceHistory", resourceCulture);
