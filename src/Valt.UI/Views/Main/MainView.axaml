@@ -244,7 +244,7 @@
                                 <MenuItem Header="{x:Static local:language.Menu_LeverageSimulator}"
                                           Command="{Binding OpenLeverageSimulatorCommand}">
                                 </MenuItem>
-                                <MenuItem Header="BTC Loan Simulator"
+                                <MenuItem Header="{x:Static local:language.Menu_BtcLoanSimulator}"
                                           Command="{Binding OpenBtcLoanSimulatorCommand}">
                                 </MenuItem>
                                 <MenuItem Header="{x:Static local:language.Main_PriceHistory}"

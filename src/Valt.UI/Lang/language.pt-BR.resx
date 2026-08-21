@@ -2459,6 +2459,9 @@
     <data name="Menu_LeverageSimulator" xml:space="preserve">
         <value>Simulador de Alavancagem</value>
     </data>
+    <data name="Menu_BtcLoanSimulator" xml:space="preserve">
+        <value>Simulador de Empréstimo BTC</value>
+    </data>
     <data name="LeverageSimulator_Title" xml:space="preserve">
         <value>Simulador de Alavancagem</value>
     </data>

@@ -4911,6 +4911,12 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string Menu_BtcLoanSimulator {
+            get {
+                return ResourceManager.GetString("Menu_BtcLoanSimulator", resourceCulture);
+            }
+        }
+
         public static string LeverageSimulator_Title {
             get {
                 return ResourceManager.GetString("LeverageSimulator_Title", resourceCulture);
