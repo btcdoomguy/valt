@@ -2,15 +2,19 @@
 gsd_state_version: 1.0
 milestone: v0.8
 milestone_name: BTC Loan Simulator
-status: roadmap_defined
-last_updated: "2026-08-13T00:00:00.000Z"
-last_activity: 2026-08-13
+current_phase: 46
+current_phase_name: Cost-Over-Time Schedule
+status: planning
+stopped_at: Phase 45 plans created
+last_updated: "2026-08-21T17:20:01.064Z"
+last_activity: 2026-08-21
+last_activity_desc: Phase 45 complete, transitioned to Phase 46
 progress:
-  total_phases: 5
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_phases: 10
+  completed_phases: 2
+  total_plans: 3
+  completed_plans: 3
+  percent: 20
 ---
 
 # STATE.md
@@ -20,20 +24,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-06)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 44 — core-loan-simulation-calculator
+**Current focus:** Phase 45 — Simulator Modal UI (Inputs + Results Panel)
 
 ## Current Position
 
-Phase: 44 (not started)
-Plan: —
-Status: Roadmap defined, ready to plan Phase 44
-Last activity: 2026-08-13 — v0.8 roadmap created (Phases 44-48, 13/13 requirements mapped)
+Phase: 46 — Cost-Over-Time Schedule
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-08-21 - Completed quick task 260821-p7v: Fix bulk category change on right-click for selected transactions
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 8
+- Total plans completed: 11
 - Average duration: 18 min
 - Total execution time: 43 min
 
@@ -52,6 +56,8 @@ Last activity: 2026-08-13 — v0.8 roadmap created (Phases 44-48, 13/13 requirem
 | 39 | 8/8 | - | - |
 | 40 | 4/4 | 55 min | 13.75 min |
 | 41 | 1 | - | - |
+| 44 | 1 | - | - |
+| 45 | 2 | - | - |
 
 **Recent Trend:**
 
@@ -91,6 +97,34 @@ Last activity: 2026-08-13 — v0.8 roadmap created (Phases 44-48, 13/13 requirem
 
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
+| Phase 29 P02 | 8min | 3 tasks | 9 files |
+| Phase 29 P03 | 5min | 3 tasks | 8 files |
+| Phase 29 P04 | 5min | 2 tasks | 2 files |
+| Phase 30-history-ui-and-details-reuse P01 | 11min | 3 tasks | 9 files |
+| Phase 30-history-ui-and-details-reuse P02 | 6 min | 3 tasks | 7 files |
+| Phase 30 P03 | 15 | 3 tasks | 2 files |
+| Phase 31-mcp-localization-documentation-and-verification P01 | 5min | 2 tasks | 1 files |
+| Phase 31 P02 | 20min | 3 tasks | 10 files |
+| Phase 31 P03 | 5 min | 1 task | 1 file |
+| Phase 31-mcp-localization-documentation-and-verification P04 | 8 | 1 tasks | 2 files |
+| Phase 31-mcp-localization-documentation-and-verification P05 | 3 min | 2 tasks | 5 files |
+| Phase 32 P01 | 20min | 3 tasks | 11 files |
+| Phase 32 P02 | 5 min | 2 tasks | 2 files |
+| Phase 33 P01 | 12 min | 2 tasks | 2 files |
+| Phase 33 P02 | 5min | 2 tasks | 1 files |
+| Phase 33-assets-page-rewrite P03 | 4min | 2 tasks | 2 files |
+| Phase 34-reports-page-update P01 | 15 min | 2 tasks | 1 files |
+| Phase 34-reports-page-update P02 | 4 min | 2 tasks | 1 files |
+| Phase 36-fixed-expenses-page-enhancement P01 | 11 min | 3 tasks | 1 files |
+| Phase 36-fixed-expenses-page-enhancement P02 | 3 min | 3 tasks | 1 files |
+| Phase 37 P01 | 4 min | 3 tasks | 1 files |
+| Phase 37-mcp-server-page-update P02 | 3 min | 3 tasks | 1 files |
+| Phase 38 P01 | 16 min | 3 tasks | 9 files |
+| Phase 38 P02 | 18 min | - tasks | - files |
+| Phase 38 P02 | 18 min | 3 tasks | 2 files |
+| Phase 38 P03 | 7 min | 3 tasks | 4 files |
+| Phase 39 P01 | 11 min | 3 tasks | 13 files |
+| Phase 39 P03 | 10 | 3 tasks | 9 files |
 | Phase 40-btc-denominated-metrics-reports-ui P01 | 15 | 3 tasks | 13 files |
 | Phase 40-btc-denominated-metrics-reports-ui P02 | 25min | 3 tasks | 7 files |
 | Phase 40 P03 | 5min | 1 tasks | 1 files |
@@ -104,7 +138,8 @@ Last activity: 2026-08-13 — v0.8 roadmap created (Phases 44-48, 13/13 requirem
 | Phase 43 P02 | 16min | 2 tasks | 2 files |
 | Phase 43-mcp-localization-documentation-verification P02 | 16min | 2 tasks | 2 files |
 | Phase 43 P03 | 5min | 2 tasks | 3 files |
-| Phase 43-mcp-localization-documentation-verification P05 | 0min | 2 tasks | 0 files |
+| Phase 43-mcp-localization-documentation-verification P05 | 0min | 3 tasks | 5 files |
+| Phase 44-core-loan-simulation-calculator P01 | 28min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -140,52 +175,17 @@ Recent decisions affecting current work:
 - [Phase ?]: Added Record Proceeds prompt note to Mark as Sold section because app language files and AssetsViewModel.cs confirm it is a real wired feature. — Content accuracy: the prompt exists in language.resx / language.pt-BR.resx and is invoked in AssetsViewModel.cs after MarkAssetAsSoldCommand succeeds.
 - [Phase ?]: Extended the export note to mention transaction CSV and average-price CSV export from the AvgPrice tab. — CsvExportService exposes both ExportTransactionsAsync and ExportAvgPriceLinesAsync, so the docs should accurately reflect both export paths.
 - [Phase ?]: Documented Posições Alavancadas and Empréstimos BTC as conditional panels visible only when user has corresponding data. — ReportsViewModel binds IsLeveragePositionsVisible and IsBtcLoansVisible based on the presence of visible leveraged positions or active BTC-backed loans.
-- [Phase ?]: Used exact English UI labels from language.resx for the English Reports page mirror — The plan requires app-aligned terminology; this keeps English docs consistent with the English UI and avoids drift.
+- [Phase ?]: Used exact English UI labels from language.resx for the English Reports page mirror — The plan requires app-aligned terminology; keeps English docs consistent with the English UI and avoids drift.
 - [Phase 36-fixed-expenses-page-enhancement]: Tightened DICAS paragraph to name exact right-click labels Ignorar para essa data and Marcar como pago (old prose covered ignore only vaguely and never mark-as-paid) — Plan optional-tightening clause applied: existing DICAS text did not already cover the right-click mark-as-paid action, so exact labels from language.pt-BR.resx were used while preserving link-to-transaction instructions
-- [Phase 36-fixed-expenses-page-enhancement]: [Phase 36-fixed-expenses-page-enhancement] Mirrored wave-1 TIPS tightening to English page (exact labels Ignore for this date / Mark as paid) for full bilingual parity per QA-01 — Wave 1 rewrote the Portuguese DICAS paragraph with exact right-click labels; mirroring only the three structural additions would leave the English TIPS paragraph stale, violating QA-01 full-mirror requirement.
+- [Phase 36-fixed-expenses-page-enhancement]: [Phase 36-fixed-expenses-page-enhancement] Mirrored wave-1 TIPS tightening to English page (exact labels Ignore for this date / Mark as paid) for full bilingual parity per QA-01 — Wave 1 rewrote the Portuguese DICAS paragraph with the exact right-click labels; mirroring only the three success criteria additions would leave the English TIPS paragraph stale, violating QA-01 full-mirror requirement.
 - [Phase ?]: [Phase 37-01]: Appended AssetTools and IndicatorTools sections after CurrencyTools on the Portuguese MCP Server page — Placement discretion D-01: zero disruption to the 8 pre-existing sections; newest categories last matches page evolution.
 - [Phase ?]: [Phase 37-01]: Used RESEARCH Code Examples as copy-paste-grade content verbatim for all 28 AssetTools + IndicatorTools rows — D-05 verbatim-from-code rule: the code is the spec; every tool/parameter name grep-verified in-session against AssetTools.cs (28 tools) and IndicatorTools.cs.
 - [Phase ?]: [Phase 37-01]: Pre-existing MCP doc name drift (CreateDCAGoal, GetAvgPriceProfiles, GetWealthHistory, CreateAccount, AddBitcoinToBitcoinTransfer) left untouched, logged for Phase 38 QA — D-04 scope boundary: no retrofit or name fixes in pre-existing categories; verified byte-identical via diff.
-- [Phase 37]: [Phase 37-02]: Mirrored all wave-1 PT additions to the English MCP Server page with full bilingual parity (QA-01) — EN descriptions track code [Description] attributes per D-05; pre-existing EN name drift untouched per D-04; MCP-01/02/03 already flipped to Complete by wave 1 metadata commit, verified in place per orchestrator instruction
+- [Phase ?]: [Phase 37-02]: Mirrored all wave-1 PT additions to the English MCP Server page with full bilingual parity (QA-01) — EN descriptions track code [Description] attributes per D-05; pre-existing EN name drift untouched per D-04; MCP-01/02/03 already flipped to Complete by wave 1 metadata commit, verified in place per orchestrator instruction
 - [Phase 38-01]: Created the Settings & Configuration page (NAV-03) rather than deferring it — the app exposes 10+ undocumented settings across three tabs and three existing pages referenced the settings screen without a link target.
 - [Phase 38-01]: Placed the Settings page in the Guide section after Basic Concepts, matching the onboarding flow that ends in app configuration.
-- [Phase 38-01]: Repeated the localhost-only MCP security warning verbatim from the existing MCP page in the Avançado / Advanced section, satisfying the T-38-01 threat mitigation.
-- [Phase 38-01]: Cross-linked the Seu Arquivo de Dados / Your Data File section to Instalação / Installation instead of duplicating backup/password guidance, satisfying T-38-02.
-- [Phase 38-01]: Documented the language combo as listing all system cultures with the three app languages pinned at the top, and the app as translated into three languages (requires restart), matching SettingsViewModel behavior.
-- [Phase ?]: Replaced 7 drifted MCP tool tables as whole units from RESEARCH Example 1 — Full replacement removes stale descriptions and adds 32 missing real tools, landing documented count at 90 = code truth
-- [Phase ?]: Committed both language files in a single docs(38-02) commit per QA-01 — Bilingual mirror discipline requires PT and EN changes to be committed together
-- [Phase ?]: Left 'mais de 80 ferramentas' / '80+ tools' intro untouched — Post-fix documented count is 90, so the existing claim remains true with no count edit
-- [Phase ?]: Preserved Categorias/Categories section byte-identical — It was the only clean pre-existing category and required no changes
-- [Phase 39]: Savings rate uses AllIncomeInFiat/AllExpensesInFiat from IMonthlyTotalsReport — Matches existing Monthly totals panel numbers and avoids a second income/expense aggregation (D-01).
-- [Phase 39]: Burn rate median is read from IStatisticsReport.MedianMonthlyExpenses — Reuses the existing 12-month median calculation instead of recomputing it (D-13).
-- [Phase 39]: Burn rate projection is gated to day >= 5 — User-specified threshold to avoid early-month projection noise (D-15).
-- [Phase ?]: 39-03: Followed existing BtcLoans/Leverage panel wiring for ReportsViewModel observables, refresh triggers, and disposal
-- [Phase ?]: 39-03: Placed burn rate card after Statistics card in DashboardGridPanel per UI-SPEC default ordering
-- [Phase ?]: 39-03: Used English-only resx strings (D-21); pt-BR/es files untouched for Phase 43 localization pass
-- [Phase ?]: 39-03: Used TransactionGridResources.Credit for projection <= median and Debt for projection > median, matching MonthlyReportItemViewModel convention
-- [Phase ?]: 39-03: Kept burn-rate card always visible (IsVisible=true) even on empty/error states, unlike conditional BtcLoans/Leverage panels
-- [Phase 40-04]: Reused `IsBtcMetricsEmpty` for both monthly and category breakdown views so the existing XAML empty-state border needs no second property.
-- [Phase 40-04]: Cached `_lastBtcMetricsData` for the category/monthly toggle so empty-state recomputes without a database round-trip.
-- [Phase ?]: [40-01] Mirrored the SpendingEvolution/SavingsRate module layout for BtcDenominatedMetrics to keep the App/Infra split consistent.
-- [Phase ?]: [40-01] Added the Earned/Spent/Velocity series-name language keys in Task 2 so chart-data classes could compile before Task 3 localization.
-- [Phase ?]: [40-01] Added error-state observables (IsBtcMetricsError, IsStackVelocityError) in Task 3 to keep the ViewModel wiring task focused on data flow.
-- [Phase ?]: [40-01] Left SpentByCategory empty in the query DTO; per-category breakdown intentionally deferred to Plan 40-02.
-- [Phase ?]: [40-02] Emit a zero-value month for every month in the date range so the stack velocity line chart has no gaps (D-11).
-- [Phase ?]: [40-02] Narrow internal-transfer exclusion to FiatToFiat/BitcoinToBitcoin only, so BTC purchases and sales contribute to stack velocity (D-09).
-- [Phase ?]: [40-02] Added English placeholders for new BTC metrics strings to pt-BR and es resx files now; full translations remain Phase 43 work per D-19, but all three language files must contain the keys per AGENTS.md.
-- [Phase ?]: Asset value approximation: used AssetDTO.CurrentValue for every active day because historical asset prices are not available; documented as approximation in a code comment.
-- [Phase ?]: English-only UI string added now; pt-BR/es localization deferred to Phase 43 per D-14.
-
-- [Phase 42-04]: Convert each loan's monthly interest and fees individually to the main currency before accumulating, following the dashboard's per-loan conversion pattern — prevents compounding re-conversion when multiple active loans use different currencies.
-- [Phase 42-04]: Scoped conversion try/catch to a single loan's contribution so a missing fiat rate zeros only that loan's cost for the month, not the entire month's combined cost.
-- [Phase ?]: Reused existing ParseAccountIds/ParseCategoryIds helpers and concurrent Task.WhenAll for query dispatch.
-- [Phase ?]: Added discovered Phase 42 loan-report strings to pt-BR/es while localizing Phase 39 to keep all three language files in sync.
-- [Phase ?]: Did not regenerate language.Designer.cs because the added keys were already exposed by existing static properties.
-- [Phase ?]: Omitted savings-rate from the MCP tool because no GetSavingsRateQuery exists in the shipped v0.7 codebase.
-- [Phase ?]: [Phase 43-02]: Omitted unimplemented v0.7 wealth-performance metrics (CAGR, fiat-vs-BTC allocation, best/worst months) from the MCP surface and documented the limitation in the XML doc and integration test.
-- [Phase ?]: [Phase 43-02]: Made SeedPriceData idempotent in ReportToolsTests so multiple MCP report integration tests can share the same IntegrationTest fixture without duplicate-date LiteDB exceptions.
-- [Phase 43]: Explicitly documented WLT-01..03 as not implemented to prevent AI assistants from requesting unimplemented v0.7 metrics. — Satisfies T-43-09 threat mitigation and aligns docs with shipped code.
-- [Phase 43]: Copied query/DTO and MCP tool names directly from source files into .claude/docs/reports.md. — Satisfies T-43-10 drift-mitigation requirement by keeping docs in sync with code contracts.
+- [Phase 45]: UI design contract approved — 6/6 checker dimensions passed; state coverage resolved by ui-consideration probe.
+- [Phase 45]: Research, pattern map, validation strategy, and two executable plans created (45-01 and 45-02). Plan-checker skipped per config (`plan_checker_enabled: false`).
 
 ### Pending Todos
 
@@ -201,7 +201,7 @@ None yet.
 |---|-------------|------|--------|-----------|
 | 260714-exz | The History page displays the description on the grid in a very weird format, check the picture: /home/vmabellini/Pictures/valt3 | 2026-07-14 | 87a83ae | [260714-exz-the-history-page-displays-the-descriptio](./quick/260714-exz-the-history-page-displays-the-descriptio/) |
 | 260714-hbv | it is still bad. take a look at /home/vmabellini/Pictures/valt3/new.png. it should align properly. just remove the icon and render the description as plain text. also, the button Restore Asset should not occupy the entire horizontal space | 2026-07-14 | 4607275 | [260714-hbv-it-is-still-bad-take-a-look-at-home-vmab](./quick/260714-hbv-it-is-still-bad-take-a-look-at-home-vmab/) |
-| 260714-i1p | when I mark as sold, the system asks for date but only month/year. it should use a date picker like the one on the transaction tab to also pick the day | 2026-07-14 | d79acfa | [260714-i1p-when-i-mark-as-sold-the-system-asks-for-](./quick/260714-i1p-when-i-mark-as-sold-the-system-asks-for-/) |
+| 260714-i1p | when I mark as sold, the system asks for date but only month/year. it should use a date picker like the one on the transaction tab to also pick the day | 2026-07-14 | d79acfa | [260714-i1p-when-i-mark-as-sold-the-date-should-use](./quick/260714-i1p-when-i-mark-as-sold-the-date-should-use/) |
 | 260714-kzm | Update Avalonia nuget packages from 12.0.3 to 12.1.0, research breaking changes first | 2026-07-14 | 36ddfe7 | [260714-kzm-update-avalonia-nuget-packages-from-12-0](./quick/260714-kzm-update-avalonia-nuget-packages-from-12-0/) |
 | 260717-iqe | after I close a database, when I try to open another one the app got stuck because all background services are stopped | 2026-07-17 | 6ffdf19 | [260717-iqe-after-i-close-a-database-when-i-try-to-o](./quick/260717-iqe-after-i-close-a-database-when-i-try-to-o/) |
 | 260804-f94 | TransactionsView left column: shorten "View All Accounts" to "View All" and move plus-icon add button to a labeled "Add new" button beside it | 2026-08-04 | 29aed14 | [260804-f94-transactions-left-column-buttons](./quick/260804-f94-transactions-left-column-buttons/) |
@@ -210,6 +210,10 @@ None yet.
 | 260806-v3s | Add color-coded thresholds to dashboard data panels: BTC Loans LTVs, stack pledged; Indicators Mayer Multiple and Fear & Greed; All-time high difference; Leverage %; Statistics YoY and Sats YoY evolutions | 2026-08-06 | ae3405f | [260806-v3s-add-color-coded-thresholds-to-dashboard-](./quick/260806-v3s-add-color-coded-thresholds-to-dashboard-/) |
 | 260807-er9 | Fix Fixed vs Variable Expenses chart to show all 12 months including current and future months, matching Sats earned & spent chart behavior | 2026-08-07 | 8aabdca | [260807-er9-fix-fixed-vs-variable-expenses-chart-to-](./quick/260807-er9-fix-fixed-vs-variable-expenses-chart-to-/) |
 | 260807-ff0 | Add explanatory labels to Reports tab panels with full translations | 2026-08-07 | 386175f | [260807-ff0-add-explanatory-labels-to-reports-tab-pa](./quick/260807-ff0-add-explanatory-labels-to-reports-tab-pa/) |
+| 260821-k09 | BTC Loan Simulator: remove prefill from existing loan feature, add missing language translations, set interest mode default to Compound | 2026-08-21 | 4749376 | [260821-k09-btc-loan-simulator-remove-prefill-from-e](./quick/260821-k09-btc-loan-simulator-remove-prefill-from-e/) |
+| 260821-kkc | Translate the BTC Loan Simulator Tools menu item | 2026-08-21 | d3eab80 | [260821-kkc-translate-the-btc-loan-simulator-tools-m](./quick/260821-kkc-translate-the-btc-loan-simulator-tools-m/) |
+| 260821-kva | Fix BTC Loan Simulator window layout: keep results panel at fixed height instead of collapsing/expanding | 2026-08-21 | d8d3bce | [260821-kva-fix-btc-loan-simulator-window-layout-kee](./quick/260821-kva-fix-btc-loan-simulator-window-layout-kee/) |
+| 260821-p7v | Fix bulk category change on right-click for selected transactions | 2026-08-21 | b9ccde1 | [260821-p7v-fix-bulk-category-change-on-right-click-](./quick/260821-p7v-fix-bulk-category-change-on-right-click-/) |
 
 ## Deferred Items
 
@@ -229,9 +233,9 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-08-13T00:00:00.000Z
-Stopped at: v0.8 roadmap defined (Phases 44-48)
-Resume file: None
+Last session: 2026-08-14T13:41:38.876Z
+Stopped at: Phase 45 plans created
+Resume file: .planning/phases/45-simulator-modal-ui-inputs-results-panel/45-01-PLAN.md
 
 ## Notes
 
@@ -245,4 +249,5 @@ Resume file: None
 ## Operator Next Steps
 
 - v0.8 BTC Loan Simulator roadmap is defined (Phases 44-48).
-- Next: run `/gsd-plan-phase 44` (Core Loan Simulation Calculator). Consider `/gsd-discuss-phase 44` first to resolve the compound-frequency question flagged by research.
+- Phase 45 UI-SPEC approved and two executable plans created.
+- Next: run `/gsd-execute-phase 45` to start execution.
