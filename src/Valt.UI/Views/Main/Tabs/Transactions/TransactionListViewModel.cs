@@ -397,12 +397,23 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     [RelayCommand]
     private async Task ChangeNamesAndCategories()
     {
+        await OpenChangeCategoryTransactionsModalAsync(null);
+    }
+
+    [RelayCommand]
+    private async Task ChangeCategories()
+    {
+        await OpenChangeCategoryTransactionsModalAsync(ChangeCategoryTransactionsViewModel.ChangeCategoryMode);
+    }
+
+    private async Task OpenChangeCategoryTransactionsModalAsync(string? mode)
+    {
         var ownerWindow = GetUserControlOwnerWindow()!;
 
         var modal =
             (ChangeCategoryTransactionsView)await _modalFactory.CreateAsync(
                 ApplicationModalNames.ChangeCategoryTransactions,
-                ownerWindow, null)!;
+                ownerWindow, mode)!;
 
         var result = await modal.ShowDialogSafeAsync<ChangeCategoryTransactionsViewModel.Response?>(ownerWindow);
 

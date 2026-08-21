@@ -333,6 +333,9 @@
     <data name="Transactions.Menu.RenameAll" xml:space="preserve">
         <value>Editar todos</value>
     </data>
+    <data name="Transactions.Menu.ChangeCategory" xml:space="preserve">
+        <value>Cambiar categoría</value>
+    </data>
     <data name="Transactions.Menu.Delete" xml:space="preserve">
         <value>Eliminar</value>
     </data>

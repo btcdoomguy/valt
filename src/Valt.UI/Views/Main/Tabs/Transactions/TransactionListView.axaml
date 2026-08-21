@@ -184,6 +184,10 @@
                               IsVisible="{Binding !IsSingleItemSelected}"
                               Command="{Binding ChangeNamesAndCategoriesCommand}">
                     </MenuItem>
+                    <MenuItem Header="{x:Static local:language.Transactions_Menu_ChangeCategory}"
+                              IsVisible="{Binding !IsSingleItemSelected}"
+                              Command="{Binding ChangeCategoriesCommand}">
+                    </MenuItem>
                     <MenuItem Header="{x:Static local:language.Transactions_Menu_Delete}"
                               Command="{Binding DeleteTransactionCommand}"
                               CommandParameter="{Binding SelectedTransaction}">

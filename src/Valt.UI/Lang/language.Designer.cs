@@ -675,6 +675,12 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string Transactions_Menu_ChangeCategory {
+            get {
+                return ResourceManager.GetString("Transactions.Menu.ChangeCategory", resourceCulture);
+            }
+        }
+        
         public static string Transactions_Menu_Delete {
             get {
                 return ResourceManager.GetString("Transactions.Menu.Delete", resourceCulture);
