@@ -79,8 +79,8 @@ public class FixedVsVariableQueries : IFixedVsVariableQueries
         }
 
         transactionQuery = transactionQuery.Where(x =>
-            (x.FromFiatAmount.HasValue && x.FromFiatAmount.Value < 0) ||
-            (x.SatAmount.HasValue && x.FromSatAmount.HasValue && x.FromSatAmount.Value < 0));
+            (x.Type == TransactionEntityType.Fiat && x.FromFiatAmount.HasValue && x.FromFiatAmount.Value < 0) ||
+            (x.Type == TransactionEntityType.Bitcoin && x.FromSatAmount.HasValue && x.FromSatAmount.Value < 0));
 
         var transactions = transactionQuery.ToList();
 

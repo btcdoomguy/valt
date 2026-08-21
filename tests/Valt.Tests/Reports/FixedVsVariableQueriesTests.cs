@@ -216,6 +216,62 @@ public class FixedVsVariableQueriesTests : DatabaseTest
         }
     }
 
+    [Test]
+    public async Task Should_Include_Bitcoin_Expense_As_Variable()
+    {
+        var month = new DateOnly(2025, 1, 1);
+        AddFixedExpense();
+        AddBitcoinExpense(new DateOnly(2025, 1, 15), 100_000); // 0.001 BTC -> BRL 550
+
+        var result = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31));
+        var monthData = GetMonth(result, month);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(monthData, Is.Not.Null);
+            Assert.That(monthData!.FixedTotal, Is.EqualTo(0m));
+            Assert.That(monthData.VariableTotal, Is.EqualTo(550m));
+        }
+    }
+
+    [Test]
+    public async Task Should_Exclude_FiatToBitcoin_Purchase_From_Variable()
+    {
+        var month = new DateOnly(2025, 1, 1);
+        AddFixedExpense();
+        AddFiatToBitcoinPurchase(new DateOnly(2025, 1, 15), 1000m, 100_000);
+
+        var result = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31));
+        var monthData = GetMonth(result, month);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(monthData, Is.Not.Null);
+            Assert.That(monthData!.FixedTotal, Is.EqualTo(0m));
+            Assert.That(monthData.VariableTotal, Is.EqualTo(0m));
+        }
+    }
+
+    [Test]
+    public async Task Should_Split_Bitcoin_Fixed_And_Variable_When_Paid_Record_Bound()
+    {
+        var month = new DateOnly(2025, 1, 1);
+        var fixedExpense = AddFixedExpense();
+        var boundTransaction = AddBitcoinExpense(new DateOnly(2025, 1, 15), 100_000); // 0.001 BTC -> BRL 550
+        AddBitcoinExpense(new DateOnly(2025, 1, 20), 200_000); // 0.002 BTC -> BRL 1100
+        AddFixedExpenseRecord(fixedExpense, boundTransaction, FixedExpenseRecordState.Paid);
+
+        var result = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31));
+        var monthData = GetMonth(result, month);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(monthData, Is.Not.Null);
+            Assert.That(monthData!.FixedTotal, Is.EqualTo(550m));
+            Assert.That(monthData.VariableTotal, Is.EqualTo(1100m));
+        }
+    }
+
     private static FixedVsVariableMonthDto? GetMonth(FixedVsVariableDataDto result, DateOnly month)
     {
         return result.Months.FirstOrDefault(x => x.Month == month);
@@ -327,6 +383,40 @@ public class FixedVsVariableQueriesTests : DatabaseTest
             Name = $"EUR Expense {date}",
             AutoSatAmountDetails = AutoSatAmountDetails.Pending,
             TransactionDetails = new FiatDetails(_eurAccount.Id.ToString(), amount, false)
+        }.Build();
+        _localDatabase.GetTransactions().Insert(entity);
+        return entity;
+    }
+
+    private TransactionEntity AddBitcoinExpense(DateOnly date, long satAmount)
+    {
+        var entity = new TransactionBuilder()
+        {
+            Id = IdGenerator.Generate(),
+            CategoryId = _categoryId,
+            Date = date,
+            Name = $"BTC Expense {date}",
+            AutoSatAmountDetails = null,
+            TransactionDetails = new BitcoinDetails(_btcAccount.Id.ToString(), BtcValue.ParseSats(satAmount), credit: false)
+        }.Build();
+        _localDatabase.GetTransactions().Insert(entity);
+        return entity;
+    }
+
+    private TransactionEntity AddFiatToBitcoinPurchase(DateOnly date, decimal fiatAmount, long satAmount)
+    {
+        var entity = new TransactionBuilder()
+        {
+            Id = IdGenerator.Generate(),
+            CategoryId = _categoryId,
+            Date = date,
+            Name = $"Fiat to BTC {date}",
+            AutoSatAmountDetails = null,
+            TransactionDetails = new FiatToBitcoinDetails(
+                _brlAccount.Id.ToString(),
+                _btcAccount.Id.ToString(),
+                FiatValue.New(fiatAmount),
+                BtcValue.ParseSats(satAmount))
         }.Build();
         _localDatabase.GetTransactions().Insert(entity);
         return entity;
