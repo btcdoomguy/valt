@@ -214,7 +214,7 @@ None yet.
 | 260821-kkc | Translate the BTC Loan Simulator Tools menu item | 2026-08-21 | d3eab80 | [260821-kkc-translate-the-btc-loan-simulator-tools-m](./quick/260821-kkc-translate-the-btc-loan-simulator-tools-m/) |
 | 260821-kva | Fix BTC Loan Simulator window layout: keep results panel at fixed height instead of collapsing/expanding | 2026-08-21 | d8d3bce | [260821-kva-fix-btc-loan-simulator-window-layout-kee](./quick/260821-kva-fix-btc-loan-simulator-window-layout-kee/) |
 | 260821-p7v | Fix bulk category change on right-click for selected transactions | 2026-08-21 | b9ccde1 | [260821-p7v-fix-bulk-category-change-on-right-click-](./quick/260821-p7v-fix-bulk-category-change-on-right-click-/) |
-| 260821-rgd | Fix bulk category change bug when selecting multiple transactions and choosing a new category | 2026-08-21 | c3e408e | [260821-rgd-fix-bulk-category-change-bug-when-select](./quick/260821-rgd-fix-bulk-category-change-bug-when-select/) |
+| 260821-rgd | Fix bulk category change bug when selecting multiple transactions and choosing a new category | 2026-08-21 | 502657a | [260821-rgd-fix-bulk-category-change-bug-when-select](./quick/260821-rgd-fix-bulk-category-change-bug-when-select/) |
 
 ## Deferred Items
 
