@@ -7,8 +7,8 @@ current_phase_name: Cost-Over-Time Schedule
 status: planning
 stopped_at: Phase 45 plans created
 last_updated: "2026-08-21T17:20:01.064Z"
-last_activity: 2026-08-21
-last_activity_desc: Phase 45 complete, transitioned to Phase 46
+last_activity: 2026-08-24
+last_activity_desc: Completed quick task 260824-hz9: Preserve selected category when switching transaction modes in Transaction Editor
 progress:
   total_phases: 10
   completed_phases: 2
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-08-06)
 Phase: 46 — Cost-Over-Time Schedule
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-08-21 - Completed quick task 260821-rgd: Fix bulk category change bug when selecting multiple transactions and choosing a new category
+Last activity: 2026-08-24 - Completed quick task 260824-hz9: Preserve selected category when switching transaction modes in Transaction Editor
 
 ## Performance Metrics
 
@@ -215,6 +215,7 @@ None yet.
 | 260821-kva | Fix BTC Loan Simulator window layout: keep results panel at fixed height instead of collapsing/expanding | 2026-08-21 | d8d3bce | [260821-kva-fix-btc-loan-simulator-window-layout-kee](./quick/260821-kva-fix-btc-loan-simulator-window-layout-kee/) |
 | 260821-p7v | Fix bulk category change on right-click for selected transactions | 2026-08-21 | b9ccde1 | [260821-p7v-fix-bulk-category-change-on-right-click-](./quick/260821-p7v-fix-bulk-category-change-on-right-click-/) |
 | 260821-rgd | Fix bulk category change bug when selecting multiple transactions and choosing a new category | 2026-08-21 | 502657a | [260821-rgd-fix-bulk-category-change-bug-when-select](./quick/260821-rgd-fix-bulk-category-change-bug-when-select/) |
+| 260824-hz9 | In the Transaction Editor window, if I switch between Debt, Credit and Transfer, the current selected category becomes empty. It should keep the value. | 2026-08-24 | 58e593a | [260824-hz9-transaction-editor-category-preservation](./quick/260824-hz9-transaction-editor-category-preservation/) |
 
 ## Deferred Items
 
