@@ -40,6 +40,7 @@ public record AssetDTO
     public decimal? DistanceToLiquidation { get; init; }
     public bool? IsAtRisk { get; init; }
     public decimal? PositionSize { get; init; }
+    public decimal? CurrentBtcValue { get; init; }
     public int? InputModeId { get; init; }
     public int? CollateralAssetTypeId { get; init; }
     public decimal? ContractCount { get; init; }

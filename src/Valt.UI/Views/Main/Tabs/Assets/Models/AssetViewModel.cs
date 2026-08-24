@@ -55,6 +55,7 @@ public partial class AssetViewModel : ObservableObject
     public decimal? ContractCount { get; }
     public decimal? ContractSizeUsd { get; }
     public bool IsBtcCollateralLeveragedPosition => IsLeveragedPosition && CollateralAssetTypeId == (int)LeveragedPositionCollateralAssetType.Btc;
+    public decimal? CurrentBtcValue { get; }
 
     /// <summary>
     /// Indicates if the leveraged position is at risk of liquidation.
@@ -205,6 +206,7 @@ public partial class AssetViewModel : ObservableObject
         CollateralAssetTypeId = dto.CollateralAssetTypeId;
         ContractCount = dto.ContractCount;
         ContractSizeUsd = dto.ContractSizeUsd;
+        CurrentBtcValue = dto.CurrentBtcValue;
         // Only show at risk if reported AND PnL is not significantly positive
         // A position with > 50% profit cannot logically be close to liquidation
         IsAtRisk = dto.IsAtRisk == true && (dto.PnLPercentage == null || dto.PnLPercentage <= 50);
@@ -289,7 +291,7 @@ public partial class AssetViewModel : ObservableObject
 
         PositionSizeFormatted = PositionSize.HasValue
             ? IsBtcCollateralLeveragedPosition
-                ? $"{PositionSize.Value:0.########} BTC"
+                ? $"{(CurrentBtcValue ?? PositionSize.Value):0.########} BTC"
                 : $"{PositionSize.Value:G} {Symbol ?? ""}"
             : "-";
 

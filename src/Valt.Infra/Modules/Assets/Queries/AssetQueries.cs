@@ -294,6 +294,9 @@ internal sealed class AssetQueries : IAssetQueries
             DistanceToLiquidation = leveraged.CalculateDistanceToLiquidation(leveraged.CurrentPrice),
             IsAtRisk = leveraged.IsAtRisk(leveraged.CurrentPrice),
             PositionSize = leveraged.PositionSize,
+            CurrentBtcValue = leveraged.CollateralAssetType == LeveragedPositionCollateralAssetType.Btc
+                ? leveraged.CalculateCurrentBtcValue(leveraged.CurrentPrice)
+                : null,
             InputModeId = (int)leveraged.InputMode,
             CollateralAssetTypeId = (int)leveraged.CollateralAssetType,
             ContractCount = leveraged.ContractCount,
