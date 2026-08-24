@@ -42,5 +42,8 @@ ClientBin/
 # Planning
 .planning/
 
+# GSD execution artifacts
+.gsd/
+
 # Test artifacts
 TestResults/

@@ -39,15 +39,8 @@ public class BurnRateQueriesTests : DatabaseTest
         }.Build();
         _localDatabase.GetAccounts().Insert(_brlAccount);
 
-        var initialDate = new DateTime(2024, 01, 01);
-        var finalDate = new DateTime(2025, 12, 31);
-        var currentDate = initialDate;
-        while (currentDate <= finalDate)
-        {
-            _priceDatabase.GetBitcoinData().Insert(new BitcoinDataEntity() { Date = currentDate, Price = 100000m });
-            _priceDatabase.GetFiatData().Insert(new FiatDataEntity() { Date = currentDate, Currency = FiatCurrency.Brl.Code, Price = 5.5m });
-            currentDate = currentDate.AddDays(1);
-        }
+        PriceDataBuilder.SeedRange(_priceDatabase, new DateTime(2024, 1, 1), new DateTime(2025, 12, 31), 100000m,
+            (FiatCurrency.Brl.Code, 5.5m));
 
         return base.SeedDatabase();
     }
@@ -176,7 +169,37 @@ public class BurnRateQueriesTests : DatabaseTest
         }
     }
 
+    [Test]
+    public async Task Should_Reduce_SpentSoFar_When_Account_Filter_Excludes_One_Account()
+    {
+        var secondBrlAccount = new FiatAccountBuilder()
+        {
+            Name = "BRL Account 2",
+            FiatCurrency = FiatCurrency.Brl,
+            Value = FiatValue.New(5000m)
+        }.Build();
+        _localDatabase.GetAccounts().Insert(secondBrlAccount);
+
+        var clock = new FakeClock(new DateTime(2025, 3, 15));
+        AddExpenseTransaction(new DateOnly(2025, 3, 10), 300m);
+        AddExpenseTransaction(new DateOnly(2025, 3, 12), 400m, _categoryId, secondBrlAccount);
+
+        var allAccounts = await ExecuteQuery(clock, 10000m, [], []);
+        var onlyFirstAccount = await ExecuteQuery(clock, 10000m, [], [_brlAccount.Id.ToString()]);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(allAccounts.SpentSoFar, Is.EqualTo(700m));
+            Assert.That(onlyFirstAccount.SpentSoFar, Is.EqualTo(300m));
+        }
+    }
+
     private async Task<BurnRateDataDto> ExecuteQuery(FakeClock clock, decimal currentWealth, string[] categoryIds)
+    {
+        return await ExecuteQuery(clock, currentWealth, categoryIds, [_brlAccount.Id.ToString()]);
+    }
+
+    private async Task<BurnRateDataDto> ExecuteQuery(FakeClock clock, decimal currentWealth, string[] categoryIds, string[] accountIds)
     {
         var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
         var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
@@ -190,7 +213,7 @@ public class BurnRateQueriesTests : DatabaseTest
         return await sut.GetBurnRateAsync(new GetBurnRateQuery
         {
             CurrentWealthInFiat = currentWealth,
-            AccountIds = [_brlAccount.Id.ToString()],
+            AccountIds = accountIds,
             CategoryIds = categoryIds
         });
     }
@@ -208,7 +231,7 @@ public class BurnRateQueriesTests : DatabaseTest
             .Build());
     }
 
-    private void AddExpenseTransaction(DateOnly date, decimal amount, CategoryId categoryId)
+    private void AddExpenseTransaction(DateOnly date, decimal amount, CategoryId categoryId, AccountEntity account)
     {
         _localDatabase.GetTransactions().Insert(new TransactionBuilder()
         {
@@ -217,8 +240,13 @@ public class BurnRateQueriesTests : DatabaseTest
             Date = date,
             Name = $"Expense {date}",
             AutoSatAmountDetails = AutoSatAmountDetails.Pending,
-            TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), amount, false)
+            TransactionDetails = new FiatDetails(account.Id.ToString(), amount, false)
         }.Build());
+    }
+
+    private void AddExpenseTransaction(DateOnly date, decimal amount, CategoryId categoryId)
+    {
+        AddExpenseTransaction(date, amount, categoryId, _brlAccount);
     }
 
     private void AddExpenseTransaction(DateOnly date, decimal amount)

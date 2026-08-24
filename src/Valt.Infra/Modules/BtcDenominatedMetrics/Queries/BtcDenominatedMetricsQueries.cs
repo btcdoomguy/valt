@@ -15,8 +15,6 @@ namespace Valt.Infra.Modules.BtcDenominatedMetrics.Queries;
 
 public class BtcDenominatedMetricsQueries : IBtcDenominatedMetricsQueries
 {
-    private const decimal SatoshisPerBitcoin = 100_000_000m;
-
     private readonly IReportDataProviderFactory _reportDataProviderFactory;
     private readonly IMonthlyTotalsReport _monthlyTotalsReport;
     private readonly IClock _clock;
@@ -131,7 +129,7 @@ public class BtcDenominatedMetricsQueries : IBtcDenominatedMetricsQueries
                 Month = month,
                 SatsEarned = aggregation.SatsEarned,
                 SatsSpent = aggregation.SatsSpent,
-                StackVelocity = aggregation.SatsEarned - aggregation.SatsSpent + aggregation.BtcPurchases - aggregation.BtcSales
+                StackVelocity = aggregation.SatsEarned + aggregation.SatsSpent + aggregation.BtcPurchases + aggregation.BtcSales
             });
         }
 
@@ -144,13 +142,7 @@ public class BtcDenominatedMetricsQueries : IBtcDenominatedMetricsQueries
 
     private static long ConvertFiatToSats(decimal fiatAmount, DateOnly transactionDate, AccountEntity account, IReportDataProvider provider)
     {
-        var accountCurrency = FiatCurrency.GetFromCode(account.Currency!);
-        var fiatRateToUsd = provider.GetFiatRateAt(transactionDate, accountCurrency);
-        var btcPriceUsd = provider.GetUsdBitcoinPriceAt(transactionDate);
-
-        var usdAmount = fiatAmount / fiatRateToUsd;
-        var btcAmount = usdAmount / btcPriceUsd;
-        return (long)(btcAmount * SatoshisPerBitcoin);
+        return HistoricalRateConverter.ConvertFiatToSats(fiatAmount, account.Currency!, transactionDate, provider);
     }
 
     private record MonthSatsAggregation

@@ -2,14 +2,12 @@ using LiteDB;
 using Valt.App.Modules.SpendingAnalytics.Contracts;
 using Valt.App.Modules.SpendingAnalytics.DTOs;
 using Valt.App.Modules.SpendingAnalytics.Queries;
-using Valt.Core.Common;
-using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Modules.Budget.FixedExpenses;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Transactions;
-using Valt.Infra.Modules.Currency.Services;
+using Valt.Infra.Modules.Reports;
 using Valt.Infra.Settings;
 
 namespace Valt.Infra.Modules.SpendingAnalytics.Queries;
@@ -17,38 +15,32 @@ namespace Valt.Infra.Modules.SpendingAnalytics.Queries;
 public class FixedVsVariableQueries : IFixedVsVariableQueries
 {
     private readonly ILocalDatabase _localDatabase;
-    private readonly IPriceDatabase _priceDatabase;
-    private readonly ICurrencyConversionService _currencyConversionService;
+    private readonly IReportDataProviderFactory _reportDataProviderFactory;
     private readonly CurrencySettings _currencySettings;
-    private readonly IClock _clock;
 
     public FixedVsVariableQueries(
         ILocalDatabase localDatabase,
-        IPriceDatabase priceDatabase,
-        ICurrencyConversionService currencyConversionService,
-        CurrencySettings currencySettings,
-        IClock clock)
+        IReportDataProviderFactory reportDataProviderFactory,
+        CurrencySettings currencySettings)
     {
         _localDatabase = localDatabase;
-        _priceDatabase = priceDatabase;
-        _currencyConversionService = currencyConversionService;
+        _reportDataProviderFactory = reportDataProviderFactory;
         _currencySettings = currencySettings;
-        _clock = clock;
     }
 
-    public Task<FixedVsVariableDataDto> GetFixedVsVariableAsync(GetFixedVsVariableQuery query)
+    public async Task<FixedVsVariableDataDto> GetFixedVsVariableAsync(GetFixedVsVariableQuery query)
     {
         var primaryCurrency = _currencySettings.MainFiatCurrency;
 
         // D-10: when the user has no fixed expenses registered, return the empty-state flag
         if (_localDatabase.GetFixedExpenses().Count() == 0)
         {
-            return Task.FromResult(new FixedVsVariableDataDto
+            return new FixedVsVariableDataDto
             {
                 Months = new List<FixedVsVariableMonthDto>(),
                 HasNoFixedExpenses = true,
                 PrimaryCurrency = primaryCurrency
-            });
+            };
         }
 
         // D-06: collect only Paid records that are bound to an actual transaction
@@ -66,8 +58,7 @@ public class FixedVsVariableQueries : IFixedVsVariableQueries
             : allAccountsList.Select(a => a.Id).ToList();
         var accountDict = allAccountsList.Where(a => selectedAccountIds.Contains(a.Id)).ToDictionary(a => a.Id);
 
-        // Get latest rates for currency conversion
-        var (bitcoinPriceUsd, fiatRates) = GetLatestRates();
+        var provider = await _reportDataProviderFactory.CreateAsync();
 
         // Build transaction query with LiteDB-side filtering (mirrors SpendingEvolutionQueries)
         var transactionQuery = _localDatabase.GetTransactions().Query();
@@ -88,13 +79,13 @@ public class FixedVsVariableQueries : IFixedVsVariableQueries
         }
 
         transactionQuery = transactionQuery.Where(x =>
-            (x.FromFiatAmount.HasValue && x.FromFiatAmount.Value < 0) ||
-            (x.SatAmount.HasValue && x.FromSatAmount.HasValue && x.FromSatAmount.Value < 0));
+            (x.Type == TransactionEntityType.Fiat && x.FromFiatAmount.HasValue && x.FromFiatAmount.Value < 0) ||
+            (x.Type == TransactionEntityType.Bitcoin && x.FromSatAmount.HasValue && x.FromSatAmount.Value < 0));
 
         var transactions = transactionQuery.ToList();
 
         // Aggregate per month, splitting fixed vs variable
-        var monthlyData = AggregateByMonth(transactions, accountDict, paidTransactionIds, primaryCurrency, bitcoinPriceUsd, fiatRates);
+        var monthlyData = AggregateByMonth(transactions, accountDict, paidTransactionIds, primaryCurrency, provider);
 
         // Emit every month in the requested range so the chart axis stays consistent
         // even when a month has no transactions (matches BtcDenominatedMetricsQueries).
@@ -115,21 +106,20 @@ public class FixedVsVariableQueries : IFixedVsVariableQueries
             });
         }
 
-        return Task.FromResult(new FixedVsVariableDataDto
+        return new FixedVsVariableDataDto
         {
             Months = sortedMonths,
             HasNoFixedExpenses = false,
             PrimaryCurrency = primaryCurrency
-        });
+        };
     }
 
-    private Dictionary<(int Year, int Month), (decimal FixedTotal, decimal VariableTotal)> AggregateByMonth(
+    private static Dictionary<(int Year, int Month), (decimal FixedTotal, decimal VariableTotal)> AggregateByMonth(
         List<TransactionEntity> transactions,
         Dictionary<ObjectId, AccountEntity> accountDict,
         HashSet<ObjectId> paidTransactionIds,
         string primaryCurrency,
-        decimal? bitcoinPriceUsd,
-        IReadOnlyDictionary<string, decimal>? fiatRates)
+        IReportDataProvider provider)
     {
         var monthlyData = new Dictionary<(int Year, int Month), (decimal FixedTotal, decimal VariableTotal)>();
 
@@ -165,7 +155,8 @@ public class FixedVsVariableQueries : IFixedVsVariableQueries
                 continue;
             }
 
-            var converted = ConvertToPrimaryCurrency(amount, sourceCurrency, primaryCurrency, bitcoinPriceUsd, fiatRates);
+            var transactionDate = DateOnly.FromDateTime(transaction.Date.ToUniversalTime());
+            var converted = ConvertToPrimaryCurrency(amount, sourceCurrency, transactionDate, primaryCurrency, provider);
 
             if (paidTransactionIds.Contains(transaction.Id))
             {
@@ -182,54 +173,14 @@ public class FixedVsVariableQueries : IFixedVsVariableQueries
         return monthlyData;
     }
 
-    private (decimal? BitcoinPriceUsd, IReadOnlyDictionary<string, decimal>? FiatRates) GetLatestRates()
-    {
-        try
-        {
-            var latestBtc = _priceDatabase.GetBitcoinData()
-                .Query()
-                .OrderByDescending(x => x.Date)
-                .FirstOrDefault();
-
-            decimal? bitcoinPriceUsd = latestBtc?.Price;
-
-            var latestFiatDate = _priceDatabase.GetFiatData()
-                .Query()
-                .OrderByDescending(x => x.Date)
-                .Select(x => x.Date)
-                .FirstOrDefault();
-
-            IReadOnlyDictionary<string, decimal>? fiatRates = null;
-
-            if (latestFiatDate != default)
-            {
-                var startDate = latestFiatDate.AddDays(-5);
-                var fiatEntries = _priceDatabase.GetFiatData()
-                    .Find(x => x.Date >= startDate && x.Date <= latestFiatDate)
-                    .GroupBy(x => x.Currency)
-                    .ToDictionary(
-                        g => g.Key,
-                        g => g.OrderByDescending(x => x.Date).First().Price);
-
-                fiatRates = fiatEntries;
-            }
-
-            return (bitcoinPriceUsd, fiatRates);
-        }
-        catch
-        {
-            return (null, null);
-        }
-    }
-
-    private decimal ConvertToPrimaryCurrency(decimal amount, string? sourceCurrency, string targetCurrency, decimal? bitcoinPriceUsd, IReadOnlyDictionary<string, decimal>? fiatRates)
+    private static decimal ConvertToPrimaryCurrency(decimal amount, string? sourceCurrency, DateOnly date, string targetCurrency, IReportDataProvider provider)
     {
         if (string.IsNullOrEmpty(sourceCurrency) || sourceCurrency == targetCurrency)
             return amount;
 
         try
         {
-            return _currencyConversionService.Convert(amount, sourceCurrency, targetCurrency, bitcoinPriceUsd, fiatRates);
+            return HistoricalRateConverter.ConvertToFiat(amount, sourceCurrency, targetCurrency, date, provider);
         }
         catch
         {

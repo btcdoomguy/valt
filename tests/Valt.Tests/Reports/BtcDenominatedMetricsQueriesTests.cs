@@ -56,16 +56,8 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
             .Build();
         _localDatabase.GetAccounts().Insert(_btcAccount);
 
-        var initialDate = new DateTime(2024, 01, 01);
-        var finalDate = new DateTime(2025, 12, 31);
-        var currentDate = initialDate;
-        while (currentDate <= finalDate)
-        {
-            _priceDatabase.GetBitcoinData().Insert(new BitcoinDataEntity() { Date = currentDate, Price = 100000m });
-            _priceDatabase.GetFiatData().Insert(new FiatDataEntity() { Date = currentDate, Currency = FiatCurrency.Brl.Code, Price = 5.5m });
-            _priceDatabase.GetFiatData().Insert(new FiatDataEntity() { Date = currentDate, Currency = FiatCurrency.Usd.Code, Price = 1m });
-            currentDate = currentDate.AddDays(1);
-        }
+        PriceDataBuilder.SeedRange(_priceDatabase, new DateTime(2024, 1, 1), new DateTime(2025, 12, 31), 100000m,
+            (FiatCurrency.Brl.Code, 5.5m), (FiatCurrency.Usd.Code, 1m));
 
         return base.SeedDatabase();
     }
@@ -91,7 +83,7 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
             Assert.That(monthData, Is.Not.Null);
             Assert.That(monthData!.SatsEarned, Is.GreaterThan(0));
             Assert.That(monthData.SatsSpent, Is.LessThan(0));
-            Assert.That(monthData.StackVelocity, Is.EqualTo(monthData.SatsEarned - monthData.SatsSpent));
+            Assert.That(monthData.StackVelocity, Is.EqualTo(monthData.SatsEarned + monthData.SatsSpent));
         }
     }
 
@@ -155,8 +147,8 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
         var result = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31));
         var monthData = GetMonthData(result, month);
 
-        // velocity = 0 - 0 + 100000 - (-50000) = 150000
-        Assert.That(monthData!.StackVelocity, Is.EqualTo(150000L));
+        // velocity = 0 + 0 + 100000 + (-50000) = 50000
+        Assert.That(monthData!.StackVelocity, Is.EqualTo(50000L));
     }
 
     [Test]
@@ -188,14 +180,23 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
         Assert.That(entity, Is.Not.Null);
         _priceDatabase.GetBitcoinData().Delete(entity.Id);
 
-        var result = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31));
-        var monthData = GetMonthData(result, month);
-
-        using (Assert.EnterMultipleScope())
+        try
         {
-            Assert.That(monthData, Is.Not.Null);
-            Assert.That(monthData!.SatsEarned, Is.EqualTo(0));
-            Assert.That(monthData.SatsSpent, Is.EqualTo(0));
+            var result = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31));
+            var monthData = GetMonthData(result, month);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(monthData, Is.Not.Null);
+                Assert.That(monthData!.SatsEarned, Is.EqualTo(0));
+                Assert.That(monthData.SatsSpent, Is.EqualTo(0));
+            }
+        }
+        finally
+        {
+            // Restore the shared fixture price row so later tests in this fixture
+            // do not run against mutated price data
+            _priceDatabase.GetBitcoinData().Insert(new BitcoinDataEntity { Date = transactionDate, Price = 100000m });
         }
     }
 

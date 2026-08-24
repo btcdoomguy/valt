@@ -663,6 +663,164 @@
                             </Grid>
                         </StackPanel>
                     </Expander>
+                    <!--Loans & Leverage Reports-->
+                    <Expander Classes="section" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsExpanded="True"
+                              IsVisible="{Binding IsLoanReportsVisible}">
+                        <Expander.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Classes="section-header-icon" Text="&#xE08D;" />
+                                <TextBlock Classes="section-header" Text="{x:Static lang:language.Reports_LoanReports_Title}" />
+                            </StackPanel>
+                        </Expander.Header>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="{x:Static lang:language.Reports_LoanReports_CostDescription}"
+                                       FontSize="{DynamicResource FontSizeSmall}"
+                                       Foreground="{DynamicResource Text500Brush}"
+                                       TextWrapping="Wrap"
+                                       MaxWidth="900"
+                                       Margin="0,0,0,12" />
+                            <Grid MinHeight="400">
+                                <Panel IsVisible="{Binding !IsLoanReportsLoading}">
+                                    <Panel IsVisible="{Binding !IsLoanReportsError}">
+                                        <Border Background="{DynamicResource Background900Brush}"
+                                                BorderBrush="{DynamicResource Background700Brush}"
+                                                BorderThickness="1"
+                                                CornerRadius="4"
+                                                Padding="10"
+                                                IsVisible="{Binding !IsLoanReportsEmpty}">
+                                            <avalonia:CartesianChart
+                                                x:Name="LoanCostChart"
+                                                Background="{DynamicResource Background900Brush}"
+                                                Series="{Binding LoanCostChartData.Series}"
+                                                XAxes="{Binding LoanCostChartData.XAxes}"
+                                                YAxes="{Binding LoanCostChartData.YAxes}"
+                                                LegendPosition="Top"
+                                                LegendTextSize="13"
+                                                TooltipTextSize="12"
+                                                ZoomMode="None"
+                                                Height="400"
+                                                Margin="20, 10, 20, 10">
+                                            </avalonia:CartesianChart>
+                                        </Border>
+                                        <Border Classes="hint-box"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"
+                                                IsVisible="{Binding IsLoanReportsEmpty}">
+                                            <StackPanel Orientation="Vertical" Spacing="8">
+                                                <TextBlock Text="{x:Static lang:language.Reports_LoanReports_EmptyHeading}"
+                                                           FontSize="{DynamicResource FontSizeLarge}"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{DynamicResource Text200Brush}"
+                                                           HorizontalAlignment="Center" />
+                                                <TextBlock Text="{x:Static lang:language.Reports_LoanReports_EmptyBody}"
+                                                           FontSize="{DynamicResource FontSizeNormal}"
+                                                           Foreground="{DynamicResource Text400Brush}"
+                                                           TextWrapping="Wrap"
+                                                           TextAlignment="Center"
+                                                           MaxWidth="500"
+                                                           HorizontalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+                                    </Panel>
+                                    <Border Classes="hint-box"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Center"
+                                            IsVisible="{Binding IsLoanReportsError}">
+                                        <StackPanel Orientation="Vertical" Spacing="8">
+                                            <TextBlock Text="{x:Static lang:language.Reports_LoanReports_ErrorTitle}"
+                                                       FontSize="{DynamicResource FontSizeLarge}"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource Text200Brush}"
+                                                       HorizontalAlignment="Center" />
+                                            <TextBlock Text="{x:Static lang:language.Reports_LoanReports_ErrorBody}"
+                                                       FontSize="{DynamicResource FontSizeNormal}"
+                                                       Foreground="{DynamicResource Text400Brush}"
+                                                       TextWrapping="Wrap"
+                                                       TextAlignment="Center"
+                                                       MaxWidth="500"
+                                                       HorizontalAlignment="Center" />
+                                        </StackPanel>
+                                    </Border>
+                                </Panel>
+                                <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                                           IsVisible="{Binding IsLoanReportsLoading}" />
+                            </Grid>
+                            <TextBlock Text="{x:Static lang:language.Reports_LoanReports_DistanceDescription}"
+                                       FontSize="{DynamicResource FontSizeSmall}"
+                                       Foreground="{DynamicResource Text500Brush}"
+                                       TextWrapping="Wrap"
+                                       MaxWidth="900"
+                                       Margin="0,24,0,12" />
+                            <Grid MinHeight="400">
+                                <Panel IsVisible="{Binding !IsLoanReportsLoading}">
+                                    <Panel IsVisible="{Binding !IsLoanReportsError}">
+                                        <Border Background="{DynamicResource Background900Brush}"
+                                                BorderBrush="{DynamicResource Background700Brush}"
+                                                BorderThickness="1"
+                                                CornerRadius="4"
+                                                Padding="10"
+                                                IsVisible="{Binding !IsLoanReportsEmpty}">
+                                            <avalonia:CartesianChart
+                                                x:Name="LiquidationDistanceChart"
+                                                Background="{DynamicResource Background900Brush}"
+                                                Series="{Binding LiquidationDistanceChartData.Series}"
+                                                XAxes="{Binding LiquidationDistanceChartData.XAxes}"
+                                                YAxes="{Binding LiquidationDistanceChartData.YAxes}"
+                                                LegendPosition="Top"
+                                                LegendTextSize="13"
+                                                TooltipTextSize="12"
+                                                ZoomMode="None"
+                                                Height="400"
+                                                Margin="20, 10, 20, 10">
+                                            </avalonia:CartesianChart>
+                                        </Border>
+                                        <Border Classes="hint-box"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"
+                                                IsVisible="{Binding IsLoanReportsEmpty}">
+                                            <StackPanel Orientation="Vertical" Spacing="8">
+                                                <TextBlock Text="{x:Static lang:language.Reports_LoanReports_EmptyHeading}"
+                                                           FontSize="{DynamicResource FontSizeLarge}"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{DynamicResource Text200Brush}"
+                                                           HorizontalAlignment="Center" />
+                                                <TextBlock Text="{x:Static lang:language.Reports_LoanReports_EmptyBody}"
+                                                           FontSize="{DynamicResource FontSizeNormal}"
+                                                           Foreground="{DynamicResource Text400Brush}"
+                                                           TextWrapping="Wrap"
+                                                           TextAlignment="Center"
+                                                           MaxWidth="500"
+                                                           HorizontalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+                                    </Panel>
+                                    <Border Classes="hint-box"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Center"
+                                            IsVisible="{Binding IsLoanReportsError}">
+                                        <StackPanel Orientation="Vertical" Spacing="8">
+                                            <TextBlock Text="{x:Static lang:language.Reports_LoanReports_ErrorTitle}"
+                                                       FontSize="{DynamicResource FontSizeLarge}"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource Text200Brush}"
+                                                       HorizontalAlignment="Center" />
+                                            <TextBlock Text="{x:Static lang:language.Reports_LoanReports_ErrorBody}"
+                                                       FontSize="{DynamicResource FontSizeNormal}"
+                                                       Foreground="{DynamicResource Text400Brush}"
+                                                       TextWrapping="Wrap"
+                                                       TextAlignment="Center"
+                                                       MaxWidth="500"
+                                                       HorizontalAlignment="Center" />
+                                        </StackPanel>
+                                    </Border>
+                                </Panel>
+                                <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                                           IsVisible="{Binding IsLoanReportsLoading}" />
+                            </Grid>
+                        </StackPanel>
+                    </Expander>
                 </StackPanel>
             </Border>
 

@@ -285,6 +285,9 @@
     <data name="Transactions.Menu.RenameAll" xml:space="preserve">
         <value>Editar todos</value>
     </data>
+    <data name="Transactions.Menu.ChangeCategory" xml:space="preserve">
+        <value>Alterar categoria</value>
+    </data>
     <data name="Transactions.MoveDown" xml:space="preserve">
         <value>Mover para baixo</value>
     </data>
@@ -790,7 +793,10 @@
         <value>Maior queda</value>
     </data>
     <data name="Reports.AllTimeHigh.BtcPriceToHitAth" xml:space="preserve">
-        <value>Preço do BTC p/ bater ATH</value>
+        <value>Preço do BTC para atingir ATH</value>
+    </data>
+    <data name="Reports.AllTimeHigh.DaysUnderWater" xml:space="preserve">
+        <value>Dias submerso</value>
     </data>
     <data name="Reports.Wealth.Title" xml:space="preserve">
         <value>Patrimônio</value>
@@ -2456,6 +2462,9 @@
     <data name="Menu_LeverageSimulator" xml:space="preserve">
         <value>Simulador de Alavancagem</value>
     </data>
+    <data name="Menu_BtcLoanSimulator" xml:space="preserve">
+        <value>Simulador de Empréstimo BTC</value>
+    </data>
     <data name="LeverageSimulator_Title" xml:space="preserve">
         <value>Simulador de Alavancagem</value>
     </data>
@@ -2509,6 +2518,70 @@
     </data>
     <data name="LeverageSimulator_Currency" xml:space="preserve">
         <value>Moeda</value>
+    </data>
+    <!-- Simulador de Empréstimo BTC -->
+    <data name="BtcLoanSimulator_Title" xml:space="preserve">
+        <value>Simulador de Empréstimo BTC</value>
+    </data>
+    <data name="BtcLoanSimulator_Currency" xml:space="preserve">
+        <value>Moeda</value>
+    </data>
+    <data name="BtcLoanSimulator_InterestMode" xml:space="preserve">
+        <value>Modalidade de juros</value>
+    </data>
+    <data name="BtcLoanSimulator_Simple" xml:space="preserve">
+        <value>Simples</value>
+    </data>
+    <data name="BtcLoanSimulator_Compound" xml:space="preserve">
+        <value>Composto</value>
+    </data>
+    <data name="BtcLoanSimulator_Collateral" xml:space="preserve">
+        <value>Colateral</value>
+    </data>
+    <data name="BtcLoanSimulator_AmountTaken" xml:space="preserve">
+        <value>Valor retirado</value>
+    </data>
+    <data name="BtcLoanSimulator_LiquidationLtv" xml:space="preserve">
+        <value>LTV de liquidação</value>
+    </data>
+    <data name="BtcLoanSimulator_StartDate" xml:space="preserve">
+        <value>Data de início</value>
+    </data>
+    <data name="BtcLoanSimulator_InterestRateApr" xml:space="preserve">
+        <value>Taxa de juros (APR)</value>
+    </data>
+    <data name="BtcLoanSimulator_Fees" xml:space="preserve">
+        <value>Taxas</value>
+    </data>
+    <data name="BtcLoanSimulator_EndDate" xml:space="preserve">
+        <value>Data de fim</value>
+    </data>
+    <data name="BtcLoanSimulator_Results" xml:space="preserve">
+        <value>Resultados</value>
+    </data>
+    <data name="BtcLoanSimulator_TotalToRepay" xml:space="preserve">
+        <value>Total a pagar</value>
+    </data>
+    <data name="BtcLoanSimulator_Principal" xml:space="preserve">
+        <value>Principal</value>
+    </data>
+    <data name="BtcLoanSimulator_Interest" xml:space="preserve">
+        <value>Juros</value>
+    </data>
+    <data name="BtcLoanSimulator_LiquidationBtcPrice" xml:space="preserve">
+        <value>Preço de liquidação do BTC</value>
+    </data>
+    <data name="BtcLoanSimulator_EffectiveApr" xml:space="preserve">
+        <value>APR efetiva</value>
+    </data>
+    <data name="BtcLoanSimulator_DistanceToLiquidation" xml:space="preserve">
+        <value>Distância p/ liquidação</value>
+    </data>
+    <data name="BtcLoanSimulator_PriceUnavailable" xml:space="preserve">
+        <value>Preço atual do BTC indisponível — valores em sats ocultos</value>
+    </data>
+    <data name="BtcLoanSimulator_BtcPriceFormat" xml:space="preserve">
+        <value>1 BTC = {0} {1}</value>
     </data>
     <data name="Main.PriceHistory" xml:space="preserve">
         <value>Histórico de Preços</value>
@@ -2991,6 +3064,9 @@
     <data name="Reports_FixedVariable_EmptyNoneBody" xml:space="preserve">
         <value>Registre despesas fixas na aba Despesas Fixas para desbloquear este detalhamento.</value>
     </data>
+    <data name="Reports_FixedVariable_EmptyPeriod" xml:space="preserve">
+        <value>Sem dados de despesa para este período — adicione transações ou amplie o intervalo de datas.</value>
+    </data>
     <data name="Reports_CategoryFilter_Tooltip" xml:space="preserve">
         <value>Configurar categorias excluídas de todos os relatórios analíticos</value>
     </data>
@@ -3016,16 +3092,16 @@
         <value>Verifique seu arquivo de dados ou tente novamente mais tarde.</value>
     </data>
     <data name="Reports_StackVelocity_Title" xml:space="preserve">
-        <value>Stack velocity</value>
+        <value>Velocidade da stack</value>
     </data>
     <data name="Reports_StackVelocity_Velocity" xml:space="preserve">
-        <value>Velocity</value>
+        <value>Velocidade</value>
     </data>
     <data name="Reports_StackVelocity_EmptyHeading" xml:space="preserve">
-        <value>No stack velocity yet</value>
+        <value>Sem velocidade da stack ainda</value>
     </data>
     <data name="Reports_StackVelocity_EmptyBody" xml:space="preserve">
-        <value>Add income, expenses, or BTC trades to see your net sats trend.</value>
+        <value>Adicione receitas, despesas ou negociações de BTC para ver a tendência líquida dos seus sats.</value>
     </data>
     <data name="Reports_WealthOverview_Description" xml:space="preserve">
         <value>Acompanha seu patrimônio total ao longo do tempo, separando saldos em fiat e bitcoin. Ele reprocessa suas transações dia a dia e converte todos os valores para sua moeda principal usando preços históricos de BTC e fiat.</value>
@@ -3044,5 +3120,32 @@
     </data>
     <data name="Reports_ByCategories_Description" xml:space="preserve">
         <value>Detalha suas receitas e despesas por categoria no período selecionado. Use os filtros para incluir ou excluir contas e categorias específicas.</value>
+    </data>
+    <data name="Reports_LoanReports_Title" xml:space="preserve">
+        <value>Relatórios de Empréstimos e Alavancagem</value>
+    </data>
+    <data name="Reports_LoanReports_CostDescription" xml:space="preserve">
+        <value>Total de juros e taxas pagos nos seus empréstimos garantidos em BTC, mês a mês.</value>
+    </data>
+    <data name="Reports_LoanReports_CostSeries" xml:space="preserve">
+        <value>Juros + taxas</value>
+    </data>
+    <data name="Reports_LoanReports_DistanceDescription" xml:space="preserve">
+        <value>Quão perto o seu empréstimo ativo mais arriscado está da liquidação, em pontos percentuais de LTV.</value>
+    </data>
+    <data name="Reports_LoanReports_DistanceSeries" xml:space="preserve">
+        <value>Mais próximo da liquidação</value>
+    </data>
+    <data name="Reports_LoanReports_EmptyHeading" xml:space="preserve">
+        <value>Nenhum empréstimo garantido em BTC ativo</value>
+    </data>
+    <data name="Reports_LoanReports_EmptyBody" xml:space="preserve">
+        <value>Adicione um empréstimo garantido em BTC na aba Ativos para ver juros, taxas e risco de liquidação ao longo do tempo.</value>
+    </data>
+    <data name="Reports_LoanReports_ErrorTitle" xml:space="preserve">
+        <value>Não foi possível carregar os relatórios de empréstimos</value>
+    </data>
+    <data name="Reports_LoanReports_ErrorBody" xml:space="preserve">
+        <value>Verifique seu arquivo de dados ou tente novamente. Se o problema persistir, reinicie o aplicativo.</value>
     </data>
 </root>

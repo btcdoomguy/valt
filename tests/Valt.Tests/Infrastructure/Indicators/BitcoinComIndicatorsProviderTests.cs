@@ -5,6 +5,7 @@ using Valt.Infra.Crawlers.Indicators;
 namespace Valt.Tests.Infrastructure.Indicators;
 
 [TestFixture]
+[Explicit("Hits live external APIs; subject to network availability and rate limiting")]
 public class BitcoinComIndicatorsProviderTests
 {
     private BitcoinComIndicatorsProvider _provider = null!;

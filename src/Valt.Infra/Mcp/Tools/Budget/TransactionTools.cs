@@ -3,6 +3,7 @@ using ModelContextProtocol.Server;
 using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Budget.Transactions.Commands.AddTransaction;
+using Valt.App.Modules.Budget.Transactions.Commands.BulkEditTransactions;
 using Valt.App.Modules.Budget.Transactions.Commands.DeleteTransaction;
 using Valt.App.Modules.Budget.Transactions.DTOs;
 using Valt.App.Modules.Budget.Transactions.Queries.GetTransactions;
@@ -302,6 +303,39 @@ public class TransactionTools
 
         await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Transaction {transactionId} deleted successfully";
+    }
+
+    /// <summary>
+    /// Bulk edits multiple transactions, optionally renaming them and/or changing their category.
+    /// </summary>
+    [McpServerTool, Description("Bulk edit multiple transactions: rename, change category, or both")]
+    public static async Task<string> BulkEditTransactions(
+        ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
+        [Description("Comma-separated transaction IDs to edit")] string transactionIds,
+        [Description("Optional new name for all selected transactions")] string? newName = null,
+        [Description("Optional new category ID for all selected transactions")] string? newCategoryId = null)
+    {
+        var ids = ParseIds(transactionIds);
+        if (ids is null || ids.Length == 0)
+        {
+            return "Error: At least one transaction ID is required.";
+        }
+
+        var result = await dispatcher.DispatchAsync(new BulkEditTransactionsCommand
+        {
+            TransactionIds = ids,
+            NewName = newName,
+            NewCategoryId = newCategoryId
+        });
+
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error?.Message ?? "Unknown error"}";
+        }
+
+        await publisher.PublishAsync(new McpDataChangedNotification());
+        return $"Updated {result.Value.UpdatedCount} transaction(s).";
     }
 
     private static DateOnly? ParseDate(string? dateString)

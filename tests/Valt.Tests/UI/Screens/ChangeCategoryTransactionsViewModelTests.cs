@@ -103,6 +103,55 @@ public class ChangeCategoryTransactionsViewModelTests
 
     #endregion
 
+    #region Mode Parameter Tests
+
+    [Test]
+    public async Task Should_Enable_Only_Category_When_ChangeCategory_Mode_Is_Provided()
+    {
+        // Arrange
+        var viewModel = CreateInstance();
+        viewModel.Parameter = ChangeCategoryTransactionsViewModel.ChangeCategoryMode;
+
+        // Act
+        await viewModel.OnBindParameterAsync();
+
+        // Assert
+        Assert.That(viewModel.RenameEnabled, Is.False);
+        Assert.That(viewModel.ChangeCategoryEnabled, Is.True);
+    }
+
+    [Test]
+    public async Task Should_Keep_Default_State_When_Parameter_Is_Null()
+    {
+        // Arrange
+        var viewModel = CreateInstance();
+        viewModel.Parameter = null;
+
+        // Act
+        await viewModel.OnBindParameterAsync();
+
+        // Assert
+        Assert.That(viewModel.RenameEnabled, Is.True);
+        Assert.That(viewModel.ChangeCategoryEnabled, Is.False);
+    }
+
+    [Test]
+    public async Task Should_Keep_Default_State_When_Parameter_Is_Unsupported()
+    {
+        // Arrange
+        var viewModel = CreateInstance();
+        viewModel.Parameter = "some-unknown-mode";
+
+        // Act
+        await viewModel.OnBindParameterAsync();
+
+        // Assert
+        Assert.That(viewModel.RenameEnabled, Is.True);
+        Assert.That(viewModel.ChangeCategoryEnabled, Is.False);
+    }
+
+    #endregion
+
     #region Rename Validation Tests
 
     [Test]
@@ -240,6 +289,34 @@ public class ChangeCategoryTransactionsViewModelTests
         Assert.That(response, Is.Not.Null);
         Assert.That(response!.ChangeCategoryEnabled, Is.True);
         Assert.That(response.CategoryId, Is.Not.Null);
+    }
+
+    [Test]
+    public async Task Should_Pass_Validation_When_Category_Selected_And_Name_Empty()
+    {
+        // Arrange - exact "Editar todos" flow: rename enabled but empty, category enabled and selected
+        var viewModel = CreateInstance();
+        await Task.Delay(100); // Wait for categories to load
+
+        viewModel.RenameEnabled = true;
+        viewModel.Name = string.Empty;
+        viewModel.ChangeCategoryEnabled = true;
+        viewModel.SelectedCategory = viewModel.AvailableCategories.First();
+
+        var expectedCategoryId = viewModel.SelectedCategory.Id;
+
+        ChangeCategoryTransactionsViewModel.Response? response = null;
+        viewModel.CloseDialog = r => response = r as ChangeCategoryTransactionsViewModel.Response;
+
+        // Act
+        await viewModel.OkCommand.ExecuteAsync(null);
+
+        // Assert
+        Assert.That(viewModel.HasErrors, Is.False);
+        Assert.That(response, Is.Not.Null);
+        Assert.That(response!.RenameEnabled, Is.True);
+        Assert.That(response.ChangeCategoryEnabled, Is.True);
+        Assert.That(response.CategoryId, Is.EqualTo(expectedCategoryId));
     }
 
     #endregion

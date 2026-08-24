@@ -7,6 +7,7 @@ using Valt.Infra.Modules.DataSources.Bitcoin;
 namespace Valt.Tests.HistoricPriceCrawlers;
 
 [TestFixture]
+[Explicit("Hits live external APIs; subject to network availability and rate limiting")]
 public class FillLocalDbWithDataTests : DatabaseTest
 {
     protected override async Task SeedDatabase()

@@ -1,172 +1,136 @@
-# Feature Research: Asset Sold History
+# Feature Research
 
-**Domain:** Personal finance / investment tracking (desktop app for bitcoiners)  
-**Researched:** 2026-07-13  
-**Confidence:** MEDIUM — cross-checked multiple low-confidence web sources against the Valt project context.
+**Domain:** BTC-backed loan simulators / what-if loan cost calculators (Valt v0.8 — BTC Loan Simulator)
+**Researched:** 2026-08-13
+**Confidence:** HIGH (codebase math verified in `BtcLoanDetails`; industry behavior verified against Unchained's live loan calculator; Ledn/Salt/DeFi norms from established product knowledge)
+
+## How Real BTC-Backed Loan Products Work (Grounding)
+
+Verified against Unchained's public loan calculator and established industry norms (Ledn, Salt, Sovryn/Morpho/Aave-style DeFi):
+
+| Concept | Industry Behavior | Valt Relevance |
+|---|---|---|
+| Interest accrual | Simple daily interest on outstanding principal, 365-day year is the standard (Unchained states this explicitly; Valt already uses `LoanAmount * Apr / 365 * days`). DeFi protocols (Aave, Morpho, Sovryn) compound continuously/daily — hence the "simple or compound" toggle is the right two-mode model. | Simulator "simple" mode must reuse the exact existing domain formula; "compound" mode = `P * (1 + apr/365)^days`. |
+| APR vs interest rate | Lenders quote a nominal rate plus an APR that folds in origination fees (e.g., Unchained: 14% rate / 16.21% APR). | Fees input should be a flat amount (matching existing `BtcLoanDetails.Fees`), reported separately in the breakdown. |
+| Fees | Origination fee typically 0.5–2% of principal, charged once at origination. | One-time fee, added to total to repay, not accrued. |
+| LTV / collateral | Starting LTV 25–50% (Unchained uses 200% collateral-to-principal = 50% LTV). Liquidation triggers ~70–90% LTV (Ledn margin call ~70% / liquidation ~80%; DeFi liquidation thresholds ~82–86%). | Liquidation LTV input drives the "liquidation BTC price" output — the most decision-relevant number for borrowers. |
+| Payment structure | Interest-only with balloon principal at term end (CeFi), or open-ended with accrued debt (DeFi, HodlHodl-style fixed debt). | Simulator is a cost projection, not an amortization schedule: total repay = principal + accrued interest + fees at end date. |
+| Loan term | Fixed terms 6–36 months typical; start/end dates define accrual window. | Start date + end date inputs; open-ended loans (null repayment date) exist in domain but simulator needs an explicit end date. |
 
 ## Feature Landscape
 
 ### Table Stakes (Users Expect These)
 
-Features users assume exist for a sold-asset history. Missing these makes the feature feel broken.
+Features users assume exist in any loan cost calculator. Missing these = the simulator feels broken.
 
 | Feature | Why Expected | Complexity | Notes |
-|---------|------------|------------|-------|
-| **Mark asset as sold** | This is the core action that creates a sold record. | LOW | Add a `Sold` boolean and a `DateSold` field to the `Asset` aggregate. Emit an `AssetUpdatedEvent` so the UI refreshes. |
-| **Hide sold assets from the active Assets view** | Once sold, an asset is no longer a current holding. | LOW | Filter `IAssetQueries.GetAllAsync()` and `GetVisibleAsync()` to `Sold == false`. Also hide sold assets from the main grid DataGrid. |
-| **Exclude sold assets from totals and net worth** | Sold assets should not contribute to wealth or leverage calculations. | LOW | `AssetSummaryDTO`/`GetSummaryAsync` should skip assets where `Sold == true`. `IncludeInNetWorth` is orthogonal: a sold asset is excluded regardless of that flag. |
-| **History / Archive list of sold assets** | Users need a way to see disposed assets without losing them. | MEDIUM | Add a new `GetSoldAssetsQuery` and a History modal/list showing asset name, type, and date sold. |
-| **Undo Sell** | Users accidentally mark things sold; restoring is standard. | LOW | A command that clears `Sold` and `DateSold` and re-emits `AssetUpdatedEvent`. The asset returns to the active grid in its original display order. |
-| **Prompt for Date Sold when missing** | A sale record is meaningless without a date. | LOW | Inline validation or a small modal; default to `DateTime.Today` but allow any past date. |
-| **MCP exposure** | AI assistants must be able to mark sold and undo. | LOW | Add `MarkAssetSold` and `UndoAssetSale` tools in `AssetTools.cs`; reuse existing command patterns. |
+|---------|--------------|------------|-------|
+| Loan parameter inputs (collateral BTC, amount taken, interest rate, fees, start date, end date) | Every loan calculator (Ledn, Unchained, Salt) starts with these | LOW | Mirror Leverage Simulator input column; reuse existing text-parsing pattern (`TryParseDecimal` with culture fallback). Dates via `CalendarDatePicker` as in other Valt modals. |
+| Liquidation LTV input → liquidation BTC price output | The #1 question a BTC borrower asks: "at what BTC price do I get liquidated?" Liquidation price = `TotalDebt / (CollateralBtc * LiquidationLtv)` | LOW | Pure arithmetic over existing inputs; no new domain math required. Show alongside distance-to-liquidation from current price (pattern already exists in `CalculateDistanceToLiquidation`). |
+| Simple vs compound interest mode | Explicitly scoped in the milestone; maps to CeFi (simple, 365-day) vs DeFi (compound) models | LOW | Simple: `P * apr / 365 * days` (identical to existing `BtcLoanDetails.CalculateAccruedInterest`). Compound: daily compounding `P * (1 + apr/365)^days - P`. Pure functions, easily unit-tested. |
+| Total to repay (principal + interest + fees) | The headline output of every loan calculator | LOW | `LoanAmount + Interest + Fees` — matches `CalculateTotalDebt` semantics. |
+| Interest/fees breakdown | Unchained separates "finance charge" (interest + origination fee) from principal; users want to see cost composition | LOW | Three-line breakdown: principal, accrued interest, fees. |
+| Fiat AND sats values for all outputs | Core Value of Valt: "users always know where they stand in sats." Existing Leverage Simulator already shows fiat + sats side by side | LOW | Sats conversion: `fiatValue / btcPrice * 100_000_000` using `RatesState.BitcoinPrice` (same as Leverage Simulator lines 250-252). |
+| Live recalculation as inputs change | Leverage Simulator recalculates on every `OnXxxChanged`; users will expect the same | LOW | Follow the existing `partial void OnXTextChanged(...) => Recalculate()` pattern exactly. |
+| Prefill from existing BTC loan asset | Milestone requirement; mirrors the position dropdown in Leverage Simulator (`AvailablePositions` + `IsNewSimulation` sentinel) | MEDIUM | Query `GetAssetsQuery`, filter `AssetTypes.BtcLoan`, map `BtcLoanDetails` fields (collateral sats, loan amount, APR, fees, liquidation LTV, start/repayment dates) into input fields. Same try/catch fallback as `LoadPositionsAsync`. |
+| Currency selector | Fiat values must render in the user's configured fiat; Leverage Simulator already does this | LOW | Reuse `AvailableCurrencies` + `CurrencySettings.MainFiatCurrency` pattern verbatim. |
 
 ### Differentiators (Competitive Advantage)
 
-Features that are not universal but fit Valt's existing architecture and user value.
+Not required for v0.8, but valuable and aligned with Valt's sats-denominated worldview.
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| **Per-type asset details in History** | Valt already supports 8 distinct asset types (stocks, ETFs, real estate, leveraged positions, BTC loans, etc.). Reusing the existing type-specific mapping gives a richer history view than simple name+date lists. | MEDIUM | Reuse `AssetDTO`/`MapToDto` and `AssetViewModel` formatting helpers so the History details panel shows the same fields as the main card. |
-| **History toolbar button on Assets tab** | Mirrors the "View History" pattern already established for BTC loan state timelines. | LOW | Add a toolbar button to `AssetsView.axaml` and `AssetsViewModel` that opens the History modal. |
-| **Date Sold defaults to today, allows past dates** | Matches common investment apps; useful for recording past sales. | LOW | Avalonia `CalendarDatePicker` with validation and a sensible default. |
-| **Undo Sell in the History screen** | Reduces context switching; users fix mistakes where they discover them. | LOW | Bind an `UndoSellCommand` to the History row or details panel. |
+| Cost-over-time schedule table | Milestone requirement. Shows debt accrual per period (monthly rows) until end date — answers "how much do I owe if I repay in month N?" | MEDIUM | Generate rows: date, accrued interest, cumulative total (fiat + sats). A simple `DataGrid`/ItemsControl; no chart library needed for v0.8. Monthly granularity is enough; daily rows would flood the UI. |
+| Liquidation price per schedule row (LTV creep) | Shows how liquidation price RISES over time as interest accrues — the insight no basic calculator gives: your safety margin decays even if BTC price is flat | MEDIUM | For each schedule row, recompute liquidation price from that row's total debt. High value for risk-aware bitcoiners; natural extension of the schedule. |
+| Effective APR display (fee-inclusive) | Unchained shows 14% rate / 16.21% APR. Folding the one-time fee into an annualized effective rate makes short loans' true cost visible | LOW | `(totalCost / principal) * 365 / days` annualized — `BtcLoanDetails.DeriveAprFromFixedDebt` already implements this exact math and can be reused/mirrored. |
+| Compare against live price: distance to liquidation | "At current price you are X% away from liquidation at end of term" — ties simulation to reality via `RatesState` | LOW | Reuse `RatesState.BitcoinPrice`; same concept as existing `CalculateDistanceToLiquidation`. |
 
 ### Anti-Features (Commonly Requested, Often Problematic)
 
-Features that seem related but are explicitly out of scope for this milestone.
-
 | Feature | Why Requested | Why Problematic | Alternative |
 |---------|---------------|-----------------|-------------|
-| **Record sale price, capital gains, or tax lots** | Tax reporting seems valuable. | It is explicitly out of scope per `PROJECT.md`; requires cost-basis strategies, tax-year logic, and reporting that Valt does not have. | Defer to a future tax/gains milestone. Keep the current milestone as record-keeping only. |
-| **Auto-detect sold assets from external data** | Convenience. | Valt has no broker or exchange integrations that would allow automated sell detection. | Manual "Mark as Sold" action only. |
-| **Hard-delete sold assets from history** | Some users want to clean up. | Deleting destroys the record-keeping value the feature is built for. | Hide/archive via the `Sold` flag; keep the asset in the database. |
-| **Permanently archive sold assets to a separate table/collection** | Cleaner separation. | Adds migration and query complexity for a desktop app; a flag is simpler and backward compatible. | Use a `Sold` flag on the existing `Asset` entity. |
+| Amortizing payment schedule (periodic principal payments) | Standard in mortgage calculators | Real BTC loans are interest-only + balloon or open-ended accrual; amortization math adds scheduling complexity for a structure users don't actually have | Keep total-debt projection; the cost-over-time schedule already answers "what if I repay early" |
+| Simulated BTC price path / volatility scenarios (liquidation "when" projection) | Users want "when will I get liquidated" | Requires price forecasting — speculative, out of scope, and Valt already has custom price simulation in Reports for this | Output liquidation *price* (a fact), not liquidation *time* (a prediction) |
+| Persisting simulations as assets | "Save this simulation" feels natural | Pollutes the Assets ledger with hypothetical data; conflicts with the real-loan tracking semantics and snapshot timeline | Simulator is ephemeral (like Leverage Simulator); prefill-from-asset is the bridge, not save-as-asset |
+| Fixed total debt mode (HodlHodl-style) in the simulator | Domain supports `FixedTotalDebt` | A fixed debt has nothing to simulate — total is known up front; compound/simple toggle becomes meaningless | If prefilled loan has `FixedTotalDebt`, show it directly as the total and disable accrual controls (or skip prefill) |
+| Origination fee as percentage | Some lenders quote fee % | Flat fee matches the existing `BtcLoanDetails.Fees` decimal; two input modes = validation ambiguity | Flat fiat amount only; users can compute % themselves |
 
 ## Feature Dependencies
 
 ```
-Mark Asset Sold
-    ├── requires──> Date Sold capture
-    ├── requires──> Active-view filter (Sold == false)
-    └── requires──> Totals exclusion (Sold == false)
-
-History Screen
-    ├── requires──> Sold flag query (GetSoldAssets)
-    ├── requires──> Date Sold field
-    └── requires──> Per-type details panel (AssetDTO mapping)
-
-Undo Sell
-    └── requires──> Reversible Sold flag (no immutable transaction ledger)
-
-MCP Tools
-    ├── requires──> MarkAssetSold command
-    └── requires──> UndoAssetSale command
+Sats/fiat conversion ──requires──> RatesState.BitcoinPrice (live rate) [EXISTS]
+Simple interest mode ──requires──> Apr/365 daily accrual formula [EXISTS in BtcLoanDetails]
+Compound interest mode ──requires──> (nothing — new pure function)
+Liquidation price output ──requires──> collateral + liquidation LTV + total debt [all inputs]
+Cost-over-time schedule ──requires──> simple/compound interest engine + end date
+Schedule liquidation column ──enhances──> cost-over-time schedule ──requires──> liquidation price math
+Prefill from loan asset ──requires──> GetAssetsQuery + BtcLoanDetails DTO fields [EXISTS]
+Effective APR row ──enhances──> results panel ──reuses──> DeriveAprFromFixedDebt math [EXISTS]
+All UI strings ──requires──> language.resx + pt-BR + es (3 files + Designer) [PROJECT CONVENTION]
 ```
 
 ### Dependency Notes
 
-- **Mark Asset Sold requires Date Sold**: A sale is not meaningful without a date. The command should require a `DateSold` value and validate it is not in the future.
-- **Active-view filter requires Sold flag**: Every query that feeds the main UI (`GetAllAsync`, `GetVisibleAsync`) must exclude `Sold == true`. The Reports and summary queries also need to filter.
-- **History Screen requires AssetDTO mapping**: The details panel should not build new formatting logic; it should reuse `AssetQueries.MapToDto` and `AssetViewModel` so all type-specific fields (leverage, LTV, rental income, etc.) render correctly.
-- **Undo Sell requires a reversible flag**: Because the milestone does not record sale transactions, the only thing to undo is the `Sold`/`DateSold` state. Do not introduce a ledger; otherwise undo becomes complex.
+- **Everything depends on the interest engine, not the other way around.** Build the pure calculation functions first (they're testable in isolation with NUnit, no DI needed) — UI, schedule, and prefill all consume them.
+- **Prefill depends on existing `AssetDTO` exposure of `BtcLoanDetails` fields.** Verify `GetAssetsQuery` DTO carries collateral sats, APR, fees, liquidation LTV, and dates (Leverage Simulator reads `EntryPrice`, `Collateral`, `Leverage` etc. from the same DTO, so the pattern exists — confirm loan fields are present; if not, that's a small Valt.App DTO extension, which is why prefill is MEDIUM not LOW).
+- **Sats display depends on a live BTC price in `RatesState`.** The Leverage Simulator already handles the null/offline case; reuse the same guard.
+- **Localization is a hard project convention** — every new string lands in three resx files plus `language.Designer.cs`; factor this into any phase that adds UI text.
 
 ## MVP Definition
 
-### Launch With (v0.5)
+### Launch With (v0.8)
 
-- [ ] **Sold flag + Date Sold** — Add domain fields and an `Asset.MarkAsSold(DateOnly)` / `UndoSale()` API.
-- [ ] **Hide from active Assets tab** — Filter main grid queries by `Sold == false`.
-- [ ] **Exclude from totals** — Update `GetSummaryAsync` to skip sold assets.
-- [ ] **History button on Assets toolbar** — Open a History modal from the main Assets tab.
-- [ ] **History list with sale date** — Show sold assets sorted by `DateSold` descending.
-- [ ] **Per-type details summary in History** — Selecting a sold asset shows the same type-specific details as the main asset card.
-- [ ] **Undo Sell action** — Restore the asset from the History screen.
-- [ ] **Date Sold prompt** — Default to today, require a date when the user marks an asset sold without one.
-- [ ] **MCP tool exposure** — Add `MarkAssetSold` and `UndoAssetSale` to `AssetTools`.
-- [ ] **Localization** — Update `language.resx`, `language.pt-BR.resx`, and `language.es.resx` for new strings.
-- [ ] **Documentation update** — Update `.claude/docs/assets.md` with sold-history behavior.
+- [ ] Input panel: collateral BTC, amount taken, liquidation LTV, start date, interest rate, fees, end date — the milestone contract
+- [ ] Simple/compound toggle — the milestone contract; the only genuinely new math
+- [ ] Results panel: total to repay, interest/fees breakdown, fiat + sats — the milestone contract
+- [ ] Liquidation BTC price output — table stakes for any BTC borrower; nearly free given the inputs
+- [ ] Live recalc + currency selector + modal layout mirroring Leverage Simulator — UX consistency with the existing tool
 
-### Add After Validation (v0.5.x)
+### Add After Core Works (same milestone, later phase)
 
-- [ ] **History filters by year or asset type** — Useful once the history list grows.
-- [ ] **Bulk mark as sold** — If users ask to sell many assets at once.
+- [ ] Cost-over-time schedule (monthly rows, fiat + sats) — milestone contract, but depends on the interest engine being correct first
+- [ ] Prefill from existing BTC loan asset — milestone contract; independent of the schedule, can ship in either order
+- [ ] Effective APR display — one-liner reuse of `DeriveAprFromFixedDebt` math
 
-### Future Consideration (v0.6+)
+### Future Consideration (v2+)
 
-- [ ] **Sale price, capital gains, and tax-lot tracking** — Requires new domain concepts (cost basis, proceeds, tax years) and is explicitly out of scope.
-- [ ] **Realized P&L in History** — Depends on sale price tracking; defer.
+- [ ] Liquidation price per schedule row — real differentiator, but only valuable once the schedule exists and is trusted
+- [ ] Distance-to-liquidation vs live price — small, but schedule work should land first
+- [ ] "What-if BTC price" slider — defer: Reports already has custom price simulation; avoid duplicating speculative-price UX in two places
 
 ## Feature Prioritization Matrix
 
 | Feature | User Value | Implementation Cost | Priority |
 |---------|------------|---------------------|----------|
-| Sold flag + Date Sold | HIGH | LOW | P1 |
-| Hide sold assets from active view | HIGH | LOW | P1 |
-| Exclude sold assets from totals | HIGH | LOW | P1 |
-| History screen | HIGH | MEDIUM | P1 |
-| Undo Sell | MEDIUM | LOW | P1 |
-| Date Sold prompt | MEDIUM | LOW | P1 |
-| Per-type details in History | MEDIUM | MEDIUM | P1 |
-| MCP tool exposure | MEDIUM | LOW | P1 |
-| History filters | MEDIUM | LOW | P2 |
-| Bulk mark as sold | LOW | MEDIUM | P3 |
-
-**Priority key:**  
-- P1: Must have for launch  
-- P2: Should have, add when possible  
-- P3: Nice to have, future consideration
+| Loan inputs + live recalc | HIGH | LOW | P1 |
+| Simple interest total repay | HIGH | LOW (reuse existing formula) | P1 |
+| Compound interest mode | HIGH | LOW | P1 |
+| Fiat + sats results breakdown | HIGH | LOW | P1 |
+| Liquidation price output | HIGH | LOW | P1 |
+| Cost-over-time schedule | HIGH | MEDIUM | P2 |
+| Prefill from existing loan | MEDIUM | MEDIUM | P2 |
+| Effective APR display | MEDIUM | LOW | P2 |
+| Per-row liquidation price | MEDIUM | MEDIUM | P3 |
+| Distance to liquidation vs live | MEDIUM | LOW | P3 |
 
 ## Competitor Feature Analysis
 
-| Feature | My Stocks Portfolio | FinTide | TradingView | Investing.com | Valt Approach |
-|---------|---------------------|---------|-------------|---------------|---------------|
-| Hide/archive sold positions | Menu toggle: "Hide closed positions" | Asset Archive for fully sold positions | Toggle "Display sold holdings" (off by default) | "Close Position" moves it out of active list | `Sold` flag + active-query filter |
-| Date sold | N/A (uses transactions) | N/A | Transaction date | Closing date required | `DateSold` field on `Asset` |
-| Undo / reopen | N/A | N/A | Edit/delete transaction | Edit position manually | Dedicated `Undo Sell` command |
-| Details in history | N/A | Realized P&L summary | Holdings view | Detailed quote link | Reuse existing `AssetDTO` details panel |
-| Sale price / commission | N/A | N/A | Yes | Yes | Explicitly out of scope |
-
-## UX Flow Examples
-
-### 1. Marking an asset as sold from the main view
-
-1. User selects an asset in the Assets DataGrid.
-2. Context menu or toolbar shows **"Mark as Sold"**.
-3. If no `DateSold` is present, a small modal or inline prompt appears with `DateSold` defaulting to today.
-4. User confirms; the command sets `Sold = true` and `DateSold`.
-5. The asset immediately disappears from the active grid.
-6. The Assets summary panel recalculates and no longer includes the sold asset.
-7. The loan / wealth Reports also refresh because the asset is excluded from totals.
-
-### 2. Browsing sold assets in History
-
-1. User clicks the **"History"** button on the Assets toolbar.
-2. A History modal opens listing only sold assets.
-3. The list is sorted by `DateSold` descending, with columns: Name, Type, Date Sold.
-4. User selects a row; the right-hand details panel renders the same type-specific summary used on the main Assets card (quantity, price, value, LTV, rental income, etc.).
-5. The user can close the modal or choose an action on the selected asset.
-
-### 3. Undoing a sale
-
-1. In the History screen, the user selects a sold asset and clicks **"Undo Sell"**.
-2. A confirmation dialog may be shown (optional, low-risk reversible action).
-3. The command clears `Sold = false` and `DateSold = null`.
-4. The asset reappears in the main Assets grid at its original `DisplayOrder`.
-5. Totals and reports recalculate and include the restored asset.
-
-### 4. Marking as sold via MCP
-
-1. AI assistant calls `MarkAssetSold(assetId, dateSold)`.
-2. The command validates the asset exists and the date is not in the future.
-3. On success, `McpDataChangedNotification` is published so the UI refreshes.
-4. To revert, the assistant calls `UndoAssetSale(assetId)`.
+| Feature | Unchained (CeFi) | Ledn / Salt (CeFi) | DeFi (Aave/Morpho/Sovryn) | Valt Simulator Approach |
+|---------|------------------|--------------------|--------------------------|-------------------------|
+| Interest model | Simple daily, 365-day year, interest-only | Simple daily, some fixed-term fixed-cost | Compound (continuous/daily) | Both modes via toggle — covers CeFi and DeFi users |
+| Key outputs | Monthly interest payment, final payment, origination fee, finance charge, APR | Total repay amount, LTV, liquidation price | Health factor, liquidation price, accrued debt | Total repay, interest/fees split, liquidation price, schedule — superset for a personal tool |
+| Liquidation display | "First CTP violation price" (= liquidation price) | Margin call price + liquidation price | Liquidation price / health factor | Liquidation BTC price from liquidation LTV input; matches domain `LiquidationLtv` semantics |
+| Fees | Origination fee folded into APR disclosure | Origination/processing fees 1–2% | Usually none (protocol rates only) | Flat fee input matching `BtcLoanDetails.Fees` |
+| Schedule | 12-payment interest-only term | Term-based | Continuous accrual graph | Monthly cost-over-time rows until end date |
 
 ## Sources
 
-- **My Stocks Portfolio help** — "Hide closed positions" toggle (webfetch, LOW confidence)
-- **FinTide** — "Asset Archive" moves fully sold positions out of the active portfolio (webfetch, LOW confidence)
-- **TradingView Portfolios** — "Display sold holdings" toggle, with sold holdings hidden by default (webfetch, LOW confidence)
-- **Investing.com support** — Close Position requires closing date, amount sold, sale price, and commission (webfetch, LOW confidence)
-- **MoneyManagerEx docs** — SELL transactions in the Stocks & Shares module (webfetch, LOW confidence)
-- **Ghostfolio GitHub/API** — Transaction types include `BUY` and `SELL`, modeling sales as transactions rather than flags (webfetch, LOW confidence)
-- **Valt project documentation** — `.claude/docs/assets.md` and `.planning/PROJECT.md` define the existing asset domain, loan-state history UI, and v0.5 scope (HIGH confidence, project context)
+- Unchained commercial loans calculator (unchained.com/loans) — verified inputs/outputs, 365-day simple-interest convention, APR-vs-rate disclosure, CTP/liquidation-price display — HIGH confidence
+- Valt codebase: `src/Valt.Core/Modules/Assets/Details/BtcLoanDetails.cs` — existing accrual formula, LTV/liquidation/fixed-debt semantics — HIGH confidence
+- Valt codebase: `src/Valt.UI/Views/Main/Modals/LeverageSimulator/LeverageSimulatorViewModel.cs` — layout, prefill, currency, sats-conversion, live-recalc patterns to mirror — HIGH confidence
+- Industry norms for Ledn/Salt liquidation thresholds (~70–80% margin-call/liquidation LTV) and DeFi liquidation thresholds (~82–86%) — MEDIUM confidence (established product knowledge, not re-fetched this session)
+
+---
+*Feature research for: Valt v0.8 BTC Loan Simulator*
+*Researched: 2026-08-13*

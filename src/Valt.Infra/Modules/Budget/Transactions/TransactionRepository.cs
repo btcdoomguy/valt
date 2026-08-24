@@ -56,7 +56,7 @@ internal class TransactionRepository : ITransactionRepository
             return Task.FromResult<IReadOnlyList<Transaction>>(new[] { entity.AsDomainObject(fixedExpenseRelated) });
         }
 
-        var bsonIds = transactionIds.Select(id => new BsonValue(id.Value)).ToArray();
+        var bsonIds = transactionIds.Select(id => new BsonValue(new ObjectId(id.Value))).ToArray();
         var entities = _localDatabase.GetTransactions()
             .Find(LiteDB.Query.In("_id", bsonIds))
             .ToList();

@@ -2,7 +2,6 @@ using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using LiveChartsCore;
-using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
@@ -12,30 +11,15 @@ using Valt.UI.Lang;
 
 namespace Valt.UI.Views.Main.Tabs.Reports;
 
-public class BtcDenominatedMetricsChartData : IDisposable
+public class BtcDenominatedMetricsChartData : ReportChartDataBase
 {
-    private static readonly SKColor EarnedColor = SKColor.Parse("#06e806");       // SemanticPositive500
-    private static readonly SKColor SpentColor = SKColor.Parse("#e80606");        // SemanticNegative500
-
-    // Grid and text colors
-    private static readonly SKColor GridColor = SKColor.Parse("#4d4d4d");        // Background700
-    private static readonly SKColor TextColor = SKColor.Parse("#a8a6a4");        // Text400
-    private static readonly SKColor LegendTextColor = SKColor.Parse("#eeebe8");  // Text200
-    private static readonly SKColor ChartBackground = SKColor.Parse("#333333");  // Background800
+    private static readonly SKColor EarnedColor = SKColor.Parse("#06e806");      // SemanticPositive500
+    private static readonly SKColor SpentColor = SKColor.Parse("#e80606");       // SemanticNegative500
 
     private const int MinChartHeight = 300;
 
-    public SolidColorPaint LegendTextPaint { get; } = new(LegendTextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) };
-    public SolidColorPaint TooltipTextPaint { get; } = new(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) };
-    public SolidColorPaint TooltipBackgroundPaint { get; } = new(ChartBackground);
-
-    public ObservableCollection<ISeries> Series { get; } = new();
-    public ObservableCollection<string> MonthLabels { get; } = new();
     public ObservableCollection<double> EarnedValues { get; } = new();
     public ObservableCollection<double> SpentValues { get; } = new();
-
-    public Axis[] XAxes { get; } = new Axis[1];
-    public Axis[] YAxes { get; } = new Axis[1];
 
     public double ChartHeight => MinChartHeight;
 
@@ -44,28 +28,7 @@ public class BtcDenominatedMetricsChartData : IDisposable
 
     public BtcDenominatedMetricsChartData()
     {
-        XAxes[0] =
-            new Axis
-            {
-                ForceStepToMin = true,
-                MinStep = 1,
-                SeparatorsPaint = new SolidColorPaint(GridColor.WithAlpha(60)) { StrokeThickness = 1 },
-                LabelsPaint = new SolidColorPaint(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) },
-                TextSize = 12,
-                Position = AxisPosition.End,
-                Labels = MonthLabels,
-                LabelsRotation = -45,
-                MinZoomDelta = 1
-            };
-
-        YAxes[0] = new Axis
-        {
-            Labeler = SatsLabeler,
-            LabelsPaint = new SolidColorPaint(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) },
-            TextSize = 12,
-            SeparatorsPaint = new SolidColorPaint(GridColor.WithAlpha(40)) { StrokeThickness = 1 },
-            MinZoomDelta = 1
-        };
+        YAxes[0] = CreateValueAxis(SatsLabeler);
     }
 
     private static string SatsLabeler(double value)
@@ -95,15 +58,7 @@ public class BtcDenominatedMetricsChartData : IDisposable
         SpentValues.Clear();
         MonthLabels.Clear();
 
-        // Reset X-axis zoom to show all data points when year changes
-        XAxes[0].MinLimit = null;
-        XAxes[0].MaxLimit = null;
-
-        // Dispose and detach the previous series so LiveCharts rebuilds the columns
-        // from scratch — reusing the same series instance leaves stale geometry
-        // after a window resize combined with a data refresh.
-        DisposeSeries();
-        Series.Clear();
+        BeginSeriesRebuild();
 
         foreach (var month in data.Months)
         {
@@ -119,29 +74,18 @@ public class BtcDenominatedMetricsChartData : IDisposable
         Series.Add(_spentSeries);
     }
 
-    private void DisposeSeries()
+    protected override void DisposeSeries()
     {
-        if (_earnedSeries is not null)
-        {
-            (_earnedSeries.Fill as IDisposable)?.Dispose();
-            _earnedSeries = null;
-        }
+        DisposePaints(_earnedSeries?.Fill);
+        _earnedSeries = null;
 
-        if (_spentSeries is not null)
-        {
-            (_spentSeries.Fill as IDisposable)?.Dispose();
-            _spentSeries = null;
-        }
+        DisposePaints(_spentSeries?.Fill);
+        _spentSeries = null;
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
-        (LegendTextPaint as IDisposable)?.Dispose();
-        (TooltipTextPaint as IDisposable)?.Dispose();
-        (TooltipBackgroundPaint as IDisposable)?.Dispose();
-        DisposeSeries();
-        Series.Clear();
-        MonthLabels.Clear();
+        base.Dispose();
         EarnedValues.Clear();
         SpentValues.Clear();
     }

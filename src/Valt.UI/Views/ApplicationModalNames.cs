@@ -38,5 +38,6 @@ public enum ApplicationModalNames
     LoanStateHistory = 38,
     SoldAssetHistory = 39,
     DateSoldPrompt = 40,
-    ReportsCategoryFilterConfig = 41
+    ReportsCategoryFilterConfig = 41,
+    BtcLoanSimulator = 42
 }

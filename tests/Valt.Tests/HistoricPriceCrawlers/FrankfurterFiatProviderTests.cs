@@ -5,6 +5,7 @@ using Valt.Infra.Crawlers.HistoricPriceCrawlers.Fiat.Providers;
 namespace Valt.Tests.HistoricPriceCrawlers;
 
 [TestFixture]
+[Explicit("Hits live external APIs; subject to network availability and rate limiting")]
 public class FrankfurterFiatHistoricalProviderTests
 {
     [Test]

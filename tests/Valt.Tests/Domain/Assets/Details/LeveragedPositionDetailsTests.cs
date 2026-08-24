@@ -680,6 +680,94 @@ public class LeveragedPositionDetailsTests
     }
 
     [Test]
+    public void Should_Calculate_Btc_Collateral_Current_Btc_Value()
+    {
+        // Arrange - 10x long, BTC goes from 100k to 110k (+10%)
+        // Notional = 10 BTC at entry, 9.0909 BTC at 110k
+        // PnL BTC = 10 - 9.0909 = 0.9091 BTC
+        // Total BTC = 1 + 0.9091 = 1.9091 BTC
+        var details = new LeveragedPositionDetails(
+            collateral: 1m,
+            entryPrice: 100000m,
+            leverage: 0,
+            liquidationPrice: 90000m,
+            currentPrice: 110000m,
+            currencyCode: "USD",
+            isLong: true,
+            collateralAssetType: LeveragedPositionCollateralAssetType.Btc,
+            contractCount: 100000m,
+            contractSizeUsd: 10m);
+
+        // Act
+        var currentBtcValue = details.CalculateCurrentBtcValue(110000m);
+
+        // Assert
+        Assert.That(currentBtcValue, Is.EqualTo(1.909090909m).Within(0.0001m));
+    }
+
+    [Test]
+    public void Should_Calculate_Btc_Collateral_Current_Btc_Value_For_Short()
+    {
+        // Arrange - 10x short, BTC goes from 100k to 90k (+10% for short)
+        // Notional = 10 BTC at entry, 11.1111 BTC at 90k
+        // PnL BTC = 11.1111 - 10 = 1.1111 BTC
+        // Total BTC = 1 + 1.1111 = 2.1111 BTC
+        var details = new LeveragedPositionDetails(
+            collateral: 1m,
+            entryPrice: 100000m,
+            leverage: 0,
+            liquidationPrice: 110000m,
+            currentPrice: 90000m,
+            currencyCode: "USD",
+            isLong: false,
+            collateralAssetType: LeveragedPositionCollateralAssetType.Btc,
+            contractCount: 100000m,
+            contractSizeUsd: 10m);
+
+        // Act
+        var currentBtcValue = details.CalculateCurrentBtcValue(90000m);
+
+        // Assert
+        Assert.That(currentBtcValue, Is.EqualTo(2.111111111m).Within(0.0001m));
+    }
+
+    [Test]
+    public void Should_Return_Collateral_When_Current_Price_Is_Zero_For_Btc_Current_Btc_Value()
+    {
+        var details = new LeveragedPositionDetails(
+            collateral: 1m,
+            entryPrice: 100000m,
+            leverage: 0,
+            liquidationPrice: 90000m,
+            currentPrice: 110000m,
+            currencyCode: "USD",
+            isLong: true,
+            collateralAssetType: LeveragedPositionCollateralAssetType.Btc,
+            contractCount: 100000m,
+            contractSizeUsd: 10m);
+
+        Assert.That(details.CalculateCurrentBtcValue(0m), Is.EqualTo(1m));
+    }
+
+    [Test]
+    public void Should_Return_Zero_Current_Btc_Value_For_Fiat_Collateral()
+    {
+        var details = new LeveragedPositionDetails(
+            collateral: 1000m,
+            entryPrice: 50000m,
+            leverage: 10m,
+            liquidationPrice: 45000m,
+            currentPrice: 55000m,
+            currencyCode: "USD",
+            isLong: true,
+            collateralAssetType: LeveragedPositionCollateralAssetType.Fiat,
+            contractCount: 0,
+            contractSizeUsd: 0);
+
+        Assert.That(details.CalculateCurrentBtcValue(55000m), Is.EqualTo(0m));
+    }
+
+    [Test]
     public void Should_Validate_Btc_Collateral_Requires_ContractCount()
     {
         Assert.Throws<ArgumentException>(() =>

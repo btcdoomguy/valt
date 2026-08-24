@@ -338,6 +338,9 @@
     <data name="Transactions.Menu.RenameAll" xml:space="preserve">
         <value>Edit all</value>
     </data>
+    <data name="Transactions.Menu.ChangeCategory" xml:space="preserve">
+        <value>Change category</value>
+    </data>
     <data name="Transactions.Menu.Delete" xml:space="preserve">
         <value>Delete</value>
     </data>
@@ -829,6 +832,9 @@
     </data>
     <data name="Reports.AllTimeHigh.BtcPriceToHitAth" xml:space="preserve">
         <value>BTC price to hit ATH</value>
+    </data>
+    <data name="Reports.AllTimeHigh.DaysUnderWater" xml:space="preserve">
+        <value>Days under water</value>
     </data>
     <data name="Reports.Wealth.Title" xml:space="preserve">
         <value>Wealth</value>
@@ -2459,6 +2465,9 @@
     <data name="Menu_LeverageSimulator" xml:space="preserve">
         <value>Leverage Simulator</value>
     </data>
+    <data name="Menu_BtcLoanSimulator" xml:space="preserve">
+        <value>BTC Loan Simulator</value>
+    </data>
     <data name="LeverageSimulator_Title" xml:space="preserve">
         <value>Leverage Simulator</value>
     </data>
@@ -2512,6 +2521,70 @@
     </data>
     <data name="LeverageSimulator_Currency" xml:space="preserve">
         <value>Currency</value>
+    </data>
+    <!-- BTC Loan Simulator -->
+    <data name="BtcLoanSimulator_Title" xml:space="preserve">
+        <value>BTC Loan Simulator</value>
+    </data>
+    <data name="BtcLoanSimulator_Currency" xml:space="preserve">
+        <value>Currency</value>
+    </data>
+    <data name="BtcLoanSimulator_InterestMode" xml:space="preserve">
+        <value>Interest mode</value>
+    </data>
+    <data name="BtcLoanSimulator_Simple" xml:space="preserve">
+        <value>Simple</value>
+    </data>
+    <data name="BtcLoanSimulator_Compound" xml:space="preserve">
+        <value>Compound</value>
+    </data>
+    <data name="BtcLoanSimulator_Collateral" xml:space="preserve">
+        <value>Collateral</value>
+    </data>
+    <data name="BtcLoanSimulator_AmountTaken" xml:space="preserve">
+        <value>Amount taken</value>
+    </data>
+    <data name="BtcLoanSimulator_LiquidationLtv" xml:space="preserve">
+        <value>Liquidation LTV</value>
+    </data>
+    <data name="BtcLoanSimulator_StartDate" xml:space="preserve">
+        <value>Start date</value>
+    </data>
+    <data name="BtcLoanSimulator_InterestRateApr" xml:space="preserve">
+        <value>Interest rate (APR)</value>
+    </data>
+    <data name="BtcLoanSimulator_Fees" xml:space="preserve">
+        <value>Fees</value>
+    </data>
+    <data name="BtcLoanSimulator_EndDate" xml:space="preserve">
+        <value>End date</value>
+    </data>
+    <data name="BtcLoanSimulator_Results" xml:space="preserve">
+        <value>Results</value>
+    </data>
+    <data name="BtcLoanSimulator_TotalToRepay" xml:space="preserve">
+        <value>Total to repay</value>
+    </data>
+    <data name="BtcLoanSimulator_Principal" xml:space="preserve">
+        <value>Principal</value>
+    </data>
+    <data name="BtcLoanSimulator_Interest" xml:space="preserve">
+        <value>Interest</value>
+    </data>
+    <data name="BtcLoanSimulator_LiquidationBtcPrice" xml:space="preserve">
+        <value>Liquidation BTC price</value>
+    </data>
+    <data name="BtcLoanSimulator_EffectiveApr" xml:space="preserve">
+        <value>Effective APR</value>
+    </data>
+    <data name="BtcLoanSimulator_DistanceToLiquidation" xml:space="preserve">
+        <value>Distance to liquidation</value>
+    </data>
+    <data name="BtcLoanSimulator_PriceUnavailable" xml:space="preserve">
+        <value>Current BTC price unavailable — sats values hidden</value>
+    </data>
+    <data name="BtcLoanSimulator_BtcPriceFormat" xml:space="preserve">
+        <value>1 BTC = {0} {1}</value>
     </data>
     <data name="Main.PriceHistory" xml:space="preserve">
         <value>Price History</value>
@@ -3027,6 +3100,9 @@
     <data name="Reports_CategoryFilter_Config_Description" xml:space="preserve">
         <value>Select the categories you want to exclude from savings rate, burn rate, fixed vs variable expenses and statistics analytics.</value>
     </data>
+    <data name="Reports_CategoryFilter_Config_ExcludedCategories" xml:space="preserve">
+        <value>Excluded categories</value>
+    </data>
     <data name="Reports_CategoryFilter_Tooltip" xml:space="preserve">
         <value>Configure categories excluded from all reports analytics</value>
     </data>
@@ -3047,5 +3123,32 @@
     </data>
     <data name="Reports_ByCategories_Description" xml:space="preserve">
         <value>Breaks down your income and expenses by category for the selected period. Use the filters to include or exclude specific accounts and categories.</value>
+    </data>
+    <data name="Reports_LoanReports_Title" xml:space="preserve">
+        <value>Loans &amp; Leverage Reports</value>
+    </data>
+    <data name="Reports_LoanReports_CostDescription" xml:space="preserve">
+        <value>Total interest and fees paid on your BTC-backed loans, month by month.</value>
+    </data>
+    <data name="Reports_LoanReports_DistanceDescription" xml:space="preserve">
+        <value>How close your riskiest active loan is to liquidation, in LTV percentage points.</value>
+    </data>
+    <data name="Reports_LoanReports_EmptyHeading" xml:space="preserve">
+        <value>No active BTC-backed loans</value>
+    </data>
+    <data name="Reports_LoanReports_EmptyBody" xml:space="preserve">
+        <value>Add a BTC-backed loan in the Assets tab to see interest, fees, and liquidation risk over time.</value>
+    </data>
+    <data name="Reports_LoanReports_ErrorTitle" xml:space="preserve">
+        <value>Could not load loan reports</value>
+    </data>
+    <data name="Reports_LoanReports_ErrorBody" xml:space="preserve">
+        <value>Check your data file or try again. If the problem persists, restart the app.</value>
+    </data>
+    <data name="Reports_LoanReports_CostSeries" xml:space="preserve">
+        <value>Interest + fees</value>
+    </data>
+    <data name="Reports_LoanReports_DistanceSeries" xml:space="preserve">
+        <value>Closest to liquidation</value>
     </data>
 </root>

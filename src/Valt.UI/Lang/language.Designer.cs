@@ -675,6 +675,12 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string Transactions_Menu_ChangeCategory {
+            get {
+                return ResourceManager.GetString("Transactions.Menu.ChangeCategory", resourceCulture);
+            }
+        }
+        
         public static string Transactions_Menu_Delete {
             get {
                 return ResourceManager.GetString("Transactions.Menu.Delete", resourceCulture);
@@ -1662,6 +1668,12 @@ namespace Valt.UI.Lang {
         public static string Reports_AllTimeHigh_BtcPriceToHitAth {
             get {
                 return ResourceManager.GetString("Reports.AllTimeHigh.BtcPriceToHitAth", resourceCulture);
+            }
+        }
+        
+        public static string Reports_AllTimeHigh_DaysUnderWater {
+            get {
+                return ResourceManager.GetString("Reports.AllTimeHigh.DaysUnderWater", resourceCulture);
             }
         }
         
@@ -4905,6 +4917,12 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string Menu_BtcLoanSimulator {
+            get {
+                return ResourceManager.GetString("Menu_BtcLoanSimulator", resourceCulture);
+            }
+        }
+
         public static string LeverageSimulator_Title {
             get {
                 return ResourceManager.GetString("LeverageSimulator_Title", resourceCulture);
@@ -5010,6 +5028,132 @@ namespace Valt.UI.Lang {
         public static string LeverageSimulator_Currency {
             get {
                 return ResourceManager.GetString("LeverageSimulator_Currency", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_Title {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_Title", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_Currency {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_Currency", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_InterestMode {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_InterestMode", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_Simple {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_Simple", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_Compound {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_Compound", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_Collateral {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_Collateral", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_AmountTaken {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_AmountTaken", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_LiquidationLtv {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_LiquidationLtv", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_StartDate {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_StartDate", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_InterestRateApr {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_InterestRateApr", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_Fees {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_Fees", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_EndDate {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_EndDate", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_Results {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_Results", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_TotalToRepay {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_TotalToRepay", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_Principal {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_Principal", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_Interest {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_Interest", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_LiquidationBtcPrice {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_LiquidationBtcPrice", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_EffectiveApr {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_EffectiveApr", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_DistanceToLiquidation {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_DistanceToLiquidation", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_PriceUnavailable {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_PriceUnavailable", resourceCulture);
+            }
+        }
+
+        public static string BtcLoanSimulator_BtcPriceFormat {
+            get {
+                return ResourceManager.GetString("BtcLoanSimulator_BtcPriceFormat", resourceCulture);
             }
         }
 
@@ -5234,7 +5378,85 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Tips.NextButton", resourceCulture);
             }
         }
-
+        
+        public static string Tips_Message_Assets {
+            get {
+                return ResourceManager.GetString("Tips.Message.Assets", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_AvgPrice {
+            get {
+                return ResourceManager.GetString("Tips.Message.AvgPrice", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_BulkEdit {
+            get {
+                return ResourceManager.GetString("Tips.Message.BulkEdit", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_DateNavigation {
+            get {
+                return ResourceManager.GetString("Tips.Message.DateNavigation", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_FixedExpenseHistory {
+            get {
+                return ResourceManager.GetString("Tips.Message.FixedExpenseHistory", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_FixedExpensePriceHistory {
+            get {
+                return ResourceManager.GetString("Tips.Message.FixedExpensePriceHistory", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_FixedExpenses {
+            get {
+                return ResourceManager.GetString("Tips.Message.FixedExpenses", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_Goals {
+            get {
+                return ResourceManager.GetString("Tips.Message.Goals", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_Leverage {
+            get {
+                return ResourceManager.GetString("Tips.Message.Leverage", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_LinkTransaction {
+            get {
+                return ResourceManager.GetString("Tips.Message.LinkTransaction", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_McpIntegration {
+            get {
+                return ResourceManager.GetString("Tips.Message.McpIntegration", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_Reports {
+            get {
+                return ResourceManager.GetString("Tips.Message.Reports", resourceCulture);
+            }
+        }
+        
+        public static string Tips_Message_ReportsLongTerm {
+            get {
+                return ResourceManager.GetString("Tips.Message.ReportsLongTerm", resourceCulture);
+            }
+        }
+        
         public static string FixedExpenseOverview_Title {
             get {
                 return ResourceManager.GetString("FixedExpenseOverview.Title", resourceCulture);
@@ -5982,6 +6204,60 @@ namespace Valt.UI.Lang {
         public static string Reports_ByCategories_Description {
             get {
                 return ResourceManager.GetString("Reports_ByCategories_Description", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LoanReports_Title {
+            get {
+                return ResourceManager.GetString("Reports_LoanReports_Title", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LoanReports_CostDescription {
+            get {
+                return ResourceManager.GetString("Reports_LoanReports_CostDescription", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LoanReports_DistanceDescription {
+            get {
+                return ResourceManager.GetString("Reports_LoanReports_DistanceDescription", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LoanReports_EmptyHeading {
+            get {
+                return ResourceManager.GetString("Reports_LoanReports_EmptyHeading", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LoanReports_EmptyBody {
+            get {
+                return ResourceManager.GetString("Reports_LoanReports_EmptyBody", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LoanReports_ErrorTitle {
+            get {
+                return ResourceManager.GetString("Reports_LoanReports_ErrorTitle", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LoanReports_ErrorBody {
+            get {
+                return ResourceManager.GetString("Reports_LoanReports_ErrorBody", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LoanReports_CostSeries {
+            get {
+                return ResourceManager.GetString("Reports_LoanReports_CostSeries", resourceCulture);
+            }
+        }
+        
+        public static string Reports_LoanReports_DistanceSeries {
+            get {
+                return ResourceManager.GetString("Reports_LoanReports_DistanceSeries", resourceCulture);
             }
         }
     }

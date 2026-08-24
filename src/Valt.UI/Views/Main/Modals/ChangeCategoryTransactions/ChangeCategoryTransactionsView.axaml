@@ -6,6 +6,7 @@
         xmlns:transactionTerms="clr-namespace:Valt.Infra.TransactionTerms;assembly=Valt.Infra"
         xmlns:local="clr-namespace:Valt.UI.Lang"
         xmlns:changeCategoryTransactions="clr-namespace:Valt.UI.Views.Main.Modals.ChangeCategoryTransactions"
+        xmlns:categoryDTOs="clr-namespace:Valt.App.Modules.Budget.Categories.DTOs;assembly=Valt.App"
         mc:Ignorable="d" d:DesignWidth="350" d:DesignHeight="300"
         MinWidth="350"
         MinHeight="300"
@@ -49,14 +50,14 @@
                         <CheckBox Content="{x:Static local:language.ChangeCategoryTransactions_ChangeCategory}"
                                   IsChecked="{Binding ChangeCategoryEnabled}" />
                         <ComboBox ItemsSource="{Binding AvailableCategories}"
-                                  SelectedItem="{Binding SelectedCategory}"
+                                  SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
                                   HorizontalAlignment="Stretch"
                                   IsEnabled="{Binding ChangeCategoryEnabled}"
                                   IsTextSearchEnabled="True"
                                   Height="36"
                                   Margin="0, 5, 0, 0">
                             <ComboBox.ItemTemplate>
-                                <DataTemplate>
+                                <DataTemplate x:DataType="categoryDTOs:CategoryDTO">
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock FontFamily="{DynamicResource MaterialDesign}" FontSize="{DynamicResource FontSizeXXLarge}"
                                                    Text="{Binding Unicode}"

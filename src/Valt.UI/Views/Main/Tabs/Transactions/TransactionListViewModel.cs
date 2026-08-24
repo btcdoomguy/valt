@@ -18,8 +18,7 @@ using Valt.App.Kernel.Queries;
 using Valt.App.Modules.AvgPrice.DTOs;
 using Valt.App.Modules.AvgPrice.Queries.GetProfiles;
 using Valt.App.Modules.Budget.Transactions.Commands.BindTransactionToFixedExpense;
-using Valt.App.Modules.Budget.Transactions.Commands.BulkChangeCategoryTransactions;
-using Valt.App.Modules.Budget.Transactions.Commands.BulkRenameTransactions;
+using Valt.App.Modules.Budget.Transactions.Commands.BulkEditTransactions;
 using Valt.App.Modules.Budget.Transactions.Commands.DeleteTransaction;
 using Valt.App.Modules.Budget.Transactions.Commands.DeleteTransactionGroup;
 using Valt.App.Modules.Budget.Transactions.Commands.UnbindTransactionFromFixedExpense;
@@ -397,12 +396,23 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
     [RelayCommand]
     private async Task ChangeNamesAndCategories()
     {
+        await OpenChangeCategoryTransactionsModalAsync(null);
+    }
+
+    [RelayCommand]
+    private async Task ChangeCategories()
+    {
+        await OpenChangeCategoryTransactionsModalAsync(ChangeCategoryTransactionsViewModel.ChangeCategoryMode);
+    }
+
+    private async Task OpenChangeCategoryTransactionsModalAsync(string? mode)
+    {
         var ownerWindow = GetUserControlOwnerWindow()!;
 
         var modal =
             (ChangeCategoryTransactionsView)await _modalFactory.CreateAsync(
                 ApplicationModalNames.ChangeCategoryTransactions,
-                ownerWindow, null)!;
+                ownerWindow, mode)!;
 
         var result = await modal.ShowDialogSafeAsync<ChangeCategoryTransactionsViewModel.Response?>(ownerWindow);
 
@@ -413,33 +423,22 @@ public partial class TransactionListViewModel : ValtViewModel, IDisposable
             return;
 
         var transactionIds = SelectedTransactions.Select(t => t.Id).ToArray();
+        var newName = result.RenameEnabled && !string.IsNullOrWhiteSpace(result.Name) ? result.Name : null;
+        var newCategoryId = result.ChangeCategoryEnabled && result.CategoryId is not null ? result.CategoryId : null;
 
-        if (result.RenameEnabled && !string.IsNullOrWhiteSpace(result.Name))
+        if (newName is null && newCategoryId is null)
+            return;
+
+        var editResult = await _commandDispatcher.DispatchAsync(new BulkEditTransactionsCommand
         {
-            var renameResult = await _commandDispatcher.DispatchAsync(new BulkRenameTransactionsCommand
-            {
-                TransactionIds = transactionIds,
-                NewName = result.Name
-            });
+            TransactionIds = transactionIds,
+            NewName = newName,
+            NewCategoryId = newCategoryId
+        });
 
-            if (renameResult.IsFailure)
-            {
-                await MessageBoxHelper.ShowErrorAsync(language.Error, renameResult.Error!.Message, ownerWindow);
-            }
-        }
-
-        if (result.ChangeCategoryEnabled && result.CategoryId is not null)
+        if (editResult.IsFailure)
         {
-            var changeCategoryResult = await _commandDispatcher.DispatchAsync(new BulkChangeCategoryTransactionsCommand
-            {
-                TransactionIds = transactionIds,
-                NewCategoryId = result.CategoryId
-            });
-
-            if (changeCategoryResult.IsFailure)
-            {
-                await MessageBoxHelper.ShowErrorAsync(language.Error, changeCategoryResult.Error!.Message, ownerWindow);
-            }
+            await MessageBoxHelper.ShowErrorAsync(language.Error, editResult.Error!.Message, ownerWindow);
         }
 
         await FetchTransactions();

@@ -44,6 +44,7 @@ using Valt.UI.Views.Main.Modals.ManageAssetGroup;
 using Valt.UI.Views.Main.Modals.ManageAssetGroupsList;
 using Valt.UI.Views.Main.Modals.ManageAsset;
 using Valt.UI.Views.Main.Modals.LeverageSimulator;
+using Valt.UI.Views.Main.Modals.BtcLoanSimulator;
 using Valt.UI.UserControls;
 using Valt.UI.Views.Main.Modals.PriceHistory;
 using Valt.UI.Views.Main.Modals.SimulatedPricesConfig;
@@ -146,6 +147,7 @@ public static class Extensions
         services.AddTransient<ManageAssetGroupsListViewModel>();
         services.AddTransient<ManageAssetViewModel>();
         services.AddTransient<LeverageSimulatorViewModel>();
+        services.AddTransient<BtcLoanSimulatorViewModel>();
         services.AddTransient<PriceHistoryViewModel>();
         services.AddTransient<SimulatedPricesConfigViewModel>();
         services.AddTransient<FixedPriceConfigViewModel>();
@@ -266,6 +268,10 @@ public static class Extensions
                 ApplicationModalNames.LeverageSimulator => new LeverageSimulatorView()
                 {
                     DataContext = services.GetRequiredService<LeverageSimulatorViewModel>(),
+                },
+                ApplicationModalNames.BtcLoanSimulator => new BtcLoanSimulatorView()
+                {
+                    DataContext = services.GetRequiredService<BtcLoanSimulatorViewModel>(),
                 },
                 ApplicationModalNames.PriceHistory => new PriceHistoryView()
                 {

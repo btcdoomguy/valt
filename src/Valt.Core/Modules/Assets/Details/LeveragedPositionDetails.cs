@@ -171,9 +171,24 @@ public sealed class LeveragedPositionDetails : IAssetDetails
         if (currentPrice == 0)
             return 0;
 
+        var currentBtcValue = CalculateCurrentBtcValue(currentPrice);
+        return currentBtcValue * currentPrice;
+    }
+
+    /// <summary>
+    /// Calculates the current total BTC value of the position (collateral + unrealized P&amp;L in BTC).
+    /// Only meaningful for BTC-collateral positions.
+    /// </summary>
+    public decimal CalculateCurrentBtcValue(decimal currentPrice)
+    {
+        if (CollateralAssetType != LeveragedPositionCollateralAssetType.Btc)
+            return 0;
+
+        if (currentPrice == 0)
+            return Collateral;
+
         var pnlBtc = CalculateBtcPnL(currentPrice);
-        var totalBtc = Collateral + pnlBtc;
-        return totalBtc * currentPrice;
+        return Collateral + pnlBtc;
     }
 
     private decimal CalculateBtcPnL(decimal currentPrice)

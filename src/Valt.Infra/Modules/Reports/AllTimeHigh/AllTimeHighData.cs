@@ -15,4 +15,10 @@ public record AllTimeHighData(DateOnly Date, FiatCurrency Currency, FiatValue Va
     /// The maximum drawdown percentage from ATH (e.g., -50 means dropped 50% from ATH)
     /// </summary>
     public decimal? MaxDrawdownPercent { get; init; }
+
+    /// <summary>
+    /// The number of whole days between the report end date (yesterday) and the all-time-high date.
+    /// Zero when the ATH occurred on the report end date; positive otherwise.
+    /// </summary>
+    public int DaysUnderWater { get; init; }
 }
