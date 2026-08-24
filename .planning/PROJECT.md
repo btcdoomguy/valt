@@ -56,6 +56,15 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - ✓ **QA-01**: Every Portuguese content change mirrored in English `.en.md` files — v0.6 (Phases 32-38)
 - ✓ **QA-02**: Documentation site builds strictly with no errors or broken internal links — v0.6 (Phases 32-38)
 - ✓ **QA-03**: Content review checklist applied to all updated pages — v0.6 (Phase 38)
+- ✓ **SIM-01**: BTC loan simulator UI exposes input loan parameters (collateral BTC, amount taken, liquidation LTV, start/end dates, interest rate, fees) — v0.8 (Phase 45)
+- ✓ **SIM-02**: BTC loan simulator UI supports simple or compound interest mode selection — v0.8 (Phase 45)
+- ✓ **SIM-03**: BTC loan simulator supports simple or compound interest mode selection — v0.8 (Phase 44)
+- ✓ **SIM-04**: BTC loan simulator simple-interest uses act/365 parity with existing loan math; compound mode uses daily accrual — v0.8 (Phase 44)
+- ✓ **SIM-05**: BTC loan simulator results panel shows total to repay, interest/fees breakdown — v0.8 (Phase 45)
+- ✓ **SIM-06**: BTC loan simulator results panel shows fiat and sats values with conversion basis — v0.8 (Phase 45)
+- ✓ **SIM-07**: BTC loan simulator results panel shows liquidation BTC price — v0.8 (Phase 45)
+- ✓ **SIM-08**: BTC loan simulator results panel shows effective fee-inclusive APR — v0.8 (Phase 45)
+- ✓ **SIM-09**: BTC loan simulator results panel shows distance to liquidation as signed percentage with color coding — v0.8 (Phase 45)
 
 ### Active
 
@@ -66,9 +75,6 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - [ ] v0.7 Insights & Metrics Expansion — savings rate, burn rate, fixed vs variable ratio
 - [ ] v0.7 Insights & Metrics Expansion — net worth CAGR, fiat vs BTC allocation %, best/worst months, days under water
 - [ ] v0.7 Insights & Metrics Expansion — interest/fees paid (total + monthly), liquidation-price distance trend
-- [ ] v0.8 BTC Loan Simulator — input loan parameters (collateral BTC, amount taken, liquidation LTV, start/end dates, interest rate, fees)
-- [ ] v0.8 BTC Loan Simulator — simple or compound interest mode selection
-- [ ] v0.8 BTC Loan Simulator — results panel with total to repay, interest/fees breakdown, fiat and sats values
 - [ ] v0.8 BTC Loan Simulator — cost-over-time schedule until end date
 - [ ] v0.8 BTC Loan Simulator — load existing BTC-backed loan from Assets to prefill fields
 
@@ -87,6 +93,9 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - **Deferred items:** 7 (see STATE.md Deferred Items) — v0.4 quality/hardening work and three debug sessions/quick tasks carried forward.
 - **v0.6 milestone complete** — 7 of 7 phases, 17 of 17 plans, 42 tasks.
 - **Phase 41 (WLT-04) complete** — asset-aware All Time High report with active net-worth assets and a "days under water" row in the existing ATH dashboard panel.
+- **Phase 44 complete** — core BTC loan simulation calculator with simple/compound interest engine, liquidation price, effective APR, and monthly schedule.
+
+- **Phase 45 complete** — BTC Loan Simulator modal UI with inputs/results panels, live recalculation, fiat/sats formatting, liquidation price, effective APR, and distance-to-liquidation color coding.
 
 ## Current Milestone: v0.8 BTC Loan Simulator
 
@@ -143,6 +152,8 @@ Valt uses a layered architecture: Valt.Core (domain), Valt.App (CQRS), Valt.Infr
 | Apply a 12-check content review matrix to all v0.6 documentation files | Satisfies QA-03 and creates an auditable artifact for future docs work | `38-QA-CHECKLIST.md` created with 18 files × 12 checks — v0.6 (Phase 38) |
 | Reused `IsBtcMetricsEmpty` for both monthly and category breakdown views | Avoids a second empty-state property and keeps the existing XAML border binding unchanged | `ReportsViewModel` toggles `IsBtcMetricsEmpty` between `Months.Count` and `SpentByCategory.Count` — Phase 40 |
 | Cache `_lastBtcMetricsData` for category/monthly toggle empty-state recompute | Switches views instantly without a database round-trip | Toggle handler recomputes empty state from cached DTO — Phase 40 |
+| Implement BTC loan simulation as a pure static calculator in `Valt.Core` | Keeps the engine free of DI, persistence, and UI dependencies so downstream UI/MCP phases consume it without reimplementing math | `BtcLoanSimulationCalculator` is a public static class in `Valt.Core.Modules.Assets.Simulation` — Phase 44 |
+| Use a daily `decimal` loop for compound interest instead of `Math.Pow` | Avoids floating-point drift and keeps totals reconcilable with generated schedule rows | Compound path computes `dailyInterest = runningPrincipal * apr / 365m` and adds it to both accrued interest and running principal; fees are excluded — Phase 44 |
 
 ## Evolution
 
@@ -162,4 +173,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-13 after milestone v0.8 start*
+*Last updated: 2026-08-21 after Phase 45 complete*

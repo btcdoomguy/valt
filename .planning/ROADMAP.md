@@ -44,7 +44,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 ### 🚧 v0.8 BTC Loan Simulator (Phases 44-48) — IN PROGRESS
 
 - [x] **Phase 44: Core Loan Simulation Calculator** — Pure static interest engine in Valt.Core with act/365 parity against BtcLoanDetails (completed 2026-08-14)
-- [ ] **Phase 45: Simulator Modal UI (Inputs + Results Panel)** — LoanSimulator modal mirroring the Leverage Simulator with live recalc and fiat+sats results
+- [x] **Phase 45: Simulator Modal UI (Inputs + Results Panel)** — LoanSimulator modal mirroring the Leverage Simulator with live recalc and fiat+sats results (completed 2026-08-21)
 - [ ] **Phase 46: Cost-Over-Time Schedule** — Monthly schedule rows (fiat + sats) accruing until the end date
 - [ ] **Phase 47: Prefill from Existing BTC Loan Asset** — Load an existing BTC-backed loan from Assets with a New Simulation sentinel
 - [ ] **Phase 48: MCP, Localization, Documentation & Verification** — simulate_btc_loan tool, 3-language strings, module docs, end-to-end sign-off
@@ -225,11 +225,11 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 
 **Wave 1**
 
-- [ ] 45-01-PLAN.md — Modal shell, ViewModel, live recalc, DI registration, and Tools menu wiring
+- [x] 45-01-PLAN.md — Modal shell, ViewModel, live recalc, DI registration, and Tools menu wiring
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 45-02-PLAN.md — SIM-08/SIM-09 tests, edge cases, and human visual sign-off
+- [x] 45-02-PLAN.md — SIM-08/SIM-09 tests, edge cases, and human visual sign-off
 
 **UI hint**: yes
 
@@ -298,7 +298,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 | 42. Loans & Leverage Reports & UI | v0.7 | 4/4 | Complete    | 2026-08-12 |
 | 43. MCP, Localization, Documentation & Verification | v0.7 | 5/5 | Complete | 2026-08-12 |
 | 44. Core Loan Simulation Calculator | v0.8 | 1/1 | Complete    | 2026-08-14 |
-| 45. Simulator Modal UI (Inputs + Results Panel) | v0.8 | 0/? | Not started | - |
+| 45. Simulator Modal UI (Inputs + Results Panel) | v0.8 | 2/2 | Complete    | 2026-08-21 |
 | 46. Cost-Over-Time Schedule | v0.8 | 0/? | Not started | - |
 | 47. Prefill from Existing BTC Loan Asset | v0.8 | 0/? | Not started | - |
 | 48. MCP, Localization, Documentation & Verification | v0.8 | 0/? | Not started | - |

@@ -9,18 +9,18 @@ A what-if calculator for BTC-backed loans, mirroring the Leverage Simulator layo
 
 ### Simulator Core
 
-- [ ] **SIM-01**: User can input loan parameters: collateral (BTC), amount taken, liquidation LTV, start date, interest rate, fees, end date
-- [ ] **SIM-02**: Results recalculate live as inputs change (mirroring Leverage Simulator behavior)
-- [ ] **SIM-03**: User can choose simple or compound interest mode
-- [ ] **SIM-04**: Simple interest mode uses the app's existing act/365 convention (parity with current loan math); compound mode uses daily accrual
+- [x] **SIM-01**: User can input loan parameters: collateral (BTC), amount taken, liquidation LTV, start date, interest rate, fees, end date
+- [x] **SIM-02**: Results recalculate live as inputs change (mirroring Leverage Simulator behavior)
+- [x] **SIM-03**: User can choose simple or compound interest mode
+- [x] **SIM-04**: Simple interest mode uses the app's existing act/365 convention (parity with current loan math); compound mode uses daily accrual
 
 ### Results Panel
 
-- [ ] **SIM-05**: User can view total to repay (principal + interest + fees) with an interest/fees breakdown
-- [ ] **SIM-06**: User can view all result values in fiat and sats, converted at the current BTC price with a visible conversion basis
-- [ ] **SIM-07**: User can view the liquidation BTC price derived from liquidation LTV and total debt
-- [ ] **SIM-08**: User can view the effective APR (fee-inclusive annualized rate)
-- [ ] **SIM-09**: User can view distance to liquidation versus the current live BTC price
+- [x] **SIM-05**: User can view total to repay (principal + interest + fees) with an interest/fees breakdown
+- [x] **SIM-06**: User can view all result values in fiat and sats, converted at the current BTC price with a visible conversion basis
+- [x] **SIM-07**: User can view the liquidation BTC price derived from liquidation LTV and total debt
+- [x] **SIM-08**: User can view the effective APR (fee-inclusive annualized rate)
+- [x] **SIM-09**: User can view distance to liquidation versus the current live BTC price
 
 ### Cost-over-time Schedule
 
@@ -112,15 +112,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SIM-01 | Phase 45 | Pending |
-| SIM-02 | Phase 45 | Pending |
-| SIM-03 | Phase 44 | Pending |
-| SIM-04 | Phase 44 | Pending |
-| SIM-05 | Phase 45 | Pending |
-| SIM-06 | Phase 45 | Pending |
-| SIM-07 | Phase 45 | Pending |
-| SIM-08 | Phase 45 | Pending |
-| SIM-09 | Phase 45 | Pending |
+| SIM-01 | Phase 45 | Complete |
+| SIM-02 | Phase 45 | Complete |
+| SIM-03 | Phase 44 | Complete |
+| SIM-04 | Phase 44 | Complete |
+| SIM-05 | Phase 45 | Complete |
+| SIM-06 | Phase 45 | Complete |
+| SIM-07 | Phase 45 | Complete |
+| SIM-08 | Phase 45 | Complete |
+| SIM-09 | Phase 45 | Complete |
 | SIM-10 | Phase 46 | Pending |
 | SIM-11 | Phase 47 | Pending |
 | SIM-12 | Phase 48 | Pending |
