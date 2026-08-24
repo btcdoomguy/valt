@@ -115,6 +115,20 @@ public class TransactionEditorViewModelTests : DatabaseTest
             GroupId: null));
     }
 
+    private void AddCategory(string id, string name)
+    {
+        _categories.Add(new CategoryDTO
+        {
+            Id = id,
+            Name = name,
+            SimpleName = name,
+            ParentId = null,
+            IconId = null,
+            Unicode = '\0',
+            Color = System.Drawing.Color.Empty
+        });
+    }
+
     [Test]
     public void TransactionEditorViewModel_ShouldSetUpDebtScreen()
     {
@@ -332,5 +346,43 @@ public class TransactionEditorViewModelTests : DatabaseTest
         typeof(TransactionEditorViewModel).GetField("_transactionId", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.SetValue(model, new TransactionId("test-id"));
 
         Assert.That(model.OkButtonLabel, Is.EqualTo(language.TransactionEditor_Save));
+    }
+
+    [Test]
+    public async Task SwitchingTransactionModes_ShouldPreserveSelectedCategory()
+    {
+        var categoryId = IdGenerator.Generate();
+        AddCategory(categoryId, "Groceries");
+
+        var model = CreateInstance();
+        await model.OnBindParameterAsync();
+
+        var category = model.AvailableCategories.Single(x => x.Id == categoryId);
+        model.Category = category;
+
+        model.SwitchToCreditCommand.Execute(null);
+        Assert.That(model.Category?.Id, Is.EqualTo(categoryId));
+
+        model.SwitchToTransferCommand.Execute(null);
+        Assert.That(model.Category?.Id, Is.EqualTo(categoryId));
+
+        model.SwitchToDebtCommand.Execute(null);
+        Assert.That(model.Category?.Id, Is.EqualTo(categoryId));
+    }
+
+    [Test]
+    public async Task SwitchingTransactionModes_ShouldNotRestoreCategory_WhenNoCategoryWasSelected()
+    {
+        var categoryId = IdGenerator.Generate();
+        AddCategory(categoryId, "Groceries");
+
+        var model = CreateInstance();
+        await model.OnBindParameterAsync();
+
+        model.SwitchToCreditCommand.Execute(null);
+        Assert.That(model.Category, Is.Null);
+
+        model.SwitchToTransferCommand.Execute(null);
+        Assert.That(model.Category, Is.Null);
     }
 }

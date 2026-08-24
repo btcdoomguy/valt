@@ -321,6 +321,7 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel
     private void SetActiveChild(TransactionTypes mode)
     {
         var previous = ActiveChildViewModel;
+        var previousCategory = Category;
 
         TransactionEditorChildViewModel child = mode switch
         {
@@ -341,6 +342,20 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel
 
         ActiveChildViewModel = child;
         SelectedMode = mode;
+
+        RestoreCategory(previousCategory);
+    }
+
+    private void RestoreCategory(CategoryDTO? previousCategory)
+    {
+        if (previousCategory is null || Category is not null)
+            return;
+
+        var existingCategory = AvailableCategories.FirstOrDefault(c => c.Id == previousCategory.Id);
+        if (existingCategory is not null)
+        {
+            Category = existingCategory;
+        }
     }
 
     private static void CopyFromPreviousChild(TransactionEditorChildViewModel? previous, TransactionEditorChildViewModel child)
