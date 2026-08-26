@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-08-06)
 Phase: 46 — Cost-Over-Time Schedule
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-08-24 - Completed quick task 260824-ry0: Fix BTC-collateral leveraged position display to show current total BTC value
+Last activity: 2026-08-26 - Completed quick task 260826-f66: Use last available price database rates at startup and merge live API rates to prevent KeyNotFoundException in AccountsTotalState
 
 ## Performance Metrics
 
@@ -216,6 +216,7 @@ None yet.
 | 260821-p7v | Fix bulk category change on right-click for selected transactions | 2026-08-21 | b9ccde1 | [260821-p7v-fix-bulk-category-change-on-right-click-](./quick/260821-p7v-fix-bulk-category-change-on-right-click-/) |
 | 260821-rgd | Fix bulk category change bug when selecting multiple transactions and choosing a new category | 2026-08-21 | 502657a | [260821-rgd-fix-bulk-category-change-bug-when-select](./quick/260821-rgd-fix-bulk-category-change-bug-when-select/) |
 | 260824-hz9 | In the Transaction Editor window, if I switch between Debt, Credit and Transfer, the current selected category becomes empty. It should keep the value. | 2026-08-24 | 58e593a | [260824-hz9-transaction-editor-category-preservation](./quick/260824-hz9-transaction-editor-category-preservation/) |
+| 260826-f66 | Use last available price database rates at startup and merge live API rates to prevent KeyNotFoundException in AccountsTotalState | 2026-08-26 | fc53d43 | [260826-f66-use-last-available-price-database-rates-](./quick/260826-f66-use-last-available-price-database-rates-/) |
 | 260824-ry0 | In the Assets tab, BTC-collateral leveraged positions display the static notional BTC at entry. They should show the current total BTC value (collateral + unrealized P&L in BTC). | 2026-08-24 | TBD | [260824-ry0-fix-btc-collateral-leverage-display](./quick/260824-ry0-fix-btc-collateral-leverage-display/) |
 
 ## Deferred Items
