@@ -3,6 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using LiteDB;
 using Microsoft.Extensions.Logging;
+using Valt.App.Kernel.Notifications;
+using Valt.Infra.Crawlers.LivePriceCrawlers;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel.BackgroundJobs;
 using Valt.Infra.Modules.Budget;
@@ -17,6 +19,8 @@ public class DatabaseLifecycleService : IDatabaseLifecycleService
     private readonly BackgroundJobManager _backgroundJobManager;
     private readonly IDatabaseInitializer _databaseInitializer;
     private readonly IDatabaseVersionChecker _databaseVersionChecker;
+    private readonly IPriceDatabaseRatesProvider _ratesProvider;
+    private readonly INotificationPublisher _notificationPublisher;
     private readonly ILogger<DatabaseLifecycleService> _logger;
 
     public DatabaseLifecycleService(
@@ -25,6 +29,8 @@ public class DatabaseLifecycleService : IDatabaseLifecycleService
         BackgroundJobManager backgroundJobManager,
         IDatabaseInitializer databaseInitializer,
         IDatabaseVersionChecker databaseVersionChecker,
+        IPriceDatabaseRatesProvider ratesProvider,
+        INotificationPublisher notificationPublisher,
         ILogger<DatabaseLifecycleService> logger)
     {
         _localDatabase = localDatabase;
@@ -32,6 +38,8 @@ public class DatabaseLifecycleService : IDatabaseLifecycleService
         _backgroundJobManager = backgroundJobManager;
         _databaseInitializer = databaseInitializer;
         _databaseVersionChecker = databaseVersionChecker;
+        _ratesProvider = ratesProvider;
+        _notificationPublisher = notificationPublisher;
         _logger = logger;
     }
 
@@ -99,6 +107,8 @@ public class DatabaseLifecycleService : IDatabaseLifecycleService
             if (!jobsAlreadyStarted)
                 await _backgroundJobManager.StartAllJobsAsync(jobType: BackgroundJobTypes.PriceDatabase, triggerInitialRun: false);
 
+            await SeedRatesFromPriceDatabaseAsync(cancellationToken);
+
             await _backgroundJobManager.TriggerJobAndWaitAsync(BackgroundJobSystemNames.LivePricesUpdater, cancellationToken);
 
             _backgroundJobManager.TriggerJobManually(BackgroundJobSystemNames.BitcoinHistoryUpdater);
@@ -121,6 +131,27 @@ public class DatabaseLifecycleService : IDatabaseLifecycleService
         {
             _logger.LogError(ex, "Error initializing price database");
             return new PriceDatabaseInitResult(false, ex.Message);
+        }
+    }
+
+    private async Task SeedRatesFromPriceDatabaseAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var seed = await _ratesProvider.GetLatestRatesAsync(cancellationToken);
+            if (seed is not null)
+            {
+                await _notificationPublisher.PublishAsync(seed);
+                _logger.LogInformation("Seeded live rates from price database before fetching live prices");
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to seed live rates from price database; continuing without cached rates");
         }
     }
 
