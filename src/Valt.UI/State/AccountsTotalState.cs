@@ -155,8 +155,16 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
 
                     if (fiatAccount.Currency == FiatCurrency.Usd.Code)
                     {
+                        if (!_ratesState.FiatRates.TryGetValue(_currencySettings.MainFiatCurrency, out var mainFiatRate))
+                        {
+                            _logger.LogWarning(
+                                "[AccountsTotalState] Main fiat rate not found for {Currency} ({AccountName}), skipping account in wealth calculation",
+                                _currencySettings.MainFiatCurrency, fiatAccount.Name);
+                            continue;
+                        }
+
                         wealthInMainFiatCurrency +=
-                            _ratesState.FiatRates[_currencySettings.MainFiatCurrency] * fiatAccount.FiatTotal.GetValueOrDefault();
+                            mainFiatRate * fiatAccount.FiatTotal.GetValueOrDefault();
                         allWealthPricedInSats += BtcPriceCalculator
                             .CalculateBtcAmountOfFiat(fiatAccount.FiatTotal.GetValueOrDefault(), 1, _ratesState.BitcoinPrice.Value);
                     }
@@ -183,17 +191,34 @@ public partial class AccountsTotalState : ObservableObject, IRecipient<RatesUpda
                             //convert it to dollar, then convert back to main fiat currency
                             var fiatConvertedToUsd =
                                 fiatAccount.FiatTotal.GetValueOrDefault() / accountCurrencyRate;
+
+                            if (!_ratesState.FiatRates.TryGetValue(_currencySettings.MainFiatCurrency, out var conversionMainFiatRate))
+                            {
+                                _logger.LogWarning(
+                                    "[AccountsTotalState] Main fiat rate not found for {Currency} ({AccountName}), skipping account in wealth calculation",
+                                    _currencySettings.MainFiatCurrency, fiatAccount.Name);
+                                continue;
+                            }
+
                             wealthInMainFiatCurrency +=
-                                _ratesState.FiatRates[_currencySettings.MainFiatCurrency] * fiatConvertedToUsd;
+                                conversionMainFiatRate * fiatConvertedToUsd;
                         }
                     }
                 }
 
                 var allWealthPricedInBtc = BtcValue.ParseSats(allWealthPricedInSats);
 
+                if (!_ratesState.FiatRates.TryGetValue(_currencySettings.MainFiatCurrency, out var currentMainFiatRate))
+                {
+                    _logger.LogWarning(
+                        "[AccountsTotalState] Main fiat rate not found for {Currency}, cannot calculate current wealth",
+                        _currencySettings.MainFiatCurrency);
+                    return Wealth.Empty;
+                }
+
                 var currentWealthInFiat =
                     Math.Round(
-                        allWealthPricedInBtc.Btc * _ratesState.BitcoinPrice.Value * _ratesState.FiatRates[_currencySettings.MainFiatCurrency],
+                        allWealthPricedInBtc.Btc * _ratesState.BitcoinPrice.Value * currentMainFiatRate,
                         2);
 
                 var wealthInBtcRatio = 0m;

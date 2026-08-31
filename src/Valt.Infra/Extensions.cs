@@ -17,6 +17,7 @@ using Valt.Infra.Crawlers.HistoricPriceCrawlers.Bitcoin.Providers;
 using Valt.Infra.Crawlers.Indicators;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Fiat;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Fiat.Providers;
+using Valt.Infra.Crawlers.LivePriceCrawlers;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Bitcoin.Providers;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Fiat.Providers;
 using Valt.Infra.DataAccess;
@@ -190,6 +191,9 @@ public static class Extensions
 
         //local historical provider
         services.AddSingleton<ILocalHistoricalPriceProvider, LocalHistoricalPriceProvider>();
+
+        //price database rates provider
+        services.AddSingleton<IPriceDatabaseRatesProvider, PriceDatabaseRatesProvider>();
         
         //reports
         services.AddSingleton<IAllTimeHighReport, AllTimeHighReport>();
