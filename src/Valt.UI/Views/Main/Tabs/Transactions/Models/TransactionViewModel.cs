@@ -187,6 +187,7 @@ public partial class TransactionViewModel : ObservableObject
 
         var newTotal = FiatValue.New(btcPrice * autoSatAmountParsed.Btc);
 
+        string? varianceText = null;
         if (_isProvisionalSats)
         {
             AutoSatLineColor = TransactionGridResources.FutureLine;
@@ -197,15 +198,43 @@ public partial class TransactionViewModel : ObservableObject
             if (fiatTotalToUse < 0)
                 fiatTotalToUse *= -1;
 
+            var originalCurrencyCode = FromAmountFiat is not null ? FromCurrency : ToCurrency;
+            if (fiatTotalToUse > 0 && originalCurrencyCode is not null && originalCurrencyCode != mainFiatCurrency)
+            {
+                if (fiatRates is not null &&
+                    fiatRates.TryGetValue(originalCurrencyCode, out var originalToUsdRate) &&
+                    originalToUsdRate > 0)
+                {
+                    fiatTotalToUse = fiatTotalToUse * currentUsdFiatRate / originalToUsdRate;
+                }
+                else
+                {
+                    fiatTotalToUse = 0;
+                }
+            }
+
             if (FromAmountFiat is null)
                 AutoSatLineColor = TransactionGridResources.RegularLine;
             else
                 AutoSatLineColor = newTotal > fiatTotalToUse
                     ? TransactionGridResources.Credit
                     : TransactionGridResources.Debt;
+
+            if (fiatTotalToUse > 0)
+            {
+                var variance = ((decimal)newTotal - fiatTotalToUse) / fiatTotalToUse * 100;
+                if (Math.Abs(variance) >= 0.5m)
+                {
+                    var sign = variance >= 0 ? "+" : "-";
+                    varianceText = $"{sign}{Math.Abs(variance):F0}%";
+                }
+            }
         }
 
-        AutoSatAmountCurrentPrice = CurrencyDisplay.FormatFiat(newTotal, mainFiatCurrency);
+        var currentPrice = CurrencyDisplay.FormatFiat(newTotal, mainFiatCurrency);
+        AutoSatAmountCurrentPrice = varianceText is null
+            ? currentPrice
+            : $"{currentPrice} ({varianceText})";
     }
 
     private long? CalculateProvisionalSats(decimal currentBtcRate, IReadOnlyDictionary<string, decimal>? fiatRates)
