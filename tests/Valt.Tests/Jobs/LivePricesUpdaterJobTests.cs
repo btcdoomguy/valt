@@ -135,6 +135,77 @@ public class LivePricesUpdaterJobTests : IntegrationTest
     }
 
     [Test]
+    public async Task Should_Publish_Single_Message_Per_Cycle_In_Steady_State()
+    {
+        var messages = new List<LivePriceUpdateMessage>();
+
+        WeakReferenceMessenger.Default.Register<LivePriceUpdateMessage>(
+            this,
+            (recipient, message) => messages.Add(message));
+
+        try
+        {
+            var fullFiat = new FiatUsdPrice(DateTime.UtcNow, true,
+            [
+                new FiatUsdPrice.Item(FiatCurrency.Usd, 1m),
+                new FiatUsdPrice.Item(FiatCurrency.Brl, 5.2m)
+            ]);
+
+            var liveBtc = new BtcPrice(DateTime.UtcNow, true,
+                [new BtcPrice.Item(FiatCurrency.Usd.Code, 20000m, 10000m)]);
+
+            // Behavior is switched via a flag (instead of ReplaceService) because the job captures its
+            // providers at construction and replacing services rebuilds the provider, which would
+            // create a fresh job singleton and lose the steady-state gating being tested here.
+            var providersFailing = false;
+
+            var fiatSelector = Substitute.For<IFiatPriceProviderSelector>();
+            fiatSelector.GetAsync(Arg.Any<IEnumerable<FiatCurrency>>())
+                .Returns(_ => providersFailing
+                    ? Task.FromException<FiatUsdPrice>(new HttpRequestException("No internet"))
+                    : Task.FromResult(fullFiat));
+
+            var btcProvider = Substitute.For<IBitcoinPriceProvider>();
+            btcProvider.GetAsync()
+                .Returns(_ => providersFailing
+                    ? Task.FromException<BtcPrice>(new TimeoutException("No internet"))
+                    : Task.FromResult(liveBtc));
+
+            ReplaceService(fiatSelector);
+            ReplaceService(btcProvider);
+
+            var job = _serviceProvider.GetRequiredService<LivePricesUpdaterJob>();
+
+            // Run 1: first cycle on an empty state — seed + live is acceptable
+            await job.RunAsync(CancellationToken.None);
+            Assert.That(messages, Has.Count.GreaterThanOrEqualTo(1));
+            Assert.That(messages.Last().IsUpToDate, Is.True);
+
+            // Run 2: steady state — exactly one live message, no seed republish
+            messages.Clear();
+            await job.RunAsync(CancellationToken.None);
+            Assert.That(messages, Has.Count.EqualTo(1));
+            Assert.That(messages[0].IsUpToDate, Is.True);
+
+            // Run 3: outage starts — stored rates published once as honest offline indication
+            providersFailing = true;
+            messages.Clear();
+            await job.RunAsync(CancellationToken.None);
+            Assert.That(messages, Has.Count.EqualTo(1));
+            Assert.That(messages[0].IsUpToDate, Is.False);
+
+            // Run 4: outage continues — no republish churn
+            messages.Clear();
+            await job.RunAsync(CancellationToken.None);
+            Assert.That(messages, Is.Empty);
+        }
+        finally
+        {
+            WeakReferenceMessenger.Default.Unregister<LivePriceUpdateMessage>(this);
+        }
+    }
+
+    [Test]
     public async Task Should_Mark_UpToDate_When_All_Configured_Currencies_Are_Returned()
     {
         LivePriceUpdateMessage? receivedValue = null;
