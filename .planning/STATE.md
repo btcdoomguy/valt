@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-08-06)
 Phase: 46 — Cost-Over-Time Schedule
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-08-26 - Completed quick task 260826-f66: Use last available price database rates at startup and merge live API rates to prevent KeyNotFoundException in AccountsTotalState
+Last activity: 2026-09-03 - Completed quick task 260903-qow: Fix UI flicker and stale gray totals on Transaction tab when LivePricesUpdaterJob refreshes prices
 
 ## Performance Metrics
 
@@ -218,6 +218,7 @@ None yet.
 | 260824-hz9 | In the Transaction Editor window, if I switch between Debt, Credit and Transfer, the current selected category becomes empty. It should keep the value. | 2026-08-24 | 58e593a | [260824-hz9-transaction-editor-category-preservation](./quick/260824-hz9-transaction-editor-category-preservation/) |
 | 260826-f66 | Use last available price database rates at startup and merge live API rates to prevent KeyNotFoundException in AccountsTotalState | 2026-08-26 | 22605ad | [260826-f66-use-last-available-price-database-rates-](./quick/260826-f66-use-last-available-price-database-rates-/) |
 | 260824-ry0 | In the Assets tab, BTC-collateral leveraged positions display the static notional BTC at entry. They should show the current total BTC value (collateral + unrealized P&L in BTC). | 2026-08-24 | TBD | [260824-ry0-fix-btc-collateral-leverage-display](./quick/260824-ry0-fix-btc-collateral-leverage-display/) |
+| 260903-qow | Fix UI flicker and stale gray totals on Transaction tab when LivePricesUpdaterJob refreshes prices | 2026-09-03 | 5913b7d | [260903-qow-fix-ui-flicker-and-stale-gray-totals-on-](./quick/260903-qow-fix-ui-flicker-and-stale-gray-totals-on-/) |
 
 ## Deferred Items
 
