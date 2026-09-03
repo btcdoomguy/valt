@@ -25,6 +25,9 @@ internal class LivePricesUpdaterJob : IBackgroundJob
     private decimal? _lastClosingPrice;
     private DateOnly? _lastClosingDate;
 
+    private bool _hasPublishedLiveRates;
+    private bool _offlineNotified;
+
     private FiatUsdPrice? _fiatUsdPrice;
     private BtcPrice? _btcPrice;
 
@@ -62,6 +65,7 @@ internal class LivePricesUpdaterJob : IBackgroundJob
     {
         _logger.LogInformation("[LivePricesUpdaterJob] Starting price update cycle");
         var isUpToDate = false;
+        LivePriceUpdateMessage? storedRates = null;
 
         try
         {
@@ -89,8 +93,8 @@ internal class LivePricesUpdaterJob : IBackgroundJob
             _logger.LogInformation("[LivePricesUpdaterJob] Fetching prices for {Count} configured currencies: {Currencies}",
                 currencies.Count, string.Join(", ", currencies.Select(c => c.Code)));
 
-            var storedRates = await _ratesProvider.GetLatestRatesAsync(stoppingToken).ConfigureAwait(false);
-            if (storedRates is not null)
+            storedRates = await _ratesProvider.GetLatestRatesAsync(stoppingToken).ConfigureAwait(false);
+            if (storedRates is not null && !_hasPublishedLiveRates)
             {
                 await _notificationPublisher.PublishAsync(storedRates).ConfigureAwait(false);
                 _logger.LogInformation("[LivePricesUpdaterJob] Seeded rates from price database before live fetch");
@@ -133,6 +137,14 @@ internal class LivePricesUpdaterJob : IBackgroundJob
         {
             _logger.LogError(ex,
                 "[LivePricesUpdaterJob] Error during live price fetch - using stored rates if available");
+
+            if (storedRates is not null && _hasPublishedLiveRates && !_offlineNotified)
+            {
+                await _notificationPublisher.PublishAsync(storedRates).ConfigureAwait(false);
+                _offlineNotified = true;
+                _logger.LogInformation("[LivePricesUpdaterJob] Published stored rates as offline notification after live fetch failure");
+            }
+
             return;
         }
 
@@ -168,6 +180,8 @@ internal class LivePricesUpdaterJob : IBackgroundJob
             }
 
             await _notificationPublisher.PublishAsync(new LivePriceUpdateMessage(_btcPrice, _fiatUsdPrice, isUpToDate));
+            _hasPublishedLiveRates = true;
+            _offlineNotified = false;
             _logger.LogInformation("[LivePricesUpdaterJob] Price update completed successfully (up-to-date: {IsUpToDate})", isUpToDate);
         }
         catch (Exception ex)
