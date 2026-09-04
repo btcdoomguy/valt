@@ -136,13 +136,15 @@ internal class LivePricesUpdaterJob : IBackgroundJob
         catch (Exception ex)
         {
             _logger.LogError(ex,
-                "[LivePricesUpdaterJob] Error during live price fetch - using stored rates if available");
+                "[LivePricesUpdaterJob] Error during live price fetch");
 
-            if (storedRates is not null && _hasPublishedLiveRates && !_offlineNotified)
+            if (_hasPublishedLiveRates && _fiatUsdPrice is not null && _btcPrice is not null && !_offlineNotified)
             {
-                await _notificationPublisher.PublishAsync(storedRates).ConfigureAwait(false);
+                await _notificationPublisher.PublishAsync(
+                    new LivePriceUpdateMessage(_btcPrice, _fiatUsdPrice, IsUpToDate: false)).ConfigureAwait(false);
                 _offlineNotified = true;
-                _logger.LogInformation("[LivePricesUpdaterJob] Published stored rates as offline notification after live fetch failure");
+                _logger.LogInformation(
+                    "[LivePricesUpdaterJob] Keeping last live prices after fetch failure; published offline notification (IsUpToDate=false)");
             }
 
             return;
