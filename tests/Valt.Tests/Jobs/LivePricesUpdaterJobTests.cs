@@ -187,14 +187,87 @@ public class LivePricesUpdaterJobTests : IntegrationTest
             Assert.That(messages, Has.Count.EqualTo(1));
             Assert.That(messages[0].IsUpToDate, Is.True);
 
-            // Run 3: outage starts — stored rates published once as honest offline indication
+            // Run 3: outage starts — previous live prices published once as honest offline indication
             providersFailing = true;
             messages.Clear();
             await job.RunAsync(CancellationToken.None);
             Assert.That(messages, Has.Count.EqualTo(1));
             Assert.That(messages[0].IsUpToDate, Is.False);
+            Assert.That(messages[0].Btc.Items, Has.Some.Matches<BtcPrice.Item>(x =>
+                x.CurrencyCode == FiatCurrency.Usd.Code && x.Price == 20000m));
+            Assert.That(messages[0].Fiat.Items, Has.Some.Matches<FiatUsdPrice.Item>(x =>
+                x.Currency.Code == FiatCurrency.Brl.Code && x.Price == 5.2m));
 
             // Run 4: outage continues — no republish churn
+            messages.Clear();
+            await job.RunAsync(CancellationToken.None);
+            Assert.That(messages, Is.Empty);
+        }
+        finally
+        {
+            WeakReferenceMessenger.Default.Unregister<LivePriceUpdateMessage>(this);
+        }
+    }
+
+    [Test]
+    public async Task Should_Keep_Previous_Live_Prices_When_Subsequent_Fetch_Fails()
+    {
+        var messages = new List<LivePriceUpdateMessage>();
+
+        WeakReferenceMessenger.Default.Register<LivePriceUpdateMessage>(
+            this,
+            (recipient, message) => messages.Add(message));
+
+        try
+        {
+            var fullFiat = new FiatUsdPrice(DateTime.UtcNow, true,
+            [
+                new FiatUsdPrice.Item(FiatCurrency.Usd, 1m),
+                new FiatUsdPrice.Item(FiatCurrency.Brl, 5.2m)
+            ]);
+
+            var liveBtc = new BtcPrice(DateTime.UtcNow, true,
+                [new BtcPrice.Item(FiatCurrency.Usd.Code, 20000m, 10000m)]);
+
+            // Behavior is switched via a flag (instead of ReplaceService) because the job captures its
+            // providers at construction and replacing services rebuilds the provider, which would
+            // create a fresh job singleton and lose the last-successful-prices being tested here.
+            var providersFailing = false;
+
+            var fiatSelector = Substitute.For<IFiatPriceProviderSelector>();
+            fiatSelector.GetAsync(Arg.Any<IEnumerable<FiatCurrency>>())
+                .Returns(_ => providersFailing
+                    ? Task.FromException<FiatUsdPrice>(new HttpRequestException("No internet"))
+                    : Task.FromResult(fullFiat));
+
+            var btcProvider = Substitute.For<IBitcoinPriceProvider>();
+            btcProvider.GetAsync()
+                .Returns(_ => providersFailing
+                    ? Task.FromException<BtcPrice>(new TimeoutException("No internet"))
+                    : Task.FromResult(liveBtc));
+
+            ReplaceService(fiatSelector);
+            ReplaceService(btcProvider);
+
+            var job = _serviceProvider.GetRequiredService<LivePricesUpdaterJob>();
+
+            // Run 1: successful cycle publishes live prices
+            await job.RunAsync(CancellationToken.None);
+            Assert.That(messages, Has.Count.GreaterThanOrEqualTo(1));
+            Assert.That(messages.Last().IsUpToDate, Is.True);
+
+            // Run 2: providers fail — a single message with the previous live prices is published
+            providersFailing = true;
+            messages.Clear();
+            await job.RunAsync(CancellationToken.None);
+            Assert.That(messages, Has.Count.EqualTo(1));
+            Assert.That(messages[0].IsUpToDate, Is.False);
+            Assert.That(messages[0].Btc.Items, Has.Some.Matches<BtcPrice.Item>(x =>
+                x.CurrencyCode == FiatCurrency.Usd.Code && x.Price == 20000m));
+            Assert.That(messages[0].Fiat.Items, Has.Some.Matches<FiatUsdPrice.Item>(x =>
+                x.Currency.Code == FiatCurrency.Brl.Code && x.Price == 5.2m));
+
+            // Run 3: outage continues — no republish churn
             messages.Clear();
             await job.RunAsync(CancellationToken.None);
             Assert.That(messages, Is.Empty);
