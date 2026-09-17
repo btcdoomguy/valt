@@ -222,11 +222,38 @@ public partial class BtcInput : UserControl
     {
         // In BTC mode, always use invariant culture (decimal separator is ".") to match ToBitcoinString()
         var culture = _isBitcoin ? CultureInfo.InvariantCulture : CultureInfo.CurrentCulture;
+
+        // BTC display never contains group separators; a pasted comma is almost certainly a
+        // locale decimal comma ("0,5") which invariant parsing would mis-read as 5 BTC — reject it.
+        if (_isBitcoin && _displayValue.Contains(','))
+        {
+            UpdateDisplayValue();
+            return;
+        }
+
         if (decimal.TryParse(_displayValue, NumberStyles.Number, culture, out decimal valueAsDecimal))
         {
-            long valueInSats = _isBitcoin ? (long)(valueAsDecimal * 100000000m) : (long)valueAsDecimal;
+            if (valueAsDecimal < 0)
+            {
+                UpdateDisplayValue();
+                return;
+            }
+
+            var scaled = valueAsDecimal * (_isBitcoin ? 100000000m : 1m);
+            if (scaled > long.MaxValue)
+            {
+                UpdateDisplayValue();
+                return;
+            }
+
+            long valueInSats = (long)scaled;
             if (valueInSats != BtcValue.Sats)
                 BtcValue = BtcValue.New(valueInSats);
+        }
+        else
+        {
+            // Unparseable input (e.g. pasting "abc"): restore the formatted display
+            UpdateDisplayValue();
         }
     }
 

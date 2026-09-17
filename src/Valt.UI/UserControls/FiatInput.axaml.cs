@@ -206,10 +206,29 @@ public partial class FiatInput : UserControl
     
     private void OnTextInput(object? sender, TextInputEventArgs e)
     {
-        if (!string.IsNullOrEmpty(e.Text) && char.IsDigit(e.Text[0]))
+        if (!string.IsNullOrEmpty(e.Text))
         {
-            _rawValue = _rawValue * 10 + long.Parse(e.Text);
-            UpdateDisplayValue();
+            if (e.Text.Length == 1 && char.IsDigit(e.Text[0]))
+            {
+                // Single digit typed by the user
+                _rawValue = _rawValue * 10 + long.Parse(e.Text);
+                UpdateDisplayValue();
+            }
+            else if (e.Text.Length > 1)
+            {
+                // Multi-character input (e.g. paste from clipboard)
+                var pasted = e.Text.Trim();
+                if (decimal.TryParse(pasted, NumberStyles.Number, CultureInfo.CurrentUICulture, out var parsed) ||
+                    decimal.TryParse(pasted, NumberStyles.Number, CultureInfo.InvariantCulture, out parsed))
+                {
+                    if (parsed >= 0)
+                    {
+                        _rawValue = (long)Math.Round(parsed * (decimal)Math.Pow(10, _decimalPlaces), MidpointRounding.AwayFromZero);
+                        UpdateDisplayValue();
+                    }
+                }
+                // Unparseable input (e.g. "abc") is ignored: _rawValue stays unchanged
+            }
         }
 
         if (_textBox is not null)
@@ -293,9 +312,29 @@ public partial class FiatInput : UserControl
     private void UpdateFiatValue()
     {
         _fiatValue ??= FiatValue.Empty;
-        decimal value = _rawValue / (decimal)Math.Pow(10, _decimalPlaces);
-        if (value != _fiatValue.Value)
-            FiatValue = FiatValue.New(value);
+
+        // Parse the display text (not _rawValue) so pasted text — which Avalonia delivers by
+        // setting TextBox.Text directly, bypassing TextInputEvent — is also registered.
+        if (decimal.TryParse(_displayValue, NumberStyles.Number, CultureInfo.CurrentUICulture, out var parsed) ||
+            decimal.TryParse(_displayValue, NumberStyles.Number, CultureInfo.InvariantCulture, out parsed))
+        {
+            if (parsed < 0)
+                return;
+
+            var scaled = parsed * (decimal)Math.Pow(10, _decimalPlaces);
+            if (scaled > long.MaxValue)
+                return; // Absurd magnitude — ignore rather than overflow
+
+            _rawValue = (long)Math.Round(scaled, MidpointRounding.AwayFromZero);
+            decimal value = _rawValue / (decimal)Math.Pow(10, _decimalPlaces);
+            if (value != _fiatValue.Value)
+                FiatValue = FiatValue.New(value);
+        }
+        else
+        {
+            // Unparseable input (e.g. pasting "abc"): restore the formatted display
+            UpdateDisplayValue();
+        }
     }
 
     private void UpdateDisplayValue()
