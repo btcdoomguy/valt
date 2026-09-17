@@ -312,9 +312,25 @@ public partial class FiatInput : UserControl
     private void UpdateFiatValue()
     {
         _fiatValue ??= FiatValue.Empty;
-        decimal value = _rawValue / (decimal)Math.Pow(10, _decimalPlaces);
-        if (value != _fiatValue.Value)
-            FiatValue = FiatValue.New(value);
+
+        // Parse the display text (not _rawValue) so pasted text — which Avalonia delivers by
+        // setting TextBox.Text directly, bypassing TextInputEvent — is also registered.
+        if (decimal.TryParse(_displayValue, NumberStyles.Number, CultureInfo.CurrentUICulture, out var parsed) ||
+            decimal.TryParse(_displayValue, NumberStyles.Number, CultureInfo.InvariantCulture, out parsed))
+        {
+            if (parsed < 0)
+                return;
+
+            _rawValue = (long)Math.Round(parsed * (decimal)Math.Pow(10, _decimalPlaces), MidpointRounding.AwayFromZero);
+            decimal value = _rawValue / (decimal)Math.Pow(10, _decimalPlaces);
+            if (value != _fiatValue.Value)
+                FiatValue = FiatValue.New(value);
+        }
+        else
+        {
+            // Unparseable input (e.g. pasting "abc"): restore the formatted display
+            UpdateDisplayValue();
+        }
     }
 
     private void UpdateDisplayValue()
