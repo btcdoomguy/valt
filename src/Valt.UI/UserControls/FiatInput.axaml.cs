@@ -321,7 +321,11 @@ public partial class FiatInput : UserControl
             if (parsed < 0)
                 return;
 
-            _rawValue = (long)Math.Round(parsed * (decimal)Math.Pow(10, _decimalPlaces), MidpointRounding.AwayFromZero);
+            var scaled = parsed * (decimal)Math.Pow(10, _decimalPlaces);
+            if (scaled > long.MaxValue)
+                return; // Absurd magnitude — ignore rather than overflow
+
+            _rawValue = (long)Math.Round(scaled, MidpointRounding.AwayFromZero);
             decimal value = _rawValue / (decimal)Math.Pow(10, _decimalPlaces);
             if (value != _fiatValue.Value)
                 FiatValue = FiatValue.New(value);
