@@ -56,6 +56,14 @@ Pasting a numeric value (e.g. "1.234,56") into any FiatInput field (Update Loan 
 5. Paste "abc" → no crash, value unchanged
 6. Spot-check one other FiatInput location (Transaction amount or Manage Asset > Current Price)
 
+## Correction (commit `27102af`) — first fix targeted the wrong event
+
+User reported the error persisted after Task 1. Investigation revealed why: **Avalonia delivers Ctrl+V paste by setting `TextBox.Text` directly** (TextBox key binding → `Paste()`), bypassing `TextInputEvent` entirely — so the patched tunnel `OnTextInput` never fires on paste. The actual paste path was: `TextBox.Text` = clipboard → two-way binding writes `DisplayValue` → setter calls `UpdateFiatValue()` → which derived the value from the **stale `_rawValue` (= 0)**, ignoring the text.
+
+**Fix:** `UpdateFiatValue()` now parses `_displayValue` with `CurrentUICulture` → `InvariantCulture` fallback (mirroring `BtcInput.UpdateBtcValue`, which already parsed its display text and was never affected), syncs `_rawValue` on success, ignores negatives, and restores the formatted display on unparseable input. The OnTextInput multi-char branch from Task 1 is retained (harmless, may catch non-Ctrl+V text-input paths) — typing behavior is unchanged.
+
+`dotnet build Valt.sln` → 0 errors.
+
 ## Deviations from Plan
 
-None — plan executed exactly as written.
+- Task 1 initial implementation (commit `89b3cc2`) was based on an incorrect root-cause hypothesis (paste raises TextInputEvent); corrected in commit `27102af` after user reported the error persisted.
