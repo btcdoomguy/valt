@@ -64,6 +64,14 @@ User reported the error persisted after Task 1. Investigation revealed why: **Av
 
 `dotnet build Valt.sln` → 0 errors.
 
+## Follow-up audit: BtcInput (commit `37d15ae`)
+
+Checked whether BtcInput needed the same fix — it did **not** (no stale `_rawValue`; `UpdateBtcValue()` already parses the display text, so paste registered correctly). However the audit found paste-related hazards, now hardened:
+
+- **BTC-mode comma mis-parse (dangerous):** invariant parsing of a pasted locale decimal comma (`"0,5"`) read it as a group separator → 5 BTC instead of 0.5 BTC. BTC mode now rejects commas (typing already blocks them; display format `ToBitcoinString()` is comma-free) and restores the formatted display.
+- **Overflow:** pasting an absurd magnitude (e.g. 20-digit number) parsed fine but the `(long)` cast threw `OverflowException`. Overflow guard added to BtcInput and to the FiatInput paste path (`scaled > long.MaxValue` → ignore).
+- **Unparseable/negative paste** in BtcInput now restores the formatted display / is ignored, matching FiatInput behavior.
+
 ## Deviations from Plan
 
 - Task 1 initial implementation (commit `89b3cc2`) was based on an incorrect root-cause hypothesis (paste raises TextInputEvent); corrected in commit `27102af` after user reported the error persisted.
