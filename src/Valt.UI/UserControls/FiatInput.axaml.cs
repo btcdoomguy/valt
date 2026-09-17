@@ -206,10 +206,29 @@ public partial class FiatInput : UserControl
     
     private void OnTextInput(object? sender, TextInputEventArgs e)
     {
-        if (!string.IsNullOrEmpty(e.Text) && char.IsDigit(e.Text[0]))
+        if (!string.IsNullOrEmpty(e.Text))
         {
-            _rawValue = _rawValue * 10 + long.Parse(e.Text);
-            UpdateDisplayValue();
+            if (e.Text.Length == 1 && char.IsDigit(e.Text[0]))
+            {
+                // Single digit typed by the user
+                _rawValue = _rawValue * 10 + long.Parse(e.Text);
+                UpdateDisplayValue();
+            }
+            else if (e.Text.Length > 1)
+            {
+                // Multi-character input (e.g. paste from clipboard)
+                var pasted = e.Text.Trim();
+                if (decimal.TryParse(pasted, NumberStyles.Number, CultureInfo.CurrentUICulture, out var parsed) ||
+                    decimal.TryParse(pasted, NumberStyles.Number, CultureInfo.InvariantCulture, out parsed))
+                {
+                    if (parsed >= 0)
+                    {
+                        _rawValue = (long)Math.Round(parsed * (decimal)Math.Pow(10, _decimalPlaces), MidpointRounding.AwayFromZero);
+                        UpdateDisplayValue();
+                    }
+                }
+                // Unparseable input (e.g. "abc") is ignored: _rawValue stays unchanged
+            }
         }
 
         if (_textBox is not null)
