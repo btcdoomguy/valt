@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-08-06)
 Phase: 46 — Cost-Over-Time Schedule
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-09-04 - Completed quick task 260904-faz: Change LivePrices job fallback behavior: keep previous live prices on fetch failure after a successful cycle; stored price data only as cold-start fallback
+Last activity: 2026-09-17 - Completed quick task 260917-lz7: Fix bug: pasting numeric values into Currency fields registers as 0; typing works.
 
 ## Performance Metrics
 
@@ -220,6 +220,7 @@ None yet.
 | 260824-ry0 | In the Assets tab, BTC-collateral leveraged positions display the static notional BTC at entry. They should show the current total BTC value (collateral + unrealized P&L in BTC). | 2026-08-24 | TBD | [260824-ry0-fix-btc-collateral-leverage-display](./quick/260824-ry0-fix-btc-collateral-leverage-display/) |
 | 260903-qow | Fix UI flicker and stale gray totals on Transaction tab when LivePricesUpdaterJob refreshes prices | 2026-09-03 | 5913b7d | [260903-qow-fix-ui-flicker-and-stale-gray-totals-on-](./quick/260903-qow-fix-ui-flicker-and-stale-gray-totals-on-/) |
 | 260904-faz | Change LivePrices job fallback behavior: keep previous live prices on fetch failure after a successful cycle; stored price data only as cold-start fallback | 2026-09-04 | ca71f63 | [260904-faz-change-liveprices-job-fallback-behavior-](./quick/260904-faz-change-liveprices-job-fallback-behavior-/) |
+| 260917-lz7 | Fix bug: pasting numeric values into Currency fields registers as 0; typing works (FiatInput paste handling) | 2026-09-17 | 89b3cc2 | [260917-lz7-fix-bug-pasting-numeric-values-into-curr](./quick/260917-lz7-fix-bug-pasting-numeric-values-into-curr/) |
 
 ## Deferred Items
 
