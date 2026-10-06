@@ -192,7 +192,7 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
     public bool ShowFailedIcon => _goal.State == (int)GoalStates.Failed;
 
     // Context menu visibility
-    public bool CanRecalculate => _goal.State == (int)GoalStates.Completed || _goal.State == (int)GoalStates.Failed;
+    public bool CanRecalculate => true;
 
     // Show progress bar only for Open state (not for Completed or Failed)
     public bool ShowProgressBar => _goal.State == (int)GoalStates.Open;
