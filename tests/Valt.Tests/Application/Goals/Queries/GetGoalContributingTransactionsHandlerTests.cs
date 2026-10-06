@@ -418,6 +418,18 @@ public class GetGoalContributingTransactionsHandlerTests : DatabaseTest
     }
 
     [Test]
+    public async Task NullGoalId_ReturnsGoalNotFound()
+    {
+        // Act: required string is a compile-time guard only — a null can still arrive from
+        // an MCP tool boundary, deserialization, or a UI binding glitch
+        var result = await _handler.HandleAsync(new GetGoalContributingTransactionsQuery { GoalId = null! });
+
+        // Assert: defensive parse path — GOAL_NOT_FOUND, not a NullReferenceException
+        Assert.That(result.IsFailure, Is.True);
+        Assert.That(result.Error!.Code, Is.EqualTo("GOAL_NOT_FOUND"));
+    }
+
+    [Test]
     public async Task MalformedGoalId_ReturnsGoalNotFound()
     {
         // Act

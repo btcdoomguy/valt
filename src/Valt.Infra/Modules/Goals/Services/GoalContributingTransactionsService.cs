@@ -70,7 +70,9 @@ internal class GoalContributingTransactionsService
     {
         id = ObjectId.Empty;
 
-        if (value.Length != 24)
+        // required string only guards the compiler — MCP tool boundaries, deserialization,
+        // or UI bindings can still pass null at runtime; those must map to GOAL_NOT_FOUND.
+        if (string.IsNullOrEmpty(value) || value.Length != 24)
             return false;
 
         foreach (var c in value)
