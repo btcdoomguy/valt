@@ -18,7 +18,8 @@ An App-layer query exposes exactly which transactions feed any goal's total calc
 - New CQRS query `GetGoalContributingTransactionsQuery` in `Valt.App/Modules/Goals/Queries/` returning a row DTO, backed by a new/existing Infra service (per AGENTS.md CQRS conventions — ViewModels must use dispatchers, not direct repository access).
 
 ### Non-Transaction-Based Goal Types
-- Goal types whose progress is NOT derived from transactions (e.g., NetWorthBtc from account balances, BitcoinHodl from price) do NOT get the View Summary feature at all. The query returns a typed result identifying these types so the UI (Phase 50) can hide/disable the context-menu item for them.
+- Goal types whose progress is NOT derived from transactions do NOT get the View Summary feature at all. The query returns a typed result identifying these types so the UI (Phase 50) can hide/disable the context-menu item for them.
+- CORRECTED during research (code-verified): `BitcoinHodl` IS transaction-based (progress sums `BitcoinToFiat` sale transactions) and IS included as a supported type — user-confirmed. Only `NetWorthBtc` (balance-derived) is unsupported. Total: 9 supported types, 1 unsupported.
 
 ### Row Shape & Running Total
 - Rows sorted chronologically ascending — the running total reads naturally top-to-bottom.
