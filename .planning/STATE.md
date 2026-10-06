@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-08-06)
 Phase: 46 — Cost-Over-Time Schedule
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-09-17 - Completed quick task 260917-lz7: Fix bug: pasting numeric values into Currency fields registers as 0; typing works.
+Last activity: 2026-10-06 - Completed quick task 261006-kks: Restore Recalculate (refresh totals) in right-click context menu on goal entries in the Goals section of Transactions tab
 
 ## Performance Metrics
 
@@ -221,6 +221,7 @@ None yet.
 | 260903-qow | Fix UI flicker and stale gray totals on Transaction tab when LivePricesUpdaterJob refreshes prices | 2026-09-03 | 5913b7d | [260903-qow-fix-ui-flicker-and-stale-gray-totals-on-](./quick/260903-qow-fix-ui-flicker-and-stale-gray-totals-on-/) |
 | 260904-faz | Change LivePrices job fallback behavior: keep previous live prices on fetch failure after a successful cycle; stored price data only as cold-start fallback | 2026-09-04 | ca71f63 | [260904-faz-change-liveprices-job-fallback-behavior-](./quick/260904-faz-change-liveprices-job-fallback-behavior-/) |
 | 260917-lz7 | Fix bug: pasting numeric values into Currency fields registers as 0; typing works (FiatInput paste handling) | 2026-09-17 | 89b3cc2 | [260917-lz7-fix-bug-pasting-numeric-values-into-curr](./quick/260917-lz7-fix-bug-pasting-numeric-values-into-curr/) |
+| 261006-kks | Restore Recalculate (refresh totals) in right-click context menu on goal entries in the Goals section of Transactions tab | 2026-10-06 | 65c0188 | [261006-kks-i-cannot-see-the-feature-to-refresh-the-](./quick/261006-kks-i-cannot-see-the-feature-to-refresh-the-/) |
 
 ## Deferred Items
 
