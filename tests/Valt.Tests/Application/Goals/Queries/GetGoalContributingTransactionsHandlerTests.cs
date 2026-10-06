@@ -251,6 +251,86 @@ public class GetGoalContributingTransactionsHandlerTests : DatabaseTest
         });
     }
 
+    [Test]
+    public async Task BoundaryDates_Included_OneDayOutside_Excluded()
+    {
+        // Arrange: monthly June goal — 1st and 30th inside, May 31 and July 1 outside
+        var goalId = await SeedSpendingLimitGoal(new DateOnly(2024, 6, 15));
+        var account = SeedUsdAccount();
+        SeedPrices(new DateOnly(2024, 5, 24), new DateOnly(2024, 7, 7), 50_000m);
+
+        SeedExpense(account, 100m, new DateOnly(2024, 5, 31), "Before period");
+        SeedExpense(account, 100m, new DateOnly(2024, 6, 1), "First day");
+        SeedExpense(account, 200m, new DateOnly(2024, 6, 30), "Last day");
+        SeedExpense(account, 100m, new DateOnly(2024, 7, 1), "After period");
+
+        // Act
+        var rows = await Dispatch(goalId);
+
+        // Assert: exactly the two boundary-dated expenses, final total their sum
+        Assert.That(rows, Has.Count.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows[0].Description, Is.EqualTo("First day"));
+            Assert.That(rows[1].Description, Is.EqualTo("Last day"));
+            Assert.That(rows[1].RunningTotal, Is.EqualTo(300m));
+        });
+    }
+
+    [Test]
+    public async Task ForeignCurrencyAccount_Converts_AtTxDateRate()
+    {
+        // Arrange: BRL account, seeded BRL rate 5.0 (BRL per USD)
+        var goalId = await SeedSpendingLimitGoal(new DateOnly(2024, 6, 15));
+        var account = FiatAccountBuilder.AnAccount()
+            .WithName("BRL Checking")
+            .WithFiatCurrency(FiatCurrency.Brl)
+            .Build();
+        _localDatabase.GetAccounts().Insert(account);
+
+        SeedPrices(new DateOnly(2024, 5, 24), new DateOnly(2024, 7, 7), 50_000m, ("BRL", 5.0m));
+
+        SeedExpense(account, 1000m, new DateOnly(2024, 6, 15), "BRL expense");
+
+        // Act
+        var rows = await Dispatch(goalId);
+
+        // Assert: natural original-currency amount on the row; strategy-unit total in main currency
+        Assert.That(rows, Has.Count.EqualTo(1));
+        var row = rows[0];
+        Assert.Multiple(() =>
+        {
+            Assert.That(row.FiatAmount.Value, Is.EqualTo(1000m));
+            Assert.That(row.FiatCurrencyCode, Is.EqualTo("BRL"));
+            Assert.That(row.RunningTotal, Is.EqualTo(200m));
+        });
+    }
+
+    [Test]
+    public async Task Sats_Converted_AtTransactionDatePrice_NotLive()
+    {
+        // Arrange: BTC price seeded per-day — 40k through Jun 15, 60k from Jun 16
+        var goalId = await SeedSpendingLimitGoal(new DateOnly(2024, 6, 15));
+        var account = SeedUsdAccount();
+        SeedPrices(new DateOnly(2024, 5, 24), new DateOnly(2024, 6, 15), 40_000m);
+        SeedPrices(new DateOnly(2024, 6, 16), new DateOnly(2024, 7, 7), 60_000m);
+
+        SeedExpense(account, 100m, new DateOnly(2024, 6, 10), "At 40k day");
+        SeedExpense(account, 100m, new DateOnly(2024, 6, 20), "At 60k day");
+
+        // Act
+        var rows = await Dispatch(goalId);
+
+        // Assert: each row's sats match its own date's seeded price, proving per-row tx-date conversion
+        Assert.That(rows, Has.Count.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows[0].SatsAmount.Sats, Is.EqualTo(250_000L)); // 100 USD / 40_000
+            Assert.That(rows[1].SatsAmount.Sats, Is.EqualTo(Convert.ToInt64(100m / 60_000m * 100_000_000m)));
+            Assert.That(rows[0].SatsAmount.Sats, Is.Not.EqualTo(rows[1].SatsAmount.Sats));
+        });
+    }
+
     private async Task<string> SeedSpendingLimitGoal(DateOnly refDate)
     {
         var goal = GoalBuilder.ASpendingLimitGoal(1000m)
