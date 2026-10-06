@@ -36,6 +36,84 @@ public class GetGoalContributingTransactionsHandlerTests : DatabaseTest
     }
 
     [Test]
+    public async Task Dca_CountRunningTotal_Reconciles()
+    {
+        // Arrange: three FiatToBitcoin purchases in period
+        var goalId = await SeedGoal(
+            GoalBuilder.AGoal().WithGoalType(new DcaGoalType(10)), new DateOnly(2024, 6, 15));
+        var btcAccount = SeedBtcAccount();
+        var fiatAccount = SeedUsdAccount();
+        var btcAccountId = new AccountId(btcAccount.Id.ToString());
+        var fiatAccountId = new AccountId(fiatAccount.Id.ToString());
+
+        SeedTransaction(TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 5)).WithName("Purchase 1")
+            .AsBitcoinPurchase(fiatAccountId, btcAccountId, 50_000, 250m));
+        SeedTransaction(TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 12)).WithName("Purchase 2")
+            .AsBitcoinPurchase(fiatAccountId, btcAccountId, 60_000, 300m));
+        SeedTransaction(TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 25)).WithName("Purchase 3")
+            .AsBitcoinPurchase(fiatAccountId, btcAccountId, 70_000, 350m));
+
+        var entity = _localDatabase.GetGoals().FindAll().Single();
+        var calculator = new DcaProgressCalculator(_localDatabase);
+        var progress = await calculator.CalculateProgressAsync(
+            NewInput(GoalTypeNames.Dca, entity.GoalTypeJson));
+        var calculatedPurchaseCount = ((DcaGoalType)progress.UpdatedGoalType).CalculatedPurchaseCount;
+
+        // Act
+        var rows = await Dispatch(goalId);
+
+        // Assert: one row per purchase; RunningTotal is the cumulative count (Q2 count unit)
+        Assert.That(rows, Has.Count.EqualTo(3));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows.Select(r => r.Description),
+                Is.EqualTo(new[] { "Purchase 1", "Purchase 2", "Purchase 3" }));
+            Assert.That(rows.Select(r => r.RunningTotal), Is.EqualTo(new[] { 1m, 2m, 3m }));
+            Assert.That(rows[2].RunningTotal, Is.EqualTo(calculatedPurchaseCount));
+        });
+    }
+
+    [Test]
+    public async Task BitcoinHodl_SoldSats_Reconciles_AndIsSupported()
+    {
+        // Arrange: one BitcoinToFiat sale in period
+        var goalId = await SeedGoal(GoalBuilder.ABitcoinHodlGoal(100_000), new DateOnly(2024, 6, 15));
+        var btcAccount = SeedBtcAccount();
+        var fiatAccount = SeedUsdAccount();
+        var btcAccountId = new AccountId(btcAccount.Id.ToString());
+        var fiatAccountId = new AccountId(fiatAccount.Id.ToString());
+
+        SeedTransaction(TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 10)).WithName("Sold some")
+            .AsBitcoinSale(btcAccountId, fiatAccountId, 40_000, 200m));
+
+        var entity = _localDatabase.GetGoals().FindAll().Single();
+        var calculator = new BitcoinHodlProgressCalculator(_localDatabase);
+        var progress = await calculator.CalculateProgressAsync(
+            NewInput(GoalTypeNames.BitcoinHodl, entity.GoalTypeJson));
+        var calculatedSoldSats = ((BitcoinHodlGoalType)progress.UpdatedGoalType).CalculatedSoldSats;
+
+        // Act
+        var result = await _handler.HandleAsync(new GetGoalContributingTransactionsQuery { GoalId = goalId });
+
+        // Assert: Supported (never NotSupported — ninth transaction-based type), sold sats reconcile
+        Assert.That(result.IsSuccess, Is.True);
+        Assert.That(result.Value, Is.TypeOf<GoalContributingTransactionsResult.Supported>());
+        var rows = ((GoalContributingTransactionsResult.Supported)result.Value!).Rows;
+        Assert.That(rows, Has.Count.EqualTo(1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows[0].Description, Is.EqualTo("Sold some"));
+            Assert.That(rows[0].RunningTotal, Is.EqualTo(40_000m));
+            Assert.That(rows[0].RunningTotal, Is.EqualTo(calculatedSoldSats));
+            Assert.That(rows[0].SatsAmount.Sats, Is.EqualTo(40_000));
+        });
+    }
+
+    [Test]
     public async Task StackBitcoin_FourBuckets_NetSats_Reconcile()
     {
         // Arrange: one transaction of each StackBitcoin bucket in period
