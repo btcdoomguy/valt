@@ -3,6 +3,21 @@
 **Defined:** 2026-08-04
 **Core Value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
 
+## v0.9 Requirements (Goal Transparency — Transaction Breakdown)
+
+Let users see exactly which transactions feed into any goal's total calculation, for deeper analysis and trust in the numbers.
+
+### Goal Transaction Breakdown
+
+- [ ] **GOL-03**: User can right-click any goal entry in the Goals section (Transactions tab) and select "View summary" to open a modal
+- [ ] **GOL-04**: Modal shows a read-only grid of all transactions contributing to the selected goal's total calculation, for every goal type
+- [ ] **GOL-05**: Grid shows per transaction: date, description, account, category, and amount in fiat and sats
+- [ ] **GOL-06**: Grid shows a running total column that accumulates according to the goal's progress calculation
+- [ ] **GOL-07**: Contributing-transaction set is derived from each goal type's progress strategy (App-layer query), so the summary always matches the calculated totals
+- [ ] **GOL-08**: AI assistant can query a goal's contributing transactions via an MCP tool
+- [ ] **GOL-09**: All new user-facing strings are localized (en-US, pt-BR, es)
+- [ ] **GOL-10**: `.claude/docs/goals.md` is updated with the goal summary feature and MCP impact
+
 ## v0.8 Requirements (BTC Loan Simulator)
 
 A what-if calculator for BTC-backed loans, mirroring the Leverage Simulator layout (inputs left, results right). Accessible from the Tools menu.
