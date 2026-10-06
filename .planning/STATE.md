@@ -1,20 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v0.8
-milestone_name: BTC Loan Simulator
-current_phase: 46
-current_phase_name: Cost-Over-Time Schedule
+milestone: v0.9
+milestone_name: Goal Transparency — Transaction Breakdown
 status: planning
-stopped_at: Phase 45 plans created
-last_updated: "2026-08-21T17:20:01.064Z"
-last_activity: 2026-08-24
-last_activity_desc: Completed quick task 260824-ry0: Fix BTC-collateral leveraged position display to show current total BTC value
+last_updated: "2026-10-06T18:11:59.706Z"
+last_activity: 2026-10-06
 progress:
-  total_phases: 10
-  completed_phases: 2
-  total_plans: 3
-  completed_plans: 3
-  percent: 20
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # STATE.md
@@ -28,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-08-06)
 
 ## Current Position
 
-Phase: 46 — Cost-Over-Time Schedule
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-10-06 - Completed quick task 261006-kks: Restore Recalculate (refresh totals) in right-click context menu on goal entries in the Goals section of Transactions tab
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-10-06 — Milestone v0.9 started
 
 ## Performance Metrics
 

@@ -77,6 +77,10 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - [ ] v0.7 Insights & Metrics Expansion — interest/fees paid (total + monthly), liquidation-price distance trend
 - [ ] v0.8 BTC Loan Simulator — cost-over-time schedule until end date
 - [ ] v0.8 BTC Loan Simulator — load existing BTC-backed loan from Assets to prefill fields
+- [ ] v0.9 Goal Transparency — "View summary" right-click menu on all goal entries opening a modal with the contributing transactions grid (date, description, account, category, fiat + sats amounts, running total)
+- [ ] v0.9 Goal Transparency — App-layer query exposing contributing transactions per goal type progress strategy
+- [ ] v0.9 Goal Transparency — MCP tool to query contributing transactions per goal
+- [ ] v0.9 Goal Transparency — localization of all new strings in en, pt-BR, es
 
 ## Out of Scope
 
@@ -97,16 +101,16 @@ Users can see their entire financial picture — cash flow, investments, and loa
 
 - **Phase 45 complete** — BTC Loan Simulator modal UI with inputs/results panels, live recalculation, fiat/sats formatting, liquidation price, effective APR, and distance-to-liquidation color coding.
 
-## Current Milestone: v0.8 BTC Loan Simulator
+## Current Milestone: v0.9 Goal Transparency — Transaction Breakdown
 
-**Goal:** Add a BTC Loan Simulator tool — a what-if calculator for BTC-backed loans, mirroring the Leverage Simulator layout (inputs left, results right).
+**Goal:** Let users see exactly which transactions feed into any goal's total calculation, for deeper analysis and trust in the numbers.
 
 **Target features:**
-- Loan inputs: collateral (BTC), amount taken, liquidation LTV, start date, interest rate, fees, end date
-- Interest mode selection: simple or compound
-- Results: total to repay (principal + interest + fees), interest/fees breakdown, in fiat and sats
-- Cost-over-time schedule showing how the debt accrues until the end date
-- Load an existing BTC-backed loan from Assets to prefill the simulator
+- "View summary" right-click context menu item on every goal entry in the Goals section (all goal types)
+- Modal window with a read-only grid of all contributing transactions: date, description, account, category, amount (fiat + sats), plus a running total column
+- Goal-progress strategies expose their contributing transactions through a new App-layer query
+- MCP tool for AI assistants to query contributing transactions per goal
+- Localization in all 3 languages (en, pt-BR, es)
 
 ## Next Milestone Goals
 
@@ -173,4 +177,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-21 after Phase 45 complete*
+*Last updated: 2026-10-06 after milestone v0.9 start*
