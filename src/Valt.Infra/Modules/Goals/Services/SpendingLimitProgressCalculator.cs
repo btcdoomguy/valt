@@ -14,6 +14,14 @@ internal class SpendingLimitProgressCalculator : IGoalProgressCalculator
         _transactionReader = transactionReader;
     }
 
+    public Task<IReadOnlyList<GoalContributionRow>?> GetContributingTransactionsAsync(GoalProgressInput input)
+    {
+        // Same selection path as CalculateProgressAsync (CalculateTotalExpenses delegates
+        // to GetExpenseRows), so the rows cannot drift from the progress math.
+        return Task.FromResult<IReadOnlyList<GoalContributionRow>?>(
+            _transactionReader.GetExpenseRows(input.From, input.To));
+    }
+
     public Task<GoalProgressResult> CalculateProgressAsync(GoalProgressInput input)
     {
         var config = GoalTypeSerializer.DeserializeSpendingLimit(input.GoalTypeJson);

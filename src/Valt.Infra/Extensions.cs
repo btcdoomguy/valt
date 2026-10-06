@@ -320,6 +320,7 @@ public static class Extensions
 
         //goals
         services.AddSingleton<IGoalTransactionReader, GoalTransactionReader>();
+        services.AddSingleton<GoalContributingTransactionsService>();
         services.AddSingleton<IGoalProgressCalculator, StackBitcoinProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculator, SpendingLimitProgressCalculator>();
         services.AddSingleton<IGoalProgressCalculator, DcaProgressCalculator>();

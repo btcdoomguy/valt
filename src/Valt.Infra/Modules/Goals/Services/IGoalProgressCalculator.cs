@@ -9,4 +9,12 @@ public interface IGoalProgressCalculator
 {
     GoalTypeNames SupportedType { get; }
     Task<GoalProgressResult> CalculateProgressAsync(GoalProgressInput input);
+
+    /// <summary>
+    /// Returns the transactions contributing to the goal for the input period, with the
+    /// cumulative running total in the strategy's own unit. Null means the goal type is
+    /// not transaction-based (the default; transaction-based calculators override).
+    /// </summary>
+    Task<IReadOnlyList<GoalContributionRow>?> GetContributingTransactionsAsync(GoalProgressInput input) =>
+        Task.FromResult<IReadOnlyList<GoalContributionRow>?>(null);
 }
