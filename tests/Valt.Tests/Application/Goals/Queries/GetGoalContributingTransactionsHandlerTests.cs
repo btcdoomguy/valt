@@ -4,6 +4,7 @@ using Valt.App.Modules.Goals.DTOs;
 using Valt.App.Modules.Goals.Queries.GetGoalContributingTransactions;
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Accounts;
+using Valt.Core.Modules.Budget.Categories;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.GoalTypes;
 using Valt.Infra.Modules.Budget.Accounts;
@@ -331,6 +332,243 @@ public class GetGoalContributingTransactionsHandlerTests : DatabaseTest
         });
     }
 
+    [Test]
+    public async Task IncomeFiat_Reconciles_AndExcludesBitcoinToFiat()
+    {
+        // Arrange: two fiat incomes on distinct days plus a BitcoinToFiat sale in period
+        var goalId = await SeedGoal(
+            GoalBuilder.AGoal().WithGoalType(new IncomeFiatGoalType(2000m)), new DateOnly(2024, 6, 15));
+        var account = SeedUsdAccount();
+        SeedPrices(new DateOnly(2024, 5, 24), new DateOnly(2024, 7, 7), 50_000m);
+
+        SeedIncome(account, 400m, new DateOnly(2024, 6, 10), "Salary A");
+        SeedIncome(account, 600m, new DateOnly(2024, 6, 20), "Salary B");
+        var sale = TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 15))
+            .WithName("Bitcoin sale")
+            .AsBitcoinSale(satAmount: 100_000, fiatAmount: 100m)
+            .Build();
+        _localDatabase.GetTransactions().Insert(sale);
+
+        var entity = _localDatabase.GetGoals().FindAll().Single();
+        var calculator = new IncomeFiatProgressCalculator(NewReader());
+        var progress = await calculator.CalculateProgressAsync(
+            NewInput(GoalTypeNames.IncomeFiat, entity.GoalTypeJson));
+        var calculatedIncome = ((IncomeFiatGoalType)progress.UpdatedGoalType).CalculatedIncome;
+
+        // Act
+        var rows = await Dispatch(goalId);
+
+        // Assert: only the fiat income rows appear (BitcoinToFiat is a transfer, not fiat income)
+        Assert.That(rows, Has.Count.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows[0].Description, Is.EqualTo("Salary A"));
+            Assert.That(rows[1].Description, Is.EqualTo("Salary B"));
+            Assert.That(rows[0].Date, Is.LessThan(rows[1].Date));
+            Assert.That(rows[0].RunningTotal, Is.EqualTo(400m));
+            Assert.That(rows[1].RunningTotal, Is.EqualTo(1000m));
+            Assert.That(rows[1].RunningTotal, Is.EqualTo(calculatedIncome));
+        });
+    }
+
+    [Test]
+    public async Task SaveFiat_MixedSigns_Ordered_Reconciles()
+    {
+        // Arrange: expense 300 (day 2), income 500 (day 5), expense 100 (day 8)
+        var goalId = await SeedGoal(GoalBuilder.ASaveFiatGoal(1000m), new DateOnly(2024, 6, 15));
+        var account = SeedUsdAccount();
+        SeedPrices(new DateOnly(2024, 5, 24), new DateOnly(2024, 7, 7), 50_000m);
+
+        SeedExpense(account, 300m, new DateOnly(2024, 6, 2), "Expense early");
+        SeedIncome(account, 500m, new DateOnly(2024, 6, 5), "Income");
+        SeedExpense(account, 100m, new DateOnly(2024, 6, 8), "Expense late");
+
+        var entity = _localDatabase.GetGoals().FindAll().Single();
+        var calculator = new SaveFiatProgressCalculator(NewReader());
+        var progress = await calculator.CalculateProgressAsync(
+            NewInput(GoalTypeNames.SaveFiat, entity.GoalTypeJson));
+        var calculatedSavings = ((SaveFiatGoalType)progress.UpdatedGoalType).CalculatedSavings;
+
+        // Act
+        var rows = await Dispatch(goalId);
+
+        // Assert: ascending expense→income→expense; running total is cumulative income minus expenses
+        Assert.That(rows, Has.Count.EqualTo(3));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows[0].Description, Is.EqualTo("Expense early"));
+            Assert.That(rows[1].Description, Is.EqualTo("Income"));
+            Assert.That(rows[2].Description, Is.EqualTo("Expense late"));
+            Assert.That(rows.Select(r => r.RunningTotal), Is.EqualTo(new[] { -300m, 200m, 100m }));
+            Assert.That(rows[2].RunningTotal, Is.EqualTo(calculatedSavings));
+        });
+    }
+
+    [Test]
+    public async Task SaveFiat_AddRemove_ChangesSetPositionAndFinalTotal()
+    {
+        // Arrange: baseline income 500 (day 10) minus expense 300 (day 5) = 200
+        var goalId = await SeedGoal(GoalBuilder.ASaveFiatGoal(1000m), new DateOnly(2024, 6, 15));
+        var account = SeedUsdAccount();
+        SeedPrices(new DateOnly(2024, 5, 24), new DateOnly(2024, 7, 7), 50_000m);
+
+        SeedExpense(account, 300m, new DateOnly(2024, 6, 5), "Expense");
+        SeedIncome(account, 500m, new DateOnly(2024, 6, 10), "Income");
+
+        var first = await Dispatch(goalId);
+        Assert.That(first, Has.Count.EqualTo(2));
+        Assert.That(first[1].RunningTotal, Is.EqualTo(200m));
+
+        // Act: add an earlier income — must appear in chronological position and move the total
+        var earlyIncome = SeedIncome(account, 200m, new DateOnly(2024, 6, 2), "Early income");
+
+        var afterAdd = await Dispatch(goalId);
+        Assert.That(afterAdd, Has.Count.EqualTo(3));
+        Assert.Multiple(() =>
+        {
+            Assert.That(afterAdd[0].Description, Is.EqualTo("Early income"));
+            Assert.That(afterAdd[0].Date, Is.LessThan(afterAdd[1].Date));
+            Assert.That(afterAdd[2].RunningTotal, Is.EqualTo(400m));
+        });
+
+        // Act: remove it — set and total revert
+        _localDatabase.GetTransactions().Delete(earlyIncome.Id);
+
+        var afterRemove = await Dispatch(goalId);
+        Assert.That(afterRemove, Has.Count.EqualTo(2));
+        Assert.That(afterRemove[1].RunningTotal, Is.EqualTo(200m));
+    }
+
+    [Test]
+    public async Task ReduceExpenseCategory_CategoryParity()
+    {
+        // Arrange: one expense in the goal's category, an equally-sized one outside it
+        var targetCategoryId = "65f1a2b3c4d5e6f7890a1b2c";
+        var otherCategoryId = "65f1a2b3c4d5e6f7890a1b2d";
+        var goalId = await SeedGoal(
+            GoalBuilder.AReduceExpenseCategoryGoal(500m, targetCategoryId, "Food"), new DateOnly(2024, 6, 15));
+        var account = SeedUsdAccount();
+        _localDatabase.GetCategories().Insert(CategoryBuilder.ACategory()
+            .WithId(new CategoryId(targetCategoryId)).WithName("Food").Build());
+        _localDatabase.GetCategories().Insert(CategoryBuilder.ACategory()
+            .WithId(new CategoryId(otherCategoryId)).WithName("Leisure").Build());
+        SeedPrices(new DateOnly(2024, 5, 24), new DateOnly(2024, 7, 7), 50_000m);
+
+        var inCategory = TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 10))
+            .WithName("Food expense")
+            .AsFiatExpense(new AccountId(account.Id.ToString()), 200m)
+            .WithCategoryId(new CategoryId(targetCategoryId))
+            .Build();
+        _localDatabase.GetTransactions().Insert(inCategory);
+        var outOfCategory = TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 12))
+            .WithName("Leisure expense")
+            .AsFiatExpense(new AccountId(account.Id.ToString()), 300m)
+            .WithCategoryId(new CategoryId(otherCategoryId))
+            .Build();
+        _localDatabase.GetTransactions().Insert(outOfCategory);
+
+        var entity = _localDatabase.GetGoals().FindAll().Single();
+        var calculator = new ReduceExpenseCategoryProgressCalculator(NewReader());
+        var progress = await calculator.CalculateProgressAsync(
+            NewInput(GoalTypeNames.ReduceExpenseCategory, entity.GoalTypeJson));
+        var calculatedSpending = ((ReduceExpenseCategoryGoalType)progress.UpdatedGoalType).CalculatedSpending;
+
+        // Act
+        var rows = await Dispatch(goalId);
+
+        // Assert: exactly the in-category row; final total equals CalculatedSpending
+        Assert.That(rows, Has.Count.EqualTo(1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows[0].Description, Is.EqualTo("Food expense"));
+            Assert.That(rows[0].CategoryName, Is.EqualTo("Food"));
+            Assert.That(rows[0].RunningTotal, Is.EqualTo(200m));
+            Assert.That(rows[0].RunningTotal, Is.EqualTo(calculatedSpending));
+        });
+    }
+
+    [Test]
+    public async Task SavingsRate_PercentageRunningTotal_Reconciles()
+    {
+        // Arrange: income 1000 (day 3), expense 400 (day 6) → savings rate 60%
+        var goalId = await SeedGoal(GoalBuilder.ASavingsRateGoal(20m), new DateOnly(2024, 6, 15));
+        var account = SeedUsdAccount();
+        SeedPrices(new DateOnly(2024, 5, 24), new DateOnly(2024, 7, 7), 50_000m);
+
+        SeedIncome(account, 1000m, new DateOnly(2024, 6, 3), "Income");
+        SeedExpense(account, 400m, new DateOnly(2024, 6, 6), "Expense");
+
+        var entity = _localDatabase.GetGoals().FindAll().Single();
+        var calculator = new SavingsRateProgressCalculator(NewReader());
+        var progress = await calculator.CalculateProgressAsync(
+            NewInput(GoalTypeNames.SavingsRate, entity.GoalTypeJson));
+        var calculatedPercentage = ((SavingsRateGoalType)progress.UpdatedGoalType).CalculatedPercentage;
+
+        // Act
+        var rows = await Dispatch(goalId);
+
+        // Assert: per-row running totals are the incremental percentages
+        Assert.That(rows, Has.Count.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows[0].RunningTotal, Is.EqualTo(100.00m)); // income only: (1000-0)/1000
+            Assert.That(rows[1].RunningTotal, Is.EqualTo(60.00m));  // (1000-400)/1000
+            Assert.That(rows[1].RunningTotal, Is.EqualTo(calculatedPercentage));
+        });
+    }
+
+    [Test]
+    public async Task SavingsRate_ExpenseBeforeIncome_FirstRowIsZero()
+    {
+        // Arrange: expense 400 (day 2) before income 1000 (day 5)
+        var goalId = await SeedGoal(GoalBuilder.ASavingsRateGoal(20m), new DateOnly(2024, 6, 15));
+        var account = SeedUsdAccount();
+        SeedPrices(new DateOnly(2024, 5, 24), new DateOnly(2024, 7, 7), 50_000m);
+
+        SeedExpense(account, 400m, new DateOnly(2024, 6, 2), "Expense");
+        SeedIncome(account, 1000m, new DateOnly(2024, 6, 5), "Income");
+
+        // Act
+        var rows = await Dispatch(goalId);
+
+        // Assert: cumulative income <= 0 branch → first row is 0.00, second reconciles to 60.00
+        Assert.That(rows, Has.Count.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows[0].RunningTotal, Is.EqualTo(0.00m));
+            Assert.That(rows[1].RunningTotal, Is.EqualTo(60.00m));
+        });
+    }
+
+    [Test]
+    public async Task FiatIncome_Sats_AtTransactionDatePrice()
+    {
+        // Arrange: BTC price seeded per-day — 40k through Jun 15, 60k from Jun 16
+        var goalId = await SeedGoal(
+            GoalBuilder.AGoal().WithGoalType(new IncomeFiatGoalType(1000m)), new DateOnly(2024, 6, 15));
+        var account = SeedUsdAccount();
+        SeedPrices(new DateOnly(2024, 5, 24), new DateOnly(2024, 6, 15), 40_000m);
+        SeedPrices(new DateOnly(2024, 6, 16), new DateOnly(2024, 7, 7), 60_000m);
+
+        SeedIncome(account, 100m, new DateOnly(2024, 6, 10), "At 40k day");
+        SeedIncome(account, 100m, new DateOnly(2024, 6, 20), "At 60k day");
+
+        // Act
+        var rows = await Dispatch(goalId);
+
+        // Assert: each fiat income row's sats match its own date's seeded price (GOL-05 precision probe)
+        Assert.That(rows, Has.Count.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows[0].SatsAmount.Sats, Is.EqualTo(250_000L)); // 100 USD / 40_000
+            Assert.That(rows[1].SatsAmount.Sats, Is.EqualTo(Convert.ToInt64(100m / 60_000m * 100_000_000m)));
+            Assert.That(rows[0].SatsAmount.Sats, Is.Not.EqualTo(rows[1].SatsAmount.Sats));
+        });
+    }
+
     private async Task<string> SeedSpendingLimitGoal(DateOnly refDate)
     {
         var goal = GoalBuilder.ASpendingLimitGoal(1000m)
@@ -370,6 +608,34 @@ public class GetGoalContributingTransactionsHandlerTests : DatabaseTest
         _localDatabase.GetTransactions().Insert(transaction);
         return transaction;
     }
+
+    private TransactionEntity SeedIncome(AccountEntity account, decimal amount, DateOnly date, string name = "Income")
+    {
+        var transaction = TransactionBuilder.ATransaction()
+            .WithDate(date)
+            .WithName(name)
+            .AsFiatIncome(new AccountId(account.Id.ToString()), amount)
+            .Build();
+        _localDatabase.GetTransactions().Insert(transaction);
+        return transaction;
+    }
+
+    private async Task<string> SeedGoal(GoalBuilder builder, DateOnly refDate)
+    {
+        var goal = builder
+            .WithRefDate(refDate)
+            .WithPeriod(GoalPeriods.Monthly)
+            .Build();
+        await _goalRepository.SaveAsync(goal);
+        return goal.Id.Value;
+    }
+
+    private GoalTransactionReader NewReader() =>
+        new(_localDatabase, _priceDatabase,
+            new CurrencySettings(_localDatabase, Substitute.For<INotificationPublisher>()));
+
+    private static GoalProgressInput NewInput(GoalTypeNames typeName, string goalTypeJson) =>
+        new(typeName, goalTypeJson, new DateOnly(2024, 6, 1), new DateOnly(2024, 6, 30));
 
     private async Task<IReadOnlyList<ContributingTransactionRow>> Dispatch(string goalId)
     {
