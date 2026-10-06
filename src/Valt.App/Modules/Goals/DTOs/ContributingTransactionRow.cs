@@ -4,8 +4,10 @@ namespace Valt.App.Modules.Goals.DTOs;
 
 /// <summary>
 /// A single transaction that contributes to a goal's progress, with the running
-/// total after this row. Amounts are displayed with the natural sign convention
-/// (income +, expense -); the running total follows the goal's accumulation math.
+/// total after this row. <see cref="FiatAmount"/> and <see cref="SatsAmount"/> carry
+/// magnitudes (always non-negative); the direction of each contribution (income +,
+/// expense -) is expressed only by the deltas of <see cref="RunningTotal"/>, which
+/// follows the goal's accumulation math.
 /// </summary>
 public sealed record ContributingTransactionRow
 {
@@ -22,8 +24,9 @@ public sealed record ContributingTransactionRow
     public required string? CategoryName { get; init; }
 
     /// <summary>
-    /// Fiat amount with the natural display sign, in the transaction's original fiat currency.
-    /// Zero for sats-only rows (no fiat leg).
+    /// Fiat amount as a magnitude (always non-negative), in the transaction's original fiat
+    /// currency. Zero for sats-only rows (no fiat leg). The sign of the contribution is
+    /// expressed only in <see cref="RunningTotal"/>, never here.
     /// </summary>
     public required FiatValue FiatAmount { get; init; }
 
@@ -31,8 +34,9 @@ public sealed record ContributingTransactionRow
     public required string FiatCurrencyCode { get; init; }
 
     /// <summary>
-    /// Sats value converted at the transaction-date BTC price (closest-date lookup with buffer),
-    /// never at a live price.
+    /// Sats value as a magnitude (always non-negative), converted at the transaction-date
+    /// BTC price (closest-date lookup with buffer), never at a live price. The sign of the
+    /// contribution is expressed only in <see cref="RunningTotal"/>, never here.
     /// </summary>
     public required BtcValue SatsAmount { get; init; }
 
