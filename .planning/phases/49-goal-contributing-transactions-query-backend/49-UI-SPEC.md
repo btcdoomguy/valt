@@ -50,9 +50,11 @@ column header and row text styles.
 ## Color
 
 **N/A — no user-facing surfaces in this phase.** One forward-looking data
-contract note for Phase 50: the row DTO carries **natural signed amounts**
-(income positive, expense negative), so the Phase 50 grid can apply the app's
-existing green/red amount-foreground convention without re-deriving signs.
+contract note for Phase 50: the row DTO carries **non-negative amount
+magnitudes** (`FiatAmount`/`SatsAmount`) with sign expressed only via
+`Contribution`/`RunningTotal` deltas (corrected after code review CR/WR-01 —
+see 49-REVIEW.md), so the Phase 50 grid derives per-row sign from RunningTotal
+deltas when applying the app's green/red convention.
 
 ---
 
