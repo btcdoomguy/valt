@@ -36,6 +36,128 @@ public class GetGoalContributingTransactionsHandlerTests : DatabaseTest
     }
 
     [Test]
+    public async Task SatsOnlyRows_CarryZeroFiat_AndMainCurrency()
+    {
+        // Arrange: direct-Bitcoin income and expense rows (no fiat leg anywhere)
+        var goalId = await SeedGoal(GoalBuilder.AStackBitcoinGoal(1_000_000), new DateOnly(2024, 6, 15));
+        var btcAccount = SeedBtcAccount();
+        var btcAccountId = new AccountId(btcAccount.Id.ToString());
+
+        SeedTransaction(TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 10)).WithName("BTC income")
+            .AsBitcoinIncome(btcAccountId, 100_000));
+        SeedTransaction(TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 15)).WithName("BTC spend")
+            .AsBitcoinExpense(btcAccountId, 25_000));
+
+        // Act
+        var rows = await Dispatch(goalId);
+
+        // Assert: Q3 contract — zero fiat + main currency on sats-only rows; sign on RunningTotal
+        Assert.That(rows, Has.Count.EqualTo(2));
+        var incomeRow = rows.Single(r => r.Description == "BTC income");
+        var expenseRow = rows.Single(r => r.Description == "BTC spend");
+        Assert.Multiple(() =>
+        {
+            Assert.That(incomeRow.FiatAmount.Value, Is.EqualTo(0m));
+            Assert.That(incomeRow.FiatCurrencyCode, Is.EqualTo("USD"));
+            Assert.That(incomeRow.SatsAmount.Sats, Is.EqualTo(100_000));
+            Assert.That(incomeRow.RunningTotal, Is.EqualTo(100_000m));
+
+            Assert.That(expenseRow.FiatAmount.Value, Is.EqualTo(0m));
+            Assert.That(expenseRow.FiatCurrencyCode, Is.EqualTo("USD"));
+            Assert.That(expenseRow.SatsAmount.Sats, Is.EqualTo(25_000));
+            Assert.That(expenseRow.RunningTotal, Is.EqualTo(75_000m));
+        });
+    }
+
+    [Test]
+    public async Task SameDayRows_StableAcrossStrategies()
+    {
+        // Arrange: StackBitcoin same-day bitcoin incomes
+        var stackGoalId = await SeedGoal(GoalBuilder.AStackBitcoinGoal(1_000_000), new DateOnly(2024, 6, 15));
+        var btcAccount = SeedBtcAccount();
+        var btcAccountId = new AccountId(btcAccount.Id.ToString());
+        SeedTransaction(TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 20)).WithName("First same-day")
+            .AsBitcoinIncome(btcAccountId, 100_000));
+        SeedTransaction(TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 20)).WithName("Second same-day")
+            .AsBitcoinIncome(btcAccountId, 50_000));
+
+        // Arrange: SaveFiat same-day expense and income
+        var saveGoalId = await SeedGoal(GoalBuilder.ASaveFiatGoal(1000m), new DateOnly(2024, 6, 15));
+        var fiatAccount = SeedUsdAccount();
+        SeedPrices(new DateOnly(2024, 5, 24), new DateOnly(2024, 7, 7), 50_000m);
+        SeedExpense(fiatAccount, 300m, new DateOnly(2024, 6, 20), "Expense same-day");
+        SeedIncome(fiatAccount, 500m, new DateOnly(2024, 6, 20), "Income same-day");
+
+        // Act: each strategy dispatched twice — order and totals must be identical
+        var stackFirst = await Dispatch(stackGoalId);
+        var stackSecond = await Dispatch(stackGoalId);
+        var saveFirst = await Dispatch(saveGoalId);
+        var saveSecond = await Dispatch(saveGoalId);
+
+        // Assert: deterministic (Date, Id) order with matching running-total sequences
+        Assert.Multiple(() =>
+        {
+            Assert.That(stackFirst.Select(r => r.Description),
+                Is.EqualTo(new[] { "First same-day", "Second same-day" }));
+            Assert.That(stackFirst.Select(r => r.RunningTotal), Is.EqualTo(new[] { 100_000m, 150_000m }));
+            Assert.That(stackSecond.Select(r => r.Description), Is.EqualTo(stackFirst.Select(r => r.Description)));
+            Assert.That(stackSecond.Select(r => r.RunningTotal), Is.EqualTo(stackFirst.Select(r => r.RunningTotal)));
+
+            Assert.That(saveFirst.Select(r => r.Description),
+                Is.EqualTo(new[] { "Expense same-day", "Income same-day" }));
+            Assert.That(saveFirst.Select(r => r.RunningTotal), Is.EqualTo(new[] { -300m, 200m }));
+            Assert.That(saveSecond.Select(r => r.Description), Is.EqualTo(saveFirst.Select(r => r.Description)));
+            Assert.That(saveSecond.Select(r => r.RunningTotal), Is.EqualTo(saveFirst.Select(r => r.RunningTotal)));
+        });
+    }
+
+    [Test]
+    public async Task AddRemove_DirectDb()
+    {
+        // Arrange: StackBitcoin baseline purchase
+        var goalId = await SeedGoal(GoalBuilder.AStackBitcoinGoal(1_000_000), new DateOnly(2024, 6, 15));
+        var btcAccount = SeedBtcAccount();
+        var fiatAccount = SeedUsdAccount();
+        var btcAccountId = new AccountId(btcAccount.Id.ToString());
+        var fiatAccountId = new AccountId(fiatAccount.Id.ToString());
+
+        SeedTransaction(TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 10)).WithName("Baseline purchase")
+            .AsBitcoinPurchase(fiatAccountId, btcAccountId, 100_000, 500m));
+
+        var first = await Dispatch(goalId);
+        Assert.That(first, Has.Count.EqualTo(1));
+        Assert.That(first[0].RunningTotal, Is.EqualTo(100_000m));
+
+        // Act: add an earlier purchase — must land in chronological position and move the total
+        var extraPurchase = TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 5)).WithName("Earlier purchase")
+            .AsBitcoinPurchase(fiatAccountId, btcAccountId, 50_000, 250m)
+            .Build();
+        _localDatabase.GetTransactions().Insert(extraPurchase);
+
+        var afterAdd = await Dispatch(goalId);
+        Assert.That(afterAdd, Has.Count.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(afterAdd[0].Description, Is.EqualTo("Earlier purchase"));
+            Assert.That(afterAdd[0].Date, Is.LessThan(afterAdd[1].Date));
+            Assert.That(afterAdd[1].RunningTotal, Is.EqualTo(150_000m));
+        });
+
+        // Act: remove it — set and total revert exactly
+        _localDatabase.GetTransactions().Delete(extraPurchase.Id);
+
+        var afterRemove = await Dispatch(goalId);
+        Assert.That(afterRemove, Has.Count.EqualTo(1));
+        Assert.That(afterRemove[0].RunningTotal, Is.EqualTo(100_000m));
+    }
+
+    [Test]
     public async Task Dca_CountRunningTotal_Reconciles()
     {
         // Arrange: three FiatToBitcoin purchases in period
