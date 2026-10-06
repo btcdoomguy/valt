@@ -38,12 +38,13 @@ internal sealed class RecalculateGoalHandler : ICommandHandler<RecalculateGoalCo
             return Result<RecalculateGoalResult>.Failure(
                 "GOAL_NOT_FOUND", $"Goal with id {command.GoalId} not found");
 
-        // Only allow recalculation of Completed or Failed goals
-        if (goal.State != GoalStates.Completed && goal.State != GoalStates.Failed)
-            return Result<RecalculateGoalResult>.Failure(
-                "INVALID_STATE", "Only Completed or Failed goals can be recalculated");
+        // Completed/Failed goals are re-opened for recalculation; Open goals are just
+        // marked stale so the progress updater job recomputes them
+        if (goal.State == GoalStates.Completed || goal.State == GoalStates.Failed)
+            goal.Recalculate();
+        else
+            goal.MarkAsStale();
 
-        goal.Recalculate();
         await _goalRepository.SaveAsync(goal);
         await _notificationPublisher.PublishAsync(new GoalProgressUpdateRequested());
 
