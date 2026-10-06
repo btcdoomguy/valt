@@ -57,9 +57,9 @@ internal class GoalContributingTransactionsService
         var accounts = _localDatabase.GetAccounts().FindAll().ToDictionary(x => x.Id);
         var categories = _localDatabase.GetCategories().FindAll().ToDictionary(x => x.Id.ToString());
 
+        // Row order is owned by the calculators (IGoalProgressCalculator contract:
+        // ascending by transaction date, then transaction id) — no re-sort here.
         var dtos = rows
-            .OrderBy(r => DateOnly.FromDateTime(r.Transaction.Date.ToUniversalTime()))
-            .ThenBy(r => r.Transaction.Id)
             .Select(r => MapRow(r, accounts, categories))
             .ToList();
 
