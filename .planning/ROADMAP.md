@@ -52,7 +52,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 
 ### 🚧 v0.9 Goal Transparency — Transaction Breakdown (Phases 49-51) — ROADMAP DEFINED 2026-10-06
 
-- [ ] **Phase 49: Goal Contributing-Transactions Query Backend** — App-layer query + DTO deriving each goal type's contributing transactions with running total, per progress strategy
+- [x] **Phase 49: Goal Contributing-Transactions Query Backend** — App-layer query + DTO deriving each goal type's contributing transactions with running total, per progress strategy (completed 2026-10-06)
 - [ ] **Phase 50: Goal Summary Modal UI** — "View summary" right-click context menu on all goal entries + read-only transaction grid modal
 - [ ] **Phase 51: MCP, Localization, Documentation & Verification** — Goal contributing-transactions MCP tool, 3-language strings, goals.md docs, end-to-end sign-off
 
@@ -297,19 +297,19 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
   3. Each returned row carries a running total accumulated in the same order and semantics as the goal's progress calculation, so the final row's running total exactly reconciles with the goal's currently displayed progress amount
   4. Adding/removing a contributing transaction changes the query result set and final running total accordingly — proven by handler unit tests per goal type, with no UI or database beyond the `DatabaseTest` base
 
-**Plans**: 3 plans
+**Plans**: 3/3 plans executed
 
 **Wave 1**
 
-- [ ] 49-01-PLAN.md — Tracer: SpendingLimit contributing-transactions slice end-to-end (App DTOs + query + handler, Infra service + reader row methods + calculator default/override, DI, reconciliation harness)
+- [x] 49-01-PLAN.md — Tracer: SpendingLimit contributing-transactions slice end-to-end (App DTOs + query + handler, Infra service + reader row methods + calculator default/override, DI, reconciliation harness)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 49-02-PLAN.md — Reader-backed strategies: IncomeFiat, SaveFiat, ReduceExpenseCategory, SavingsRate (GetIncomeRows, drift-proof aggregates, per-strategy fixtures)
+- [x] 49-02-PLAN.md — Reader-backed strategies: IncomeFiat, SaveFiat, ReduceExpenseCategory, SavingsRate (GetIncomeRows, drift-proof aggregates, per-strategy fixtures)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 49-03-PLAN.md — Direct-DB strategies: StackBitcoin, IncomeBtc, Dca, BitcoinHodl + cross-cutting fixtures (sats-only rows, same-day ordering) + full-suite phase gate
+- [x] 49-03-PLAN.md — Direct-DB strategies: StackBitcoin, IncomeBtc, Dca, BitcoinHodl + cross-cutting fixtures (sats-only rows, same-day ordering) + full-suite phase gate
 
 ### Phase 50: Goal Summary Modal UI
 
@@ -364,7 +364,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 | 46. Cost-Over-Time Schedule | v0.8 | 0/? | Not started | - |
 | 47. Prefill from Existing BTC Loan Asset | v0.8 | 0/? | Not started | - |
 | 48. MCP, Localization, Documentation & Verification | v0.8 | 0/? | Not started | - |
-| 49. Goal Contributing-Transactions Query Backend | v0.9 | 0/? | Not started | - |
+| 49. Goal Contributing-Transactions Query Backend | v0.9 | 3/3 | Complete    | 2026-10-06 |
 | 50. Goal Summary Modal UI | v0.9 | 0/? | Not started | - |
 | 51. MCP, Localization, Documentation & Verification | v0.9 | 0/? | Not started | - |
 

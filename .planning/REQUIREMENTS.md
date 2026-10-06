@@ -11,9 +11,9 @@ Let users see exactly which transactions feed into any goal's total calculation,
 
 - [ ] **GOL-03**: User can right-click any goal entry in the Goals section (Transactions tab) and select "View summary" to open a modal
 - [ ] **GOL-04**: Modal shows a read-only grid of all transactions contributing to the selected goal's total calculation, for every goal type
-- [ ] **GOL-05**: Grid shows per transaction: date, description, account, category, and amount in fiat and sats
-- [ ] **GOL-06**: Grid shows a running total column that accumulates according to the goal's progress calculation
-- [ ] **GOL-07**: Contributing-transaction set is derived from each goal type's progress strategy (App-layer query), so the summary always matches the calculated totals
+- [x] **GOL-05**: Grid shows per transaction: date, description, account, category, and amount in fiat and sats
+- [x] **GOL-06**: Grid shows a running total column that accumulates according to the goal's progress calculation
+- [x] **GOL-07**: Contributing-transaction set is derived from each goal type's progress strategy (App-layer query), so the summary always matches the calculated totals
 - [ ] **GOL-08**: AI assistant can query a goal's contributing transactions via an MCP tool
 - [ ] **GOL-09**: All new user-facing strings are localized (en-US, pt-BR, es)
 - [ ] **GOL-10**: `.claude/docs/goals.md` is updated with the goal summary feature and MCP impact
@@ -129,9 +129,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | GOL-03 | Phase 50 | Pending |
 | GOL-04 | Phase 50 | Pending |
-| GOL-05 | Phase 49 | Pending |
-| GOL-06 | Phase 49 | Pending |
-| GOL-07 | Phase 49 | Pending |
+| GOL-05 | Phase 49 | Complete |
+| GOL-06 | Phase 49 | Complete |
+| GOL-07 | Phase 49 | Complete |
 | GOL-08 | Phase 51 | Pending |
 | GOL-09 | Phase 51 | Pending |
 | GOL-10 | Phase 51 | Pending |

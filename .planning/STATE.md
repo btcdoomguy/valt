@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v0.9
 milestone_name: Goal Transparency — Transaction Breakdown
-current_phase: 49
-current_phase_name: Goal Contributing-Transactions Query Backend
+current_phase: 50
+current_phase_name: Goal Summary Modal UI
 status: planning
-stopped_at: Phase 45 plans created
-last_updated: "2026-10-06T19:26:44.492Z"
+stopped_at: Completed 49-03-PLAN.md
+last_updated: "2026-10-06T20:40:43.088Z"
 last_activity: 2026-10-06
-last_activity_desc: v0.9 roadmap created (Phases 49-51, 8/8 GOL requirements mapped)
+last_activity_desc: Phase 49 complete, transitioned to Phase 50
 progress:
   total_phases: 13
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 0
-  percent: 0
+  completed_plans: 3
+  percent: 8
 ---
 
 # STATE.md
@@ -24,20 +24,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-06)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** v0.9 Goal Transparency — Phase 49: Goal Contributing-Transactions Query Backend
+**Current focus:** Phase 49 — Goal Contributing-Transactions Query Backend
 
 ## Current Position
 
-Phase: 49 — Goal Contributing-Transactions Query Backend (not started)
-Plan: —
-Status: v0.9 roadmap defined; awaiting plan-phase
-Last activity: 2026-10-06 — v0.9 roadmap created (Phases 49-51, 8/8 GOL requirements mapped)
+Phase: 50 — Goal Summary Modal UI
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-10-06 — Phase 49 complete, transitioned to Phase 50
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 11
+- Total plans completed: 14
 - Average duration: 18 min
 - Total execution time: 43 min
 
@@ -58,6 +58,7 @@ Last activity: 2026-10-06 — v0.9 roadmap created (Phases 49-51, 8/8 GOL requir
 | 41 | 1 | - | - |
 | 44 | 1 | - | - |
 | 45 | 2 | - | - |
+| 49 | 3 | - | - |
 
 **Recent Trend:**
 
@@ -140,6 +141,9 @@ Last activity: 2026-10-06 — v0.9 roadmap created (Phases 49-51, 8/8 GOL requir
 | Phase 43 P03 | 5min | 2 tasks | 3 files |
 | Phase 43-mcp-localization-documentation-verification P05 | 0min | 3 tasks | 5 files |
 | Phase 44-core-loan-simulation-calculator P01 | 28min | 3 tasks | 6 files |
+| Phase 49 P01 | 45min | 3 tasks | 15 files |
+| Phase 49 P02 | 25 | 3 tasks | 6 files |
+| Phase 49 P03 | 8min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -186,6 +190,13 @@ Recent decisions affecting current work:
 - [Phase 38-01]: Placed the Settings page in the Guide section after Basic Concepts, matching the onboarding flow that ends in app configuration.
 - [Phase 45]: UI design contract approved — 6/6 checker dimensions passed; state coverage resolved by ui-consideration probe.
 - [Phase 45]: Research, pattern map, validation strategy, and two executable plans created (45-01 and 45-02). Plan-checker skipped per config (`plan_checker_enabled: false`).
+- [Phase ?]: GoalContributionRow made public because IGoalProgressCalculator is public (CS0050); plan internal inventory adjusted
+- [Phase ?]: LiteDB 5.0.21 ObjectId has no TryParse; service uses private 24-hex defensive parser for T-49-01
+- [Phase ?]: RunningTotal accumulates in (Date, Id) order in reader; service re-asserts order after mapping
+- [Phase ?]: [Phase 49-02] SaveFiat/SavingsRate merge tags rows with reader-set origin (isExpense) at concat time — running-total signs never re-evaluate transaction predicates
+- [Phase ?]: [Phase 49-02] Origin-flag merge + with-expression RunningTotal rebuild: GoalContributionRow rows are rebuilt, never mutated, keeping reader Contribution untouched
+- [Phase ?]: BtcValue is a magnitude type — sats-only/debit rows carry SatsAmount as absolute magnitude; sign lives on Contribution/RunningTotal
+- [Phase ?]: Direct-DB calculators resolve main currency from persisted settings collection (CurrencySettings.MainFiatCurrency key, USD default) — stay ILocalDatabase-only
 
 ### Pending Todos
 
@@ -241,9 +252,9 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-08-14T13:41:38.876Z
-Stopped at: Phase 45 plans created
-Resume file: .planning/phases/45-simulator-modal-ui-inputs-results-panel/45-01-PLAN.md
+Last session: 2026-10-06T20:17:36.192Z
+Stopped at: Completed 49-03-PLAN.md
+Resume file: None
 
 ## Notes
 
