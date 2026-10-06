@@ -32,6 +32,14 @@ internal interface IGoalTransactionReader
     IReadOnlyList<GoalContributionRow> GetExpenseRows(DateOnly from, DateOnly to, ObjectId? categoryId = null);
 
     /// <summary>
+    /// Returns the individual fiat income rows in the main fiat currency for the given date range,
+    /// ordered by (Date, Id) ascending, with a cumulative running total of contributions.
+    /// Same selection as <see cref="CalculateTotalIncome"/> — only Fiat-type transactions with
+    /// positive FromFiatAmount; BitcoinToFiat (a transfer) is never included.
+    /// </summary>
+    IReadOnlyList<GoalContributionRow> GetIncomeRows(DateOnly from, DateOnly to);
+
+    /// <summary>
     /// Calculates total fiat income in the main fiat currency for the given date range.
     /// Only includes real fiat income (positive fiat transactions).
     /// Does NOT include BitcoinToFiat (handled by IncomeBtcGoalType).
@@ -102,26 +110,42 @@ internal class GoalTransactionReader : IGoalTransactionReader
         return rows;
     }
 
-    public decimal CalculateTotalIncome(DateOnly from, DateOnly to)
+    public IReadOnlyList<GoalContributionRow> GetIncomeRows(DateOnly from, DateOnly to)
     {
         var context = LoadDataContext(from, to, categoryId: null);
-        var totalIncome = 0m;
+        var rows = new List<GoalContributionRow>();
+        var runningTotal = 0m;
 
-        foreach (var tx in context.Transactions)
+        var ordered = context.Transactions
+            .OrderBy(x => DateOnly.FromDateTime(x.Date.ToUniversalTime()))
+            .ThenBy(x => x.Id);
+
+        foreach (var tx in ordered)
         {
             var txDate = DateOnly.FromDateTime(tx.Date.ToUniversalTime());
 
             // Handle fiat income (positive FromFiatAmount on Fiat type only)
             if (tx.Type == TransactionEntityType.Fiat && tx.FromFiatAmount > 0)
             {
-                var amount = ConvertFiatTransactionAmount(tx, context, txDate, useFromAccount: true, absoluteValue: false);
-                totalIncome += amount;
+                var signedFiatAmount = tx.FromFiatAmount ?? 0;
+                var contribution = ConvertFiatTransactionAmount(tx, context, txDate, useFromAccount: true, absoluteValue: false);
+                var fiatCurrencyCode = GetAccountCurrency(tx.FromAccountId, context);
+                var satsAmount = BtcValue.ParseBitcoin(ConvertFiatToBtc(signedFiatAmount, fiatCurrencyCode, context, txDate));
+                runningTotal += contribution;
+                rows.Add(new GoalContributionRow(tx, signedFiatAmount, fiatCurrencyCode, satsAmount, contribution, runningTotal));
             }
             // NOTE: BitcoinToFiat is NOT counted as fiat income - it's a transfer
             // Bitcoin income is handled by IncomeBtcGoalType separately
         }
 
-        return totalIncome;
+        return rows;
+    }
+
+    public decimal CalculateTotalIncome(DateOnly from, DateOnly to)
+    {
+        // Selection lives in exactly one place (GetIncomeRows), so the aggregate
+        // cannot drift from the row-level path.
+        return GetIncomeRows(from, to).Sum(r => r.Contribution);
     }
 
     private decimal ConvertFiatTransactionAmount(
