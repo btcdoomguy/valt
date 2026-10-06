@@ -6,6 +6,7 @@
 - ✅ **v0.6 Documentation Site Refresh** — Phases 32-38 (shipped 2026-07-17)
 - ✅ **v0.7 Insights & Metrics Expansion** — Phases 39-43 (completed 2026-08-12)
 - 🚧 **v0.8 BTC Loan Simulator** — Phases 44-48 (in progress)
+- 🚧 **v0.9 Goal Transparency — Transaction Breakdown** — Phases 49-51 (roadmap defined 2026-10-06)
 
 ## Phases
 
@@ -48,6 +49,12 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 - [ ] **Phase 46: Cost-Over-Time Schedule** — Monthly schedule rows (fiat + sats) accruing until the end date
 - [ ] **Phase 47: Prefill from Existing BTC Loan Asset** — Load an existing BTC-backed loan from Assets with a New Simulation sentinel
 - [ ] **Phase 48: MCP, Localization, Documentation & Verification** — simulate_btc_loan tool, 3-language strings, module docs, end-to-end sign-off
+
+### 🚧 v0.9 Goal Transparency — Transaction Breakdown (Phases 49-51) — ROADMAP DEFINED 2026-10-06
+
+- [ ] **Phase 49: Goal Contributing-Transactions Query Backend** — App-layer query + DTO deriving each goal type's contributing transactions with running total, per progress strategy
+- [ ] **Phase 50: Goal Summary Modal UI** — "View summary" right-click context menu on all goal entries + read-only transaction grid modal
+- [ ] **Phase 51: MCP, Localization, Documentation & Verification** — Goal contributing-transactions MCP tool, 3-language strings, goals.md docs, end-to-end sign-off
 
 ## Phase Details
 
@@ -278,6 +285,49 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 
 **Plans**: TBD
 
+### Phase 49: Goal Contributing-Transactions Query Backend
+
+**Goal**: An App-layer query exposes exactly which transactions feed any goal's total calculation, with a running total that reconciles with the goal's displayed progress
+**Depends on**: Nothing (first v0.9 phase)
+**Requirements**: GOL-05, GOL-06, GOL-07
+**Success Criteria** (what must be TRUE):
+
+  1. A query in `Valt.App/Modules/Goals/Queries/` returns, for any goal of any type (all current goal progress strategies), the ordered set of transactions contributing to that goal's total calculation
+  2. Each returned row carries date, description, account, category, and amount in fiat and sats (converted at the transaction-date rate, consistent with existing goal progress calculations)
+  3. Each returned row carries a running total accumulated in the same order and semantics as the goal's progress calculation, so the final row's running total exactly reconciles with the goal's currently displayed progress amount
+  4. Adding/removing a contributing transaction changes the query result set and final running total accordingly — proven by handler unit tests per goal type, with no UI or database beyond the `DatabaseTest` base
+
+**Plans**: TBD
+
+### Phase 50: Goal Summary Modal UI
+
+**Goal**: Users can right-click any goal entry and inspect the full transaction breakdown behind its number in a read-only modal
+**Depends on**: Phase 49
+**Requirements**: GOL-03, GOL-04
+**Success Criteria** (what must be TRUE):
+
+  1. User can right-click any goal entry in the Goals section (Transactions tab) — for every goal type — and select "View summary" from the context menu
+  2. A modal opens showing a read-only grid of all transactions contributing to the selected goal's total calculation
+  3. The grid shows per transaction: date, description, account, category, and amount in fiat and sats, plus a running-total column whose final row matches the goal's displayed progress
+  4. Modal follows project conventions: `SystemDecorations="None"` with custom title bar, MinWidth/MinHeight set from design dimensions, localized title, and a graceful empty state when the goal has no contributing transactions
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 51: MCP, Localization, Documentation & Verification
+
+**Goal**: The goal summary feature is AI-accessible, fully localized, documented, and verified end-to-end
+**Depends on**: Phases 49, 50
+**Requirements**: GOL-08, GOL-09, GOL-10
+**Success Criteria** (what must be TRUE):
+
+  1. AI assistant can query a goal's contributing transactions (date, description, account, category, fiat + sats, running total) via a new MCP tool in `GoalTools`, with services forwarded per the MCP impact checklist
+  2. All new user-facing strings (context menu item, modal title, column headers, empty state) are available in English, Portuguese (pt-BR), and Spanish, with `language.Designer.cs` regenerated
+  3. `.claude/docs/goals.md` documents the goal summary feature: the "View summary" flow, the App-layer query and its per-strategy derivation, and the new MCP tool
+  4. Full test suite is green and the feature is verified end-to-end: right-click a goal of each major type, confirm grid contents and final running total match the goal's progress, and confirm the MCP tool returns identical data
+
+**Plans**: TBD
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -302,10 +352,15 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 | 46. Cost-Over-Time Schedule | v0.8 | 0/? | Not started | - |
 | 47. Prefill from Existing BTC Loan Asset | v0.8 | 0/? | Not started | - |
 | 48. MCP, Localization, Documentation & Verification | v0.8 | 0/? | Not started | - |
+| 49. Goal Contributing-Transactions Query Backend | v0.9 | 0/? | Not started | - |
+| 50. Goal Summary Modal UI | v0.9 | 0/? | Not started | - |
+| 51. MCP, Localization, Documentation & Verification | v0.9 | 0/? | Not started | - |
 
-**Total phases:** 20 (15 complete, 5 planned)  
+**Total phases:** 23 (17 complete, 6 planned)  
 **v0.8 plans:** 0/? (roadmap defined 2026-08-13)  
-**v0.8 requirements:** 13/13 mapped (SIM-01..SIM-13)
+**v0.8 requirements:** 13/13 mapped (SIM-01..SIM-13)  
+**v0.9 plans:** 0/? (roadmap defined 2026-10-06)  
+**v0.9 requirements:** 8/8 mapped (GOL-03..GOL-10)
 
 ---
-*Last updated: 2026-08-13 after defining the v0.8 roadmap*
+*Last updated: 2026-10-06 after defining the v0.9 roadmap (Phases 49-51)*

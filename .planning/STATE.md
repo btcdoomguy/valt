@@ -6,7 +6,7 @@ status: planning
 last_updated: "2026-10-06T18:11:59.706Z"
 last_activity: 2026-10-06
 progress:
-  total_phases: 0
+  total_phases: 3
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-06)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 45 — Simulator Modal UI (Inputs + Results Panel)
+**Current focus:** v0.9 Goal Transparency — Phase 49: Goal Contributing-Transactions Query Backend
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 49 — Goal Contributing-Transactions Query Backend (not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-10-06 — Milestone v0.9 started
+Status: v0.9 roadmap defined; awaiting plan-phase
+Last activity: 2026-10-06 — v0.9 roadmap created (Phases 49-51, 8/8 GOL requirements mapped)
 
 ## Performance Metrics
 
@@ -249,9 +249,9 @@ Resume file: .planning/phases/45-simulator-modal-ui-inputs-results-panel/45-01-P
 - v0.7 roadmap defined 2026-08-04: Phases 39-43, 12/12 requirements mapped (SPA-01..03, BTC-01..03, WLT-01..04, LON-01..02).
 - Phase 42 (loans-leverage-reports-ui) is now complete: 4/4 plans finished, gap G-42-2 closed.
 - v0.8 roadmap defined 2026-08-13: Phases 44-48, 13/13 requirements mapped (SIM-01..SIM-13), structure follows research/SUMMARY.md dependency order (engine → UI → schedule → prefill → MCP/localization/docs).
+- v0.9 roadmap defined 2026-10-06: Phases 49-51, 8/8 requirements mapped (GOL-03..GOL-10), following the codebase's core → UI → integration pattern (query backend → summary modal → MCP/localization/docs/verification). Note: v0.8 phases 46-48 remain pending.
 
 ## Operator Next Steps
 
-- v0.8 BTC Loan Simulator roadmap is defined (Phases 44-48).
-- Phase 45 UI-SPEC approved and two executable plans created.
-- Next: run `/gsd-execute-phase 45` to start execution.
+- v0.9 roadmap defined (Phases 49-51). v0.8 phases 46-48 remain pending (SIM-10..SIM-13).
+- Next: run `/gsd-plan-phase 49` to plan the Goal Contributing-Transactions Query Backend.

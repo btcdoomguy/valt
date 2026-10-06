@@ -127,6 +127,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
+| GOL-03 | Phase 50 | Pending |
+| GOL-04 | Phase 50 | Pending |
+| GOL-05 | Phase 49 | Pending |
+| GOL-06 | Phase 49 | Pending |
+| GOL-07 | Phase 49 | Pending |
+| GOL-08 | Phase 51 | Pending |
+| GOL-09 | Phase 51 | Pending |
+| GOL-10 | Phase 51 | Pending |
 | SIM-01 | Phase 45 | Complete |
 | SIM-02 | Phase 45 | Complete |
 | SIM-03 | Phase 44 | Complete |
@@ -155,6 +163,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 **Coverage:**
 
+- v0.9 requirements: 8 total
+- Mapped to phases: 8 (GOL-05/06/07 → Phase 49; GOL-03/04 → Phase 50; GOL-08/09/10 → Phase 51)
+- Unmapped: 0 ✓
 - v0.8 requirements: 13 total
 - Mapped to phases: 13 (SIM-03/04 → Phase 44; SIM-01/02/05–09 → Phase 45; SIM-10 → Phase 46; SIM-11 → Phase 47; SIM-12/13 → Phase 48)
 - Unmapped: 0 ✓
@@ -162,4 +173,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-08-04*
-*Last updated: 2026-08-13 after v0.8 roadmap creation*
+*Last updated: 2026-10-06 after v0.9 roadmap creation*
