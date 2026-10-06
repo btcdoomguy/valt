@@ -36,6 +36,88 @@ public class GetGoalContributingTransactionsHandlerTests : DatabaseTest
     }
 
     [Test]
+    public async Task StackBitcoin_FourBuckets_NetSats_Reconcile()
+    {
+        // Arrange: one transaction of each StackBitcoin bucket in period
+        var goalId = await SeedGoal(GoalBuilder.AStackBitcoinGoal(1_000_000), new DateOnly(2024, 6, 15));
+        var btcAccount = SeedBtcAccount();
+        var fiatAccount = SeedUsdAccount();
+        var btcAccountId = new AccountId(btcAccount.Id.ToString());
+        var fiatAccountId = new AccountId(fiatAccount.Id.ToString());
+
+        SeedTransaction(TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 5)).WithName("Purchase")
+            .AsBitcoinPurchase(fiatAccountId, btcAccountId, 100_000, 500m));
+        SeedTransaction(TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 10)).WithName("BTC income")
+            .AsBitcoinIncome(btcAccountId, 50_000));
+        SeedTransaction(TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 15)).WithName("Sale")
+            .AsBitcoinSale(btcAccountId, fiatAccountId, 30_000, 150m));
+        SeedTransaction(TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 20)).WithName("BTC spend")
+            .AsBitcoinExpense(btcAccountId, 20_000));
+
+        var entity = _localDatabase.GetGoals().FindAll().Single();
+        var calculator = new StackBitcoinProgressCalculator(_localDatabase);
+        var progress = await calculator.CalculateProgressAsync(
+            NewInput(GoalTypeNames.StackBitcoin, entity.GoalTypeJson));
+        var calculatedSats = ((StackBitcoinGoalType)progress.UpdatedGoalType).CalculatedSats;
+
+        // Act
+        var rows = await Dispatch(goalId);
+
+        // Assert: four rows in date order with natural signs; final net sats reconcile
+        Assert.That(rows, Has.Count.EqualTo(4));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows.Select(r => r.Description),
+                Is.EqualTo(new[] { "Purchase", "BTC income", "Sale", "BTC spend" }));
+            Assert.That(rows.Select(r => r.RunningTotal),
+                Is.EqualTo(new[] { 100_000m, 150_000m, 120_000m, 100_000m }));
+            Assert.That(rows[3].RunningTotal, Is.EqualTo(calculatedSats));
+        });
+    }
+
+    [Test]
+    public async Task IncomeBtc_NativeSats_Reconciles()
+    {
+        // Arrange: two direct bitcoin incomes on distinct days
+        var goalId = await SeedGoal(
+            GoalBuilder.AGoal().WithGoalType(new IncomeBtcGoalType(1_000_000)), new DateOnly(2024, 6, 15));
+        var btcAccount = SeedBtcAccount();
+        var btcAccountId = new AccountId(btcAccount.Id.ToString());
+
+        SeedTransaction(TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 10)).WithName("Mining reward")
+            .AsBitcoinIncome(btcAccountId, 100_000));
+        SeedTransaction(TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 20)).WithName("BTC paycheck")
+            .AsBitcoinIncome(btcAccountId, 50_000));
+
+        var entity = _localDatabase.GetGoals().FindAll().Single();
+        var calculator = new IncomeBtcProgressCalculator(_localDatabase);
+        var progress = await calculator.CalculateProgressAsync(
+            NewInput(GoalTypeNames.IncomeBtc, entity.GoalTypeJson));
+        var calculatedSats = ((IncomeBtcGoalType)progress.UpdatedGoalType).CalculatedSats;
+
+        // Act
+        var rows = await Dispatch(goalId);
+
+        // Assert: native sats carried exactly; cumulative running total reconciles
+        Assert.That(rows, Has.Count.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows[0].Description, Is.EqualTo("Mining reward"));
+            Assert.That(rows[1].Description, Is.EqualTo("BTC paycheck"));
+            Assert.That(rows[0].SatsAmount.Sats, Is.EqualTo(100_000));
+            Assert.That(rows[1].SatsAmount.Sats, Is.EqualTo(50_000));
+            Assert.That(rows.Select(r => r.RunningTotal), Is.EqualTo(new[] { 100_000m, 150_000m }));
+            Assert.That(rows[1].RunningTotal, Is.EqualTo(calculatedSats));
+        });
+    }
+
+    [Test]
     public async Task SpendingLimit_Reconciles()
     {
         // Arrange
@@ -587,6 +669,22 @@ public class GetGoalContributingTransactionsHandlerTests : DatabaseTest
             .Build();
         _localDatabase.GetAccounts().Insert(account);
         return account;
+    }
+
+    private AccountEntity SeedBtcAccount(string name = "Savings BTC")
+    {
+        var account = BtcAccountBuilder.AnAccount()
+            .WithName(name)
+            .Build();
+        _localDatabase.GetAccounts().Insert(account);
+        return account;
+    }
+
+    private TransactionEntity SeedTransaction(TransactionBuilder builder)
+    {
+        var transaction = builder.Build();
+        _localDatabase.GetTransactions().Insert(transaction);
+        return transaction;
     }
 
     private void SeedPrices(DateOnly from, DateOnly to, decimal btcPriceUsd, params (string CurrencyCode, decimal Price)[] fiatRates)
