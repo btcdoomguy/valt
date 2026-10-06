@@ -85,12 +85,15 @@ internal class BitcoinHodlProgressCalculator : IGoalProgressCalculator
             var soldSats = Math.Abs(tx.FromSatAmount.Value);
             var contribution = (decimal)soldSats;
             runningTotal += contribution;
+            // The entity mapping persists the sale's fiat leg on the "to" side
+            // (ToFiatAmount/ToAccountId) — FromFiatAmount is always null for BitcoinToFiat,
+            // so reading it would fabricate a zero-fiat row in the wrong currency.
             // BtcValue is a magnitude type (negative sats are rejected), so SatsAmount carries
             // the sold magnitude — the debit nature is expressed by the strategy itself.
             rows.Add(new GoalContributionRow(
                 tx,
-                tx.FromFiatAmount ?? 0m,
-                GoalContributingTransactionsCurrency.ResolveFromAccountCurrency(tx, accounts, mainCurrencyCode),
+                tx.ToFiatAmount ?? 0m,
+                GoalContributingTransactionsCurrency.ResolveAccountCurrency(tx.ToAccountId, accounts, mainCurrencyCode),
                 BtcValue.ParseSats(soldSats),
                 contribution,
                 runningTotal));

@@ -32,7 +32,20 @@ internal static class GoalContributingTransactionsCurrency
         IReadOnlyDictionary<ObjectId, AccountEntity> accounts,
         string mainFiatCurrencyCode)
     {
-        return accounts.TryGetValue(transaction.FromAccountId, out var account)
+        return ResolveAccountCurrency(transaction.FromAccountId, accounts, mainFiatCurrencyCode);
+    }
+
+    /// <summary>
+    /// Resolves the fiat currency code through the given (fiat-leg) account id, falling back
+    /// to the main fiat currency when the account row or its currency is missing
+    /// (Q3 decision: unresolved fiat legs carry the main currency).
+    /// </summary>
+    public static string ResolveAccountCurrency(
+        ObjectId? accountId,
+        IReadOnlyDictionary<ObjectId, AccountEntity> accounts,
+        string mainFiatCurrencyCode)
+    {
+        return accountId is not null && accounts.TryGetValue(accountId, out var account)
             ? account.Currency ?? mainFiatCurrencyCode
             : mainFiatCurrencyCode;
     }

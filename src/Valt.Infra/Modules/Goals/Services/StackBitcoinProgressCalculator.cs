@@ -102,12 +102,18 @@ internal class StackBitcoinProgressCalculator : IGoalProgressCalculator
             if (signedSats is null)
                 continue;
 
-            // Transfers with a fiat leg carry it (from-account currency); direct-Bitcoin
-            // rows are sats-only: zero fiat, main currency (Q3 decision).
+            // Transfers with a fiat leg carry it: purchases (FiatToBitcoin) persist the fiat
+            // leg on the "from" side, sales (BitcoinToFiat) on the "to" side (their
+            // FromFiatAmount is always null) — resolve currency against the fiat-leg account.
+            // Direct-Bitcoin rows are sats-only: zero fiat, main currency (Q3 decision).
             var hasFiatLeg = tx.Type is TransactionEntityType.FiatToBitcoin or TransactionEntityType.BitcoinToFiat;
-            var signedFiatAmount = hasFiatLeg ? (tx.FromFiatAmount ?? 0m) : 0m;
+            var isSale = tx.Type == TransactionEntityType.BitcoinToFiat;
+            var fiatAccountId = isSale ? tx.ToAccountId : tx.FromAccountId;
+            var signedFiatAmount = hasFiatLeg
+                ? (isSale ? tx.ToFiatAmount ?? 0m : tx.FromFiatAmount ?? 0m)
+                : 0m;
             var fiatCurrencyCode = hasFiatLeg
-                ? GoalContributingTransactionsCurrency.ResolveFromAccountCurrency(tx, accounts, mainCurrencyCode)
+                ? GoalContributingTransactionsCurrency.ResolveAccountCurrency(fiatAccountId, accounts, mainCurrencyCode)
                 : mainCurrencyCode;
 
             var contribution = (decimal)signedSats.Value;

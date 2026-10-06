@@ -221,7 +221,9 @@ public class GetGoalContributingTransactionsHandlerTests : DatabaseTest
         // Act
         var result = await _handler.HandleAsync(new GetGoalContributingTransactionsQuery { GoalId = goalId });
 
-        // Assert: Supported (never NotSupported — ninth transaction-based type), sold sats reconcile
+        // Assert: Supported (never NotSupported — ninth transaction-based type), sold sats reconcile.
+        // The sale's fiat leg lives on the "to" side (ToFiatAmount/ToAccountId) — the row must
+        // report the actual fiat proceeds (200 USD), not a fabricated zero in the main currency.
         Assert.That(result.IsSuccess, Is.True);
         Assert.That(result.Value, Is.TypeOf<GoalContributingTransactionsResult.Supported>());
         var rows = ((GoalContributingTransactionsResult.Supported)result.Value!).Rows;
@@ -232,6 +234,8 @@ public class GetGoalContributingTransactionsHandlerTests : DatabaseTest
             Assert.That(rows[0].RunningTotal, Is.EqualTo(40_000m));
             Assert.That(rows[0].RunningTotal, Is.EqualTo(calculatedSoldSats));
             Assert.That(rows[0].SatsAmount.Sats, Is.EqualTo(40_000));
+            Assert.That(rows[0].FiatAmount.Value, Is.EqualTo(200m));
+            Assert.That(rows[0].FiatCurrencyCode, Is.EqualTo("USD"));
         });
     }
 
@@ -267,7 +271,9 @@ public class GetGoalContributingTransactionsHandlerTests : DatabaseTest
         // Act
         var rows = await Dispatch(goalId);
 
-        // Assert: four rows in date order with natural signs; final net sats reconcile
+        // Assert: four rows in date order with natural signs; final net sats reconcile.
+        // The sale's fiat leg lives on the "to" side (ToFiatAmount/ToAccountId) — its row must
+        // report the actual fiat proceeds (150 USD), not a fabricated zero in the main currency.
         Assert.That(rows, Has.Count.EqualTo(4));
         Assert.Multiple(() =>
         {
@@ -276,6 +282,10 @@ public class GetGoalContributingTransactionsHandlerTests : DatabaseTest
             Assert.That(rows.Select(r => r.RunningTotal),
                 Is.EqualTo(new[] { 100_000m, 150_000m, 120_000m, 100_000m }));
             Assert.That(rows[3].RunningTotal, Is.EqualTo(calculatedSats));
+            Assert.That(rows[0].FiatAmount.Value, Is.EqualTo(500m));
+            Assert.That(rows[0].FiatCurrencyCode, Is.EqualTo("USD"));
+            Assert.That(rows[2].FiatAmount.Value, Is.EqualTo(150m));
+            Assert.That(rows[2].FiatCurrencyCode, Is.EqualTo("USD"));
         });
     }
 
