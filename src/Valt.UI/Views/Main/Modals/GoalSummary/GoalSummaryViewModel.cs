@@ -56,7 +56,7 @@ public partial class GoalSummaryViewModel : ValtModalViewModel
             RunningTotalFormatted = "500.00 USD",
             IsContributionPositive = true,
             IsContributionNegative = false,
-            ContributionForeground = null
+            ContributionForeground = ResolveBrush("SemanticPositive200Brush")
         });
 
         Rows.Add(new RowItemViewModel
@@ -70,7 +70,7 @@ public partial class GoalSummaryViewModel : ValtModalViewModel
             RunningTotalFormatted = "250 000",
             IsContributionPositive = false,
             IsContributionNegative = true,
-            ContributionForeground = null
+            ContributionForeground = ResolveBrush("SemanticNegative200Brush")
         });
     }
 
