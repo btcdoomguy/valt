@@ -14,9 +14,9 @@ Let users see exactly which transactions feed into any goal's total calculation,
 - [x] **GOL-05**: Grid shows per transaction: date, description, account, category, and amount in fiat and sats
 - [x] **GOL-06**: Grid shows a running total column that accumulates according to the goal's progress calculation
 - [x] **GOL-07**: Contributing-transaction set is derived from each goal type's progress strategy (App-layer query), so the summary always matches the calculated totals
-- [ ] **GOL-08**: AI assistant can query a goal's contributing transactions via an MCP tool
-- [ ] **GOL-09**: All new user-facing strings are localized (en-US, pt-BR, es)
-- [ ] **GOL-10**: `.claude/docs/goals.md` is updated with the goal summary feature and MCP impact
+- [x] **GOL-08**: AI assistant can query a goal's contributing transactions via an MCP tool
+- [x] **GOL-09**: All new user-facing strings are localized (en-US, pt-BR, es)
+- [x] **GOL-10**: `.claude/docs/goals.md` is updated with the goal summary feature and MCP impact
 
 ## v0.8 Requirements (BTC Loan Simulator)
 
@@ -132,9 +132,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | GOL-05 | Phase 49 | Complete |
 | GOL-06 | Phase 49 | Complete |
 | GOL-07 | Phase 49 | Complete |
-| GOL-08 | Phase 51 | Pending |
-| GOL-09 | Phase 51 | Pending |
-| GOL-10 | Phase 51 | Pending |
+| GOL-08 | Phase 51 | Complete |
+| GOL-09 | Phase 51 | Complete |
+| GOL-10 | Phase 51 | Complete |
 | SIM-01 | Phase 45 | Complete |
 | SIM-02 | Phase 45 | Complete |
 | SIM-03 | Phase 44 | Complete |

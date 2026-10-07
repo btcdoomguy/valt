@@ -4,17 +4,17 @@ milestone: v0.9
 milestone_name: Goal Transparency — Transaction Breakdown
 current_phase: 51
 current_phase_name: MCP, Localization, Documentation & Verification
-status: executing
-stopped_at: Completed 50-03-PLAN.md
-last_updated: "2026-10-07T13:13:33.435Z"
-last_activity: 2026-10-06
-last_activity_desc: Phase 50 complete, transitioned to Phase 51
+status: complete
+stopped_at: Completed 51-05-PLAN.md (human end-to-end sign-off approved — Phase 51 ready for milestone verification)
+last_updated: "2026-10-07T14:05:00.000Z"
+last_activity: 2026-10-07
+last_activity_desc: Phase 51 plan 51-05 complete (phase gate verified)
 progress:
   total_phases: 13
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 11
-  completed_plans: 6
-  percent: 15
+  completed_plans: 11
+  percent: 17
 ---
 
 # STATE.md
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-06)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 50 — Goal Summary Modal UI
+**Current focus:** Phase 51 — MCP, Localization, Documentation & Verification
 
 ## Current Position
 
-Phase: 51 — MCP, Localization, Documentation & Verification
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-10-06 — Phase 50 complete, transitioned to Phase 51
+Phase: 51 (MCP, Localization, Documentation & Verification) — COMPLETE
+Plan: 5 of 5
+Status: All plans done — phase gate verified, ready for milestone verification
+Last activity: 2026-10-07 — Phase 51 plan 51-05 complete
 
 ## Performance Metrics
 
@@ -148,6 +148,11 @@ Last activity: 2026-10-06 — Phase 50 complete, transitioned to Phase 51
 | Phase 50 P01 | 25min | 3 tasks | 10 files |
 | Phase 50 P02 | 15 | 2 tasks | 1 files |
 | Phase 50 P03 | 25min | 2 tasks | 2 files |
+| Phase 51 P01 | 15m | 2 tasks | 1 files |
+| Phase 51 P02 | 10 minutes | 2 tasks | 2 files |
+| Phase 51 P03 | 10 min | 2 tasks | 1 files |
+| Phase 51 P04 | 5 min | 1 tasks | 1 files |
+| Phase 51 P05 | 10 min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -208,6 +213,10 @@ Recent decisions affecting current work:
 - [Phase 50-02]: Human visual sign-off approved for all 8 checkpoint steps (2026-10-06): populated grid, empty state, NetWorthBtc menu absence, 720px truncation backstop, semantic colors, secure-mode disable, Escape/Close dismissal
 - [Phase ?]: 50-03: test-only plan skipped RED/GREEN ceremony — production surface pre-exists from 50-01/50-02; committed green as test(50-03)
 - [Phase ?]: 50-03: failure-path catch widened to InvalidOperationException — ValtMessageBox Window ctor throws IWindowingPlatform error headlessly
+- [Phase ?]: 51-01: NotSupported maps GoalType from actual TypeId enum name, not hardcoded string
+- [Phase ?]: [Phase 51-03]: Skipped TDD RED/GREEN — MCP tool production surface pre-exists from 51-01; committed green as test(51-03) per 50-03 precedent
+- [Phase ?]: Documented GoalSummary modal chrome as WindowDecorations=None (Avalonia 11 actual) instead of plan's SystemDecorations=None — code is spec
+- [Phase 51-05]: Human end-to-end sign-off approved (2026-10-07): goal summary grid + running total match goal progress per type; empty state and Close/Escape confirmed; NetWorthBtc hidden; MCP parity with typed Supported=false contract; pt-BR/es render without truncation — Phase 51 gate closed, GOL-08/09/10 complete
 
 ### Pending Todos
 
@@ -263,8 +272,8 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-10-06
-Stopped at: Phase 50 complete (verification passed 27/27, human visual sign-off approved), ready to plan Phase 51 — MCP, Localization, Documentation & Verification
+Last session: 2026-10-07T14:05:00.000Z
+Stopped at: Completed 51-05-PLAN.md — Phase 51 complete, ready for milestone verification
 Resume file: None
 Resume file: None
 
