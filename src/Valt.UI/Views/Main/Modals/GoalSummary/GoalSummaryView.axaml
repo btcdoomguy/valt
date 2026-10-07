@@ -71,6 +71,8 @@
 
                 <DataGrid Grid.Row="1"
                           GridLinesVisibility="All"
+                          BorderBrush="{DynamicResource Background500Brush}"
+                          BorderThickness="1"
                           ItemsSource="{Binding Rows}"
                           CanUserResizeColumns="True"
                           IsReadOnly="True"
