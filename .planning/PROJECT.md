@@ -68,6 +68,8 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - ✓ **GOL-05**: Contributing-transaction rows carry date, description, account, category, and amount in fiat and sats — v0.9 (Phase 49)
 - ✓ **GOL-06**: Rows carry a running total accumulated per the goal's progress calculation, reconciling exactly with displayed progress — v0.9 (Phase 49)
 - ✓ **GOL-07**: Contributing-transaction set is derived from each goal type's progress strategy (App-layer query) — v0.9 (Phase 49)
+- ✓ **GOL-03**: "View summary" right-click context menu on goal entries opens the Goal Summary modal (hidden for NetWorthBtc, disabled in secure mode) — v0.9 (Phase 50)
+- ✓ **GOL-04**: Modal shows a read-only grid of all contributing transactions with fiat + sats amounts and reconciling running total — v0.9 (Phase 50)
 
 ### Active
 
@@ -80,7 +82,6 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - [ ] v0.7 Insights & Metrics Expansion — interest/fees paid (total + monthly), liquidation-price distance trend
 - [ ] v0.8 BTC Loan Simulator — cost-over-time schedule until end date
 - [ ] v0.8 BTC Loan Simulator — load existing BTC-backed loan from Assets to prefill fields
-- [ ] v0.9 Goal Transparency — "View summary" right-click menu on all goal entries opening a modal with the contributing transactions grid (date, description, account, category, fiat + sats amounts, running total)
 - [ ] v0.9 Goal Transparency — MCP tool to query contributing transactions per goal
 - [ ] v0.9 Goal Transparency — localization of all new strings in en, pt-BR, es
 
@@ -103,6 +104,7 @@ Users can see their entire financial picture — cash flow, investments, and loa
 
 - **Phase 45 complete** — BTC Loan Simulator modal UI with inputs/results panels, live recalculation, fiat/sats formatting, liquidation price, effective APR, and distance-to-liquidation color coding.
 - **Phase 49 complete** — `GetGoalContributingTransactionsQuery` backend: 9 transaction-based goal strategies expose their contributing transactions with reconciling running totals (only `NetWorthBtc` unsupported); 1804 tests green; code review findings CR-01/WR-01/WR-02 fixed.
+- **Phase 50 complete** — Goal Summary modal UI: "View summary" context menu (allow-list gating, secure-mode disable), chromeless resizable modal with 7-column read-only grid, per-unit running-total formatting, header strip with focal reconciled total; human visual sign-off approved; 1818 tests green.
 
 ## Current Milestone: v0.9 Goal Transparency — Transaction Breakdown
 
@@ -164,6 +166,7 @@ Valt uses a layered architecture: Valt.Core (domain), Valt.App (CQRS), Valt.Infr
 | Extend `IGoalProgressCalculator` with `GetContributingTransactionsAsync` returning per-strategy rows; aggregates re-derived as row sums | Selection logic stays in one place per strategy and cannot drift from the progress math — Phase 49 |
 | `BitcoinHodl` is transaction-based (progress sums `BitcoinToFiat` sale fiat-leg) — included as 9th supported type; only `NetWorthBtc` is `NotSupported` | Code-verified correction of the smart-discuss assumption; user-confirmed | Sale rows read `ToFiatAmount`/`ToAccountId` (production mapping nulls `FromFiatAmount`) — Phase 49 |
 | Amount fields on `ContributingTransactionRow` are non-negative magnitudes; sign lives only in `Contribution`/`RunningTotal` | `BtcValue` core invariant rejects negative sats; magnitude contract matches all existing assertions | `FiatAmount`/`SatsAmount` absolute; sign on Contribution and RunningTotal deltas — Phase 49 |
+| Query awaited before modal opens; `CanViewSummary` is an allow-list of the 9 supported goal-type DTOs | Modal opens fully populated (no loading chrome); a future goal type can't silently fall into a misleading empty state | `ViewSummaryCommand` no-ops on `NotSupported`; NetWorthBtc hidden via allow-list — Phase 50 |
 
 ## Evolution
 
@@ -183,4 +186,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-10-06 after Phase 49 complete*
+*Last updated: 2026-10-06 after Phase 50 complete*

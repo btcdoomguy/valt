@@ -53,7 +53,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 ### 🚧 v0.9 Goal Transparency — Transaction Breakdown (Phases 49-51) — ROADMAP DEFINED 2026-10-06
 
 - [x] **Phase 49: Goal Contributing-Transactions Query Backend** — App-layer query + DTO deriving each goal type's contributing transactions with running total, per progress strategy (completed 2026-10-06)
-- [ ] **Phase 50: Goal Summary Modal UI** — "View summary" right-click context menu on all goal entries + read-only transaction grid modal
+- [x] **Phase 50: Goal Summary Modal UI** — "View summary" right-click context menu on all goal entries + read-only transaction grid modal (completed 2026-10-06)
 - [ ] **Phase 51: MCP, Localization, Documentation & Verification** — Goal contributing-transactions MCP tool, 3-language strings, goals.md docs, end-to-end sign-off
 
 ## Phase Details
@@ -323,7 +323,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
   3. The grid shows per transaction: date, description, account, category, and amount in fiat and sats, plus a running-total column whose final row matches the goal's displayed progress
   4. Modal follows project conventions: `SystemDecorations="None"` with custom title bar, MinWidth/MinHeight set from design dimensions, localized title, and a graceful empty state when the goal has no contributing transactions
 
-**Plans**: 2/3 plans executed
+**Plans**: 3/3 plans executed
 
 **Wave 1**
 
@@ -332,7 +332,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 50-03-PLAN.md — ViewSummary/CanViewSummary/SummaryStrategyUnit tests + GoalSummaryViewModel projection tests + full-suite phase gate
+- [x] 50-03-PLAN.md — ViewSummary/CanViewSummary/SummaryStrategyUnit tests + GoalSummaryViewModel projection tests + full-suite phase gate
 
 **UI hint**: yes
 
@@ -375,7 +375,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 | 47. Prefill from Existing BTC Loan Asset | v0.8 | 0/? | Not started | - |
 | 48. MCP, Localization, Documentation & Verification | v0.8 | 0/? | Not started | - |
 | 49. Goal Contributing-Transactions Query Backend | v0.9 | 3/3 | Complete    | 2026-10-06 |
-| 50. Goal Summary Modal UI | v0.9 | 2/3 | In Progress|  |
+| 50. Goal Summary Modal UI | v0.9 | 3/3 | Complete    | 2026-10-06 |
 | 51. MCP, Localization, Documentation & Verification | v0.9 | 0/? | Not started | - |
 
 **Total phases:** 23 (17 complete, 6 planned)  
