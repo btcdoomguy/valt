@@ -627,7 +627,7 @@ public class GoalsPanelViewModelTests : DatabaseTest
                 r.PeriodLabel == "(01/25)" &&
                 r.MainCurrencyCode == _currencySettings.MainFiatCurrency &&
                 ReferenceEquals(r.Result, supportedResult) &&
-                r.StrategyUnit == GoalSummaryViewModel.GoalSummaryStrategyUnit.Sats));
+                r.StrategyUnit == GoalStrategyUnit.Sats));
     }
 
     [Test]
@@ -675,12 +675,12 @@ public class GoalsPanelViewModelTests : DatabaseTest
         var savingsRate = new GoalEntryViewModel(CreateSavingsRateGoalDTO("4", GoalPeriods.Monthly, new DateOnly(2025, 1, 1)), _currencySettings.MainFiatCurrency);
 
         // Act & Assert
-        Assert.That(stackBitcoin.SummaryStrategyUnit, Is.EqualTo(GoalSummaryViewModel.GoalSummaryStrategyUnit.Sats));
-        Assert.That(incomeBtc.SummaryStrategyUnit, Is.EqualTo(GoalSummaryViewModel.GoalSummaryStrategyUnit.Sats));
-        Assert.That(bitcoinHodl.SummaryStrategyUnit, Is.EqualTo(GoalSummaryViewModel.GoalSummaryStrategyUnit.Sats));
-        Assert.That(spendingLimit.SummaryStrategyUnit, Is.EqualTo(GoalSummaryViewModel.GoalSummaryStrategyUnit.Fiat));
-        Assert.That(dca.SummaryStrategyUnit, Is.EqualTo(GoalSummaryViewModel.GoalSummaryStrategyUnit.Count));
-        Assert.That(savingsRate.SummaryStrategyUnit, Is.EqualTo(GoalSummaryViewModel.GoalSummaryStrategyUnit.Percentage));
+        Assert.That(stackBitcoin.SummaryStrategyUnit, Is.EqualTo(GoalStrategyUnit.Sats));
+        Assert.That(incomeBtc.SummaryStrategyUnit, Is.EqualTo(GoalStrategyUnit.Sats));
+        Assert.That(bitcoinHodl.SummaryStrategyUnit, Is.EqualTo(GoalStrategyUnit.Sats));
+        Assert.That(spendingLimit.SummaryStrategyUnit, Is.EqualTo(GoalStrategyUnit.Fiat));
+        Assert.That(dca.SummaryStrategyUnit, Is.EqualTo(GoalStrategyUnit.Count));
+        Assert.That(savingsRate.SummaryStrategyUnit, Is.EqualTo(GoalStrategyUnit.Percentage));
     }
 
     #endregion

@@ -3,6 +3,7 @@ using Valt.Core.Common;
 using Valt.Infra.Kernel;
 using Valt.UI.Lang;
 using Valt.UI.Views.Main.Modals.GoalSummary;
+using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
 namespace Valt.Tests.UI.Screens;
 
@@ -10,7 +11,7 @@ namespace Valt.Tests.UI.Screens;
 public class GoalSummaryViewModelTests
 {
     private static GoalSummaryViewModel.Request CreateRequest(
-        GoalSummaryViewModel.GoalSummaryStrategyUnit unit,
+        GoalStrategyUnit unit,
         params ContributingTransactionRow[] rows)
     {
         return new GoalSummaryViewModel.Request
@@ -56,7 +57,7 @@ public class GoalSummaryViewModelTests
     {
         // Arrange
         var request = CreateRequest(
-            GoalSummaryViewModel.GoalSummaryStrategyUnit.Fiat,
+            GoalStrategyUnit.Fiat,
             CreateRow(100m, 0, 100m),
             CreateRow(150m, 0, 250m, date: new DateOnly(2025, 1, 2)));
 
@@ -80,7 +81,7 @@ public class GoalSummaryViewModelTests
     {
         // Arrange
         var request = CreateRequest(
-            GoalSummaryViewModel.GoalSummaryStrategyUnit.Sats,
+            GoalStrategyUnit.Sats,
             CreateRow(0m, 5000, 5000m),
             CreateRow(0m, 0, 3000m, date: new DateOnly(2025, 1, 2)));
 
@@ -101,7 +102,7 @@ public class GoalSummaryViewModelTests
     {
         // Arrange
         var request = CreateRequest(
-            GoalSummaryViewModel.GoalSummaryStrategyUnit.Count,
+            GoalStrategyUnit.Count,
             CreateRow(0m, 0, 1m),
             CreateRow(0m, 0, 2m, date: new DateOnly(2025, 1, 2)));
 
@@ -118,7 +119,7 @@ public class GoalSummaryViewModelTests
     {
         // Arrange
         var request = CreateRequest(
-            GoalSummaryViewModel.GoalSummaryStrategyUnit.Percentage,
+            GoalStrategyUnit.Percentage,
             CreateRow(0m, 0, 25.5m));
 
         // Act
@@ -134,7 +135,7 @@ public class GoalSummaryViewModelTests
     {
         // Arrange
         var request = CreateRequest(
-            GoalSummaryViewModel.GoalSummaryStrategyUnit.Sats,
+            GoalStrategyUnit.Sats,
             CreateRow(0m, 5000, 5000m));
 
         // Act
@@ -150,7 +151,7 @@ public class GoalSummaryViewModelTests
     {
         // Arrange
         var request = CreateRequest(
-            GoalSummaryViewModel.GoalSummaryStrategyUnit.Fiat,
+            GoalStrategyUnit.Fiat,
             CreateRow(100m, 0, 100m));
 
         // Act
@@ -165,7 +166,7 @@ public class GoalSummaryViewModelTests
     public async Task SupportedWithEmptyRows_HasNoRowsAndLeavesFinalTotalEmpty()
     {
         // Arrange
-        var request = CreateRequest(GoalSummaryViewModel.GoalSummaryStrategyUnit.Fiat);
+        var request = CreateRequest(GoalStrategyUnit.Fiat);
 
         // Act
         var vm = await BindAsync(request);

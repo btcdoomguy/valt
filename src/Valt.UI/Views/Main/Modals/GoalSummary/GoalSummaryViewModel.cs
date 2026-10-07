@@ -12,19 +12,12 @@ using Valt.App.Modules.Goals.DTOs;
 using Valt.Infra.Kernel;
 using Valt.UI.Base;
 using Valt.UI.Lang;
+using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
 namespace Valt.UI.Views.Main.Modals.GoalSummary;
 
 public partial class GoalSummaryViewModel : ValtModalViewModel
 {
-    public enum GoalSummaryStrategyUnit
-    {
-        Fiat,
-        Sats,
-        Count,
-        Percentage
-    }
-
     [ObservableProperty] private string _windowTitle = language.GoalSummary_Title;
     [ObservableProperty] private string _goalName = string.Empty;
     [ObservableProperty] private string _periodLabel = string.Empty;
@@ -130,14 +123,14 @@ public partial class GoalSummaryViewModel : ValtModalViewModel
         return Task.CompletedTask;
     }
 
-    private static string FormatRunningTotal(decimal value, GoalSummaryStrategyUnit unit, string mainCurrencyCode)
+    private static string FormatRunningTotal(decimal value, GoalStrategyUnit unit, string mainCurrencyCode)
     {
         return unit switch
         {
-            GoalSummaryStrategyUnit.Fiat => CurrencyDisplay.FormatFiat(value, mainCurrencyCode),
-            GoalSummaryStrategyUnit.Sats => CurrencyDisplay.FormatSatsAsNumber((long)value),
-            GoalSummaryStrategyUnit.Count => string.Format("{0:N0}", value),
-            GoalSummaryStrategyUnit.Percentage => string.Format("{0:N1}%", value),
+            GoalStrategyUnit.Fiat => CurrencyDisplay.FormatFiat(value, mainCurrencyCode),
+            GoalStrategyUnit.Sats => CurrencyDisplay.FormatSatsAsNumber((long)value),
+            GoalStrategyUnit.Count => string.Format("{0:N0}", value),
+            GoalStrategyUnit.Percentage => string.Format("{0:N1}%", value),
             _ => string.Empty
         };
     }
@@ -164,7 +157,7 @@ public partial class GoalSummaryViewModel : ValtModalViewModel
         public required string PeriodLabel { get; init; }
         public required string MainCurrencyCode { get; init; }
         public required GoalContributingTransactionsResult Result { get; init; }
-        public required GoalSummaryStrategyUnit StrategyUnit { get; init; }
+        public required GoalStrategyUnit StrategyUnit { get; init; }
     }
 
     public record Response

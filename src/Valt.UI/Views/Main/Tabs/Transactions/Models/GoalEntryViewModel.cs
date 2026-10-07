@@ -6,7 +6,6 @@ using Valt.App.Modules.Goals.DTOs;
 using Valt.Core.Modules.Goals;
 using Valt.Infra.Kernel;
 using Valt.UI.Lang;
-using Valt.UI.Views.Main.Modals.GoalSummary;
 
 namespace Valt.UI.Views.Main.Tabs.Transactions.Models;
 
@@ -202,13 +201,13 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
         SaveFiatGoalTypeOutputDTO or IncomeFiatGoalTypeOutputDTO or
         ReduceExpenseCategoryGoalTypeOutputDTO;
 
-    public GoalSummaryViewModel.GoalSummaryStrategyUnit SummaryStrategyUnit => _goal.GoalType switch
+    public GoalStrategyUnit SummaryStrategyUnit => _goal.GoalType switch
     {
         StackBitcoinGoalTypeOutputDTO or IncomeBtcGoalTypeOutputDTO or BitcoinHodlGoalTypeOutputDTO =>
-            GoalSummaryViewModel.GoalSummaryStrategyUnit.Sats,
-        DcaGoalTypeOutputDTO => GoalSummaryViewModel.GoalSummaryStrategyUnit.Count,
-        SavingsRateGoalTypeOutputDTO => GoalSummaryViewModel.GoalSummaryStrategyUnit.Percentage,
-        _ => GoalSummaryViewModel.GoalSummaryStrategyUnit.Fiat // NetWorthBtc falls here but is unreachable (menu hidden)
+            GoalStrategyUnit.Sats,
+        DcaGoalTypeOutputDTO => GoalStrategyUnit.Count,
+        SavingsRateGoalTypeOutputDTO => GoalStrategyUnit.Percentage,
+        _ => GoalStrategyUnit.Fiat // NetWorthBtc falls here but is unreachable (menu hidden)
     };
 
     // Show progress bar only for Open state (not for Completed or Failed)
