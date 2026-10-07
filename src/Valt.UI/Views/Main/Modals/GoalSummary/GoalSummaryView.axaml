@@ -28,19 +28,46 @@
                                          CloseClick="CustomTitleBarCloseClicked" />
 
             <Grid Grid.Row="1" RowDefinitions="Auto, *" Margin="12">
-                <!-- Header strip (minimal for plan 01; full label/total layout lands in plan 02) -->
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
-                    <TextBlock Text="{Binding GoalName}"
-                               FontSize="{DynamicResource FontSizeNormal}"
-                               FontWeight="SemiBold"
-                               FontFamily="{DynamicResource Geist}"
-                               TextTrimming="CharacterEllipsis" />
-                    <TextBlock Text="{Binding PeriodLabel}"
-                               FontSize="{DynamicResource FontSizeNormal}"
-                               Foreground="{DynamicResource Text400Brush}"
-                               FontFamily="{DynamicResource Geist}"
-                               VerticalAlignment="Center" />
-                </StackPanel>
+                <!-- Header strip: goal identity / period / focal-point reconciled total -->
+                <Border Grid.Row="0"
+                        Background="{DynamicResource Background800Brush}"
+                        BorderBrush="{DynamicResource Background500Brush}"
+                        BorderThickness="1"
+                        Padding="8"
+                        Margin="0,0,0,8">
+                    <StackPanel Orientation="Horizontal" Spacing="24">
+                        <TextBlock Text="{Binding GoalName}"
+                                   FontSize="{DynamicResource FontSizeNormal}"
+                                   FontWeight="SemiBold"
+                                   FontFamily="{DynamicResource Geist}"
+                                   MaxWidth="360"
+                                   TextTrimming="CharacterEllipsis"
+                                   VerticalAlignment="Center" />
+                        <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                            <TextBlock Text="{x:Static lang:language.GoalSummary_PeriodLabel}"
+                                       FontSize="{DynamicResource FontSizeNormal}"
+                                       Foreground="{DynamicResource Text400Brush}"
+                                       FontFamily="{DynamicResource Geist}"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding PeriodLabel}"
+                                       FontSize="{DynamicResource FontSizeNormal}"
+                                       FontFamily="{DynamicResource Geist}"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                            <TextBlock Text="{x:Static lang:language.GoalSummary_TotalLabel}"
+                                       FontSize="{DynamicResource FontSizeNormal}"
+                                       Foreground="{DynamicResource Text400Brush}"
+                                       FontFamily="{DynamicResource Geist}"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding FinalTotalFormatted}"
+                                       FontSize="{DynamicResource FontSizeLarge}"
+                                       FontWeight="SemiBold"
+                                       FontFamily="{DynamicResource GeistMono}"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
 
                 <DataGrid Grid.Row="1"
                           GridLinesVisibility="All"
