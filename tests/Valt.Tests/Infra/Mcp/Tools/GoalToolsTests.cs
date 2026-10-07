@@ -90,6 +90,18 @@ public class GoalToolsTests : IntegrationTest
             Assert.That(mcpResult.FinalTotal, Is.EqualTo(mcpResult.Rows[^1].RunningTotal));
         });
 
+        // Semantic expectations for the seeded scenario (pin the values, not just
+        // MCP↔App parity — a systematic formula bug on both sides must still fail here):
+        // +100,000 sats BTC income on 06-10, then −25,000 sats BTC spend on 06-15.
+        Assert.Multiple(() =>
+        {
+            Assert.That(mcpResult!.Rows[0].Contribution, Is.EqualTo(100_000m));
+            Assert.That(mcpResult.Rows[0].RunningTotal, Is.EqualTo(100_000m));
+            Assert.That(mcpResult.Rows[1].Contribution, Is.EqualTo(-25_000m));
+            Assert.That(mcpResult.Rows[1].RunningTotal, Is.EqualTo(75_000m));
+            Assert.That(mcpResult.FinalTotal, Is.EqualTo(75_000m));
+        });
+
         // Parity: dispatch the same App query directly through the container and
         // assert field-by-field — never against a hand-built expectation list
         var appResult = await _queryDispatcher.DispatchAsync(
