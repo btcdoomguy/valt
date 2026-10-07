@@ -131,12 +131,12 @@ public class GoalTools
     /// Maps a goal type to the unit its running total is expressed in
     /// (mirrors the SummaryStrategyUnit semantics in the UI layer).
     /// </summary>
-    private static string GetStrategyUnit(int typeId) => typeId switch
+    private static string GetStrategyUnit(int typeId) => (GoalTypeNames)typeId switch
     {
-        0 or 4 or 6 => "Sats",     // StackBitcoin, IncomeBtc, BitcoinHodl
-        2 => "Count",              // Dca
-        8 => "Percentage",         // SavingsRate
-        _ => "Fiat"                // SpendingLimit, IncomeFiat, ReduceExpenseCategory, SaveFiat, NetWorthBtc
+        GoalTypeNames.StackBitcoin or GoalTypeNames.IncomeBtc or GoalTypeNames.BitcoinHodl => "Sats",
+        GoalTypeNames.Dca => "Count",
+        GoalTypeNames.SavingsRate => "Percentage",
+        _ => "Fiat" // SpendingLimit, IncomeFiat, ReduceExpenseCategory, SaveFiat (NetWorthBtc never reaches here — it takes the NotSupported path above)
     };
 
     /// <summary>
