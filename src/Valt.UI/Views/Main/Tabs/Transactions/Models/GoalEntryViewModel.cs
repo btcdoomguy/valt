@@ -6,6 +6,7 @@ using Valt.App.Modules.Goals.DTOs;
 using Valt.Core.Modules.Goals;
 using Valt.Infra.Kernel;
 using Valt.UI.Lang;
+using Valt.UI.Views.Main.Modals.GoalSummary;
 
 namespace Valt.UI.Views.Main.Tabs.Transactions.Models;
 
@@ -193,6 +194,16 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
 
     // Context menu visibility
     public bool CanRecalculate => true;
+    public bool CanViewSummary => _goal.GoalType is not NetWorthBtcGoalTypeOutputDTO;
+
+    public GoalSummaryViewModel.GoalSummaryStrategyUnit SummaryStrategyUnit => _goal.GoalType switch
+    {
+        StackBitcoinGoalTypeOutputDTO or IncomeBtcGoalTypeOutputDTO or BitcoinHodlGoalTypeOutputDTO =>
+            GoalSummaryViewModel.GoalSummaryStrategyUnit.Sats,
+        DcaGoalTypeOutputDTO => GoalSummaryViewModel.GoalSummaryStrategyUnit.Count,
+        SavingsRateGoalTypeOutputDTO => GoalSummaryViewModel.GoalSummaryStrategyUnit.Percentage,
+        _ => GoalSummaryViewModel.GoalSummaryStrategyUnit.Fiat // NetWorthBtc falls here but is unreachable (menu hidden)
+    };
 
     // Show progress bar only for Open state (not for Completed or Failed)
     public bool ShowProgressBar => _goal.State == (int)GoalStates.Open;
@@ -224,6 +235,8 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(ShowSuccessIcon));
         OnPropertyChanged(nameof(ShowFailedIcon));
         OnPropertyChanged(nameof(CanRecalculate));
+        OnPropertyChanged(nameof(CanViewSummary));
+        OnPropertyChanged(nameof(SummaryStrategyUnit));
         OnPropertyChanged(nameof(ShowProgressBar));
         OnPropertyChanged(nameof(RequiresPriceData));
 

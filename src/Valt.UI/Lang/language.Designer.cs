@@ -4047,6 +4047,78 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string Goals_ViewSummary {
+            get {
+                return ResourceManager.GetString("Goals_ViewSummary", resourceCulture);
+            }
+        }
+        
+        public static string GoalSummary_Title {
+            get {
+                return ResourceManager.GetString("GoalSummary_Title", resourceCulture);
+            }
+        }
+        
+        public static string GoalSummary_PeriodLabel {
+            get {
+                return ResourceManager.GetString("GoalSummary_PeriodLabel", resourceCulture);
+            }
+        }
+        
+        public static string GoalSummary_TotalLabel {
+            get {
+                return ResourceManager.GetString("GoalSummary_TotalLabel", resourceCulture);
+            }
+        }
+        
+        public static string GoalSummary_ColumnAccount {
+            get {
+                return ResourceManager.GetString("GoalSummary_ColumnAccount", resourceCulture);
+            }
+        }
+        
+        public static string GoalSummary_ColumnCategory {
+            get {
+                return ResourceManager.GetString("GoalSummary_ColumnCategory", resourceCulture);
+            }
+        }
+        
+        public static string GoalSummary_ColumnFiat {
+            get {
+                return ResourceManager.GetString("GoalSummary_ColumnFiat", resourceCulture);
+            }
+        }
+        
+        public static string GoalSummary_ColumnSats {
+            get {
+                return ResourceManager.GetString("GoalSummary_ColumnSats", resourceCulture);
+            }
+        }
+        
+        public static string GoalSummary_ColumnRunningTotal {
+            get {
+                return ResourceManager.GetString("GoalSummary_ColumnRunningTotal", resourceCulture);
+            }
+        }
+        
+        public static string GoalSummary_EmptyTitle {
+            get {
+                return ResourceManager.GetString("GoalSummary_EmptyTitle", resourceCulture);
+            }
+        }
+        
+        public static string GoalSummary_EmptyMessage {
+            get {
+                return ResourceManager.GetString("GoalSummary_EmptyMessage", resourceCulture);
+            }
+        }
+        
+        public static string GoalSummary_Close {
+            get {
+                return ResourceManager.GetString("GoalSummary_Close", resourceCulture);
+            }
+        }
+        
         public static string Goals_Success {
             get {
                 return ResourceManager.GetString("Goals_Success", resourceCulture);

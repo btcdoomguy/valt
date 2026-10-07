@@ -39,5 +39,6 @@ public enum ApplicationModalNames
     SoldAssetHistory = 39,
     DateSoldPrompt = 40,
     ReportsCategoryFilterConfig = 41,
-    BtcLoanSimulator = 42
+    BtcLoanSimulator = 42,
+    GoalSummary = 43
 }
