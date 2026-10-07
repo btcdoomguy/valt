@@ -548,6 +548,30 @@ public class GoalsPanelViewModelTests : DatabaseTest
     }
 
     [Test]
+    public async Task ViewSummary_NotSupportedResult_DoesNotOpenModal()
+    {
+        // Arrange - goal types without contributing-transaction semantics (e.g. NetWorthBtc)
+        // return NotSupported from the Phase 49 query; the modal must not open for them
+        _queryDispatcher.DispatchAsync(Arg.Any<GetGoalContributingTransactionsQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(Result<GoalContributingTransactionsResult>.Success(
+                new GoalContributingTransactionsResult.NotSupported(GoalTypeNames.NetWorthBtc))));
+
+        var vm = CreateViewModel();
+        var entry = new GoalEntryViewModel(
+            CreateNetWorthBtcGoalDTO("goal-1", GoalPeriods.Monthly, new DateOnly(2025, 1, 1)),
+            _currencySettings.MainFiatCurrency);
+
+        // Act
+        await vm.ViewSummaryCommand.ExecuteAsync(entry);
+
+        // Assert - the modal factory never receives the GoalSummary name on NotSupported
+        _ = _modalFactory.DidNotReceive().CreateAsync(
+            Arg.Is(ApplicationModalNames.GoalSummary),
+            Arg.Any<Window?>(),
+            Arg.Any<object>());
+    }
+
+    [Test]
     public async Task ViewSummary_SupportedResult_OpensModalWithRequest()
     {
         // Arrange

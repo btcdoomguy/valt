@@ -192,9 +192,15 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
     public bool ShowSuccessIcon => _goal.State == (int)GoalStates.Completed;
     public bool ShowFailedIcon => _goal.State == (int)GoalStates.Failed;
 
-    // Context menu visibility
+    // Context menu visibility — allow-list of goal types with contributing-transaction
+    // semantics (mirrors Phase 49 query support). Future goal types default to hidden.
     public bool CanRecalculate => true;
-    public bool CanViewSummary => _goal.GoalType is not NetWorthBtcGoalTypeOutputDTO;
+    public bool CanViewSummary => _goal.GoalType is
+        StackBitcoinGoalTypeOutputDTO or IncomeBtcGoalTypeOutputDTO or
+        BitcoinHodlGoalTypeOutputDTO or DcaGoalTypeOutputDTO or
+        SavingsRateGoalTypeOutputDTO or SpendingLimitGoalTypeOutputDTO or
+        SaveFiatGoalTypeOutputDTO or IncomeFiatGoalTypeOutputDTO or
+        ReduceExpenseCategoryGoalTypeOutputDTO;
 
     public GoalSummaryViewModel.GoalSummaryStrategyUnit SummaryStrategyUnit => _goal.GoalType switch
     {

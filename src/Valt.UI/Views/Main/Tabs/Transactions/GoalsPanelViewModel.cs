@@ -254,6 +254,12 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
             return; // modal does NOT open on query failure
         }
 
+        // Defense-in-depth: goal types without contributing-transaction semantics return
+        // NotSupported. The menu item is hidden for those (CanViewSummary allow-list),
+        // but never open the modal for them — it would show a factually wrong empty state.
+        if (result.Value is not GoalContributingTransactionsResult.Supported)
+            return;
+
         var ownerWindow = GetUserControlOwnerWindow();
         var modal = (GoalSummaryView)await _modalFactory.CreateAsync(
             ApplicationModalNames.GoalSummary,
