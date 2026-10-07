@@ -70,6 +70,9 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - ✓ **GOL-07**: Contributing-transaction set is derived from each goal type's progress strategy (App-layer query) — v0.9 (Phase 49)
 - ✓ **GOL-03**: "View summary" right-click context menu on goal entries opens the Goal Summary modal (hidden for NetWorthBtc, disabled in secure mode) — v0.9 (Phase 50)
 - ✓ **GOL-04**: Modal shows a read-only grid of all contributing transactions with fiat + sats amounts and reconciling running total — v0.9 (Phase 50)
+- ✓ **GOL-08**: AI assistant can query a goal's contributing transactions via the `GetGoalContributingTransactions` MCP tool (typed Supported/Error contract) — v0.9 (Phase 51)
+- ✓ **GOL-09**: All Goal Summary strings localized in en-US, pt-BR, es with Designer parity — v0.9 (Phase 51)
+- ✓ **GOL-10**: `.claude/docs/goals.md` documents the goal summary feature and MCP tool — v0.9 (Phase 51)
 
 ### Active
 
@@ -82,8 +85,6 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - [ ] v0.7 Insights & Metrics Expansion — interest/fees paid (total + monthly), liquidation-price distance trend
 - [ ] v0.8 BTC Loan Simulator — cost-over-time schedule until end date
 - [ ] v0.8 BTC Loan Simulator — load existing BTC-backed loan from Assets to prefill fields
-- [ ] v0.9 Goal Transparency — MCP tool to query contributing transactions per goal
-- [ ] v0.9 Goal Transparency — localization of all new strings in en, pt-BR, es
 
 ## Out of Scope
 
@@ -105,6 +106,7 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - **Phase 45 complete** — BTC Loan Simulator modal UI with inputs/results panels, live recalculation, fiat/sats formatting, liquidation price, effective APR, and distance-to-liquidation color coding.
 - **Phase 49 complete** — `GetGoalContributingTransactionsQuery` backend: 9 transaction-based goal strategies expose their contributing transactions with reconciling running totals (only `NetWorthBtc` unsupported); 1804 tests green; code review findings CR-01/WR-01/WR-02 fixed.
 - **Phase 50 complete** — Goal Summary modal UI: "View summary" context menu (allow-list gating, secure-mode disable), chromeless resizable modal with 7-column read-only grid, per-unit running-total formatting, header strip with focal reconciled total; human visual sign-off approved; 1818 tests green.
+- **Phase 51 complete** — `GetGoalContributingTransactions` MCP tool with typed Supported/Error contract, pt-BR/es localization (1048-key tri-locale parity), `.claude/docs/goals.md` update; end-to-end human sign-off approved; 1822 tests green. **v0.9 milestone complete** (3 phases, 11 plans, 8/8 requirements GOL-03..GOL-10).
 
 ## Current Milestone: v0.9 Goal Transparency — Transaction Breakdown
 
@@ -167,6 +169,7 @@ Valt uses a layered architecture: Valt.Core (domain), Valt.App (CQRS), Valt.Infr
 | `BitcoinHodl` is transaction-based (progress sums `BitcoinToFiat` sale fiat-leg) — included as 9th supported type; only `NetWorthBtc` is `NotSupported` | Code-verified correction of the smart-discuss assumption; user-confirmed | Sale rows read `ToFiatAmount`/`ToAccountId` (production mapping nulls `FromFiatAmount`) — Phase 49 |
 | Amount fields on `ContributingTransactionRow` are non-negative magnitudes; sign lives only in `Contribution`/`RunningTotal` | `BtcValue` core invariant rejects negative sats; magnitude contract matches all existing assertions | `FiatAmount`/`SatsAmount` absolute; sign on Contribution and RunningTotal deltas — Phase 49 |
 | Query awaited before modal opens; `CanViewSummary` is an allow-list of the 9 supported goal-type DTOs | Modal opens fully populated (no loading chrome); a future goal type can't silently fall into a misleading empty state | `ViewSummaryCommand` no-ops on `NotSupported`; NetWorthBtc hidden via allow-list — Phase 50 |
+| MCP tool returns typed `Supported=false` for NetWorthBtc and typed `Error` on query failure | `null` means only "goal not found"; MCP clients can distinguish all three outcomes (code review WR-01) | `GetGoalContributingTransactionsMcpResult.Error` + failure-path test — Phase 51 |
 
 ## Evolution
 
@@ -186,4 +189,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-10-06 after Phase 50 complete*
+*Last updated: 2026-10-07 after Phase 51 complete (v0.9 milestone complete)*
