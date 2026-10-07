@@ -49,9 +49,12 @@ public class GoalTools
 
     /// <summary>
     /// Gets the transactions contributing to a goal's progress, with running total.
-    /// Returns null when the goal is not found; returns a typed result with
+    /// Returns null only when the goal is not found. Returns a typed result with
     /// <see cref="GoalContributingTransactionsMcpResult.Supported"/> = false for goal
-    /// types whose progress is not derived from transactions (e.g. NetWorthBtc).
+    /// types whose progress is not derived from transactions (e.g. NetWorthBtc), and
+    /// also with <see cref="GoalContributingTransactionsMcpResult.Error"/> set when the
+    /// underlying query fails — so "not supported" and "internal failure" are never
+    /// conflated.
     /// </summary>
     [McpServerTool, Description("Get the transactions contributing to a goal's progress, with running total")]
     public static async Task<GoalContributingTransactionsMcpResult?> GetGoalContributingTransactions(
@@ -62,11 +65,21 @@ public class GoalTools
         if (goal is null)
             return null;
 
+        var goalType = ((GoalTypeNames)goal.GoalType.TypeId).ToString();
+
         var result = await dispatcher.DispatchAsync(new GetGoalContributingTransactionsQuery { GoalId = goalId });
         if (result.IsFailure)
-            return null;
-
-        var goalType = ((GoalTypeNames)goal.GoalType.TypeId).ToString();
+        {
+            return new GoalContributingTransactionsMcpResult
+            {
+                Supported = false,
+                GoalType = goalType,
+                StrategyUnit = null,
+                FinalTotal = null,
+                Rows = [],
+                Error = result.Error?.Message ?? "Unknown error"
+            };
+        }
 
         if (result.Value is GoalContributingTransactionsResult.NotSupported)
         {
@@ -115,7 +128,7 @@ public class GoalTools
     }
 
     /// <summary>
-    /// Maps a goal type id to the unit its running total is expressed in
+    /// Maps a goal type to the unit its running total is expressed in
     /// (mirrors the SummaryStrategyUnit semantics in the UI layer).
     /// </summary>
     private static string GetStrategyUnit(int typeId) => typeId switch
@@ -448,11 +461,13 @@ public class GoalTools
 /// <summary>
 /// Flat result of the contributing-transactions query for MCP clients.
 /// <see cref="Supported"/> is false (typed, not an error) for goal types whose
-/// progress is not derived from transactions.
+/// progress is not derived from transactions; <see cref="Error"/> is set only when
+/// the underlying query failed, so clients can distinguish "not supported" from
+/// "internal failure".
 /// </summary>
 public sealed record GoalContributingTransactionsMcpResult
 {
-    /// <summary>True when rows are available; false for non-transaction-based goal types.</summary>
+    /// <summary>True when rows are available; false for non-transaction-based goal types or on internal failure.</summary>
     public required bool Supported { get; init; }
 
     /// <summary>Goal type enum name (e.g. StackBitcoin, NetWorthBtc).</summary>
@@ -466,6 +481,9 @@ public sealed record GoalContributingTransactionsMcpResult
 
     /// <summary>Contributing transactions in date order, each with contribution and running total.</summary>
     public required IReadOnlyList<GoalContributingTransactionMcpRow> Rows { get; init; }
+
+    /// <summary>Error message when the underlying query failed (Supported=false). Null on success and for typed NotSupported results.</summary>
+    public string? Error { get; init; }
 }
 
 /// <summary>A single contributing transaction row for MCP clients.</summary>

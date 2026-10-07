@@ -1,9 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
 using NUnit.Framework;
 using System.Linq;
 using Valt.App;
+using Valt.App.Kernel;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Goals.DTOs;
+using Valt.App.Modules.Goals.Queries.GetGoal;
 using Valt.App.Modules.Goals.Queries.GetGoalContributingTransactions;
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Accounts;
@@ -152,5 +155,45 @@ public class GoalToolsTests : IntegrationTest
             _queryDispatcher, "000000000000000000000099");
 
         Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task QueryFailure_ReturnsTypedErrorInsteadOfNull()
+    {
+        // Arrange: the goal exists, but the contributing-transactions query fails —
+        // the tool must surface a typed error, not the same null used for not-found
+        var goalDto = new GoalDTO
+        {
+            Id = "goal-1",
+            RefDate = new DateOnly(2024, 6, 15),
+            Period = 0,
+            StartDate = null,
+            Progress = 0m,
+            IsUpToDate = true,
+            LastUpdatedAt = DateTime.UtcNow,
+            State = 0,
+            GoalType = new StackBitcoinGoalTypeOutputDTO { TargetSats = 1_000_000, CalculatedSats = 0 }
+        };
+
+        var dispatcher = Substitute.For<IQueryDispatcher>();
+        dispatcher.DispatchAsync<GoalDTO?>(Arg.Any<GetGoalQuery>()).Returns(goalDto);
+        dispatcher.DispatchAsync<Result<GoalContributingTransactionsResult>>(
+                Arg.Any<GetGoalContributingTransactionsQuery>())
+            .Returns(Result<GoalContributingTransactionsResult>.Failure("TEST_ERROR", "query exploded"));
+
+        // Act
+        var result = await GoalTools.GetGoalContributingTransactions(dispatcher, goalDto.Id);
+
+        // Assert: typed failure, distinguishable from both not-found (null) and NotSupported
+        Assert.That(result, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result!.Supported, Is.False);
+            Assert.That(result.Error, Is.EqualTo("query exploded"));
+            Assert.That(result.GoalType, Is.EqualTo("StackBitcoin"));
+            Assert.That(result.StrategyUnit, Is.Null);
+            Assert.That(result.FinalTotal, Is.Null);
+            Assert.That(result.Rows, Is.Empty);
+        });
     }
 }
