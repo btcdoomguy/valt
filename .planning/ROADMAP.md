@@ -323,7 +323,17 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
   3. The grid shows per transaction: date, description, account, category, and amount in fiat and sats, plus a running-total column whose final row matches the goal's displayed progress
   4. Modal follows project conventions: `SystemDecorations="None"` with custom title bar, MinWidth/MinHeight set from design dimensions, localized title, and a graceful empty state when the goal has no contributing transactions
 
-**Plans**: TBD
+**Plans**: 3 plans
+
+**Wave 1**
+
+- [ ] 50-01-PLAN.md — "View summary" tracer end-to-end: context menu item, ViewSummaryCommand, GoalSummary modal (view/code-behind/VM) with per-unit running-total formatting, gating, empty state, DI + en localization
+- [ ] 50-02-PLAN.md — UI-SPEC header strip (goal identity, period, focal total) + human visual sign-off incl. 720px truncation backstop
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 50-03-PLAN.md — ViewSummary/CanViewSummary/SummaryStrategyUnit tests + GoalSummaryViewModel projection tests + full-suite phase gate
+
 **UI hint**: yes
 
 ### Phase 51: MCP, Localization, Documentation & Verification
