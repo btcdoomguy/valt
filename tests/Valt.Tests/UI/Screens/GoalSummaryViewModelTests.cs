@@ -16,7 +16,6 @@ public class GoalSummaryViewModelTests
     {
         return new GoalSummaryViewModel.Request
         {
-            GoalId = "goal-1",
             GoalName = "Stack bitcoin",
             PeriodLabel = "(01/25)",
             MainCurrencyCode = "USD",

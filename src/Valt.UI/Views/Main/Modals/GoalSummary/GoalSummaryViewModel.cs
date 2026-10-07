@@ -152,7 +152,8 @@ public partial class GoalSummaryViewModel : ValtModalViewModel
 
     public record Request
     {
-        public required string GoalId { get; init; }
+        // GoalId intentionally omitted: the query result is pre-fetched by
+        // ViewSummaryCommand, so the modal never re-queries by id.
         public required string GoalName { get; init; }
         public required string PeriodLabel { get; init; }
         public required string MainCurrencyCode { get; init; }

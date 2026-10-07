@@ -266,7 +266,6 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
             ownerWindow,
             new GoalSummaryViewModel.Request
             {
-                GoalId = entry.Id,
                 GoalName = entry.FriendlyName,
                 PeriodLabel = entry.IsYearly ? $"({entry.RefDate:yyyy})" : $"({entry.RefDate:MM/yy})",
                 MainCurrencyCode = _currencySettings.MainFiatCurrency,

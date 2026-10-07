@@ -622,7 +622,6 @@ public class GoalsPanelViewModelTests : DatabaseTest
             Arg.Is(ApplicationModalNames.GoalSummary),
             Arg.Any<Window?>(),
             Arg.Is<GoalSummaryViewModel.Request>(r =>
-                r.GoalId == "goal-1" &&
                 r.GoalName == entry.FriendlyName &&
                 r.PeriodLabel == "(01/25)" &&
                 r.MainCurrencyCode == _currencySettings.MainFiatCurrency &&
