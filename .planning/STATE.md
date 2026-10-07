@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v0.9
 milestone_name: Goal Transparency — Transaction Breakdown
-current_phase: 51
-status: completed
+status: Awaiting next milestone
 stopped_at: Completed 51-05-PLAN.md — Phase 51 complete, ready for milestone verification
-last_updated: "2026-10-07T14:48:08.340Z"
+last_updated: "2026-10-07T16:26:28.929Z"
 last_activity: 2026-10-07
-last_activity_desc: Phase 51 complete
+last_activity_desc: Milestone v0.9 completed and archived
 progress:
   total_phases: 13
   completed_phases: 3
   total_plans: 11
   completed_plans: 11
   percent: 23
+current_phase: 51
 current_phase_name: MCP, Localization, Documentation & Verification
 ---
 
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-08-06)
 
 ## Current Position
 
-Phase: 51
-Plan: Not started
-Status: All phases complete
-Last activity: 2026-10-07 — Phase 51 complete
+Phase: Milestone v0.9 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-10-07 — Milestone v0.9 completed and archived
 
 ## Performance Metrics
 
@@ -257,17 +257,21 @@ None yet.
 
 ## Deferred Items
 
-Items acknowledged and deferred at v0.6 milestone close (2026-07-17):
+Items acknowledged and deferred at v0.9 milestone close (2026-10-07; all predate v0.9, carried since the v0.6 close):
 
-| Category | Item | Status | Deferred At |
-|----------|------|--------|-------------|
-| Quality | v0.4 quality/hardening items (async void cleanup, god-VM refactor, live-API test isolation, handler unit tests) | Deferred | v0.6 |
-| Debug Session | empty-loan-context — Current Loan Context formatted properties are computed read-only properties | Investigating | v0.6 |
-| Debug Session | translation-gaps — UpdateLoanState UI strings added to neutral resx file not code-generated | Diagnosed | v0.6 |
-| Debug Session | visual-layout — hardcoded input widths exceed available column space and button widths | Diagnosed | v0.6 |
-| Quick Task | 001-copy-modal-perf | Unknown | v0.6 |
-| Quick Task | reports-summary-simulation | Missing | v0.6 |
-| Quick Task | 260616-rcu-fix-stock-asset-edit-modal-not-loading-s | Unknown | v0.6 |
+| Category | Item | Status |
+|----------|------|--------|
+| Quality | v0.4 quality/hardening items (async void cleanup, god-VM refactor, live-API test isolation, handler unit tests) — still deferred | Deferred |
+| Debug Session | 39-savings-rate-not-visible | Investigating |
+| Debug Session | btc-category-axis-crash | Diagnosed |
+| Debug Session | empty-loan-context | Investigating |
+| Debug Session | loanreports-cost-discrepancy | Diagnosed |
+| Debug Session | translation-gaps | Diagnosed |
+| Debug Session | visual-layout | Diagnosed |
+| Quick Task | 001-copy-modal-perf | Unknown |
+| Quick Task | reports-summary-simulation | Missing |
+| Quick Task | 260616-rcu-fix-stock-asset-edit-modal-not-loading-s | Unknown |
+| Roadmap | v0.8 phases 46–48 (Cost-Over-Time Schedule, Prefill from Existing Loan, Simulator MCP/Localization/Verification) — left pending at v0.9 start; recover in a future milestone | Pending |
 
 _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-03 executed; the QA-03 gap is closed by 38-QA-CHECKLIST.md._
 
@@ -290,5 +294,4 @@ Resume file: None
 
 ## Operator Next Steps
 
-- v0.9 roadmap defined (Phases 49-51). v0.8 phases 46-48 remain pending (SIM-10..SIM-13).
-- Next: run `/gsd-plan-phase 49` to plan the Goal Contributing-Transactions Query Backend.
+- Start the next milestone with /gsd-new-milestone
