@@ -7,7 +7,9 @@ using Valt.App.Modules.Goals.Commands.DeleteGoal;
 using Valt.App.Modules.Goals.Commands.EditGoal;
 using Valt.App.Modules.Goals.DTOs;
 using Valt.App.Modules.Goals.Queries.GetGoal;
+using Valt.App.Modules.Goals.Queries.GetGoalContributingTransactions;
 using Valt.App.Modules.Goals.Queries.GetGoals;
+using Valt.Core.Modules.Goals;
 using Valt.App.Kernel.Notifications;
 using Valt.Infra.Mcp.Notifications;
 
@@ -44,6 +46,85 @@ public class GoalTools
     {
         return await dispatcher.DispatchAsync(new GetGoalQuery { GoalId = goalId });
     }
+
+    /// <summary>
+    /// Gets the transactions contributing to a goal's progress, with running total.
+    /// Returns null when the goal is not found; returns a typed result with
+    /// <see cref="GoalContributingTransactionsMcpResult.Supported"/> = false for goal
+    /// types whose progress is not derived from transactions (e.g. NetWorthBtc).
+    /// </summary>
+    [McpServerTool, Description("Get the transactions contributing to a goal's progress, with running total")]
+    public static async Task<GoalContributingTransactionsMcpResult?> GetGoalContributingTransactions(
+        IQueryDispatcher dispatcher,
+        [Description("ID of the goal (from GetGoals)")] string goalId)
+    {
+        var goal = await dispatcher.DispatchAsync(new GetGoalQuery { GoalId = goalId });
+        if (goal is null)
+            return null;
+
+        var result = await dispatcher.DispatchAsync(new GetGoalContributingTransactionsQuery { GoalId = goalId });
+        if (result.IsFailure)
+            return null;
+
+        var goalType = ((GoalTypeNames)goal.GoalType.TypeId).ToString();
+
+        if (result.Value is GoalContributingTransactionsResult.NotSupported)
+        {
+            return new GoalContributingTransactionsMcpResult
+            {
+                Supported = false,
+                GoalType = goalType,
+                StrategyUnit = null,
+                FinalTotal = null,
+                Rows = []
+            };
+        }
+
+        var rows = ((GoalContributingTransactionsResult.Supported)result.Value!).Rows;
+        var mapped = new List<GoalContributingTransactionMcpRow>(rows.Count);
+        decimal previousRunningTotal = 0m;
+        foreach (var row in rows)
+        {
+            var contribution = mapped.Count == 0
+                ? row.RunningTotal
+                : row.RunningTotal - previousRunningTotal;
+            previousRunningTotal = row.RunningTotal;
+
+            mapped.Add(new GoalContributingTransactionMcpRow
+            {
+                Date = row.Date,
+                Description = row.Description,
+                Account = row.AccountName,
+                Category = row.CategoryName,
+                FiatAmount = row.FiatAmount.Value,
+                FiatCurrencyCode = row.FiatCurrencyCode,
+                SatsAmount = row.SatsAmount.Sats,
+                Contribution = contribution,
+                RunningTotal = row.RunningTotal
+            });
+        }
+
+        return new GoalContributingTransactionsMcpResult
+        {
+            Supported = true,
+            GoalType = goalType,
+            StrategyUnit = GetStrategyUnit(goal.GoalType.TypeId),
+            FinalTotal = rows.Count > 0 ? rows[^1].RunningTotal : null,
+            Rows = mapped
+        };
+    }
+
+    /// <summary>
+    /// Maps a goal type id to the unit its running total is expressed in
+    /// (mirrors the SummaryStrategyUnit semantics in the UI layer).
+    /// </summary>
+    private static string GetStrategyUnit(int typeId) => typeId switch
+    {
+        0 or 4 or 6 => "Sats",     // StackBitcoin, IncomeBtc, BitcoinHodl
+        2 => "Count",              // Dca
+        8 => "Percentage",         // SavingsRate
+        _ => "Fiat"                // SpendingLimit, IncomeFiat, ReduceExpenseCategory, SaveFiat, NetWorthBtc
+    };
 
     /// <summary>
     /// Creates a Stack Bitcoin goal (accumulate a target amount of sats).
@@ -362,4 +443,58 @@ public class GoalTools
         await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Goal {goalId} deleted successfully";
     }
+}
+
+/// <summary>
+/// Flat result of the contributing-transactions query for MCP clients.
+/// <see cref="Supported"/> is false (typed, not an error) for goal types whose
+/// progress is not derived from transactions.
+/// </summary>
+public sealed record GoalContributingTransactionsMcpResult
+{
+    /// <summary>True when rows are available; false for non-transaction-based goal types.</summary>
+    public required bool Supported { get; init; }
+
+    /// <summary>Goal type enum name (e.g. StackBitcoin, NetWorthBtc).</summary>
+    public required string? GoalType { get; init; }
+
+    /// <summary>Unit of Contribution/RunningTotal/FinalTotal: Fiat, Sats, Count, or Percentage. Null when not supported.</summary>
+    public required string? StrategyUnit { get; init; }
+
+    /// <summary>Final running total, equal to the goal's calculated field. Null when not supported or no rows.</summary>
+    public required decimal? FinalTotal { get; init; }
+
+    /// <summary>Contributing transactions in date order, each with contribution and running total.</summary>
+    public required IReadOnlyList<GoalContributingTransactionMcpRow> Rows { get; init; }
+}
+
+/// <summary>A single contributing transaction row for MCP clients.</summary>
+public sealed record GoalContributingTransactionMcpRow
+{
+    /// <summary>Date of the contributing transaction.</summary>
+    public required DateOnly Date { get; init; }
+
+    /// <summary>Transaction description (name).</summary>
+    public required string Description { get; init; }
+
+    /// <summary>Name of the account the amount left (or entered, when no origin account exists).</summary>
+    public required string Account { get; init; }
+
+    /// <summary>Category name, or null when the transaction is uncategorized.</summary>
+    public required string? Category { get; init; }
+
+    /// <summary>Fiat amount magnitude (always non-negative), in <see cref="FiatCurrencyCode"/>.</summary>
+    public required decimal FiatAmount { get; init; }
+
+    /// <summary>ISO code of the currency <see cref="FiatAmount"/> is expressed in.</summary>
+    public required string FiatCurrencyCode { get; init; }
+
+    /// <summary>Sats amount magnitude (always non-negative), converted at the transaction-date BTC price.</summary>
+    public required long SatsAmount { get; init; }
+
+    /// <summary>Contribution of this row to the running total: first row = its RunningTotal, later rows = delta.</summary>
+    public required decimal Contribution { get; init; }
+
+    /// <summary>Cumulative total in the strategy's own unit after this row.</summary>
+    public required decimal RunningTotal { get; init; }
 }
