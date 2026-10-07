@@ -5,15 +5,15 @@ milestone_name: Goal Transparency — Transaction Breakdown
 current_phase: 50
 current_phase_name: Goal Summary Modal UI
 status: executing
-stopped_at: Completed 49-03-PLAN.md
-last_updated: "2026-10-07T00:09:45.285Z"
+stopped_at: Completed 50-02-PLAN.md
+last_updated: "2026-10-06T00:00:00.000Z"
 last_activity: 2026-10-06
-last_activity_desc: Phase 49 complete, transitioned to Phase 50
+last_activity_desc: Plan 50-02 complete — UI-SPEC header strip + human visual sign-off approved
 progress:
   total_phases: 13
   completed_phases: 1
   total_plans: 6
-  completed_plans: 3
+  completed_plans: 5
   percent: 8
 ---
 
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-06)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 49 — Goal Contributing-Transactions Query Backend
+**Current focus:** Phase 50 — Goal Summary Modal UI
 
 ## Current Position
 
-Phase: 50 — Goal Summary Modal UI
-Plan: Not started
+Phase: 50 (Goal Summary Modal UI) — EXECUTING
+Plan: 3 of 3
 Status: Ready to execute
-Last activity: 2026-10-06 — Phase 49 complete, transitioned to Phase 50
+Last activity: 2026-10-06 — Plan 50-02 complete (UI-SPEC header strip + human visual sign-off)
 
 ## Performance Metrics
 
@@ -144,6 +144,8 @@ Last activity: 2026-10-06 — Phase 49 complete, transitioned to Phase 50
 | Phase 49 P01 | 45min | 3 tasks | 15 files |
 | Phase 49 P02 | 25 | 3 tasks | 6 files |
 | Phase 49 P03 | 8min | 3 tasks | 6 files |
+| Phase 50 P01 | 25min | 3 tasks | 10 files |
+| Phase 50 P02 | 15 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -197,6 +199,11 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 49-02] Origin-flag merge + with-expression RunningTotal rebuild: GoalContributionRow rows are rebuilt, never mutated, keeping reader Contribution untouched
 - [Phase ?]: BtcValue is a magnitude type — sats-only/debit rows carry SatsAmount as absolute magnitude; sign lives on Contribution/RunningTotal
 - [Phase ?]: Direct-DB calculators resolve main currency from persisted settings collection (CurrencySettings.MainFiatCurrency key, USD default) — stay ILocalDatabase-only
+
+- [Phase 50-02]: Header strip uses a single container Border (Background800Brush/Background500Brush, Padding 8) with an inner 24px-spaced StackPanel of three sections — identity, period, total — keeping the grid, empty state, and footer untouched
+- [Phase 50-02]: Goal name truncated via MaxWidth=360 + CharacterEllipsis as the 50-UI-SPEC 720px backstop; no MaxWidth/MaxHeight on the Window itself
+- [Phase 50-02]: FinalTotalFormatted is the sole FontSizeLarge (16px) element in the modal — the focal reconciled total — bound directly from the VM property per prohibition on XAML recompute
+- [Phase 50-02]: Human visual sign-off approved for all 8 checkpoint steps (2026-10-06): populated grid, empty state, NetWorthBtc menu absence, 720px truncation backstop, semantic colors, secure-mode disable, Escape/Close dismissal
 
 ### Pending Todos
 
@@ -253,7 +260,7 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 ## Session Continuity
 
 Last session: 2026-10-06
-Stopped at: Phase 49 complete (verification passed 20/20), ready to plan Phase 50 — Goal Summary Modal UI
+Stopped at: Completed 50-02-PLAN.md
 Resume file: None
 
 ## Notes

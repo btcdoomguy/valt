@@ -323,12 +323,12 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
   3. The grid shows per transaction: date, description, account, category, and amount in fiat and sats, plus a running-total column whose final row matches the goal's displayed progress
   4. Modal follows project conventions: `SystemDecorations="None"` with custom title bar, MinWidth/MinHeight set from design dimensions, localized title, and a graceful empty state when the goal has no contributing transactions
 
-**Plans**: 3 plans
+**Plans**: 2/3 plans executed
 
 **Wave 1**
 
-- [ ] 50-01-PLAN.md — "View summary" tracer end-to-end: context menu item, ViewSummaryCommand, GoalSummary modal (view/code-behind/VM) with per-unit running-total formatting, gating, empty state, DI + en localization
-- [ ] 50-02-PLAN.md — UI-SPEC header strip (goal identity, period, focal total) + human visual sign-off incl. 720px truncation backstop
+- [x] 50-01-PLAN.md — "View summary" tracer end-to-end: context menu item, ViewSummaryCommand, GoalSummary modal (view/code-behind/VM) with per-unit running-total formatting, gating, empty state, DI + en localization
+- [x] 50-02-PLAN.md — UI-SPEC header strip (goal identity, period, focal total) + human visual sign-off incl. 720px truncation backstop
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -375,7 +375,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 | 47. Prefill from Existing BTC Loan Asset | v0.8 | 0/? | Not started | - |
 | 48. MCP, Localization, Documentation & Verification | v0.8 | 0/? | Not started | - |
 | 49. Goal Contributing-Transactions Query Backend | v0.9 | 3/3 | Complete    | 2026-10-06 |
-| 50. Goal Summary Modal UI | v0.9 | 0/? | Not started | - |
+| 50. Goal Summary Modal UI | v0.9 | 2/3 | In Progress|  |
 | 51. MCP, Localization, Documentation & Verification | v0.9 | 0/? | Not started | - |
 
 **Total phases:** 23 (17 complete, 6 planned)  
