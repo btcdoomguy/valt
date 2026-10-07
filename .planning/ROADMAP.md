@@ -348,7 +348,21 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
   3. `.claude/docs/goals.md` documents the goal summary feature: the "View summary" flow, the App-layer query and its per-strategy derivation, and the new MCP tool
   4. Full test suite is green and the feature is verified end-to-end: right-click a goal of each major type, confirm grid contents and final running total match the goal's progress, and confirm the MCP tool returns identical data
 
-**Plans**: TBD
+**Plans**: 5 plans
+
+**Wave 1**
+
+- [ ] 51-01-PLAN.md — Tracer: GetGoalContributingTransactions MCP tool + MCP-owned DTOs + DI forwarding verification (GOL-08)
+- [ ] 51-02-PLAN.md — pt-BR + es translations of the 12 GoalSummary keys + tri-locale parity gate (GOL-09)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 51-03-PLAN.md — GoalToolsTests integration fixture: App-query data parity + NetWorthBtc Supported=false + full-suite gate (GOL-08)
+- [ ] 51-04-PLAN.md — goals.md Goal Summary documentation: flow, query contract, MCP tool (GOL-10)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 51-05-PLAN.md — Aggregate phase gates + requirement flips + human end-to-end sign-off (GOL-08, GOL-09, GOL-10)
 
 ## Progress
 
@@ -376,7 +390,7 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 | 48. MCP, Localization, Documentation & Verification | v0.8 | 0/? | Not started | - |
 | 49. Goal Contributing-Transactions Query Backend | v0.9 | 3/3 | Complete    | 2026-10-06 |
 | 50. Goal Summary Modal UI | v0.9 | 3/3 | Complete    | 2026-10-06 |
-| 51. MCP, Localization, Documentation & Verification | v0.9 | 0/? | Not started | - |
+| 51. MCP, Localization, Documentation & Verification | v0.9 | 0/5 | Not started | - |
 
 **Total phases:** 23 (17 complete, 6 planned)  
 **v0.8 plans:** 0/? (roadmap defined 2026-08-13)  
