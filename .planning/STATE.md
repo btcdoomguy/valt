@@ -1,20 +1,20 @@
 ---
 gsd_state_version: 1.0
-milestone: v0.8
-milestone_name: BTC Loan Simulator
-current_phase: 46
-current_phase_name: Cost-Over-Time Schedule
-status: planning
-stopped_at: Phase 45 plans created
-last_updated: "2026-08-21T17:20:01.064Z"
-last_activity: 2026-08-24
-last_activity_desc: Completed quick task 260824-ry0: Fix BTC-collateral leveraged position display to show current total BTC value
+milestone: v0.9
+milestone_name: Goal Transparency — Transaction Breakdown
+status: Awaiting next milestone
+stopped_at: Completed 51-05-PLAN.md — Phase 51 complete, ready for milestone verification
+last_updated: "2026-10-07T16:26:28.929Z"
+last_activity: 2026-10-07
+last_activity_desc: Milestone v0.9 completed and archived
 progress:
-  total_phases: 10
-  completed_phases: 2
-  total_plans: 3
-  completed_plans: 3
-  percent: 20
+  total_phases: 13
+  completed_phases: 3
+  total_plans: 11
+  completed_plans: 11
+  percent: 23
+current_phase: 51
+current_phase_name: MCP, Localization, Documentation & Verification
 ---
 
 # STATE.md
@@ -24,20 +24,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-06)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 45 — Simulator Modal UI (Inputs + Results Panel)
+**Current focus:** Phase 51 — MCP, Localization, Documentation & Verification
 
 ## Current Position
 
-Phase: 46 — Cost-Over-Time Schedule
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-09-17 - Completed quick task 260917-lz7: Fix bug: pasting numeric values into Currency fields registers as 0; typing works.
+Phase: Milestone v0.9 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-10-07 — Milestone v0.9 completed and archived
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 11
+- Total plans completed: 22
 - Average duration: 18 min
 - Total execution time: 43 min
 
@@ -58,6 +58,9 @@ Last activity: 2026-09-17 - Completed quick task 260917-lz7: Fix bug: pasting nu
 | 41 | 1 | - | - |
 | 44 | 1 | - | - |
 | 45 | 2 | - | - |
+| 49 | 3 | - | - |
+| 50 | 3 | - | - |
+| 51 | 5 | - | - |
 
 **Recent Trend:**
 
@@ -140,6 +143,17 @@ Last activity: 2026-09-17 - Completed quick task 260917-lz7: Fix bug: pasting nu
 | Phase 43 P03 | 5min | 2 tasks | 3 files |
 | Phase 43-mcp-localization-documentation-verification P05 | 0min | 3 tasks | 5 files |
 | Phase 44-core-loan-simulation-calculator P01 | 28min | 3 tasks | 6 files |
+| Phase 49 P01 | 45min | 3 tasks | 15 files |
+| Phase 49 P02 | 25 | 3 tasks | 6 files |
+| Phase 49 P03 | 8min | 3 tasks | 6 files |
+| Phase 50 P01 | 25min | 3 tasks | 10 files |
+| Phase 50 P02 | 15 | 2 tasks | 1 files |
+| Phase 50 P03 | 25min | 2 tasks | 2 files |
+| Phase 51 P01 | 15m | 2 tasks | 1 files |
+| Phase 51 P02 | 10 minutes | 2 tasks | 2 files |
+| Phase 51 P03 | 10 min | 2 tasks | 1 files |
+| Phase 51 P04 | 5 min | 1 tasks | 1 files |
+| Phase 51 P05 | 10 min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -186,6 +200,24 @@ Recent decisions affecting current work:
 - [Phase 38-01]: Placed the Settings page in the Guide section after Basic Concepts, matching the onboarding flow that ends in app configuration.
 - [Phase 45]: UI design contract approved — 6/6 checker dimensions passed; state coverage resolved by ui-consideration probe.
 - [Phase 45]: Research, pattern map, validation strategy, and two executable plans created (45-01 and 45-02). Plan-checker skipped per config (`plan_checker_enabled: false`).
+- [Phase ?]: GoalContributionRow made public because IGoalProgressCalculator is public (CS0050); plan internal inventory adjusted
+- [Phase ?]: LiteDB 5.0.21 ObjectId has no TryParse; service uses private 24-hex defensive parser for T-49-01
+- [Phase ?]: RunningTotal accumulates in (Date, Id) order in reader; service re-asserts order after mapping
+- [Phase ?]: [Phase 49-02] SaveFiat/SavingsRate merge tags rows with reader-set origin (isExpense) at concat time — running-total signs never re-evaluate transaction predicates
+- [Phase ?]: [Phase 49-02] Origin-flag merge + with-expression RunningTotal rebuild: GoalContributionRow rows are rebuilt, never mutated, keeping reader Contribution untouched
+- [Phase ?]: BtcValue is a magnitude type — sats-only/debit rows carry SatsAmount as absolute magnitude; sign lives on Contribution/RunningTotal
+- [Phase ?]: Direct-DB calculators resolve main currency from persisted settings collection (CurrencySettings.MainFiatCurrency key, USD default) — stay ILocalDatabase-only
+
+- [Phase 50-02]: Header strip uses a single container Border (Background800Brush/Background500Brush, Padding 8) with an inner 24px-spaced StackPanel of three sections — identity, period, total — keeping the grid, empty state, and footer untouched
+- [Phase 50-02]: Goal name truncated via MaxWidth=360 + CharacterEllipsis as the 50-UI-SPEC 720px backstop; no MaxWidth/MaxHeight on the Window itself
+- [Phase 50-02]: FinalTotalFormatted is the sole FontSizeLarge (16px) element in the modal — the focal reconciled total — bound directly from the VM property per prohibition on XAML recompute
+- [Phase 50-02]: Human visual sign-off approved for all 8 checkpoint steps (2026-10-06): populated grid, empty state, NetWorthBtc menu absence, 720px truncation backstop, semantic colors, secure-mode disable, Escape/Close dismissal
+- [Phase ?]: 50-03: test-only plan skipped RED/GREEN ceremony — production surface pre-exists from 50-01/50-02; committed green as test(50-03)
+- [Phase ?]: 50-03: failure-path catch widened to InvalidOperationException — ValtMessageBox Window ctor throws IWindowingPlatform error headlessly
+- [Phase ?]: 51-01: NotSupported maps GoalType from actual TypeId enum name, not hardcoded string
+- [Phase ?]: [Phase 51-03]: Skipped TDD RED/GREEN — MCP tool production surface pre-exists from 51-01; committed green as test(51-03) per 50-03 precedent
+- [Phase ?]: Documented GoalSummary modal chrome as WindowDecorations=None (Avalonia 11 actual) instead of plan's SystemDecorations=None — code is spec
+- [Phase 51-05]: Human end-to-end sign-off approved (2026-10-07): goal summary grid + running total match goal progress per type; empty state and Close/Escape confirmed; NetWorthBtc hidden; MCP parity with typed Supported=false contract; pt-BR/es render without truncation — Phase 51 gate closed, GOL-08/09/10 complete
 
 ### Pending Todos
 
@@ -221,28 +253,34 @@ None yet.
 | 260903-qow | Fix UI flicker and stale gray totals on Transaction tab when LivePricesUpdaterJob refreshes prices | 2026-09-03 | 5913b7d | [260903-qow-fix-ui-flicker-and-stale-gray-totals-on-](./quick/260903-qow-fix-ui-flicker-and-stale-gray-totals-on-/) |
 | 260904-faz | Change LivePrices job fallback behavior: keep previous live prices on fetch failure after a successful cycle; stored price data only as cold-start fallback | 2026-09-04 | ca71f63 | [260904-faz-change-liveprices-job-fallback-behavior-](./quick/260904-faz-change-liveprices-job-fallback-behavior-/) |
 | 260917-lz7 | Fix bug: pasting numeric values into Currency fields registers as 0; typing works (FiatInput paste handling) | 2026-09-17 | 89b3cc2 | [260917-lz7-fix-bug-pasting-numeric-values-into-curr](./quick/260917-lz7-fix-bug-pasting-numeric-values-into-curr/) |
+| 261006-kks | Restore Recalculate (refresh totals) in right-click context menu on goal entries in the Goals section of Transactions tab | 2026-10-06 | 65c0188 | [261006-kks-i-cannot-see-the-feature-to-refresh-the-](./quick/261006-kks-i-cannot-see-the-feature-to-refresh-the-/) |
 
 ## Deferred Items
 
-Items acknowledged and deferred at v0.6 milestone close (2026-07-17):
+Items acknowledged and deferred at v0.9 milestone close (2026-10-07; all predate v0.9, carried since the v0.6 close):
 
-| Category | Item | Status | Deferred At |
-|----------|------|--------|-------------|
-| Quality | v0.4 quality/hardening items (async void cleanup, god-VM refactor, live-API test isolation, handler unit tests) | Deferred | v0.6 |
-| Debug Session | empty-loan-context — Current Loan Context formatted properties are computed read-only properties | Investigating | v0.6 |
-| Debug Session | translation-gaps — UpdateLoanState UI strings added to neutral resx file not code-generated | Diagnosed | v0.6 |
-| Debug Session | visual-layout — hardcoded input widths exceed available column space and button widths | Diagnosed | v0.6 |
-| Quick Task | 001-copy-modal-perf | Unknown | v0.6 |
-| Quick Task | reports-summary-simulation | Missing | v0.6 |
-| Quick Task | 260616-rcu-fix-stock-asset-edit-modal-not-loading-s | Unknown | v0.6 |
+| Category | Item | Status |
+|----------|------|--------|
+| Quality | v0.4 quality/hardening items (async void cleanup, god-VM refactor, live-API test isolation, handler unit tests) — still deferred | Deferred |
+| Debug Session | 39-savings-rate-not-visible | Investigating |
+| Debug Session | btc-category-axis-crash | Diagnosed |
+| Debug Session | empty-loan-context | Investigating |
+| Debug Session | loanreports-cost-discrepancy | Diagnosed |
+| Debug Session | translation-gaps | Diagnosed |
+| Debug Session | visual-layout | Diagnosed |
+| Quick Task | 001-copy-modal-perf | Unknown |
+| Quick Task | reports-summary-simulation | Missing |
+| Quick Task | 260616-rcu-fix-stock-asset-edit-modal-not-loading-s | Unknown |
+| Roadmap | v0.8 phases 46–48 (Cost-Over-Time Schedule, Prefill from Existing Loan, Simulator MCP/Localization/Verification) — left pending at v0.9 start; recover in a future milestone | Pending |
 
 _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-03 executed; the QA-03 gap is closed by 38-QA-CHECKLIST.md._
 
 ## Session Continuity
 
-Last session: 2026-08-14T13:41:38.876Z
-Stopped at: Phase 45 plans created
-Resume file: .planning/phases/45-simulator-modal-ui-inputs-results-panel/45-01-PLAN.md
+Last session: 2026-10-07T14:05:00.000Z
+Stopped at: Completed 51-05-PLAN.md — Phase 51 complete, ready for milestone verification
+Resume file: None
+Resume file: None
 
 ## Notes
 
@@ -252,9 +290,8 @@ Resume file: .planning/phases/45-simulator-modal-ui-inputs-results-panel/45-01-P
 - v0.7 roadmap defined 2026-08-04: Phases 39-43, 12/12 requirements mapped (SPA-01..03, BTC-01..03, WLT-01..04, LON-01..02).
 - Phase 42 (loans-leverage-reports-ui) is now complete: 4/4 plans finished, gap G-42-2 closed.
 - v0.8 roadmap defined 2026-08-13: Phases 44-48, 13/13 requirements mapped (SIM-01..SIM-13), structure follows research/SUMMARY.md dependency order (engine → UI → schedule → prefill → MCP/localization/docs).
+- v0.9 roadmap defined 2026-10-06: Phases 49-51, 8/8 requirements mapped (GOL-03..GOL-10), following the codebase's core → UI → integration pattern (query backend → summary modal → MCP/localization/docs/verification). Note: v0.8 phases 46-48 remain pending.
 
 ## Operator Next Steps
 
-- v0.8 BTC Loan Simulator roadmap is defined (Phases 44-48).
-- Phase 45 UI-SPEC approved and two executable plans created.
-- Next: run `/gsd-execute-phase 45` to start execution.
+- Start the next milestone with /gsd-new-milestone

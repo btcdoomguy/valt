@@ -250,6 +250,40 @@ Individual goal display model with animation support.
 
 **Context Menu:**
 - `CanRecalculate` - Available for Completed or Failed goals (resets to Open)
+- `CanViewSummary` - Allow-lists the nine transaction-based goal types; NetWorthBtc is hidden (no contributing-transaction semantics)
+
+### Goal Summary (Contributing Transactions)
+
+**Files:**
+- UI: `src/Valt.UI/Views/Main/Modals/GoalSummary/GoalSummaryView.axaml(.cs)`, `GoalSummaryViewModel.cs`
+- App: `src/Valt.App/Modules/Goals/Queries/GetGoalContributingTransactions/` (query + handler)
+- Infra: `src/Valt.Infra/Modules/Goals/Services/GoalContributingTransactionsService.cs`
+- MCP: `src/Valt.Infra/Mcp/Tools/GoalTools.cs`
+
+**View Summary Flow (UI):**
+- Right-click a goal entry in the Goals section → "View summary" context menu item (`Goals_ViewSummary` in `GoalsPanelView.axaml`, bound to `GoalsPanelViewModel.ViewSummaryCommand`)
+- `GoalsPanelViewModel.ViewSummary` (`Views/Main/Tabs/Transactions/GoalsPanelViewModel.cs`) dispatches `GetGoalContributingTransactionsQuery` via `IQueryDispatcher`
+- Query failure → error message box; modal does NOT open
+- `NotSupported` result → modal does NOT open (defense-in-depth behind the hidden menu item)
+- `Supported` → opens `GoalSummaryView` modal (`ApplicationModalNames.GoalSummary`) via `IModalFactory` with `GoalSummaryViewModel.Request` (`GoalName`, `PeriodLabel`, `MainCurrencyCode`, `Result`, `StrategyUnit` = `GoalEntryViewModel.SummaryStrategyUnit`)
+- Modal: read-only grid (date, description, account, category, fiat, sats, running total), header strip with goal identity / period / final total, empty state (`GoalSummary_EmptyMessage`) when no rows; `WindowDecorations="None"` with `CustomTitleBar` per modal convention
+
+**App-Layer Query:**
+- `GetGoalContributingTransactionsQuery` → `GetGoalContributingTransactionsHandler` → `IGoalQueries.GetContributingTransactionsAsync(goalId)` (`Valt.App/Modules/Goals/Contracts/IGoalQueries.cs`)
+- Result is a discriminated union `GoalContributingTransactionsResult`: `Supported(IReadOnlyList<ContributingTransactionRow> Rows)` for the nine transaction-based strategies, `NotSupported(GoalTypeNames Type)` as the sole typed fallback — NetWorthBtc is the only NotSupported type (typed marker, not an error)
+- Unknown goalId → `GetContributingTransactionsAsync` returns null → handler maps to `Result.NotFound("Goal", goalId)`
+- Rows (`ContributingTransactionRow`, `Valt.App/Modules/Goals/DTOs/`): `FiatAmount`/`SatsAmount` are non-negative magnitudes (`BtcValue` cannot carry negative sats); the contribution sign is expressed only by `RunningTotal` deltas
+- Final row's `RunningTotal` equals the goal's calculated field, in the strategy's own unit: fiat for SpendingLimit/SaveFiat/IncomeFiat/ReduceExpenseCategory, percentage for SavingsRate, sats for StackBitcoin/IncomeBtc/BitcoinHodl, count for Dca
+- Per-strategy derivation lives beside each progress calculator: an override of `GetContributingTransactionsAsync` on `IGoalProgressCalculator` (9 of 10 calculators; NetWorthBtc keeps the NotSupported default), executed by `GoalContributingTransactionsService`
+- Same-day rows order by (Date, Id)
+
+**MCP Tool (GOL-08):**
+- `GetGoalContributingTransactions(goalId)` in `src/Valt.Infra/Mcp/Tools/GoalTools.cs` — read-only, no `McpDataChangedNotification`
+- Dispatches `GetGoalQuery` first (unknown goalId → returns null), then the App query
+- Returns MCP-owned DTO `GoalContributingTransactionsMcpResult { Supported, GoalType, StrategyUnit, FinalTotal, Rows[] }`; per-row `GoalContributingTransactionMcpRow { date, description, account, category, fiatAmount, fiatCurrencyCode, satsAmount, contribution, runningTotal }`
+- `Contribution` is the `RunningTotal` delta (computed by the tool, not stored on the App row); `FinalTotal` is the last row's `RunningTotal` (null when no rows)
+- `Supported=false` (typed) for NetWorthBtc, with empty rows and null StrategyUnit/FinalTotal
+- `IQueryDispatcher` already forwarded in `McpServerService.ForwardServicesFromMainApp()` — no DI change
 
 ### ManageGoalViewModel
 
@@ -412,6 +446,9 @@ src/Valt.Infra/Modules/Goals/
 │   ├── GoalTransactionReader.cs
 │   ├── IGoalProgressCalculator.cs
 │   ├── GoalProgressCalculatorFactory.cs
+│   ├── GoalContributingTransactionsService.cs
+│   ├── GoalContributionRow.cs
+│   ├── GoalContributingTransactionsCurrency.cs
 │   └── *ProgressCalculator.cs (10 implementations)
 ├── Handlers/
 │   ├── GoalEventHandler.cs
@@ -425,9 +462,12 @@ src/Valt.UI/Views/Main/
 │   ├── GoalsPanelView.axaml
 │   ├── GoalsPanelViewModel.cs
 │   └── Models/GoalEntryViewModel.cs
-└── Modals/ManageGoal/
-    ├── ManageGoalViewModel.cs, ManageGoalView.axaml
-    ├── IGoalTypeEditorViewModel.cs
-    └── GoalTypeEditors/
-        └── *GoalTypeEditorViewModel.cs (10 editors + views)
+└── Modals/
+    ├── ManageGoal/
+    │   ├── ManageGoalViewModel.cs, ManageGoalView.axaml
+    │   ├── IGoalTypeEditorViewModel.cs
+    │   └── GoalTypeEditors/
+    │       └── *GoalTypeEditorViewModel.cs (10 editors + views)
+    └── GoalSummary/
+        └── GoalSummaryViewModel.cs, GoalSummaryView.axaml
 ```

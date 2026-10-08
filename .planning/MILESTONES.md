@@ -1,5 +1,24 @@
 # Milestones
 
+## v0.9 Goal Transparency — Transaction Breakdown (Shipped: 2026-10-07)
+
+**Phases completed:** 3 phases, 11 plans, 25 tasks
+
+**Known verification overrides:** 9 deferred items acknowledged at close (see STATE.md Deferred Items — all predate v0.9).
+
+**Key accomplishments:**
+
+- CQRS query exposing contributing transactions for all 9 transaction-based goal strategies with running totals that reconcile exactly with `CalculateProgressAsync` — via a calculator-level row-exposure mechanism with aggregates re-derived as row sums (selection logic cannot drift from progress math); NetWorthBtc is the sole typed NotSupported type.
+- `GetIncomeRows` as the single fiat-income selection path plus 8 calculator overrides covering mixed-sign merges, category filtering, incremental percentage running totals, signed sats buckets, purchase counts, and sold-sats — the BitcoinHodl strategy was code-verified as transaction-based and included per user decision.
+- Goal Summary modal UI: "View summary" context-menu item (allow-list gating, secure-mode disable), chromeless resizable modal with 7-column read-only DataGrid, per-strategy-unit running-total formatting with RunningTotal-delta semantic colors, empty counterpart cells (no fabricated zeros), focal reconciled-total header strip, and localized empty state.
+- `GetGoalContributingTransactions` MCP tool on `GoalTools` with typed `Supported`/`Error` contract; integration tests prove MCP DTO byte-parity with the App query through real DI (NetWorthBtc `Supported=false`, unknown-id null, query-failure typed error).
+- Full localization of the feature in en/pt-BR/es (1048-key tri-locale parity) and `.claude/docs/goals.md` documentation of the View Summary flow, query contract, and MCP tool.
+- Quality gates: 3 phase verifications passed (20/20, 27/27, 14/14 must-haves), milestone integration check passed (all 8 requirements wired end-to-end), two human sign-offs (visual + end-to-end MCP parity), code review found 1 critical + 8 warnings — all fixed; final suite 1822/1822 green.
+
+**Known deferred items at close:** 10 (see STATE.md Deferred Items — 9 pre-existing debug/quick-task items plus pending v0.8 phases 46–48)
+
+---
+
 ## v0.6 Documentation Site Refresh (Shipped: 2026-07-17)
 
 **Phases completed:** 7 phases, 17 plans, 42 tasks

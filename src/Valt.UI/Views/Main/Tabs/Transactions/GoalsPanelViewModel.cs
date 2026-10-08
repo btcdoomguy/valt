@@ -16,6 +16,7 @@ using Valt.App.Modules.Goals.Commands.RecalculateGoal;
 using Valt.App.Modules.Goals.Contracts;
 using Valt.App.Modules.Goals.DTOs;
 using Valt.App.Modules.Goals.Queries.GetGoals;
+using Valt.App.Modules.Goals.Queries.GetGoalContributingTransactions;
 using Valt.Core.Modules.Goals;
 using Valt.Infra.Modules.Goals.Services;
 using Valt.Infra.Settings;
@@ -24,6 +25,7 @@ using Valt.UI.Lang;
 using Valt.UI.Services;
 using Valt.UI.Services.MessageBoxes;
 using Valt.UI.State;
+using Valt.UI.Views.Main.Modals.GoalSummary;
 using Valt.UI.Views.Main.Modals.ManageGoal;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
@@ -235,6 +237,43 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
         _goalProgressState.MarkAsStale();
         await FetchGoals();
         WeakReferenceMessenger.Default.Send(new GoalListChanged());
+    }
+
+    [RelayCommand]
+    private async Task ViewSummary(GoalEntryViewModel? entry)
+    {
+        if (entry is null)
+            return;
+
+        var result = await _queryDispatcher.DispatchAsync(
+            new GetGoalContributingTransactionsQuery { GoalId = entry.Id });
+
+        if (result.IsFailure)
+        {
+            await MessageBoxHelper.ShowErrorAsync(language.Error, result.Error!.Message, GetUserControlOwnerWindow()!);
+            return; // modal does NOT open on query failure
+        }
+
+        // Defense-in-depth: goal types without contributing-transaction semantics return
+        // NotSupported. The menu item is hidden for those (CanViewSummary allow-list),
+        // but never open the modal for them — it would show a factually wrong empty state.
+        if (result.Value is not GoalContributingTransactionsResult.Supported)
+            return;
+
+        var ownerWindow = GetUserControlOwnerWindow();
+        var modal = (GoalSummaryView)await _modalFactory.CreateAsync(
+            ApplicationModalNames.GoalSummary,
+            ownerWindow,
+            new GoalSummaryViewModel.Request
+            {
+                GoalName = entry.FriendlyName,
+                PeriodLabel = entry.IsYearly ? $"({entry.RefDate:yyyy})" : $"({entry.RefDate:MM/yy})",
+                MainCurrencyCode = _currencySettings.MainFiatCurrency,
+                Result = result.Value!,
+                StrategyUnit = entry.SummaryStrategyUnit
+            })!;
+
+        await modal.ShowDialogSafeAsync<GoalSummaryViewModel.Response?>(ownerWindow!);
     }
 
     [RelayCommand]

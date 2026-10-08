@@ -15,6 +15,15 @@ internal class ReduceExpenseCategoryProgressCalculator : IGoalProgressCalculator
         _transactionReader = transactionReader;
     }
 
+    public Task<IReadOnlyList<GoalContributionRow>?> GetContributingTransactionsAsync(GoalProgressInput input)
+    {
+        var config = GoalTypeSerializer.DeserializeReduceExpenseCategory(input.GoalTypeJson);
+
+        // Same selection path as CalculateProgressAsync — category filter applied by the reader.
+        return Task.FromResult<IReadOnlyList<GoalContributionRow>?>(
+            _transactionReader.GetExpenseRows(input.From, input.To, categoryId: new ObjectId(config.CategoryId)));
+    }
+
     public Task<GoalProgressResult> CalculateProgressAsync(GoalProgressInput input)
     {
         var config = GoalTypeSerializer.DeserializeReduceExpenseCategory(input.GoalTypeJson);

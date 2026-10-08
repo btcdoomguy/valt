@@ -14,6 +14,14 @@ internal class IncomeFiatProgressCalculator : IGoalProgressCalculator
         _transactionReader = transactionReader;
     }
 
+    public Task<IReadOnlyList<GoalContributionRow>?> GetContributingTransactionsAsync(GoalProgressInput input)
+    {
+        // Same selection path as CalculateProgressAsync (CalculateTotalIncome delegates
+        // to GetIncomeRows), so the rows cannot drift from the progress math.
+        return Task.FromResult<IReadOnlyList<GoalContributionRow>?>(
+            _transactionReader.GetIncomeRows(input.From, input.To));
+    }
+
     public Task<GoalProgressResult> CalculateProgressAsync(GoalProgressInput input)
     {
         var config = GoalTypeSerializer.DeserializeIncomeFiat(input.GoalTypeJson);

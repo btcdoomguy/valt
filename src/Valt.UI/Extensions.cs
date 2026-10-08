@@ -20,6 +20,7 @@ using Valt.UI.Views.Main.Modals.CreateDatabase;
 using Valt.UI.Views.Main.Modals.FixedExpenseEditor;
 using Valt.UI.Views.Main.Modals.FixedExpenseHistory;
 using Valt.UI.Views.Main.Modals.FixedExpenseOverview;
+using Valt.UI.Views.Main.Modals.GoalSummary;
 using Valt.UI.Views.Main.Modals.IconSelector;
 using Valt.UI.Views.Main.Modals.InitialSelection;
 using Valt.UI.Views.Main.Modals.InputPassword;
@@ -159,6 +160,7 @@ public static class Extensions
         services.AddTransient<SoldAssetHistoryViewModel>();
         services.AddTransient<DateSoldPromptViewModel>();
         services.AddTransient<ReportsCategoryFilterConfigViewModel>();
+        services.AddTransient<GoalSummaryViewModel>();
 
         //other
         services.AddSingleton<IInitialCategoryNameLanguageProvider, InitialCategoryNameLanguageProvider>();
@@ -316,6 +318,10 @@ public static class Extensions
                 ApplicationModalNames.ReportsCategoryFilterConfig => new ReportsCategoryFilterConfigView()
                 {
                     DataContext = services.GetRequiredService<ReportsCategoryFilterConfigViewModel>(),
+                },
+                ApplicationModalNames.GoalSummary => new GoalSummaryView()
+                {
+                    DataContext = services.GetRequiredService<GoalSummaryViewModel>(),
                 },
                 _ => throw new ArgumentOutOfRangeException(nameof(modalNames), modalNames, null)
             };

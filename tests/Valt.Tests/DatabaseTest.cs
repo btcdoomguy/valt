@@ -29,6 +29,8 @@ using Valt.Infra.Modules.Goals;
 using Valt.Infra.Modules.Budget.Transactions;
 using Valt.Infra.Modules.Budget.Transactions.Queries;
 using Valt.Infra.Modules.Goals.Queries;
+using Valt.Infra.Modules.Goals.Services;
+using Valt.Infra.Settings;
 
 namespace Valt.Tests;
 
@@ -86,8 +88,33 @@ public abstract class DatabaseTest
         _categoryQueries = new CategoryQueries(_localDatabase);
         _accountQueries = new AccountQueries(_localDatabase, Substitute.For<IAccountTotalsCalculator>());
         _transactionQueries = new TransactionQueries(_localDatabase);
-        _goalQueries = new GoalQueries(_localDatabase);
+        _goalQueries = BuildGoalQueries();
         _assetQueries = new AssetQueries(_localDatabase);
+    }
+
+    private IGoalQueries BuildGoalQueries()
+    {
+        var currencySettings = new CurrencySettings(_localDatabase, Substitute.For<INotificationPublisher>());
+        var goalTransactionReader = new GoalTransactionReader(_localDatabase, _priceDatabase, currencySettings);
+
+        var calculators = new IGoalProgressCalculator[]
+        {
+            new StackBitcoinProgressCalculator(_localDatabase),
+            new SpendingLimitProgressCalculator(goalTransactionReader),
+            new DcaProgressCalculator(_localDatabase),
+            new IncomeFiatProgressCalculator(goalTransactionReader),
+            new IncomeBtcProgressCalculator(_localDatabase),
+            new ReduceExpenseCategoryProgressCalculator(goalTransactionReader),
+            new BitcoinHodlProgressCalculator(_localDatabase),
+            new SaveFiatProgressCalculator(goalTransactionReader),
+            new SavingsRateProgressCalculator(goalTransactionReader),
+            new NetWorthBtcProgressCalculator(_localDatabase, _priceDatabase, currencySettings)
+        };
+
+        var calculatorFactory = new GoalProgressCalculatorFactory(calculators);
+        var contributingTransactionsService = new GoalContributingTransactionsService(_localDatabase, calculatorFactory);
+
+        return new GoalQueries(_localDatabase, contributingTransactionsService);
     }
 
     [OneTimeSetUp]

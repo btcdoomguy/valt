@@ -4,16 +4,24 @@ using Valt.App.Modules.Goals.Contracts;
 using Valt.App.Modules.Goals.DTOs;
 using Valt.Core.Modules.Goals;
 using Valt.Infra.DataAccess;
+using Valt.Infra.Modules.Goals.Services;
 
 namespace Valt.Infra.Modules.Goals.Queries;
 
 internal class GoalQueries : IGoalQueries
 {
     private readonly ILocalDatabase _localDatabase;
+    private readonly GoalContributingTransactionsService _contributingTransactionsService;
 
-    public GoalQueries(ILocalDatabase localDatabase)
+    public GoalQueries(ILocalDatabase localDatabase, GoalContributingTransactionsService contributingTransactionsService)
     {
         _localDatabase = localDatabase;
+        _contributingTransactionsService = contributingTransactionsService;
+    }
+
+    public Task<GoalContributingTransactionsResult?> GetContributingTransactionsAsync(string goalId)
+    {
+        return _contributingTransactionsService.GetContributingTransactionsAsync(goalId);
     }
 
     public Task<IReadOnlyList<StaleGoalDTO>> GetStaleGoalsAsync()
@@ -25,7 +33,7 @@ internal class GoalQueries : IGoalQueries
                 var period = (GoalPeriods)entity.PeriodId;
                 var refDate = DateOnly.FromDateTime(entity.RefDate);
                 var startDate = entity.StartDate.HasValue ? DateOnly.FromDateTime(entity.StartDate.Value) : (DateOnly?)null;
-                var (from, to) = GetPeriodRange(refDate, period, startDate);
+                var (from, to) = GoalPeriodRangeHelper.GetRange(refDate, period, startDate);
 
                 return new StaleGoalDTO(
                     entity.Id.ToString(),
@@ -53,7 +61,7 @@ internal class GoalQueries : IGoalQueries
                 var refDate = DateOnly.FromDateTime(g.RefDate);
                 var period = (GoalPeriods)g.PeriodId;
                 var startDate = g.StartDate.HasValue ? DateOnly.FromDateTime(g.StartDate.Value) : (DateOnly?)null;
-                var range = GetPeriodRange(refDate, period, startDate);
+                var range = GoalPeriodRangeHelper.GetRange(refDate, period, startDate);
                 return date >= range.From && date <= range.To;
             });
         }
@@ -235,20 +243,6 @@ internal class GoalQueries : IGoalQueries
         {
             TargetSats = dto.TargetSats,
             CalculatedSats = dto.CalculatedSats
-        };
-    }
-
-    private static (DateOnly From, DateOnly To) GetPeriodRange(DateOnly refDate, GoalPeriods period, DateOnly? startDate = null)
-    {
-        return period switch
-        {
-            GoalPeriods.Monthly => (
-                new DateOnly(refDate.Year, refDate.Month, 1),
-                new DateOnly(refDate.Year, refDate.Month, DateTime.DaysInMonth(refDate.Year, refDate.Month))),
-            GoalPeriods.Yearly => (
-                startDate ?? new DateOnly(refDate.Year, 1, 1),
-                new DateOnly(refDate.Year, 12, 31)),
-            _ => throw new ArgumentOutOfRangeException(nameof(period))
         };
     }
 }

@@ -72,10 +72,11 @@ public class RecalculateGoalHandlerTests : DatabaseTest
     }
 
     [Test]
-    public async Task HandleAsync_WithOpenGoal_ReturnsError()
+    public async Task HandleAsync_WithOpenGoal_MarksGoalStaleAndSucceeds()
     {
         var goal = GoalBuilder.AStackBitcoinGoal(1_000_000)
             .WithState(GoalStates.Open)
+            .WithIsUpToDate(true)
             .Build();
         await _goalRepository.SaveAsync(goal);
 
@@ -83,11 +84,17 @@ public class RecalculateGoalHandlerTests : DatabaseTest
 
         var result = await _handler.HandleAsync(command);
 
+        Assert.That(result.IsSuccess, Is.True);
+
+        var updatedGoal = await _goalRepository.GetByIdAsync(goal.Id);
         Assert.Multiple(() =>
         {
-            Assert.That(result.IsFailure, Is.True);
-            Assert.That(result.Error!.Code, Is.EqualTo("INVALID_STATE"));
+            Assert.That(updatedGoal!.State, Is.EqualTo(GoalStates.Open));
+            Assert.That(updatedGoal.IsUpToDate, Is.False);
         });
+
+        await _notificationPublisher.Received(1)
+            .PublishAsync(Arg.Is<GoalProgressUpdateRequested>(_ => true));
     }
 
     [Test]

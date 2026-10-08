@@ -1,3 +1,4 @@
+using Valt.Core.Common;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.GoalTypes;
 using Valt.Infra.DataAccess;
@@ -61,5 +62,68 @@ internal class StackBitcoinProgressCalculator : IGoalProgressCalculator
         var updatedGoalType = config.WithCalculatedSats(netBtcStacked);
 
         return Task.FromResult(new GoalProgressResult(progress, updatedGoalType));
+    }
+
+    public Task<IReadOnlyList<GoalContributionRow>?> GetContributingTransactionsAsync(GoalProgressInput input)
+    {
+        // Same range scan as CalculateProgressAsync with the four bucket predicates mirrored
+        // verbatim — selection stays beside the progress math, so rows cannot drift from it.
+        var fromDate = input.From.ToValtDateTime();
+        var toDate = input.To.ToValtDateTime().AddDays(1).AddTicks(-1);
+
+        var mainCurrencyCode = GoalContributingTransactionsCurrency.GetMainFiatCurrencyCode(_localDatabase);
+        var accounts = _localDatabase.GetAccounts().FindAll().ToDictionary(x => x.Id);
+
+        var transactions = _localDatabase.GetTransactions()
+            .Find(x => x.Date >= fromDate && x.Date <= toDate)
+            .ToList();
+
+        var rows = new List<GoalContributionRow>();
+        var runningTotal = 0m;
+
+        var ordered = transactions
+            .OrderBy(x => DateOnly.FromDateTime(x.Date.ToUniversalTime()))
+            .ThenBy(x => x.Id);
+
+        foreach (var tx in ordered)
+        {
+            long? signedSats = tx.Type switch
+            {
+                // BTC purchased (FiatToBitcoin transactions)
+                TransactionEntityType.FiatToBitcoin when tx.ToSatAmount > 0 => tx.ToSatAmount.Value,
+                // Direct BTC income (Bitcoin transactions with positive FromSatAmount)
+                TransactionEntityType.Bitcoin when tx.FromSatAmount > 0 => tx.FromSatAmount.Value,
+                // BTC sold (BitcoinToFiat transactions - FromSatAmount is negative)
+                TransactionEntityType.BitcoinToFiat when tx.FromSatAmount < 0 => -Math.Abs(tx.FromSatAmount.Value),
+                // Direct BTC expenses (Bitcoin transactions with negative FromSatAmount)
+                TransactionEntityType.Bitcoin when tx.FromSatAmount < 0 => -Math.Abs(tx.FromSatAmount.Value),
+                _ => null,
+            };
+            if (signedSats is null)
+                continue;
+
+            // Transfers with a fiat leg carry it: purchases (FiatToBitcoin) persist the fiat
+            // leg on the "from" side, sales (BitcoinToFiat) on the "to" side (their
+            // FromFiatAmount is always null) — resolve currency against the fiat-leg account.
+            // Direct-Bitcoin rows are sats-only: zero fiat, main currency (Q3 decision).
+            var hasFiatLeg = tx.Type is TransactionEntityType.FiatToBitcoin or TransactionEntityType.BitcoinToFiat;
+            var isSale = tx.Type == TransactionEntityType.BitcoinToFiat;
+            var fiatAccountId = isSale ? tx.ToAccountId : tx.FromAccountId;
+            var signedFiatAmount = hasFiatLeg
+                ? (isSale ? tx.ToFiatAmount ?? 0m : tx.FromFiatAmount ?? 0m)
+                : 0m;
+            var fiatCurrencyCode = hasFiatLeg
+                ? GoalContributingTransactionsCurrency.ResolveAccountCurrency(fiatAccountId, accounts, mainCurrencyCode)
+                : mainCurrencyCode;
+
+            var contribution = (decimal)signedSats.Value;
+            runningTotal += contribution;
+            // BtcValue is a magnitude type (negative sats are rejected), so SatsAmount carries
+            // the absolute sats — the natural sign lives on Contribution/RunningTotal.
+            rows.Add(new GoalContributionRow(
+                tx, signedFiatAmount, fiatCurrencyCode, BtcValue.ParseSats(Math.Abs(signedSats.Value)), contribution, runningTotal));
+        }
+
+        return Task.FromResult<IReadOnlyList<GoalContributionRow>?>(rows);
     }
 }

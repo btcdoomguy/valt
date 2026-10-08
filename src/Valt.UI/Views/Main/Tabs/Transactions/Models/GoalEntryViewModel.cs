@@ -191,8 +191,24 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
     public bool ShowSuccessIcon => _goal.State == (int)GoalStates.Completed;
     public bool ShowFailedIcon => _goal.State == (int)GoalStates.Failed;
 
-    // Context menu visibility
-    public bool CanRecalculate => _goal.State == (int)GoalStates.Completed || _goal.State == (int)GoalStates.Failed;
+    // Context menu visibility — allow-list of goal types with contributing-transaction
+    // semantics (mirrors Phase 49 query support). Future goal types default to hidden.
+    public bool CanRecalculate => true;
+    public bool CanViewSummary => _goal.GoalType is
+        StackBitcoinGoalTypeOutputDTO or IncomeBtcGoalTypeOutputDTO or
+        BitcoinHodlGoalTypeOutputDTO or DcaGoalTypeOutputDTO or
+        SavingsRateGoalTypeOutputDTO or SpendingLimitGoalTypeOutputDTO or
+        SaveFiatGoalTypeOutputDTO or IncomeFiatGoalTypeOutputDTO or
+        ReduceExpenseCategoryGoalTypeOutputDTO;
+
+    public GoalStrategyUnit SummaryStrategyUnit => _goal.GoalType switch
+    {
+        StackBitcoinGoalTypeOutputDTO or IncomeBtcGoalTypeOutputDTO or BitcoinHodlGoalTypeOutputDTO =>
+            GoalStrategyUnit.Sats,
+        DcaGoalTypeOutputDTO => GoalStrategyUnit.Count,
+        SavingsRateGoalTypeOutputDTO => GoalStrategyUnit.Percentage,
+        _ => GoalStrategyUnit.Fiat // NetWorthBtc falls here but is unreachable (menu hidden)
+    };
 
     // Show progress bar only for Open state (not for Completed or Failed)
     public bool ShowProgressBar => _goal.State == (int)GoalStates.Open;
@@ -224,6 +240,8 @@ public partial class GoalEntryViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(ShowSuccessIcon));
         OnPropertyChanged(nameof(ShowFailedIcon));
         OnPropertyChanged(nameof(CanRecalculate));
+        OnPropertyChanged(nameof(CanViewSummary));
+        OnPropertyChanged(nameof(SummaryStrategyUnit));
         OnPropertyChanged(nameof(ShowProgressBar));
         OnPropertyChanged(nameof(RequiresPriceData));
 

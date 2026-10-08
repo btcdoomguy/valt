@@ -2033,6 +2033,43 @@
     <data name="Goals_YearlyIndicator" xml:space="preserve">
         <value>(anual)</value>
     </data>
+    <!-- Goal Summary Modal -->
+    <data name="Goals_ViewSummary" xml:space="preserve">
+        <value>Ver resumo</value>
+    </data>
+    <data name="GoalSummary_Title" xml:space="preserve">
+        <value>Resumo da meta</value>
+    </data>
+    <data name="GoalSummary_PeriodLabel" xml:space="preserve">
+        <value>Período</value>
+    </data>
+    <data name="GoalSummary_TotalLabel" xml:space="preserve">
+        <value>Total</value>
+    </data>
+    <data name="GoalSummary_ColumnAccount" xml:space="preserve">
+        <value>Conta</value>
+    </data>
+    <data name="GoalSummary_ColumnCategory" xml:space="preserve">
+        <value>Categoria</value>
+    </data>
+    <data name="GoalSummary_ColumnFiat" xml:space="preserve">
+        <value>Fiat</value>
+    </data>
+    <data name="GoalSummary_ColumnSats" xml:space="preserve">
+        <value>Sats</value>
+    </data>
+    <data name="GoalSummary_ColumnRunningTotal" xml:space="preserve">
+        <value>Total acumulado</value>
+    </data>
+    <data name="GoalSummary_EmptyTitle" xml:space="preserve">
+        <value>Ainda sem transações</value>
+    </data>
+    <data name="GoalSummary_EmptyMessage" xml:space="preserve">
+        <value>Nenhuma transação contribui para esta meta ainda.</value>
+    </data>
+    <data name="GoalSummary_Close" xml:space="preserve">
+        <value>Fechar</value>
+    </data>
     <data name="GoalDescription_StackBitcoin" xml:space="preserve">
         <value>{0}/{1} sats</value>
     </data>

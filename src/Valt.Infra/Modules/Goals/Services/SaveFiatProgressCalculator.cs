@@ -14,6 +14,28 @@ internal class SaveFiatProgressCalculator : IGoalProgressCalculator
         _transactionReader = transactionReader;
     }
 
+    public Task<IReadOnlyList<GoalContributionRow>?> GetContributingTransactionsAsync(GoalProgressInput input)
+    {
+        // Merge income and expense rows from the reader (the only selection paths,
+        // so rows cannot drift from CalculateProgressAsync), then re-accumulate the
+        // running total as cumulative income minus cumulative expenses.
+        var merged = _transactionReader.GetIncomeRows(input.From, input.To)
+            .Select(r => (Row: r, IsExpense: false))
+            .Concat(_transactionReader.GetExpenseRows(input.From, input.To).Select(r => (Row: r, IsExpense: true)))
+            .OrderBy(x => DateOnly.FromDateTime(x.Row.Transaction.Date.ToUniversalTime()))
+            .ThenBy(x => x.Row.Transaction.Id);
+
+        var rows = new List<GoalContributionRow>();
+        var runningTotal = 0m;
+        foreach (var (row, isExpense) in merged)
+        {
+            runningTotal += isExpense ? -row.Contribution : row.Contribution;
+            rows.Add(row with { RunningTotal = runningTotal });
+        }
+
+        return Task.FromResult<IReadOnlyList<GoalContributionRow>?>(rows);
+    }
+
     public Task<GoalProgressResult> CalculateProgressAsync(GoalProgressInput input)
     {
         var config = GoalTypeSerializer.DeserializeSaveFiat(input.GoalTypeJson);

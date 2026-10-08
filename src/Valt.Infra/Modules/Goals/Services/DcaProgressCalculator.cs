@@ -1,3 +1,4 @@
+using Valt.Core.Common;
 using Valt.Core.Modules.Goals;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
@@ -38,5 +39,43 @@ internal class DcaProgressCalculator : IGoalProgressCalculator
         var updatedGoalType = config.WithCalculatedPurchaseCount(purchaseCount);
 
         return Task.FromResult(new GoalProgressResult(progress, updatedGoalType));
+    }
+
+    public Task<IReadOnlyList<GoalContributionRow>?> GetContributingTransactionsAsync(GoalProgressInput input)
+    {
+        // Same range scan and predicate as CalculateProgressAsync (FiatToBitcoin only) —
+        // selection stays beside the progress math, so rows cannot drift from it.
+        var fromDate = input.From.ToValtDateTime();
+        var toDate = input.To.ToValtDateTime().AddDays(1).AddTicks(-1);
+
+        var mainCurrencyCode = GoalContributingTransactionsCurrency.GetMainFiatCurrencyCode(_localDatabase);
+        var accounts = _localDatabase.GetAccounts().FindAll().ToDictionary(x => x.Id);
+
+        var transactions = _localDatabase.GetTransactions()
+            .Find(x => x.Date >= fromDate && x.Date <= toDate && x.Type == TransactionEntityType.FiatToBitcoin)
+            .ToList();
+
+        var rows = new List<GoalContributionRow>();
+        var runningTotal = 0m;
+
+        var ordered = transactions
+            .OrderBy(x => DateOnly.FromDateTime(x.Date.ToUniversalTime()))
+            .ThenBy(x => x.Id);
+
+        foreach (var tx in ordered)
+        {
+            // Progress is a purchase count: each row contributes 1 (Q2 count-unit decision).
+            var contribution = 1m;
+            runningTotal += contribution;
+            rows.Add(new GoalContributionRow(
+                tx,
+                tx.FromFiatAmount ?? 0m,
+                GoalContributingTransactionsCurrency.ResolveFromAccountCurrency(tx, accounts, mainCurrencyCode),
+                BtcValue.ParseSats(Math.Abs(tx.ToSatAmount ?? 0)),
+                contribution,
+                runningTotal));
+        }
+
+        return Task.FromResult<IReadOnlyList<GoalContributionRow>?>(rows);
     }
 }

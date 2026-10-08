@@ -147,6 +147,13 @@
                                     CommandParameter="{Binding .}"
                                     IsVisible="{Binding CanRecalculate}">
                                 </MenuItem>
+                                <MenuItem
+                                    Header="{x:Static local:language.Goals_ViewSummary}"
+                                    Command="{Binding $parent[UserControl].((vm:GoalsPanelViewModel)DataContext).ViewSummaryCommand}"
+                                    CommandParameter="{Binding .}"
+                                    IsVisible="{Binding CanViewSummary}"
+                                    IsEnabled="{Binding !$parent[UserControl].((vm:GoalsPanelViewModel)DataContext).IsSecureModeEnabled}">
+                                </MenuItem>
                                 <Separator />
                                 <MenuItem
                                     Header="{x:Static local:language.Goals_Delete}"

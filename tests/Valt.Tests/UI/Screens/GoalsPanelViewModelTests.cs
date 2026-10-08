@@ -1,3 +1,4 @@
+using Avalonia.Controls;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -9,14 +10,18 @@ using Valt.App.Modules.Goals.Commands.DeleteGoal;
 using Valt.App.Modules.Goals.Commands.RecalculateGoal;
 using Valt.App.Modules.Goals.DTOs;
 using Valt.App.Modules.Goals.Queries.GetGoals;
+using Valt.App.Modules.Goals.Queries.GetGoalContributingTransactions;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Goals;
 using Valt.Infra.Kernel;
 using Valt.Infra.Settings;
 using Valt.Infra.Modules.Goals.Services;
+using Valt.UI.Base;
 using Valt.UI.Services;
 using Valt.UI.State;
+using Valt.UI.Views;
+using Valt.UI.Views.Main.Modals.GoalSummary;
 using Valt.UI.Views.Main.Tabs.Transactions;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
 
@@ -140,6 +145,66 @@ public class GoalsPanelViewModelTests : DatabaseTest
                 TargetPurchaseCount = 12,
                 CalculatedPurchaseCount = (int)(progress / 10)
             }
+        };
+    }
+
+    private GoalDTO CreateNetWorthBtcGoalDTO(string id, GoalPeriods period, DateOnly refDate, GoalStates state = GoalStates.Open, decimal progress = 0m)
+    {
+        return new GoalDTO
+        {
+            Id = id,
+            RefDate = refDate,
+            Period = (int)period,
+            StartDate = null,
+            Progress = progress,
+            State = (int)state,
+            IsUpToDate = true,
+            LastUpdatedAt = DateTime.Now,
+            GoalType = new NetWorthBtcGoalTypeOutputDTO
+            {
+                TargetSats = 1_000_000,
+                CalculatedSats = (long)(progress * 10000)
+            }
+        };
+    }
+
+    private GoalDTO CreateSavingsRateGoalDTO(string id, GoalPeriods period, DateOnly refDate, GoalStates state = GoalStates.Open, decimal progress = 0m)
+    {
+        return new GoalDTO
+        {
+            Id = id,
+            RefDate = refDate,
+            Period = (int)period,
+            StartDate = null,
+            Progress = progress,
+            State = (int)state,
+            IsUpToDate = true,
+            LastUpdatedAt = DateTime.Now,
+            GoalType = new SavingsRateGoalTypeOutputDTO
+            {
+                TargetPercentage = 50m,
+                CalculatedPercentage = progress / 2
+            }
+        };
+    }
+
+    /// <summary>
+    /// Builds a GoalDTO for any goal-type output DTO, so per-type visibility/unit
+    /// tests stay declarative without one factory per DTO shape.
+    /// </summary>
+    private GoalDTO CreateGoalDTO(GoalTypeOutputDTO goalType, string id = "goal-1")
+    {
+        return new GoalDTO
+        {
+            Id = id,
+            RefDate = new DateOnly(2025, 1, 1),
+            Period = (int)GoalPeriods.Monthly,
+            StartDate = null,
+            Progress = 0m,
+            State = (int)GoalStates.Open,
+            IsUpToDate = true,
+            LastUpdatedAt = DateTime.Now,
+            GoalType = goalType
         };
     }
 
@@ -425,6 +490,196 @@ public class GoalsPanelViewModelTests : DatabaseTest
 
         // Assert
         Assert.That(_goalProgressState.HasStaleGoals, Is.False);
+    }
+
+    #endregion
+
+    #region ViewSummary Tests
+
+    [Test]
+    public async Task ViewSummary_NullEntry_DoesNothing()
+    {
+        // Arrange
+        var vm = CreateViewModel();
+
+        // Act
+        await vm.ViewSummaryCommand.ExecuteAsync(null);
+
+        // Assert
+        await _queryDispatcher.DidNotReceive().DispatchAsync(
+            Arg.Any<GetGoalContributingTransactionsQuery>(),
+            Arg.Any<CancellationToken>());
+        _ = _modalFactory.DidNotReceive().CreateAsync(
+            Arg.Is(ApplicationModalNames.GoalSummary),
+            Arg.Any<Window?>(),
+            Arg.Any<object>());
+    }
+
+    [Test]
+    public async Task ViewSummary_QueryFailure_DoesNotOpenModal()
+    {
+        // Arrange
+        _queryDispatcher.DispatchAsync(Arg.Any<GetGoalContributingTransactionsQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(Result<GoalContributingTransactionsResult>.Failure(
+                new Error("GOAL_NOT_FOUND", "Goal not found"))));
+
+        var vm = CreateViewModel();
+        var entry = new GoalEntryViewModel(
+            CreateStackBitcoinGoalDTO("goal-1", GoalPeriods.Monthly, new DateOnly(2025, 1, 1)),
+            _currencySettings.MainFiatCurrency);
+
+        // Act
+        try
+        {
+            await vm.ViewSummaryCommand.ExecuteAsync(entry);
+        }
+        catch (Exception ex) when (ex is NullReferenceException or InvalidOperationException)
+        {
+            // Expected: ShowErrorAsync builds a ValtMessageBox (a Window), which cannot
+            // be constructed/shown outside a real Avalonia app (null owner window /
+            // missing IWindowingPlatform in the test environment).
+        }
+
+        // Assert - the modal factory never receives the GoalSummary name on query failure
+        _ = _modalFactory.DidNotReceive().CreateAsync(
+            Arg.Is(ApplicationModalNames.GoalSummary),
+            Arg.Any<Window?>(),
+            Arg.Any<object>());
+    }
+
+    [Test]
+    public async Task ViewSummary_NotSupportedResult_DoesNotOpenModal()
+    {
+        // Arrange - goal types without contributing-transaction semantics (e.g. NetWorthBtc)
+        // return NotSupported from the Phase 49 query; the modal must not open for them
+        _queryDispatcher.DispatchAsync(Arg.Any<GetGoalContributingTransactionsQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(Result<GoalContributingTransactionsResult>.Success(
+                new GoalContributingTransactionsResult.NotSupported(GoalTypeNames.NetWorthBtc))));
+
+        var vm = CreateViewModel();
+        var entry = new GoalEntryViewModel(
+            CreateNetWorthBtcGoalDTO("goal-1", GoalPeriods.Monthly, new DateOnly(2025, 1, 1)),
+            _currencySettings.MainFiatCurrency);
+
+        // Act
+        await vm.ViewSummaryCommand.ExecuteAsync(entry);
+
+        // Assert - the modal factory never receives the GoalSummary name on NotSupported
+        _ = _modalFactory.DidNotReceive().CreateAsync(
+            Arg.Is(ApplicationModalNames.GoalSummary),
+            Arg.Any<Window?>(),
+            Arg.Any<object>());
+    }
+
+    [Test]
+    public async Task ViewSummary_SupportedResult_OpensModalWithRequest()
+    {
+        // Arrange
+        var supportedResult = new GoalContributingTransactionsResult.Supported(
+            new List<ContributingTransactionRow>
+            {
+                new()
+                {
+                    Date = new DateOnly(2025, 1, 1),
+                    Description = "Monthly buy",
+                    AccountName = "Checking",
+                    CategoryName = null,
+                    FiatAmount = FiatValue.New(100m),
+                    FiatCurrencyCode = "USD",
+                    SatsAmount = BtcValue.ParseSats(5000m),
+                    RunningTotal = 100m
+                }
+            });
+
+        _queryDispatcher.DispatchAsync(Arg.Any<GetGoalContributingTransactionsQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(Result<GoalContributingTransactionsResult>.Success(supportedResult)));
+
+        _modalFactory.CreateAsync(
+                Arg.Is(ApplicationModalNames.GoalSummary),
+                Arg.Any<Window?>(),
+                Arg.Any<object>())
+            .Returns(Task.FromResult<ValtBaseWindow>(null!));
+
+        var vm = CreateViewModel();
+        var entry = new GoalEntryViewModel(
+            CreateStackBitcoinGoalDTO("goal-1", GoalPeriods.Monthly, new DateOnly(2025, 1, 1)),
+            _currencySettings.MainFiatCurrency);
+
+        // Act
+        try
+        {
+            await vm.ViewSummaryCommand.ExecuteAsync(entry);
+        }
+        catch (NullReferenceException)
+        {
+            // Expected: the substitute factory returns null and ShowDialogSafeAsync
+            // is invoked on a null view reference outside a real Avalonia app
+            // (LoanStateHistoryViewModelTests precedent).
+        }
+
+        // Assert
+        _ = _modalFactory.Received(1).CreateAsync(
+            Arg.Is(ApplicationModalNames.GoalSummary),
+            Arg.Any<Window?>(),
+            Arg.Is<GoalSummaryViewModel.Request>(r =>
+                r.GoalName == entry.FriendlyName &&
+                r.PeriodLabel == "(01/25)" &&
+                r.MainCurrencyCode == _currencySettings.MainFiatCurrency &&
+                ReferenceEquals(r.Result, supportedResult) &&
+                r.StrategyUnit == GoalStrategyUnit.Sats));
+    }
+
+    [Test]
+    public void CanViewSummary_FalseForNetWorthBtc()
+    {
+        // Arrange
+        var entry = new GoalEntryViewModel(
+            CreateNetWorthBtcGoalDTO("goal-1", GoalPeriods.Monthly, new DateOnly(2025, 1, 1)),
+            _currencySettings.MainFiatCurrency);
+
+        // Act & Assert
+        Assert.That(entry.CanViewSummary, Is.False);
+    }
+
+    [Test]
+    public void CanViewSummary_TrueForTransactionBasedTypes()
+    {
+        // Arrange - one entry per transaction-based goal type
+        var entries = new[]
+        {
+            new GoalEntryViewModel(CreateStackBitcoinGoalDTO("1", GoalPeriods.Monthly, new DateOnly(2025, 1, 1)), _currencySettings.MainFiatCurrency),
+            new GoalEntryViewModel(CreateSpendingLimitGoalDTO("2", GoalPeriods.Monthly, new DateOnly(2025, 1, 1)), _currencySettings.MainFiatCurrency),
+            new GoalEntryViewModel(CreateDcaGoalDTO("3", GoalPeriods.Monthly, new DateOnly(2025, 1, 1)), _currencySettings.MainFiatCurrency),
+            new GoalEntryViewModel(CreateSavingsRateGoalDTO("4", GoalPeriods.Monthly, new DateOnly(2025, 1, 1)), _currencySettings.MainFiatCurrency),
+            new GoalEntryViewModel(CreateGoalDTO(new IncomeFiatGoalTypeOutputDTO { TargetAmount = 1000m, CalculatedIncome = 0m }), _currencySettings.MainFiatCurrency),
+            new GoalEntryViewModel(CreateGoalDTO(new IncomeBtcGoalTypeOutputDTO { TargetSats = 100_000, CalculatedSats = 0 }), _currencySettings.MainFiatCurrency),
+            new GoalEntryViewModel(CreateGoalDTO(new ReduceExpenseCategoryGoalTypeOutputDTO { TargetAmount = 500m, CategoryId = "cat-1", CategoryName = "Food", CalculatedSpending = 0m }), _currencySettings.MainFiatCurrency),
+            new GoalEntryViewModel(CreateGoalDTO(new BitcoinHodlGoalTypeOutputDTO { MaxSellableSats = 100_000, CalculatedSoldSats = 0 }), _currencySettings.MainFiatCurrency),
+            new GoalEntryViewModel(CreateGoalDTO(new SaveFiatGoalTypeOutputDTO { TargetAmount = 1000m, CalculatedSavings = 0m }), _currencySettings.MainFiatCurrency)
+        };
+
+        // Act & Assert
+        Assert.That(entries.Select(e => e.CanViewSummary), Is.All.True);
+    }
+
+    [Test]
+    public void SummaryStrategyUnit_MapsGoalTypes()
+    {
+        // Arrange
+        var stackBitcoin = new GoalEntryViewModel(CreateStackBitcoinGoalDTO("1", GoalPeriods.Monthly, new DateOnly(2025, 1, 1)), _currencySettings.MainFiatCurrency);
+        var incomeBtc = new GoalEntryViewModel(CreateGoalDTO(new IncomeBtcGoalTypeOutputDTO { TargetSats = 100_000, CalculatedSats = 0 }), _currencySettings.MainFiatCurrency);
+        var bitcoinHodl = new GoalEntryViewModel(CreateGoalDTO(new BitcoinHodlGoalTypeOutputDTO { MaxSellableSats = 100_000, CalculatedSoldSats = 0 }), _currencySettings.MainFiatCurrency);
+        var spendingLimit = new GoalEntryViewModel(CreateSpendingLimitGoalDTO("2", GoalPeriods.Monthly, new DateOnly(2025, 1, 1)), _currencySettings.MainFiatCurrency);
+        var dca = new GoalEntryViewModel(CreateDcaGoalDTO("3", GoalPeriods.Monthly, new DateOnly(2025, 1, 1)), _currencySettings.MainFiatCurrency);
+        var savingsRate = new GoalEntryViewModel(CreateSavingsRateGoalDTO("4", GoalPeriods.Monthly, new DateOnly(2025, 1, 1)), _currencySettings.MainFiatCurrency);
+
+        // Act & Assert
+        Assert.That(stackBitcoin.SummaryStrategyUnit, Is.EqualTo(GoalStrategyUnit.Sats));
+        Assert.That(incomeBtc.SummaryStrategyUnit, Is.EqualTo(GoalStrategyUnit.Sats));
+        Assert.That(bitcoinHodl.SummaryStrategyUnit, Is.EqualTo(GoalStrategyUnit.Sats));
+        Assert.That(spendingLimit.SummaryStrategyUnit, Is.EqualTo(GoalStrategyUnit.Fiat));
+        Assert.That(dca.SummaryStrategyUnit, Is.EqualTo(GoalStrategyUnit.Count));
+        Assert.That(savingsRate.SummaryStrategyUnit, Is.EqualTo(GoalStrategyUnit.Percentage));
     }
 
     #endregion

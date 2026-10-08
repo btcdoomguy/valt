@@ -109,6 +109,48 @@
 
 ---
 
+## Milestone: v0.9 — Goal Transparency — Transaction Breakdown
+
+**Shipped:** 2026-10-07
+**Phases:** 3 | **Plans:** 11 | **Tasks:** 25
+
+### What Was Built
+
+- `GetGoalContributingTransactionsQuery` (App-layer CQRS) exposing the contributing-transaction set for all 9 transaction-based goal strategies, with per-strategy running totals that reconcile exactly with `CalculateProgressAsync`; NetWorthBtc is the sole typed NotSupported type.
+- Calculator-level row-exposure mechanism (`IGoalProgressCalculator.GetContributingTransactionsAsync`) with `GoalTransactionReader` aggregates re-derived as row sums — selection logic cannot drift from progress math.
+- Goal Summary modal: "View summary" context-menu item (allow-list gating via `CanViewSummary`, secure-mode disable), chromeless resizable modal with 7-column read-only DataGrid, per-strategy-unit running-total formatting (fiat 2dp / sats grouped / count / percentage 1dp), RunningTotal-delta semantic colors, empty counterpart cells, focal reconciled-total header strip.
+- `GetGoalContributingTransactions` MCP tool with typed `Supported`/`Error` contract; integration tests prove byte-parity with the App query through real DI.
+- Full en/pt-BR/es localization (1048-key tri-locale parity) and `.claude/docs/goals.md` documentation.
+
+### What Worked
+
+- **Smart discuss with code-verified corrections** — the research phase caught that `BitcoinHodl` was transaction-based (contradicting the discuss-phase assumption); the correction was user-confirmed and folded back into CONTEXT.md before planning. Cheap to fix at discuss time, expensive after execution.
+- **Aggregates-as-row-sums drift-proofing** — re-implementing `CalculateTotalExpenses`/`CalculateTotalIncome` as `Sum(r => r.Contribution)` over the row methods guarantees the summary can never disagree with the total by construction.
+- **Tracer-slice phasing** (one strategy end-to-end, then the remaining 8 in two waves) de-risked the shared-file changes (`IGoalProgressCalculator`, `GoalTransactionReader`) before scaling out.
+- **Code review between execute and verify caught a real blocker** (BitcoinToFiat sale rows reading the null `FromFiatAmount` leg) that all green tests had missed because no test asserted the fiat fields.
+
+### What Was Inefficient
+
+- **Tests asserted reconciliation but not field-level correctness** — the CR-01 blocker passed 1803 tests. Row-shape tests must assert every DTO field, including the ones "obviously" correct.
+- **Contribution-delta derivation is now triplicated** (service, UI VM, MCP tool) — identical, test-locked algorithm, but a future semantic change must touch three sites. Consider a shared projection helper in a later cleanup phase.
+
+### Patterns Established
+
+- Typed result unions (`Supported`/`NotSupported`/`Failure`) for queries whose applicability depends on entity type — consumers (UI allow-list, MCP contract) stay in lockstep.
+- UI gating as an explicit allow-list of supported DTO types, with defense-in-depth no-op in the command — fail-safe for a future 11th goal type in both directions.
+
+### Key Lessons
+
+- When the user's feature request says "all goal types," verify against the calculators before locking scope — domain assumptions baked into discuss-phase examples were wrong for BitcoinHodl.
+- The spec-less edge probe plus UI-SPEC lift gave the verifier a concrete, checkable contract — all three phase verifications scored 100% of must-haves with no human-needed items beyond the intentional sign-offs.
+
+### Cost Observations
+
+- Sessions: 1 autonomous run (discuss → plan → execute for 3 phases + lifecycle)
+- Notable: The full milestone (3 phases, 11 plans) completed in a single autonomous session with 2 human sign-off pauses; sequential-on-main-tree execution (worktrees disabled) worked cleanly for this repo's gitignored-.planning setup.
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -117,6 +159,7 @@
 |-----------|----------|--------|------------|
 | v0.5 | — | 3 | Explicit localization phase moved after UI implementation; future milestones should stub resx keys during UI construction. |
 | v0.6 | — | 7 | Documentation-only milestone adopted a two-repo protocol and a final QA checklist phase to ensure every touched file is reviewed. |
+| v0.9 | 1 | 3 | First fully autonomous milestone run (discuss→plan→execute per phase + lifecycle); smart-discuss batch grey-area tables and per-phase code review between execute and verify became the quality gates that mattered. |
 
 ### Cumulative Quality
 
