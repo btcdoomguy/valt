@@ -2,19 +2,18 @@
 gsd_state_version: 1.0
 milestone: v0.9
 milestone_name: Goal Transparency — Transaction Breakdown
-status: Awaiting next milestone
-stopped_at: Completed 51-05-PLAN.md — Phase 51 complete, ready for milestone verification
-last_updated: "2026-10-07T16:26:28.929Z"
-last_activity: 2026-10-07
-last_activity_desc: Milestone v0.9 completed and archived
+current_phase: 52
+current_phase_name: Wealth Snapshots & Asset Totals in Monthly Reports
+status: executing
+stopped_at: Completed 52-03-PLAN.md
+last_updated: "2026-10-26T18:41:37.120Z"
+last_activity: 2026-10-26
+last_activity_desc: Phase 52 execution started
 progress:
-  total_phases: 13
-  completed_phases: 3
-  total_plans: 11
-  completed_plans: 11
-  percent: 23
-current_phase: 51
-current_phase_name: MCP, Localization, Documentation & Verification
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # STATE.md
@@ -24,14 +23,14 @@ current_phase_name: MCP, Localization, Documentation & Verification
 See: .planning/PROJECT.md (updated 2026-08-06)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 51 — MCP, Localization, Documentation & Verification
+**Current focus:** Phase 52 — Wealth Snapshots & Asset Totals in Monthly Reports
 
 ## Current Position
 
-Phase: Milestone v0.9 complete
-Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-10-26 - Completed quick task 261026-iqj: Fix transaction grid not persisting Date column descending sort order after app restart
+Phase: 52 (Wealth Snapshots & Asset Totals in Monthly Reports) — EXECUTING
+Plan: 3 of 3
+Status: Ready to execute
+Last activity: 2026-10-26 — Phase 52 execution started
 
 ## Performance Metrics
 
@@ -154,6 +153,8 @@ Last activity: 2026-10-26 - Completed quick task 261026-iqj: Fix transaction gri
 | Phase 51 P03 | 10 min | 2 tasks | 1 files |
 | Phase 51 P04 | 5 min | 1 tasks | 1 files |
 | Phase 51 P05 | 10 min | 2 tasks | 5 files |
+| Phase 52 P01 | 25min | 3 tasks | 16 files |
+| Phase 52 P03 | 8min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -218,6 +219,11 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 51-03]: Skipped TDD RED/GREEN — MCP tool production surface pre-exists from 51-01; committed green as test(51-03) per 50-03 precedent
 - [Phase ?]: Documented GoalSummary modal chrome as WindowDecorations=None (Avalonia 11 actual) instead of plan's SystemDecorations=None — code is spec
 - [Phase 51-05]: Human end-to-end sign-off approved (2026-10-07): goal summary grid + running total match goal progress per type; empty state and Close/Escape confirmed; NetWorthBtc hidden; MCP parity with typed Supported=false contract; pt-BR/es render without truncation — Phase 51 gate closed, GOL-08/09/10 complete
+- [Phase ?]: 52-01: Wealth snapshot value sourced exclusively from IAssetQueries.GetSummaryAsync (IncludeInNetWorth && !IsSold filter stays centralized in the query layer)
+- [Phase ?]: 52-01: Same-day snapshot overwrite decided by the DB collection query, never an in-memory day flag (Pitfall 3 — DB swap resets in-memory state)
+- [Phase ?]: 52-01: MonthlyTotalsData.Item.AssetsTotalFiat/AssetsTotalSats made non-required with default 0 to avoid rippling into DesignTime constructions
+- [Phase ?]: 52-01: Report join uses Option A (ILocalDatabase injected into MonthlyTotalsReport) and joins against the calculator's emission date, not blind month-end
+- [Phase ?]: No McpServerService forwarding change needed for 52-03: _localDatabase field is interface-typed and forwarded via services.AddSingleton(_localDatabase) — ILocalDatabase already resolvable in MCP scope
 
 ### Pending Todos
 
@@ -278,8 +284,8 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-10-07T14:05:00.000Z
-Stopped at: Completed 51-05-PLAN.md — Phase 51 complete, ready for milestone verification
+Last session: 2026-10-26T18:41:37.110Z
+Stopped at: Completed 52-03-PLAN.md
 Resume file: None
 Resume file: None
 
