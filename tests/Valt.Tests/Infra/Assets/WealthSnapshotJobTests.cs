@@ -111,14 +111,123 @@ public class WealthSnapshotJobTests
         }
     }
 
+    [Test]
+    public async Task RunAsync_When_Rates_Missing_Should_Not_Write()
+    {
+        _ratesProvider.GetLatestRatesAsync(Arg.Any<CancellationToken>())
+            .Returns((LivePriceUpdateMessage?)null);
+
+        await _job.RunAsync(CancellationToken.None);
+
+        await _assetQueries.DidNotReceive()
+            .GetSummaryAsync(Arg.Any<string>(), Arg.Any<decimal?>(), Arg.Any<IReadOnlyDictionary<string, decimal>?>());
+        await _wealthSnapshotRepository.DidNotReceive().SaveAsync(Arg.Any<WealthSnapshotEntity>());
+    }
+
+    [Test]
+    public async Task RunAsync_When_Value_Unchanged_Should_Not_Rewrite_Row()
+    {
+        await using var stream = new MemoryStream();
+        var realDatabase = new LocalDatabase(new Clock());
+        realDatabase.OpenInMemoryDatabase(stream);
+        var realRepository = new WealthSnapshotRepository(realDatabase);
+
+        try
+        {
+            var morningClock = new FakeClock(new DateTime(2024, 1, 15, 8, 0, 0, DateTimeKind.Utc));
+            var eveningClock = new FakeClock(new DateTime(2024, 1, 15, 18, 0, 0, DateTimeKind.Utc));
+
+            await BuildJob(realDatabase, realRepository, morningClock).RunAsync(CancellationToken.None);
+            await BuildJob(realDatabase, realRepository, eveningClock).RunAsync(CancellationToken.None);
+
+            var rows = realDatabase.GetWealthSnapshots().FindAll().ToList();
+            Assert.That(rows, Has.Count.EqualTo(1));
+            Assert.That(rows[0].SnapshotDateTimeUtc, Is.EqualTo(new DateTime(2024, 1, 15, 8, 0, 0, DateTimeKind.Utc)));
+            Assert.That(rows[0].TotalValueInMainCurrency, Is.EqualTo(123.45m));
+        }
+        finally
+        {
+            realDatabase.Dispose();
+            await stream.DisposeAsync();
+        }
+    }
+
+    [Test]
+    public async Task RunAsync_When_Value_Changed_Same_Day_Should_Overwrite_Row()
+    {
+        await using var stream = new MemoryStream();
+        var realDatabase = new LocalDatabase(new Clock());
+        realDatabase.OpenInMemoryDatabase(stream);
+        var realRepository = new WealthSnapshotRepository(realDatabase);
+
+        try
+        {
+            var morningClock = new FakeClock(new DateTime(2024, 1, 15, 8, 0, 0, DateTimeKind.Utc));
+            var eveningClock = new FakeClock(new DateTime(2024, 1, 15, 18, 0, 0, DateTimeKind.Utc));
+
+            await BuildJob(realDatabase, realRepository, morningClock).RunAsync(CancellationToken.None);
+
+            _assetQueries.GetSummaryAsync(Arg.Any<string>(), Arg.Any<decimal?>(), Arg.Any<IReadOnlyDictionary<string, decimal>?>())
+                .Returns(BuildSummary(700m, 1400000L));
+            await BuildJob(realDatabase, realRepository, eveningClock).RunAsync(CancellationToken.None);
+
+            var rows = realDatabase.GetWealthSnapshots().FindAll().ToList();
+            Assert.That(rows, Has.Count.EqualTo(1));
+            Assert.That(rows[0].TotalValueInMainCurrency, Is.EqualTo(700m));
+            Assert.That(rows[0].TotalValueInSats, Is.EqualTo(1400000L));
+            Assert.That(rows[0].SnapshotDateTimeUtc, Is.EqualTo(new DateTime(2024, 1, 15, 18, 0, 0, DateTimeKind.Utc)));
+        }
+        finally
+        {
+            realDatabase.Dispose();
+            await stream.DisposeAsync();
+        }
+    }
+
+    [Test]
+    public async Task RunAsync_On_Next_Local_Day_Should_Write_Second_Row()
+    {
+        await using var stream = new MemoryStream();
+        var realDatabase = new LocalDatabase(new Clock());
+        realDatabase.OpenInMemoryDatabase(stream);
+        var realRepository = new WealthSnapshotRepository(realDatabase);
+
+        try
+        {
+            var dayOneClock = new FakeClock(new DateTime(2024, 1, 15, 12, 0, 0, DateTimeKind.Utc));
+            var dayTwoClock = new FakeClock(new DateTime(2024, 1, 16, 12, 0, 0, DateTimeKind.Utc));
+
+            await BuildJob(realDatabase, realRepository, dayOneClock).RunAsync(CancellationToken.None);
+            await BuildJob(realDatabase, realRepository, dayTwoClock).RunAsync(CancellationToken.None);
+
+            var rows = realDatabase.GetWealthSnapshots().FindAll().ToList();
+            Assert.That(rows, Has.Count.EqualTo(2));
+            Assert.That(rows.Select(x => x.SnapshotDay), Is.EquivalentTo(new[]
+            {
+                new DateOnly(2024, 1, 15),
+                new DateOnly(2024, 1, 16)
+            }));
+        }
+        finally
+        {
+            realDatabase.Dispose();
+            await stream.DisposeAsync();
+        }
+    }
+
     private WealthSnapshotJob BuildJob(ILocalDatabase localDatabase, IWealthSnapshotRepository repository)
+    {
+        return BuildJob(localDatabase, repository, _clock);
+    }
+
+    private WealthSnapshotJob BuildJob(ILocalDatabase localDatabase, IWealthSnapshotRepository repository, IClock clock)
     {
         return new WealthSnapshotJob(
             localDatabase,
             repository,
             _assetQueries,
             _ratesProvider,
-            _clock,
+            clock,
             _logger);
     }
 
