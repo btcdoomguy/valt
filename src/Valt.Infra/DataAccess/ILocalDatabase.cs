@@ -72,6 +72,7 @@ public interface ILocalDatabase : INotifyPropertyChanged, IDisposable
 
     ILiteCollection<AssetEntity> GetAssets();
     ILiteCollection<AssetGroupEntity> GetAssetGroups();
+    ILiteCollection<WealthSnapshotEntity> GetWealthSnapshots();
 
     #endregion
 

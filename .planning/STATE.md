@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-08-06)
 Phase: Milestone v0.9 complete
 Plan: —
 Status: Awaiting next milestone
-Last activity: 2026-10-07 — Milestone v0.9 completed and archived
+Last activity: 2026-10-26 - Completed quick task 261026-iqj: Fix transaction grid not persisting Date column descending sort order after app restart
 
 ## Performance Metrics
 
@@ -254,6 +254,7 @@ None yet.
 | 260904-faz | Change LivePrices job fallback behavior: keep previous live prices on fetch failure after a successful cycle; stored price data only as cold-start fallback | 2026-09-04 | ca71f63 | [260904-faz-change-liveprices-job-fallback-behavior-](./quick/260904-faz-change-liveprices-job-fallback-behavior-/) |
 | 260917-lz7 | Fix bug: pasting numeric values into Currency fields registers as 0; typing works (FiatInput paste handling) | 2026-09-17 | 89b3cc2 | [260917-lz7-fix-bug-pasting-numeric-values-into-curr](./quick/260917-lz7-fix-bug-pasting-numeric-values-into-curr/) |
 | 261006-kks | Restore Recalculate (refresh totals) in right-click context menu on goal entries in the Goals section of Transactions tab | 2026-10-06 | 65c0188 | [261006-kks-i-cannot-see-the-feature-to-refresh-the-](./quick/261006-kks-i-cannot-see-the-feature-to-refresh-the-/) |
+| 261026-iqj | Fix transaction grid not persisting Date column descending sort order after app restart | 2026-10-26 | f63a9fb | [261026-iqj-fix-transaction-grid-not-persisting-date](./quick/261026-iqj-fix-transaction-grid-not-persisting-date/) |
 
 ## Deferred Items
 

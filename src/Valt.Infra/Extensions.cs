@@ -272,6 +272,7 @@ public static class Extensions
         services.AddSingleton<IGoalRepository, GoalRepository>();
         services.AddSingleton<IAssetRepository, AssetRepository>();
         services.AddSingleton<IAssetGroupRepository, AssetGroupRepository>();
+        services.AddSingleton<IWealthSnapshotRepository, WealthSnapshotRepository>();
 
         return services;
     }

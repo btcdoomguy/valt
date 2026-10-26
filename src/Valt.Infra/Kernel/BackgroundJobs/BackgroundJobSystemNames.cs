@@ -10,5 +10,6 @@ public enum BackgroundJobSystemNames
     AccountTotalsCalculator,
     GoalProgressUpdater,
     AssetPriceUpdater,
-    IndicatorsUpdater
+    IndicatorsUpdater,
+    WealthSnapshot
 }
