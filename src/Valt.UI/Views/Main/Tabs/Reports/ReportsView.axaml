@@ -315,6 +315,10 @@
                                                 Header="{x:Static lang:language.Reports_MonthlyTotals_TotalWealth}"
                                                 Binding="{Binding FiatTotalFormatted}">
                                             </DataGridTextColumn>
+                                            <DataGridTextColumn
+                                                Header="{x:Static lang:language.Reports_MonthlyTotals_AssetsColumn}"
+                                                Binding="{Binding AssetsTotalFormatted}">
+                                            </DataGridTextColumn>
                                             <DataGridTemplateColumn
                                                 Header="{x:Static lang:language.Reports_MonthlyTotals_PreviousMonth}">
                                                 <DataGridTemplateColumn.CellTemplate>
@@ -410,7 +414,7 @@
                                            HorizontalAlignment="Center" VerticalAlignment="Center"
                                            IsVisible="{Binding IsMonthlyTotalsLoading}" />
                             </Grid>
-                            <TextBlock Text="{x:Static lang:language.Reports_DoesntIncludeAssets}"
+                            <TextBlock Text="{x:Static lang:language.Reports_MonthlyTotals_IncludesAssets}"
                                        FontSize="{DynamicResource FontSizeSmall}"
                                        Foreground="{DynamicResource Text500Brush}"
                                        Margin="0, 5, 0, 0" />

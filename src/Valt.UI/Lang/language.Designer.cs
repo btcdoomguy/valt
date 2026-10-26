@@ -2085,6 +2085,18 @@ namespace Valt.UI.Lang {
             }
         }
 
+        public static string Reports_MonthlyTotals_AssetsColumn {
+            get {
+                return ResourceManager.GetString("Reports.MonthlyTotals.AssetsColumn", resourceCulture);
+            }
+        }
+
+        public static string Reports_MonthlyTotals_IncludesAssets {
+            get {
+                return ResourceManager.GetString("Reports.MonthlyTotals.IncludesAssets", resourceCulture);
+            }
+        }
+
         public static string Reports_MonthlyTotals_Income {
             get {
                 return ResourceManager.GetString("Reports.MonthlyTotals.Income", resourceCulture);

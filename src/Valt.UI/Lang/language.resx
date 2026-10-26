@@ -1028,6 +1028,12 @@
     <data name="Reports.DoesntIncludeAssets" xml:space="preserve">
         <value>* doesn't include Assets</value>
     </data>
+    <data name="Reports.MonthlyTotals.AssetsColumn" xml:space="preserve">
+        <value>Assets</value>
+    </data>
+    <data name="Reports.MonthlyTotals.IncludesAssets" xml:space="preserve">
+        <value>* includes Assets based on the latest available data</value>
+    </data>
     <data name="Transactions.MyAssets" xml:space="preserve">
         <value>Assets</value>
     </data>

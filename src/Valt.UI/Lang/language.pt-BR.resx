@@ -992,6 +992,12 @@
     <data name="Reports.DoesntIncludeAssets" xml:space="preserve">
         <value>* não inclui Ativos</value>
     </data>
+    <data name="Reports.MonthlyTotals.AssetsColumn" xml:space="preserve">
+        <value>Ativos</value>
+    </data>
+    <data name="Reports.MonthlyTotals.IncludesAssets" xml:space="preserve">
+        <value>* inclui Ativos com base nos dados mais recentes disponíveis</value>
+    </data>
     <data name="Transactions.MyAssets" xml:space="preserve">
         <value>Ativos</value>
     </data>
