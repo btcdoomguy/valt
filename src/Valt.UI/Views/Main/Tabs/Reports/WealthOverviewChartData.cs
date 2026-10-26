@@ -155,7 +155,8 @@ public class WealthOverviewChartData : IDisposable
             var item = wealthOverviewData.Items[index];
 
             PeriodLabels.Add(item.Label);
-            FiatValues.Add(new ObservablePoint(index, (double)item.FiatTotal));
+            // Total Wealth includes the latest-snapshot Assets total (D-08)
+            FiatValues.Add(new ObservablePoint(index, (double)(item.FiatTotal + item.AssetsTotalFiat)));
             BtcValues.Add(new ObservablePoint(index, (double)item.BtcTotal));
         }
 

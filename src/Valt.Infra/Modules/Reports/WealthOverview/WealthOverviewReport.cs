@@ -3,6 +3,8 @@ using LiteDB;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
+using Valt.Infra.DataAccess;
+using Valt.Infra.Modules.Assets;
 using Valt.Infra.Modules.Budget.Accounts;
 
 namespace Valt.Infra.Modules.Reports.WealthOverview;
@@ -12,11 +14,13 @@ internal class WealthOverviewReport : IWealthOverviewReport
     private const int MaxDataPoints = 12;
     private readonly IClock _clock;
     private readonly ILogger<WealthOverviewReport> _logger;
+    private readonly ILocalDatabase _localDatabase;
 
-    public WealthOverviewReport(IClock clock, ILogger<WealthOverviewReport> logger)
+    public WealthOverviewReport(IClock clock, ILogger<WealthOverviewReport> logger, ILocalDatabase localDatabase)
     {
         _clock = clock;
         _logger = logger;
+        _localDatabase = localDatabase;
     }
 
     public Task<WealthOverviewData> GetAsync(WealthOverviewPeriod period, FiatCurrency currency, IReportDataProvider provider, int maxDataPoints = MaxDataPoints)
@@ -31,7 +35,8 @@ internal class WealthOverviewReport : IWealthOverviewReport
             });
         }
 
-        var calculator = new Calculator(currency, provider, _clock.GetCurrentLocalDate(), period, maxDataPoints);
+        var calculator = new Calculator(currency, provider, _clock.GetCurrentLocalDate(), period, maxDataPoints,
+            LoadSnapshots());
 
         try
         {
@@ -44,6 +49,17 @@ internal class WealthOverviewReport : IWealthOverviewReport
         }
     }
 
+    private List<WealthSnapshotEntity> LoadSnapshots()
+    {
+        if (!_localDatabase.HasDatabaseOpen)
+            return [];
+
+        return _localDatabase.GetWealthSnapshots()
+            .FindAll()
+            .OrderBy(x => x.SnapshotDay)
+            .ToList();
+    }
+
     private class Calculator
     {
         private const decimal SatoshisPerBitcoin = 100_000_000m;
@@ -53,19 +69,22 @@ internal class WealthOverviewReport : IWealthOverviewReport
         private readonly DateOnly _today;
         private readonly WealthOverviewPeriod _period;
         private readonly int _maxDataPoints;
+        private readonly IReadOnlyList<WealthSnapshotEntity> _snapshots;
 
         public Calculator(
             FiatCurrency currency,
             IReportDataProvider provider,
             DateOnly today,
             WealthOverviewPeriod period,
-            int maxDataPoints)
+            int maxDataPoints,
+            IReadOnlyList<WealthSnapshotEntity>? snapshots = null)
         {
             _currency = currency;
             _provider = provider;
             _today = today;
             _period = period;
             _maxDataPoints = maxDataPoints;
+            _snapshots = snapshots ?? [];
         }
 
         public WealthOverviewData Calculate()
@@ -135,7 +154,8 @@ internal class WealthOverviewReport : IWealthOverviewReport
                     {
                         var (fiatTotal, btcTotal) = CalculateTotalsAtDate(currentDate, accountBalances, bitcoinTotal);
                         var label = GetLabelForPeriod(periodEnd);
-                        items.Add(new WealthOverviewData.Item(periodEnd, label, fiatTotal, btcTotal));
+                        var assetsTotalFiat = FindLatestSnapshot(periodEnd)?.TotalValueInMainCurrency ?? 0m;
+                        items.Add(new WealthOverviewData.Item(periodEnd, label, fiatTotal, btcTotal, assetsTotalFiat));
                     }
                     periodIndex++;
                 }
@@ -149,7 +169,9 @@ internal class WealthOverviewReport : IWealthOverviewReport
                 {
                     var (fiatTotal, btcTotal) = CalculateTotalsAtDate(_today, accountBalances, bitcoinTotal);
                     var label = GetLabelForPeriod(periodEnd);
-                    items.Add(new WealthOverviewData.Item(periodEnd, label, fiatTotal, btcTotal));
+                    // Future periods reuse today's balances, so the assets join also uses today as cutoff
+                    var assetsTotalFiat = FindLatestSnapshot(_today)?.TotalValueInMainCurrency ?? 0m;
+                    items.Add(new WealthOverviewData.Item(periodEnd, label, fiatTotal, btcTotal, assetsTotalFiat));
                 }
                 periodIndex++;
             }
@@ -202,6 +224,29 @@ internal class WealthOverviewReport : IWealthOverviewReport
         private static DateOnly GetEndOfYear(DateOnly baseDate, int yearsBack)
         {
             return new DateOnly(baseDate.Year - yearsBack, 12, 31);
+        }
+
+        /// <summary>
+        /// Latest wealth snapshot with SnapshotDay ≤ the given cutoff date whose stored
+        /// currency matches the report currency — same join semantics as MonthlyTotalsReport
+        /// (52-01): snapshots only ever hold values computed in the main currency at write
+        /// time, so a currency-mismatched snapshot must not be joined. Returns null when no
+        /// snapshot qualifies; callers fall back to 0.
+        /// </summary>
+        private WealthSnapshotEntity? FindLatestSnapshot(DateOnly cutoffDate)
+        {
+            WealthSnapshotEntity? latest = null;
+            foreach (var snapshot in _snapshots)
+            {
+                if (snapshot.SnapshotDay > cutoffDate)
+                    break; // _snapshots is ordered by SnapshotDay ascending
+
+                if (!string.Equals(snapshot.MainCurrencyCode, _currency.Code, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                latest = snapshot;
+            }
+            return latest;
         }
 
         private string GetLabelForPeriod(DateOnly periodEnd)
