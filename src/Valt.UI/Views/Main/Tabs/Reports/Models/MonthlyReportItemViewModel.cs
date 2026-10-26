@@ -30,6 +30,8 @@ public class MonthlyReportItemViewModel : ObservableObject
         BitcoinExpenses = item.BitcoinExpenses;
         AllIncomeInFiat = item.AllIncomeInFiat;
         AllExpensesInFiat = item.AllExpensesInFiat;
+        AssetsTotalFiat = item.AssetsTotalFiat;
+        AssetsTotalSats = item.AssetsTotalSats;
     }
     
     public MonthlyReportItemViewModel(FiatCurrency currency, MonthlyTotalsData.Totals item)
@@ -80,6 +82,17 @@ public class MonthlyReportItemViewModel : ObservableObject
         ? CurrencyDisplay.FormatFiat(FiatTotal.Value, Currency.Code)
         : string.Empty;
 
+    /// <summary>
+    /// Total Wealth including the latest-snapshot Assets total (fiat side).
+    /// This is what the Total Wealth grid column displays (D-07).
+    /// </summary>
+    public decimal? FiatTotalIncludingAssets =>
+        FiatTotal is not null ? FiatTotal.Value + (AssetsTotalFiat ?? 0m) : null;
+
+    public string FiatTotalIncludingAssetsFormatted => FiatTotalIncludingAssets is not null
+        ? CurrencyDisplay.FormatFiat(FiatTotalIncludingAssets.Value, Currency.Code)
+        : string.Empty;
+
     public decimal? FiatMonthlyChange { get; init; }
 
     public string FiatMonthlyChangeFormatted => FiatMonthlyChange is not null
@@ -119,6 +132,18 @@ public class MonthlyReportItemViewModel : ObservableObject
     public string AllIncomeInFiatFormatted => CurrencyDisplay.FormatFiat(AllIncomeInFiat, Currency.Code);
     public decimal AllExpensesInFiat { get; init; }
     public string AllExpensesInFiatFormatted => CurrencyDisplay.FormatFiat(AllExpensesInFiat, Currency.Code);
+
+    public decimal? AssetsTotalFiat { get; init; }
+
+    public string AssetsTotalFormatted => AssetsTotalFiat is not null
+        ? CurrencyDisplay.FormatFiat(AssetsTotalFiat.Value, Currency.Code)
+        : string.Empty;
+
+    public long? AssetsTotalSats { get; init; }
+
+    public string AssetsTotalSatsFormatted => AssetsTotalSats is not null
+        ? CurrencyDisplay.FormatSatsAsBitcoin(AssetsTotalSats.Value)
+        : string.Empty;
 
     private SolidColorBrush Process(decimal percentage)
     {

@@ -116,7 +116,8 @@ public class MonthlyTotalsChartData : ReportChartDataBase
             var item = monthlyTotalsData.Items[index];
 
             MonthLabels.Add(item.MonthYear.ToString("MMM yyyy", CultureInfo.InvariantCulture));
-            FiatValues.Add(new ObservablePoint(index, (double)item.FiatTotal));
+            // Total Wealth includes the latest-snapshot Assets total (D-06)
+            FiatValues.Add(new ObservablePoint(index, (double)(item.FiatTotal + item.AssetsTotalFiat)));
             BtcValues.Add(new ObservablePoint(index, (double)item.BtcTotal));
         }
 

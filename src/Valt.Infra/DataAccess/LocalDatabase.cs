@@ -213,6 +213,9 @@ internal sealed class LocalDatabase : ILocalDatabase
         assets.EnsureIndex(x => x.IncludeInNetWorth);
         assets.EnsureIndex(x => x.DisplayOrder);
         assets.EnsureIndex(x => x.GroupId);
+
+        var wealthSnapshots = GetOpenDatabase().GetCollection<WealthSnapshotEntity>("wealth_snapshots");
+        wealthSnapshots.EnsureIndex(x => x.SnapshotDay);
     }
 
     #region AvgPrice module
@@ -306,6 +309,11 @@ internal sealed class LocalDatabase : ILocalDatabase
     public ILiteCollection<AssetGroupEntity> GetAssetGroups()
     {
         return GetOpenDatabase().GetCollection<AssetGroupEntity>("asset_groups");
+    }
+
+    public ILiteCollection<WealthSnapshotEntity> GetWealthSnapshots()
+    {
+        return GetOpenDatabase().GetCollection<WealthSnapshotEntity>("wealth_snapshots");
     }
 
     #endregion

@@ -3,6 +3,7 @@ using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Valt.UI.Base;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
@@ -11,7 +12,7 @@ namespace Valt.UI.Views.Main.Tabs.Transactions;
 
 public partial class TransactionListView : ValtBaseUserControl
 {
-    private bool _ignoreFirstOnSorting = false;
+    private DataGridColumn? _sortingRestoreGuard;
 
     public TransactionListView()
     {
@@ -44,6 +45,7 @@ public partial class TransactionListView : ValtBaseUserControl
         MainGrid.RemoveHandler(DoubleTappedEvent, MainGrid_OnDoubleTapped);
         MainGrid.RemoveHandler(PointerPressedEvent, MainGrid_OnPointerPressed);
         MainGrid.Sorting -= MainGrid_OnSorting;
+        _sortingRestoreGuard = null;
     }
 
     private void RestoreDataGridSettings()
@@ -76,8 +78,16 @@ public partial class TransactionListView : ValtBaseUserControl
 
             if (columnId == settings.OrderedColumn)
             {
-                _ignoreFirstOnSorting = true;
+                _sortingRestoreGuard = column;
                 column.Sort(settings.SortDirection.GetValueOrDefault(ListSortDirection.Ascending));
+                // Failsafe: the restore-time Sorting event is posted at default priority and
+                // consumes the guard first; this Background-priority post clears it if the
+                // event never fired so it cannot swallow the first real user click.
+                Dispatcher.UIThread.Post(() =>
+                {
+                    if (ReferenceEquals(_sortingRestoreGuard, column))
+                        _sortingRestoreGuard = null;
+                }, DispatcherPriority.Background);
             }
         }
 
@@ -101,14 +111,14 @@ public partial class TransactionListView : ValtBaseUserControl
 
     private void MainGrid_OnSorting(object? sender, DataGridColumnEventArgs e)
     {
-        if (_ignoreFirstOnSorting)
+        if (ReferenceEquals(_sortingRestoreGuard, e.Column))
         {
-            _ignoreFirstOnSorting = false;
+            _sortingRestoreGuard = null;
             return;
         }
 
         var vm = DataContext as TransactionListViewModel;
-        vm?.UpdateSortState(e.Column.Header?.ToString());
+        vm?.UpdateSortState(e.Column.Tag?.ToString());
     }
 
     private void MainGrid_OnDoubleTapped(object? sender, TappedEventArgs e)

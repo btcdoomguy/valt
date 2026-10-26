@@ -5,8 +5,9 @@
 - ✅ **v0.5 Asset Sold History** — Phases 29-31 (shipped 2026-07-14)
 - ✅ **v0.6 Documentation Site Refresh** — Phases 32-38 (shipped 2026-07-17)
 - ✅ **v0.7 Insights & Metrics Expansion** — Phases 39-43 (completed 2026-08-12)
-- 🚧 **v0.8 BTC Loan Simulator** — Phases 44-48 (in progress)
+- ⏸️ **v0.8 BTC Loan Simulator** — Phases 44-45 (paused 2026-10-26 — remaining phases removed, superseded by v0.10)
 - ✅ **v0.9 Goal Transparency — Transaction Breakdown** — Phases 49-51 (shipped 2026-10-07)
+- 🚧 **v0.10 Wealth Snapshots** — Phase 52 (in progress)
 
 ## Phases
 
@@ -42,19 +43,22 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 - [x] **Phase 42: Loans & Leverage Reports & UI** — Interest/fees paid and liquidation-price distance trend
 - [x] **Phase 43: MCP, Localization, Documentation & Verification** — Tool exposure, 3-language strings, module docs, end-to-end sign-off — completed 2026-08-12
 
-### 🚧 v0.8 BTC Loan Simulator (Phases 44-48) — IN PROGRESS
+### ⏸️ v0.8 BTC Loan Simulator (Phases 44-45) — PAUSED 2026-10-26
+
+Phases 46-48 (Cost-Over-Time Schedule, Prefill from Existing BTC Loan Asset, MCP/L10N/Verification) were removed from the roadmap — the simulator core (44-45) shipped and remaining work is dropped in favor of v0.10.
 
 - [x] **Phase 44: Core Loan Simulation Calculator** — Pure static interest engine in Valt.Core with act/365 parity against BtcLoanDetails (completed 2026-08-14)
 - [x] **Phase 45: Simulator Modal UI (Inputs + Results Panel)** — LoanSimulator modal mirroring the Leverage Simulator with live recalc and fiat+sats results (completed 2026-08-21)
-- [ ] **Phase 46: Cost-Over-Time Schedule** — Monthly schedule rows (fiat + sats) accruing until the end date
-- [ ] **Phase 47: Prefill from Existing BTC Loan Asset** — Load an existing BTC-backed loan from Assets with a New Simulation sentinel
-- [ ] **Phase 48: MCP, Localization, Documentation & Verification** — simulate_btc_loan tool, 3-language strings, module docs, end-to-end sign-off
 
 ### ✅ v0.9 Goal Transparency — Transaction Breakdown (Phases 49-51) — SHIPPED 2026-10-07
 
 - [x] **Phase 49: Goal Contributing-Transactions Query Backend** — App-layer query + DTO deriving each goal type's contributing transactions with running total, per progress strategy (completed 2026-10-06)
 - [x] **Phase 50: Goal Summary Modal UI** — "View summary" right-click context menu on all goal entries + read-only transaction grid modal (completed 2026-10-06)
 - [x] **Phase 51: MCP, Localization, Documentation & Verification** — Goal contributing-transactions MCP tool, 3-language strings, goals.md docs, end-to-end sign-off (completed 2026-10-07)
+
+### 🚧 v0.10 Wealth Snapshots (Phase 52) — IN PROGRESS
+
+- [ ] **Phase 52: Wealth Snapshots & Asset Totals in Monthly Reports** — Persist daily snapshots of Included-in-Wealth-Totals asset values and include asset totals in the Monthly Totals grid and chart using the latest snapshot available per period
 
 ## Phase Details
 
@@ -240,51 +244,6 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 
 **UI hint**: yes
 
-### Phase 46: Cost-Over-Time Schedule
-
-**Goal**: Users can see how the simulated debt accrues month by month until the end date
-**Depends on**: Phase 44, Phase 45
-**Requirements**: SIM-10
-**Success Criteria** (what must be TRUE):
-
-  1. User can view a monthly schedule (date, accrued interest, cumulative total) from the start date until the end date in the results panel
-  2. Each schedule row shows cumulative totals in both fiat and sats at the same conversion basis as the results panel
-  3. Schedule rows accumulate unrounded so the final row's cumulative total exactly equals the headline total-to-repay figure
-  4. Long loan terms render without row explosion (monthly anchors plus end date, capped row count)
-
-**Plans**: TBD
-**UI hint**: yes
-
-### Phase 47: Prefill from Existing BTC Loan Asset
-
-**Goal**: Users can load one of their real BTC-backed loans into the simulator instead of typing parameters by hand
-**Depends on**: Phase 45
-**Requirements**: SIM-11
-**Success Criteria** (what must be TRUE):
-
-  1. User can pick an existing BTC-backed loan from a dropdown in the simulator and have all input fields prefilled from it
-  2. A "New simulation" sentinel option clears the fields back to a blank simulation
-  3. Prefill uses the loan's effective latest-state snapshot (not just setup fields) for current debt and collateral
-  4. `FixedTotalDebt` loans are handled explicitly — derived APR with an "approximate" indicator, or blocked with an explanation — never silently treated as daily-accruing
-  5. Switching between a prefilled loan and "New simulation" keeps live recalculation working correctly
-
-**Plans**: TBD
-**UI hint**: yes
-
-### Phase 48: MCP, Localization, Documentation & Verification
-
-**Goal**: The simulator is AI-accessible, fully localized, documented, and verified end-to-end
-**Depends on**: Phases 44, 45, 46, 47
-**Requirements**: SIM-12, SIM-13
-**Success Criteria** (what must be TRUE):
-
-  1. AI assistant can run a BTC loan simulation via a static `simulate_btc_loan` MCP tool returning total repay, breakdown, liquidation price, and effective APR
-  2. All new user-facing strings are available in English, Portuguese (pt-BR), and Spanish, with `language.Designer.cs` regenerated
-  3. `.claude/docs/assets.md` (or a dedicated simulator doc) documents the simulator UI, interest modes, prefill semantics, and the MCP tool
-  4. Full test suite is green and the simulator is verified end-to-end: prefill a real loan, toggle interest modes, confirm sats match `RatesState`, and confirm nothing is persisted to the database
-
-**Plans**: TBD
-
 ### Phase 49: Goal Contributing-Transactions Query Backend
 
 **Goal**: An App-layer query exposes exactly which transactions feed any goal's total calculation, with a running total that reconciles with the goal's displayed progress
@@ -364,6 +323,31 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 
 - [x] 51-05-PLAN.md — Aggregate phase gates + requirement flips + human end-to-end sign-off (GOL-08, GOL-09, GOL-10)
 
+### Phase 52: Wealth Snapshots & Asset Totals in Monthly Reports
+
+**Goal**: The system persists a daily snapshot of the current asset wealth totals (the same value shown as "Assets Total" in the Transactions tab top bar, considering only assets marked Included in Wealth Totals) and the Monthly Totals grid and chart include asset totals for each period using the latest snapshot available on or before that period
+**Depends on**: Nothing (first v0.10 phase)
+**Requirements**: TBD
+**Success Criteria** (what must be TRUE):
+
+  1. A snapshot of the current Included-in-Wealth-Totals asset value is stored in the database with its datetime each time the totals are refreshed
+  2. The database can hold multiple snapshots but at most one snapshot per day — when totals update on the same day, the existing snapshot for that day is overwritten, not duplicated
+  3. The Monthly Totals grid includes an asset-totals column/row derived from snapshots, and the Monthly Totals chart includes asset totals, each using the latest snapshot available on or before the end of that period (e.g., data only for Oct 10 → all of October uses the Oct 10 snapshot)
+  4. Any message on the Monthly Totals panel stating that totals exclude assets is updated to state that totals include assets based on the latest available data for that range
+
+**Plans**: 2/3 plans executed
+
+**Wave 1**
+
+- [x] 52-01-PLAN.md — Tracer: snapshot persistence (entity, collection, repository) + WealthSnapshotJob (1/day upsert) + Monthly Totals report join (latest snapshot ≤ period end) with full test coverage (SC-1, SC-2, SC-3 backend)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 52-02-PLAN.md — UI: Assets grid column, Monthly Totals chart added to view with assets series, trilingual footnote copy, human visual sign-off (SC-3 UI, SC-4)
+- [x] 52-03-PLAN.md — MCP parity for GetMonthlyTotals asset totals + DI resolution check + full-suite phase gate (SC-3 MCP)
+
+**UI hint**: yes
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -385,18 +369,18 @@ _Full phase details are archived in `.planning/milestones/v0.6-ROADMAP.md`._
 | 43. MCP, Localization, Documentation & Verification | v0.7 | 5/5 | Complete | 2026-08-12 |
 | 44. Core Loan Simulation Calculator | v0.8 | 1/1 | Complete    | 2026-08-14 |
 | 45. Simulator Modal UI (Inputs + Results Panel) | v0.8 | 2/2 | Complete    | 2026-08-21 |
-| 46. Cost-Over-Time Schedule | v0.8 | 0/? | Not started | - |
-| 47. Prefill from Existing BTC Loan Asset | v0.8 | 0/? | Not started | - |
-| 48. MCP, Localization, Documentation & Verification | v0.8 | 0/? | Not started | - |
 | 49. Goal Contributing-Transactions Query Backend | v0.9 | 3/3 | Complete    | 2026-10-06 |
 | 50. Goal Summary Modal UI | v0.9 | 3/3 | Complete    | 2026-10-06 |
 | 51. MCP, Localization, Documentation & Verification | v0.9 | 5/5 | Complete    | 2026-10-07 |
+| 52. Wealth Snapshots & Asset Totals in Monthly Reports | v0.10 | 2/3 | In Progress|  |
 
-**Total phases:** 23 (17 complete, 6 planned)  
-**v0.8 plans:** 0/? (roadmap defined 2026-08-13)  
-**v0.8 requirements:** 13/13 mapped (SIM-01..SIM-13)  
-**v0.9 plans:** 0/? (roadmap defined 2026-10-06)  
-**v0.9 requirements:** 8/8 mapped (GOL-03..GOL-10)
+**Total phases:** 21 (17 complete, 1 active, 3 removed/paused)  
+**v0.8 plans:** 3/3 executed (phases 46-48 removed 2026-10-26)  
+**v0.8 requirements:** SIM-01..SIM-13 (SIM-10..SIM-13 dropped with phases 46-48)  
+**v0.9 plans:** 11/11 executed (roadmap defined 2026-10-06)  
+**v0.9 requirements:** 8/8 mapped (GOL-03..GOL-10)  
+**v0.10 plans:** 0/3 (roadmap defined 2026-10-26)  
+**v0.10 requirements:** TBD
 
 ---
-*Last updated: 2026-10-06 after defining the v0.9 roadmap (Phases 49-51)*
+*Last updated: 2026-10-26 — v0.8 paused (phases 46-48 removed), v0.10 Wealth Snapshots roadmap added (Phase 52)*

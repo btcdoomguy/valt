@@ -1022,8 +1022,14 @@
     <data name="Reports.MonthlyTotals.Obs" xml:space="preserve">
         <value>* los totales actuales se calculan basándose en los montos de ayer</value>
     </data>
-    <data name="Reports.DoesntIncludeAssets" xml:space="preserve">
-        <value>* no incluye Activos</value>
+    <data name="Reports.WealthOverview.IncludesAssets" xml:space="preserve">
+        <value>* incluye Activos según los datos más recientes disponibles</value>
+    </data>
+    <data name="Reports.MonthlyTotals.AssetsColumn" xml:space="preserve">
+        <value>Activos</value>
+    </data>
+    <data name="Reports.MonthlyTotals.IncludesAssets" xml:space="preserve">
+        <value>* incluye Activos según los datos más recientes disponibles</value>
     </data>
     <data name="Transactions.MyAssets" xml:space="preserve">
         <value>Activos</value>

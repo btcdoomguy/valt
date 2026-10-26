@@ -108,7 +108,7 @@ public class BurnRateQueriesTests : DatabaseTest
         var result = await ExecuteQuery(clock, 10000m);
 
         var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-        var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+        var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
         var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
         var stats = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
 
@@ -201,7 +201,7 @@ public class BurnRateQueriesTests : DatabaseTest
 
     private async Task<BurnRateDataDto> ExecuteQuery(FakeClock clock, decimal currentWealth, string[] categoryIds, string[] accountIds)
     {
-        var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+        var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
         var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
         var currencySettings = new CurrencySettings(_localDatabase, Substitute.For<INotificationPublisher>())
         {

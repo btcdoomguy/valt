@@ -1,9 +1,11 @@
+using LiteDB;
 using Microsoft.Extensions.Logging.Abstractions;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Budget.Transactions.Details;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.DataSources.Bitcoin;
+using Valt.Infra.Modules.Assets;
 using Valt.Infra.Modules.DataSources.Fiat;
 using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.WealthOverview;
@@ -16,6 +18,14 @@ public class WealthOverviewReportTests : DatabaseTest
 {
     private AccountEntity _btcAccount = null!;
     private AccountEntity _usdAccount = null!;
+
+    [SetUp]
+    public new void SetUp()
+    {
+        // The in-memory database is shared across tests in this fixture —
+        // clear wealth snapshots so seeded rows never leak between tests
+        _localDatabase.GetWealthSnapshots().DeleteAll();
+    }
 
     protected override Task SeedDatabase()
     {
@@ -67,7 +77,7 @@ public class WealthOverviewReportTests : DatabaseTest
     {
         var clock = new FakeClock(new DateTime(2025, 1, 25));
         var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-        var report = new WealthOverviewReport(clock, new NullLogger<WealthOverviewReport>());
+        var report = new WealthOverviewReport(clock, new NullLogger<WealthOverviewReport>(), _localDatabase);
 
         var result = await report.GetAsync(WealthOverviewPeriod.Daily, FiatCurrency.Usd, provider);
 
@@ -92,7 +102,7 @@ public class WealthOverviewReportTests : DatabaseTest
         // Wednesday January 15, 2025
         var clock = new FakeClock(new DateTime(2025, 1, 15));
         var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-        var report = new WealthOverviewReport(clock, new NullLogger<WealthOverviewReport>());
+        var report = new WealthOverviewReport(clock, new NullLogger<WealthOverviewReport>(), _localDatabase);
 
         var result = await report.GetAsync(WealthOverviewPeriod.Weekly, FiatCurrency.Usd, provider);
 
@@ -117,7 +127,7 @@ public class WealthOverviewReportTests : DatabaseTest
         // Clock set to January 17, 2025 - only 2 days after first transaction (Jan 15)
         var clock = new FakeClock(new DateTime(2025, 1, 17));
         var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-        var report = new WealthOverviewReport(clock, new NullLogger<WealthOverviewReport>());
+        var report = new WealthOverviewReport(clock, new NullLogger<WealthOverviewReport>(), _localDatabase);
 
         var result = await report.GetAsync(WealthOverviewPeriod.Daily, FiatCurrency.Usd, provider);
 
@@ -134,7 +144,7 @@ public class WealthOverviewReportTests : DatabaseTest
         // have no data and should be omitted rather than filled with today's balance.
         var clock = new FakeClock(new DateTime(2025, 1, 17));
         var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-        var report = new WealthOverviewReport(clock, new NullLogger<WealthOverviewReport>());
+        var report = new WealthOverviewReport(clock, new NullLogger<WealthOverviewReport>(), _localDatabase);
 
         var result = await report.GetAsync(WealthOverviewPeriod.Monthly, FiatCurrency.Usd, provider, maxDataPoints: 12);
 
@@ -151,7 +161,7 @@ public class WealthOverviewReportTests : DatabaseTest
     {
         var clock = new FakeClock(new DateTime(2025, 1, 25));
         var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-        var report = new WealthOverviewReport(clock, new NullLogger<WealthOverviewReport>());
+        var report = new WealthOverviewReport(clock, new NullLogger<WealthOverviewReport>(), _localDatabase);
 
         var result = await report.GetAsync(WealthOverviewPeriod.Monthly, FiatCurrency.Usd, provider);
 
@@ -171,7 +181,7 @@ public class WealthOverviewReportTests : DatabaseTest
     {
         var clock = new FakeClock(new DateTime(2025, 1, 25));
         var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-        var report = new WealthOverviewReport(clock, new NullLogger<WealthOverviewReport>());
+        var report = new WealthOverviewReport(clock, new NullLogger<WealthOverviewReport>(), _localDatabase);
 
         var result = await report.GetAsync(WealthOverviewPeriod.Yearly, FiatCurrency.Usd, provider);
 
@@ -191,7 +201,7 @@ public class WealthOverviewReportTests : DatabaseTest
     {
         var clock = new FakeClock(new DateTime(2025, 1, 25));
         var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-        var report = new WealthOverviewReport(clock, new NullLogger<WealthOverviewReport>());
+        var report = new WealthOverviewReport(clock, new NullLogger<WealthOverviewReport>(), _localDatabase);
 
         var result = await report.GetAsync(WealthOverviewPeriod.Daily, FiatCurrency.Usd, provider);
 
@@ -221,7 +231,7 @@ public class WealthOverviewReportTests : DatabaseTest
 
         var clock = new FakeClock(new DateTime(2025, 1, 25));
         var provider = new ReportDataProvider(emptyPriceDb, emptyDb, clock);
-        var report = new WealthOverviewReport(clock, new NullLogger<WealthOverviewReport>());
+        var report = new WealthOverviewReport(clock, new NullLogger<WealthOverviewReport>(), emptyDb);
 
         var result = await report.GetAsync(WealthOverviewPeriod.Daily, FiatCurrency.Usd, provider);
 
@@ -229,5 +239,71 @@ public class WealthOverviewReportTests : DatabaseTest
 
         emptyDb.CloseDatabase();
         emptyPriceDb.CloseDatabase();
+    }
+
+    [Test]
+    public async Task Period_End_Item_Should_Carry_Latest_Snapshot_On_Or_Before_Period_End()
+    {
+        SeedSnapshot(new DateOnly(2025, 1, 20), totalFiat: 5000m, currencyCode: "USD");
+
+        var clock = new FakeClock(new DateTime(2025, 1, 25));
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var report = new WealthOverviewReport(clock, new NullLogger<WealthOverviewReport>(), _localDatabase);
+
+        var result = await report.GetAsync(WealthOverviewPeriod.Daily, FiatCurrency.Usd, provider);
+
+        var beforeSnapshot = result.Items.Single(x => x.PeriodEnd == new DateOnly(2025, 1, 19));
+        var atSnapshot = result.Items.Single(x => x.PeriodEnd == new DateOnly(2025, 1, 20));
+        var afterSnapshot = result.Items.Single(x => x.PeriodEnd == new DateOnly(2025, 1, 25));
+
+        Assert.That(beforeSnapshot.AssetsTotalFiat, Is.EqualTo(0m), "no snapshot on or before the period end yet");
+        Assert.That(atSnapshot.AssetsTotalFiat, Is.EqualTo(5000m));
+        Assert.That(afterSnapshot.AssetsTotalFiat, Is.EqualTo(5000m), "latest snapshot ≤ period end wins");
+        Assert.That(afterSnapshot.FiatTotal, Is.EqualTo(60100m), "raw FiatTotal stays asset-free; the UI combines");
+    }
+
+    [Test]
+    public async Task Currency_Mismatched_Snapshot_Should_Not_Be_Joined()
+    {
+        SeedSnapshot(new DateOnly(2025, 1, 20), totalFiat: 5000m, currencyCode: "BRL");
+
+        var clock = new FakeClock(new DateTime(2025, 1, 25));
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var report = new WealthOverviewReport(clock, new NullLogger<WealthOverviewReport>(), _localDatabase);
+
+        var result = await report.GetAsync(WealthOverviewPeriod.Daily, FiatCurrency.Usd, provider);
+
+        Assert.That(result.Items.All(x => x.AssetsTotalFiat == 0m), Is.True);
+    }
+
+    [Test]
+    public async Task Future_Period_Item_Should_Join_Snapshot_Using_Today_As_Cutoff()
+    {
+        // Wednesday 2025-01-22: the weekly period ending Saturday 2025-01-25 is in the
+        // future, so its item reuses today's balances and the join must use today as cutoff
+        SeedSnapshot(new DateOnly(2025, 1, 21), totalFiat: 7000m, currencyCode: "USD");
+
+        var clock = new FakeClock(new DateTime(2025, 1, 22));
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var report = new WealthOverviewReport(clock, new NullLogger<WealthOverviewReport>(), _localDatabase);
+
+        var result = await report.GetAsync(WealthOverviewPeriod.Weekly, FiatCurrency.Usd, provider);
+
+        var futureItem = result.Items.Single(x => x.PeriodEnd == new DateOnly(2025, 1, 25));
+        Assert.That(futureItem.AssetsTotalFiat, Is.EqualTo(7000m),
+            "future periods reuse today's balances, so the join also uses today as cutoff");
+    }
+
+    private void SeedSnapshot(DateOnly day, decimal totalFiat, string currencyCode)
+    {
+        _localDatabase.GetWealthSnapshots().Insert(new WealthSnapshotEntity
+        {
+            Id = ObjectId.NewObjectId(),
+            SnapshotDateTimeUtc = day.ToDateTime(new TimeOnly(12, 0, 0), DateTimeKind.Utc),
+            SnapshotDay = day,
+            TotalValueInMainCurrency = totalFiat,
+            TotalValueInSats = 0L,
+            MainCurrencyCode = currencyCode
+        });
     }
 }

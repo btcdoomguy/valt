@@ -2079,9 +2079,21 @@ namespace Valt.UI.Lang {
             }
         }
 
-        public static string Reports_DoesntIncludeAssets {
+        public static string Reports_WealthOverview_IncludesAssets {
             get {
-                return ResourceManager.GetString("Reports.DoesntIncludeAssets", resourceCulture);
+                return ResourceManager.GetString("Reports.WealthOverview.IncludesAssets", resourceCulture);
+            }
+        }
+
+        public static string Reports_MonthlyTotals_AssetsColumn {
+            get {
+                return ResourceManager.GetString("Reports.MonthlyTotals.AssetsColumn", resourceCulture);
+            }
+        }
+
+        public static string Reports_MonthlyTotals_IncludesAssets {
+            get {
+                return ResourceManager.GetString("Reports.MonthlyTotals.IncludesAssets", resourceCulture);
             }
         }
 

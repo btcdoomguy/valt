@@ -62,7 +62,9 @@ public class ReportTools
                 BitcoinIncome = i.BitcoinIncome,
                 BitcoinExpenses = i.BitcoinExpenses,
                 AllIncomeInFiat = i.AllIncomeInFiat,
-                AllExpensesInFiat = i.AllExpensesInFiat
+                AllExpensesInFiat = i.AllExpensesInFiat,
+                AssetsTotalFiat = i.AssetsTotalFiat,
+                AssetsTotalSats = i.AssetsTotalSats
             }).ToList(),
             Totals = new MonthlyTotalsSummaryDto
             {
@@ -537,6 +539,17 @@ public class MonthlyTotalsItemDto
     public required decimal BitcoinExpenses { get; init; }
     public required decimal AllIncomeInFiat { get; init; }
     public required decimal AllExpensesInFiat { get; init; }
+
+    /// <summary>
+    /// Aggregate "Included in Wealth Totals" asset value from the latest wealth snapshot
+    /// on or before this period's end date, in the report's main currency. Zero when no
+    /// snapshot exists on or before the period end (or the snapshot currency mismatches).
+    /// Same value the Monthly Totals grid shows in the UI (SC-3 MCP parity).
+    /// </summary>
+    public decimal AssetsTotalFiat { get; init; }
+
+    /// <summary>Same snapshot value expressed in satoshis; zero under the same fallback conditions.</summary>
+    public long AssetsTotalSats { get; init; }
 }
 
 public class MonthlyTotalsSummaryDto

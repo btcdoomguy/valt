@@ -1,8 +1,10 @@
+using LiteDB;
 using Microsoft.Extensions.Logging.Abstractions;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Budget.Categories;
 using Valt.Core.Modules.Budget.Transactions.Details;
+using Valt.Infra.Modules.Assets;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.DataSources.Bitcoin;
 using Valt.Infra.Modules.DataSources.Fiat;
@@ -21,6 +23,12 @@ public class MonthlyTotalsReportTests : DatabaseTest
     private AccountEntity _eurAccount = null!;
 
     private CategoryId _categoryId = null!;
+
+    [SetUp]
+    public new void SetUp()
+    {
+        _localDatabase.GetWealthSnapshots().DeleteAll();
+    }
 
     protected override Task SeedDatabase()
     {
@@ -158,7 +166,7 @@ public class MonthlyTotalsReportTests : DatabaseTest
         var baseDate = new DateOnly(2025, 12, 31);
         var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
         var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-        var report = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+        var report = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
 
         var result2024 = await report.GetAsync(baseDate, new DateOnlyRange(new DateOnly(2024, 01, 01), new DateOnly(2024, 12, 31)),
             FiatCurrency.Brl, provider);
@@ -193,5 +201,84 @@ public class MonthlyTotalsReportTests : DatabaseTest
         Assert.That(result2025.Items[11].BtcYearlyChange, Is.EqualTo(0.09m));
         Assert.That(result2025.Items[11].Income, Is.EqualTo(1383.33m));
         Assert.That(result2025.Items[11].Expenses, Is.EqualTo(-415m));
+    }
+
+    [Test]
+    public async Task October_Item_Should_Carry_Latest_Snapshot_On_Or_Before_Month_End()
+    {
+        SeedSnapshot(new DateOnly(2024, 10, 10), 100000m, 200000000L, FiatCurrency.Brl.Code);
+
+        var result = await BuildBrlReportFor2024();
+
+        var october = result.Items.Single(x => x.MonthYear == new DateOnly(2024, 10, 1));
+        Assert.That(october.AssetsTotalFiat, Is.EqualTo(100000m));
+        Assert.That(october.AssetsTotalSats, Is.EqualTo(200000000L));
+    }
+
+    [Test]
+    public async Task Month_Before_Any_Snapshot_Should_Carry_Zero_Asset_Totals()
+    {
+        SeedSnapshot(new DateOnly(2024, 10, 10), 100000m, 200000000L, FiatCurrency.Brl.Code);
+
+        var result = await BuildBrlReportFor2024();
+
+        var september = result.Items.Single(x => x.MonthYear == new DateOnly(2024, 9, 1));
+        Assert.That(september.AssetsTotalFiat, Is.Zero);
+        Assert.That(september.AssetsTotalSats, Is.Zero);
+    }
+
+    [Test]
+    public async Task Currency_Mismatched_Snapshot_Should_Not_Be_Joined()
+    {
+        SeedSnapshot(new DateOnly(2024, 10, 10), 100000m, 200000000L, FiatCurrency.Brl.Code);
+
+        var baseDate = new DateOnly(2024, 12, 31);
+        var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var report = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
+
+        var result = await report.GetAsync(baseDate, new DateOnlyRange(new DateOnly(2024, 1, 1), new DateOnly(2024, 12, 31)),
+            FiatCurrency.Usd, provider);
+
+        var october = result.Items.Single(x => x.MonthYear == new DateOnly(2024, 10, 1));
+        Assert.That(october.AssetsTotalFiat, Is.Zero);
+        Assert.That(october.AssetsTotalSats, Is.Zero);
+    }
+
+    [Test]
+    public async Task Two_Snapshots_In_One_Month_Should_Use_The_Latest()
+    {
+        SeedSnapshot(new DateOnly(2024, 10, 10), 100000m, 100L, FiatCurrency.Brl.Code);
+        SeedSnapshot(new DateOnly(2024, 10, 20), 150000m, 200L, FiatCurrency.Brl.Code);
+
+        var result = await BuildBrlReportFor2024();
+
+        var october = result.Items.Single(x => x.MonthYear == new DateOnly(2024, 10, 1));
+        Assert.That(october.AssetsTotalFiat, Is.EqualTo(150000m));
+        Assert.That(october.AssetsTotalSats, Is.EqualTo(200L));
+    }
+
+    private async Task<MonthlyTotalsData> BuildBrlReportFor2024()
+    {
+        var baseDate = new DateOnly(2024, 12, 31);
+        var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var report = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
+
+        return await report.GetAsync(baseDate, new DateOnlyRange(new DateOnly(2024, 1, 1), new DateOnly(2024, 12, 31)),
+            FiatCurrency.Brl, provider);
+    }
+
+    private void SeedSnapshot(DateOnly day, decimal totalFiat, long totalSats, string currencyCode)
+    {
+        _localDatabase.GetWealthSnapshots().Insert(new WealthSnapshotEntity
+        {
+            Id = ObjectId.NewObjectId(),
+            SnapshotDateTimeUtc = day.ToDateTime(new TimeOnly(12, 0, 0), DateTimeKind.Utc),
+            SnapshotDay = day,
+            TotalValueInMainCurrency = totalFiat,
+            TotalValueInSats = totalSats,
+            MainCurrencyCode = currencyCode
+        });
     }
 }

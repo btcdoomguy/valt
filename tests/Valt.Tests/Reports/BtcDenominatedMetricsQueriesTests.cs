@@ -304,7 +304,7 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
         string[] categoryIds,
         string[] accountIds)
     {
-        var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+        var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
         var currencySettings = new CurrencySettings(_localDatabase, Substitute.For<INotificationPublisher>())
         {
             MainFiatCurrency = FiatCurrency.Brl.Code

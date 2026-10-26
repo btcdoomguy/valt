@@ -239,7 +239,7 @@
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    IsVisible="{Binding IsWealthOverviewLoading}" />
                     </Grid>
-                    <TextBlock Text="{x:Static lang:language.Reports_DoesntIncludeAssets}"
+                    <TextBlock Text="{x:Static lang:language.Reports_WealthOverview_IncludesAssets}"
                                FontSize="{DynamicResource FontSizeSmall}"
                                Foreground="{DynamicResource Text500Brush}"
                                Margin="0, 5, 0, 0" />
@@ -312,8 +312,12 @@
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
                                             <DataGridTextColumn
+                                                Header="{x:Static lang:language.Reports_MonthlyTotals_AssetsColumn}"
+                                                Binding="{Binding AssetsTotalFormatted}">
+                                            </DataGridTextColumn>
+                                            <DataGridTextColumn
                                                 Header="{x:Static lang:language.Reports_MonthlyTotals_TotalWealth}"
-                                                Binding="{Binding FiatTotalFormatted}">
+                                                Binding="{Binding FiatTotalIncludingAssetsFormatted}">
                                             </DataGridTextColumn>
                                             <DataGridTemplateColumn
                                                 Header="{x:Static lang:language.Reports_MonthlyTotals_PreviousMonth}">
@@ -410,7 +414,32 @@
                                            HorizontalAlignment="Center" VerticalAlignment="Center"
                                            IsVisible="{Binding IsMonthlyTotalsLoading}" />
                             </Grid>
-                            <TextBlock Text="{x:Static lang:language.Reports_DoesntIncludeAssets}"
+                            <Grid MinHeight="500">
+                                <Border Background="{DynamicResource Background900Brush}"
+                                        BorderBrush="{DynamicResource Background700Brush}"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="10"
+                                        IsVisible="{Binding !IsMonthlyTotalsLoading}">
+                                    <avalonia:CartesianChart
+                                        x:Name="MonthlyTotalsChart"
+                                        Background="{DynamicResource Background900Brush}"
+                                        Series="{Binding MonthlyTotalsChartData.Series}"
+                                        XAxes="{Binding MonthlyTotalsChartData.XAxes}"
+                                        YAxes="{Binding MonthlyTotalsChartData.YAxes}"
+                                        LegendPosition="Top"
+                                        LegendTextSize="13"
+                                        TooltipTextSize="12"
+                                        ZoomMode="None"
+                                        Height="480"
+                                        Margin="20, 10, 20, 10">
+                                    </avalonia:CartesianChart>
+                                </Border>
+                                <TextBlock Text="{x:Static lang:language.Loading}" FontSize="{DynamicResource FontSizeMedium}" Foreground="{DynamicResource Text400Brush}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                                           IsVisible="{Binding IsMonthlyTotalsLoading}" />
+                            </Grid>
+                            <TextBlock Text="{x:Static lang:language.Reports_MonthlyTotals_IncludesAssets}"
                                        FontSize="{DynamicResource FontSizeSmall}"
                                        Foreground="{DynamicResource Text500Brush}"
                                        Margin="0, 5, 0, 0" />
