@@ -27,21 +27,13 @@ public class MonthlyTotalsChartData : ReportChartDataBase
     private static readonly SKColor BtcDark = SKColor.Parse("#e98805");          // Accent500
     private static readonly SKColor BtcFill = SKColor.Parse("#ffa122").WithAlpha(40);
 
-    // Color palette - Assets (Green shades, distinct from Fiat blue and BTC orange)
-    private static readonly SKColor AssetsPrimary = SKColor.Parse("#2e9e5b");    // Green500
-    private static readonly SKColor AssetsLight = SKColor.Parse("#7cc99b");      // Green300
-    private static readonly SKColor AssetsDark = SKColor.Parse("#1d7a43");       // Green600
-    private static readonly SKColor AssetsFill = SKColor.Parse("#2e9e5b").WithAlpha(40);
-
     public FiatCurrency FiatCurrency { get; set; } = null!;
 
     public ObservableCollection<ObservablePoint> FiatValues { get; } = new();
     public ObservableCollection<ObservablePoint> BtcValues { get; } = new();
-    public ObservableCollection<ObservablePoint> AssetsValues { get; } = new();
 
     private LineSeries<ObservablePoint>? _fiatSeries;
     private LineSeries<ObservablePoint>? _btcSeries;
-    private LineSeries<ObservablePoint>? _assetsSeries;
 
     public MonthlyTotalsChartData() : base(yAxisCount: 2)
     {
@@ -100,19 +92,6 @@ public class MonthlyTotalsChartData : ReportChartDataBase
         ScalesYAt = 1
     };
 
-    private LineSeries<ObservablePoint> CreateAssetsSeries() => new()
-    {
-        Name = "Assets",
-        Values = AssetsValues,
-        Stroke = new SolidColorPaint(AssetsPrimary) { StrokeThickness = 2.5f },
-        GeometryStroke = new SolidColorPaint(AssetsDark) { StrokeThickness = 2 },
-        GeometryFill = new SolidColorPaint(AssetsLight),
-        GeometrySize = 8,
-        Fill = new SolidColorPaint(AssetsFill),
-        LineSmoothness = 0.3,
-        ScalesYAt = 0
-    };
-
     private string BitcoinLabeler(double arg)
     {
         return CurrencyDisplay.FormatAsBitcoin((decimal)arg);
@@ -128,7 +107,6 @@ public class MonthlyTotalsChartData : ReportChartDataBase
         FiatCurrency = monthlyTotalsData.MainCurrency;
         FiatValues.Clear();
         BtcValues.Clear();
-        AssetsValues.Clear();
         MonthLabels.Clear();
 
         BeginSeriesRebuild();
@@ -138,17 +116,15 @@ public class MonthlyTotalsChartData : ReportChartDataBase
             var item = monthlyTotalsData.Items[index];
 
             MonthLabels.Add(item.MonthYear.ToString("MMM yyyy", CultureInfo.InvariantCulture));
-            FiatValues.Add(new ObservablePoint(index, (double)item.FiatTotal));
+            // Total Wealth includes the latest-snapshot Assets total (D-06)
+            FiatValues.Add(new ObservablePoint(index, (double)(item.FiatTotal + item.AssetsTotalFiat)));
             BtcValues.Add(new ObservablePoint(index, (double)item.BtcTotal));
-            AssetsValues.Add(new ObservablePoint(index, (double)item.AssetsTotalFiat));
         }
 
         _fiatSeries = CreateFiatSeries();
         _btcSeries = CreateBtcSeries();
-        _assetsSeries = CreateAssetsSeries();
         Series.Add(_fiatSeries);
         Series.Add(_btcSeries);
-        Series.Add(_assetsSeries);
     }
 
     protected override void DisposeSeries()
@@ -158,9 +134,6 @@ public class MonthlyTotalsChartData : ReportChartDataBase
 
         DisposePaints(_btcSeries?.Stroke, _btcSeries?.GeometryStroke, _btcSeries?.GeometryFill, _btcSeries?.Fill);
         _btcSeries = null;
-
-        DisposePaints(_assetsSeries?.Stroke, _assetsSeries?.GeometryStroke, _assetsSeries?.GeometryFill, _assetsSeries?.Fill);
-        _assetsSeries = null;
     }
 
     public override void Dispose()
@@ -168,6 +141,5 @@ public class MonthlyTotalsChartData : ReportChartDataBase
         base.Dispose();
         FiatValues.Clear();
         BtcValues.Clear();
-        AssetsValues.Clear();
     }
 }

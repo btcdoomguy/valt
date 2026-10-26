@@ -312,12 +312,12 @@
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
                                             <DataGridTextColumn
-                                                Header="{x:Static lang:language.Reports_MonthlyTotals_TotalWealth}"
-                                                Binding="{Binding FiatTotalFormatted}">
-                                            </DataGridTextColumn>
-                                            <DataGridTextColumn
                                                 Header="{x:Static lang:language.Reports_MonthlyTotals_AssetsColumn}"
                                                 Binding="{Binding AssetsTotalFormatted}">
+                                            </DataGridTextColumn>
+                                            <DataGridTextColumn
+                                                Header="{x:Static lang:language.Reports_MonthlyTotals_TotalWealth}"
+                                                Binding="{Binding FiatTotalIncludingAssetsFormatted}">
                                             </DataGridTextColumn>
                                             <DataGridTemplateColumn
                                                 Header="{x:Static lang:language.Reports_MonthlyTotals_PreviousMonth}">

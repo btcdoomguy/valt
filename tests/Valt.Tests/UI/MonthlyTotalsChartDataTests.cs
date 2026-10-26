@@ -8,7 +8,7 @@ namespace Valt.Tests.UI;
 public class MonthlyTotalsChartDataTests
 {
     [Test]
-    public void RefreshChart_With_Items_Carrying_AssetsTotalFiat_Should_Populate_One_Assets_Point_Per_Item()
+    public void RefreshChart_Should_Populate_Total_Wealth_Points_Combining_Assets_Total()
     {
         var chartData = new MonthlyTotalsChartData();
         var data = new MonthlyTotalsData
@@ -25,18 +25,16 @@ public class MonthlyTotalsChartDataTests
 
         chartData.RefreshChart(data);
 
-        Assert.That(chartData.AssetsValues, Has.Count.EqualTo(3));
-        Assert.That(chartData.AssetsValues[0].X, Is.EqualTo(0));
-        Assert.That(chartData.AssetsValues[0].Y, Is.EqualTo(250d));
-        Assert.That(chartData.AssetsValues[1].X, Is.EqualTo(1));
-        Assert.That(chartData.AssetsValues[1].Y, Is.EqualTo(400d));
-        Assert.That(chartData.AssetsValues[2].Y, Is.EqualTo(0d));
+        Assert.That(chartData.FiatValues, Has.Count.EqualTo(3));
+        Assert.That(chartData.FiatValues[0].Y, Is.EqualTo(1250d), "Total Wealth must include the Assets total");
+        Assert.That(chartData.FiatValues[1].Y, Is.EqualTo(2400d));
+        Assert.That(chartData.FiatValues[2].Y, Is.EqualTo(3000d));
 
         chartData.Dispose();
     }
 
     [Test]
-    public void RefreshChart_Should_Add_Three_Series_And_Dispose_Should_Clear_All_Without_Leaking()
+    public void RefreshChart_Should_Add_Two_Series_And_Dispose_Should_Clear_All_Without_Leaking()
     {
         var chartData = new MonthlyTotalsChartData();
         var data = new MonthlyTotalsData
@@ -48,18 +46,17 @@ public class MonthlyTotalsChartDataTests
 
         chartData.RefreshChart(data);
 
-        Assert.That(chartData.Series, Has.Count.EqualTo(3));
+        Assert.That(chartData.Series, Has.Count.EqualTo(2));
 
         chartData.RefreshChart(data);
 
-        Assert.That(chartData.Series, Has.Count.EqualTo(3), "re-refresh must rebuild, not accumulate, series");
+        Assert.That(chartData.Series, Has.Count.EqualTo(2), "re-refresh must rebuild, not accumulate, series");
 
         chartData.Dispose();
 
         Assert.That(chartData.Series, Is.Empty);
         Assert.That(chartData.FiatValues, Is.Empty);
         Assert.That(chartData.BtcValues, Is.Empty);
-        Assert.That(chartData.AssetsValues, Is.Empty);
     }
 
     private static MonthlyTotalsData.Item CreateItem(DateOnly monthYear, decimal fiatTotal, decimal assetsTotalFiat) => new()

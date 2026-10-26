@@ -82,6 +82,17 @@ public class MonthlyReportItemViewModel : ObservableObject
         ? CurrencyDisplay.FormatFiat(FiatTotal.Value, Currency.Code)
         : string.Empty;
 
+    /// <summary>
+    /// Total Wealth including the latest-snapshot Assets total (fiat side).
+    /// This is what the Total Wealth grid column displays (D-07).
+    /// </summary>
+    public decimal? FiatTotalIncludingAssets =>
+        FiatTotal is not null ? FiatTotal.Value + (AssetsTotalFiat ?? 0m) : null;
+
+    public string FiatTotalIncludingAssetsFormatted => FiatTotalIncludingAssets is not null
+        ? CurrencyDisplay.FormatFiat(FiatTotalIncludingAssets.Value, Currency.Code)
+        : string.Empty;
+
     public decimal? FiatMonthlyChange { get; init; }
 
     public string FiatMonthlyChangeFormatted => FiatMonthlyChange is not null
