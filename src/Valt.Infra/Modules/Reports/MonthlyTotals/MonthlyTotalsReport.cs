@@ -2,6 +2,8 @@ using LiteDB;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
+using Valt.Infra.DataAccess;
+using Valt.Infra.Modules.Assets;
 using Valt.Infra.Modules.Budget.Accounts;
 using Valt.Infra.Modules.Budget.Transactions;
 
@@ -11,11 +13,13 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
 {
     private readonly IClock _clock;
     private readonly ILogger<MonthlyTotalsReport> _logger;
+    private readonly ILocalDatabase _localDatabase;
 
-    public MonthlyTotalsReport(IClock clock, ILogger<MonthlyTotalsReport> logger)
+    public MonthlyTotalsReport(IClock clock, ILogger<MonthlyTotalsReport> logger, ILocalDatabase localDatabase)
     {
         _clock = clock;
         _logger = logger;
+        _localDatabase = localDatabase;
     }
 
     public Task<MonthlyTotalsData> GetAsync(
@@ -34,7 +38,8 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
         var currentDate = _clock.GetCurrentLocalDate();
         var maxDate = displayRangeEnd < currentDate ? displayRangeEnd : currentDate;
 
-        var calculator = new Calculator(currency, provider, provider.MinTransactionDate, maxDate, displayRange, excludedCategoryIds);
+        var calculator = new Calculator(currency, provider, provider.MinTransactionDate, maxDate, displayRange, excludedCategoryIds,
+            LoadSnapshots());
 
         try
         {
@@ -47,6 +52,17 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
         }
     }
 
+    private List<WealthSnapshotEntity> LoadSnapshots()
+    {
+        if (!_localDatabase.HasDatabaseOpen)
+            return [];
+
+        return _localDatabase.GetWealthSnapshots()
+            .FindAll()
+            .OrderBy(x => x.SnapshotDay)
+            .ToList();
+    }
+
     private class Calculator
     {
         private const decimal SatoshisPerBitcoin = 100_000_000m;
@@ -57,6 +73,7 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
         private readonly DateOnly _endDate;
         private readonly DateOnlyRange _displayRange;
         private readonly IReadOnlySet<string>? _excludedCategoryIds;
+        private readonly IReadOnlyList<WealthSnapshotEntity> _snapshots;
 
         public Calculator(
             FiatCurrency currency,
@@ -64,7 +81,8 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
             DateOnly startDate,
             DateOnly endDate,
             DateOnlyRange displayRange,
-            IReadOnlySet<string>? excludedCategoryIds = null)
+            IReadOnlySet<string>? excludedCategoryIds = null,
+            IReadOnlyList<WealthSnapshotEntity>? snapshots = null)
         {
             _currency = currency;
             _provider = provider;
@@ -72,11 +90,13 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
             _endDate = endDate;
             _displayRange = displayRange;
             _excludedCategoryIds = excludedCategoryIds;
+            _snapshots = snapshots ?? [];
         }
 
         public MonthlyTotalsData Calculate()
         {
             var monthlyTotals = new Dictionary<DateOnly, MonthlyTotal>();
+            var emissionDates = new Dictionary<DateOnly, DateOnly>();
             var accountBalances = new Dictionary<ObjectId, decimal>();
             var bitcoinDailyTotal = 0m;
             var accountIncomes = new Dictionary<ObjectId, decimal>();
@@ -125,11 +145,12 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
                     accountExpenses, accountBitcoinPurchases, accountBitcoinSales, ref bitcoinDailyTotal);
                 var monthYear = new DateOnly(currentDate.Year, currentDate.Month, 1);
                 monthlyTotals[monthYear] = monthlyData;
+                emissionDates[monthYear] = currentDate;
 
                 ResetMonthlyChanges(accountIncomes, accountExpenses, accountBitcoinPurchases, accountBitcoinSales);
             }
 
-            var resultItems = BuildResultItems(monthlyTotals);
+            var resultItems = BuildResultItems(monthlyTotals, emissionDates);
             var filteredItems = resultItems
                 .Where(x => x.MonthYear >= _displayRange.Start && x.MonthYear <= _displayRange.End).ToList();
             var totals = BuildTotals(filteredItems);
@@ -395,7 +416,9 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
             }
         }
 
-        private static List<MonthlyTotalsData.Item> BuildResultItems(Dictionary<DateOnly, MonthlyTotal> monthlyTotals)
+        private List<MonthlyTotalsData.Item> BuildResultItems(
+            Dictionary<DateOnly, MonthlyTotal> monthlyTotals,
+            Dictionary<DateOnly, DateOnly> emissionDates)
         {
             return monthlyTotals.Select(monthly =>
             {
@@ -418,6 +441,8 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
                     ? FinancialCalculator.CalculateImprovementPercentage(previousYear.Fiat, monthly.Value.Fiat)
                     : 0m;
 
+                var latestSnapshot = FindLatestSnapshot(emissionDates[monthly.Key]);
+
                 return new MonthlyTotalsData.Item
                 {
                     MonthYear = monthly.Key,
@@ -434,9 +459,33 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
                     Income = monthly.Value.Income,
                     Expenses = monthly.Value.Expenses,
                     AllExpensesInFiat = monthly.Value.AllExpensesInFiat,
-                    AllIncomeInFiat = monthly.Value.AllIncomeInFiat
+                    AllIncomeInFiat = monthly.Value.AllIncomeInFiat,
+                    AssetsTotalFiat = latestSnapshot?.TotalValueInMainCurrency ?? 0m,
+                    AssetsTotalSats = latestSnapshot?.TotalValueInSats ?? 0L
                 };
             }).ToList();
+        }
+
+        /// <summary>
+        /// Latest wealth snapshot with SnapshotDay ≤ the given period-end emission date whose
+        /// stored currency matches the report currency. Snapshots only ever hold values computed
+        /// in the main currency at write time, so a currency-mismatched snapshot must not be
+        /// joined (Pitfall 2). Returns null when no snapshot qualifies — callers fall back to 0.
+        /// </summary>
+        private WealthSnapshotEntity? FindLatestSnapshot(DateOnly periodEndDate)
+        {
+            WealthSnapshotEntity? latest = null;
+            foreach (var snapshot in _snapshots)
+            {
+                if (snapshot.SnapshotDay > periodEndDate)
+                    break; // _snapshots is ordered by SnapshotDay ascending
+
+                if (!string.Equals(snapshot.MainCurrencyCode, _currency.Code, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                latest = snapshot;
+            }
+            return latest;
         }
 
 

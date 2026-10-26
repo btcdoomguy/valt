@@ -36,6 +36,18 @@ public record MonthlyTotalsData
         
         public required decimal AllIncomeInFiat { get; init; }
         public required decimal AllExpensesInFiat { get; init; }
+
+        /// <summary>
+        /// Aggregate "Included in Wealth Totals" asset value from the latest wealth snapshot
+        /// on or before this period's end date, in the report's main currency. Zero when no
+        /// snapshot exists on or before the period end (or the snapshot currency mismatches).
+        /// </summary>
+        public decimal AssetsTotalFiat { get; init; }
+
+        /// <summary>
+        /// Same snapshot value expressed in satoshis; zero under the same fallback conditions.
+        /// </summary>
+        public long AssetsTotalSats { get; init; }
     }
 
     public record Totals

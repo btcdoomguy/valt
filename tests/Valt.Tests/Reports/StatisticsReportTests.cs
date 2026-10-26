@@ -70,7 +70,7 @@ public class StatisticsReportTests : DatabaseTest
     {
         var clock = new FakeClock(new DateTime(2025, 12, 31));
         var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-        var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+        var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
         var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
         var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
@@ -96,7 +96,7 @@ public class StatisticsReportTests : DatabaseTest
             AddExpenseTransaction(new DateOnly(2025, 3, 15), 1000m);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 0m, provider);
@@ -124,7 +124,7 @@ public class StatisticsReportTests : DatabaseTest
             AddExpenseTransaction(new DateOnly(2025, 11, 15), 1000m);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
@@ -153,7 +153,7 @@ public class StatisticsReportTests : DatabaseTest
             AddExpenseTransaction(new DateOnly(2025, 11, 15), 1500m);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
@@ -178,7 +178,7 @@ public class StatisticsReportTests : DatabaseTest
             AddExpenseTransaction(new DateOnly(2025, 11, 15), 1000m);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 5000m, provider);
@@ -204,7 +204,7 @@ public class StatisticsReportTests : DatabaseTest
             AddExpenseTransaction(new DateOnly(2025, 11, 15), 1000m);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 15000m, provider);
@@ -230,7 +230,7 @@ public class StatisticsReportTests : DatabaseTest
             AddExpenseTransaction(new DateOnly(2025, 11, 15), 1000m);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 24000m, provider);
@@ -258,7 +258,7 @@ public class StatisticsReportTests : DatabaseTest
             AddExpenseTransaction(new DateOnly(2025, 11, 15), 1000m);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
@@ -290,7 +290,7 @@ public class StatisticsReportTests : DatabaseTest
             AddExpenseTransaction(new DateOnly(2024, 3, 15), 850m);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
@@ -326,7 +326,7 @@ public class StatisticsReportTests : DatabaseTest
             AddExpenseTransaction(new DateOnly(2024, 3, 15), 800m);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
@@ -362,7 +362,7 @@ public class StatisticsReportTests : DatabaseTest
             AddExpenseTransaction(new DateOnly(2024, 3, 15), 1000m);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
@@ -392,7 +392,7 @@ public class StatisticsReportTests : DatabaseTest
             AddExpenseTransaction(new DateOnly(2025, 2, 15), 1000m);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
@@ -422,7 +422,7 @@ public class StatisticsReportTests : DatabaseTest
             AddExpenseTransaction(new DateOnly(2024, 2, 15), 1000m);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
@@ -457,7 +457,7 @@ public class StatisticsReportTests : DatabaseTest
             AddExpenseTransactionWithSats(new DateOnly(2025, 3, 15), 1200m, -12000);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
@@ -492,7 +492,7 @@ public class StatisticsReportTests : DatabaseTest
             AddExpenseTransactionWithSats(new DateOnly(2024, 3, 15), 800m, -8000);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
@@ -524,7 +524,7 @@ public class StatisticsReportTests : DatabaseTest
             AddExpenseTransaction(new DateOnly(2025, 2, 15), 1000m);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
@@ -561,7 +561,7 @@ public class StatisticsReportTests : DatabaseTest
             AddExpenseTransactionWithSats(new DateOnly(2024, 3, 15), 1000m, -10000);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
@@ -595,7 +595,7 @@ public class StatisticsReportTests : DatabaseTest
             AddExpenseTransaction(new DateOnly(2025, 3, 15), 1500m);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
@@ -631,7 +631,7 @@ public class StatisticsReportTests : DatabaseTest
             AddBtcExpenseTransaction(new DateOnly(2025, 3, 15), -60000);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
@@ -665,7 +665,7 @@ public class StatisticsReportTests : DatabaseTest
             AddExpenseTransactionWithSats(new DateOnly(2025, 3, 15), 1500m, -15000);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
@@ -700,7 +700,7 @@ public class StatisticsReportTests : DatabaseTest
             AddExpenseTransactionWithSats(new DateOnly(2025, 3, 15), 1500m, -15000);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
@@ -735,7 +735,7 @@ public class StatisticsReportTests : DatabaseTest
             AddExpenseTransactionWithSats(new DateOnly(2025, 3, 15), 1500m, -15000);
 
             var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>());
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
             var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
 
             var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
