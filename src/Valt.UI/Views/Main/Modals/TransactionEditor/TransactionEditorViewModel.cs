@@ -74,6 +74,8 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel
 
     [ObservableProperty] private string _notes = string.Empty;
 
+    [ObservableProperty] private bool _isExcluded;
+
     [NotifyPropertyChangedFor(nameof(IsBoundToFixedExpense), nameof(BoundToFixedExpenseCaption), nameof(HasMetadata))]
     [ObservableProperty]
     private TransactionFixedExpenseReference? _transactionFixedExpenseReference;
@@ -283,6 +285,11 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel
 
         Name = transaction.Name;
         Notes = transaction.Notes ?? string.Empty;
+        // D-P53-4a: copying a transaction resets the exclusion flag (a copy is a new economic event)
+        if (!request.CopyTransaction)
+        {
+            IsExcluded = transaction.IsExcluded;
+        }
         Category = AvailableCategories.FirstOrDefault(c => c.Id == transaction.CategoryId);
 
         var values = _transactionDetailsBuilder!.LoadFromDto(transaction.Details, AvailableAccounts);
@@ -522,7 +529,8 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel
                 Details = detailsDto,
                 Notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes,
                 FixedExpenseId = TransactionFixedExpenseReference?.FixedExpenseId.Value,
-                FixedExpenseReferenceDate = TransactionFixedExpenseReference?.ReferenceDate
+                FixedExpenseReferenceDate = TransactionFixedExpenseReference?.ReferenceDate,
+                IsExcluded = IsExcluded
             });
 
             if (result.IsFailure)
@@ -556,7 +564,8 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel
                         Notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes,
                         FixedExpenseId = TransactionFixedExpenseReference?.FixedExpenseId.Value,
                         FixedExpenseReferenceDate = TransactionFixedExpenseReference?.ReferenceDate,
-                        GroupId = groupId.Value
+                        GroupId = groupId.Value,
+                        IsExcluded = IsExcluded
                     });
 
                     if (result.IsFailure)
@@ -582,7 +591,8 @@ public partial class TransactionEditorViewModel : ValtModalValidatorViewModel
                     Details = detailsDto,
                     Notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes,
                     FixedExpenseId = TransactionFixedExpenseReference?.FixedExpenseId.Value,
-                    FixedExpenseReferenceDate = TransactionFixedExpenseReference?.ReferenceDate
+                    FixedExpenseReferenceDate = TransactionFixedExpenseReference?.ReferenceDate,
+                    IsExcluded = IsExcluded
                 });
 
                 if (result.IsFailure)

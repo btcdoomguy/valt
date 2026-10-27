@@ -1638,6 +1638,9 @@
     <data name="ManageTransactions.Properties" xml:space="preserve">
         <value>Propriedades</value>
     </data>
+    <data name="ManageTransactions.ExcludedFromReports" xml:space="preserve">
+        <value>Excluído de relatórios e metas</value>
+    </data>
     <data name="Transactions.Columns.Notes" xml:space="preserve">
         <value>Notas</value>
     </data>

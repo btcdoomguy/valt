@@ -3333,6 +3333,12 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string ManageTransactions_ExcludedFromReports {
+            get {
+                return ResourceManager.GetString("ManageTransactions.ExcludedFromReports", resourceCulture);
+            }
+        }
+        
         public static string Transactions_Columns_Notes {
             get {
                 return ResourceManager.GetString("Transactions.Columns.Notes", resourceCulture);
