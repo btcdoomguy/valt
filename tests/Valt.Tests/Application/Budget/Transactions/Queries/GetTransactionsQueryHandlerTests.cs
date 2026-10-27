@@ -257,7 +257,7 @@ public class GetTransactionsQueryHandlerTests : DatabaseTest
         var excludedTransaction = new TransactionBuilder()
         {
             CategoryId = _categoryId,
-            Date = new DateOnly(2023, 2, 1),
+            Date = new DateOnly(2023, 3, 1),
             Name = "Excluded Transaction",
             TransactionDetails = new FiatDetails(_fiatAccountId, 200, true),
             IsExcluded = true
@@ -267,8 +267,8 @@ public class GetTransactionsQueryHandlerTests : DatabaseTest
 
         var filter = new TransactionQueryFilter()
         {
-            From = new DateOnly(2023, 2, 1),
-            To = new DateOnly(2023, 2, 28),
+            From = new DateOnly(2023, 3, 1),
+            To = new DateOnly(2023, 3, 31),
             AccountIds = new[] { _fiatAccountId.Value }
         };
 
@@ -285,7 +285,7 @@ public class GetTransactionsQueryHandlerTests : DatabaseTest
         var excludedTransaction = new TransactionBuilder()
         {
             CategoryId = _categoryId,
-            Date = new DateOnly(2023, 2, 1),
+            Date = new DateOnly(2023, 3, 1),
             Name = "Excluded Transaction",
             TransactionDetails = new FiatDetails(_fiatAccountId, 200, true),
             IsExcluded = true

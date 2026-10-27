@@ -14,4 +14,5 @@ public record EditTransactionCommand : ICommand<Unit>
     public string? Notes { get; init; }
     public string? FixedExpenseId { get; init; }
     public DateOnly? FixedExpenseReferenceDate { get; init; }
+    public bool IsExcluded { get; init; }
 }

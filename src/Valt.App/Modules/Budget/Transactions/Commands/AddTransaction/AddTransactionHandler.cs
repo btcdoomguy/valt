@@ -99,7 +99,8 @@ internal sealed class AddTransactionHandler : ICommandHandler<AddTransactionComm
             transactionDetails,
             notes,
             fixedExpenseReference,
-            groupId);
+            groupId,
+            command.IsExcluded);
 
         await _transactionRepository.SaveTransactionAsync(transaction);
 

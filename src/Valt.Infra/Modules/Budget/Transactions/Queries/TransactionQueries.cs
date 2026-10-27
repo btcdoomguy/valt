@@ -159,7 +159,8 @@ public class TransactionQueries : ITransactionQueries
                 FixedExpenseReferenceDate = fixedExpenseRecord is not null
                     ? DateOnly.FromDateTime(fixedExpenseRecord.ReferenceDate)
                     : null,
-                Notes = transactionEntity.Notes
+                Notes = transactionEntity.Notes,
+                IsExcluded = transactionEntity.IsExcluded
             };
         });
 
@@ -221,6 +222,7 @@ public class TransactionQueries : ITransactionQueries
             CategoryId = entity.CategoryId.ToString(),
             Notes = entity.Notes,
             GroupId = entity.GroupId?.ToString(),
+            IsExcluded = entity.IsExcluded,
             FixedExpenseReference = fixedExpenseRecord is not null
                 ? new FixedExpenseReferenceDTO
                 {

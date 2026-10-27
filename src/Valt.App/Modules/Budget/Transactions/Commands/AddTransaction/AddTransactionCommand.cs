@@ -13,6 +13,7 @@ public record AddTransactionCommand : ICommand<AddTransactionResult>
     public string? FixedExpenseId { get; init; }
     public DateOnly? FixedExpenseReferenceDate { get; init; }
     public string? GroupId { get; init; }
+    public bool IsExcluded { get; init; }
 }
 
 public record AddTransactionResult(string TransactionId, DateOnly Date);
