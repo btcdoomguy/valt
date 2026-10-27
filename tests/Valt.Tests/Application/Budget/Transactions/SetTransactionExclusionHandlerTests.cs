@@ -95,7 +95,7 @@ public class SetTransactionExclusionHandlerTests : DatabaseTest
     {
         var command = new SetTransactionExclusionCommand
         {
-            TransactionId = "nonexistent-id",
+            TransactionId = "00000000000000000000ffff",
             IsExcluded = true
         };
 
