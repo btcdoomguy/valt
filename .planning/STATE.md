@@ -5,8 +5,8 @@ milestone_name: Goal Transparency — Transaction Breakdown
 current_phase: 53
 current_phase_name: Transaction Exclusion Flag for Reports & Goals
 status: executing
-stopped_at: Completed 53-01-PLAN.md
-last_updated: "2026-10-27T18:29:00.119Z"
+stopped_at: Checkpoint in 53-04-PLAN.md (Task 1 committed 06151dd, awaiting human visual sign-off)
+last_updated: "2026-10-27T19:00:22.454Z"
 last_activity: 2026-10-27
 last_activity_desc: Phase 53 execution started
 progress:
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-08-06)
 ## Current Position
 
 Phase: 53 (Transaction Exclusion Flag for Reports & Goals) — EXECUTING
-Plan: 2 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-10-27 — Phase 53 execution started
 
@@ -156,6 +156,8 @@ Last activity: 2026-10-27 — Phase 53 execution started
 | Phase 52 P01 | 25min | 3 tasks | 16 files |
 | Phase 52 P03 | 8min | 2 tasks | 3 files |
 | Phase 53 P01 | 21 min | 3 tasks | 21 files |
+| Phase 53 P02 | 11 | 3 tasks | 17 files |
+| Phase 53 P03 | 7 min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -230,6 +232,10 @@ Recent decisions affecting current work:
 - [Phase ?]: 53-01: Commands/DTOs use non-required init bool IsExcluded per Phase 29 lesson — MCP and design-time object initializers keep compiling
 - [Phase ?]: 53-01: Report tests use before/after runs with delta-of-deltas instead of hardcoded month baselines (DatabaseTest fixture shares one DB; months differ in day count)
 - [Phase ?]: 53-01: Legacy-document test strips excl from a raw BsonDocument inserted via the app's own BsonMapper reflected from LocalDatabase._database
+- [Phase ?]: 53-02: Invalidate() added to IReportDataProviderFactory (not just internal factory) so the notification handler depends on the abstraction and tests can substitute it
+- [Phase ?]: 53-02: Report-cache invalidation publish is repository-level (not VM-level) so MCP-initiated saves invalidate too; MCP UI refresh stays on McpDataChangedNotification
+- [Phase ?]: 53-02: Stale-cache regression test kept as permanent characterization: count-based cache returns same provider instance after a flag toggle until Invalidate() is called
+- [Phase ?]: Reader-based exclusion tests placed in GetGoalContributingTransactionsHandlerTests (real reader + real DB) instead of mock-based calculator fixtures — mocks cannot observe a LiteDB filter
 
 ### Pending Todos
 
@@ -237,7 +243,9 @@ None yet.
 
 ### Blockers/Concerns
 
-None yet.
+yet.
+
+- 53-04 checkpoint: human visual sign-off of Excluded checkbox in Transaction Editor (Task 2/3 pending)
 
 ### Quick Tasks Completed
 
@@ -290,9 +298,9 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-10-27T18:29:00.109Z
-Stopped at: Completed 53-01-PLAN.md
-Resume file: None
+Last session: 2026-10-27T19:00:22.360Z
+Stopped at: Checkpoint in 53-04-PLAN.md (Task 1 committed 06151dd, awaiting human visual sign-off)
+Resume file: .planning/phases/53-transaction-exclusion-flag-for-reports-and-goals/53-04-PLAN.md
 Resume file: None
 
 ## Notes

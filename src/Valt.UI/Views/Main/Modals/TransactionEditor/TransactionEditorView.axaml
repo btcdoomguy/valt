@@ -197,15 +197,13 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- Exclusion section (top, above Notes) -->
-                        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,10" Spacing="4">
-                            <TextBlock Text="{x:Static local:language.ManageTransactions_ExcludedFromReports}"
-                                       FontWeight="SemiBold" FontSize="{DynamicResource FontSizeSmall}"
-                                       Foreground="{DynamicResource Text300Brush}" />
-                            <CheckBox Content="{x:Static local:language.ManageTransactions_ExcludedFromReports}"
-                                      IsChecked="{Binding IsExcluded}"
-                                      VerticalAlignment="Center" />
-                        </StackPanel>
+                        <!-- Exclusion checkbox (docked below Notes, above the Properties border) -->
+                        <CheckBox DockPanel.Dock="Bottom"
+                                  Content="{x:Static local:language.ManageTransactions_ExcludedFromReports}"
+                                  IsChecked="{Binding IsExcluded}"
+                                  FontSize="{DynamicResource FontSizeSmall}"
+                                  VerticalAlignment="Center"
+                                  Margin="0,10,0,0" />
 
                         <!-- Notes field (fills remaining space) -->
                         <StackPanel Classes="form-field" Margin="0,0,0,10">
