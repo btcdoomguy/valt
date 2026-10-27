@@ -50,8 +50,12 @@ public class SpendingEvolutionQueries : ISpendingEvolutionQueries
         var toDate = query.To.ToValtDateTime();
         transactionQuery = transactionQuery.Where(x => x.Date >= fromDate && x.Date <= toDate);
 
-        // Excluded transactions never count toward spending evolution
-        transactionQuery = transactionQuery.Where(x => !x.IsExcluded);
+        // Excluded transactions never count toward spending evolution.
+        // WARNING: never negate the bool here (e.g. "!" operator) — LiteDB's
+        // LinqExpressionVisitor translates bool negation to ($.excl = false), and legacy
+        // documents lacking the excl field read as NULL, so NULL = false silently drops them.
+        // "!=" keeps missing (NULL != true) and explicit-false rows while dropping only excl: true.
+        transactionQuery = transactionQuery.Where(x => x.IsExcluded != true);
 
         // Filter by category IDs if provided
         if (query.CategoryIds.Length > 0)
