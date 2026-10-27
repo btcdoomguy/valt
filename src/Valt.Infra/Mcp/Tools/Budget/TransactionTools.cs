@@ -5,6 +5,7 @@ using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Budget.Transactions.Commands.AddTransaction;
 using Valt.App.Modules.Budget.Transactions.Commands.BulkEditTransactions;
 using Valt.App.Modules.Budget.Transactions.Commands.DeleteTransaction;
+using Valt.App.Modules.Budget.Transactions.Commands.SetTransactionExclusion;
 using Valt.App.Modules.Budget.Transactions.DTOs;
 using Valt.App.Modules.Budget.Transactions.Queries.GetTransactions;
 using Valt.App.Kernel.Notifications;
@@ -54,7 +55,8 @@ public class TransactionTools
         [Description("Category ID")] string categoryId,
         [Description("Account ID (the fiat account to debit)")] string accountId,
         [Description("Amount (positive value)")] decimal amount,
-        [Description("Optional notes")] string? notes = null)
+        [Description("Optional notes")] string? notes = null,
+        [Description("Exclude from reports and goals (wealth transfers)")] bool excluded = false)
     {
         var parsedDate = DateOnly.Parse(date);
 
@@ -64,6 +66,7 @@ public class TransactionTools
             Name = name,
             CategoryId = categoryId,
             Notes = notes,
+            IsExcluded = excluded,
             Details = new FiatTransactionDto
             {
                 FromAccountId = accountId,
@@ -93,7 +96,8 @@ public class TransactionTools
         [Description("Category ID")] string categoryId,
         [Description("Account ID (the fiat account to credit)")] string accountId,
         [Description("Amount (positive value)")] decimal amount,
-        [Description("Optional notes")] string? notes = null)
+        [Description("Optional notes")] string? notes = null,
+        [Description("Exclude from reports and goals (wealth transfers)")] bool excluded = false)
     {
         var parsedDate = DateOnly.Parse(date);
 
@@ -103,6 +107,7 @@ public class TransactionTools
             Name = name,
             CategoryId = categoryId,
             Notes = notes,
+            IsExcluded = excluded,
             Details = new FiatTransactionDto
             {
                 FromAccountId = accountId,
@@ -134,7 +139,8 @@ public class TransactionTools
         [Description("Amount leaving source account")] decimal fromAmount,
         [Description("Destination account ID")] string toAccountId,
         [Description("Amount entering destination account")] decimal toAmount,
-        [Description("Optional notes")] string? notes = null)
+        [Description("Optional notes")] string? notes = null,
+        [Description("Exclude from reports and goals (wealth transfers)")] bool excluded = false)
     {
         var parsedDate = DateOnly.Parse(date);
 
@@ -144,6 +150,7 @@ public class TransactionTools
             Name = name,
             CategoryId = categoryId,
             Notes = notes,
+            IsExcluded = excluded,
             Details = new FiatToFiatTransferDto
             {
                 FromAccountId = fromAccountId,
@@ -174,7 +181,8 @@ public class TransactionTools
         [Description("Category ID")] string categoryId,
         [Description("BTC Account ID")] string accountId,
         [Description("Amount in satoshis")] long amountSats,
-        [Description("Optional notes")] string? notes = null)
+        [Description("Optional notes")] string? notes = null,
+        [Description("Exclude from reports and goals (wealth transfers)")] bool excluded = false)
     {
         var parsedDate = DateOnly.Parse(date);
 
@@ -184,6 +192,7 @@ public class TransactionTools
             Name = name,
             CategoryId = categoryId,
             Notes = notes,
+            IsExcluded = excluded,
             Details = new BitcoinTransactionDto
             {
                 FromAccountId = accountId,
@@ -213,7 +222,8 @@ public class TransactionTools
         [Description("Category ID")] string categoryId,
         [Description("BTC Account ID")] string accountId,
         [Description("Amount in satoshis")] long amountSats,
-        [Description("Optional notes")] string? notes = null)
+        [Description("Optional notes")] string? notes = null,
+        [Description("Exclude from reports and goals (wealth transfers)")] bool excluded = false)
     {
         var parsedDate = DateOnly.Parse(date);
 
@@ -223,6 +233,7 @@ public class TransactionTools
             Name = name,
             CategoryId = categoryId,
             Notes = notes,
+            IsExcluded = excluded,
             Details = new BitcoinTransactionDto
             {
                 FromAccountId = accountId,
@@ -254,7 +265,8 @@ public class TransactionTools
         [Description("Fiat amount spent")] decimal fiatAmount,
         [Description("BTC account ID (where sats arrive)")] string btcAccountId,
         [Description("Satoshis received")] long satsAmount,
-        [Description("Optional notes")] string? notes = null)
+        [Description("Optional notes")] string? notes = null,
+        [Description("Exclude from reports and goals (wealth transfers)")] bool excluded = false)
     {
         var parsedDate = DateOnly.Parse(date);
 
@@ -264,6 +276,7 @@ public class TransactionTools
             Name = name,
             CategoryId = categoryId,
             Notes = notes,
+            IsExcluded = excluded,
             Details = new FiatToBitcoinTransferDto
             {
                 FromAccountId = fiatAccountId,
@@ -303,6 +316,31 @@ public class TransactionTools
 
         await publisher.PublishAsync(new McpDataChangedNotification());
         return $"Transaction {transactionId} deleted successfully";
+    }
+
+    /// <summary>
+    /// Sets or clears the exclusion flag of a transaction (excluded transactions are hidden from reports and goals).
+    /// </summary>
+    [McpServerTool, Description("Set or clear a transaction's exclusion flag (excluded from reports and goals)")]
+    public static async Task<string> SetTransactionExcluded(
+        ICommandDispatcher dispatcher,
+        INotificationPublisher publisher,
+        [Description("Transaction ID")] string transactionId,
+        [Description("Exclude from reports and goals")] bool excluded)
+    {
+        var result = await dispatcher.DispatchAsync(new SetTransactionExclusionCommand
+        {
+            TransactionId = transactionId,
+            IsExcluded = excluded
+        });
+
+        if (result.IsFailure)
+        {
+            return $"Error: {result.Error?.Message ?? "Unknown error"}";
+        }
+
+        await publisher.PublishAsync(new McpDataChangedNotification());
+        return $"Transaction {transactionId} exclusion set to {excluded}";
     }
 
     /// <summary>
