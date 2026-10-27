@@ -102,6 +102,6 @@ public class TransactionRepository_BtcToFiatTransferTests : DatabaseTest
         await _transactionRepository.SaveTransactionAsync(transaction);
 
         var restoredTransaction = await _transactionRepository.GetTransactionByIdAsync(transaction.Id);
-        Assert.That(restoredTransaction.IsExcluded, Is.True);
+        Assert.That(restoredTransaction!.IsExcluded, Is.True);
     }
 }
