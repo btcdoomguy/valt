@@ -106,6 +106,50 @@ public class SetTransactionExclusionHandlerTests : DatabaseTest
     }
 
     [Test]
+    public async Task HandleAsync_WithMalformedTransactionId_ReturnsValidationFailure()
+    {
+        var command = new SetTransactionExclusionCommand
+        {
+            TransactionId = "not-a-valid-object-id",
+            IsExcluded = true
+        };
+
+        var result = await _handler.HandleAsync(command);
+
+        Assert.That(result.IsFailure, Is.True);
+        Assert.That(result.Error!.Code, Is.EqualTo("VALIDATION_FAILED"));
+    }
+
+    [Test]
+    public async Task HandleAsync_WithWrongLengthTransactionId_ReturnsValidationFailure()
+    {
+        var command = new SetTransactionExclusionCommand
+        {
+            TransactionId = "abcdef0123",
+            IsExcluded = true
+        };
+
+        var result = await _handler.HandleAsync(command);
+
+        Assert.That(result.IsFailure, Is.True);
+        Assert.That(result.Error!.Code, Is.EqualTo("VALIDATION_FAILED"));
+    }
+
+    [Test]
+    public void Validate_WithMalformedTransactionId_IsInvalid()
+    {
+        var validator = new SetTransactionExclusionValidator();
+
+        var validation = validator.Validate(new SetTransactionExclusionCommand
+        {
+            TransactionId = "not-a-valid-object-id",
+            IsExcluded = true
+        });
+
+        Assert.That(validation.IsValid, Is.False);
+    }
+
+    [Test]
     public void Validate_WithBlankTransactionId_IsInvalid()
     {
         var validator = new SetTransactionExclusionValidator();
