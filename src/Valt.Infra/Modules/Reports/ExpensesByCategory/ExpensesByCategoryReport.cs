@@ -97,6 +97,10 @@ internal class ExpensesByCategoryReport : IExpensesByCategoryReport
 
                     foreach (var transaction in transactions)
                     {
+                        // Excluded transactions never count toward expense buckets
+                        if (transaction.IsExcluded)
+                            continue;
+
                         // If filter has category IDs, only include matching categories; otherwise include all
                         if (_filter.CategoryIds.Any() && !_filter.CategoryIds.Contains(new CategoryId(transaction.CategoryId.ToString())))
                             continue;

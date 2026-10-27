@@ -67,6 +67,9 @@ public class FixedVsVariableQueries : IFixedVsVariableQueries
         var toDate = query.To.ToValtDateTime();
         transactionQuery = transactionQuery.Where(x => x.Date >= fromDate && x.Date <= toDate);
 
+        // Excluded transactions never count toward the fixed/variable split
+        transactionQuery = transactionQuery.Where(x => !x.IsExcluded);
+
         if (query.CategoryIds.Length > 0)
         {
             var categoryObjectIds = query.CategoryIds.Select(id => new ObjectId(id)).ToList();

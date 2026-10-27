@@ -50,6 +50,9 @@ public class SpendingEvolutionQueries : ISpendingEvolutionQueries
         var toDate = query.To.ToValtDateTime();
         transactionQuery = transactionQuery.Where(x => x.Date >= fromDate && x.Date <= toDate);
 
+        // Excluded transactions never count toward spending evolution
+        transactionQuery = transactionQuery.Where(x => !x.IsExcluded);
+
         // Filter by category IDs if provided
         if (query.CategoryIds.Length > 0)
         {
