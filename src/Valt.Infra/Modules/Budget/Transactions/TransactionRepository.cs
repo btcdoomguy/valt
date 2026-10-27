@@ -81,8 +81,10 @@ internal class TransactionRepository : ITransactionRepository
         _localDatabase.GetTransactions().Upsert(entity);
 
         // Reports cache the data provider; an edit without a count change
-        // (e.g. an exclusion-flag toggle) must still invalidate it
-        _ = _notificationPublisher.PublishAsync(new TransactionsDataChangedNotification());
+        // (e.g. an exclusion-flag toggle) must still invalidate it.
+        // Awaited (not fire-and-forget) so a handler fault surfaces to the caller
+        // instead of becoming an unobserved exception with a silently stale cache.
+        await _notificationPublisher.PublishAsync(new TransactionsDataChangedNotification());
 
         // Check if transaction date is before the minimum fiat date in prices.db
         // If so, trigger a fiat history refresh to fetch the missing data
@@ -132,7 +134,9 @@ internal class TransactionRepository : ITransactionRepository
 
         _localDatabase.GetTransactions().Delete(new ObjectId(transactionId));
 
-        _ = _notificationPublisher.PublishAsync(new TransactionsDataChangedNotification());
+        // Awaited so a handler fault surfaces to the caller instead of becoming
+        // an unobserved exception with a silently stale report cache.
+        await _notificationPublisher.PublishAsync(new TransactionsDataChangedNotification());
 
         await _domainEventPublisher.PublishAsync(new TransactionDeletedEvent(transaction));
     }
