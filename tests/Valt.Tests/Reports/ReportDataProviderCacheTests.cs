@@ -167,6 +167,38 @@ public class ReportDataProviderCacheTests : DatabaseTest
     }
 
     [Test]
+    public async Task Flag_Toggle_Through_Publish_Handler_Chain_Refreshes_Provider_Without_Restart()
+    {
+        var clock = new FakeClock(new DateTime(2025, 12, 31));
+        var factory = new ReportDataProviderFactory(_priceDatabase, _localDatabase, clock);
+        var handler = new TransactionsDataChangedHandler(factory);
+        var publisher = new InlineNotificationPublisher(handler);
+        var repository = new TransactionRepository(
+            _localDatabase, _priceDatabase, Substitute.For<IDomainEventPublisher>(), publisher);
+
+        var transaction = BuildExpense(isExcluded: false);
+        await repository.SaveTransactionAsync(transaction);
+
+        var provider1 = await factory.CreateAsync();
+        Assert.That(provider1.AllTransactions.Single().IsExcluded, Is.False);
+
+        // Flag-only toggle: repository Upsert with unchanged transaction count.
+        // The save publishes TransactionsDataChangedNotification, the handler invalidates
+        // the factory, and the next CreateAsync returns a provider reflecting the toggle —
+        // the same chain the app runs, with no app-restart equivalent.
+        transaction.SetExcluded(true);
+        await repository.SaveTransactionAsync(transaction);
+
+        var provider2 = await factory.CreateAsync();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(ReferenceEquals(provider2, provider1), Is.False);
+            Assert.That(provider2.AllTransactions.Single().IsExcluded, Is.True);
+        });
+    }
+
+    [Test]
     public void SaveTransactionAsync_Propagates_NotificationPublisher_Failure()
     {
         var publisher = Substitute.For<INotificationPublisher>();
@@ -195,6 +227,20 @@ public class ReportDataProviderCacheTests : DatabaseTest
         Assert.ThrowsAsync<InvalidOperationException>(async () => await repository.SaveTransactionAsync(transaction));
 
         Assert.ThrowsAsync<InvalidOperationException>(async () => await repository.DeleteTransactionAsync(transaction.Id));
+    }
+
+    /// <summary>
+    /// Dispatches notifications synchronously to the real handler, standing in for the app's
+    /// DI-mediated publish pipeline so the repository → publisher → handler → factory chain
+    /// is exercised end to end.
+    /// </summary>
+    private sealed class InlineNotificationPublisher(TransactionsDataChangedHandler handler) : INotificationPublisher
+    {
+        public async Task PublishAsync<TIntegrationEvent>(TIntegrationEvent @event) where TIntegrationEvent : class, INotification
+        {
+            if (@event is TransactionsDataChangedNotification notification)
+                await handler.HandleAsync(notification);
+        }
     }
 
     private Transaction BuildExpense(bool isExcluded)
