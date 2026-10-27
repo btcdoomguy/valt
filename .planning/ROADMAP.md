@@ -59,6 +59,7 @@ Phases 46-48 (Cost-Over-Time Schedule, Prefill from Existing BTC Loan Asset, MCP
 ### 🚧 v0.10 Wealth Snapshots (Phase 52) — IN PROGRESS
 
 - [ ] **Phase 52: Wealth Snapshots & Asset Totals in Monthly Reports** — Persist daily snapshots of Included-in-Wealth-Totals asset values and include asset totals in the Monthly Totals grid and chart using the latest snapshot available per period
+- [ ] **Phase 53: Transaction Exclusion Flag for Reports & Goals** — Per-transaction "excluded" flag (checkbox in Transaction Editor right panel) that removes the transaction from all Reports and Goals calculations
 
 ## Phase Details
 
@@ -381,6 +382,26 @@ Phases 46-48 (Cost-Over-Time Schedule, Prefill from Existing BTC Loan Asset, MCP
 **v0.9 requirements:** 8/8 mapped (GOL-03..GOL-10)  
 **v0.10 plans:** 0/3 (roadmap defined 2026-10-26)  
 **v0.10 requirements:** TBD
+
+### Phase 53: Transaction Exclusion Flag for Reports & Goals
+
+**Goal**: Users can flag any transaction as "excluded" so wealth transfers that merely move value between an account and a tracked asset (e.g., moving exchange fiat into a long/short position registered in the Assets tab) are not counted as income/expense by Reports and Goals calculations; the flag is set via a checkbox in the Transaction Editor's right panel
+**Requirements**: TBD
+**Depends on:** Phase 52
+**Plans:** 4 plans
+
+**Wave 1**
+
+- [ ] 53-01-PLAN.md — Tracer: IsExcluded domain flag + LiteDB additive field (no migration) + 12 mapping sites + CQRS/DTO surface + MonthlyTotalsReport income/expense filter with round-trip and legacy-doc tests
+- [ ] 53-02-PLAN.md — Remaining report calculators (Statistics, Expenses/IncomeByCategory, SpendingEvolution, FixedVsVariable) + report-provider cache invalidation on save/delete (Pitfall 1)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 53-03-PLAN.md — Goals filtering: GoalTransactionReader single query point + 4 direct-DB calculators (both paired methods) + reconciliation tests
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 53-04-PLAN.md — UI checkbox + trilingual localization + MCP surface (excluded param + SetTransactionExcluded tool) + docs + full-suite gate + human visual sign-off
 
 ---
 *Last updated: 2026-10-26 — v0.8 paused (phases 46-48 removed), v0.10 Wealth Snapshots roadmap added (Phase 52)*
