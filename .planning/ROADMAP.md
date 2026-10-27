@@ -388,11 +388,11 @@ Phases 46-48 (Cost-Over-Time Schedule, Prefill from Existing BTC Loan Asset, MCP
 **Goal**: Users can flag any transaction as "excluded" so wealth transfers that merely move value between an account and a tracked asset (e.g., moving exchange fiat into a long/short position registered in the Assets tab) are not counted as income/expense by Reports and Goals calculations; the flag is set via a checkbox in the Transaction Editor's right panel
 **Requirements**: TBD
 **Depends on:** Phase 52
-**Plans:** 4 plans
+**Plans:** 1/4 plans executed
 
 **Wave 1**
 
-- [ ] 53-01-PLAN.md — Tracer: IsExcluded domain flag + LiteDB additive field (no migration) + 12 mapping sites + CQRS/DTO surface + MonthlyTotalsReport income/expense filter with round-trip and legacy-doc tests
+- [x] 53-01-PLAN.md — Tracer: IsExcluded domain flag + LiteDB additive field (no migration) + 12 mapping sites + CQRS/DTO surface + MonthlyTotalsReport income/expense filter with round-trip and legacy-doc tests
 - [ ] 53-02-PLAN.md — Remaining report calculators (Statistics, Expenses/IncomeByCategory, SpendingEvolution, FixedVsVariable) + report-provider cache invalidation on save/delete (Pitfall 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*

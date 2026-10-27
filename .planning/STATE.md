@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v0.9
 milestone_name: Goal Transparency — Transaction Breakdown
-current_phase: 52
-current_phase_name: Wealth Snapshots & Asset Totals in Monthly Reports
+current_phase: 53
+current_phase_name: Transaction Exclusion Flag for Reports & Goals
 status: executing
-stopped_at: Completed 52-03-PLAN.md
-last_updated: "2026-10-26T18:41:37.120Z"
-last_activity: 2026-10-26
-last_activity_desc: Phase 52 execution started
+stopped_at: Completed 53-01-PLAN.md
+last_updated: "2026-10-27T18:29:00.119Z"
+last_activity: 2026-10-27
+last_activity_desc: Phase 53 execution started
 progress:
   total_phases: 0
   completed_phases: 0
@@ -23,14 +23,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-06)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 52 — Wealth Snapshots & Asset Totals in Monthly Reports
+**Current focus:** Phase 53 — Transaction Exclusion Flag for Reports & Goals
 
 ## Current Position
 
-Phase: 52 (Wealth Snapshots & Asset Totals in Monthly Reports) — EXECUTING
-Plan: 3 of 3
+Phase: 53 (Transaction Exclusion Flag for Reports & Goals) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-10-26 — Phase 52 execution started
+Last activity: 2026-10-27 — Phase 53 execution started
 
 ## Performance Metrics
 
@@ -155,6 +155,7 @@ Last activity: 2026-10-26 — Phase 52 execution started
 | Phase 51 P05 | 10 min | 2 tasks | 5 files |
 | Phase 52 P01 | 25min | 3 tasks | 16 files |
 | Phase 52 P03 | 8min | 2 tasks | 3 files |
+| Phase 53 P01 | 21 min | 3 tasks | 21 files |
 
 ## Accumulated Context
 
@@ -224,6 +225,11 @@ Recent decisions affecting current work:
 - [Phase ?]: 52-01: MonthlyTotalsData.Item.AssetsTotalFiat/AssetsTotalSats made non-required with default 0 to avoid rippling into DesignTime constructions
 - [Phase ?]: 52-01: Report join uses Option A (ILocalDatabase injected into MonthlyTotalsReport) and joins against the calculator's emission date, not blind month-end
 - [Phase ?]: No McpServerService forwarding change needed for 52-03: _localDatabase field is interface-typed and forwarded via services.AddSingleton(_localDatabase) — ILocalDatabase already resolvable in MCP scope
+- [Phase ?]: 53-01: Transaction.New kept optional isExcluded=false; Transaction.Create gained required trailing isExcluded (all 6 rehydration sites in Extensions.cs)
+- [Phase ?]: 53-01: SetExcluded reuses TransactionEditedEvent for free goal stale-marking; UpdateAccountTotalEventHandler stays unsubscribed (balances move regardless of exclusion)
+- [Phase ?]: 53-01: Commands/DTOs use non-required init bool IsExcluded per Phase 29 lesson — MCP and design-time object initializers keep compiling
+- [Phase ?]: 53-01: Report tests use before/after runs with delta-of-deltas instead of hardcoded month baselines (DatabaseTest fixture shares one DB; months differ in day count)
+- [Phase ?]: 53-01: Legacy-document test strips excl from a raw BsonDocument inserted via the app's own BsonMapper reflected from LocalDatabase._database
 
 ### Pending Todos
 
@@ -284,8 +290,8 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-10-26T18:41:37.110Z
-Stopped at: Completed 52-03-PLAN.md
+Last session: 2026-10-27T18:29:00.109Z
+Stopped at: Completed 53-01-PLAN.md
 Resume file: None
 Resume file: None
 

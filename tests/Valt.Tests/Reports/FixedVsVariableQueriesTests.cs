@@ -272,6 +272,25 @@ public class FixedVsVariableQueriesTests : DatabaseTest
         }
     }
 
+    [Test]
+    public async Task Should_Exclude_Flagged_Expense_From_Both_Buckets()
+    {
+        var month = new DateOnly(2025, 1, 1);
+        AddFixedExpense();
+        AddBrlExpense(new DateOnly(2025, 1, 15), 300m);
+        AddBrlExpense(new DateOnly(2025, 1, 20), 700m, isExcluded: true);
+
+        var result = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31));
+        var monthData = GetMonth(result, month);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(monthData, Is.Not.Null);
+            Assert.That(monthData!.FixedTotal, Is.EqualTo(0m));
+            Assert.That(monthData.VariableTotal, Is.EqualTo(300m));
+        }
+    }
+
     private static FixedVsVariableMonthDto? GetMonth(FixedVsVariableDataDto result, DateOnly month)
     {
         return result.Months.FirstOrDefault(x => x.Month == month);
@@ -353,7 +372,7 @@ public class FixedVsVariableQueriesTests : DatabaseTest
         return fixedExpense;
     }
 
-    private TransactionEntity AddBrlExpense(DateOnly date, decimal amount, CategoryId categoryId)
+    private TransactionEntity AddBrlExpense(DateOnly date, decimal amount, CategoryId categoryId, bool isExcluded = false)
     {
         var entity = new TransactionBuilder()
         {
@@ -362,15 +381,21 @@ public class FixedVsVariableQueriesTests : DatabaseTest
             Date = date,
             Name = $"BRL Expense {date}",
             AutoSatAmountDetails = AutoSatAmountDetails.Pending,
-            TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), amount, false)
+            TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), amount, false),
+            IsExcluded = isExcluded
         }.Build();
         _localDatabase.GetTransactions().Insert(entity);
         return entity;
     }
 
-    private TransactionEntity AddBrlExpense(DateOnly date, decimal amount)
+    private TransactionEntity AddBrlExpense(DateOnly date, decimal amount, bool isExcluded = false)
     {
-        return AddBrlExpense(date, amount, _categoryId);
+        return AddBrlExpense(date, amount, _categoryId, isExcluded);
+    }
+
+    private TransactionEntity AddBrlExpense(DateOnly date, decimal amount, CategoryId categoryId)
+    {
+        return AddBrlExpense(date, amount, categoryId, isExcluded: false);
     }
 
     private TransactionEntity AddEurExpense(DateOnly date, decimal amount)

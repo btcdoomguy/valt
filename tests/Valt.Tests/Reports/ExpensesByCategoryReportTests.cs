@@ -174,6 +174,97 @@ public class ExpensesByCategoryReportTests : DatabaseTest
         return base.SeedDatabase();
     }
 
+    #region Exclusion Flag Tests
+
+    [Test]
+    public async Task Flagged_Expense_Is_Excluded_From_Category_Total()
+    {
+        var baseDate = new DateOnly(2025, 01, 31);
+        var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
+        var report = new ExpensesByCategoryReport(new NullLogger<ExpensesByCategoryReport>());
+        var range = new DateOnlyRange(new DateOnly(2025, 01, 01), new DateOnly(2025, 01, 31));
+
+        var filter = new IExpensesByCategoryReport.Filter(
+            new[] { new AccountId(_usdAccount.Id.ToString()) },
+            new[] { _foodCategoryId }
+        );
+
+        var before = await report.GetAsync(baseDate, range, FiatCurrency.Usd, filter,
+            new ReportDataProvider(_priceDatabase, _localDatabase, clock));
+        var foodBefore = before.Items.Single(x => x.CategoryId == _foodCategoryId).FiatTotal;
+
+        var entity = new TransactionBuilder()
+        {
+            Id = IdGenerator.Generate(),
+            CategoryId = _foodCategoryId,
+            Date = new DateOnly(2025, 01, 30),
+            Name = "Flagged Expense",
+            AutoSatAmountDetails = AutoSatAmountDetails.Pending,
+            TransactionDetails = new FiatDetails(_usdAccount.Id.ToString(), 70m, false),
+            IsExcluded = true
+        }.Build();
+        _localDatabase.GetTransactions().Insert(entity);
+
+        try
+        {
+            var after = await report.GetAsync(baseDate, range, FiatCurrency.Usd, filter,
+                new ReportDataProvider(_priceDatabase, _localDatabase, clock));
+
+            // The flagged expense must not change the Food bucket
+            Assert.That(after.Items.Single(x => x.CategoryId == _foodCategoryId).FiatTotal,
+                Is.EqualTo(foodBefore));
+        }
+        finally
+        {
+            _localDatabase.GetTransactions().Delete(entity.Id);
+        }
+    }
+
+    [Test]
+    public async Task Unflagged_Transaction_Still_Aggregates_Normally()
+    {
+        var baseDate = new DateOnly(2025, 01, 31);
+        var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
+        var report = new ExpensesByCategoryReport(new NullLogger<ExpensesByCategoryReport>());
+        var range = new DateOnlyRange(new DateOnly(2025, 01, 01), new DateOnly(2025, 01, 31));
+
+        var filter = new IExpensesByCategoryReport.Filter(
+            new[] { new AccountId(_usdAccount.Id.ToString()) },
+            new[] { _foodCategoryId }
+        );
+
+        var before = await report.GetAsync(baseDate, range, FiatCurrency.Usd, filter,
+            new ReportDataProvider(_priceDatabase, _localDatabase, clock));
+        var foodBefore = before.Items.Single(x => x.CategoryId == _foodCategoryId).FiatTotal;
+
+        var entity = new TransactionBuilder()
+        {
+            Id = IdGenerator.Generate(),
+            CategoryId = _foodCategoryId,
+            Date = new DateOnly(2025, 01, 30),
+            Name = "Unflagged Expense",
+            AutoSatAmountDetails = AutoSatAmountDetails.Pending,
+            TransactionDetails = new FiatDetails(_usdAccount.Id.ToString(), 70m, false),
+            IsExcluded = false
+        }.Build();
+        _localDatabase.GetTransactions().Insert(entity);
+
+        try
+        {
+            var after = await report.GetAsync(baseDate, range, FiatCurrency.Usd, filter,
+                new ReportDataProvider(_priceDatabase, _localDatabase, clock));
+
+            Assert.That(after.Items.Single(x => x.CategoryId == _foodCategoryId).FiatTotal,
+                Is.EqualTo(foodBefore + 70m));
+        }
+        finally
+        {
+            _localDatabase.GetTransactions().Delete(entity.Id);
+        }
+    }
+
+    #endregion
+
     [Test]
     public async Task Should_Calculate_Expenses_By_Category_In_USD()
     {
