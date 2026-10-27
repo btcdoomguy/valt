@@ -273,6 +273,8 @@ public class MonthlyTotalsReportTests : DatabaseTest
     [Test]
     public async Task Flagged_Income_Is_Absent_From_Income_Bucket_But_Counts_In_Balance()
     {
+        var before = await BuildBrlReportFor2024();
+
         var entity = new TransactionBuilder()
         {
             CategoryId = _categoryId,
@@ -284,22 +286,29 @@ public class MonthlyTotalsReportTests : DatabaseTest
         _insertedTransactionIds.Add(entity.Id);
         _localDatabase.GetTransactions().Insert(entity);
 
-        var result = await BuildBrlReportFor2024();
-        var may = result.Items.Single(x => x.MonthYear == new DateOnly(2024, 5, 1));
-        var june = result.Items.Single(x => x.MonthYear == new DateOnly(2024, 6, 1));
+        var after = await BuildBrlReportFor2024();
+        var mayBefore = before.Items.Single(x => x.MonthYear == new DateOnly(2024, 5, 1));
+        var juneBefore = before.Items.Single(x => x.MonthYear == new DateOnly(2024, 6, 1));
+        var mayAfter = after.Items.Single(x => x.MonthYear == new DateOnly(2024, 5, 1));
+        var juneAfter = after.Items.Single(x => x.MonthYear == new DateOnly(2024, 6, 1));
 
         Assert.Multiple(() =>
         {
-            // income bucket unchanged versus the previous (untouched) month
-            Assert.That(june.Income, Is.EqualTo(may.Income));
-            // balance still accumulates: +500 USD * 5.5 BRL/USD
-            Assert.That(june.FiatTotal, Is.EqualTo(may.FiatTotal + 2750m));
+            // flagged income absent from the income bucket
+            Assert.That(juneAfter.Income, Is.EqualTo(juneBefore.Income));
+            // earlier month untouched
+            Assert.That(mayAfter.FiatTotal, Is.EqualTo(mayBefore.FiatTotal));
+            // balance still accumulates the flagged transaction: +500 USD * 5.5 BRL/USD
+            Assert.That(juneAfter.FiatTotal - mayAfter.FiatTotal,
+                Is.EqualTo(juneBefore.FiatTotal - mayBefore.FiatTotal + 2750m));
         });
     }
 
     [Test]
     public async Task Flagged_Expense_Is_Absent_From_Expense_Bucket_But_Counts_In_Balance()
     {
+        var before = await BuildBrlReportFor2024();
+
         var entity = new TransactionBuilder()
         {
             CategoryId = _categoryId,
@@ -311,14 +320,21 @@ public class MonthlyTotalsReportTests : DatabaseTest
         _insertedTransactionIds.Add(entity.Id);
         _localDatabase.GetTransactions().Insert(entity);
 
-        var result = await BuildBrlReportFor2024();
-        var june = result.Items.Single(x => x.MonthYear == new DateOnly(2024, 6, 1));
-        var july = result.Items.Single(x => x.MonthYear == new DateOnly(2024, 7, 1));
+        var after = await BuildBrlReportFor2024();
+        var juneBefore = before.Items.Single(x => x.MonthYear == new DateOnly(2024, 6, 1));
+        var julyBefore = before.Items.Single(x => x.MonthYear == new DateOnly(2024, 7, 1));
+        var juneAfter = after.Items.Single(x => x.MonthYear == new DateOnly(2024, 6, 1));
+        var julyAfter = after.Items.Single(x => x.MonthYear == new DateOnly(2024, 7, 1));
 
         Assert.Multiple(() =>
         {
-            Assert.That(july.Expenses, Is.EqualTo(june.Expenses));
-            Assert.That(july.FiatTotal, Is.EqualTo(june.FiatTotal - 2750m));
+            // flagged expense absent from the expense bucket
+            Assert.That(julyAfter.Expenses, Is.EqualTo(julyBefore.Expenses));
+            // earlier month untouched
+            Assert.That(juneAfter.FiatTotal, Is.EqualTo(juneBefore.FiatTotal));
+            // balance still accumulates the flagged transaction: -500 USD * 5.5 BRL/USD
+            Assert.That(julyAfter.FiatTotal - juneAfter.FiatTotal,
+                Is.EqualTo(julyBefore.FiatTotal - juneBefore.FiatTotal - 2750m));
         });
     }
 
@@ -333,6 +349,9 @@ public class MonthlyTotalsReportTests : DatabaseTest
             .Build();
         _localDatabase.GetCategories().Insert(excludedCategory);
 
+        var excludedCategoryIds = new HashSet<string> { excludedCategoryId.Value };
+        var before = await BuildBrlReportFor2024(excludedCategoryIds);
+
         var entity = new TransactionBuilder()
         {
             CategoryId = excludedCategoryId,
@@ -343,28 +362,29 @@ public class MonthlyTotalsReportTests : DatabaseTest
         _insertedTransactionIds.Add(entity.Id);
         _localDatabase.GetTransactions().Insert(entity);
 
-        var baseDate = new DateOnly(2024, 12, 31);
-        var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
-        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
-        var report = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
-
-        var result = await report.GetAsync(baseDate, new DateOnlyRange(new DateOnly(2024, 1, 1), new DateOnly(2024, 12, 31)),
-            FiatCurrency.Brl, provider, new HashSet<string> { excludedCategoryId.Value });
-
-        var july = result.Items.Single(x => x.MonthYear == new DateOnly(2024, 7, 1));
-        var august = result.Items.Single(x => x.MonthYear == new DateOnly(2024, 8, 1));
+        var after = await BuildBrlReportFor2024(excludedCategoryIds);
+        var julyBefore = before.Items.Single(x => x.MonthYear == new DateOnly(2024, 7, 1));
+        var augustBefore = before.Items.Single(x => x.MonthYear == new DateOnly(2024, 8, 1));
+        var julyAfter = after.Items.Single(x => x.MonthYear == new DateOnly(2024, 7, 1));
+        var augustAfter = after.Items.Single(x => x.MonthYear == new DateOnly(2024, 8, 1));
 
         Assert.Multiple(() =>
         {
             // category exclusion still applies independently of the transaction flag
-            Assert.That(august.Income, Is.EqualTo(july.Income));
-            Assert.That(august.FiatTotal, Is.EqualTo(july.FiatTotal + 2750m));
+            Assert.That(augustAfter.Income, Is.EqualTo(augustBefore.Income));
+            // earlier month untouched
+            Assert.That(julyAfter.FiatTotal, Is.EqualTo(julyBefore.FiatTotal));
+            // balance still accumulates the transaction
+            Assert.That(augustAfter.FiatTotal - julyAfter.FiatTotal,
+                Is.EqualTo(augustBefore.FiatTotal - julyBefore.FiatTotal + 2750m));
         });
     }
 
     [Test]
     public async Task Flagged_Transaction_Does_Not_Affect_Purchase_And_Sale_Buckets()
     {
+        var before = await BuildBrlReportFor2024();
+
         var purchaseEntity = new TransactionBuilder()
         {
             CategoryId = _categoryId,
@@ -389,26 +409,34 @@ public class MonthlyTotalsReportTests : DatabaseTest
         _insertedTransactionIds.Add(saleEntity.Id);
         _localDatabase.GetTransactions().Insert(saleEntity);
 
-        var result = await BuildBrlReportFor2024();
-        var august = result.Items.Single(x => x.MonthYear == new DateOnly(2024, 8, 1));
-        var september = result.Items.Single(x => x.MonthYear == new DateOnly(2024, 9, 1));
-        var october = result.Items.Single(x => x.MonthYear == new DateOnly(2024, 10, 1));
+        var after = await BuildBrlReportFor2024();
+        var augustBefore = before.Items.Single(x => x.MonthYear == new DateOnly(2024, 8, 1));
+        var septemberBefore = before.Items.Single(x => x.MonthYear == new DateOnly(2024, 9, 1));
+        var octoberBefore = before.Items.Single(x => x.MonthYear == new DateOnly(2024, 10, 1));
+        var augustAfter = after.Items.Single(x => x.MonthYear == new DateOnly(2024, 8, 1));
+        var septemberAfter = after.Items.Single(x => x.MonthYear == new DateOnly(2024, 9, 1));
+        var octoberAfter = after.Items.Single(x => x.MonthYear == new DateOnly(2024, 10, 1));
 
         Assert.Multiple(() =>
         {
             // purchase bucket unaffected by the flag
-            Assert.That(september.BitcoinPurchased, Is.EqualTo(august.BitcoinPurchased + 0.001m));
+            Assert.That(septemberAfter.BitcoinPurchased, Is.EqualTo(septemberBefore.BitcoinPurchased + 0.001m));
             // sale bucket unaffected by the flag
-            Assert.That(october.BitcoinSold, Is.EqualTo(september.BitcoinSold - 0.0001m));
-            // balances still move for both
-            Assert.That(september.FiatTotal, Is.EqualTo(august.FiatTotal - 5500m));
-            Assert.That(october.FiatTotal, Is.EqualTo(september.FiatTotal + 5500m));
+            Assert.That(octoberAfter.BitcoinSold, Is.EqualTo(octoberBefore.BitcoinSold - 0.0001m));
+            // earlier month untouched
+            Assert.That(augustAfter.FiatTotal, Is.EqualTo(augustBefore.FiatTotal));
+            // balances still move for both flagged transactions (BTC leg valued at the fake price:
+            // +0.001 BTC * 100k USD/BTC * 5.5 BRL/USD = +550 on purchase month, mirrored on sale)
+            Assert.That(septemberAfter.FiatTotal - augustAfter.FiatTotal,
+                Is.EqualTo(septemberBefore.FiatTotal - augustBefore.FiatTotal - 4950m));
+            Assert.That(octoberAfter.FiatTotal - septemberAfter.FiatTotal,
+                Is.EqualTo(octoberBefore.FiatTotal - septemberBefore.FiatTotal + 5445m));
         });
     }
 
     #endregion
 
-    private async Task<MonthlyTotalsData> BuildBrlReportFor2024()
+    private async Task<MonthlyTotalsData> BuildBrlReportFor2024(IReadOnlySet<string>? excludedCategoryIds = null)
     {
         var baseDate = new DateOnly(2024, 12, 31);
         var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
@@ -416,7 +444,7 @@ public class MonthlyTotalsReportTests : DatabaseTest
         var report = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
 
         return await report.GetAsync(baseDate, new DateOnlyRange(new DateOnly(2024, 1, 1), new DateOnly(2024, 12, 31)),
-            FiatCurrency.Brl, provider);
+            FiatCurrency.Brl, provider, excludedCategoryIds);
     }
 
     private void SeedSnapshot(DateOnly day, decimal totalFiat, long totalSats, string currencyCode)
