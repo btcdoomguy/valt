@@ -7,6 +7,7 @@ using Valt.Core.Modules.Budget.Transactions.Events;
 using Valt.Infra.Crawlers.HistoricPriceCrawlers.Messages;
 using Valt.Infra.DataAccess;
 using Valt.App.Kernel.Notifications;
+using Valt.Infra.Modules.Reports.Notifications;
 
 namespace Valt.Infra.Modules.Budget.Transactions;
 
@@ -79,6 +80,10 @@ internal class TransactionRepository : ITransactionRepository
 
         _localDatabase.GetTransactions().Upsert(entity);
 
+        // Reports cache the data provider; an edit without a count change
+        // (e.g. an exclusion-flag toggle) must still invalidate it
+        _ = _notificationPublisher.PublishAsync(new TransactionsDataChangedNotification());
+
         // Check if transaction date is before the minimum fiat date in prices.db
         // If so, trigger a fiat history refresh to fetch the missing data
         CheckAndTriggerFiatHistoryRefresh(transaction.Date);
@@ -126,6 +131,8 @@ internal class TransactionRepository : ITransactionRepository
             return;
 
         _localDatabase.GetTransactions().Delete(new ObjectId(transactionId));
+
+        _ = _notificationPublisher.PublishAsync(new TransactionsDataChangedNotification());
 
         await _domainEventPublisher.PublishAsync(new TransactionDeletedEvent(transaction));
     }
