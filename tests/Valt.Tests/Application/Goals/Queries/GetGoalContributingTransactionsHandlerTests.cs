@@ -873,6 +873,213 @@ public class GetGoalContributingTransactionsHandlerTests : DatabaseTest
         });
     }
 
+    #region Exclusion Flag Tests
+
+    [Test]
+    public async Task IncomeFiat_ExcludedIncome_Ignored_InProgressAndRows()
+    {
+        // Arrange: one unflagged and one excluded fiat income in the period
+        var goalId = await SeedGoal(
+            GoalBuilder.AGoal().WithGoalType(new IncomeFiatGoalType(2000m)), new DateOnly(2024, 6, 15));
+        var account = SeedUsdAccount();
+        SeedPrices(new DateOnly(2024, 5, 24), new DateOnly(2024, 7, 7), 50_000m);
+
+        SeedIncome(account, 400m, new DateOnly(2024, 6, 10), "Salary A");
+        var excludedIncome = TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 20))
+            .WithName("Off-books income")
+            .AsFiatIncome(new AccountId(account.Id.ToString()), 600m)
+            .WithExcluded(true)
+            .Build();
+        _localDatabase.GetTransactions().Insert(excludedIncome);
+
+        var entity = _localDatabase.GetGoals().FindAll().Single();
+        var calculator = new IncomeFiatProgressCalculator(NewReader());
+        var progress = await calculator.CalculateProgressAsync(
+            NewInput(GoalTypeNames.IncomeFiat, entity.GoalTypeJson));
+        var calculatedIncome = ((IncomeFiatGoalType)progress.UpdatedGoalType).CalculatedIncome;
+
+        // Act
+        var rows = await Dispatch(goalId);
+
+        // Assert: excluded income advances nothing and never appears as a row
+        Assert.That(rows, Has.Count.EqualTo(1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows[0].Description, Is.EqualTo("Salary A"));
+            Assert.That(rows[0].RunningTotal, Is.EqualTo(400m));
+            Assert.That(rows[0].RunningTotal, Is.EqualTo(calculatedIncome));
+        });
+    }
+
+    [Test]
+    public async Task SpendingLimit_ExcludedExpense_Ignored_InProgressAndRows()
+    {
+        // Arrange: one unflagged and one excluded expense in the period
+        var goalId = await SeedSpendingLimitGoal(new DateOnly(2024, 6, 15));
+        var account = SeedUsdAccount();
+        SeedPrices(new DateOnly(2024, 5, 24), new DateOnly(2024, 7, 7), 50_000m);
+
+        SeedExpense(account, 300m, new DateOnly(2024, 6, 10), "Real expense");
+        var excludedExpense = TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 20))
+            .WithName("Excluded expense")
+            .AsFiatExpense(new AccountId(account.Id.ToString()), 500m)
+            .WithExcluded(true)
+            .Build();
+        _localDatabase.GetTransactions().Insert(excludedExpense);
+
+        var entity = _localDatabase.GetGoals().FindAll().Single();
+        var calculator = new SpendingLimitProgressCalculator(NewReader());
+        var progress = await calculator.CalculateProgressAsync(
+            NewInput(GoalTypeNames.SpendingLimit, entity.GoalTypeJson));
+        var calculatedSpending = ((SpendingLimitGoalType)progress.UpdatedGoalType).CalculatedSpending;
+
+        // Act
+        var rows = await Dispatch(goalId);
+
+        // Assert: excluded expense advances nothing and never appears as a row
+        Assert.That(rows, Has.Count.EqualTo(1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows[0].Description, Is.EqualTo("Real expense"));
+            Assert.That(rows[0].RunningTotal, Is.EqualTo(300m));
+            Assert.That(rows[0].RunningTotal, Is.EqualTo(calculatedSpending));
+        });
+    }
+
+    [Test]
+    public async Task SaveFiat_ExcludedTransactions_Ignored_InBuckets()
+    {
+        // Arrange: unflagged expense + income, excluded expense + income in the period
+        var goalId = await SeedGoal(GoalBuilder.ASaveFiatGoal(1000m), new DateOnly(2024, 6, 15));
+        var account = SeedUsdAccount();
+        SeedPrices(new DateOnly(2024, 5, 24), new DateOnly(2024, 7, 7), 50_000m);
+
+        SeedExpense(account, 300m, new DateOnly(2024, 6, 2), "Real expense");
+        SeedIncome(account, 500m, new DateOnly(2024, 6, 5), "Real income");
+        var excludedExpense = TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 8))
+            .WithName("Excluded expense")
+            .AsFiatExpense(new AccountId(account.Id.ToString()), 100m)
+            .WithExcluded(true)
+            .Build();
+        var excludedIncome = TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 12))
+            .WithName("Excluded income")
+            .AsFiatIncome(new AccountId(account.Id.ToString()), 200m)
+            .WithExcluded(true)
+            .Build();
+        _localDatabase.GetTransactions().Insert(excludedExpense);
+        _localDatabase.GetTransactions().Insert(excludedIncome);
+
+        var entity = _localDatabase.GetGoals().FindAll().Single();
+        var calculator = new SaveFiatProgressCalculator(NewReader());
+        var progress = await calculator.CalculateProgressAsync(
+            NewInput(GoalTypeNames.SaveFiat, entity.GoalTypeJson));
+        var calculatedSavings = ((SaveFiatGoalType)progress.UpdatedGoalType).CalculatedSavings;
+
+        // Act
+        var rows = await Dispatch(goalId);
+
+        // Assert: only the unflagged pair contributes; savings = 500 - 300 = 200
+        Assert.That(rows, Has.Count.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows.Select(r => r.Description),
+                Is.EqualTo(new[] { "Real expense", "Real income" }));
+            Assert.That(rows.Select(r => r.RunningTotal), Is.EqualTo(new[] { -300m, 200m }));
+            Assert.That(rows[1].RunningTotal, Is.EqualTo(calculatedSavings));
+        });
+    }
+
+    [Test]
+    public async Task SavingsRate_ExcludedTransactions_Ignored_InBuckets()
+    {
+        // Arrange: unflagged income + expense, excluded expense in the period
+        var goalId = await SeedGoal(GoalBuilder.ASavingsRateGoal(20m), new DateOnly(2024, 6, 15));
+        var account = SeedUsdAccount();
+        SeedPrices(new DateOnly(2024, 5, 24), new DateOnly(2024, 7, 7), 50_000m);
+
+        SeedIncome(account, 1000m, new DateOnly(2024, 6, 3), "Income");
+        SeedExpense(account, 400m, new DateOnly(2024, 6, 6), "Real expense");
+        var excludedExpense = TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 9))
+            .WithName("Excluded expense")
+            .AsFiatExpense(new AccountId(account.Id.ToString()), 200m)
+            .WithExcluded(true)
+            .Build();
+        _localDatabase.GetTransactions().Insert(excludedExpense);
+
+        var entity = _localDatabase.GetGoals().FindAll().Single();
+        var calculator = new SavingsRateProgressCalculator(NewReader());
+        var progress = await calculator.CalculateProgressAsync(
+            NewInput(GoalTypeNames.SavingsRate, entity.GoalTypeJson));
+        var calculatedPercentage = ((SavingsRateGoalType)progress.UpdatedGoalType).CalculatedPercentage;
+
+        // Act
+        var rows = await Dispatch(goalId);
+
+        // Assert: rate is (1000-400)/1000 = 60%; excluded expense absent from rows
+        Assert.That(rows, Has.Count.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows[0].Description, Is.EqualTo("Income"));
+            Assert.That(rows[1].Description, Is.EqualTo("Real expense"));
+            Assert.That(rows[1].RunningTotal, Is.EqualTo(60.00m));
+            Assert.That(rows[1].RunningTotal, Is.EqualTo(calculatedPercentage));
+        });
+    }
+
+    [Test]
+    public async Task ReduceExpenseCategory_ExcludedExpense_Ignored()
+    {
+        // Arrange: in-category unflagged and excluded expenses, seeded category
+        var targetCategoryId = "65f1a2b3c4d5e6f7890a1b2e";
+        var goalId = await SeedGoal(
+            GoalBuilder.AReduceExpenseCategoryGoal(500m, targetCategoryId, "Food"), new DateOnly(2024, 6, 15));
+        var account = SeedUsdAccount();
+        _localDatabase.GetCategories().Insert(CategoryBuilder.ACategory()
+            .WithId(new CategoryId(targetCategoryId)).WithName("Food").Build());
+        SeedPrices(new DateOnly(2024, 5, 24), new DateOnly(2024, 7, 7), 50_000m);
+
+        var realExpense = TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 10))
+            .WithName("Real food expense")
+            .AsFiatExpense(new AccountId(account.Id.ToString()), 200m)
+            .WithCategoryId(new CategoryId(targetCategoryId))
+            .Build();
+        var excludedExpense = TransactionBuilder.ATransaction()
+            .WithDate(new DateOnly(2024, 6, 12))
+            .WithName("Excluded food expense")
+            .AsFiatExpense(new AccountId(account.Id.ToString()), 300m)
+            .WithCategoryId(new CategoryId(targetCategoryId))
+            .WithExcluded(true)
+            .Build();
+        _localDatabase.GetTransactions().Insert(realExpense);
+        _localDatabase.GetTransactions().Insert(excludedExpense);
+
+        var entity = _localDatabase.GetGoals().FindAll().Single();
+        var calculator = new ReduceExpenseCategoryProgressCalculator(NewReader());
+        var progress = await calculator.CalculateProgressAsync(
+            NewInput(GoalTypeNames.ReduceExpenseCategory, entity.GoalTypeJson));
+        var calculatedSpending = ((ReduceExpenseCategoryGoalType)progress.UpdatedGoalType).CalculatedSpending;
+
+        // Act
+        var rows = await Dispatch(goalId);
+
+        // Assert: only the unflagged in-category row contributes
+        Assert.That(rows, Has.Count.EqualTo(1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows[0].Description, Is.EqualTo("Real food expense"));
+            Assert.That(rows[0].RunningTotal, Is.EqualTo(200m));
+            Assert.That(rows[0].RunningTotal, Is.EqualTo(calculatedSpending));
+        });
+    }
+
+    #endregion
+
     private async Task<string> SeedSpendingLimitGoal(DateOnly refDate)
     {
         var goal = GoalBuilder.ASpendingLimitGoal(1000m)
