@@ -209,9 +209,9 @@ internal class GoalTransactionReader : IGoalTransactionReader
                     .Order()
                     .ToList());
 
-        // Load transactions
+        // Load transactions (excluded transactions never advance goals)
         var transactionsQuery = _localDatabase.GetTransactions()
-            .Find(x => x.Date >= fromDate && x.Date <= toDate);
+            .Find(x => x.Date >= fromDate && x.Date <= toDate && !x.IsExcluded);
 
         var transactions = categoryId is not null
             ? transactionsQuery.Where(x => x.CategoryId == categoryId).ToList()
