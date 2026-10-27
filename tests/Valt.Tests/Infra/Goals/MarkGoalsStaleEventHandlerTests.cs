@@ -86,6 +86,29 @@ public class MarkGoalsStaleEventHandlerTests
     }
 
     [Test]
+    public async Task HandleAsync_TransactionEditedEvent_FromExcludedFlagToggle_MarksStaleThenTriggersJob()
+    {
+        // Arrange: flag-only edit — SetExcluded(true) on an otherwise-unchanged transaction is
+        // the exact event shape produced by the exclusion checkbox toggle in the editor
+        var transaction = TransactionBuilder.ATransaction().AsFiatExpense(100m).BuildDomainObject();
+        transaction.ClearEvents();
+        transaction.SetExcluded(true);
+
+        var emitted = transaction.Events.Single();
+        Assert.That(emitted, Is.TypeOf<TransactionEditedEvent>());
+
+        // Act
+        await _handler.HandleAsync((TransactionEditedEvent)emitted);
+        await _manager.TriggerJobAndWaitAsync(BackgroundJobSystemNames.GoalProgressUpdater);
+
+        // Assert: toggle-shaped edit marks covering goals stale and triggers the job run
+        await _goalRepository.Received(1).MarkGoalsStaleForDateAsync(transaction.Date);
+        _progressState.Received(1).MarkAsStale();
+        Assert.That(_fakeJob.RunCount, Is.GreaterThanOrEqualTo(1));
+        Assert.That(_runTimestamp, Is.GreaterThan(_markTimestamp));
+    }
+
+    [Test]
     public async Task HandleAsync_TransactionDeletedEvent_MarksStaleThenTriggersJob()
     {
         var transaction = TransactionBuilder.ATransaction().AsFiatExpense(100m).BuildDomainObject();
