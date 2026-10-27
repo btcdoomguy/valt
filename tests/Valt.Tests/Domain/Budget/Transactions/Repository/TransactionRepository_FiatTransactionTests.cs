@@ -104,4 +104,23 @@ public class TransactionRepository_FiatTransactionTests : DatabaseTest
             Assert.That(fiatRestoredTransaction.Credit, Is.EqualTo(transactionDetails.Credit));
         });
     }
+
+    [Test]
+    public async Task Should_RoundTrip_IsExcluded()
+    {
+        var transaction = new TransactionBuilder()
+        {
+            CategoryId = _categoryId,
+            Date = new DateOnly(2023, 1, 1),
+            Name = "My Transaction",
+            TransactionDetails = new FiatDetails(_fiatAccountId, 153.32m, true),
+            AutoSatAmountDetails = AutoSatAmountDetails.Pending,
+            IsExcluded = true
+        }.BuildDomainObject();
+
+        await _transactionRepository.SaveTransactionAsync(transaction);
+
+        var restoredTransaction = await _transactionRepository.GetTransactionByIdAsync(transaction.Id);
+        Assert.That(restoredTransaction.IsExcluded, Is.True);
+    }
 }

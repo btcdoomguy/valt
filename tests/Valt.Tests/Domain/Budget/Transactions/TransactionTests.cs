@@ -4,6 +4,7 @@ using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Categories;
 using Valt.Core.Modules.Budget.Transactions;
 using Valt.Core.Modules.Budget.Transactions.Details;
+using Valt.Core.Modules.Budget.Transactions.Events;
 using Valt.Tests.Builders;
 
 namespace Valt.Tests.Domain.Budget.Transactions;
@@ -174,6 +175,104 @@ public class TransactionTests : DatabaseTest
 
         // Assert
         Assert.That(transaction.Events, Is.Empty);
+    }
+
+    #endregion
+
+    #region Exclusion Tests
+
+    [Test]
+    public void Should_Default_IsExcluded_To_False()
+    {
+        // Arrange & Act
+        var transaction = new TransactionBuilder()
+            .WithCategoryId(_categoryId)
+            .WithDate(new DateOnly(2023, 1, 1))
+            .WithName("My Transaction")
+            .WithTransactionDetails(new FiatDetails(_fiatAccountId, 100m, true))
+            .BuildDomainObject();
+
+        // Assert
+        Assert.That(transaction.IsExcluded, Is.False);
+    }
+
+    [Test]
+    public void Should_Set_IsExcluded_And_Emit_TransactionEditedEvent_When_SetExcluded_Toggles()
+    {
+        // Arrange
+        var transaction = new TransactionBuilder()
+            .WithCategoryId(_categoryId)
+            .WithDate(new DateOnly(2023, 1, 1))
+            .WithName("My Transaction")
+            .WithTransactionDetails(new FiatDetails(_fiatAccountId, 100m, true))
+            .WithVersion(1) // Set version > 0 to avoid creation event
+            .BuildDomainObject();
+
+        transaction.ClearEvents();
+
+        // Act
+        transaction.SetExcluded(true);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(transaction.IsExcluded, Is.True);
+            Assert.That(transaction.Events.Count, Is.EqualTo(1));
+            Assert.That(transaction.Events.Single(), Is.TypeOf<TransactionEditedEvent>());
+        });
+    }
+
+    [Test]
+    public void Should_Clear_IsExcluded_When_SetExcluded_False_On_Excluded_Transaction()
+    {
+        // Arrange
+        var transaction = new TransactionBuilder()
+            .WithCategoryId(_categoryId)
+            .WithDate(new DateOnly(2023, 1, 1))
+            .WithName("My Transaction")
+            .WithTransactionDetails(new FiatDetails(_fiatAccountId, 100m, true))
+            .WithExcluded(true)
+            .WithVersion(1)
+            .BuildDomainObject();
+
+        transaction.ClearEvents();
+
+        // Act
+        transaction.SetExcluded(false);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(transaction.IsExcluded, Is.False);
+            Assert.That(transaction.Events.Count, Is.EqualTo(1));
+            Assert.That(transaction.Events.Single(), Is.TypeOf<TransactionEditedEvent>());
+        });
+    }
+
+    [Test]
+    public void Should_Not_Emit_Event_When_SetExcluded_With_Current_Value()
+    {
+        // Arrange
+        var transaction = new TransactionBuilder()
+            .WithCategoryId(_categoryId)
+            .WithDate(new DateOnly(2023, 1, 1))
+            .WithName("My Transaction")
+            .WithTransactionDetails(new FiatDetails(_fiatAccountId, 100m, true))
+            .WithExcluded(true)
+            .WithVersion(1)
+            .BuildDomainObject();
+
+        transaction.ClearEvents();
+
+        // Act
+        transaction.SetExcluded(true);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(transaction.IsExcluded, Is.True);
+            Assert.That(transaction.Events, Is.Empty);
+        });
     }
 
     #endregion
