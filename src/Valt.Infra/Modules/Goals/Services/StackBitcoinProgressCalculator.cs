@@ -27,7 +27,7 @@ internal class StackBitcoinProgressCalculator : IGoalProgressCalculator
         var toDate = input.To.ToValtDateTime().AddDays(1).AddTicks(-1);
 
         var transactions = _localDatabase.GetTransactions()
-            .Find(x => x.Date >= fromDate && x.Date <= toDate)
+            .Find(x => x.Date >= fromDate && x.Date <= toDate && !x.IsExcluded)
             .ToList();
 
         // Sum BTC purchased (FiatToBitcoin transactions)
@@ -75,7 +75,7 @@ internal class StackBitcoinProgressCalculator : IGoalProgressCalculator
         var accounts = _localDatabase.GetAccounts().FindAll().ToDictionary(x => x.Id);
 
         var transactions = _localDatabase.GetTransactions()
-            .Find(x => x.Date >= fromDate && x.Date <= toDate)
+            .Find(x => x.Date >= fromDate && x.Date <= toDate && !x.IsExcluded)
             .ToList();
 
         var rows = new List<GoalContributionRow>();

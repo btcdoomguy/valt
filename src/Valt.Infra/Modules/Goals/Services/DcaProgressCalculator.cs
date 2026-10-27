@@ -27,7 +27,7 @@ internal class DcaProgressCalculator : IGoalProgressCalculator
 
         // Count FiatToBitcoin transactions (bitcoin purchases)
         var purchaseCount = _localDatabase.GetTransactions()
-            .Find(x => x.Date >= fromDate && x.Date <= toDate && x.Type == TransactionEntityType.FiatToBitcoin)
+            .Find(x => x.Date >= fromDate && x.Date <= toDate && x.Type == TransactionEntityType.FiatToBitcoin && !x.IsExcluded)
             .Count();
 
         // Calculate percentage (0-100%)
@@ -52,7 +52,7 @@ internal class DcaProgressCalculator : IGoalProgressCalculator
         var accounts = _localDatabase.GetAccounts().FindAll().ToDictionary(x => x.Id);
 
         var transactions = _localDatabase.GetTransactions()
-            .Find(x => x.Date >= fromDate && x.Date <= toDate && x.Type == TransactionEntityType.FiatToBitcoin)
+            .Find(x => x.Date >= fromDate && x.Date <= toDate && x.Type == TransactionEntityType.FiatToBitcoin && !x.IsExcluded)
             .ToList();
 
         var rows = new List<GoalContributionRow>();

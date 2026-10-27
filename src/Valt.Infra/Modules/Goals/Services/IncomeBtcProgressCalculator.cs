@@ -26,7 +26,7 @@ internal class IncomeBtcProgressCalculator : IGoalProgressCalculator
         var toDate = input.To.ToValtDateTime().AddDays(1).AddTicks(-1);
 
         var transactions = _localDatabase.GetTransactions()
-            .Find(x => x.Date >= fromDate && x.Date <= toDate)
+            .Find(x => x.Date >= fromDate && x.Date <= toDate && !x.IsExcluded)
             .ToList();
 
         // Sum direct BTC income (Bitcoin transactions with positive FromSatAmount)
@@ -56,7 +56,7 @@ internal class IncomeBtcProgressCalculator : IGoalProgressCalculator
         var mainCurrencyCode = GoalContributingTransactionsCurrency.GetMainFiatCurrencyCode(_localDatabase);
 
         var transactions = _localDatabase.GetTransactions()
-            .Find(x => x.Date >= fromDate && x.Date <= toDate)
+            .Find(x => x.Date >= fromDate && x.Date <= toDate && !x.IsExcluded)
             .ToList();
 
         var rows = new List<GoalContributionRow>();
