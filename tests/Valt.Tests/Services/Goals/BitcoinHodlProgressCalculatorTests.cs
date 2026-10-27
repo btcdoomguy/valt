@@ -1,3 +1,5 @@
+using System.Reflection;
+using LiteDB;
 using Valt.Core.Modules.Goals;
 using Valt.Core.Modules.Goals.GoalTypes;
 using Valt.Infra.Modules.Goals.Queries.DTOs;
@@ -204,9 +206,68 @@ public class BitcoinHodlProgressCalculatorTests : DatabaseTest
         });
     }
 
+    [Test]
+    public async Task Should_Reconcile_Legacy_And_Excluded_Sale_Mix()
+    {
+        // Arrange: legacy sale, modern unflagged sale, modern excluded sale in one period
+        var goalTypeJson = SerializeGoalType(100_000);
+
+        var input = new GoalProgressInput(
+            GoalTypeNames.BitcoinHodl,
+            goalTypeJson,
+            new DateOnly(2024, 1, 1),
+            new DateOnly(2024, 1, 31));
+
+        InsertLegacySale(new DateOnly(2024, 1, 5), 40_000);            // counts (no excl field)
+        AddBtcSale(new DateOnly(2024, 1, 10), 30_000);                 // counts
+        AddBtcSale(new DateOnly(2024, 1, 15), 50_000, excluded: true); // ignored
+
+        // Act
+        var result = await _calculator.CalculateProgressAsync(input);
+        var rows = await _calculator.GetContributingTransactionsAsync(input);
+
+        // Assert: sold = 70k of 100k max; two rows; final running total reconciles with progress
+        var calculatedSoldSats = ((BitcoinHodlGoalType)result.UpdatedGoalType).CalculatedSoldSats;
+        Assert.That(calculatedSoldSats, Is.EqualTo(70_000L));
+        Assert.That(result.Progress, Is.EqualTo(70m));
+        Assert.That(rows, Has.Count.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows!.Select(r => r.Transaction.Name),
+                Is.EqualTo(new[] { "Legacy Sale", "BTC Sale" }));
+            Assert.That(rows.Select(r => r.RunningTotal), Is.EqualTo(new[] { 40_000m, 70_000m }));
+            Assert.That(rows[1].RunningTotal, Is.EqualTo(calculatedSoldSats));
+        });
+    }
+
     #endregion
 
     #region Helper Methods
+
+    /// <summary>
+    /// Inserts a sale document with the "excl" field stripped, simulating a document
+    /// written before the exclusion flag existed (pre-phase-53 legacy shape).
+    /// </summary>
+    private void InsertLegacySale(DateOnly date, long satAmount)
+    {
+        var entity = TransactionBuilder.ATransaction()
+            .WithDate(date)
+            .WithName("Legacy Sale")
+            .AsBitcoinSale(satAmount: satAmount, fiatAmount: 50000m)
+            .Build();
+
+        var database = GetUnderlyingDatabase();
+        var document = database.Mapper.ToDocument(entity);
+        document.Remove("excl");
+        database.GetCollection("budget_transactions").Insert(document);
+    }
+
+    private LiteDatabase GetUnderlyingDatabase()
+    {
+        var field = typeof(Valt.Infra.DataAccess.LocalDatabase).GetField("_database",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        return (LiteDatabase)field!.GetValue(_localDatabase)!;
+    }
 
     private void AddBtcSale(DateOnly date, long satAmount, bool excluded = false)
     {

@@ -209,9 +209,12 @@ internal class GoalTransactionReader : IGoalTransactionReader
                     .Order()
                     .ToList());
 
-        // Load transactions (excluded transactions never advance goals)
+        // Load transactions (excluded transactions never advance goals).
+        // Exclusion predicate MUST stay in the != true shape: LiteDB translates bool negation
+        // of IsExcluded to ($.excl = false), which silently drops legacy documents lacking the
+        // excl field (NULL = false is false). ($.excl != true) keeps missing-field docs as non-excluded.
         var transactionsQuery = _localDatabase.GetTransactions()
-            .Find(x => x.Date >= fromDate && x.Date <= toDate && !x.IsExcluded);
+            .Find(x => x.Date >= fromDate && x.Date <= toDate && x.IsExcluded != true);
 
         var transactions = categoryId is not null
             ? transactionsQuery.Where(x => x.CategoryId == categoryId).ToList()
