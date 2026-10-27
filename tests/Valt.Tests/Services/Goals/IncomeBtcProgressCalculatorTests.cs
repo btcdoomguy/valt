@@ -308,14 +308,52 @@ public class IncomeBtcProgressCalculatorTests : DatabaseTest
 
     #endregion
 
+    #region Exclusion Flag Tests
+
+    [Test]
+    public async Task Should_Ignore_Excluded_Income_In_Progress_And_Rows()
+    {
+        // Arrange: one unflagged and one excluded direct BTC income in the period
+        var goalTypeJson = SerializeGoalType(1_000_000);
+
+        var input = new GoalProgressInput(
+            GoalTypeNames.IncomeBtc,
+            goalTypeJson,
+            new DateOnly(2024, 1, 1),
+            new DateOnly(2024, 1, 31));
+
+        AddDirectBtcIncome(new DateOnly(2024, 1, 5), 200_000);
+        AddDirectBtcIncome(new DateOnly(2024, 1, 10), 300_000, excluded: true);
+
+        // Act
+        var result = await _calculator.CalculateProgressAsync(input);
+        var rows = await _calculator.GetContributingTransactionsAsync(input);
+
+        // Assert: only the unflagged income counts; final running total reconciles with progress
+        var calculatedSats = ((IncomeBtcGoalType)result.UpdatedGoalType).CalculatedSats;
+        Assert.That(calculatedSats, Is.EqualTo(200_000L));
+        Assert.That(result.Progress, Is.EqualTo(20m));
+        Assert.That(rows, Has.Count.EqualTo(1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows![0].Transaction.Name, Is.EqualTo("BTC Income"));
+            Assert.That(rows[0].Contribution, Is.EqualTo(200_000m));
+            Assert.That(rows[0].RunningTotal, Is.EqualTo(200_000m));
+            Assert.That(rows[0].RunningTotal, Is.EqualTo(calculatedSats));
+        });
+    }
+
+    #endregion
+
     #region Helper Methods
 
-    private void AddDirectBtcIncome(DateOnly date, long satAmount)
+    private void AddDirectBtcIncome(DateOnly date, long satAmount, bool excluded = false)
     {
         var entity = TransactionBuilder.ATransaction()
             .WithDate(date)
             .WithName("BTC Income")
             .AsBitcoinIncome(satAmount)
+            .WithExcluded(excluded)
             .Build();
         _localDatabase.GetTransactions().Insert(entity);
     }

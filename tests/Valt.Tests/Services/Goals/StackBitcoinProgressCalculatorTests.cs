@@ -381,14 +381,53 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
 
     #endregion
 
+    #region Exclusion Flag Tests
+
+    [Test]
+    public async Task Should_Ignore_Excluded_Transactions_In_Progress_And_Rows()
+    {
+        // Arrange: flagged purchase and flagged sale must not move progress or appear as rows
+        var goalTypeJson = SerializeGoalType(1_000_000);
+
+        var input = new GoalProgressInput(
+            GoalTypeNames.StackBitcoin,
+            goalTypeJson,
+            new DateOnly(2024, 1, 1),
+            new DateOnly(2024, 1, 31));
+
+        AddBtcTransaction(new DateOnly(2024, 1, 5), 300_000, excluded: true);  // ignored purchase
+        AddBtcTransaction(new DateOnly(2024, 1, 15), 200_000);                 // counts
+        AddBtcSale(new DateOnly(2024, 1, 20), 100_000, excluded: true);        // ignored sale
+
+        // Act
+        var result = await _calculator.CalculateProgressAsync(input);
+        var rows = await _calculator.GetContributingTransactionsAsync(input);
+
+        // Assert: net = 200,000; exactly one row; final running total reconciles with progress
+        var calculatedSats = ((StackBitcoinGoalType)result.UpdatedGoalType).CalculatedSats;
+        Assert.That(calculatedSats, Is.EqualTo(200_000L));
+        Assert.That(result.Progress, Is.EqualTo(20m));
+        Assert.That(rows, Has.Count.EqualTo(1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows![0].Transaction.Name, Is.EqualTo("BTC Purchase"));
+            Assert.That(rows[0].Contribution, Is.EqualTo(200_000m));
+            Assert.That(rows[0].RunningTotal, Is.EqualTo(200_000m));
+            Assert.That(rows[0].RunningTotal, Is.EqualTo(calculatedSats));
+        });
+    }
+
+    #endregion
+
     #region Helper Methods
 
-    private void AddBtcTransaction(DateOnly date, long satAmount)
+    private void AddBtcTransaction(DateOnly date, long satAmount, bool excluded = false)
     {
         var entity = TransactionBuilder.ATransaction()
             .WithDate(date)
             .WithName("BTC Purchase")
             .AsBitcoinPurchase(satAmount: satAmount, fiatAmount: 100m)
+            .WithExcluded(excluded)
             .Build();
         _localDatabase.GetTransactions().Insert(entity);
     }
@@ -423,12 +462,13 @@ public class StackBitcoinProgressCalculatorTests : DatabaseTest
         _localDatabase.GetTransactions().Insert(entity);
     }
 
-    private void AddBtcSale(DateOnly date, long satAmount)
+    private void AddBtcSale(DateOnly date, long satAmount, bool excluded = false)
     {
         var entity = TransactionBuilder.ATransaction()
             .WithDate(date)
             .WithName("BTC Sale")
             .AsBitcoinSale(satAmount: satAmount, fiatAmount: 50000m)
+            .WithExcluded(excluded)
             .Build();
         _localDatabase.GetTransactions().Insert(entity);
     }
