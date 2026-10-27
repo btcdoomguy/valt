@@ -166,6 +166,37 @@ public class ReportDataProviderCacheTests : DatabaseTest
         factory.Received(1).Invalidate();
     }
 
+    [Test]
+    public void SaveTransactionAsync_Propagates_NotificationPublisher_Failure()
+    {
+        var publisher = Substitute.For<INotificationPublisher>();
+        publisher.PublishAsync(Arg.Any<TransactionsDataChangedNotification>())
+            .Returns(Task.FromException(new InvalidOperationException("handler fault")));
+        var repository = new TransactionRepository(
+            _localDatabase, _priceDatabase, Substitute.For<IDomainEventPublisher>(), publisher);
+
+        var transaction = BuildExpense(isExcluded: false);
+
+        Assert.ThrowsAsync<InvalidOperationException>(async () => await repository.SaveTransactionAsync(transaction));
+    }
+
+    [Test]
+    public void DeleteTransactionAsync_Propagates_NotificationPublisher_Failure()
+    {
+        var publisher = Substitute.For<INotificationPublisher>();
+        publisher.PublishAsync(Arg.Any<TransactionsDataChangedNotification>())
+            .Returns(Task.FromException(new InvalidOperationException("handler fault")));
+        var repository = new TransactionRepository(
+            _localDatabase, _priceDatabase, Substitute.For<IDomainEventPublisher>(), publisher);
+
+        var transaction = BuildExpense(isExcluded: false);
+        // The first save also routes through the (faulting) publisher; swallow it so the
+        // delete under test starts from a persisted transaction.
+        Assert.ThrowsAsync<InvalidOperationException>(async () => await repository.SaveTransactionAsync(transaction));
+
+        Assert.ThrowsAsync<InvalidOperationException>(async () => await repository.DeleteTransactionAsync(transaction.Id));
+    }
+
     private Transaction BuildExpense(bool isExcluded)
     {
         return new TransactionBuilder()
