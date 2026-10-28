@@ -1,19 +1,20 @@
 ---
-gsd_state_version: 1.0
+gsd_state_version: "1.0"
 milestone: v0.9
-milestone_name: Goal Transparency — Transaction Breakdown
 current_phase: 53
-current_phase_name: Transaction Exclusion Flag for Reports & Goals
-status: executing
-stopped_at: Checkpoint in 53-04-PLAN.md (Task 1 committed 06151dd, awaiting human visual sign-off)
-last_updated: "2026-10-27T19:00:22.454Z"
+status: completed
+stopped_at: Completed 53-06-PLAN.md (GAP-2 gap closure)
+last_updated: "2026-10-28T14:13:33.551Z"
 last_activity: 2026-10-27
-last_activity_desc: Phase 53 execution started
+last_activity_desc: Phase 53 complete
+state_head: f2e81427f696ff603cd13e50a123042cbd0c9713
 progress:
   total_phases: 0
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
+milestone_name: Goal Transparency — Transaction Breakdown
+current_phase_name: Transaction Exclusion Flag for Reports & Goals
 ---
 
 # STATE.md
@@ -27,16 +28,16 @@ See: .planning/PROJECT.md (updated 2026-08-06)
 
 ## Current Position
 
-Phase: 53 (Transaction Exclusion Flag for Reports & Goals) — EXECUTING
-Plan: 4 of 4
-Status: Ready to execute
-Last activity: 2026-10-27 — Phase 53 execution started
+Phase: 53
+Plan: Not started
+Status: All phases complete
+Last activity: 2026-10-28 - Completed quick task 261028-fdt: Expand scope of "Excluded from goals and reports" transactions to the Fixed vs variable expenses chart, Sats earned & spent chart, Stack velocity chart and By categories panel breakdown
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 22
+- Total plans completed: 28
 - Average duration: 18 min
 - Total execution time: 43 min
 
@@ -60,6 +61,7 @@ Last activity: 2026-10-27 — Phase 53 execution started
 | 49 | 3 | - | - |
 | 50 | 3 | - | - |
 | 51 | 5 | - | - |
+| 53 | 6 | - | - |
 
 **Recent Trend:**
 
@@ -158,6 +160,9 @@ Last activity: 2026-10-27 — Phase 53 execution started
 | Phase 53 P01 | 21 min | 3 tasks | 21 files |
 | Phase 53 P02 | 11 | 3 tasks | 17 files |
 | Phase 53 P03 | 7 min | 3 tasks | 9 files |
+| Phase 53 P04 | 30 min | 4 tasks | 13 files |
+| Phase 53 P05 | 14 min | 3 tasks | 10 files |
+| Phase 53 P06 | 6 min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -236,6 +241,12 @@ Recent decisions affecting current work:
 - [Phase ?]: 53-02: Report-cache invalidation publish is repository-level (not VM-level) so MCP-initiated saves invalidate too; MCP UI refresh stays on McpDataChangedNotification
 - [Phase ?]: 53-02: Stale-cache regression test kept as permanent characterization: count-based cache returns same provider instance after a flag toggle until Invalidate() is called
 - [Phase ?]: Reader-based exclusion tests placed in GetGoalContributingTransactionsHandlerTests (real reader + real DB) instead of mock-based calculator fixtures — mocks cannot observe a LiteDB filter
+- [Phase ?]: 53-04: Removed duplicated exclusion header, moved checkbox below Notes, FontSizeSmall for single-line label (checkpoint fix acd12f7)
+- [Phase ?]: 53-04: NotFound test uses 24-hex ObjectId shape since LiteDB ObjectId ctor throws on free-form strings
+- [Phase ?]: [Phase 53-05]: GAP-1 root cause confirmed and fixed at the engine-predicate shape — LiteDB translates bool negation of IsExcluded to ($.excl = false), dropping pre-phase-53 documents lacking the excl field (NULL = false); all 9 goal predicates now use x.IsExcluded != true, correct for missing/false/true document shapes
+- [Phase ?]: [Phase 53-05]: No backfill migration for legacy excl field — deserialization yields false and the null-safe engine predicate treats missing as non-excluded; every write path persists the field via the entity mapper (T-53-11 accepted)
+- [Phase ?]: [Phase 53-06]: GAP-2 fixed at the engine-predicate shape — LiteDB translates bool negation of IsExcluded to ($.excl = false), dropping pre-phase-53 documents lacking the excl field; both LiteDB-side report queries (FixedVsVariable, SpendingEvolution) now use x.IsExcluded != true, correct for missing/false/true document shapes
+- [Phase ?]: [Phase 53-06]: Toggle→invalidate chain re-proven end to end for report panels — flag-only repository Upsert publishes TransactionsDataChangedNotification, handler invalidates ReportDataProviderFactory, next CreateAsync reflects the toggle without app restart
 
 ### Pending Todos
 
@@ -243,9 +254,7 @@ None yet.
 
 ### Blockers/Concerns
 
-yet.
-
-- 53-04 checkpoint: human visual sign-off of Excluded checkbox in Transaction Editor (Task 2/3 pending)
+None — 53-04 checkpoint issues resolved (fix commit acd12f7); plan complete, full suite green.
 
 ### Quick Tasks Completed
 
@@ -275,6 +284,8 @@ yet.
 | 260917-lz7 | Fix bug: pasting numeric values into Currency fields registers as 0; typing works (FiatInput paste handling) | 2026-09-17 | 89b3cc2 | [260917-lz7-fix-bug-pasting-numeric-values-into-curr](./quick/260917-lz7-fix-bug-pasting-numeric-values-into-curr/) |
 | 261006-kks | Restore Recalculate (refresh totals) in right-click context menu on goal entries in the Goals section of Transactions tab | 2026-10-06 | 65c0188 | [261006-kks-i-cannot-see-the-feature-to-refresh-the-](./quick/261006-kks-i-cannot-see-the-feature-to-refresh-the-/) |
 | 261026-iqj | Fix transaction grid not persisting Date column descending sort order after app restart | 2026-10-26 | f63a9fb | [261026-iqj-fix-transaction-grid-not-persisting-date](./quick/261026-iqj-fix-transaction-grid-not-persisting-date/) |
+| 261027-s9v | Add an asterisk suffix to the amount of excluded transactions in the Transactions tab list (show "$ 123.00 *" instead of "$ 123.00" when IsExcluded is ON) for clearer visual feedback about the exclusion flag | 2026-10-27 | f97eb65 | [261027-s9v-add-an-asterisk-suffix-to-the-amount-of-](./quick/261027-s9v-add-an-asterisk-suffix-to-the-amount-of-/) |
+| 261028-fdt | Expand scope of "Excluded from goals and reports" transactions to the Fixed vs variable expenses chart, Sats earned & spent chart, Stack velocity chart and By categories panel breakdown | 2026-10-28 | f2e8142 | [261028-fdt-i-want-to-expand-the-scope-of-the-latest](./quick/261028-fdt-i-want-to-expand-the-scope-of-the-latest/) |
 
 ## Deferred Items
 
@@ -298,9 +309,9 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-10-27T19:00:22.360Z
-Stopped at: Checkpoint in 53-04-PLAN.md (Task 1 committed 06151dd, awaiting human visual sign-off)
-Resume file: .planning/phases/53-transaction-exclusion-flag-for-reports-and-goals/53-04-PLAN.md
+Last session: 2026-10-27T22:28:59.057Z
+Stopped at: Completed 53-06-PLAN.md (GAP-2 gap closure)
+Resume file: None
 Resume file: None
 
 ## Notes
