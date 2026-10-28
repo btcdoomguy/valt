@@ -82,4 +82,22 @@ public class TransactionRepository_BtcToBtcTransferTests : DatabaseTest
             Assert.That(btcToBtcTransaction.Amount, Is.EqualTo(transactionDetails.Amount));
         });
     }
+
+    [Test]
+    public async Task Should_RoundTrip_IsExcluded()
+    {
+        var transaction = new TransactionBuilder()
+        {
+            CategoryId = _categoryId,
+            Date = new DateOnly(2023, 1, 1),
+            Name = "My Transaction",
+            TransactionDetails = new BitcoinToBitcoinDetails(_fromBtcAccountId, _toBtcAccountId, 200000),
+            IsExcluded = true
+        }.BuildDomainObject();
+
+        await _transactionRepository.SaveTransactionAsync(transaction);
+
+        var restoredTransaction = await _transactionRepository.GetTransactionByIdAsync(transaction.Id);
+        Assert.That(restoredTransaction.IsExcluded, Is.True);
+    }
 }

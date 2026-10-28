@@ -217,9 +217,9 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
                 var satAmount = tx.FromSatAmount.GetValueOrDefault() / SatoshisPerBitcoin;
                 fromBalanceChange += satAmount;
 
-                // Check if category is excluded (only for income/expense tracking, not balance)
-                var isExcluded = _excludedCategoryIds is not null && tx.CategoryId is not null &&
-                                 _excludedCategoryIds.Contains(tx.CategoryId.ToString());
+                // Check if category is excluded or transaction flagged (only for income/expense tracking, not balance)
+                var isExcluded = tx.IsExcluded || (_excludedCategoryIds is not null && tx.CategoryId is not null &&
+                                 _excludedCategoryIds.Contains(tx.CategoryId.ToString()));
 
                 if (tx.Type == TransactionEntityType.Bitcoin && !isExcluded)
                 {
@@ -279,9 +279,9 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
 
                 if (tx.Type == TransactionEntityType.Fiat)
                 {
-                    // Check if category is excluded (only for income/expense tracking, not balance)
-                    var isExcluded = _excludedCategoryIds is not null && tx.CategoryId is not null &&
-                                     _excludedCategoryIds.Contains(tx.CategoryId.ToString());
+                    // Check if category is excluded or transaction flagged (only for income/expense tracking, not balance)
+                    var isExcluded = tx.IsExcluded || (_excludedCategoryIds is not null && tx.CategoryId is not null &&
+                                     _excludedCategoryIds.Contains(tx.CategoryId.ToString()));
 
                     if (!isExcluded)
                     {

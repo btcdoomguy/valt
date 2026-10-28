@@ -15,6 +15,13 @@ namespace Valt.Infra.Modules.Reports;
 public interface IReportDataProviderFactory
 {
     Task<IReportDataProvider> CreateAsync(bool forceRefresh = false, CancellationToken ct = default);
+
+    /// <summary>
+    /// Drops the cached provider so the next <see cref="CreateAsync"/> rebuilds it
+    /// from current data. Required for edits that do not change the transaction
+    /// count (e.g. an exclusion-flag toggle).
+    /// </summary>
+    void Invalidate();
 }
 
 internal class ReportDataProviderFactory : IReportDataProviderFactory
@@ -31,6 +38,15 @@ internal class ReportDataProviderFactory : IReportDataProviderFactory
         _priceDatabase = priceDatabase;
         _localDatabase = localDatabase;
         _clock = clock;
+    }
+
+    public void Invalidate()
+    {
+        lock (_lock)
+        {
+            _cachedProvider = null;
+            _lastTransactionCount = -1;
+        }
     }
 
     public async Task<IReportDataProvider> CreateAsync(bool forceRefresh = false, CancellationToken ct = default)

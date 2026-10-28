@@ -20,10 +20,12 @@ public class Transaction : AggregateRoot<TransactionId>
     public GroupId? GroupId { get; private set; }
     public bool IsPartOfGroup => GroupId is not null;
 
+    public bool IsExcluded { get; private set; }
+
     private Transaction(TransactionId id, DateOnly date, TransactionName name, CategoryId categoryId,
         TransactionDetails transactionDetails, AutoSatAmountDetails? autoSatAmountDetails, string? notes,
         TransactionFixedExpenseReference? fixedExpenseReference, GroupId? groupId,
-        int version)
+        int version, bool isExcluded)
     {
         ArgumentNullException.ThrowIfNull(id);
         ArgumentNullException.ThrowIfNull(name);
@@ -40,6 +42,7 @@ public class Transaction : AggregateRoot<TransactionId>
         FixedExpenseReference = fixedExpenseReference;
         GroupId = groupId;
         Version = version;
+        IsExcluded = isExcluded;
 
         if (Version != 0) return;
 
@@ -50,18 +53,20 @@ public class Transaction : AggregateRoot<TransactionId>
 
     public static Transaction New(DateOnly date, TransactionName name, CategoryId categoryId,
         TransactionDetails transactionDetails, string? notes, TransactionFixedExpenseReference? fixedExpense,
-        GroupId? groupId = null)
+        GroupId? groupId = null, bool isExcluded = false)
     {
         return new Transaction(new TransactionId(), date, name, categoryId, transactionDetails,
-            transactionDetails.EligibleToAutoSatAmount ? AutoSatAmountDetails.Pending : null, notes, fixedExpense, groupId, 0);
+            transactionDetails.EligibleToAutoSatAmount ? AutoSatAmountDetails.Pending : null, notes, fixedExpense, groupId, 0,
+            isExcluded);
     }
 
     public static Transaction Create(TransactionId id, DateOnly date, TransactionName name, CategoryId categoryId,
         TransactionDetails transactionDetails, AutoSatAmountDetails? autoSatAmountDetails, string? notes,
         TransactionFixedExpenseReference? fixedExpense, GroupId? groupId,
-        int version)
+        int version, bool isExcluded)
     {
-        return new Transaction(id, date, name, categoryId, transactionDetails, autoSatAmountDetails, notes, fixedExpense, groupId, version);
+        return new Transaction(id, date, name, categoryId, transactionDetails, autoSatAmountDetails, notes, fixedExpense, groupId, version,
+            isExcluded);
     }
     
     public void ChangeDate(DateOnly date)
@@ -176,6 +181,15 @@ public class Transaction : AggregateRoot<TransactionId>
             return;
 
         Notes = notes;
+        AddEvent(new TransactionEditedEvent(this));
+    }
+
+    public void SetExcluded(bool isExcluded)
+    {
+        if (IsExcluded == isExcluded)
+            return;
+
+        IsExcluded = isExcluded;
         AddEvent(new TransactionEditedEvent(this));
     }
 }

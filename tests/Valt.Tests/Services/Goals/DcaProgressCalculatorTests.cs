@@ -316,14 +316,51 @@ public class DcaProgressCalculatorTests : DatabaseTest
 
     #endregion
 
+    #region Exclusion Flag Tests
+
+    [Test]
+    public async Task Should_Ignore_Excluded_Purchases_In_Progress_And_Rows()
+    {
+        // Arrange: one unflagged and one excluded purchase in the period
+        var goalTypeJson = SerializeGoalType(4);
+
+        var input = new GoalProgressInput(
+            GoalTypeNames.Dca,
+            goalTypeJson,
+            new DateOnly(2024, 1, 1),
+            new DateOnly(2024, 1, 31));
+
+        AddBitcoinPurchase(new DateOnly(2024, 1, 5));
+        AddBitcoinPurchase(new DateOnly(2024, 1, 10), excluded: true);
+
+        // Act
+        var result = await _calculator.CalculateProgressAsync(input);
+        var rows = await _calculator.GetContributingTransactionsAsync(input);
+
+        // Assert: count is 1; exactly one row; final running total reconciles with progress
+        var calculatedPurchaseCount = ((DcaGoalType)result.UpdatedGoalType).CalculatedPurchaseCount;
+        Assert.That(calculatedPurchaseCount, Is.EqualTo(1));
+        Assert.That(result.Progress, Is.EqualTo(25m));
+        Assert.That(rows, Has.Count.EqualTo(1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows![0].Contribution, Is.EqualTo(1m));
+            Assert.That(rows[0].RunningTotal, Is.EqualTo(1m));
+            Assert.That(rows[0].RunningTotal, Is.EqualTo(calculatedPurchaseCount));
+        });
+    }
+
+    #endregion
+
     #region Helper Methods
 
-    private void AddBitcoinPurchase(DateOnly date)
+    private void AddBitcoinPurchase(DateOnly date, bool excluded = false)
     {
         var entity = TransactionBuilder.ATransaction()
             .WithDate(date)
             .WithName("Bitcoin Purchase")
             .AsBitcoinPurchase(satAmount: 100_000, fiatAmount: 100m)
+            .WithExcluded(excluded)
             .Build();
         _localDatabase.GetTransactions().Insert(entity);
     }

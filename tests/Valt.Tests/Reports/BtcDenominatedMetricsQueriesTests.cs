@@ -152,6 +152,67 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
     }
 
     [Test]
+    public async Task Flagged_Fiat_Transactions_Do_Not_Affect_Earned_And_Spent_Buckets()
+    {
+        var month = new DateOnly(2025, 1, 1);
+        AddIncomeTransaction(month, 1100m);
+        AddExpenseTransaction(month, 550m);
+        AddIncomeTransaction(month, 2200m, isExcluded: true);
+        AddExpenseTransaction(month, 275m, isExcluded: true);
+
+        var result = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31));
+        var monthData = GetMonthData(result, month);
+
+        // Only the unflagged pair counts: 1100 BRL -> 200000 sats earned, 550 BRL -> -100000 sats spent.
+        // The flagged pair would add +400000 / -50000 if the exclusion were not applied.
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(monthData!.SatsEarned, Is.EqualTo(200000L));
+            Assert.That(monthData.SatsSpent, Is.EqualTo(-100000L));
+            Assert.That(monthData.StackVelocity, Is.EqualTo(100000L));
+        }
+    }
+
+    [Test]
+    public async Task Flagged_Bitcoin_Transactions_Do_Not_Affect_Earned_And_Spent_Buckets()
+    {
+        var month = new DateOnly(2025, 1, 1);
+        AddBtcIncomeTransaction(month, 500000L);
+        AddBtcExpenseTransaction(month, 250000L);
+        AddBtcIncomeTransaction(month, 300000L, isExcluded: true);
+        AddBtcExpenseTransaction(month, 100000L, isExcluded: true);
+
+        var result = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31));
+        var monthData = GetMonthData(result, month);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(monthData!.SatsEarned, Is.EqualTo(500000L));
+            Assert.That(monthData.SatsSpent, Is.EqualTo(-250000L));
+        }
+    }
+
+    [Test]
+    public async Task Flagged_Purchase_And_Sale_Do_Not_Count_Toward_Velocity()
+    {
+        var month = new DateOnly(2025, 1, 1);
+        AddBtcPurchaseTransaction(month, 100000L, 100m, isExcluded: true);
+        AddBtcSaleTransaction(month, 50000L, 50m, isExcluded: true);
+
+        var result = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31));
+        var monthData = GetMonthData(result, month);
+
+        // Excluded transactions never count toward any aggregation: not earned, not spent,
+        // not BTC purchases, not BTC sales — and therefore not Stack Velocity.
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(monthData!.SatsEarned, Is.EqualTo(0));
+            Assert.That(monthData.SatsSpent, Is.EqualTo(0));
+            Assert.That(monthData.StackVelocity, Is.EqualTo(0L));
+        }
+    }
+
+    [Test]
     public async Task Should_Exclude_Internal_Transfers()
     {
         var month = new DateOnly(2025, 1, 1);
@@ -332,9 +393,9 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
         return id;
     }
 
-    private void AddIncomeTransaction(DateOnly month, decimal amount, int day = 10)
+    private void AddIncomeTransaction(DateOnly month, decimal amount, int day = 10, bool isExcluded = false)
     {
-        AddIncomeTransaction(month, amount, day, _categoryId, _brlAccount.Id.ToString());
+        AddIncomeTransaction(month, amount, day, _categoryId, _brlAccount.Id.ToString(), isExcluded);
     }
 
     private void AddIncomeTransaction(DateOnly month, decimal amount, int day, CategoryId categoryId)
@@ -347,7 +408,7 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
         AddIncomeTransaction(month, amount, day, _categoryId, accountId);
     }
 
-    private void AddIncomeTransaction(DateOnly month, decimal amount, int day, CategoryId categoryId, AccountId accountId)
+    private void AddIncomeTransaction(DateOnly month, decimal amount, int day, CategoryId categoryId, AccountId accountId, bool isExcluded = false)
     {
         _localDatabase.GetTransactions().Insert(new TransactionBuilder()
         {
@@ -356,13 +417,14 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
             Date = new DateOnly(month.Year, month.Month, day),
             Name = $"Income {month}",
             AutoSatAmountDetails = AutoSatAmountDetails.Pending,
+            IsExcluded = isExcluded,
             TransactionDetails = new FiatDetails(accountId, amount, true)
         }.Build());
     }
 
-    private void AddExpenseTransaction(DateOnly month, decimal amount, int day = 15)
+    private void AddExpenseTransaction(DateOnly month, decimal amount, int day = 15, bool isExcluded = false)
     {
-        AddExpenseTransaction(month, amount, day, _categoryId, _brlAccount.Id.ToString());
+        AddExpenseTransaction(month, amount, day, _categoryId, _brlAccount.Id.ToString(), isExcluded);
     }
 
     private void AddExpenseTransaction(DateOnly month, decimal amount, int day, CategoryId categoryId)
@@ -370,7 +432,7 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
         AddExpenseTransaction(month, amount, day, categoryId, _brlAccount.Id.ToString());
     }
 
-    private void AddExpenseTransaction(DateOnly month, decimal amount, int day, CategoryId categoryId, AccountId accountId)
+    private void AddExpenseTransaction(DateOnly month, decimal amount, int day, CategoryId categoryId, AccountId accountId, bool isExcluded = false)
     {
         _localDatabase.GetTransactions().Insert(new TransactionBuilder()
         {
@@ -379,11 +441,12 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
             Date = new DateOnly(month.Year, month.Month, day),
             Name = $"Expense {month}",
             AutoSatAmountDetails = AutoSatAmountDetails.Pending,
+            IsExcluded = isExcluded,
             TransactionDetails = new FiatDetails(accountId, amount, false)
         }.Build());
     }
 
-    private void AddBtcIncomeTransaction(DateOnly month, long satAmount)
+    private void AddBtcIncomeTransaction(DateOnly month, long satAmount, bool isExcluded = false)
     {
         _localDatabase.GetTransactions().Insert(new TransactionBuilder()
             .WithId(IdGenerator.Generate())
@@ -391,11 +454,12 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
             .WithDate(new DateOnly(month.Year, month.Month, 10))
             .WithName($"BTC Income {month}")
             .WithAutoSatAmountDetails(null)
+            .WithExcluded(isExcluded)
             .WithTransactionDetails(new BitcoinDetails(_btcAccount.Id.ToString(), satAmount, credit: true))
             .Build());
     }
 
-    private void AddBtcExpenseTransaction(DateOnly month, long satAmount)
+    private void AddBtcExpenseTransaction(DateOnly month, long satAmount, bool isExcluded = false)
     {
         _localDatabase.GetTransactions().Insert(new TransactionBuilder()
             .WithId(IdGenerator.Generate())
@@ -403,11 +467,12 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
             .WithDate(new DateOnly(month.Year, month.Month, 10))
             .WithName($"BTC Expense {month}")
             .WithAutoSatAmountDetails(null)
+            .WithExcluded(isExcluded)
             .WithTransactionDetails(new BitcoinDetails(_btcAccount.Id.ToString(), satAmount, credit: false))
             .Build());
     }
 
-    private void AddBtcPurchaseTransaction(DateOnly month, long satAmount, decimal fiatAmount)
+    private void AddBtcPurchaseTransaction(DateOnly month, long satAmount, decimal fiatAmount, bool isExcluded = false)
     {
         _localDatabase.GetTransactions().Insert(new TransactionBuilder()
             .WithId(IdGenerator.Generate())
@@ -415,11 +480,12 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
             .WithDate(new DateOnly(month.Year, month.Month, 10))
             .WithName($"BTC Purchase {month}")
             .WithAutoSatAmountDetails(null)
+            .WithExcluded(isExcluded)
             .WithTransactionDetails(new FiatToBitcoinDetails(_brlAccount.Id.ToString(), _btcAccount.Id.ToString(), fiatAmount, satAmount))
             .Build());
     }
 
-    private void AddBtcSaleTransaction(DateOnly month, long satAmount, decimal fiatAmount)
+    private void AddBtcSaleTransaction(DateOnly month, long satAmount, decimal fiatAmount, bool isExcluded = false)
     {
         _localDatabase.GetTransactions().Insert(new TransactionBuilder()
             .WithId(IdGenerator.Generate())
@@ -427,6 +493,7 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
             .WithDate(new DateOnly(month.Year, month.Month, 10))
             .WithName($"BTC Sale {month}")
             .WithAutoSatAmountDetails(null)
+            .WithExcluded(isExcluded)
             .WithTransactionDetails(new BitcoinToFiatDetails(_btcAccount.Id.ToString(), _brlAccount.Id.ToString(), satAmount, fiatAmount))
             .Build());
     }

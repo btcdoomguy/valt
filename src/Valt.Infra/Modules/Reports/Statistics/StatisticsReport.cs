@@ -130,6 +130,10 @@ internal class StatisticsReport : IStatisticsReport
     /// </summary>
     private static long? GetSatExpenseAmount(TransactionEntity transaction, IReadOnlySet<string>? excludedCategoryIds = null)
     {
+        // Excluded transactions never count toward sat medians
+        if (transaction.IsExcluded)
+            return null;
+
         // Check if category should be excluded
         if (excludedCategoryIds is not null && transaction.CategoryId is not null &&
             excludedCategoryIds.Contains(transaction.CategoryId.ToString()))

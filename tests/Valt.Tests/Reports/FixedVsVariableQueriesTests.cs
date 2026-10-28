@@ -1,3 +1,4 @@
+using System.Reflection;
 using LiteDB;
 using NSubstitute;
 using Valt.App.Kernel.Notifications;
@@ -272,6 +273,45 @@ public class FixedVsVariableQueriesTests : DatabaseTest
         }
     }
 
+    [Test]
+    public async Task Should_Exclude_Flagged_Expense_From_Both_Buckets()
+    {
+        var month = new DateOnly(2025, 1, 1);
+        AddFixedExpense();
+        AddBrlExpense(new DateOnly(2025, 1, 15), 300m);
+        AddBrlExpense(new DateOnly(2025, 1, 20), 700m, isExcluded: true);
+
+        var result = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31));
+        var monthData = GetMonth(result, month);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(monthData, Is.Not.Null);
+            Assert.That(monthData!.FixedTotal, Is.EqualTo(0m));
+            Assert.That(monthData.VariableTotal, Is.EqualTo(300m));
+        }
+    }
+
+    [Test]
+    public async Task Should_Count_Legacy_Doc_And_Omit_Only_Flagged_In_Mixed_Month()
+    {
+        var month = new DateOnly(2025, 1, 1);
+        AddFixedExpense();
+        InsertLegacyDocument(AddBrlExpenseEntity(new DateOnly(2025, 1, 10), 200m));
+        AddBrlExpense(new DateOnly(2025, 1, 15), 300m);
+        AddBrlExpense(new DateOnly(2025, 1, 20), 700m, isExcluded: true);
+
+        var result = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31));
+        var monthData = GetMonth(result, month);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(monthData, Is.Not.Null);
+            Assert.That(monthData!.FixedTotal, Is.EqualTo(0m));
+            Assert.That(monthData.VariableTotal, Is.EqualTo(500m));
+        }
+    }
+
     private static FixedVsVariableMonthDto? GetMonth(FixedVsVariableDataDto result, DateOnly month)
     {
         return result.Months.FirstOrDefault(x => x.Month == month);
@@ -353,7 +393,7 @@ public class FixedVsVariableQueriesTests : DatabaseTest
         return fixedExpense;
     }
 
-    private TransactionEntity AddBrlExpense(DateOnly date, decimal amount, CategoryId categoryId)
+    private TransactionEntity AddBrlExpense(DateOnly date, decimal amount, CategoryId categoryId, bool isExcluded = false)
     {
         var entity = new TransactionBuilder()
         {
@@ -362,15 +402,21 @@ public class FixedVsVariableQueriesTests : DatabaseTest
             Date = date,
             Name = $"BRL Expense {date}",
             AutoSatAmountDetails = AutoSatAmountDetails.Pending,
-            TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), amount, false)
+            TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), amount, false),
+            IsExcluded = isExcluded
         }.Build();
         _localDatabase.GetTransactions().Insert(entity);
         return entity;
     }
 
-    private TransactionEntity AddBrlExpense(DateOnly date, decimal amount)
+    private TransactionEntity AddBrlExpense(DateOnly date, decimal amount, bool isExcluded = false)
     {
-        return AddBrlExpense(date, amount, _categoryId);
+        return AddBrlExpense(date, amount, _categoryId, isExcluded);
+    }
+
+    private TransactionEntity AddBrlExpense(DateOnly date, decimal amount, CategoryId categoryId)
+    {
+        return AddBrlExpense(date, amount, categoryId, isExcluded: false);
     }
 
     private TransactionEntity AddEurExpense(DateOnly date, decimal amount)
@@ -420,6 +466,44 @@ public class FixedVsVariableQueriesTests : DatabaseTest
         }.Build();
         _localDatabase.GetTransactions().Insert(entity);
         return entity;
+    }
+
+    /// <summary>
+    /// Inserts a transaction document directly into the raw LiteDB collection with the "excl"
+    /// field stripped, simulating a document written before the exclusion flag existed.
+    /// Uses the app's own BsonMapper so field names match production serialization.
+    /// </summary>
+    private TransactionEntity InsertLegacyDocument(TransactionEntity entity)
+    {
+        var database = GetUnderlyingDatabase();
+
+        var document = database.Mapper.ToDocument(entity);
+        document.Remove("excl");
+
+        database.GetCollection("budget_transactions").Insert(document);
+
+        return entity;
+    }
+
+    private TransactionEntity AddBrlExpenseEntity(DateOnly date, decimal amount, bool isExcluded = false)
+    {
+        return new TransactionBuilder()
+        {
+            Id = IdGenerator.Generate(),
+            CategoryId = _categoryId,
+            Date = date,
+            Name = $"BRL Expense {date}",
+            AutoSatAmountDetails = AutoSatAmountDetails.Pending,
+            TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), amount, false),
+            IsExcluded = isExcluded
+        }.Build();
+    }
+
+    private LiteDatabase GetUnderlyingDatabase()
+    {
+        var field = typeof(Valt.Infra.DataAccess.LocalDatabase).GetField("_database",
+            BindingFlags.NonPublic | BindingFlags.Instance);
+        return (LiteDatabase)field!.GetValue(_localDatabase)!;
     }
 
     private void AddFixedExpenseRecord(FixedExpenseEntity fixedExpense, TransactionEntity transaction, FixedExpenseRecordState state)

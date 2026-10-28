@@ -34,6 +34,7 @@ public partial class TransactionViewModel : ObservableObject
     public string? ToCurrency { get; }
     public TransactionTransferTypes TransferType { get; }
     public TransactionTypes TransactionType { get; }
+    public bool IsExcluded { get; }
 
     public string? FiatCurrencyCode => TransferType switch
     {
@@ -73,7 +74,7 @@ public partial class TransactionViewModel : ObservableObject
         TransactionTransferTypes transferType,
         TransactionTypes transactionType,
         long? autoSatAmount, string? fixedExpenseRecordId, string? fixedExpenseId, string? fixedExpenseName,
-        DateOnly? fixedExpenseReferenceDate, string? notes, bool futureTransaction)
+        DateOnly? fixedExpenseReferenceDate, string? notes, bool isExcluded, bool futureTransaction)
     {
         Id = id;
         Date = date;
@@ -103,6 +104,7 @@ public partial class TransactionViewModel : ObservableObject
         FixedExpenseReferenceDate = fixedExpenseReferenceDate;
         Notes = notes;
         _autoSatAmount = autoSatAmount;
+        IsExcluded = isExcluded;
         _futureTransaction = futureTransaction;
     }
 
@@ -110,13 +112,16 @@ public partial class TransactionViewModel : ObservableObject
     {
         get
         {
+            string summary;
+
             if (TransactionType != TransactionTypes.Transfer)
-                return $"{FormattedFromAmount}";
+                summary = $"{FormattedFromAmount}";
+            else if (FromCurrency == ToCurrency)
+                summary = $"-> {FormattedToAmount}";
+            else
+                summary = $"{FormattedFromAmount} -> {FormattedToAmount}";
 
-            if (FromCurrency == ToCurrency)
-                return $"-> {FormattedToAmount}";
-
-            return $"{FormattedFromAmount} -> {FormattedToAmount}";
+            return IsExcluded ? $"{summary} *" : summary;
         }
     }
 
@@ -304,6 +309,7 @@ public partial class TransactionViewModel : ObservableObject
             dto.FixedExpenseName,
             dto.FixedExpenseReferenceDate,
             dto.Notes,
+            dto.IsExcluded,
             dto.Date > today));
     }
 }

@@ -25,9 +25,12 @@ internal class DcaProgressCalculator : IGoalProgressCalculator
         var fromDate = input.From.ToValtDateTime();
         var toDate = input.To.ToValtDateTime().AddDays(1).AddTicks(-1);
 
-        // Count FiatToBitcoin transactions (bitcoin purchases)
+        // Count FiatToBitcoin transactions (bitcoin purchases).
+        // Exclusion predicate MUST stay in the != true shape: LiteDB translates bool negation
+        // of IsExcluded to ($.excl = false), which silently drops legacy documents lacking the
+        // excl field (NULL = false is false). ($.excl != true) keeps missing-field docs as non-excluded.
         var purchaseCount = _localDatabase.GetTransactions()
-            .Find(x => x.Date >= fromDate && x.Date <= toDate && x.Type == TransactionEntityType.FiatToBitcoin)
+            .Find(x => x.Date >= fromDate && x.Date <= toDate && x.Type == TransactionEntityType.FiatToBitcoin && x.IsExcluded != true)
             .Count();
 
         // Calculate percentage (0-100%)
@@ -51,8 +54,11 @@ internal class DcaProgressCalculator : IGoalProgressCalculator
         var mainCurrencyCode = GoalContributingTransactionsCurrency.GetMainFiatCurrencyCode(_localDatabase);
         var accounts = _localDatabase.GetAccounts().FindAll().ToDictionary(x => x.Id);
 
+        // Exclusion predicate MUST stay in the != true shape: LiteDB translates bool negation
+        // of IsExcluded to ($.excl = false), which silently drops legacy documents lacking the
+        // excl field (NULL = false is false). ($.excl != true) keeps missing-field docs as non-excluded.
         var transactions = _localDatabase.GetTransactions()
-            .Find(x => x.Date >= fromDate && x.Date <= toDate && x.Type == TransactionEntityType.FiatToBitcoin)
+            .Find(x => x.Date >= fromDate && x.Date <= toDate && x.Type == TransactionEntityType.FiatToBitcoin && x.IsExcluded != true)
             .ToList();
 
         var rows = new List<GoalContributionRow>();

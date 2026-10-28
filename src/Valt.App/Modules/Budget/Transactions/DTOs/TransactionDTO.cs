@@ -32,4 +32,5 @@ public record TransactionDTO
     public string? FixedExpenseName { get; set; }
     public DateOnly? FixedExpenseReferenceDate { get; set; }
     public string? Notes { get; set; }
+    public bool IsExcluded { get; init; }
 }

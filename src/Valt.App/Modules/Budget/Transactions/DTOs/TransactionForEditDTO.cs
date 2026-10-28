@@ -11,6 +11,7 @@ public record TransactionForEditDTO
     public required string CategoryId { get; init; }
     public string? Notes { get; init; }
     public string? GroupId { get; init; }
+    public bool IsExcluded { get; init; }
 
     /// <summary>
     /// Fixed expense reference, if bound.

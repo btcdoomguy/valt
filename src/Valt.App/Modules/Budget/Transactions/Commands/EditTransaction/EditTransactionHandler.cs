@@ -101,6 +101,7 @@ internal sealed class EditTransactionHandler : ICommandHandler<EditTransactionCo
         transaction.SetFixedExpense(fixedExpenseReference);
         transaction.ChangeTransactionDetails(transactionDetails);
         transaction.ChangeNotes(notes);
+        transaction.SetExcluded(command.IsExcluded);
 
         await _transactionRepository.SaveTransactionAsync(transaction);
 

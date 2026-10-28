@@ -23,6 +23,7 @@ public class TransactionEntity
     //btc price in the current fiat from the transaction account origin if BTC -> Fiat or Fiat -> BTC
     [BsonField("bPrice")] public decimal? BtcPrice { get; set; }
     [BsonField("auto")] public bool? IsAutoSatAmount { get; set; }
+    [BsonField("excl")] public bool IsExcluded { get; set; }
     [BsonField("sats")] public long? SatAmount { get; set; }
     [BsonField("sState")] public int? SatAmountStateId { get; set; }
     [BsonField("note")] public string? Notes { get; set; }

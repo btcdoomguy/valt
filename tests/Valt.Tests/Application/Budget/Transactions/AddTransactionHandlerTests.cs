@@ -208,6 +208,32 @@ public class AddTransactionHandlerTests : DatabaseTest
     }
 
     [Test]
+    public async Task HandleAsync_WithIsExcluded_CreatesExcludedTransaction()
+    {
+        var command = new AddTransactionCommand
+        {
+            Date = DateOnly.FromDateTime(DateTime.Today),
+            Name = "Internal Wealth Transfer",
+            CategoryId = _category.Id.Value,
+            Details = new FiatTransactionDto
+            {
+                FromAccountId = _fiatAccount.Id.Value,
+                Amount = 25.00m,
+                IsCredit = false
+            },
+            IsExcluded = true
+        };
+
+        var result = await _handler.HandleAsync(command);
+
+        Assert.That(result.IsSuccess, Is.True);
+
+        var savedTransaction = await _transactionRepository.GetTransactionByIdAsync(
+            new TransactionId(result.Value!.TransactionId));
+        Assert.That(savedTransaction!.IsExcluded, Is.True);
+    }
+
+    [Test]
     public async Task HandleAsync_WithNonExistentCategory_ReturnsNotFound()
     {
         var command = new AddTransactionCommand

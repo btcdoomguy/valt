@@ -23,6 +23,7 @@ public class TransactionBuilder
     private TransactionFixedExpenseReference? _fixedExpense;
     private GroupId? _groupId;
     private int _version = 0;
+    private bool _isExcluded;
 
     // Public properties for backward compatibility with property initializer syntax
     public TransactionId Id { get => _id; set => _id = value; }
@@ -35,6 +36,7 @@ public class TransactionBuilder
     public TransactionFixedExpenseReference? FixedExpense { get => _fixedExpense; set => _fixedExpense = value; }
     public GroupId? GroupId { get => _groupId; set => _groupId = value; }
     public int Version { get => _version; set => _version = value; }
+    public bool IsExcluded { get => _isExcluded; set => _isExcluded = value; }
 
     public static TransactionBuilder ATransaction() => new();
 
@@ -95,6 +97,12 @@ public class TransactionBuilder
     public TransactionBuilder WithGroupId(GroupId? groupId)
     {
         _groupId = groupId;
+        return this;
+    }
+
+    public TransactionBuilder WithExcluded(bool isExcluded)
+    {
+        _isExcluded = isExcluded;
         return this;
     }
 
@@ -254,12 +262,12 @@ public class TransactionBuilder
 
     public Transaction BuildDomainObject()
     {
-        return Transaction.Create(_id, _date, _name, _categoryId, _transactionDetails, _autoSatAmountDetails, _notes, _fixedExpense, _groupId, _version);
+        return Transaction.Create(_id, _date, _name, _categoryId, _transactionDetails, _autoSatAmountDetails, _notes, _fixedExpense, _groupId, _version, _isExcluded);
     }
 
     public TransactionEntity Build()
     {
-        var transaction = Transaction.Create(_id, _date, _name, _categoryId, _transactionDetails, _autoSatAmountDetails, _notes, _fixedExpense, _groupId, _version);
+        var transaction = Transaction.Create(_id, _date, _name, _categoryId, _transactionDetails, _autoSatAmountDetails, _notes, _fixedExpense, _groupId, _version, _isExcluded);
         return transaction.AsEntity();
     }
 }

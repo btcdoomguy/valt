@@ -1,3 +1,5 @@
+using System.Linq;
+using Valt.App.Modules.Budget.Transactions.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Transactions;
 using Valt.UI.Views.Main.Tabs.Transactions.Models;
@@ -204,6 +206,83 @@ public class TransactionViewModelTests
         Assert.That(vm.AutoSatAmountCurrentPrice, Does.Not.Contain("%"));
     }
 
+    [TestFixture]
+    public class FormattedSummarizedAmountExcludedTests
+    {
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            TransactionGridResources.InitializeForTesting();
+        }
+
+        [Test]
+        public void FormattedSummarizedAmount_WhenNotExcluded_NonTransfer_RendersPlainAmount()
+        {
+            var vm = CreateTransactionViewModel(
+                transferType: TransactionTransferTypes.Fiat,
+                fromCurrency: "BRL",
+                toCurrency: null,
+                transactionType: TransactionTypes.Debt,
+                formattedFromAmount: "R$ 123.00",
+                isExcluded: false);
+
+            Assert.That(vm.FormattedSummarizedAmount, Is.EqualTo("R$ 123.00"));
+        }
+
+        [Test]
+        public void FormattedSummarizedAmount_WhenExcluded_NonTransfer_AppendsAsterisk()
+        {
+            var vm = CreateTransactionViewModel(
+                transferType: TransactionTransferTypes.Fiat,
+                fromCurrency: "BRL",
+                toCurrency: null,
+                transactionType: TransactionTypes.Debt,
+                formattedFromAmount: "R$ 123.00",
+                isExcluded: true);
+
+            Assert.That(vm.FormattedSummarizedAmount, Is.EqualTo("R$ 123.00 *"));
+        }
+
+        [Test]
+        public void FormattedSummarizedAmount_WhenExcluded_SameCurrencyTransfer_AppendsAsterisk()
+        {
+            var vm = CreateTransactionViewModel(
+                transferType: TransactionTransferTypes.FiatToFiat,
+                fromCurrency: "BRL",
+                toCurrency: "BRL",
+                transactionType: TransactionTypes.Transfer,
+                formattedFromAmount: "R$ 100.00",
+                formattedToAmount: "R$ 100.00",
+                isExcluded: true);
+
+            Assert.That(vm.FormattedSummarizedAmount, Is.EqualTo("-> R$ 100.00 *"));
+        }
+
+        [Test]
+        public void Parse_WhenDtoIsExcluded_AppendsAsteriskToSummarizedAmount()
+        {
+            var dto = new TransactionDTO
+            {
+                Id = "tx-1",
+                Date = new DateOnly(2024, 6, 1),
+                Name = "Excluded tx",
+                CategoryId = "cat-1",
+                CategoryName = "Test",
+                FromAccountId = "acc-1",
+                FromAccountName = "Account",
+                FormattedFromAmount = "R$ 123.00",
+                TransferType = "Fiat",
+                TransactionType = "Debt",
+                IsExcluded = true
+            };
+
+            var vm = TransactionViewModel.Parse(new List<TransactionDTO> { dto }, new DateOnly(2024, 6, 2)).Single();
+
+            Assert.That(vm.FormattedSummarizedAmount, Is.EqualTo("R$ 123.00 *"));
+            Assert.That(vm.IsExcluded, Is.True);
+        }
+    }
+
     private static TransactionViewModel CreateTransactionViewModelForAutoSat(
         TransactionTransferTypes transferType,
         string? fromCurrency,
@@ -240,13 +319,18 @@ public class TransactionViewModelTests
             fixedExpenseName: null,
             fixedExpenseReferenceDate: null,
             notes: null,
+            isExcluded: false,
             futureTransaction: false);
     }
 
     private static TransactionViewModel CreateTransactionViewModel(
         TransactionTransferTypes transferType,
         string? fromCurrency,
-        string? toCurrency)
+        string? toCurrency,
+        TransactionTypes transactionType = TransactionTypes.Transfer,
+        string formattedFromAmount = "-$100",
+        string? formattedToAmount = "$100",
+        bool isExcluded = false)
     {
         return new TransactionViewModel(
             id: "test-id",
@@ -261,22 +345,23 @@ public class TransactionViewModelTests
             toAccountId: "acc-2",
             toAccountName: "To Account",
             toAccountIcon: Icon.Empty,
-            formattedFromAmount: "-$100",
+            formattedFromAmount: formattedFromAmount,
             fromAmountSats: null,
             fromAmountFiat: -100m,
-            formattedToAmount: "$100",
+            formattedToAmount: formattedToAmount,
             toAmountSats: null,
             toAmountFiat: 100m,
             fromCurrency: fromCurrency,
             toCurrency: toCurrency,
             transferType: transferType,
-            transactionType: TransactionTypes.Transfer,
+            transactionType: transactionType,
             autoSatAmount: null,
             fixedExpenseRecordId: null,
             fixedExpenseId: null,
             fixedExpenseName: null,
             fixedExpenseReferenceDate: null,
             notes: null,
+            isExcluded: isExcluded,
             futureTransaction: false);
     }
 }

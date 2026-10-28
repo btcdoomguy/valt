@@ -235,6 +235,7 @@ public class TransactionListViewModelAvgPriceTests : DatabaseTest
             fixedExpenseName: null,
             fixedExpenseReferenceDate: null,
             notes: null,
+            isExcluded: false,
             futureTransaction: false);
     }
 

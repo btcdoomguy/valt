@@ -26,8 +26,11 @@ internal class StackBitcoinProgressCalculator : IGoalProgressCalculator
         var fromDate = input.From.ToValtDateTime();
         var toDate = input.To.ToValtDateTime().AddDays(1).AddTicks(-1);
 
+        // Exclusion predicate MUST stay in the != true shape: LiteDB translates bool negation
+        // of IsExcluded to ($.excl = false), which silently drops legacy documents lacking the
+        // excl field (NULL = false is false). ($.excl != true) keeps missing-field docs as non-excluded.
         var transactions = _localDatabase.GetTransactions()
-            .Find(x => x.Date >= fromDate && x.Date <= toDate)
+            .Find(x => x.Date >= fromDate && x.Date <= toDate && x.IsExcluded != true)
             .ToList();
 
         // Sum BTC purchased (FiatToBitcoin transactions)
@@ -74,8 +77,11 @@ internal class StackBitcoinProgressCalculator : IGoalProgressCalculator
         var mainCurrencyCode = GoalContributingTransactionsCurrency.GetMainFiatCurrencyCode(_localDatabase);
         var accounts = _localDatabase.GetAccounts().FindAll().ToDictionary(x => x.Id);
 
+        // Exclusion predicate MUST stay in the != true shape: LiteDB translates bool negation
+        // of IsExcluded to ($.excl = false), which silently drops legacy documents lacking the
+        // excl field (NULL = false is false). ($.excl != true) keeps missing-field docs as non-excluded.
         var transactions = _localDatabase.GetTransactions()
-            .Find(x => x.Date >= fromDate && x.Date <= toDate)
+            .Find(x => x.Date >= fromDate && x.Date <= toDate && x.IsExcluded != true)
             .ToList();
 
         var rows = new List<GoalContributionRow>();

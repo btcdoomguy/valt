@@ -107,6 +107,7 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - **Phase 49 complete** — `GetGoalContributingTransactionsQuery` backend: 9 transaction-based goal strategies expose their contributing transactions with reconciling running totals (only `NetWorthBtc` unsupported); 1804 tests green; code review findings CR-01/WR-01/WR-02 fixed.
 - **Phase 50 complete** — Goal Summary modal UI: "View summary" context menu (allow-list gating, secure-mode disable), chromeless resizable modal with 7-column read-only grid, per-unit running-total formatting, header strip with focal reconciled total; human visual sign-off approved; 1818 tests green.
 - **Phase 51 complete** — `GetGoalContributingTransactions` MCP tool with typed Supported/Error contract, pt-BR/es localization (1048-key tri-locale parity), `.claude/docs/goals.md` update; end-to-end human sign-off approved; 1822 tests green. **v0.9 milestone complete** (3 phases, 11 plans, 8/8 requirements GOL-03..GOL-10).
+- **Phase 53 complete** (2026-10-27) — per-transaction "Excluded from reports and goals" flag: checkbox in the Transaction Editor right panel, exclusion from all Reports income/expense aggregations and all 9 goal progress strategies (semantic boundary: balances/net-worth/ATH/avg-price/snapshots untouched), report-cache invalidation on toggle, MCP surface (6 `excluded` params + `SetTransactionExcluded`), trilingual localization. Gap closure fixed a LiteDB legacy-document predicate bug (`!x.IsExcluded` → `($.excl = false)` dropped pre-phase-53 documents; rewritten null-safe). 6/6 plans, 1921 tests green; human UAT passed.
 
 ## Current Milestone: v0.9 Goal Transparency — Transaction Breakdown
 
@@ -189,4 +190,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-10-07 after Phase 51 complete (v0.9 milestone complete)*
+*Last updated: 2026-10-27 after Phase 53 complete (transaction exclusion flag)*

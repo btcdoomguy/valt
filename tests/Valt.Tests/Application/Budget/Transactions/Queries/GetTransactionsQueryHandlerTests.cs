@@ -250,4 +250,53 @@ public class GetTransactionsQueryHandlerTests : DatabaseTest
         Assert.That(transaction.ToAccountId, Is.EqualTo(_btcAccountId.Value));
         Assert.That(transaction.ToAccountName, Is.EqualTo("Btc Account"));
     }
+
+    [Test]
+    public async Task Should_Carry_IsExcluded_In_List_TransactionDTO()
+    {
+        var excludedTransaction = new TransactionBuilder()
+        {
+            CategoryId = _categoryId,
+            Date = new DateOnly(2023, 3, 1),
+            Name = "Excluded Transaction",
+            TransactionDetails = new FiatDetails(_fiatAccountId, 200, true),
+            IsExcluded = true
+        }.BuildDomainObject();
+
+        _localDatabase.GetTransactions().Insert(excludedTransaction.AsEntity());
+
+        var filter = new TransactionQueryFilter()
+        {
+            From = new DateOnly(2023, 3, 1),
+            To = new DateOnly(2023, 3, 31),
+            AccountIds = new[] { _fiatAccountId.Value }
+        };
+
+        var query = new TransactionQueries(_localDatabase);
+        var result = await query.GetTransactionsAsync(filter);
+
+        Assert.That(result.Items.Count, Is.EqualTo(1));
+        Assert.That(result.Items.First().IsExcluded, Is.True);
+    }
+
+    [Test]
+    public async Task Should_Carry_IsExcluded_In_TransactionForEditDTO()
+    {
+        var excludedTransaction = new TransactionBuilder()
+        {
+            CategoryId = _categoryId,
+            Date = new DateOnly(2023, 3, 1),
+            Name = "Excluded Transaction",
+            TransactionDetails = new FiatDetails(_fiatAccountId, 200, true),
+            IsExcluded = true
+        }.BuildDomainObject();
+
+        _localDatabase.GetTransactions().Insert(excludedTransaction.AsEntity());
+
+        var query = new TransactionQueries(_localDatabase);
+        var result = await query.GetTransactionByIdAsync(excludedTransaction.Id.Value);
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.IsExcluded, Is.True);
+    }
 }

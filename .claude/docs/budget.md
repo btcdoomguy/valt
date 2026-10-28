@@ -58,6 +58,14 @@ Aggregate root for financial movements between accounts.
 - `ChangeDate()` - Updates date, may trigger auto-sat reprocessing
 - `ChangeTransactionDetails()` - Swap transaction type/accounts
 - `SetFixedExpense()` - Link/unlink to fixed expense
+- `SetExcluded()` - Set/clear the exclusion flag (emits `TransactionEditedEvent`)
+
+**Exclusion Flag:**
+- `IsExcluded: bool` (persisted as `excl` in LiteDB) marks wealth transfers that are not economic income/expense
+- **Semantic boundary:** excluded transactions are removed from income/expense report buckets and from all goal progress strategies; they ALWAYS remain in account balances, net-worth, ATH, max-BTC-stack, avg-price, wealth snapshots, and account totals
+- **UI:** the Transaction Editor right panel has an "Excluded from reports and goals" checkbox below the Notes field (localized en/pt-BR/es); copying a transaction resets the flag to false (a copy is a new economic event); debt installments inherit the flag from the parent form
+- **MCP:** the 6 Add* tools accept an optional `excluded` param; the `SetTransactionExcluded` tool toggles the flag on an existing transaction (backed by `SetTransactionExclusionCommand`); `TransactionDTO.IsExcluded` surfaces the flag in `GetTransactions` results; every mutation publishes `McpDataChangedNotification` so UI tabs refresh
+- **Report cache:** toggling the flag invalidates the report data-provider cache via `TransactionsDataChangedNotification` and the factory `Invalidate()` — reports reflect a toggle without app restart
 
 **Auto-Sat Processing:**
 - Eligible fiat transactions auto-calculate satoshi equivalents

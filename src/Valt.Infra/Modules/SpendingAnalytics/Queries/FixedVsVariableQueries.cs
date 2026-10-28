@@ -67,6 +67,13 @@ public class FixedVsVariableQueries : IFixedVsVariableQueries
         var toDate = query.To.ToValtDateTime();
         transactionQuery = transactionQuery.Where(x => x.Date >= fromDate && x.Date <= toDate);
 
+        // Excluded transactions never count toward the fixed/variable split.
+        // WARNING: never negate the bool here (e.g. "!" operator) — LiteDB's
+        // LinqExpressionVisitor translates bool negation to ($.excl = false), and legacy
+        // documents lacking the excl field read as NULL, so NULL = false silently drops them.
+        // "!=" keeps missing (NULL != true) and explicit-false rows while dropping only excl: true.
+        transactionQuery = transactionQuery.Where(x => x.IsExcluded != true);
+
         if (query.CategoryIds.Length > 0)
         {
             var categoryObjectIds = query.CategoryIds.Select(id => new ObjectId(id)).ToList();

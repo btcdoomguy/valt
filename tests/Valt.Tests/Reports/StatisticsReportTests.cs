@@ -755,7 +755,70 @@ public class StatisticsReportTests : DatabaseTest
 
     #endregion
 
+    [Test]
+    public async Task Should_Exclude_Flagged_Expense_From_Sat_Median()
+    {
+        var clock = new FakeClock(new DateTime(2025, 12, 31));
+
+        try
+        {
+            // Jan and Mar unflagged, Feb flagged — the flagged month must not contribute
+            AddExpenseTransactionWithSats(new DateOnly(2025, 1, 15), 1000m, -10000);
+            AddExpenseTransactionWithSats(new DateOnly(2025, 2, 15), 1500m, -15000, isExcluded: true);
+            AddExpenseTransactionWithSats(new DateOnly(2025, 3, 15), 1200m, -12000);
+
+            var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
+            var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
+
+            var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(result.HasMedianMonthlyExpensesSats, Is.True);
+                // Only Jan (10000) and Mar (12000): median = (10000 + 12000) / 2
+                Assert.That(result.MedianMonthlyExpensesSats, Is.EqualTo(11000));
+            }
+        }
+        finally
+        {
+            _localDatabase.GetTransactions().DeleteAll();
+        }
+    }
+
+    [Test]
+    public async Task Should_Exclude_Flagged_Expense_From_Fiat_Median()
+    {
+        var clock = new FakeClock(new DateTime(2025, 12, 31));
+
+        try
+        {
+            // Jan and Mar unflagged, Feb flagged — the flagged month must not contribute
+            AddExpenseTransaction(new DateOnly(2025, 1, 15), 1000m);
+            AddExpenseTransaction(new DateOnly(2025, 2, 15), 9999m, isExcluded: true);
+            AddExpenseTransaction(new DateOnly(2025, 3, 15), 1200m);
+
+            var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+            var monthlyTotalsReport = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
+            var statisticsReport = new StatisticsReport(clock, monthlyTotalsReport);
+
+            var result = await statisticsReport.GetAsync(FiatCurrency.Brl, 10000m, provider);
+
+            // Only Jan (1000) and Mar (1200): median = (1000 + 1200) / 2
+            Assert.That(result.MedianMonthlyExpenses.Value, Is.EqualTo(1100m));
+        }
+        finally
+        {
+            _localDatabase.GetTransactions().DeleteAll();
+        }
+    }
+
     private void AddExpenseTransaction(DateOnly date, decimal amount)
+    {
+        AddExpenseTransaction(date, amount, isExcluded: false);
+    }
+
+    private void AddExpenseTransaction(DateOnly date, decimal amount, bool isExcluded)
     {
         _localDatabase.GetTransactions().Insert(new TransactionBuilder()
         {
@@ -764,11 +827,12 @@ public class StatisticsReportTests : DatabaseTest
             Date = date,
             Name = $"Expense {date}",
             AutoSatAmountDetails = AutoSatAmountDetails.Pending,
-            TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), amount, false) // false = expense
+            TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), amount, false), // false = expense
+            IsExcluded = isExcluded
         }.Build());
     }
 
-    private void AddExpenseTransactionWithSats(DateOnly date, decimal fiatAmount, long satAmount)
+    private void AddExpenseTransactionWithSats(DateOnly date, decimal fiatAmount, long satAmount, bool isExcluded = false)
     {
         var autoSatDetails = new AutoSatAmountDetails(true, SatAmountState.Processed, BtcValue.New(Math.Abs(satAmount)));
 
@@ -779,7 +843,8 @@ public class StatisticsReportTests : DatabaseTest
             Date = date,
             Name = $"Expense {date}",
             AutoSatAmountDetails = autoSatDetails,
-            TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), fiatAmount, false) // false = expense
+            TransactionDetails = new FiatDetails(_brlAccount.Id.ToString(), fiatAmount, false), // false = expense
+            IsExcluded = isExcluded
         }.Build();
 
         // Override SatAmount to be negative for expenses (matching how the system stores them)
