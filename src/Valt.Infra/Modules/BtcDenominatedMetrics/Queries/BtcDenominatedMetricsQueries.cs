@@ -54,11 +54,11 @@ public class BtcDenominatedMetricsQueries : IBtcDenominatedMetricsQueries
             if (transactionDate < query.From || transactionDate > query.To)
                 continue;
 
-            // Excluded transactions never count toward earned/spent buckets (D-53);
-            // purchase/sale buckets (FiatToBitcoin/BitcoinToFiat) intentionally unaffected,
-            // matching MonthlyTotalsReport's income/expense-only gating.
-            var isEarnedSpent = transaction.Type is TransactionEntityType.Fiat or TransactionEntityType.Bitcoin;
-            if (transaction.IsExcluded && isEarnedSpent)
+            // Excluded transactions never count toward any aggregation — not earned/spent
+            // buckets, not BTC purchase/sale buckets, and therefore not Stack Velocity.
+            // This supersedes the CR-01 income/expense-only gating for this query
+            // (MonthlyTotalsReport is intentionally left untouched).
+            if (transaction.IsExcluded)
                 continue;
 
             if (selectedAccountIds is not null && !selectedAccountIds.Contains(transaction.FromAccountId))
