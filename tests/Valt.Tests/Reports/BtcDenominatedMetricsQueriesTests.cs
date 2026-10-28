@@ -193,7 +193,7 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
     }
 
     [Test]
-    public async Task Flagged_Purchase_And_Sale_Still_Count_Toward_Velocity()
+    public async Task Flagged_Purchase_And_Sale_Do_Not_Count_Toward_Velocity()
     {
         var month = new DateOnly(2025, 1, 1);
         AddBtcPurchaseTransaction(month, 100000L, 100m, isExcluded: true);
@@ -202,13 +202,13 @@ public class BtcDenominatedMetricsQueriesTests : DatabaseTest
         var result = await ExecuteQuery(new DateOnly(2024, 1, 1), new DateOnly(2025, 12, 31), new DateTime(2025, 12, 31));
         var monthData = GetMonthData(result, month);
 
-        // Mirrors MonthlyTotalsReport: the exclusion gates income/expense buckets only,
-        // so flagged purchases/sales still move BtcPurchases/BtcSales and velocity.
+        // Excluded transactions never count toward any aggregation: not earned, not spent,
+        // not BTC purchases, not BTC sales — and therefore not Stack Velocity.
         using (Assert.EnterMultipleScope())
         {
             Assert.That(monthData!.SatsEarned, Is.EqualTo(0));
             Assert.That(monthData.SatsSpent, Is.EqualTo(0));
-            Assert.That(monthData.StackVelocity, Is.EqualTo(50000L));
+            Assert.That(monthData.StackVelocity, Is.EqualTo(0L));
         }
     }
 
