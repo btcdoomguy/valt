@@ -424,7 +424,7 @@ Phases 46-48 (Cost-Over-Time Schedule, Prefill from Existing BTC Loan Asset, MCP
   4. The BTC Loan Simulator is documented (new page or Tools section), and the MCP Server page lists the new tools (v0.7 report tools, goal contributing-transactions, SetTransactionExcluded, monthly-totals asset parity) — in both pt-BR and en-US
   5. The site builds cleanly with `mkdocs build`, nav covers any new pages, and both language variants of every touched page are updated together (no pt/en drift)
 
-**Plans**: 3/6 plans executed
+**Plans**: 4/6 plans executed
 
 **Wave 1**
 
@@ -434,7 +434,7 @@ Phases 46-48 (Cost-Over-Time Schedule, Prefill from Existing BTC Loan Asset, MCP
 
 - [x] 54-02-PLAN.md — Transactions exclusion-flag section + Goals View-summary subsection, pt+en — SC-3
 - [x] 54-03-PLAN.md — Assets daily-wealth-snapshots subsection + Reports cross-reference, pt+en — SC-3
-- [ ] 54-04-PLAN.md — New BTC Loan Simulator page pt+en + 3-point nav registration + Reports cross-links — SC-4
+- [x] 54-04-PLAN.md — New BTC Loan Simulator page pt+en + 3-point nav registration + Reports cross-links — SC-4
 - [ ] 54-05-PLAN.md — MCP Server tool-catalog sync (7 new tools, excluded param, asset totals, count fix), pt+en — SC-4
 
 **Wave 3** *(blocked on Wave 2 completion)*
