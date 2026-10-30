@@ -8,7 +8,7 @@
 - ⏸️ **v0.8 BTC Loan Simulator** — Phases 44-45 (paused 2026-10-26 — remaining phases removed, superseded by v0.10)
 - ✅ **v0.9 Goal Transparency — Transaction Breakdown** — Phases 49-51 (shipped 2026-10-07)
 - 🚧 **v0.10 Wealth Snapshots** — Phase 52 (in progress)
-- 📝 **v0.11 Documentation Site Sync** — Phase 54 (planned)
+- ✅ **v0.11 Documentation Site Sync** — Phase 54 (shipped 2026-10-30)
 
 ## Phases
 
@@ -62,9 +62,9 @@ Phases 46-48 (Cost-Over-Time Schedule, Prefill from Existing BTC Loan Asset, MCP
 - [ ] **Phase 52: Wealth Snapshots & Asset Totals in Monthly Reports** — Persist daily snapshots of Included-in-Wealth-Totals asset values and include asset totals in the Monthly Totals grid and chart using the latest snapshot available per period
 - [ ] **Phase 53: Transaction Exclusion Flag for Reports & Goals** — Per-transaction "excluded" flag (checkbox in Transaction Editor right panel) that removes the transaction from all Reports and Goals calculations
 
-### 📝 v0.11 Documentation Site Sync (Phase 54) — PLANNED
+### ✅ v0.11 Documentation Site Sync (Phase 54) — SHIPPED 2026-10-30
 
-- [ ] **Phase 54: Documentation Site Sync — Features Since July 2026** — Update the `../valt-docs` MkDocs site (pt-BR + en-US) to cover every user-facing feature shipped since the v0.6 docs refresh (2026-07-17): v0.7 reports/metrics, v0.8 BTC Loan Simulator, v0.9 Goal Summary, v0.10 Wealth Snapshots & Transaction Exclusion
+- [x] **Phase 54: Documentation Site Sync — Features Since July 2026** — Update the `../valt-docs` MkDocs site (pt-BR + en-US) to cover every user-facing feature shipped since the v0.6 docs refresh (2026-07-17): v0.7 reports/metrics, v0.8 BTC Loan Simulator, v0.9 Goal Summary, v0.10 Wealth Snapshots & Transaction Exclusion — completed 2026-10-30
 
 ## Phase Details
 
@@ -379,8 +379,9 @@ Phases 46-48 (Cost-Over-Time Schedule, Prefill from Existing BTC Loan Asset, MCP
 | 50. Goal Summary Modal UI | v0.9 | 3/3 | Complete    | 2026-10-06 |
 | 51. MCP, Localization, Documentation & Verification | v0.9 | 5/5 | Complete    | 2026-10-07 |
 | 52. Wealth Snapshots & Asset Totals in Monthly Reports | v0.10 | 2/3 | In Progress|  |
+| 54. Documentation Site Sync — Features Since July 2026 | v0.11 | 6/6 | Complete | 2026-10-30 |
 
-**Total phases:** 21 (17 complete, 1 active, 3 removed/paused)  
+**Total phases:** 22 (18 complete, 1 active, 3 removed/paused)  
 **v0.8 plans:** 3/3 executed (phases 46-48 removed 2026-10-26)  
 **v0.8 requirements:** SIM-01..SIM-13 (SIM-10..SIM-13 dropped with phases 46-48)  
 **v0.9 plans:** 11/11 executed (roadmap defined 2026-10-06)  
@@ -442,4 +443,4 @@ Phases 46-48 (Cost-Over-Time Schedule, Prefill from Existing BTC Loan Asset, MCP
 - [x] 54-06-PLAN.md — QA gate: full-site automated battery (build/parity/presence/stale/nav/D-01) + human visual & factual sign-off — SC-1, SC-5
 
 ---
-*Last updated: 2026-10-30 — v0.11 Documentation Site Sync roadmap added (Phase 54)*
+*Last updated: 2026-10-30 — v0.11 Documentation Site Sync shipped (Phase 54 complete, verification passed 5/5)*
