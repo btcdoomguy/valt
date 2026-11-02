@@ -420,28 +420,45 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
             Dictionary<DateOnly, MonthlyTotal> monthlyTotals,
             Dictionary<DateOnly, DateOnly> emissionDates)
         {
+            // Percentage changes are computed on the asset-inclusive Total Wealth basis: each
+            // side of a comparison is the month's fiat/bitcoin balance PLUS the latest wealth
+            // snapshot at that point, resolved via the same FindLatestSnapshot helper the
+            // Assets column uses — so the % columns can never disagree with the Total Wealth
+            // column beside them. A missing snapshot contributes 0 assets to that side (the
+            // Assets column's own documented fallback). A missing previous month/year in the
+            // data still yields 0% (there is nothing to compare against).
             return monthlyTotals.Select(monthly =>
             {
                 var previousMonthKey = monthly.Key.AddMonths(-1);
                 var previousYearKey = new DateOnly(monthly.Key.Year - 1, 12, 1);
 
-                var btcMonthlyChange = monthlyTotals.TryGetValue(previousMonthKey, out var previousMonth)
-                    ? FinancialCalculator.CalculateImprovementPercentage(previousMonth.Bitcoin, monthly.Value.Bitcoin)
-                    : 0m;
+                var currentSnapshot = FindLatestSnapshot(emissionDates[monthly.Key]);
 
-                var fiatMonthlyChange = monthlyTotals.TryGetValue(previousMonthKey, out previousMonth)
-                    ? FinancialCalculator.CalculateImprovementPercentage(previousMonth.Fiat, monthly.Value.Fiat)
-                    : 0m;
+                var btcMonthlyChange = 0m;
+                var fiatMonthlyChange = 0m;
+                if (monthlyTotals.TryGetValue(previousMonthKey, out var previousMonth))
+                {
+                    var previousMonthSnapshot = FindLatestSnapshot(emissionDates[previousMonthKey]);
+                    btcMonthlyChange = FinancialCalculator.CalculateImprovementPercentage(
+                        previousMonth.Bitcoin + (previousMonthSnapshot?.TotalValueInSats ?? 0L) / SatoshisPerBitcoin,
+                        monthly.Value.Bitcoin + (currentSnapshot?.TotalValueInSats ?? 0L) / SatoshisPerBitcoin);
+                    fiatMonthlyChange = FinancialCalculator.CalculateImprovementPercentage(
+                        previousMonth.Fiat + (previousMonthSnapshot?.TotalValueInMainCurrency ?? 0m),
+                        monthly.Value.Fiat + (currentSnapshot?.TotalValueInMainCurrency ?? 0m));
+                }
 
-                var btcYearlyChange = monthlyTotals.TryGetValue(previousYearKey, out var previousYear)
-                    ? FinancialCalculator.CalculateImprovementPercentage(previousYear.Bitcoin, monthly.Value.Bitcoin)
-                    : 0m;
-
-                var fiatYearlyChange = monthlyTotals.TryGetValue(previousYearKey, out previousYear)
-                    ? FinancialCalculator.CalculateImprovementPercentage(previousYear.Fiat, monthly.Value.Fiat)
-                    : 0m;
-
-                var latestSnapshot = FindLatestSnapshot(emissionDates[monthly.Key]);
+                var btcYearlyChange = 0m;
+                var fiatYearlyChange = 0m;
+                if (monthlyTotals.TryGetValue(previousYearKey, out var previousYear))
+                {
+                    var previousYearSnapshot = FindLatestSnapshot(emissionDates[previousYearKey]);
+                    btcYearlyChange = FinancialCalculator.CalculateImprovementPercentage(
+                        previousYear.Bitcoin + (previousYearSnapshot?.TotalValueInSats ?? 0L) / SatoshisPerBitcoin,
+                        monthly.Value.Bitcoin + (currentSnapshot?.TotalValueInSats ?? 0L) / SatoshisPerBitcoin);
+                    fiatYearlyChange = FinancialCalculator.CalculateImprovementPercentage(
+                        previousYear.Fiat + (previousYearSnapshot?.TotalValueInMainCurrency ?? 0m),
+                        monthly.Value.Fiat + (currentSnapshot?.TotalValueInMainCurrency ?? 0m));
+                }
 
                 return new MonthlyTotalsData.Item
                 {
@@ -460,8 +477,8 @@ internal class MonthlyTotalsReport : IMonthlyTotalsReport
                     Expenses = monthly.Value.Expenses,
                     AllExpensesInFiat = monthly.Value.AllExpensesInFiat,
                     AllIncomeInFiat = monthly.Value.AllIncomeInFiat,
-                    AssetsTotalFiat = latestSnapshot?.TotalValueInMainCurrency ?? 0m,
-                    AssetsTotalSats = latestSnapshot?.TotalValueInSats ?? 0L
+                    AssetsTotalFiat = currentSnapshot?.TotalValueInMainCurrency ?? 0m,
+                    AssetsTotalSats = currentSnapshot?.TotalValueInSats ?? 0L
                 };
             }).ToList();
         }
