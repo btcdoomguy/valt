@@ -2783,6 +2783,9 @@
     <data name="Tips.Message.ReportsLongTerm" xml:space="preserve">
         <value>After using Valt for several months, the **Reports** tab will show more relevant insights, such as your **average expenses over the last 12 months** compared to the previous 12 months.</value>
     </data>
+    <data name="Tips.Message.ExcludeFromReports" xml:space="preserve">
+        <value>You can exclude some transactions from being considered in the reports and goals calculations (through the Transaction Editor). For example: if you purchase stocks, you can remove the value from the brokerage account in the Transaction tab creating a Debt and add the new stock as an Asset, and this debt can be excluded from the reports since it was used to acquire that asset.</value>
+    </data>
     <data name="FixedExpenseOverview.Title" xml:space="preserve">
         <value>Fixed Expenses Overview</value>
     </data>

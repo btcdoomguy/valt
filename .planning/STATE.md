@@ -1,20 +1,19 @@
 ---
 gsd_state_version: "1.0"
 milestone: v0.9
-current_phase: 53
+current_phase: 54
 status: completed
-stopped_at: Completed 53-06-PLAN.md (GAP-2 gap closure)
-last_updated: "2026-10-28T14:13:33.551Z"
-last_activity: 2026-10-27
-last_activity_desc: Phase 53 complete
-state_head: f2e81427f696ff603cd13e50a123042cbd0c9713
+stopped_at: Phase 54 complete — all phases complete
+last_updated: "2026-11-02T17:59:43.326Z"
+last_activity: 2026-11-02
+last_activity_desc: Phase 54 complete
+state_head: 2b46849f45c73274060812754be52f5a529f44f0
 progress:
   total_phases: 0
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
 milestone_name: Goal Transparency — Transaction Breakdown
-current_phase_name: Transaction Exclusion Flag for Reports & Goals
 ---
 
 # STATE.md
@@ -24,20 +23,20 @@ current_phase_name: Transaction Exclusion Flag for Reports & Goals
 See: .planning/PROJECT.md (updated 2026-08-06)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 53 — Transaction Exclusion Flag for Reports & Goals
+**Current focus:** Phase 54 — Documentation Site Sync — Features Since July 2026
 
 ## Current Position
 
-Phase: 53
+Phase: 54
 Plan: Not started
 Status: All phases complete
-Last activity: 2026-10-28 - Completed quick task 261028-fdt: Expand scope of "Excluded from goals and reports" transactions to the Fixed vs variable expenses chart, Sats earned & spent chart, Stack velocity chart and By categories panel breakdown
+Last activity: 2026-11-02 - Completed quick task 261102-ki6: Reports Monthly Totals % columns now asset-inclusive (Total Wealth basis), grid column audit done
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 28
+- Total plans completed: 34
 - Average duration: 18 min
 - Total execution time: 43 min
 
@@ -62,6 +61,7 @@ Last activity: 2026-10-28 - Completed quick task 261028-fdt: Expand scope of "Ex
 | 50 | 3 | - | - |
 | 51 | 5 | - | - |
 | 53 | 6 | - | - |
+| 54 | 6 | - | - |
 
 **Recent Trend:**
 
@@ -163,6 +163,12 @@ Last activity: 2026-10-28 - Completed quick task 261028-fdt: Expand scope of "Ex
 | Phase 53 P04 | 30 min | 4 tasks | 13 files |
 | Phase 53 P05 | 14 min | 3 tasks | 10 files |
 | Phase 53 P06 | 6 min | 3 tasks | 6 files |
+| Phase 54 P01 | 5min | 3 tasks | 2 files |
+| Phase 54 P02 | 4min | 3 tasks | 4 files |
+| Phase 54 P03 | 2min | 2 tasks | 2 files |
+| Phase 54 P04 | 6min | 3 tasks | 5 files |
+| Phase 54 P05 | 3min | 2 tasks | 2 files |
+| Phase 54 P06 | 5min | 2 tasks | 0 files |
 
 ## Accumulated Context
 
@@ -247,6 +253,16 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 53-05]: No backfill migration for legacy excl field — deserialization yields false and the null-safe engine predicate treats missing as non-excluded; every write path persists the field via the entity mapper (T-53-11 accepted)
 - [Phase ?]: [Phase 53-06]: GAP-2 fixed at the engine-predicate shape — LiteDB translates bool negation of IsExcluded to ($.excl = false), dropping pre-phase-53 documents lacking the excl field; both LiteDB-side report queries (FixedVsVariable, SpendingEvolution) now use x.IsExcluded != true, correct for missing/false/true document shapes
 - [Phase ?]: [Phase 53-06]: Toggle→invalidate chain re-proven end to end for report panels — flag-only repository Upsert publishes TransactionsDataChangedNotification, handler invalidates ReportDataProviderFactory, next CreateAsync reflects the toggle without app restart
+- [Phase 54]: [Phase 54-01]: Reports docs page synced to shipped v0.7 panels + v0.10 asset totals (pt/en); stale excludes-Assets claims and Statistics-gear sentence rewritten, centralized analytics filter documented
+- [Phase 54]: [Phase 54-01]: Overview area list (4→8) and Summary panel count (8→9) updated alongside new sections via Rule 2 to keep the page self-consistent
+- [Phase 54]: [Phase 54-02]: Transactions + Goals docs pages synced (pt/en) — exclusion flag (checkbox, balances-vs-reports scope, asterisk) and Goal summary modal (Ver resumo, reconciling running total, Patrimônio em BTC hidden) documented with verbatim resx labels
+- [Phase 54]: [Phase 54-02]: Corrected plan's Source-comment path (Transactions/Panels/GoalsPanelView.axaml does not exist; actual Transactions/GoalsPanelView.axaml) — code is spec
+- [Phase 54]: [Phase 54-03]: Assets docs page (pt/en) documents v0.10 daily wealth snapshots (one/day, same-day overwrite, skip-on-no-rates) with loan-state-snapshot disambiguation and the Monthly Totals/Wealth Overview cross-reference
+- [Phase 54]: [Phase 54-03]: Corrected plan's Source-comment path to actual src/Valt.Infra/Modules/Assets/Services/WealthSnapshotJob.cs and used verbatim 'Total de Ativos'/'Total Assets' top-bar label — code and resx are spec
+- [Phase 54]: [Phase 54-04]: Used verbatim resx label 'Calculadora de Conversão'/'Conversion Calculator' for the Tools-menu mention instead of the plan's shorthand 'Conversor' — code/resx is spec
+- [Phase 54]: [Phase 54-04]: BTC Loan Simulator docs page created bilingual (pt/en) with 3-point mkdocs.yml nav registration per D-02; placed after MCP Server in Features nav
+- [Phase 54]: [Phase 54-05]: Corrected plan/research MCP tool count (107) to actual verified 97 — wrote 'mais de 90 ferramentas'/'over 90 tools' because code is the spec and 'mais de 100' would be misinformation (T-54-10)
+- [Phase 54]: [Phase 54-06]: Phase QA gate green on first run — strict build, 6/6 parity, 36/36 presence anchors, zero stale claims, nav + D-01 verified; human visual + factual sign-off approved 2026-10-30 closing SC-1/SC-5 and Phase 54
 
 ### Pending Todos
 
@@ -286,6 +302,8 @@ None — 53-04 checkpoint issues resolved (fix commit acd12f7); plan complete, f
 | 261026-iqj | Fix transaction grid not persisting Date column descending sort order after app restart | 2026-10-26 | f63a9fb | [261026-iqj-fix-transaction-grid-not-persisting-date](./quick/261026-iqj-fix-transaction-grid-not-persisting-date/) |
 | 261027-s9v | Add an asterisk suffix to the amount of excluded transactions in the Transactions tab list (show "$ 123.00 *" instead of "$ 123.00" when IsExcluded is ON) for clearer visual feedback about the exclusion flag | 2026-10-27 | f97eb65 | [261027-s9v-add-an-asterisk-suffix-to-the-amount-of-](./quick/261027-s9v-add-an-asterisk-suffix-to-the-amount-of-/) |
 | 261028-fdt | Expand scope of "Excluded from goals and reports" transactions to the Fixed vs variable expenses chart, Sats earned & spent chart, Stack velocity chart and By categories panel breakdown | 2026-10-28 | f2e8142 | [261028-fdt-i-want-to-expand-the-scope-of-the-latest](./quick/261028-fdt-i-want-to-expand-the-scope-of-the-latest/) |
+| 261102-jwn | Reports Monthly Totals: confirm yearly % baseline is end-of-previous-calendar-year (confirmed fixed, not rolling); added regression tests, hardened null guard, documented baseline | 2026-11-02 | 4d258f9 | [261102-jwn-reports-monthly-totals-chart-the-percent](./quick/261102-jwn-reports-monthly-totals-chart-the-percent/) |
+| 261102-ki6 | Reports Monthly Totals: make all % columns asset-inclusive (Total Wealth basis), full grid column audit, tests + docs | 2026-11-02 | 2b46849 | [261102-ki6-reports-monthly-totals-change-the-previo](./quick/261102-ki6-reports-monthly-totals-change-the-previo/) |
 
 ## Deferred Items
 
@@ -309,8 +327,8 @@ _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-
 
 ## Session Continuity
 
-Last session: 2026-10-27T22:28:59.057Z
-Stopped at: Completed 53-06-PLAN.md (GAP-2 gap closure)
+Last session: 2026-10-30T18:03:49.400Z
+Stopped at: Phase 54 complete — all phases complete
 Resume file: None
 Resume file: None
 

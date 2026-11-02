@@ -16,13 +16,41 @@ public record MonthlyTotalsData
     {
         public required DateOnly MonthYear { get; init; }
         public required decimal BtcTotal { get; init; }
-        
+
+        /// <summary>
+        /// Asset-inclusive Total Wealth change vs. the previous month: (bitcoin balance +
+        /// latest wealth snapshot sats, converted to BTC) vs. the same wealth basis at the
+        /// previous month's end. A month with no qualifying snapshot contributes 0 assets
+        /// to its side; 0% when the previous month has no data.
+        /// </summary>
         public required decimal BtcMonthlyChange { get; init; }
+
+        /// <summary>
+        /// Asset-inclusive Total Wealth change vs. the end of the previous calendar year:
+        /// (bitcoin balance + latest wealth snapshot sats, converted to BTC) vs. the same
+        /// wealth basis at the prior year's December end. A month with no qualifying
+        /// snapshot contributes 0 assets to its side; 0% only when the previous calendar
+        /// year has no monthly data.
+        /// </summary>
         public required decimal BtcYearlyChange { get; init; }
 
         public required decimal FiatTotal { get; init; }
-        
+
+        /// <summary>
+        /// Asset-inclusive Total Wealth change vs. the previous month: (fiat balance +
+        /// latest wealth snapshot value in the main currency) vs. the same wealth basis at
+        /// the previous month's end. A month with no qualifying snapshot contributes 0
+        /// assets to its side; 0% when the previous month has no data.
+        /// </summary>
         public required decimal FiatMonthlyChange { get; init; }
+
+        /// <summary>
+        /// Asset-inclusive Total Wealth change vs. the end of the previous calendar year:
+        /// (fiat balance + latest wealth snapshot value in the main currency) vs. the same
+        /// wealth basis at the prior year's December end. A month with no qualifying
+        /// snapshot contributes 0 assets to its side; 0% only when the previous calendar
+        /// year has no monthly data.
+        /// </summary>
         public required decimal FiatYearlyChange { get; init; }
         
         public required decimal Income { get; init; }

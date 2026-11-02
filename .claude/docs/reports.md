@@ -46,6 +46,13 @@ Calculates monthly wealth totals and transaction flows.
 4. Converts to target currency using historical rates
 5. Builds items with percentage comparisons
 
+**Percentage-change baselines:**
+- All four percentage changes (fiat and BTC, monthly and yearly) are computed on the **asset-inclusive Total Wealth basis**: each side of a comparison is the month's fiat/bitcoin balance PLUS the latest wealth snapshot on or before that month's end — the same `FindLatestSnapshot` resolution the Assets column uses, so the % columns can never disagree with the adjacent Total Wealth column (`FiatTotal + AssetsTotalFiat`).
+- Monthly change compares each month against the previous month on that wealth basis; the previous month's snapshot adjusts the baseline side and the current month's snapshot the current side.
+- Yearly change compares each month against the position at the **end of the previous calendar year** (December of the prior year) on the same wealth basis — it is NOT a rolling same-month-last-year window.
+- A month with no qualifying snapshot (or a currency-mismatched one) contributes **0 assets to its side** — the same documented fallback as the Assets column. Notably, the yearly % is still computed (not forced to 0%) when only the prior-year baseline lacks a snapshot; yearly change is 0% **only** when the previous calendar year has no monthly data at all.
+- With no snapshots in the database, all change percentages reduce exactly to the fiat/bitcoin-balance-only values.
+
 #### ExpensesByCategoryReport
 
 **Interface:** `IExpensesByCategoryReport`

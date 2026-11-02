@@ -2789,6 +2789,9 @@
     <data name="Tips.Message.ReportsLongTerm" xml:space="preserve">
         <value>Después de usar Valt durante varios meses, la **pestaña de Informes** mostrará información más relevante, como tu **promedio de gastos de los últimos 12 meses** comparado con los 12 meses anteriores.</value>
     </data>
+    <data name="Tips.Message.ExcludeFromReports" xml:space="preserve">
+        <value>Puedes excluir determinadas transacciones para que no se tengan en cuenta en los informes ni en el cálculo de objetivos (a través del editor de transacciones). Por ejemplo: si compras acciones, puedes eliminar su valor de la cuenta de corretaje en la pestaña «Transacciones» —creando una deuda— y añadir las nuevas acciones como un activo; dicha deuda puede excluirse de los informes, dado que se utilizó para adquirir ese activo.</value>
+    </data>
     <data name="FixedExpenseOverview.Title" xml:space="preserve">
         <value>Resumen de Gastos Fijos</value>
     </data>

@@ -8,6 +8,7 @@
 - ⏸️ **v0.8 BTC Loan Simulator** — Phases 44-45 (paused 2026-10-26 — remaining phases removed, superseded by v0.10)
 - ✅ **v0.9 Goal Transparency — Transaction Breakdown** — Phases 49-51 (shipped 2026-10-07)
 - 🚧 **v0.10 Wealth Snapshots** — Phase 52 (in progress)
+- ✅ **v0.11 Documentation Site Sync** — Phase 54 (shipped 2026-10-30)
 
 ## Phases
 
@@ -60,6 +61,10 @@ Phases 46-48 (Cost-Over-Time Schedule, Prefill from Existing BTC Loan Asset, MCP
 
 - [ ] **Phase 52: Wealth Snapshots & Asset Totals in Monthly Reports** — Persist daily snapshots of Included-in-Wealth-Totals asset values and include asset totals in the Monthly Totals grid and chart using the latest snapshot available per period
 - [ ] **Phase 53: Transaction Exclusion Flag for Reports & Goals** — Per-transaction "excluded" flag (checkbox in Transaction Editor right panel) that removes the transaction from all Reports and Goals calculations
+
+### ✅ v0.11 Documentation Site Sync (Phase 54) — SHIPPED 2026-10-30
+
+- [x] **Phase 54: Documentation Site Sync — Features Since July 2026** — Update the `../valt-docs` MkDocs site (pt-BR + en-US) to cover every user-facing feature shipped since the v0.6 docs refresh (2026-07-17): v0.7 reports/metrics, v0.8 BTC Loan Simulator, v0.9 Goal Summary, v0.10 Wealth Snapshots & Transaction Exclusion — completed 2026-10-30
 
 ## Phase Details
 
@@ -374,8 +379,9 @@ Phases 46-48 (Cost-Over-Time Schedule, Prefill from Existing BTC Loan Asset, MCP
 | 50. Goal Summary Modal UI | v0.9 | 3/3 | Complete    | 2026-10-06 |
 | 51. MCP, Localization, Documentation & Verification | v0.9 | 5/5 | Complete    | 2026-10-07 |
 | 52. Wealth Snapshots & Asset Totals in Monthly Reports | v0.10 | 2/3 | In Progress|  |
+| 54. Documentation Site Sync — Features Since July 2026 | v0.11 | 6/6 | Complete | 2026-10-30 |
 
-**Total phases:** 21 (17 complete, 1 active, 3 removed/paused)  
+**Total phases:** 22 (18 complete, 1 active, 3 removed/paused)  
 **v0.8 plans:** 3/3 executed (phases 46-48 removed 2026-10-26)  
 **v0.8 requirements:** SIM-01..SIM-13 (SIM-10..SIM-13 dropped with phases 46-48)  
 **v0.9 plans:** 11/11 executed (roadmap defined 2026-10-06)  
@@ -406,5 +412,35 @@ Phases 46-48 (Cost-Over-Time Schedule, Prefill from Existing BTC Loan Asset, MCP
 
 - [x] 53-04-PLAN.md — UI checkbox + trilingual localization + MCP surface (excluded param + SetTransactionExcluded tool) + docs + full-suite gate + human visual sign-off
 
+### Phase 54: Documentation Site Sync — Features Since July 2026
+
+**Goal**: The `../valt-docs` MkDocs site (pt-BR default + en-US `.en.md` variants) documents every user-facing feature shipped since the v0.6 documentation refresh (last docs commit 2026-07-17), so the public documentation matches the application as of v0.10
+**Depends on**: Phase 52 (Wealth Snapshots backend already executed; 52-02 UI plan may land in parallel — document current behavior and note pending UI where applicable)
+**Requirements**: TBD
+**Success Criteria** (what must be TRUE):
+
+  1. A gap analysis lists every user-facing feature shipped since 2026-07-17 (v0.7 spending/BTC/wealth/loans reports, v0.8 BTC Loan Simulator, v0.9 Goal Summary modal, v0.10 wealth snapshots + asset totals in Monthly Totals + transaction exclusion flag) with each item marked as covered/missing in the current docs site
+  2. The Reports page (`funcionalidades/relatorios`) documents all SHIPPED v0.7 panels (burn rate, fixed vs variable, sats earned/spent, stack velocity, days under water, loans & leverage) and the v0.10 asset totals in the Monthly Totals grid/chart — in both pt-BR and en-US (locked decision: never-shipped metrics — savings-rate panel, net worth CAGR, fiat vs BTC allocation, best/worst months — are NOT documented)
+  3. The Transactions page documents the per-transaction "excluded" flag; the Goals page documents the "View summary" transaction breakdown modal; the Assets page documents DB persistence and inclusion in wealth/monthly totals — in both pt-BR and en-US
+  4. The BTC Loan Simulator is documented (new page or Tools section), and the MCP Server page lists the new tools (v0.7 report tools, goal contributing-transactions, SetTransactionExcluded, monthly-totals asset parity) — in both pt-BR and en-US
+  5. The site builds cleanly with `mkdocs build`, nav covers any new pages, and both language variants of every touched page are updated together (no pt/en drift)
+
+**Plans**: 6/6 plans executed
+
+**Wave 1**
+
+- [x] 54-01-PLAN.md — Tracer: Reports page rewrite pt+en (stale-claim fixes, centralized filter, all shipped v0.7 panels, v0.10 Monthly Totals asset totals) — SC-2
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [x] 54-02-PLAN.md — Transactions exclusion-flag section + Goals View-summary subsection, pt+en — SC-3
+- [x] 54-03-PLAN.md — Assets daily-wealth-snapshots subsection + Reports cross-reference, pt+en — SC-3
+- [x] 54-04-PLAN.md — New BTC Loan Simulator page pt+en + 3-point nav registration + Reports cross-links — SC-4
+- [x] 54-05-PLAN.md — MCP Server tool-catalog sync (7 new tools, excluded param, asset totals, count fix), pt+en — SC-4
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [x] 54-06-PLAN.md — QA gate: full-site automated battery (build/parity/presence/stale/nav/D-01) + human visual & factual sign-off — SC-1, SC-5
+
 ---
-*Last updated: 2026-10-26 — v0.8 paused (phases 46-48 removed), v0.10 Wealth Snapshots roadmap added (Phase 52)*
+*Last updated: 2026-10-30 — v0.11 Documentation Site Sync shipped (Phase 54 complete, verification passed 5/5)*

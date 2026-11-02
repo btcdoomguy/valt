@@ -518,7 +518,7 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Transactions.ViewAllAccounts", resourceCulture);
             }
         }
-
+        
         public static string Transactions_AddNew {
             get {
                 return ResourceManager.GetString("Transactions.AddNew", resourceCulture);
@@ -734,13 +734,7 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Transactions.MyOther", resourceCulture);
             }
         }
-
-        public static string Transactions_MyAssets {
-            get {
-                return ResourceManager.GetString("Transactions.MyAssets", resourceCulture);
-            }
-        }
-
+        
         public static string ManageTransactions_SelectToday {
             get {
                 return ResourceManager.GetString("ManageTransactions.SelectToday", resourceCulture);
@@ -1172,19 +1166,19 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("FixedExpenseEditor.Validation.InvalidRangePeriodStart", resourceCulture);
             }
         }
-
+        
         public static string FixedExpenseEditor_ChangePrice_Title {
             get {
                 return ResourceManager.GetString("FixedExpenseEditor.ChangePrice.Title", resourceCulture);
             }
         }
-
+        
         public static string FixedExpenseEditor_ChangePrice_Message {
             get {
                 return ResourceManager.GetString("FixedExpenseEditor.ChangePrice.Message", resourceCulture);
             }
         }
-
+        
         public static string FixedExpenseEditor_ChangeRecurrence {
             get {
                 return ResourceManager.GetString("FixedExpenseEditor.ChangeRecurrence", resourceCulture);
@@ -1694,13 +1688,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.Wealth.MyAssets", resourceCulture);
             }
         }
-
+        
         public static string Reports_Wealth_TotalInUsd {
             get {
                 return ResourceManager.GetString("Reports.Wealth.TotalInUsd", resourceCulture);
             }
         }
-
+        
         public static string Reports_Wealth_NetWorth {
             get {
                 return ResourceManager.GetString("Reports.Wealth.NetWorth", resourceCulture);
@@ -1742,25 +1736,25 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.BtcStack.PeopleWithSameStack.Tooltip", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcStack_MaxStack {
             get {
                 return ResourceManager.GetString("Reports.BtcStack.MaxStack", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcStack_MaxStackDate {
             get {
                 return ResourceManager.GetString("Reports.BtcStack.MaxStackDate", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcStack_DeclineFromMax {
             get {
                 return ResourceManager.GetString("Reports.BtcStack.DeclineFromMax", resourceCulture);
             }
         }
-
+        
         public static string Reports_LeveragePositions_Title {
             get {
                 return ResourceManager.GetString("Reports.LeveragePositions.Title", resourceCulture);
@@ -1802,52 +1796,46 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.LeveragePositions.PositionCount", resourceCulture);
             }
         }
-
+        
         public static string Reports_LeveragePositions_CurrentResult {
             get {
                 return ResourceManager.GetString("Reports.LeveragePositions.CurrentResult", resourceCulture);
             }
         }
-
+        
         public static string Reports_LeveragePositions_CurrentResultBtc {
             get {
                 return ResourceManager.GetString("Reports.LeveragePositions.CurrentResultBtc", resourceCulture);
             }
         }
-
+        
         public static string Reports_LeveragePositions_BtcPriceToHitAth {
             get {
                 return ResourceManager.GetString("Reports.LeveragePositions.BtcPriceToHitAth", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_Title {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.Title", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_ActiveLoans {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.ActiveLoans", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_TotalDebt {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.TotalDebt", resourceCulture);
             }
         }
-
-        public static string UpdateLoanState_TotalBorrowed {
-            get {
-                return ResourceManager.GetString("UpdateLoanState_TotalBorrowed", resourceCulture);
-            }
-        }
         
-        public static string UpdateLoanState_InterestAccruedUntilDate {
+        public static string Reports_BtcLoans_TotalDebtBtc {
             get {
-                return ResourceManager.GetString("UpdateLoanState_InterestAccruedUntilDate", resourceCulture);
+                return ResourceManager.GetString("Reports.BtcLoans.TotalDebtBtc", resourceCulture);
             }
         }
         
@@ -1857,156 +1845,138 @@ namespace Valt.UI.Lang {
             }
         }
         
-        public static string Validation_TotalBorrowedRequired {
-            get {
-                return ResourceManager.GetString("Validation_TotalBorrowedRequired", resourceCulture);
-            }
-        }
-        
-        public static string Validation_InterestAccruedUntilDateRequired {
-            get {
-                return ResourceManager.GetString("Validation_InterestAccruedUntilDateRequired", resourceCulture);
-            }
-        }
-        
-        public static string Reports_BtcLoans_TotalDebtBtc {
-            get {
-                return ResourceManager.GetString("Reports.BtcLoans.TotalDebtBtc", resourceCulture);
-            }
-        }
-
         public static string Reports_BtcLoans_AvgLtv {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.AvgLtv", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_AvgLtv_Tooltip {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.AvgLtv.Tooltip", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_AvgApr {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.AvgApr", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_AvgApr_Tooltip {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.AvgApr.Tooltip", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_CollateralSats {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.CollateralSats", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_CollateralFiat {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.CollateralFiat", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_CollateralPercent {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.CollateralPercent", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_CollateralPercent_Tooltip {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.CollateralPercent.Tooltip", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_FreeBtc {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.FreeBtc", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_HealthBreakdown {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.HealthBreakdown", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_HealthBreakdown_Format {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.HealthBreakdown.Format", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_HighestLtv {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.HighestLtv", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_ClosestDistance {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.ClosestDistance", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_ClosestDistance_Tooltip {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.ClosestDistance.Tooltip", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_WorstCaseLiquidationPrice {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.WorstCaseLiquidationPrice", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_WorstCaseLiquidationPrice_Tooltip {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.WorstCaseLiquidationPrice.Tooltip", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_AccruedInterest {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.AccruedInterest", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_FeesPaid {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.FeesPaid", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_AvgLoanAge {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.AvgLoanAge", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_NextRepayment {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.NextRepayment", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_NextRepayment_Tooltip {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.NextRepayment.Tooltip", resourceCulture);
             }
         }
-
+        
         public static string Reports_BtcLoans_DaysFormat {
             get {
                 return ResourceManager.GetString("Reports.BtcLoans.DaysFormat", resourceCulture);
             }
         }
-
+        
         public static string Reports_Statistics_Title {
             get {
                 return ResourceManager.GetString("Reports.Statistics.Title", resourceCulture);
@@ -2078,25 +2048,31 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.MonthlyTotals.Obs", resourceCulture);
             }
         }
-
+        
         public static string Reports_WealthOverview_IncludesAssets {
             get {
                 return ResourceManager.GetString("Reports.WealthOverview.IncludesAssets", resourceCulture);
             }
         }
-
+        
         public static string Reports_MonthlyTotals_AssetsColumn {
             get {
                 return ResourceManager.GetString("Reports.MonthlyTotals.AssetsColumn", resourceCulture);
             }
         }
-
+        
         public static string Reports_MonthlyTotals_IncludesAssets {
             get {
                 return ResourceManager.GetString("Reports.MonthlyTotals.IncludesAssets", resourceCulture);
             }
         }
-
+        
+        public static string Transactions_MyAssets {
+            get {
+                return ResourceManager.GetString("Transactions.MyAssets", resourceCulture);
+            }
+        }
+        
         public static string Reports_MonthlyTotals_Income {
             get {
                 return ResourceManager.GetString("Reports.MonthlyTotals.Income", resourceCulture);
@@ -2156,19 +2132,19 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.ByCategories.Title", resourceCulture);
             }
         }
-
+        
         public static string Reports_ByCategories_Filters {
             get {
                 return ResourceManager.GetString("Reports.ByCategories.Filters", resourceCulture);
             }
         }
-
+        
         public static string Reports_ByCategories_Expenses {
             get {
                 return ResourceManager.GetString("Reports.ByCategories.Expenses", resourceCulture);
             }
         }
-
+        
         public static string Reports_ByCategories_Income {
             get {
                 return ResourceManager.GetString("Reports.ByCategories.Income", resourceCulture);
@@ -2318,19 +2294,19 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Assets.Summary.TotalSats", resourceCulture);
             }
         }
-
+        
         public static string Assets_Summary_TotalAssetsValue {
             get {
                 return ResourceManager.GetString("Assets.Summary.TotalAssetsValue", resourceCulture);
             }
         }
-
+        
         public static string Assets_Summary_TotalLiabilities {
             get {
                 return ResourceManager.GetString("Assets.Summary.TotalLiabilities", resourceCulture);
             }
         }
-
+        
         public static string Assets_Details_Title {
             get {
                 return ResourceManager.GetString("Assets.Details.Title", resourceCulture);
@@ -2486,13 +2462,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("ManageAsset_IsLong", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_InputMode {
             get {
                 return ResourceManager.GetString("ManageAsset_InputMode", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_ExactPosition {
             get {
                 return ResourceManager.GetString("ManageAsset_ExactPosition", resourceCulture);
@@ -2618,19 +2594,19 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Assets.Type.Custom", resourceCulture);
             }
         }
-
+        
         public static string Assets_Type_BtcLoan {
             get {
                 return ResourceManager.GetString("Assets_Type_BtcLoan", resourceCulture);
             }
         }
-
+        
         public static string Assets_Type_BtcLending {
             get {
                 return ResourceManager.GetString("Assets_Type_BtcLending", resourceCulture);
             }
         }
-
+        
         public static string Assets_PriceSource_Manual {
             get {
                 return ResourceManager.GetString("Assets.PriceSource.Manual", resourceCulture);
@@ -2666,163 +2642,163 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("ManageAsset_CustomAsset", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_Section_BasicInfo {
             get {
                 return ResourceManager.GetString("ManageAsset_Section_BasicInfo", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_Section_AssetDetails {
             get {
                 return ResourceManager.GetString("ManageAsset_Section_AssetDetails", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_Section_Acquisition {
             get {
                 return ResourceManager.GetString("ManageAsset_Section_Acquisition", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_Section_Display {
             get {
                 return ResourceManager.GetString("ManageAsset_Section_Display", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_Section_BtcLoan {
             get {
                 return ResourceManager.GetString("ManageAsset_Section_BtcLoan", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_Section_BtcLending {
             get {
                 return ResourceManager.GetString("ManageAsset_Section_BtcLending", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_Platform {
             get {
                 return ResourceManager.GetString("ManageAsset_Platform", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_CollateralSats {
             get {
                 return ResourceManager.GetString("ManageAsset_CollateralSats", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_LoanAmount {
             get {
                 return ResourceManager.GetString("ManageAsset_LoanAmount", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_APR {
             get {
                 return ResourceManager.GetString("ManageAsset_APR", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_Fees {
             get {
                 return ResourceManager.GetString("ManageAsset_Fees", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_InitialLTV {
             get {
                 return ResourceManager.GetString("ManageAsset_InitialLTV", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_MarginCallLTV {
             get {
                 return ResourceManager.GetString("ManageAsset_MarginCallLTV", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_LiquidationLTV {
             get {
                 return ResourceManager.GetString("ManageAsset_LiquidationLTV", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_LoanStartDate {
             get {
                 return ResourceManager.GetString("ManageAsset_LoanStartDate", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_RepaymentDate {
             get {
                 return ResourceManager.GetString("ManageAsset_RepaymentDate", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_IndefinitePeriod {
             get {
                 return ResourceManager.GetString("ManageAsset_IndefinitePeriod", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_UseFixedTotalDebt {
             get {
                 return ResourceManager.GetString("ManageAsset_UseFixedTotalDebt", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_FixedTotalDebt {
             get {
                 return ResourceManager.GetString("ManageAsset_FixedTotalDebt", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_DerivedApr {
             get {
                 return ResourceManager.GetString("ManageAsset_DerivedApr", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_FixedTotalDebt_Help {
             get {
                 return ResourceManager.GetString("ManageAsset_FixedTotalDebt_Help", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_BorrowerPlatform {
             get {
                 return ResourceManager.GetString("ManageAsset_BorrowerPlatform", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_AmountLent {
             get {
                 return ResourceManager.GetString("ManageAsset_AmountLent", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_LendingAPR {
             get {
                 return ResourceManager.GetString("ManageAsset_LendingAPR", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_LendingStartDate {
             get {
                 return ResourceManager.GetString("ManageAsset_LendingStartDate", resourceCulture);
             }
         }
-
+        
         public static string ManageAsset_ExpectedRepaymentDate {
             get {
                 return ResourceManager.GetString("ManageAsset_ExpectedRepaymentDate", resourceCulture);
             }
         }
-
+        
         public static string Error_AssetNotFound {
             get {
                 return ResourceManager.GetString("Error.AssetNotFound", resourceCulture);
@@ -2870,25 +2846,25 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Reports.WealthOverview.Period.Yearly", resourceCulture);
             }
         }
-
+        
         public static string Reports_WealthOverview_Chart_TotalWealth {
             get {
                 return ResourceManager.GetString("Reports.WealthOverview.Chart.TotalWealth", resourceCulture);
             }
         }
-
+        
         public static string Reports_WealthOverview_Chart_Bitcoin {
             get {
                 return ResourceManager.GetString("Reports.WealthOverview.Chart.Bitcoin", resourceCulture);
             }
         }
-
+        
         public static string Reports_WealthOverview_Chart_Fiat {
             get {
                 return ResourceManager.GetString("Reports.WealthOverview.Chart.Fiat", resourceCulture);
             }
         }
-
+        
         public static string AvgPriceLineEditor_AddTitle {
             get {
                 return ResourceManager.GetString("AvgPriceLineEditor.AddTitle", resourceCulture);
@@ -2960,13 +2936,13 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("AvgPrice.ManageProfiles", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_ExportToCsv {
             get {
                 return ResourceManager.GetString("AvgPrice.ExportToCsv", resourceCulture);
             }
         }
-
+        
         public static string AvgPrice_AddOperation {
             get {
                 return ResourceManager.GetString("AvgPrice.AddOperation", resourceCulture);
@@ -3290,7 +3266,7 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("TransactionEditor.Help.ResetDate", resourceCulture);
             }
         }
-
+        
         public static string TransactionEditor_Help_Tip1 {
             get {
                 return ResourceManager.GetString("TransactionEditor.Help.Tip1", resourceCulture);
@@ -4328,73 +4304,73 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("GoalTarget_NoSales", resourceCulture);
             }
         }
-
+        
         public static string GoalType_SaveFiat {
             get {
                 return ResourceManager.GetString("GoalType_SaveFiat", resourceCulture);
             }
         }
-
+        
         public static string GoalType_SaveFiat_Description {
             get {
                 return ResourceManager.GetString("GoalType_SaveFiat_Description", resourceCulture);
             }
         }
-
+        
         public static string GoalDescription_SaveFiat {
             get {
                 return ResourceManager.GetString("GoalDescription_SaveFiat", resourceCulture);
             }
         }
-
+        
         public static string GoalType_SavingsRate {
             get {
                 return ResourceManager.GetString("GoalType_SavingsRate", resourceCulture);
             }
         }
-
+        
         public static string GoalType_SavingsRate_Description {
             get {
                 return ResourceManager.GetString("GoalType_SavingsRate_Description", resourceCulture);
             }
         }
-
+        
         public static string GoalDescription_SavingsRate {
             get {
                 return ResourceManager.GetString("GoalDescription_SavingsRate", resourceCulture);
             }
         }
-
+        
         public static string GoalType_NetWorthBtc {
             get {
                 return ResourceManager.GetString("GoalType_NetWorthBtc", resourceCulture);
             }
         }
-
+        
         public static string GoalType_NetWorthBtc_Description {
             get {
                 return ResourceManager.GetString("GoalType_NetWorthBtc_Description", resourceCulture);
             }
         }
-
+        
         public static string GoalDescription_NetWorthBtc {
             get {
                 return ResourceManager.GetString("GoalDescription_NetWorthBtc", resourceCulture);
             }
         }
-
+        
         public static string ManageGoal_TargetSavingsAmount {
             get {
                 return ResourceManager.GetString("ManageGoal_TargetSavingsAmount", resourceCulture);
             }
         }
-
+        
         public static string ManageGoal_TargetSavingsRate {
             get {
                 return ResourceManager.GetString("ManageGoal_TargetSavingsRate", resourceCulture);
             }
         }
-
+        
         public static string Settings_FontScale {
             get {
                 return ResourceManager.GetString("Settings_FontScale", resourceCulture);
@@ -4592,19 +4568,19 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Assets_Card_AtRisk", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_Collateral_Leveraged {
             get {
                 return ResourceManager.GetString("Assets_Card_Collateral_Leveraged", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_Position {
             get {
                 return ResourceManager.GetString("Assets_Card_Position", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_NetWorth {
             get {
                 return ResourceManager.GetString("Assets_Card_NetWorth", resourceCulture);
@@ -4628,157 +4604,157 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Assets_Card_PnL", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_Platform {
             get {
                 return ResourceManager.GetString("Assets_Card_Platform", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_Collateral {
             get {
                 return ResourceManager.GetString("Assets_Card_Collateral", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_LoanAmount {
             get {
                 return ResourceManager.GetString("Assets_Card_LoanAmount", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_LTV {
             get {
                 return ResourceManager.GetString("Assets_Card_LTV", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_BorrowerPlatform {
             get {
                 return ResourceManager.GetString("Assets_Card_BorrowerPlatform", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_AmountLent {
             get {
                 return ResourceManager.GetString("Assets_Card_AmountLent", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_EarnedInterest {
             get {
                 return ResourceManager.GetString("Assets_Card_EarnedInterest", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_DaysUntilRepayment {
             get {
                 return ResourceManager.GetString("Assets_Card_DaysUntilRepayment", resourceCulture);
             }
         }
-
+        
         public static string Assets_Platform {
             get {
                 return ResourceManager.GetString("Assets_Platform", resourceCulture);
             }
         }
-
+        
         public static string Assets_CollateralSats {
             get {
                 return ResourceManager.GetString("Assets_CollateralSats", resourceCulture);
             }
         }
-
+        
         public static string Assets_LoanAmount {
             get {
                 return ResourceManager.GetString("Assets_LoanAmount", resourceCulture);
             }
         }
-
+        
         public static string Assets_APR {
             get {
                 return ResourceManager.GetString("Assets_APR", resourceCulture);
             }
         }
-
+        
         public static string Assets_CurrentLTV {
             get {
                 return ResourceManager.GetString("Assets_CurrentLTV", resourceCulture);
             }
         }
-
+        
         public static string Assets_DistToLiqLTV {
             get {
                 return ResourceManager.GetString("Assets_DistToLiqLTV", resourceCulture);
             }
         }
-
+        
         public static string Assets_AccruedInterest {
             get {
                 return ResourceManager.GetString("Assets_AccruedInterest", resourceCulture);
             }
         }
-
+        
         public static string Assets_Fees {
             get {
                 return ResourceManager.GetString("Assets_Fees", resourceCulture);
             }
         }
-
+        
         public static string Assets_TotalDebt {
             get {
                 return ResourceManager.GetString("Assets_TotalDebt", resourceCulture);
             }
         }
-
+        
         public static string Assets_NetEquity {
             get {
                 return ResourceManager.GetString("Assets_NetEquity", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_TotalDebt {
             get {
                 return ResourceManager.GetString("Assets_Card_TotalDebt", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_AccruedInterest {
             get {
                 return ResourceManager.GetString("Assets_Card_AccruedInterest", resourceCulture);
             }
         }
-
+        
         public static string Assets_BorrowerPlatform {
             get {
                 return ResourceManager.GetString("Assets_BorrowerPlatform", resourceCulture);
             }
         }
-
+        
         public static string Assets_AmountLent {
             get {
                 return ResourceManager.GetString("Assets_AmountLent", resourceCulture);
             }
         }
-
+        
         public static string Assets_EarnedInterest {
             get {
                 return ResourceManager.GetString("Assets_EarnedInterest", resourceCulture);
             }
         }
-
+        
         public static string Assets_DaysUntilRepayment {
             get {
                 return ResourceManager.GetString("Assets_DaysUntilRepayment", resourceCulture);
             }
         }
-
+        
         public static string Assets_IndefinitePeriod {
             get {
                 return ResourceManager.GetString("Assets_IndefinitePeriod", resourceCulture);
             }
         }
-
+        
         public static string Assets_Sell {
             get {
                 return ResourceManager.GetString("Assets.Sell", resourceCulture);
@@ -4838,631 +4814,631 @@ namespace Valt.UI.Lang {
                 return ResourceManager.GetString("Assets.Sell.Notes.Basic", resourceCulture);
             }
         }
-
+        
         public static string Assets_RepayLoan {
             get {
                 return ResourceManager.GetString("Assets_RepayLoan", resourceCulture);
             }
         }
-
+        
         public static string Assets_RepayLoan_Alert {
             get {
                 return ResourceManager.GetString("Assets_RepayLoan_Alert", resourceCulture);
             }
         }
-
+        
         public static string Assets_RepayLoan_Message {
             get {
                 return ResourceManager.GetString("Assets_RepayLoan_Message", resourceCulture);
             }
         }
-
+        
         public static string Assets_Card_APR {
             get {
                 return ResourceManager.GetString("Assets_Card_APR", resourceCulture);
             }
         }
-
+        
         public static string Assets_Health_Healthy {
             get {
                 return ResourceManager.GetString("Assets_Health_Healthy", resourceCulture);
             }
         }
-
+        
         public static string Assets_Health_Warning {
             get {
                 return ResourceManager.GetString("Assets_Health_Warning", resourceCulture);
             }
         }
-
+        
         public static string Assets_Health_Danger {
             get {
                 return ResourceManager.GetString("Assets_Health_Danger", resourceCulture);
             }
         }
-
+        
         public static string Assets_Status_Active {
             get {
                 return ResourceManager.GetString("Assets_Status_Active", resourceCulture);
             }
         }
-
+        
         public static string Assets_Status_Repaid {
             get {
                 return ResourceManager.GetString("Assets_Status_Repaid", resourceCulture);
             }
         }
-
+        
         public static string Assets_RefreshPrices {
             get {
                 return ResourceManager.GetString("Assets.RefreshPrices", resourceCulture);
             }
         }
-
+        
         public static string Assets_Help_Title {
             get {
                 return ResourceManager.GetString("Assets.Help.Title", resourceCulture);
             }
         }
-
+        
         public static string Assets_Help_Description {
             get {
                 return ResourceManager.GetString("Assets.Help.Description", resourceCulture);
             }
         }
-
+        
         public static string Assets_Help_NetWorth {
             get {
                 return ResourceManager.GetString("Assets.Help.NetWorth", resourceCulture);
             }
         }
-
+        
         public static string Assets_Help_NetWorthDescription {
             get {
                 return ResourceManager.GetString("Assets.Help.NetWorthDescription", resourceCulture);
             }
         }
-
+        
         public static string Assets_Help_Selling {
             get {
                 return ResourceManager.GetString("Assets.Help.Selling", resourceCulture);
             }
         }
-
+        
         public static string Assets_Help_SellingDescription {
             get {
                 return ResourceManager.GetString("Assets.Help.SellingDescription", resourceCulture);
             }
         }
-
+        
         public static string Assets_ManageGroups {
             get {
                 return ResourceManager.GetString("Assets_ManageGroups", resourceCulture);
             }
         }
-
+        
         public static string Assets_EditGroup {
             get {
                 return ResourceManager.GetString("Assets_EditGroup", resourceCulture);
             }
         }
-
+        
         public static string Assets_DeleteGroup {
             get {
                 return ResourceManager.GetString("Assets_DeleteGroup", resourceCulture);
             }
         }
-
+        
         public static string Assets_DeleteGroupConfirmation {
             get {
                 return ResourceManager.GetString("Assets_DeleteGroupConfirmation", resourceCulture);
             }
         }
-
+        
         public static string Assets_MoveToGroup {
             get {
                 return ResourceManager.GetString("Assets_MoveToGroup", resourceCulture);
             }
         }
-
+        
         public static string Assets_RemoveFromGroup {
             get {
                 return ResourceManager.GetString("Assets_RemoveFromGroup", resourceCulture);
             }
         }
-
+        
         public static string ManageAssetGroup_Title {
             get {
                 return ResourceManager.GetString("ManageAssetGroup_Title", resourceCulture);
             }
         }
-
+        
         public static string ManageAssetGroup_Name {
             get {
                 return ResourceManager.GetString("ManageAssetGroup_Name", resourceCulture);
             }
         }
-
+        
         public static string ManageAssetGroup_Description {
             get {
                 return ResourceManager.GetString("ManageAssetGroup_Description", resourceCulture);
             }
         }
-
+        
         public static string Error_AssetGroupNotFound {
             get {
                 return ResourceManager.GetString("Error_AssetGroupNotFound", resourceCulture);
             }
         }
-
+        
         public static string ManageAssetGroupsList_Title {
             get {
                 return ResourceManager.GetString("ManageAssetGroupsList_Title", resourceCulture);
             }
         }
-
+        
         public static string Menu_LeverageSimulator {
             get {
                 return ResourceManager.GetString("Menu_LeverageSimulator", resourceCulture);
             }
         }
-
+        
         public static string Menu_BtcLoanSimulator {
             get {
                 return ResourceManager.GetString("Menu_BtcLoanSimulator", resourceCulture);
             }
         }
-
+        
         public static string LeverageSimulator_Title {
             get {
                 return ResourceManager.GetString("LeverageSimulator_Title", resourceCulture);
             }
         }
-
+        
         public static string LeverageSimulator_PositionType {
             get {
                 return ResourceManager.GetString("LeverageSimulator_PositionType", resourceCulture);
             }
         }
-
+        
         public static string LeverageSimulator_Long {
             get {
                 return ResourceManager.GetString("LeverageSimulator_Long", resourceCulture);
             }
         }
-
+        
         public static string LeverageSimulator_Short {
             get {
                 return ResourceManager.GetString("LeverageSimulator_Short", resourceCulture);
             }
         }
-
+        
         public static string LeverageSimulator_EntryPrice {
             get {
                 return ResourceManager.GetString("LeverageSimulator_EntryPrice", resourceCulture);
             }
         }
-
+        
         public static string LeverageSimulator_Collateral {
             get {
                 return ResourceManager.GetString("LeverageSimulator_Collateral", resourceCulture);
             }
         }
-
+        
         public static string LeverageSimulator_Leverage {
             get {
                 return ResourceManager.GetString("LeverageSimulator_Leverage", resourceCulture);
             }
         }
-
+        
         public static string LeverageSimulator_LiquidationPrice {
             get {
                 return ResourceManager.GetString("LeverageSimulator_LiquidationPrice", resourceCulture);
             }
         }
-
+        
         public static string LeverageSimulator_SimulatedPrice {
             get {
                 return ResourceManager.GetString("LeverageSimulator_SimulatedPrice", resourceCulture);
             }
         }
-
+        
         public static string LeverageSimulator_Results {
             get {
                 return ResourceManager.GetString("LeverageSimulator_Results", resourceCulture);
             }
         }
-
+        
         public static string LeverageSimulator_PositionValue {
             get {
                 return ResourceManager.GetString("LeverageSimulator_PositionValue", resourceCulture);
             }
         }
-
+        
         public static string LeverageSimulator_PnL {
             get {
                 return ResourceManager.GetString("LeverageSimulator_PnL", resourceCulture);
             }
         }
-
+        
         public static string LeverageSimulator_PnLPercentage {
             get {
                 return ResourceManager.GetString("LeverageSimulator_PnLPercentage", resourceCulture);
             }
         }
-
+        
         public static string LeverageSimulator_DistanceToLiquidation {
             get {
                 return ResourceManager.GetString("LeverageSimulator_DistanceToLiquidation", resourceCulture);
             }
         }
-
+        
         public static string LeverageSimulator_LoadPosition {
             get {
                 return ResourceManager.GetString("LeverageSimulator_LoadPosition", resourceCulture);
             }
         }
-
+        
         public static string LeverageSimulator_NewSimulation {
             get {
                 return ResourceManager.GetString("LeverageSimulator_NewSimulation", resourceCulture);
             }
         }
-
+        
         public static string LeverageSimulator_InSats {
             get {
                 return ResourceManager.GetString("LeverageSimulator_InSats", resourceCulture);
             }
         }
-
+        
         public static string LeverageSimulator_Currency {
             get {
                 return ResourceManager.GetString("LeverageSimulator_Currency", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_Title {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_Title", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_Currency {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_Currency", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_InterestMode {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_InterestMode", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_Simple {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_Simple", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_Compound {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_Compound", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_Collateral {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_Collateral", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_AmountTaken {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_AmountTaken", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_LiquidationLtv {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_LiquidationLtv", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_StartDate {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_StartDate", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_InterestRateApr {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_InterestRateApr", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_Fees {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_Fees", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_EndDate {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_EndDate", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_Results {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_Results", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_TotalToRepay {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_TotalToRepay", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_Principal {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_Principal", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_Interest {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_Interest", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_LiquidationBtcPrice {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_LiquidationBtcPrice", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_EffectiveApr {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_EffectiveApr", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_DistanceToLiquidation {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_DistanceToLiquidation", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_PriceUnavailable {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_PriceUnavailable", resourceCulture);
             }
         }
-
+        
         public static string BtcLoanSimulator_BtcPriceFormat {
             get {
                 return ResourceManager.GetString("BtcLoanSimulator_BtcPriceFormat", resourceCulture);
             }
         }
-
+        
         public static string Main_PriceHistory {
             get {
                 return ResourceManager.GetString("Main.PriceHistory", resourceCulture);
             }
         }
-
+        
         public static string PriceHistory_Title {
             get {
                 return ResourceManager.GetString("PriceHistory.Title", resourceCulture);
             }
         }
-
+        
         public static string PriceHistory_Column_Date {
             get {
                 return ResourceManager.GetString("PriceHistory.Column.Date", resourceCulture);
             }
         }
-
+        
         public static string PriceHistory_Column_Price {
             get {
                 return ResourceManager.GetString("PriceHistory.Column.Price", resourceCulture);
             }
         }
-
+        
         public static string PriceHistory_Column_Rate {
             get {
                 return ResourceManager.GetString("PriceHistory.Column.Rate", resourceCulture);
             }
         }
-
+        
         public static string PriceHistory_Previous {
             get {
                 return ResourceManager.GetString("PriceHistory.Previous", resourceCulture);
             }
         }
-
+        
         public static string PriceHistory_Next {
             get {
                 return ResourceManager.GetString("PriceHistory.Next", resourceCulture);
             }
         }
-
+        
         public static string PriceHistory_PageInfo {
             get {
                 return ResourceManager.GetString("PriceHistory.PageInfo", resourceCulture);
             }
         }
-
+        
         public static string PriceHistory_NoData {
             get {
                 return ResourceManager.GetString("PriceHistory.NoData", resourceCulture);
             }
         }
-
+        
         public static string PriceHistory_TotalRecords {
             get {
                 return ResourceManager.GetString("PriceHistory.TotalRecords", resourceCulture);
             }
         }
-
+        
         public static string Reports_CategoryFilter_SaveAsDefault {
             get {
                 return ResourceManager.GetString("Reports.CategoryFilter.SaveAsDefault", resourceCulture);
             }
         }
-
+        
         public static string Reports_CategoryFilter_LoadDefault {
             get {
                 return ResourceManager.GetString("Reports.CategoryFilter.LoadDefault", resourceCulture);
             }
         }
-
+        
         public static string Reports_CategoryFilter_SaveConfirmTitle {
             get {
                 return ResourceManager.GetString("Reports.CategoryFilter.SaveConfirmTitle", resourceCulture);
             }
         }
-
+        
         public static string Reports_CategoryFilter_SaveConfirmMessage {
             get {
                 return ResourceManager.GetString("Reports.CategoryFilter.SaveConfirmMessage", resourceCulture);
             }
         }
-
+        
         public static string Reports_CategoryFilter_SaveSuccess {
             get {
                 return ResourceManager.GetString("Reports.CategoryFilter.SaveSuccess", resourceCulture);
             }
         }
-
+        
         public static string Reports_SimulatedPrices_Title {
             get {
                 return ResourceManager.GetString("Reports.SimulatedPrices.Title", resourceCulture);
             }
         }
-
+        
         public static string Reports_SimulatedPrices_Fixed {
             get {
                 return ResourceManager.GetString("Reports.SimulatedPrices.Fixed", resourceCulture);
             }
         }
-
+        
         public static string SimulatedPrices_Config_Title {
             get {
                 return ResourceManager.GetString("SimulatedPrices.Config.Title", resourceCulture);
             }
         }
-
+        
         public static string SimulatedPrices_Config_Description {
             get {
                 return ResourceManager.GetString("SimulatedPrices.Config.Description", resourceCulture);
             }
         }
-
+        
         public static string SimulatedPrices_Config_Type_Percentage {
             get {
                 return ResourceManager.GetString("SimulatedPrices.Config.Type.Percentage", resourceCulture);
             }
         }
-
+        
         public static string SimulatedPrices_Config_Type_Fixed {
             get {
                 return ResourceManager.GetString("SimulatedPrices.Config.Type.Fixed", resourceCulture);
             }
         }
-
+        
         public static string SimulatedPrices_Config_Value {
             get {
                 return ResourceManager.GetString("SimulatedPrices.Config.Value", resourceCulture);
             }
         }
-
+        
         public static string SimulatedPrices_Config_AddLine {
             get {
                 return ResourceManager.GetString("SimulatedPrices.Config.AddLine", resourceCulture);
             }
         }
-
+        
         public static string SimulatedPrices_Config_MaxLines {
             get {
                 return ResourceManager.GetString("SimulatedPrices.Config.MaxLines", resourceCulture);
             }
         }
-
+        
         public static string SimulatedPrices_Config_MinPercentage {
             get {
                 return ResourceManager.GetString("SimulatedPrices.Config.MinPercentage", resourceCulture);
             }
         }
-
+        
         public static string Reports_Indicators_Title {
             get {
                 return ResourceManager.GetString("Reports.Indicators.Title", resourceCulture);
             }
         }
-
+        
         public static string Reports_Indicators_MayerMultiple {
             get {
                 return ResourceManager.GetString("Reports.Indicators.MayerMultiple", resourceCulture);
             }
         }
-
+        
         public static string Reports_Indicators_RainbowChart {
             get {
                 return ResourceManager.GetString("Reports.Indicators.RainbowChart", resourceCulture);
             }
         }
-
+        
         public static string Reports_Indicators_FearAndGreed {
             get {
                 return ResourceManager.GetString("Reports.Indicators.FearAndGreed", resourceCulture);
             }
         }
-
+        
         public static string Reports_Indicators_BtcDominance {
             get {
                 return ResourceManager.GetString("Reports.Indicators.BtcDominance", resourceCulture);
             }
         }
-
+        
         public static string Reports_Indicators_StaleTooltip {
             get {
                 return ResourceManager.GetString("Reports.Indicators.StaleTooltip", resourceCulture);
             }
         }
-
+        
         public static string Main_Menu_ShowTips {
             get {
                 return ResourceManager.GetString("Main_Menu_ShowTips", resourceCulture);
             }
         }
-
+        
         public static string Tips_Title {
             get {
                 return ResourceManager.GetString("Tips.Title", resourceCulture);
             }
         }
-
+        
         public static string Tips_DontShowOnStartup {
             get {
                 return ResourceManager.GetString("Tips.DontShowOnStartup", resourceCulture);
             }
         }
-
+        
         public static string Tips_Counter {
             get {
                 return ResourceManager.GetString("Tips.Counter", resourceCulture);
             }
         }
-
+        
         public static string Tips_PreviousButton {
             get {
                 return ResourceManager.GetString("Tips.PreviousButton", resourceCulture);
             }
         }
-
+        
         public static string Tips_NextButton {
             get {
                 return ResourceManager.GetString("Tips.NextButton", resourceCulture);
@@ -5547,174 +5523,180 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string Tips_Message_ExcludeFromReports {
+            get {
+                return ResourceManager.GetString("Tips.Message.ExcludeFromReports", resourceCulture);
+            }
+        }
+        
         public static string FixedExpenseOverview_Title {
             get {
                 return ResourceManager.GetString("FixedExpenseOverview.Title", resourceCulture);
             }
         }
-
+        
         public static string FixedExpenseOverview_PaidTotal {
             get {
                 return ResourceManager.GetString("FixedExpenseOverview.PaidTotal", resourceCulture);
             }
         }
-
+        
         public static string FixedExpenseOverview_FutureExpensesTotal {
             get {
                 return ResourceManager.GetString("FixedExpenseOverview.FutureExpensesTotal", resourceCulture);
             }
         }
-
+        
         public static string FixedExpenseOverview_Column_Name {
             get {
                 return ResourceManager.GetString("FixedExpenseOverview.Column.Name", resourceCulture);
             }
         }
-
+        
         public static string FixedExpenseOverview_Column_Status {
             get {
                 return ResourceManager.GetString("FixedExpenseOverview.Column.Status", resourceCulture);
             }
         }
-
+        
         public static string FixedExpenseOverview_Column_Expected {
             get {
                 return ResourceManager.GetString("FixedExpenseOverview.Column.Expected", resourceCulture);
             }
         }
-
+        
         public static string FixedExpenseOverview_Column_Actual {
             get {
                 return ResourceManager.GetString("FixedExpenseOverview.Column.Actual", resourceCulture);
             }
         }
-
+        
         public static string FixedExpenseOverview_Status_Paid {
             get {
                 return ResourceManager.GetString("FixedExpenseOverview.Status.Paid", resourceCulture);
             }
         }
-
+        
         public static string FixedExpenseOverview_Status_Ignored {
             get {
                 return ResourceManager.GetString("FixedExpenseOverview.Status.Ignored", resourceCulture);
             }
         }
-
+        
         public static string FixedExpenseOverview_Status_ManuallyPaid {
             get {
                 return ResourceManager.GetString("FixedExpenseOverview.Status.ManuallyPaid", resourceCulture);
             }
         }
-
+        
         public static string FixedExpenseOverview_Status_Pending {
             get {
                 return ResourceManager.GetString("FixedExpenseOverview.Status.Pending", resourceCulture);
             }
         }
-
+        
         public static string FixedExpenseOverview_NoExpenses {
             get {
                 return ResourceManager.GetString("FixedExpenseOverview.NoExpenses", resourceCulture);
             }
         }
-
+        
         public static string SpendingEvolution_Title {
             get {
                 return ResourceManager.GetString("SpendingEvolution.Title", resourceCulture);
             }
         }
-
+        
         public static string SpendingEvolution_Menu {
             get {
                 return ResourceManager.GetString("SpendingEvolution.Menu", resourceCulture);
             }
         }
-
+        
         public static string SpendingEvolution_ContextMenu {
             get {
                 return ResourceManager.GetString("SpendingEvolution.ContextMenu", resourceCulture);
             }
         }
-
+        
         public static string SpendingEvolution_Categories {
             get {
                 return ResourceManager.GetString("SpendingEvolution.Categories", resourceCulture);
             }
         }
-
+        
         public static string SpendingEvolution_TimeRange {
             get {
                 return ResourceManager.GetString("SpendingEvolution.TimeRange", resourceCulture);
             }
         }
-
+        
         public static string SpendingEvolution_Months {
             get {
                 return ResourceManager.GetString("SpendingEvolution.Months", resourceCulture);
             }
         }
-
+        
         public static string SpendingEvolution_CostOfLiving_Fiat {
             get {
                 return ResourceManager.GetString("SpendingEvolution.CostOfLiving.Fiat", resourceCulture);
             }
         }
-
+        
         public static string SpendingEvolution_CostOfLiving_Btc {
             get {
                 return ResourceManager.GetString("SpendingEvolution.CostOfLiving.Btc", resourceCulture);
             }
         }
-
+        
         public static string SpendingEvolution_Warning_MissingPriceData {
             get {
                 return ResourceManager.GetString("SpendingEvolution.Warning.MissingPriceData", resourceCulture);
             }
         }
-
+        
         public static string SpendingEvolution_NA {
             get {
                 return ResourceManager.GetString("SpendingEvolution.NA", resourceCulture);
             }
         }
-
+        
         public static string SpendingEvolution_Filters {
             get {
                 return ResourceManager.GetString("SpendingEvolution.Filters", resourceCulture);
             }
         }
-
+        
         public static string SpendingEvolution_Accounts {
             get {
                 return ResourceManager.GetString("SpendingEvolution.Accounts", resourceCulture);
             }
         }
-
+        
         public static string SpendingEvolution_SaveAsDefault {
             get {
                 return ResourceManager.GetString("SpendingEvolution.SaveAsDefault", resourceCulture);
             }
         }
-
+        
         public static string SpendingEvolution_LoadDefault {
             get {
                 return ResourceManager.GetString("SpendingEvolution.LoadDefault", resourceCulture);
             }
         }
-
+        
         public static string SpendingEvolution_SaveConfirmTitle {
             get {
                 return ResourceManager.GetString("SpendingEvolution.SaveConfirmTitle", resourceCulture);
             }
         }
-
+        
         public static string SpendingEvolution_SaveConfirmMessage {
             get {
                 return ResourceManager.GetString("SpendingEvolution.SaveConfirmMessage", resourceCulture);
             }
         }
-
+        
         public static string SpendingEvolution_SaveSuccess {
             get {
                 return ResourceManager.GetString("SpendingEvolution.SaveSuccess", resourceCulture);
@@ -5838,6 +5820,18 @@ namespace Valt.UI.Lang {
         public static string UpdateLoanState_CurrentTotalDebt {
             get {
                 return ResourceManager.GetString("UpdateLoanState_CurrentTotalDebt", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_TotalBorrowed {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_TotalBorrowed", resourceCulture);
+            }
+        }
+        
+        public static string UpdateLoanState_InterestAccruedUntilDate {
+            get {
+                return ResourceManager.GetString("UpdateLoanState_InterestAccruedUntilDate", resourceCulture);
             }
         }
         
@@ -6051,6 +6045,18 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string Validation_TotalBorrowedRequired {
+            get {
+                return ResourceManager.GetString("Validation_TotalBorrowedRequired", resourceCulture);
+            }
+        }
+        
+        public static string Validation_InterestAccruedUntilDateRequired {
+            get {
+                return ResourceManager.GetString("Validation_InterestAccruedUntilDateRequired", resourceCulture);
+            }
+        }
+        
         public static string Validation_CollateralRequired {
             get {
                 return ResourceManager.GetString("Validation_CollateralRequired", resourceCulture);
@@ -6171,30 +6177,6 @@ namespace Valt.UI.Lang {
             }
         }
         
-        public static string Reports_CategoryFilter_Config_Title {
-            get {
-                return ResourceManager.GetString("Reports_CategoryFilter_Config_Title", resourceCulture);
-            }
-        }
-        
-        public static string Reports_CategoryFilter_Config_Description {
-            get {
-                return ResourceManager.GetString("Reports_CategoryFilter_Config_Description", resourceCulture);
-            }
-        }
-        
-        public static string Reports_CategoryFilter_Config_ExcludedCategories {
-            get {
-                return ResourceManager.GetString("Reports_CategoryFilter_Config_ExcludedCategories", resourceCulture);
-            }
-        }
-        
-        public static string Reports_CategoryFilter_Tooltip {
-            get {
-                return ResourceManager.GetString("Reports_CategoryFilter_Tooltip", resourceCulture);
-            }
-        }
-        
         public static string Reports_BtcMetrics_Earned {
             get {
                 return ResourceManager.GetString("Reports_BtcMetrics_Earned", resourceCulture);
@@ -6258,6 +6240,30 @@ namespace Valt.UI.Lang {
         public static string Reports_StackVelocity_EmptyBody {
             get {
                 return ResourceManager.GetString("Reports_StackVelocity_EmptyBody", resourceCulture);
+            }
+        }
+        
+        public static string Reports_CategoryFilter_Config_Title {
+            get {
+                return ResourceManager.GetString("Reports_CategoryFilter_Config_Title", resourceCulture);
+            }
+        }
+        
+        public static string Reports_CategoryFilter_Config_Description {
+            get {
+                return ResourceManager.GetString("Reports_CategoryFilter_Config_Description", resourceCulture);
+            }
+        }
+        
+        public static string Reports_CategoryFilter_Config_ExcludedCategories {
+            get {
+                return ResourceManager.GetString("Reports_CategoryFilter_Config_ExcludedCategories", resourceCulture);
+            }
+        }
+        
+        public static string Reports_CategoryFilter_Tooltip {
+            get {
+                return ResourceManager.GetString("Reports_CategoryFilter_Tooltip", resourceCulture);
             }
         }
         
