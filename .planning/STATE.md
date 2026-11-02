@@ -4,10 +4,10 @@ milestone: v0.9
 current_phase: 54
 status: completed
 stopped_at: Phase 54 complete — all phases complete
-last_updated: "2026-11-02T17:41:56.540Z"
-last_activity: 2026-10-30
+last_updated: "2026-11-02T17:59:43.326Z"
+last_activity: 2026-11-02
 last_activity_desc: Phase 54 complete
-state_head: 4d258f9dc8039115a3f44b7799641c3bbd1b502d
+state_head: 2b46849f45c73274060812754be52f5a529f44f0
 progress:
   total_phases: 0
   completed_phases: 0
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-08-06)
 Phase: 54
 Plan: Not started
 Status: All phases complete
-Last activity: 2026-11-02 - Completed quick task 261102-jwn: Reports Monthly Totals yearly % baseline confirmed as end-of-previous-calendar-year (regression tests added)
+Last activity: 2026-11-02 - Completed quick task 261102-ki6: Reports Monthly Totals % columns now asset-inclusive (Total Wealth basis), grid column audit done
 
 ## Performance Metrics
 
@@ -303,6 +303,7 @@ None — 53-04 checkpoint issues resolved (fix commit acd12f7); plan complete, f
 | 261027-s9v | Add an asterisk suffix to the amount of excluded transactions in the Transactions tab list (show "$ 123.00 *" instead of "$ 123.00" when IsExcluded is ON) for clearer visual feedback about the exclusion flag | 2026-10-27 | f97eb65 | [261027-s9v-add-an-asterisk-suffix-to-the-amount-of-](./quick/261027-s9v-add-an-asterisk-suffix-to-the-amount-of-/) |
 | 261028-fdt | Expand scope of "Excluded from goals and reports" transactions to the Fixed vs variable expenses chart, Sats earned & spent chart, Stack velocity chart and By categories panel breakdown | 2026-10-28 | f2e8142 | [261028-fdt-i-want-to-expand-the-scope-of-the-latest](./quick/261028-fdt-i-want-to-expand-the-scope-of-the-latest/) |
 | 261102-jwn | Reports Monthly Totals: confirm yearly % baseline is end-of-previous-calendar-year (confirmed fixed, not rolling); added regression tests, hardened null guard, documented baseline | 2026-11-02 | 4d258f9 | [261102-jwn-reports-monthly-totals-chart-the-percent](./quick/261102-jwn-reports-monthly-totals-chart-the-percent/) |
+| 261102-ki6 | Reports Monthly Totals: make all % columns asset-inclusive (Total Wealth basis), full grid column audit, tests + docs | 2026-11-02 | 2b46849 | [261102-ki6-reports-monthly-totals-change-the-previo](./quick/261102-ki6-reports-monthly-totals-change-the-previo/) |
 
 ## Deferred Items
 

@@ -2789,6 +2789,9 @@
     <data name="Tips.Message.ReportsLongTerm" xml:space="preserve">
         <value>Ao utilizar o Valt por vários meses, a **aba de relatórios** vai mostrar informações mais relevantes, como a sua **média de despesas dos últimos 12 meses** e comparar com os outros 12 meses anteriores.</value>
     </data>
+    <data name="Tips.Message.ExcludeFromReports" xml:space="preserve">
+        <value>Você pode excluir determinadas transações para que não sejam consideradas nos relatórios e nos cálculos de metas (através do editor de transações). Por exemplo: ao comprar ações, você pode registrar a saída do valor da conta da corretora na aba "Transações" criando um débito, e adicionar a nova ação como um Ativo; esse débito pode, então, ser excluído dos relatórios, uma vez que foi utilizada para a aquisição do referido ativo.</value>
+    </data>
     <data name="FixedExpenseOverview.Title" xml:space="preserve">
         <value>Visão Geral de Despesas Fixas</value>
     </data>
