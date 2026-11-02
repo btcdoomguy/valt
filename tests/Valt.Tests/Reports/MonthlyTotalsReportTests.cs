@@ -213,6 +213,85 @@ public class MonthlyTotalsReportTests : DatabaseTest
         Assert.That(result2025.Items[11].Expenses, Is.EqualTo(-415m));
     }
 
+    /// <summary>
+    /// Pins the yearly-change baseline semantics: every displayed month's "Previous Year"
+    /// percentage is computed against the position at the END OF THE PREVIOUS CALENDAR YEAR
+    /// (December of the prior year), not against the same month one year earlier.
+    /// The guard assertion on June 2025 fails if the baseline is ever switched to a
+    /// rolling same-month-last-year comparison.
+    /// </summary>
+    [Test]
+    public async Task YearlyChange_Uses_End_Of_Previous_Calendar_Year_As_Baseline()
+    {
+        var baseDate = new DateOnly(2025, 12, 31);
+        var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var report = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
+
+        var result2024 = await report.GetAsync(baseDate, new DateOnlyRange(new DateOnly(2024, 01, 01), new DateOnly(2024, 12, 31)),
+            FiatCurrency.Brl, provider);
+        var result2025 = await report.GetAsync(baseDate, new DateOnlyRange(new DateOnly(2025, 01, 01), new DateOnly(2025, 12, 31)),
+            FiatCurrency.Brl, provider);
+
+        var dec2024Item = result2024.Items.Single(x => x.MonthYear == new DateOnly(2024, 12, 1));
+
+        Assert.That(result2025.Items, Has.Count.EqualTo(12));
+
+        foreach (var item in result2025.Items)
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(item.BtcYearlyChange,
+                    Is.EqualTo(FinancialCalculator.CalculateImprovementPercentage(dec2024Item.BtcTotal, item.BtcTotal)),
+                    $"BtcYearlyChange for {item.MonthYear:yyyy-MM} must use Dec-2024 (end of previous calendar year) as baseline");
+                Assert.That(item.FiatYearlyChange,
+                    Is.EqualTo(FinancialCalculator.CalculateImprovementPercentage(dec2024Item.FiatTotal, item.FiatTotal)),
+                    $"FiatYearlyChange for {item.MonthYear:yyyy-MM} must use Dec-2024 (end of previous calendar year) as baseline");
+            });
+        }
+
+        // Guard: with the daily-accumulating seed, June-2024 and Dec-2024 totals differ, so a
+        // rolling same-month-last-year baseline would produce a different percentage for June 2025.
+        var june2024Item = result2024.Items.Single(x => x.MonthYear == new DateOnly(2024, 6, 1));
+        var june2025Item = result2025.Items.Single(x => x.MonthYear == new DateOnly(2025, 6, 1));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(june2024Item.BtcTotal, Is.Not.EqualTo(dec2024Item.BtcTotal),
+                "Seed sanity: June-2024 and Dec-2024 BTC totals must differ for the guard to discriminate");
+            Assert.That(june2025Item.BtcYearlyChange,
+                Is.Not.EqualTo(FinancialCalculator.CalculateImprovementPercentage(june2024Item.BtcTotal, june2025Item.BtcTotal)),
+                "BtcYearlyChange must NOT equal a rolling same-month-last-year (June-2024) comparison");
+            Assert.That(june2025Item.FiatYearlyChange,
+                Is.Not.EqualTo(FinancialCalculator.CalculateImprovementPercentage(june2024Item.FiatTotal, june2025Item.FiatTotal)),
+                "FiatYearlyChange must NOT equal a rolling same-month-last-year (June-2024) comparison");
+        });
+    }
+
+    /// <summary>
+    /// The seed starts at 2024-01-01, so Dec-2023 never exists: every month of 2024 has no
+    /// previous-calendar-year data and must report 0% yearly change (generalizes the Jan/Dec
+    /// spot-checks in Should_Calculate_MonthlyTotals).
+    /// </summary>
+    [Test]
+    public async Task YearlyChange_Is_Zero_When_Previous_Calendar_Year_Has_No_Data()
+    {
+        var result2024 = await BuildBrlReportFor2024();
+
+        Assert.That(result2024.Items, Has.Count.EqualTo(12));
+
+        foreach (var item in result2024.Items)
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(item.BtcYearlyChange, Is.Zero,
+                    $"BtcYearlyChange for {item.MonthYear:yyyy-MM} must be 0% when the previous calendar year has no data");
+                Assert.That(item.FiatYearlyChange, Is.Zero,
+                    $"FiatYearlyChange for {item.MonthYear:yyyy-MM} must be 0% when the previous calendar year has no data");
+            });
+        }
+    }
+
     [Test]
     public async Task October_Item_Should_Carry_Latest_Snapshot_On_Or_Before_Month_End()
     {
