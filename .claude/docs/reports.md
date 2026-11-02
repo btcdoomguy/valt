@@ -46,6 +46,12 @@ Calculates monthly wealth totals and transaction flows.
 4. Converts to target currency using historical rates
 5. Builds items with percentage comparisons
 
+**Percentage-change baselines:**
+- Monthly change compares each month against the previous month.
+- Yearly change compares each month against the position at the **end of the previous calendar year** (December 31 of the prior year) as a fixed baseline — it is NOT a rolling same-month-last-year window.
+- Months whose previous calendar year has no data report 0% yearly change.
+- The fiat yearly-change percentage is computed on fiat-denominated balances only — it does not fold in asset snapshot values, unlike the Total Wealth column (`FiatTotal + AssetsTotalFiat`).
+
 #### ExpensesByCategoryReport
 
 **Interface:** `IExpensesByCategoryReport`

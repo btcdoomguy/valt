@@ -68,7 +68,7 @@ public class MonthlyReportItemViewModel : ObservableObject
 
     public decimal? BtcYearlyChange { get; init; }
 
-    public string BtcYearlyChangeFormatted => BtcMonthlyChange is not null
+    public string BtcYearlyChangeFormatted => BtcYearlyChange is not null
         ? BtcYearlyChange >= 0 ? $"+{BtcYearlyChange}%" : $"{BtcYearlyChange}%"
         : string.Empty;
 
