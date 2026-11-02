@@ -217,12 +217,22 @@ public class MonthlyTotalsReportTests : DatabaseTest
     /// Pins the yearly-change baseline semantics: every displayed month's "Previous Year"
     /// percentage is computed against the position at the END OF THE PREVIOUS CALENDAR YEAR
     /// (December of the prior year), not against the same month one year earlier.
-    /// The guard assertion on June 2025 fails if the baseline is ever switched to a
-    /// rolling same-month-last-year comparison.
+    /// The change percentages are asset-inclusive (Total Wealth basis): each side of the
+    /// comparison folds in the latest wealth snapshot on or before that month's end — a
+    /// missing snapshot contributes 0 assets to that side (the Assets column's own fallback).
+    /// The guard assertions on June 2025 fail if the baseline is ever switched to a
+    /// rolling same-month-last-year comparison or back to fiat/btc-only balances.
     /// </summary>
     [Test]
     public async Task YearlyChange_Uses_End_Of_Previous_Calendar_Year_As_Baseline()
     {
+        // Dec-2024 baseline snapshot (end of previous calendar year) + a mid-2025 snapshot.
+        var baselineSnapshot = (Day: new DateOnly(2024, 12, 15), Fiat: 100000m, Sats: 200000000L);
+        var mid2025Snapshot = (Day: new DateOnly(2025, 3, 15), Fiat: 150000m, Sats: 300000000L);
+        var snapshots = new[] { baselineSnapshot, mid2025Snapshot };
+        SeedSnapshot(baselineSnapshot.Day, baselineSnapshot.Fiat, baselineSnapshot.Sats, FiatCurrency.Brl.Code);
+        SeedSnapshot(mid2025Snapshot.Day, mid2025Snapshot.Fiat, mid2025Snapshot.Sats, FiatCurrency.Brl.Code);
+
         var baseDate = new DateOnly(2025, 12, 31);
         var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
         var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
@@ -239,14 +249,20 @@ public class MonthlyTotalsReportTests : DatabaseTest
 
         foreach (var item in result2025.Items)
         {
+            var snapshotFiat = SnapshotFiatForMonth(item.MonthYear, snapshots);
+            var snapshotBtc = SnapshotSatsForMonth(item.MonthYear, snapshots) / SatoshisPerBitcoin;
             Assert.Multiple(() =>
             {
                 Assert.That(item.BtcYearlyChange,
-                    Is.EqualTo(FinancialCalculator.CalculateImprovementPercentage(dec2024Item.BtcTotal, item.BtcTotal)),
-                    $"BtcYearlyChange for {item.MonthYear:yyyy-MM} must use Dec-2024 (end of previous calendar year) as baseline");
+                    Is.EqualTo(FinancialCalculator.CalculateImprovementPercentage(
+                        dec2024Item.BtcTotal + baselineSnapshot.Sats / SatoshisPerBitcoin,
+                        item.BtcTotal + snapshotBtc)),
+                    $"BtcYearlyChange for {item.MonthYear:yyyy-MM} must use Dec-2024 (end of previous calendar year) Total Wealth incl. snapshots as baseline");
                 Assert.That(item.FiatYearlyChange,
-                    Is.EqualTo(FinancialCalculator.CalculateImprovementPercentage(dec2024Item.FiatTotal, item.FiatTotal)),
-                    $"FiatYearlyChange for {item.MonthYear:yyyy-MM} must use Dec-2024 (end of previous calendar year) as baseline");
+                    Is.EqualTo(FinancialCalculator.CalculateImprovementPercentage(
+                        dec2024Item.FiatTotal + baselineSnapshot.Fiat,
+                        item.FiatTotal + snapshotFiat)),
+                    $"FiatYearlyChange for {item.MonthYear:yyyy-MM} must use Dec-2024 (end of previous calendar year) Total Wealth incl. snapshots as baseline");
             });
         }
 
@@ -254,17 +270,126 @@ public class MonthlyTotalsReportTests : DatabaseTest
         // rolling same-month-last-year baseline would produce a different percentage for June 2025.
         var june2024Item = result2024.Items.Single(x => x.MonthYear == new DateOnly(2024, 6, 1));
         var june2025Item = result2025.Items.Single(x => x.MonthYear == new DateOnly(2025, 6, 1));
+        var june2025SnapshotFiat = SnapshotFiatForMonth(june2025Item.MonthYear, snapshots);
+        var june2025SnapshotBtc = SnapshotSatsForMonth(june2025Item.MonthYear, snapshots) / SatoshisPerBitcoin;
 
         Assert.Multiple(() =>
         {
             Assert.That(june2024Item.BtcTotal, Is.Not.EqualTo(dec2024Item.BtcTotal),
                 "Seed sanity: June-2024 and Dec-2024 BTC totals must differ for the guard to discriminate");
             Assert.That(june2025Item.BtcYearlyChange,
-                Is.Not.EqualTo(FinancialCalculator.CalculateImprovementPercentage(june2024Item.BtcTotal, june2025Item.BtcTotal)),
+                Is.Not.EqualTo(FinancialCalculator.CalculateImprovementPercentage(
+                    june2024Item.BtcTotal, june2025Item.BtcTotal + june2025SnapshotBtc)),
                 "BtcYearlyChange must NOT equal a rolling same-month-last-year (June-2024) comparison");
             Assert.That(june2025Item.FiatYearlyChange,
-                Is.Not.EqualTo(FinancialCalculator.CalculateImprovementPercentage(june2024Item.FiatTotal, june2025Item.FiatTotal)),
+                Is.Not.EqualTo(FinancialCalculator.CalculateImprovementPercentage(
+                    june2024Item.FiatTotal, june2025Item.FiatTotal + june2025SnapshotFiat)),
                 "FiatYearlyChange must NOT equal a rolling same-month-last-year (June-2024) comparison");
+            Assert.That(june2025Item.BtcYearlyChange,
+                Is.Not.EqualTo(FinancialCalculator.CalculateImprovementPercentage(dec2024Item.BtcTotal, june2025Item.BtcTotal)),
+                "BtcYearlyChange must NOT be the btc-only (snapshot-less) comparison");
+            Assert.That(june2025Item.FiatYearlyChange,
+                Is.Not.EqualTo(FinancialCalculator.CalculateImprovementPercentage(dec2024Item.FiatTotal, june2025Item.FiatTotal)),
+                "FiatYearlyChange must NOT be the fiat-only (snapshot-less) comparison");
+        });
+    }
+
+    /// <summary>
+    /// Snapshots that exist only in the current year must NOT force the yearly change to 0%:
+    /// the prior-calendar-year baseline simply contributes 0 assets on its side (the same
+    /// fallback as the Assets column), and the percentage is still computed against the
+    /// monthly wealth totals on both sides.
+    /// </summary>
+    [Test]
+    public async Task YearlyChange_Falls_Back_To_Zero_Assets_When_Baseline_Snapshot_Missing()
+    {
+        var snapshot = (Day: new DateOnly(2025, 6, 15), Fiat: 150000m, Sats: 300000000L);
+        var snapshots = new[] { snapshot };
+        SeedSnapshot(snapshot.Day, snapshot.Fiat, snapshot.Sats, FiatCurrency.Brl.Code);
+
+        var baseDate = new DateOnly(2025, 12, 31);
+        var clock = new FakeClock(baseDate.ToDateTime(TimeOnly.MinValue));
+        var provider = new ReportDataProvider(_priceDatabase, _localDatabase, clock);
+        var report = new MonthlyTotalsReport(clock, new NullLogger<MonthlyTotalsReport>(), _localDatabase);
+
+        var result2024 = await report.GetAsync(baseDate, new DateOnlyRange(new DateOnly(2024, 01, 01), new DateOnly(2024, 12, 31)),
+            FiatCurrency.Brl, provider);
+        var result2025 = await report.GetAsync(baseDate, new DateOnlyRange(new DateOnly(2025, 01, 01), new DateOnly(2025, 12, 31)),
+            FiatCurrency.Brl, provider);
+
+        var dec2024Item = result2024.Items.Single(x => x.MonthYear == new DateOnly(2024, 12, 1));
+
+        Assert.That(result2025.Items, Has.Count.EqualTo(12));
+
+        foreach (var item in result2025.Items)
+        {
+            // Baseline side has no snapshot at all → contributes 0 assets; current side folds its own.
+            var snapshotFiat = SnapshotFiatForMonth(item.MonthYear, snapshots);
+            var snapshotBtc = SnapshotSatsForMonth(item.MonthYear, snapshots) / SatoshisPerBitcoin;
+            Assert.Multiple(() =>
+            {
+                Assert.That(item.FiatYearlyChange,
+                    Is.EqualTo(FinancialCalculator.CalculateImprovementPercentage(dec2024Item.FiatTotal, item.FiatTotal + snapshotFiat)),
+                    $"FiatYearlyChange for {item.MonthYear:yyyy-MM} must be computed with 0 assets on the baseline side");
+                Assert.That(item.BtcYearlyChange,
+                    Is.EqualTo(FinancialCalculator.CalculateImprovementPercentage(dec2024Item.BtcTotal, item.BtcTotal + snapshotBtc)),
+                    $"BtcYearlyChange for {item.MonthYear:yyyy-MM} must be computed with 0 assets on the baseline side");
+            });
+        }
+
+        // December 2025 has a snapshot on the current side only: the % is computed, not forced to 0.
+        var december = result2025.Items.Single(x => x.MonthYear == new DateOnly(2025, 12, 1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(december.AssetsTotalFiat, Is.EqualTo(150000m));
+            Assert.That(december.FiatYearlyChange, Is.Not.Zero);
+        });
+    }
+
+    /// <summary>
+    /// Monthly changes fold each month's own latest snapshot into BOTH sides of the
+    /// comparison: the previous month's snapshot adjusts the baseline, the current month's
+    /// snapshot adjusts the current wealth — matching the asset-inclusive Total Wealth basis
+    /// used by the yearly change.
+    /// </summary>
+    [Test]
+    public async Task MonthlyChange_Folds_Snapshots_Into_Both_Sides()
+    {
+        var octoberSnapshot = (Day: new DateOnly(2024, 10, 10), Fiat: 100000m, Sats: 200000000L);
+        var novemberSnapshot = (Day: new DateOnly(2024, 11, 20), Fiat: 150000m, Sats: 300000000L);
+        SeedSnapshot(octoberSnapshot.Day, octoberSnapshot.Fiat, octoberSnapshot.Sats, FiatCurrency.Brl.Code);
+        SeedSnapshot(novemberSnapshot.Day, novemberSnapshot.Fiat, novemberSnapshot.Sats, FiatCurrency.Brl.Code);
+
+        var result = await BuildBrlReportFor2024();
+
+        var september = result.Items.Single(x => x.MonthYear == new DateOnly(2024, 9, 1));
+        var october = result.Items.Single(x => x.MonthYear == new DateOnly(2024, 10, 1));
+        var november = result.Items.Single(x => x.MonthYear == new DateOnly(2024, 11, 1));
+
+        Assert.Multiple(() =>
+        {
+            // October: previous month (September) has no snapshot → 0 on that side; October folds its own.
+            Assert.That(october.FiatMonthlyChange,
+                Is.EqualTo(FinancialCalculator.CalculateImprovementPercentage(
+                    september.FiatTotal, october.FiatTotal + octoberSnapshot.Fiat)));
+            Assert.That(october.BtcMonthlyChange,
+                Is.EqualTo(FinancialCalculator.CalculateImprovementPercentage(
+                    september.BtcTotal, october.BtcTotal + octoberSnapshot.Sats / SatoshisPerBitcoin)));
+
+            // November: both sides fold their own month's latest snapshot.
+            Assert.That(november.FiatMonthlyChange,
+                Is.EqualTo(FinancialCalculator.CalculateImprovementPercentage(
+                    october.FiatTotal + octoberSnapshot.Fiat, november.FiatTotal + novemberSnapshot.Fiat)));
+            Assert.That(november.BtcMonthlyChange,
+                Is.EqualTo(FinancialCalculator.CalculateImprovementPercentage(
+                    october.BtcTotal + octoberSnapshot.Sats / SatoshisPerBitcoin,
+                    november.BtcTotal + novemberSnapshot.Sats / SatoshisPerBitcoin)));
+
+            // Discriminator: must not be the fiat/btc-only comparison.
+            Assert.That(november.FiatMonthlyChange,
+                Is.Not.EqualTo(FinancialCalculator.CalculateImprovementPercentage(october.FiatTotal, november.FiatTotal)));
+            Assert.That(november.BtcMonthlyChange,
+                Is.Not.EqualTo(FinancialCalculator.CalculateImprovementPercentage(october.BtcTotal, november.BtcTotal)));
         });
     }
 
@@ -524,6 +649,20 @@ public class MonthlyTotalsReportTests : DatabaseTest
 
         return await report.GetAsync(baseDate, new DateOnlyRange(new DateOnly(2024, 1, 1), new DateOnly(2024, 12, 31)),
             FiatCurrency.Brl, provider, excludedCategoryIds);
+    }
+
+    private const decimal SatoshisPerBitcoin = 100_000_000m;
+
+    private static decimal SnapshotFiatForMonth(DateOnly monthYear, IReadOnlyList<(DateOnly Day, decimal Fiat, long Sats)> snapshots)
+    {
+        var monthEnd = new DateOnly(monthYear.Year, monthYear.Month, DateTime.DaysInMonth(monthYear.Year, monthYear.Month));
+        return snapshots.Where(s => s.Day <= monthEnd).OrderBy(s => s.Day).LastOrDefault().Fiat;
+    }
+
+    private static long SnapshotSatsForMonth(DateOnly monthYear, IReadOnlyList<(DateOnly Day, decimal Fiat, long Sats)> snapshots)
+    {
+        var monthEnd = new DateOnly(monthYear.Year, monthYear.Month, DateTime.DaysInMonth(monthYear.Year, monthYear.Month));
+        return snapshots.Where(s => s.Day <= monthEnd).OrderBy(s => s.Day).LastOrDefault().Sats;
     }
 
     private void SeedSnapshot(DateOnly day, decimal totalFiat, long totalSats, string currencyCode)
