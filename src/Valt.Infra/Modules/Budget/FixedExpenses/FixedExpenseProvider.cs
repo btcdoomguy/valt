@@ -119,7 +119,10 @@ public class FixedExpenseProvider : IFixedExpenseProvider
             switch (match.FixedExpenseRecordStateId)
             {
                 case (int)FixedExpenseRecordState.Paid when match.Transaction is not null:
-                    entry.Pay(match.Transaction.Id.ToString(), match.Transaction.FromFiatAmount);
+                    entry.Pay(match.Transaction.Id.ToString(), match.Transaction.FromFiatAmount,
+                        allAccounts.TryGetValue(match.Transaction.FromAccountId, out var txAccount)
+                            ? txAccount.Currency
+                            : null);
                     break;
                 case (int)FixedExpenseRecordState.Ignored:
                     entry.Ignore();

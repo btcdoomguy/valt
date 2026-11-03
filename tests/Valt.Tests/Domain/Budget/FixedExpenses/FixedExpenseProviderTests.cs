@@ -152,6 +152,60 @@ public class FixedExpenseProviderTests : IntegrationTest
     }
 
     [Test]
+    public async Task Should_Capture_ActualCurrency_When_Paid_From_Different_Currency_Account()
+    {
+        await PrepareDataType1();
+
+        var usdAccount = FiatAccount.New("My USD account", AccountCurrencyNickname.Empty, true, Icon.Empty, FiatCurrency.Usd, FiatValue.New(1000m));
+        var accountRepo = new AccountRepository(_localDatabase, _serviceProvider.GetRequiredService<IDomainEventPublisher>());
+
+        await accountRepo.SaveAccountAsync(usdAccount);
+
+        var transaction = Transaction.New(new DateOnly(2025, 1, 25), "Electricity", new CategoryId(),
+            new FiatDetails(usdAccount.Id, FiatValue.New(170m), false), null, new TransactionFixedExpenseReference(_electricityFixedExpenseId.Value, new DateOnly(2025, 1, 30)));
+        var transactionRepo = new TransactionRepository(_localDatabase, _priceDatabase, _serviceProvider.GetRequiredService<IDomainEventPublisher>(), Substitute.For<INotificationPublisher>());
+
+        await transactionRepo.SaveTransactionAsync(transaction);
+
+        var provider = new FixedExpenseProvider(_localDatabase);
+
+        var entries = await provider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 31));
+
+        var electricityFixedExpenseEntry = entries.Single(x => x.Id == _electricityFixedExpenseId.Value);
+        Assert.That(electricityFixedExpenseEntry.Paid, Is.True);
+        Assert.That(electricityFixedExpenseEntry.ActualAmount, Is.EqualTo(-170m));
+        Assert.That(electricityFixedExpenseEntry.ActualCurrency, Is.EqualTo(FiatCurrency.Usd.Code));
+        Assert.That(electricityFixedExpenseEntry.Currency, Is.EqualTo(FiatCurrency.Brl.Code));
+    }
+
+    [Test]
+    public async Task Should_Capture_ActualCurrency_When_Paid_From_Same_Currency_Account()
+    {
+        await PrepareDataType1();
+
+        var brlAccount = FiatAccount.New("My account", AccountCurrencyNickname.Empty, true, Icon.Empty, FiatCurrency.Brl, FiatValue.New(1000m));
+        var accountRepo = new AccountRepository(_localDatabase, _serviceProvider.GetRequiredService<IDomainEventPublisher>());
+
+        await accountRepo.SaveAccountAsync(brlAccount);
+
+        var transaction = Transaction.New(new DateOnly(2025, 1, 25), "Electricity", new CategoryId(),
+            new FiatDetails(brlAccount.Id, FiatValue.New(170m), false), null, new TransactionFixedExpenseReference(_electricityFixedExpenseId.Value, new DateOnly(2025, 1, 30)));
+        var transactionRepo = new TransactionRepository(_localDatabase, _priceDatabase, _serviceProvider.GetRequiredService<IDomainEventPublisher>(), Substitute.For<INotificationPublisher>());
+
+        await transactionRepo.SaveTransactionAsync(transaction);
+
+        var provider = new FixedExpenseProvider(_localDatabase);
+
+        var entries = await provider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 31));
+
+        var electricityFixedExpenseEntry = entries.Single(x => x.Id == _electricityFixedExpenseId.Value);
+        Assert.That(electricityFixedExpenseEntry.Paid, Is.True);
+        Assert.That(electricityFixedExpenseEntry.ActualAmount, Is.EqualTo(-170m));
+        Assert.That(electricityFixedExpenseEntry.ActualCurrency, Is.EqualTo(FiatCurrency.Brl.Code));
+        Assert.That(electricityFixedExpenseEntry.Currency, Is.EqualTo(FiatCurrency.Brl.Code));
+    }
+
+    [Test]
     public async Task Should_Detect_FixedExpense_Was_MarkedAsPaid()
     {
         await PrepareDataType1();
