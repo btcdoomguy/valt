@@ -19,6 +19,7 @@ public record FixedExpenseProviderEntry
     
     public string? TransactionId { get; private set; }
     public decimal? ActualAmount { get; private set; }
+    public string? ActualCurrency { get; private set; }
     public FixedExpenseRecordState State { get; private set; }
 
     public bool Paid => State == FixedExpenseRecordState.Paid && TransactionId != null;
@@ -58,9 +59,13 @@ public record FixedExpenseProviderEntry
     }
 
     public void Pay(string transactionId, decimal? actualAmount)
+        => Pay(transactionId, actualAmount, null);
+
+    public void Pay(string transactionId, decimal? actualAmount, string? actualCurrency)
     {
         TransactionId = transactionId;
         ActualAmount = actualAmount;
+        ActualCurrency = actualCurrency;
         State = FixedExpenseRecordState.Paid;
     }
 
