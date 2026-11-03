@@ -113,14 +113,15 @@ public partial class FixedExpenseOverviewViewModel : ValtModalViewModel
                 if (entry.Paid && entry.ActualAmount.HasValue)
                 {
                     var absActualAmount = Math.Abs(entry.ActualAmount.Value);
-                    actualAmount = CurrencyDisplay.FormatFiat(absActualAmount, entry.Currency);
+                    var actualCurrency = entry.ActualCurrency ?? entry.Currency;
+                    actualAmount = CurrencyDisplay.FormatFiat(absActualAmount, actualCurrency);
                     isOutOfRange = IsAmountOutOfRange(entry);
                     actualAmountColor = isOutOfRange
                         ? FixedExpenseListResources.WarningForeground
                         : FixedExpenseListResources.DefaultForeground;
 
                     var (convertedMin, _) = fixedExpenseHelper.CalculateFixedExpenseRange(
-                        absActualAmount, null, null, entry.Currency);
+                        absActualAmount, null, null, actualCurrency);
                     paidTotalAmount += convertedMin;
                 }
                 else if (entry.MarkedAsPaid)
@@ -172,8 +173,9 @@ public partial class FixedExpenseOverviewViewModel : ValtModalViewModel
                 // Paid total for the month
                 if (entry.Paid && entry.ActualAmount.HasValue)
                 {
+                    var actualCurrency = entry.ActualCurrency ?? entry.Currency;
                     var (convertedMin, _) = fixedExpenseHelper.CalculateFixedExpenseRange(
-                        Math.Abs(entry.ActualAmount.Value), null, null, entry.Currency);
+                        Math.Abs(entry.ActualAmount.Value), null, null, actualCurrency);
                     monthPaidAmount += convertedMin;
                 }
                 else if (entry.MarkedAsPaid)
@@ -272,6 +274,11 @@ public partial class FixedExpenseOverviewViewModel : ValtModalViewModel
     private static bool IsAmountOutOfRange(FixedExpenseProviderEntry entry)
     {
         if (!entry.ActualAmount.HasValue)
+            return false;
+
+        // Comparing raw amounts across different currencies is meaningless and would
+        // flag every cross-currency payment as out of range
+        if (entry.ActualCurrency is not null && entry.ActualCurrency != entry.Currency)
             return false;
 
         var actual = Math.Abs(entry.ActualAmount.Value);

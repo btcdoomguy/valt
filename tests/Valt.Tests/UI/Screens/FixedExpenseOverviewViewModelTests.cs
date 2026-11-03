@@ -292,6 +292,28 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
     }
 
     [Test]
+    public async Task Should_Not_Flag_OutOfRange_For_Cross_Currency_Payment()
+    {
+        // Arrange - BRL-expected expense paid from a USD account
+        var entry = new FixedExpenseProviderEntry(
+            new FixedExpenseId().Value, "Rent", new CategoryId(), new DateOnly(2025, 1, 5),
+            null, 250m, null, null, FiatCurrency.Brl.Code);
+        entry.Pay("tx1", -50m, FiatCurrency.Usd.Code);
+
+        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
+            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { entry }));
+
+        // Act
+        var vm = CreateViewModel();
+        await Task.Delay(200);
+
+        // Assert - cross-currency numeric comparison is meaningless, must not flag
+        var januaryEntry = vm.MonthGroups[0].Entries[0];
+        Assert.That(januaryEntry.IsOutOfRange, Is.False);
+        Assert.That(januaryEntry.ActualAmountColor, Is.SameAs(FixedExpenseListResources.DefaultForeground));
+    }
+
+    [Test]
     public async Task Should_Not_Flag_OutOfRange_When_Actual_Within_Range()
     {
         // Arrange
@@ -340,6 +362,28 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
         var januaryGroup = vm.MonthGroups[0];
         Assert.That(januaryGroup.MonthPaidTotal, Does.Contain("1"));
         Assert.That(januaryGroup.MonthPaidTotal, Does.Contain("080"));
+    }
+
+    [Test]
+    public async Task Should_Convert_MonthPaidTotal_From_Actual_Currency()
+    {
+        // Arrange - BRL-expected expense paid in USD (50 USD, not 50 BRL)
+        var entry = new FixedExpenseProviderEntry(
+            new FixedExpenseId().Value, "Rent", new CategoryId(), new DateOnly(2025, 1, 5),
+            null, 250m, null, null, FiatCurrency.Brl.Code);
+        entry.Pay("tx1", -50m, FiatCurrency.Usd.Code);
+
+        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
+            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { entry }));
+
+        // Act
+        var vm = CreateViewModel();
+        await Task.Delay(200);
+
+        // Assert - 50 USD stays 50 in main currency (USD); naive BRL conversion would be 10
+        var januaryGroup = vm.MonthGroups[0];
+        Assert.That(januaryGroup.MonthPaidTotal, Does.Contain("50"));
+        Assert.That(januaryGroup.MonthPaidTotal, Does.Not.Contain("10"));
     }
 
     [Test]
@@ -432,6 +476,27 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
         // Assert
         Assert.That(vm.PaidTotal, Does.Contain("1"));
         Assert.That(vm.PaidTotal, Does.Contain("000"));
+    }
+
+    [Test]
+    public async Task Should_Convert_PaidTotal_From_Actual_Currency()
+    {
+        // Arrange - BRL-expected expense paid in USD (50 USD, not 50 BRL)
+        var entry = new FixedExpenseProviderEntry(
+            new FixedExpenseId().Value, "Rent", new CategoryId(), new DateOnly(2025, 1, 5),
+            null, 250m, null, null, FiatCurrency.Brl.Code);
+        entry.Pay("tx1", -50m, FiatCurrency.Usd.Code);
+
+        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
+            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { entry }));
+
+        // Act
+        var vm = CreateViewModel();
+        await Task.Delay(200);
+
+        // Assert - 50 USD stays 50 in main currency (USD); naive BRL conversion would be 10
+        Assert.That(vm.PaidTotal, Does.Contain("50"));
+        Assert.That(vm.PaidTotal, Does.Not.Contain("10"));
     }
 
     #endregion
@@ -530,6 +595,28 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
 
         // Assert
         Assert.That(vm.MonthGroups[0].Entries[0].DayFormatted, Is.EqualTo("05"));
+    }
+
+    [Test]
+    public async Task Should_Display_ActualAmount_With_Actual_Payment_Currency()
+    {
+        // Arrange - BRL-expected expense paid from a USD account
+        var entry = new FixedExpenseProviderEntry(
+            new FixedExpenseId().Value, "Rent", new CategoryId(), new DateOnly(2025, 1, 5),
+            null, 250m, null, null, FiatCurrency.Brl.Code);
+        entry.Pay("tx1", -50m, FiatCurrency.Usd.Code);
+
+        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
+            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { entry }));
+
+        // Act
+        var vm = CreateViewModel();
+        await Task.Delay(200);
+
+        // Assert - shows "$ 50.00" (USD), not "R$ 50.00" (expected BRL)
+        var actualAmount = vm.MonthGroups[0].Entries[0].ActualAmount;
+        Assert.That(actualAmount, Does.StartWith("$"));
+        Assert.That(actualAmount, Does.Not.StartWith("R$"));
     }
 
     [Test]
