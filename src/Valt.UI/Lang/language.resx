@@ -2334,6 +2334,9 @@
     <data name="Assets_Card_LTV" xml:space="preserve">
         <value>LTV: </value>
     </data>
+    <data name="Assets_Card_MarginCallPrice" xml:space="preserve">
+        <value>ELP (Margin Call): </value>
+    </data>
     <data name="Assets_Card_BorrowerPlatform" xml:space="preserve">
         <value>Borrower: </value>
     </data>

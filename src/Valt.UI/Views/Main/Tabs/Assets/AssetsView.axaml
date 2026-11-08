@@ -385,6 +385,17 @@
                                 </Grid>
                                 <Grid ColumnDefinitions="Auto, *">
                                     <TextBlock Grid.Column="0"
+                                               Text="{x:Static lang:language.Assets_Card_MarginCallPrice}"
+                                               FontSize="{DynamicResource FontSizeXSmall}"
+                                               Foreground="{DynamicResource AssetCardLabelBrush}"
+                                               Margin="0,0,4,0" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding MarginCallPriceFormatted}"
+                                               FontSize="{DynamicResource FontSizeXSmall}"
+                                               Foreground="{DynamicResource AssetCardTextBrush}" />
+                                </Grid>
+                                <Grid ColumnDefinitions="Auto, *">
+                                    <TextBlock Grid.Column="0"
                                                Text="{x:Static lang:language.Assets_Card_DaysUntilRepayment}"
                                                FontSize="{DynamicResource FontSizeXSmall}"
                                                Foreground="{DynamicResource AssetCardLabelBrush}"

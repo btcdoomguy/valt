@@ -4629,6 +4629,12 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string Assets_Card_MarginCallPrice {
+            get {
+                return ResourceManager.GetString("Assets_Card_MarginCallPrice", resourceCulture);
+            }
+        }
+        
         public static string Assets_Card_BorrowerPlatform {
             get {
                 return ResourceManager.GetString("Assets_Card_BorrowerPlatform", resourceCulture);
