@@ -211,6 +211,24 @@ public sealed class BtcLoanDetails : IAssetDetails
     }
 
     /// <summary>
+    /// Calculates the estimated BTC price (in the loan's currency) at which the loan reaches its
+    /// margin call LTV — the estimated liquidation price (ELP). Snapshot-aware: the effective
+    /// snapshot's collateral sats and margin call LTV win over the setup values; the current
+    /// total debt (including snapshot-based accrual) is used as the debt basis.
+    /// </summary>
+    public decimal CalculateMarginCallPrice()
+    {
+        var snapshot = GetEffectiveSnapshot();
+        var collateralSats = snapshot?.CollateralSats ?? CollateralSats;
+        var marginCallLtv = snapshot?.MarginCallLtv ?? MarginCallLtv;
+
+        var collateralBtc = collateralSats / 100_000_000m;
+        var totalDebt = CalculateTotalDebt();
+
+        return Math.Round(totalDebt / (collateralBtc * marginCallLtv / 100m), 2);
+    }
+
+    /// <summary>
     /// Calculates the accrued interest from the effective snapshot's effective date to today.
     /// For fixed-debt loans no additional interest accrues, so the snapshot's stored interest is returned.
     /// When no snapshot exists, interest accrues from <see cref="LoanStartDate"/>.
