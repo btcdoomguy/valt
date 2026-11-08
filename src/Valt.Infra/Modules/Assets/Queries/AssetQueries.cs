@@ -334,6 +334,7 @@ internal sealed class AssetQueries : IAssetQueries
             InitialLtv = btcLoan.InitialLtv,
             LiquidationLtv = snapshot?.LiquidationLtv ?? btcLoan.LiquidationLtv,
             MarginCallLtv = snapshot?.MarginCallLtv ?? btcLoan.MarginCallLtv,
+            MarginCallPrice = btcLoan.CalculateMarginCallPrice(),
             Fees = snapshot?.Fees ?? btcLoan.Fees,
             LoanStartDate = btcLoan.LoanStartDate,
             RepaymentDate = snapshot?.RepaymentDate ?? btcLoan.RepaymentDate,
