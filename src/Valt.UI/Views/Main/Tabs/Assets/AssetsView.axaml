@@ -36,7 +36,7 @@
         <DataTemplate DataType="models:AssetViewModel">
             <!-- Asset Card -->
             <Border Width="230"
-                    Height="340"
+                    Height="364"
                     Margin="0,0,12,12"
                     CornerRadius="8"
                     BoxShadow="0 4 16 0 #AA000000, 0 1 4 0 #66000000"
