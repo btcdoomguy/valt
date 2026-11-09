@@ -4,10 +4,10 @@ milestone: v0.9
 current_phase: 54
 status: completed
 stopped_at: Phase 54 complete — all phases complete
-last_updated: "2026-11-03T15:42:49.831Z"
-last_activity: 2026-11-02
-last_activity_desc: Phase 54 complete
-state_head: aa3830bce11dd6aadf2ad9e0e19e564c68c19b62
+last_updated: "2026-11-09T14:30:00.000Z"
+last_activity: 2026-11-09
+last_activity_desc: "Completed quick task 261109-tab: Fix the TabIndex of the Transaction Editor window — the 'Exclude from goals and reports' checkbox now comes after the Notes textbox (TabIndex 11)."
+state_head: 63915a54324c26029b720de1582cfd0180d222e6
 progress:
   total_phases: 0
   completed_phases: 0
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-08-06)
 Phase: 54
 Plan: Not started
 Status: All phases complete
-Last activity: 2026-11-03 - Completed quick task 261103-hfg: Fix Fixed Expenses Overview showing wrong currency symbol when a fixed expense is paid with a different currency than expected (shows expected currency instead of actual payment currency); check whether totals are also affected
+Last activity: 2026-11-09 - Completed quick task 261109-tab: Fix the TabIndex of the Transaction Editor window — the "Exclude from goals and reports" checkbox now comes after the Notes textbox (TabIndex 11).
 
 ## Performance Metrics
 
@@ -305,6 +305,9 @@ None — 53-04 checkpoint issues resolved (fix commit acd12f7); plan complete, f
 | 261102-jwn | Reports Monthly Totals: confirm yearly % baseline is end-of-previous-calendar-year (confirmed fixed, not rolling); added regression tests, hardened null guard, documented baseline | 2026-11-02 | 4d258f9 | [261102-jwn-reports-monthly-totals-chart-the-percent](./quick/261102-jwn-reports-monthly-totals-chart-the-percent/) |
 | 261102-ki6 | Reports Monthly Totals: make all % columns asset-inclusive (Total Wealth basis), full grid column audit, tests + docs | 2026-11-02 | 2b46849 | [261102-ki6-reports-monthly-totals-change-the-previo](./quick/261102-ki6-reports-monthly-totals-change-the-previo/) |
 | 261103-hfg | Fix Fixed Expenses Overview showing wrong currency symbol when a fixed expense is paid with a different currency than expected (shows expected currency instead of actual payment currency); check whether totals are also affected | 2026-11-03 | aa3830b | [261103-hfg-fix-fixed-expenses-overview-showing-wron](./quick/261103-hfg-fix-fixed-expenses-overview-showing-wron/) |
+| 261108-qjh | In the assets tab, add to the BTC Loans cards the information about the ELP (Estimated Liquidation Price) based on the LTV Margin Call property of each loan. | 2026-11-08 | 7ac554b | [261108-qjh-in-the-assets-tab-add-to-the-btc-loans-c](./quick/261108-qjh-in-the-assets-tab-add-to-the-btc-loans-c/) |
+| 261109-fd1 | Increase the height of the Assets cards a little since the ELP line was added; content below the separator line is overflowing to the top. Add extra height to compensate. | 2026-11-09 | 63915a5 | [261109-fd1-increase-the-height-of-the-assets-cards-](./quick/261109-fd1-increase-the-height-of-the-assets-cards-/) |
+| 261109-tab | Fix the TabIndex of the Transaction Editor window: the "Exclude from goals and reports" checkbox must come after the Notes textbox | 2026-11-09 | 0a6e251 | [261109-tab-fix-transaction-editor-tabindex](./quick/261109-tab-fix-transaction-editor-tabindex/) |
 
 ## Deferred Items
 
