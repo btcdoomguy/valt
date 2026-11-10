@@ -929,11 +929,11 @@
     <data name="Reports.BtcLoans.ClosestDistance.Tooltip" xml:space="preserve">
         <value>Distância em LTV até a liquidação para "{0}"</value>
     </data>
-    <data name="Reports.BtcLoans.WorstCaseLiquidationPrice" xml:space="preserve">
-        <value>Preço de liq. (pior caso)</value>
+    <data name="Reports.BtcLoans.ClosestLiquidationPrice" xml:space="preserve">
+        <value>Preço de liq. mais próximo</value>
     </data>
-    <data name="Reports.BtcLoans.WorstCaseLiquidationPrice.Tooltip" xml:space="preserve">
-        <value>Maior preço do BTC em que algum dos seus empréstimos ainda estaria em risco</value>
+    <data name="Reports.BtcLoans.ClosestLiquidationPrice.Tooltip" xml:space="preserve">
+        <value>Primeiro preço estimado de margin call atingido com a queda do BTC, entre os empréstimos ativos</value>
     </data>
     <data name="Reports.BtcLoans.AccruedInterest" xml:space="preserve">
         <value>Juros acumulados</value>
