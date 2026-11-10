@@ -91,12 +91,23 @@ internal sealed class GetBtcLoansDashboardHandler : IQueryHandler<GetBtcLoansDas
             return Math.Round(debtInMain / collateralInMain * 100, 2);
         }
 
-        // Debt-weighted averages (skip loans without CurrentLtv when computing LTV avg)
+        decimal? CalculateEffectiveLtv(AssetDTO loan)
+        {
+            if (!query.CustomBtcPriceUsd.HasValue)
+                return loan.CurrentLtv;
+
+            return CalculateSimulatedLtv(loan) ?? loan.CurrentLtv;
+        }
+
+        // Debt-weighted averages use stored LTV normally and simulated LTV only for an explicit custom price.
         decimal weightedLtv = 0m;
-        var loansWithLtv = loanData.Where(x => x.Loan.CurrentLtv.HasValue && x.DebtInMain > 0).ToList();
+        var loansWithLtv = loanData
+            .Select(x => new { x.DebtInMain, EffectiveLtv = CalculateEffectiveLtv(x.Loan) })
+            .Where(x => x.EffectiveLtv.HasValue && x.DebtInMain > 0)
+            .ToList();
         var debtWithLtv = loansWithLtv.Sum(x => x.DebtInMain);
         if (debtWithLtv > 0)
-            weightedLtv = loansWithLtv.Sum(x => (CalculateSimulatedLtv(x.Loan) ?? x.Loan.CurrentLtv!.Value) * x.DebtInMain) / debtWithLtv;
+            weightedLtv = loansWithLtv.Sum(x => x.EffectiveLtv!.Value * x.DebtInMain) / debtWithLtv;
 
         decimal weightedApr = 0m;
         if (totalDebtMain > 0)
@@ -121,48 +132,44 @@ internal sealed class GetBtcLoansDashboardHandler : IQueryHandler<GetBtcLoansDas
                     : 0m;
         }
 
-        // Risk (use simulated LTV when custom price is active)
-        var loansWithLtvForRisk = loans.Where(l => l.CurrentLtv.HasValue && l.LiquidationLtv.HasValue).ToList();
+        // Risk uses the same effective LTV path as the debt-weighted average.
+        var loansWithLtvForRisk = loans
+            .Where(l => l.LiquidationLtv.HasValue)
+            .Select(l => new { Loan = l, EffectiveLtv = CalculateEffectiveLtv(l) })
+            .Where(x => x.EffectiveLtv.HasValue)
+            .ToList();
         decimal highestLtv = 0m;
         decimal closestDistance = 0m;
         string closestLoanName = string.Empty;
         if (loansWithLtvForRisk.Count > 0)
         {
-            var simulatedLtvs = loansWithLtvForRisk
-                .Select(l => new { Loan = l, SimulatedLtv = CalculateSimulatedLtv(l) ?? l.CurrentLtv!.Value })
-                .ToList();
-
-            highestLtv = simulatedLtvs.Max(x => x.SimulatedLtv);
-            var closest = simulatedLtvs
-                .OrderBy(x => x.Loan.LiquidationLtv!.Value - x.SimulatedLtv)
+            highestLtv = loansWithLtvForRisk.Max(x => x.EffectiveLtv!.Value);
+            var closest = loansWithLtvForRisk
+                .OrderBy(x => x.Loan.LiquidationLtv!.Value - x.EffectiveLtv!.Value)
                 .First();
-            closestDistance = closest.Loan.LiquidationLtv!.Value - closest.SimulatedLtv;
+            var unclampedDistance = closest.Loan.LiquidationLtv!.Value - closest.EffectiveLtv!.Value;
+            closestDistance = Math.Max(0, unclampedDistance);
             closestLoanName = closest.Loan.Name;
         }
 
-        // Worst-case liquidation BTC price (USD): per loan = LoanAmount / (LiquidationLtv/100 * CollateralBtc),
-        // converted to USD via fiatRates[loan.CurrencyCode]. Pick the max — the highest BTC price at which any loan still triggers.
-        decimal worstCaseLiqUsd = 0m;
-        if (fiatRates is not null)
+        // Closest estimated liquidation price (USD): reuse the snapshot-aware margin-call ELP
+        // exposed on the Assets DTO and select the first threshold reached as BTC falls.
+        decimal closestLiquidationPriceUsd = 0m;
+        foreach (var loan in loans)
         {
-            foreach (var loan in loans)
-            {
-                if (!loan.LoanAmount.HasValue || !loan.LiquidationLtv.HasValue || !loan.CollateralSats.HasValue)
-                    continue;
-                if (loan.LiquidationLtv.Value <= 0 || loan.CollateralSats.Value <= 0)
-                    continue;
-                var collateralBtc = loan.CollateralSats.Value / SatsPerBtc;
-                var liqPriceLoanCcy = loan.LoanAmount.Value / (loan.LiquidationLtv.Value / 100m * collateralBtc);
-                decimal liqPriceUsd;
-                if (loan.CurrencyCode == FiatCurrency.Usd.Code)
-                    liqPriceUsd = liqPriceLoanCcy;
-                else if (fiatRates.TryGetValue(loan.CurrencyCode, out var rate) && rate > 0)
-                    liqPriceUsd = liqPriceLoanCcy / rate;
-                else
-                    continue;
-                if (liqPriceUsd > worstCaseLiqUsd)
-                    worstCaseLiqUsd = liqPriceUsd;
-            }
+            if (!loan.MarginCallPrice.HasValue || loan.MarginCallPrice.Value <= 0)
+                continue;
+
+            decimal marginCallPriceUsd;
+            if (loan.CurrencyCode == FiatCurrency.Usd.Code)
+                marginCallPriceUsd = loan.MarginCallPrice.Value;
+            else if (fiatRates is not null && fiatRates.TryGetValue(loan.CurrencyCode, out var rate) && rate > 0)
+                marginCallPriceUsd = loan.MarginCallPrice.Value / rate;
+            else
+                continue;
+
+            if (marginCallPriceUsd > closestLiquidationPriceUsd)
+                closestLiquidationPriceUsd = marginCallPriceUsd;
         }
 
         // Health buckets (recalculate when custom price is active)
@@ -235,7 +242,7 @@ internal sealed class GetBtcLoansDashboardHandler : IQueryHandler<GetBtcLoansDas
             HighestLtv = Math.Round(highestLtv, 2),
             ClosestDistanceToLiquidationLtv = Math.Round(closestDistance, 2),
             ClosestLoanName = closestLoanName,
-            WorstCaseLiquidationBtcPriceUsd = Math.Round(worstCaseLiqUsd, 2),
+            WorstCaseLiquidationBtcPriceUsd = Math.Round(closestLiquidationPriceUsd, 2),
             HealthyCount = healthy,
             WarningCount = warning,
             DangerCount = danger,

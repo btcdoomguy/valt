@@ -62,15 +62,16 @@ public class GetBtcLoansDashboardHandlerSnapshotTests : DatabaseTest
 
         var result = await _dashboardHandler.HandleAsync(Query());
 
-        // 30k debt / (0.8 BTC * 50k) = 30k / 40k = 75% LTV
+        // Assets CurrentLtv = 25k borrowed / (0.8 BTC * 50k) = 62.5%.
+        // The closest ELP separately uses 30k total debt and the 70% margin-call LTV.
         Assert.Multiple(() =>
         {
             Assert.That(result.TotalDebtInMainCurrency, Is.EqualTo(30_000m));
             Assert.That(result.TotalBorrowedInMainCurrency, Is.EqualTo(25_000m));
-            Assert.That(result.DebtWeightedAvgLtv, Is.EqualTo(75m));
+            Assert.That(result.DebtWeightedAvgLtv, Is.EqualTo(62.5m));
             Assert.That(result.DebtWeightedAvgApr, Is.EqualTo(15m));
-            Assert.That(result.HighestLtv, Is.EqualTo(75m));
-            Assert.That(result.ClosestDistanceToLiquidationLtv, Is.EqualTo(5m));
+            Assert.That(result.HighestLtv, Is.EqualTo(62.5m));
+            Assert.That(result.ClosestDistanceToLiquidationLtv, Is.EqualTo(17.5m));
             Assert.That(result.WorstCaseLiquidationBtcPriceUsd, Is.EqualTo(53_571.43m));
         });
     }
@@ -118,15 +119,15 @@ public class GetBtcLoansDashboardHandlerSnapshotTests : DatabaseTest
         // borrowed = 25_000; interest until date = 4_900; additional interest = 25_000 * 0.15 / 365 = 10.27
         // Total = 25_000 + 4_900 + 100 + 10.27 = 30_010.27
         var expectedDebt = 30_010.27m;
-        var expectedLtv = Math.Round(expectedDebt / 40_000m * 100, 2);
+        var expectedCurrentLtv = Math.Round(firstBorrowed / 40_000m * 100, 2);
 
         Assert.Multiple(() =>
         {
             Assert.That(result.TotalDebtInMainCurrency, Is.EqualTo(expectedDebt));
             Assert.That(result.TotalBorrowedInMainCurrency, Is.EqualTo(25_000m));
-            Assert.That(result.DebtWeightedAvgLtv, Is.EqualTo(expectedLtv));
+            Assert.That(result.DebtWeightedAvgLtv, Is.EqualTo(expectedCurrentLtv));
             Assert.That(result.DebtWeightedAvgApr, Is.EqualTo(15m));
-            Assert.That(result.HighestLtv, Is.EqualTo(expectedLtv));
+            Assert.That(result.HighestLtv, Is.EqualTo(expectedCurrentLtv));
         });
     }
 }
