@@ -1929,15 +1929,15 @@ namespace Valt.UI.Lang {
             }
         }
         
-        public static string Reports_BtcLoans_WorstCaseLiquidationPrice {
+        public static string Reports_BtcLoans_ClosestLiquidationPrice {
             get {
-                return ResourceManager.GetString("Reports.BtcLoans.WorstCaseLiquidationPrice", resourceCulture);
+                return ResourceManager.GetString("Reports.BtcLoans.ClosestLiquidationPrice", resourceCulture);
             }
         }
         
-        public static string Reports_BtcLoans_WorstCaseLiquidationPrice_Tooltip {
+        public static string Reports_BtcLoans_ClosestLiquidationPrice_Tooltip {
             get {
-                return ResourceManager.GetString("Reports.BtcLoans.WorstCaseLiquidationPrice.Tooltip", resourceCulture);
+                return ResourceManager.GetString("Reports.BtcLoans.ClosestLiquidationPrice.Tooltip", resourceCulture);
             }
         }
         

@@ -201,7 +201,7 @@ public class BtcLoansPanelViewModelTests
         Assert.That(leftTexts, Has.Member(language.Reports_BtcLoans_HealthBreakdown));
         Assert.That(leftTexts, Has.Member(language.Reports_BtcLoans_HighestLtv));
         Assert.That(leftTexts, Has.Member(language.Reports_BtcLoans_ClosestDistance));
-        Assert.That(leftTexts, Has.Member(language.Reports_BtcLoans_WorstCaseLiquidationPrice));
+        Assert.That(leftTexts, Has.Member(language.Reports_BtcLoans_ClosestLiquidationPrice));
         Assert.That(leftTexts, Has.Member(language.Reports_BtcLoans_AccruedInterest));
         Assert.That(leftTexts, Has.Member(language.Reports_BtcLoans_FeesPaid));
         Assert.That(leftTexts, Has.Member(language.Reports_BtcLoans_AvgLoanAge));
@@ -211,6 +211,11 @@ public class BtcLoansPanelViewModelTests
 
         var activeLoansRow = vm.Data.Rows.First(r => r.LeftText == language.Reports_BtcLoans_ActiveLoans);
         Assert.That(activeLoansRow.RightText, Is.EqualTo("1"));
+
+        var closestLiquidationPriceRow = vm.Data.Rows.First(r =>
+            r.LeftText == language.Reports_BtcLoans_ClosestLiquidationPrice);
+        Assert.That(closestLiquidationPriceRow.RightText,
+            Is.EqualTo(CurrencyDisplay.FormatFiat(30_000m, FiatCurrency.Usd.Code)));
 
         var nextRepaymentRow = vm.Data.Rows.First(r => r.LeftText == language.Reports_BtcLoans_NextRepayment);
         var expectedDate = new DateOnly(2025, 2, 1).ToString(System.Globalization.CultureInfo.CurrentCulture);

@@ -965,11 +965,11 @@
     <data name="Reports.BtcLoans.ClosestDistance.Tooltip" xml:space="preserve">
         <value>LTV gap to liquidation for "{0}"</value>
     </data>
-    <data name="Reports.BtcLoans.WorstCaseLiquidationPrice" xml:space="preserve">
-        <value>Worst-case liq. price</value>
+    <data name="Reports.BtcLoans.ClosestLiquidationPrice" xml:space="preserve">
+        <value>Closest liq. price</value>
     </data>
-    <data name="Reports.BtcLoans.WorstCaseLiquidationPrice.Tooltip" xml:space="preserve">
-        <value>Highest BTC price at which any of your loans would still be at risk</value>
+    <data name="Reports.BtcLoans.ClosestLiquidationPrice.Tooltip" xml:space="preserve">
+        <value>First estimated margin-call price reached as BTC falls, across active loans</value>
     </data>
     <data name="Reports.BtcLoans.AccruedInterest" xml:space="preserve">
         <value>Accrued interest</value>
