@@ -71,6 +71,7 @@ public class GetBtcLoansDashboardHandlerSnapshotTests : DatabaseTest
             Assert.That(result.DebtWeightedAvgApr, Is.EqualTo(15m));
             Assert.That(result.HighestLtv, Is.EqualTo(75m));
             Assert.That(result.ClosestDistanceToLiquidationLtv, Is.EqualTo(5m));
+            Assert.That(result.WorstCaseLiquidationBtcPriceUsd, Is.EqualTo(53_571.43m));
         });
     }
 
