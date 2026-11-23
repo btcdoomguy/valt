@@ -12,12 +12,12 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using LiteDB;
 using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Budget.Accounts.Queries.GetAccounts;
+using Valt.App.Modules.Budget.Categories.Queries.GetCategories;
 using Valt.App.Modules.SpendingEvolution.DTOs;
 using Valt.App.Modules.SpendingEvolution.Queries;
 using Valt.Core.Kernel.Abstractions.Time;
-using Valt.Infra.DataAccess;
 using Valt.Infra.Modules.Configuration;
 using Valt.UI.Base;
 using Valt.UI.Lang;
@@ -31,7 +31,6 @@ public record SelectItem(string Id, string Name);
 public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposable
 {
     private readonly IQueryDispatcher _queryDispatcher;
-    private readonly ILocalDatabase _localDatabase;
     private readonly IConfigurationManager _configurationManager;
     private readonly IClock _clock;
     private bool _isDataLoading;
@@ -44,12 +43,10 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
 
     public SpendingEvolutionViewModel(
         IQueryDispatcher queryDispatcher,
-        ILocalDatabase localDatabase,
         IConfigurationManager configurationManager,
         IClock clock)
     {
         _queryDispatcher = queryDispatcher;
-        _localDatabase = localDatabase;
         _configurationManager = configurationManager;
         _clock = clock;
         ChartData = new SpendingEvolutionChartData();
@@ -120,7 +117,7 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
             PreSelectedCategoryId = categoryId;
         }
 
-        PrepareAccountsAndCategoriesList();
+        await PrepareAccountsAndCategoriesList();
 
         SelectedAccounts.CollectionChanged += OnSelectedFiltersChanged;
         SelectedCategories.CollectionChanged += OnSelectedFiltersChanged;
@@ -134,7 +131,7 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
         CloseWindow?.Invoke();
     }
 
-    private void PrepareAccountsAndCategoriesList()
+    private async Task PrepareAccountsAndCategoriesList()
     {
         AvailableAccounts.Clear();
         SelectedAccounts.Clear();
@@ -142,29 +139,23 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
         SelectedCategories.Clear();
 
         // Load accounts
-        var accounts = _localDatabase.GetAccounts().FindAll()
+        var accountDtos = await _queryDispatcher.DispatchAsync(new GetAccountsQuery());
+        var accounts = accountDtos
             .OrderByDescending(x => x.Visible)
-            .ThenBy(x => x.DisplayOrder)
-            .Select(x => new SelectItem(x.Id.ToString(), x.Name))
+            .Select(x => new SelectItem(x.Id, x.Name))
             .ToList();
 
         AvailableAccounts.AddRange(accounts);
         SelectedAccounts.AddRange(AvailableAccounts);
 
-        // Load categories with parent prefix
-        var categories = _localDatabase.GetCategories().FindAll().ToDictionary(x => x.Id.ToString());
+        // Load categories (CategoryDTO.Name already includes hierarchical parent prefix)
+        var categoriesDto = await _queryDispatcher.DispatchAsync(new GetCategoriesQuery());
+        var parsedCategories = categoriesDto.Items
+            .Select(c => new SelectItem(c.Id, c.Name))
+            .OrderBy(x => x.Name)
+            .ToList();
 
-        var parsedCategories = new List<SelectItem>();
-        foreach (var category in categories)
-        {
-            var name = category.Value.Name;
-            if (category.Value.ParentId is not null)
-                name = categories[category.Value.ParentId.ToString()].Name + " >> " + name;
-
-            parsedCategories.Add(new SelectItem(category.Key, name));
-        }
-
-        AvailableCategories.AddRange(parsedCategories.OrderBy(x => x.Name));
+        AvailableCategories.AddRange(parsedCategories);
         SelectedCategories.AddRange(AvailableCategories);
 
         // Apply saved filter defaults

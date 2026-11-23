@@ -24,13 +24,14 @@ using Valt.App.Modules.LoanReports.Queries;
 using Valt.App.Modules.SpendingAnalytics.DTOs;
 using Valt.App.Modules.SpendingAnalytics.Queries;
 using Valt.App.Modules.Assets.Queries.GetVisibleAssets;
+using Valt.App.Modules.Budget.Accounts.Queries.GetAccounts;
+using Valt.App.Modules.Budget.Categories.Queries.GetCategories;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Modules.Assets;
 using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Categories;
 using Valt.Infra.Crawlers.Indicators;
-using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Modules.Reports;
@@ -70,7 +71,6 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     private readonly IWealthOverviewReport _wealthOverviewReport = null!;
     private readonly IReportDataProviderFactory _reportDataProviderFactory = null!;
     private readonly CurrencySettings _currencySettings = null!;
-    private readonly ILocalDatabase _localDatabase = null!;
     private readonly IClock _clock = null!;
     private readonly ILogger<ReportsViewModel> _logger = null!;
     private readonly AccountsTotalState _accountsTotalState = null!;
@@ -193,7 +193,6 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         IWealthOverviewReport wealthOverviewReport,
         IReportDataProviderFactory reportDataProviderFactory,
         CurrencySettings currencySettings,
-        ILocalDatabase localDatabase,
         IClock clock,
         ILogger<ReportsViewModel> logger,
         AccountsTotalState accountsTotalState,
@@ -222,7 +221,6 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _wealthOverviewReport = wealthOverviewReport;
         _reportDataProviderFactory = reportDataProviderFactory;
         _currencySettings = currencySettings;
-        _localDatabase = localDatabase;
         _clock = clock;
         _logger = logger;
         _accountsTotalState = accountsTotalState;
@@ -259,9 +257,6 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         FilterRange = new DateRange(new DateTime(FilterMainDate.Year, 1, 1), new DateTime(FilterMainDate.Year, 12, 31));
         var currentMonth = new DateTime(CategoryFilterMainDate.Year, CategoryFilterMainDate.Month, 1);
         CategoryFilterRange = new DateRange(currentMonth, currentMonth.AddMonths(1).AddDays(-1));
-
-        PrepareAccountsAndCategoriesList();
-        LoadReportsAnalyticsCategoryFilter();
 
         SelectedAccounts.CollectionChanged += OnSelectedFiltersChanged;
         SelectedCategories.CollectionChanged += OnSelectedFiltersChanged;
@@ -315,7 +310,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
         _ready = false;
         try
         {
-            PrepareAccountsAndCategoriesList();
+            _ = PrepareAccountsAndCategoriesList();
             LoadReportsAnalyticsCategoryFilter();
         }
         finally
@@ -411,32 +406,29 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             FetchWealthOverviewAsync(provider));
     }
 
-    private void PrepareAccountsAndCategoriesList()
+    private async Task PrepareAccountsAndCategoriesList()
     {
         AvailableAccounts.Clear();
         SelectedAccounts.Clear();
         AvailableCategories.Clear();
         SelectedCategories.Clear();
 
-        var accounts = GetFilterableAccounts();
+        var accounts = await GetFilterableAccounts();
 
         AvailableAccounts.AddRange(accounts);
         SelectedAccounts.AddRange(AvailableAccounts);
 
-        var categories = _localDatabase.GetCategories().FindAll().ToDictionary(x => x.Id.ToString());
-
-        var parsedCategories = new List<SelectItem>();
-        foreach (var category in categories)
+        var categoriesDto = await _queryDispatcher.DispatchAsync(new GetCategoriesQuery());
+        if (categoriesDto?.Items is not null)
         {
-            var name = category.Value.Name;
-            if (category.Value.ParentId is not null)
-                name = categories[category.Value.ParentId.ToString()].Name + " >> " +  name;
+            var parsedCategories = categoriesDto.Items
+                .Select(c => new SelectItem(c.Id, c.Name))
+                .OrderBy(x => x.Name)
+                .ToList();
 
-            parsedCategories.Add(new SelectItem(category.Key, name));
+            AvailableCategories.AddRange(parsedCategories);
+            SelectedCategories.AddRange(AvailableCategories);
         }
-
-        AvailableCategories.AddRange(parsedCategories.OrderBy(x => x.Name));
-        SelectedCategories.AddRange(AvailableCategories);
 
         // Apply saved expense category filter
         var expenseExcluded = _configurationManager.GetExpensesCategoryFilterExcludedIds().ToHashSet();
@@ -465,38 +457,47 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
             .ToArray();
     }
 
-    private IEnumerable<SelectItem> GetFilterableAccounts()
+    private async Task<IEnumerable<SelectItem>> GetFilterableAccounts()
     {
-        var allAccounts = _localDatabase.GetAccounts().FindAll().ToList();
+        var allAccounts = await _queryDispatcher.DispatchAsync(new GetAccountsQuery());
+        if (allAccounts is null)
+            return [];
 
         var hiddenAccountIds = allAccounts
             .Where(x => !x.Visible)
             .Select(x => x.Id)
             .ToHashSet();
 
-        var hiddenAccountIdsWithTransactions = new HashSet<LiteDB.ObjectId>();
-        if (hiddenAccountIds.Count > 0)
+        var hiddenAccountIdsWithTransactions = new HashSet<string>();
+        if (hiddenAccountIds.Count > 0 && _cachedProvider?.TransactionsByDate is not null)
         {
-            var transactions = _localDatabase.GetTransactions()
-                .Find(t => t.Date >= CategoryFilterRange.Start && t.Date <= CategoryFilterRange.End);
+            var startDate = DateOnly.FromDateTime(CategoryFilterRange.Start);
+            var endDate = DateOnly.FromDateTime(CategoryFilterRange.End);
 
-            foreach (var t in transactions)
+            foreach (var (date, transactions) in _cachedProvider.TransactionsByDate)
             {
-                if (hiddenAccountIds.Contains(t.FromAccountId))
-                    hiddenAccountIdsWithTransactions.Add(t.FromAccountId);
-                if (t.ToAccountId is not null && hiddenAccountIds.Contains(t.ToAccountId))
-                    hiddenAccountIdsWithTransactions.Add(t.ToAccountId);
+                if (date < startDate || date > endDate)
+                    continue;
+
+                foreach (var t in transactions)
+                {
+                    var fromId = t.FromAccountId.ToString();
+                    if (hiddenAccountIds.Contains(fromId))
+                        hiddenAccountIdsWithTransactions.Add(fromId);
+                    var toId = t.ToAccountId?.ToString();
+                    if (toId is not null && hiddenAccountIds.Contains(toId))
+                        hiddenAccountIdsWithTransactions.Add(toId);
+                }
             }
         }
 
         return allAccounts
             .Where(x => x.Visible || hiddenAccountIdsWithTransactions.Contains(x.Id))
             .OrderByDescending(x => x.Visible)
-            .ThenBy(x => x.DisplayOrder)
-            .Select(x => new SelectItem(x.Id.ToString(), x.Name));
+            .Select(x => new SelectItem(x.Id, x.Name));
     }
 
-    private void RefreshAvailableAccounts()
+    private async Task RefreshAvailableAccounts()
     {
         var previousSelectedIds = SelectedAccounts.Select(x => x.Id).ToHashSet();
 
@@ -504,7 +505,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
 
         try
         {
-            var accounts = GetFilterableAccounts().ToList();
+            var accounts = (await GetFilterableAccounts()).ToList();
 
             AvailableAccounts.Clear();
             SelectedAccounts.Clear();
@@ -550,7 +551,7 @@ public partial class ReportsViewModel : ValtTabViewModel, IDisposable
     {
         if (!_ready) return;
 
-        RefreshAvailableAccounts();
+        _ = RefreshAvailableAccounts();
         IsSpendingByCategoriesLoading = true;
         IsIncomeByCategoriesLoading = true;
         FetchCategoriesWithProviderAsync().FireAndForgetSafeAsync(_runner, _logger);
