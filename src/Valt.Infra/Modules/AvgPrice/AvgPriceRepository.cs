@@ -66,9 +66,10 @@ internal sealed class AvgPriceRepository : IAvgPriceRepository
             .ToDictionary(x => x.Key, x => x.ToList());
 
         var response = _localDatabase.GetAvgPriceProfiles().FindAll()
-            .Select(profile => profile.AsDomainObject(lines[profile.Id]));
+            .Select(profile => profile.AsDomainObject(lines.TryGetValue(profile.Id, out var profileLines) ? profileLines : []))
+            .ToList();
 
-        return Task.FromResult(response);
+        return Task.FromResult<IEnumerable<AvgPriceProfile>>(response);
     }
 
     public async Task DeleteAvgPriceProfileAsync(AvgPriceProfile avgPriceProfile)

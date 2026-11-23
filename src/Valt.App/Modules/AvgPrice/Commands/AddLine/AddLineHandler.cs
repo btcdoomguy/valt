@@ -42,7 +42,7 @@ internal sealed class AddLineHandler : ICommandHandler<AddLineCommand, AddLineRe
         // Get the next display order (AddLine internally calculates this)
         var displayOrder = 0;
 
-        profile.AddLine(
+        var newLine = profile.AddLine(
             command.Date,
             displayOrder,
             lineType,
@@ -51,9 +51,6 @@ internal sealed class AddLineHandler : ICommandHandler<AddLineCommand, AddLineRe
             command.Comment ?? string.Empty);
 
         await _avgPriceRepository.SaveAvgPriceProfileAsync(profile);
-
-        // The new line is the last one added
-        var newLine = profile.AvgPriceLines.Last();
 
         return Result<AddLineResult>.Success(new AddLineResult(newLine.Id.Value));
     }
