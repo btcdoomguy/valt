@@ -29,8 +29,7 @@ internal sealed class CreateFiatAccountHandler : ICommandHandler<CreateFiatAccou
         var validation = _validator.Validate(command);
         if (!validation.IsValid)
         {
-            return Result<CreateFiatAccountResult>.ValidationFailure(
-                new Dictionary<string, string[]>(validation.Errors));
+            return Result<CreateFiatAccountResult>.ValidationFailure(validation.Errors);
         }
 
         // Validate group exists if specified

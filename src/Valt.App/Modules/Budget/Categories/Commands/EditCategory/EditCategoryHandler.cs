@@ -25,8 +25,7 @@ internal sealed class EditCategoryHandler : ICommandHandler<EditCategoryCommand,
         var validation = _validator.Validate(command);
         if (!validation.IsValid)
         {
-            return Result<Unit>.ValidationFailure(
-                new Dictionary<string, string[]>(validation.Errors));
+            return Result<Unit>.ValidationFailure(validation.Errors);
         }
 
         var categoryId = new CategoryId(command.CategoryId);
