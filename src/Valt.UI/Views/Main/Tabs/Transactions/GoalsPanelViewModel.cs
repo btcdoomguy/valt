@@ -121,6 +121,8 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
                 .ThenBy(g => g.RefDate)
                 .ToList();
 
+            foreach (var entry in GoalEntries)
+                entry.Dispose();
             GoalEntries.Clear();
             foreach (var goal in sortedGoals)
             {
@@ -340,6 +342,9 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
 
     public void Dispose()
     {
+        foreach (var entry in GoalEntries)
+            entry.Dispose();
+
         _filterState.PropertyChanged -= FilterStateOnPropertyChanged;
         _secureModeState.PropertyChanged -= SecureModeStateOnPropertyChanged;
 

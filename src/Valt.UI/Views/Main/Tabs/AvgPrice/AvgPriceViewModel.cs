@@ -528,5 +528,6 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
     {
         if (_secureModeState is not null)
             _secureModeState.PropertyChanged -= OnSecureModeStatePropertyChanged;
+        WeakReferenceMessenger.Default.Unregister<AddAvgPriceLineRequested>(this);
     }
 }

@@ -126,6 +126,13 @@ public class PriceHistoryChartData : IDisposable
     public void Dispose()
     {
         DisposeSeries();
+        foreach (var axis in XAxes.Concat(YAxes))
+        {
+            if (axis is null) continue;
+            (axis.SeparatorsPaint as IDisposable)?.Dispose();
+            (axis.LabelsPaint as IDisposable)?.Dispose();
+            (axis.NamePaint as IDisposable)?.Dispose();
+        }
         Series.Clear();
         Values.Clear();
         DateLabels.Clear();

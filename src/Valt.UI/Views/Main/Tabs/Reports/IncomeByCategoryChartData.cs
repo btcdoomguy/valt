@@ -60,9 +60,10 @@ public class IncomeByCategoryChartData : IDisposable, INotifyPropertyChanged
     private static readonly SKColor ChartBackground = SKColor.Parse("#333333");  // Background800
     private static readonly SKColor GridColor = SKColor.Parse("#4d4d4d");        // Background700
     private static readonly SKColor TextColor = SKColor.Parse("#a8a6a4");        // Text400
+    private static readonly SKTypeface InterTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal);
 
-    public SolidColorPaint LegendTextPaint { get; } = new(LegendTextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) };
-    public SolidColorPaint TooltipTextPaint { get; } = new(TooltipTextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) };
+    public SolidColorPaint LegendTextPaint { get; } = new(LegendTextColor) { SKTypeface = InterTypeface };
+    public SolidColorPaint TooltipTextPaint { get; } = new(TooltipTextColor) { SKTypeface = InterTypeface };
     public SolidColorPaint TooltipBackgroundPaint { get; } = new(ChartBackground);
 
     public ObservableCollection<ISeries> Series { get; } = new();
@@ -73,6 +74,8 @@ public class IncomeByCategoryChartData : IDisposable, INotifyPropertyChanged
     public Axis[] XAxes { get; }
     public Axis[] YAxes { get; }
 
+    private SolidColorPaint[] _barPaints = Array.Empty<SolidColorPaint>();
+
     public IncomeByCategoryChartData()
     {
         XAxes = new[]
@@ -80,7 +83,7 @@ public class IncomeByCategoryChartData : IDisposable, INotifyPropertyChanged
             new Axis
             {
                 Labeler = FiatLabeler,
-                LabelsPaint = new SolidColorPaint(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) },
+                LabelsPaint = new SolidColorPaint(TextColor) { SKTypeface = InterTypeface },
                 TextSize = 12,
                 SeparatorsPaint = new SolidColorPaint(GridColor.WithAlpha(60)) { StrokeThickness = 1 },
                 MinLimit = 0,
@@ -93,7 +96,7 @@ public class IncomeByCategoryChartData : IDisposable, INotifyPropertyChanged
             new Axis
             {
                 Labels = CategoryLabels,
-                LabelsPaint = new SolidColorPaint(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) },
+                LabelsPaint = new SolidColorPaint(TextColor) { SKTypeface = InterTypeface },
                 TextSize = 12,
                 SeparatorsPaint = new SolidColorPaint(GridColor.WithAlpha(40)) { StrokeThickness = 1 },
                 MinStep = 1,  // Force showing every label, prevents skipping labels when there are few items
@@ -135,16 +138,17 @@ public class IncomeByCategoryChartData : IDisposable, INotifyPropertyChanged
         var values = sortedItems.Select(x => Convert.ToDouble(x.FiatTotal)).ToList();
         var total = values.Sum();
         TotalText = CurrencyDisplay.FormatFiat((decimal)total, FiatCurrency.Code);
-        var colors = sortedItems.Select(x =>
+        var paints = sortedItems.Select(x =>
         {
             var iconColor = x.Icon.Color;
-            return new SKColor(iconColor.R, iconColor.G, iconColor.B, iconColor.A);
-        }).ToList();
+            return new SolidColorPaint(new SKColor(iconColor.R, iconColor.G, iconColor.B, iconColor.A));
+        }).ToArray();
+        _barPaints = paints;
 
         var rowSeries = new RowSeries<double>
         {
             Values = values,
-            DataLabelsPaint = new SolidColorPaint(SKColors.White) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) },
+            DataLabelsPaint = new SolidColorPaint(SKColors.White) { SKTypeface = InterTypeface },
             DataLabelsSize = 12,
             DataLabelsPosition = DataLabelsPosition.End,
             DataLabelsFormatter = point =>
@@ -169,9 +173,9 @@ public class IncomeByCategoryChartData : IDisposable, INotifyPropertyChanged
         {
             if (point.Visual is null) return;
             var index = point.Index;
-            if (index < colors.Count)
+            if (index < paints.Length)
             {
-                point.Visual.Fill = new SolidColorPaint(colors[index]);
+                point.Visual.Fill = paints[index];
             }
         };
 
@@ -180,6 +184,12 @@ public class IncomeByCategoryChartData : IDisposable, INotifyPropertyChanged
 
     private void DisposeSeries()
     {
+        foreach (var paint in _barPaints)
+        {
+            (paint as IDisposable)?.Dispose();
+        }
+        _barPaints = Array.Empty<SolidColorPaint>();
+
         foreach (var series in Series)
         {
             if (series is RowSeries<double> rowSeries)
@@ -193,6 +203,15 @@ public class IncomeByCategoryChartData : IDisposable, INotifyPropertyChanged
     public void Dispose()
     {
         DisposeSeries();
+        (LegendTextPaint as IDisposable)?.Dispose();
+        (TooltipTextPaint as IDisposable)?.Dispose();
+        (TooltipBackgroundPaint as IDisposable)?.Dispose();
+        foreach (var axis in XAxes.Concat(YAxes))
+        {
+            (axis.SeparatorsPaint as IDisposable)?.Dispose();
+            (axis.LabelsPaint as IDisposable)?.Dispose();
+            (axis.NamePaint as IDisposable)?.Dispose();
+        }
         Series.Clear();
         CategoryLabels.Clear();
     }

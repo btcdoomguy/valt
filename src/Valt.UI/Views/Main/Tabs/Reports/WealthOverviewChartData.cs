@@ -190,6 +190,16 @@ public class WealthOverviewChartData : IDisposable
     public void Dispose()
     {
         DisposeSeries();
+        (LegendTextPaint as IDisposable)?.Dispose();
+        (TooltipTextPaint as IDisposable)?.Dispose();
+        (TooltipBackgroundPaint as IDisposable)?.Dispose();
+        foreach (var axis in XAxes.Concat(YAxes))
+        {
+            if (axis is null) continue;
+            (axis.SeparatorsPaint as IDisposable)?.Dispose();
+            (axis.LabelsPaint as IDisposable)?.Dispose();
+            (axis.NamePaint as IDisposable)?.Dispose();
+        }
         Series.Clear();
         FiatValues.Clear();
         BtcValues.Clear();

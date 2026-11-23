@@ -935,6 +935,7 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
         if (_assetPriceUpdaterJobInfo != null)
             _assetPriceUpdaterJobInfo.PropertyChanged -= OnAssetPriceUpdaterJobPropertyChanged;
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
+        WeakReferenceMessenger.Default.Unregister<AddAssetRequested>(this);
         WeakReferenceMessenger.Default.Unregister<LoanStateUpdatedMessage>(this);
     }
 }
