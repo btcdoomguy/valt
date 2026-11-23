@@ -62,12 +62,20 @@ internal class TransactionRepository : ITransactionRepository
             .Find(LiteDB.Query.In("_id", bsonIds))
             .ToList();
 
+        if (entities.Count == 0)
+            return Task.FromResult<IReadOnlyList<Transaction>>(Array.Empty<Transaction>());
+
+        var entityIds = new BsonArray(entities.Select(e => new BsonValue(e.Id)));
+        var fixedRecordsByTxId = _localDatabase.GetFixedExpenseRecords()
+            .Find(Query.In("Transaction.$id", entityIds))
+            .Where(r => r.Transaction != null)
+            .GroupBy(r => r.Transaction!.Id)
+            .ToDictionary(g => g.Key, g => g.First());
+
         var result = new List<Transaction>(entities.Count);
         foreach (var entity in entities)
         {
-            var fixedExpenseRelated = _localDatabase.GetFixedExpenseRecords()
-                .Find(x => x.Transaction != null && x.Transaction.Id == entity.Id)
-                .FirstOrDefault();
+            var fixedExpenseRelated = fixedRecordsByTxId.GetValueOrDefault(entity.Id);
             result.Add(entity.AsDomainObject(fixedExpenseRelated));
         }
 
@@ -163,12 +171,17 @@ internal class TransactionRepository : ITransactionRepository
 
     public async Task DeleteTransactionsByGroupIdAsync(GroupId groupId)
     {
-        var transactions = await GetTransactionsByGroupIdAsync(groupId);
+        var transactions = (await GetTransactionsByGroupIdAsync(groupId)).ToList();
 
         foreach (var transaction in transactions)
         {
             _localDatabase.GetTransactions().Delete(new ObjectId(transaction.Id));
             await _domainEventPublisher.PublishAsync(new TransactionDeletedEvent(transaction));
+        }
+
+        if (transactions.Count > 0)
+        {
+            await _notificationPublisher.PublishAsync(new TransactionsDataChangedNotification());
         }
     }
 }

@@ -1,8 +1,10 @@
+using LiteDB;
 using Microsoft.Extensions.Logging;
 using Valt.Core.Common;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Messages;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Modules.Configuration;
+using Valt.Infra.Modules.DataSources.Bitcoin;
 
 namespace Valt.Infra.Crawlers.LivePriceCrawlers;
 
@@ -58,13 +60,11 @@ internal sealed class PriceDatabaseRatesProvider : IPriceDatabaseRatesProvider
     {
         try
         {
-            if (!_priceDatabase.GetBitcoinData().Exists(x => true))
-                return null;
-
             var entry = _priceDatabase.GetBitcoinData()
-                .FindAll()
-                .OrderByDescending(x => x.Date)
-                .First();
+                .FindOne(Query.All(nameof(BitcoinDataEntity.Date), Query.Descending));
+
+            if (entry is null)
+                return null;
 
             return new BtcPrice(entry.Date, false,
             [

@@ -1,3 +1,4 @@
+using LiteDB;
 using Valt.App.Modules.Budget.Categories.Contracts;
 using Valt.App.Modules.Budget.Categories.DTOs;
 using Valt.Core.Common;
@@ -45,8 +46,10 @@ public class CategoryQueries : ICategoryQueries
 
     public Task<CategoryDTO?> GetCategoryAsync(string categoryId)
     {
-        var data = _localDatabase.GetCategories().FindAll().ToList();
-        var category = data.FirstOrDefault(c => c.Id.ToString() == categoryId);
+        if (!TryParseObjectId(categoryId, out var id))
+            return Task.FromResult<CategoryDTO?>(null);
+
+        var category = _localDatabase.GetCategories().FindById(id);
 
         if (category is null)
             return Task.FromResult<CategoryDTO?>(null);
@@ -56,7 +59,7 @@ public class CategoryQueries : ICategoryQueries
         var name = category.Name;
         if (category.ParentId is not null)
         {
-            var parent = data.SingleOrDefault(x => x.Id == category.ParentId);
+            var parent = _localDatabase.GetCategories().FindById(category.ParentId);
             if (parent is not null)
                 name = $"{parent.Name} > {name}";
         }
@@ -66,9 +69,22 @@ public class CategoryQueries : ICategoryQueries
             Id = category.Id.ToString(),
             Name = name,
             SimpleName = category.Name,
+            ParentId = category.ParentId?.ToString(),
             IconId = category.Icon,
             Unicode = icon.Unicode,
             Color = icon.Color
         });
+    }
+
+    private static bool TryParseObjectId(string? value, out ObjectId id)
+    {
+        if (!string.IsNullOrEmpty(value) && value.Length == 24 && value.All(Uri.IsHexDigit))
+        {
+            id = new ObjectId(value);
+            return true;
+        }
+
+        id = ObjectId.Empty;
+        return false;
     }
 }

@@ -49,12 +49,13 @@ public class AccountQueries : IAccountQueries
 
     public async Task<AccountSummariesDTO> GetAccountSummariesAsync(bool showHiddenAccounts)
     {
-        var accounts = showHiddenAccounts
+        var accounts = (showHiddenAccounts
             ? _localDatabase.GetAccounts().FindAll().OrderBy(x => x.DisplayOrder)
-            : _localDatabase.GetAccounts().Find(x => x.Visible).OrderBy(x => x.DisplayOrder);
+            : _localDatabase.GetAccounts().Find(x => x.Visible).OrderBy(x => x.DisplayOrder)).ToList();
         var groups = _localDatabase.GetAccountGroups().FindAll().ToDictionary(g => g.Id, g => g.Name);
+        var caches = _localDatabase.GetAccountCaches().FindAll().ToDictionary(c => c.Id);
 
-        var summaryTasks = accounts.Select(account => CreateAccountSummaryAsync(account, groups)).ToList();
+        var summaryTasks = accounts.Select(account => CreateAccountSummaryAsync(account, groups, caches)).ToList();
 
         var dtos = await Task.WhenAll(summaryTasks);
         return new AccountSummariesDTO(dtos.ToList());
@@ -98,7 +99,10 @@ public class AccountQueries : IAccountQueries
         return Task.FromResult(groups);
     }
 
-    private async Task<AccountSummaryDTO> CreateAccountSummaryAsync(AccountEntity account, Dictionary<LiteDB.ObjectId, string> groups)
+    private async Task<AccountSummaryDTO> CreateAccountSummaryAsync(
+        AccountEntity account,
+        Dictionary<LiteDB.ObjectId, string> groups,
+        Dictionary<LiteDB.ObjectId, AccountCacheEntity> caches)
     {
         decimal? fiatTotal = null;
         decimal? futureFiatTotal = null;
@@ -106,19 +110,41 @@ public class AccountQueries : IAccountQueries
         long? futureSatsTotal = null;
         bool hasFuture;
 
+        var hasCache = caches.TryGetValue(account.Id, out var cache);
+
         if (account.AccountEntityType == AccountEntityType.Fiat)
         {
-            var total = await _accountTotalsCalculator.CalculateFiatTotalAsync(account.Id.ToString());
-            fiatTotal = total.CurrentFiatTotal;
-            futureFiatTotal = total.FiatTotal;
-            hasFuture = total.FiatTotal != total.CurrentFiatTotal;
+            if (hasCache && cache is not null)
+            {
+                fiatTotal = cache.CurrentTotal;
+                futureFiatTotal = cache.Total;
+                hasFuture = cache.Total != cache.CurrentTotal;
+            }
+            else
+            {
+                var total = await _accountTotalsCalculator.CalculateFiatTotalAsync(account.Id.ToString());
+                fiatTotal = total.CurrentFiatTotal;
+                futureFiatTotal = total.FiatTotal;
+                hasFuture = total.FiatTotal != total.CurrentFiatTotal;
+            }
         }
         else
         {
-            var total = await _accountTotalsCalculator.CalculateBtcTotalAsync(account.Id.ToString());
-            satsTotal = total.CurrentSatsTotal;
-            futureSatsTotal = total.SatsTotal;
-            hasFuture = total.SatsTotal != total.CurrentSatsTotal;
+            if (hasCache && cache is not null)
+            {
+                var currentSats = Convert.ToInt64(cache.CurrentTotal);
+                var totalSats = Convert.ToInt64(cache.Total);
+                satsTotal = currentSats;
+                futureSatsTotal = totalSats;
+                hasFuture = totalSats != currentSats;
+            }
+            else
+            {
+                var total = await _accountTotalsCalculator.CalculateBtcTotalAsync(account.Id.ToString());
+                satsTotal = total.CurrentSatsTotal;
+                futureSatsTotal = total.SatsTotal;
+                hasFuture = total.SatsTotal != total.CurrentSatsTotal;
+            }
         }
 
         var icon = account.Icon != null ? Icon.RestoreFromId(account.Icon) : Icon.Empty;

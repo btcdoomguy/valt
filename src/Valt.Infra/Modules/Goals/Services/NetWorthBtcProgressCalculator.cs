@@ -1,7 +1,9 @@
+using LiteDB;
 using Valt.Core.Common;
 using Valt.Core.Modules.Goals;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Modules.Budget.Accounts;
+using Valt.Infra.Modules.DataSources.Bitcoin;
 using Valt.Infra.Modules.Goals.Queries.DTOs;
 using Valt.Infra.Settings;
 
@@ -37,9 +39,7 @@ internal class NetWorthBtcProgressCalculator : IGoalProgressCalculator
 
         // Get latest BTC/USD price
         var latestBtcPrice = _priceDatabase.GetBitcoinData()
-            .FindAll()
-            .OrderByDescending(x => x.Date)
-            .FirstOrDefault();
+            .FindOne(Query.All(nameof(BitcoinDataEntity.Date), Query.Descending));
 
         var usdBtcPrice = latestBtcPrice?.Price ?? 0m;
 

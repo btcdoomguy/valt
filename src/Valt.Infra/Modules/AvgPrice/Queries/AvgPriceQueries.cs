@@ -18,10 +18,9 @@ internal sealed class AvgPriceQueries : IAvgPriceQueries
 
     public Task<IEnumerable<AvgPriceProfileDTO>> GetProfilesAsync(bool showHidden = false)
     {
-        var query = _localDatabase.GetAvgPriceProfiles().FindAll();
-
-        if (!showHidden)
-            query = query.Where(x => x.Visible);
+        var query = showHidden
+            ? _localDatabase.GetAvgPriceProfiles().FindAll()
+            : _localDatabase.GetAvgPriceProfiles().Find(x => x.Visible);
 
         return Task.FromResult(query.Select(AsDto));
     }

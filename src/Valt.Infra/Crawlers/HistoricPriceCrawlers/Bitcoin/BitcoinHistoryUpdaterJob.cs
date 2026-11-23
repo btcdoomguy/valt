@@ -108,8 +108,6 @@ internal class BitcoinHistoryUpdaterJob : IBackgroundJob
                 if (price.Date <= endDateOnly && !existingDates.Contains(price.Date))
                 {
                     var dateToStore = price.Date.ToValtDateTime();
-                    _logger.LogInformation("[BitcoinHistoryUpdater] Adding BTC price ${Price:N2} for {Date}",
-                        price.Price, dateToStore.ToString("yyyy-MM-dd"));
 
                     entries.Add(new BitcoinDataEntity()
                     {

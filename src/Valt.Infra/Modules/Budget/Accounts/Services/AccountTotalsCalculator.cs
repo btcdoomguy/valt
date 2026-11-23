@@ -19,42 +19,52 @@ public class AccountTotalsCalculator : IAccountTotalsCalculator
 
     public async Task<CalculatedFiatTotals> CalculateFiatTotalAsync(AccountId accountId)
     {
-        var account = _localDatabase.GetAccounts().FindById(accountId.AsObjectId());
+        var accountObjectId = accountId.AsObjectId();
+        var accountCache = _localDatabase.GetAccountCaches().FindById(accountObjectId);
+
+        if (accountCache is not null)
+        {
+            var cachedAccount = _localDatabase.GetAccounts().FindById(accountObjectId);
+            if (cachedAccount.AccountEntityType != AccountEntityType.Fiat)
+                throw new WrongAccountTypeException(accountId);
+
+            return new CalculatedFiatTotals(accountCache.Total, accountCache.CurrentTotal);
+        }
+
+        var account = _localDatabase.GetAccounts().FindById(accountObjectId);
 
         if (account.AccountEntityType != AccountEntityType.Fiat)
             throw new WrongAccountTypeException(accountId);
 
-        var accountObjectId = accountId.AsObjectId();
+        await _accountCacheService.CalculateTotalsForAccountAsync(accountId);
 
-        var accountCache = _localDatabase.GetAccountCaches().FindById(accountObjectId);
-
-        if (accountCache is null)
-        {
-            await _accountCacheService.CalculateTotalsForAccountAsync(accountId);
-
-            accountCache = _localDatabase.GetAccountCaches().FindById(accountObjectId);
-        }
+        accountCache = _localDatabase.GetAccountCaches().FindById(accountObjectId);
 
         return new CalculatedFiatTotals(accountCache.Total, accountCache.CurrentTotal);
     }
 
     public async Task<CalculatedBtcTotals> CalculateBtcTotalAsync(AccountId accountId)
     {
-        var account = _localDatabase.GetAccounts().FindById(accountId.AsObjectId());
+        var accountObjectId = accountId.AsObjectId();
+        var accountCache = _localDatabase.GetAccountCaches().FindById(accountObjectId);
+
+        if (accountCache is not null)
+        {
+            var cachedAccount = _localDatabase.GetAccounts().FindById(accountObjectId);
+            if (cachedAccount.AccountEntityType != AccountEntityType.Bitcoin)
+                throw new WrongAccountTypeException(accountId);
+
+            return new CalculatedBtcTotals(Convert.ToInt64(accountCache.Total), Convert.ToInt64(accountCache.CurrentTotal));
+        }
+
+        var account = _localDatabase.GetAccounts().FindById(accountObjectId);
 
         if (account.AccountEntityType != AccountEntityType.Bitcoin)
             throw new WrongAccountTypeException(accountId);
 
-        var accountObjectId = accountId.AsObjectId();
+        await _accountCacheService.CalculateTotalsForAccountAsync(accountId);
 
-        var accountCache = _localDatabase.GetAccountCaches().FindById(accountObjectId);
-
-        if (accountCache is null)
-        {
-            await _accountCacheService.CalculateTotalsForAccountAsync(accountId);
-
-            accountCache = _localDatabase.GetAccountCaches().FindById(accountObjectId);
-        }
+        accountCache = _localDatabase.GetAccountCaches().FindById(accountObjectId);
 
         return new CalculatedBtcTotals(Convert.ToInt64(accountCache.Total), Convert.ToInt64(accountCache.CurrentTotal));
     }

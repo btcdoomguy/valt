@@ -70,6 +70,7 @@ public record AssetDTO
     public int? DaysUntilRepayment { get; init; }
     public decimal? FixedTotalDebt { get; init; }
     public bool HasFixedTotalDebt { get; init; }
+    public IReadOnlyList<LoanStateSnapshotDTO>? Snapshots { get; init; }
 
     // BTC lending specific
     public decimal? AmountLent { get; init; }

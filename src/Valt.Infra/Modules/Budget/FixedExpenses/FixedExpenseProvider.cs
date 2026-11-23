@@ -20,8 +20,8 @@ public class FixedExpenseProvider : IFixedExpenseProvider
 
         var allAccounts = _localDatabase.GetAccounts().FindAll().ToDictionary(x => x.Id, x => x);
 
-        var allFixedExpenses = _localDatabase.GetFixedExpenses().FindAll()
-            .Where(x => x.Enabled)
+        var allFixedExpenses = _localDatabase.GetFixedExpenses()
+            .Find(x => x.Enabled)
             .ToList();
 
         var entries = new List<FixedExpenseProviderEntry>();

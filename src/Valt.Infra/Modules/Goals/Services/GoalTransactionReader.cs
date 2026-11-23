@@ -45,6 +45,18 @@ internal interface IGoalTransactionReader
     /// Does NOT include BitcoinToFiat (handled by IncomeBtcGoalType).
     /// </summary>
     decimal CalculateTotalIncome(DateOnly from, DateOnly to);
+
+    /// <summary>
+    /// Returns both income and expense rows in the main fiat currency for the given date range
+    /// using a single underlying data context load.
+    /// </summary>
+    (IReadOnlyList<GoalContributionRow> IncomeRows, IReadOnlyList<GoalContributionRow> ExpenseRows) GetIncomeAndExpenseRows(DateOnly from, DateOnly to);
+
+    /// <summary>
+    /// Calculates both total fiat income and total expenses in the main fiat currency for the given date range
+    /// using a single underlying data context load.
+    /// </summary>
+    (decimal TotalIncome, decimal TotalExpenses) CalculateTotalIncomeAndExpenses(DateOnly from, DateOnly to);
 }
 
 internal class GoalTransactionReader : IGoalTransactionReader
@@ -74,6 +86,36 @@ internal class GoalTransactionReader : IGoalTransactionReader
     public IReadOnlyList<GoalContributionRow> GetExpenseRows(DateOnly from, DateOnly to, ObjectId? categoryId = null)
     {
         var context = LoadDataContext(from, to, categoryId);
+        return BuildExpenseRows(context);
+    }
+
+    public IReadOnlyList<GoalContributionRow> GetIncomeRows(DateOnly from, DateOnly to)
+    {
+        var context = LoadDataContext(from, to, categoryId: null);
+        return BuildIncomeRows(context);
+    }
+
+    public (IReadOnlyList<GoalContributionRow> IncomeRows, IReadOnlyList<GoalContributionRow> ExpenseRows) GetIncomeAndExpenseRows(DateOnly from, DateOnly to)
+    {
+        var context = LoadDataContext(from, to, categoryId: null);
+        return (BuildIncomeRows(context), BuildExpenseRows(context));
+    }
+
+    public decimal CalculateTotalIncome(DateOnly from, DateOnly to)
+    {
+        // Selection lives in exactly one place (GetIncomeRows), so the aggregate
+        // cannot drift from the row-level path.
+        return GetIncomeRows(from, to).Sum(r => r.Contribution);
+    }
+
+    public (decimal TotalIncome, decimal TotalExpenses) CalculateTotalIncomeAndExpenses(DateOnly from, DateOnly to)
+    {
+        var (incomeRows, expenseRows) = GetIncomeAndExpenseRows(from, to);
+        return (incomeRows.Sum(r => r.Contribution), expenseRows.Sum(r => r.Contribution));
+    }
+
+    private IReadOnlyList<GoalContributionRow> BuildExpenseRows(DataContext context)
+    {
         var rows = new List<GoalContributionRow>();
         var runningTotal = 0m;
 
@@ -110,9 +152,8 @@ internal class GoalTransactionReader : IGoalTransactionReader
         return rows;
     }
 
-    public IReadOnlyList<GoalContributionRow> GetIncomeRows(DateOnly from, DateOnly to)
+    private IReadOnlyList<GoalContributionRow> BuildIncomeRows(DataContext context)
     {
-        var context = LoadDataContext(from, to, categoryId: null);
         var rows = new List<GoalContributionRow>();
         var runningTotal = 0m;
 
@@ -139,13 +180,6 @@ internal class GoalTransactionReader : IGoalTransactionReader
         }
 
         return rows;
-    }
-
-    public decimal CalculateTotalIncome(DateOnly from, DateOnly to)
-    {
-        // Selection lives in exactly one place (GetIncomeRows), so the aggregate
-        // cannot drift from the row-level path.
-        return GetIncomeRows(from, to).Sum(r => r.Contribution);
     }
 
     private decimal ConvertFiatTransactionAmount(
