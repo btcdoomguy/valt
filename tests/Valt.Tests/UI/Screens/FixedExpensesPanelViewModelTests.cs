@@ -1,12 +1,19 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Valt.App.Kernel;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Budget.FixedExpenses.Commands.IgnoreFixedExpense;
+using Valt.App.Modules.Budget.FixedExpenses.Commands.MarkFixedExpenseAsPaid;
+using Valt.App.Modules.Budget.FixedExpenses.Commands.UndoIgnoreFixedExpense;
+using Valt.App.Modules.Budget.FixedExpenses.Commands.UnmarkFixedExpenseAsPaid;
+using Valt.App.Modules.Budget.FixedExpenses.Queries.GetFixedExpensesOfMonth;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Budget.Categories;
 using Valt.Core.Modules.Budget.FixedExpenses;
-using Valt.Core.Modules.Budget.FixedExpenses.Contracts;
 using Valt.Core.Modules.Budget.Transactions;
 using Valt.Infra.Kernel;
 using Valt.Infra.Modules.Budget.FixedExpenses;
@@ -22,8 +29,8 @@ namespace Valt.Tests.UI.Screens;
 public class FixedExpensesPanelViewModelTests : DatabaseTest
 {
     private IModalFactory _modalFactory = null!;
-    private IFixedExpenseProvider _fixedExpenseProvider = null!;
-    private IFixedExpenseRecordService _fixedExpenseRecordService = null!;
+    private IQueryDispatcher _queryDispatcher = null!;
+    private ICommandDispatcher _commandDispatcher = null!;
     private RatesState _ratesState = null!;
     private CurrencySettings _currencySettings = null!;
     private FilterState _filterState = null!;
@@ -44,8 +51,8 @@ public class FixedExpensesPanelViewModelTests : DatabaseTest
         WeakReferenceMessenger.Default.Reset();
 
         _modalFactory = Substitute.For<IModalFactory>();
-        _fixedExpenseProvider = Substitute.For<IFixedExpenseProvider>();
-        _fixedExpenseRecordService = Substitute.For<IFixedExpenseRecordService>();
+        _queryDispatcher = Substitute.For<IQueryDispatcher>();
+        _commandDispatcher = Substitute.For<ICommandDispatcher>();
         _ratesState = new RatesState();
         _ratesState.FiatRates = new Dictionary<string, decimal> { { "BRL", 5.0m }, { "USD", 1.0m } };
         _currencySettings = new CurrencySettings(_localDatabase, null!);
@@ -55,9 +62,9 @@ public class FixedExpensesPanelViewModelTests : DatabaseTest
         _logger = Substitute.For<ILogger<FixedExpensesPanelViewModel>>();
         _secureModeState = new SecureModeState();
 
-        // Default mock for fixed expense provider
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(Arg.Any<DateOnly>())
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new List<FixedExpenseProviderEntry>()));
+        // Default mock for fixed expense query
+        _queryDispatcher.DispatchAsync(Arg.Any<GetFixedExpensesOfMonthQuery>())
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(new List<FixedExpenseEntryDTO>()));
     }
 
     [TearDown]
@@ -71,8 +78,8 @@ public class FixedExpensesPanelViewModelTests : DatabaseTest
     {
         var vm = new FixedExpensesPanelViewModel(
             _modalFactory,
-            _fixedExpenseProvider,
-            _fixedExpenseRecordService,
+            _queryDispatcher,
+            _commandDispatcher,
             _ratesState,
             _currencySettings,
             _filterState,
@@ -108,8 +115,8 @@ public class FixedExpensesPanelViewModelTests : DatabaseTest
                 null, FiatCurrency.Usd.Code, FixedExpenseRecordState.Paid, new TransactionId())
         };
 
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(Arg.Any<DateOnly>())
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(fixedExpenses));
+        _queryDispatcher.DispatchAsync(Arg.Any<GetFixedExpensesOfMonthQuery>())
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(fixedExpenses));
 
         // Act
         var vm = CreateViewModel();
@@ -188,12 +195,12 @@ public class FixedExpensesPanelViewModelTests : DatabaseTest
     {
         // Arrange
         var callCount = 0;
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(Arg.Any<DateOnly>())
+        _queryDispatcher.DispatchAsync(Arg.Any<GetFixedExpensesOfMonthQuery>())
             .Returns(callInfo =>
             {
                 callCount++;
-                return Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(
-                    new List<FixedExpenseProviderEntry>());
+                return Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(
+                    new List<FixedExpenseEntryDTO>());
             });
 
         var vm = CreateViewModel();
@@ -213,12 +220,12 @@ public class FixedExpensesPanelViewModelTests : DatabaseTest
     {
         // Arrange
         var callCount = 0;
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(Arg.Any<DateOnly>())
+        _queryDispatcher.DispatchAsync(Arg.Any<GetFixedExpensesOfMonthQuery>())
             .Returns(callInfo =>
             {
                 callCount++;
-                return Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(
-                    new List<FixedExpenseProviderEntry>());
+                return Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(
+                    new List<FixedExpenseEntryDTO>());
             });
 
         var vm = CreateViewModel();
@@ -273,8 +280,8 @@ public class FixedExpensesPanelViewModelTests : DatabaseTest
         await vm.IgnoreFixedExpenseCommand.ExecuteAsync(entry);
 
         // Assert
-        await _fixedExpenseRecordService.Received(1)
-            .IgnoreFixedExpenseAsync(Arg.Any<TransactionFixedExpenseReference>());
+        await _commandDispatcher.Received(1)
+            .DispatchAsync(Arg.Any<IgnoreFixedExpenseCommand>());
     }
 
     [Test]
@@ -292,8 +299,8 @@ public class FixedExpensesPanelViewModelTests : DatabaseTest
         await vm.MarkFixedExpenseAsPaidCommand.ExecuteAsync(entry);
 
         // Assert
-        await _fixedExpenseRecordService.Received(1)
-            .MarkFixedExpenseAsPaidAsync(Arg.Any<TransactionFixedExpenseReference>());
+        await _commandDispatcher.Received(1)
+            .DispatchAsync(Arg.Any<MarkFixedExpenseAsPaidCommand>());
     }
 
     [Test]
@@ -311,8 +318,8 @@ public class FixedExpensesPanelViewModelTests : DatabaseTest
         await vm.UndoIgnoreFixedExpenseCommand.ExecuteAsync(entry);
 
         // Assert
-        await _fixedExpenseRecordService.Received(1)
-            .UndoIgnoreFixedExpenseAsync(Arg.Any<TransactionFixedExpenseReference>());
+        await _commandDispatcher.Received(1)
+            .DispatchAsync(Arg.Any<UndoIgnoreFixedExpenseCommand>());
     }
 
     [Test]
@@ -330,8 +337,8 @@ public class FixedExpensesPanelViewModelTests : DatabaseTest
         await vm.UnmarkFixedExpenseAsPaidCommand.ExecuteAsync(entry);
 
         // Assert
-        await _fixedExpenseRecordService.Received(1)
-            .UnmarkFixedExpenseAsPaidAsync(Arg.Any<TransactionFixedExpenseReference>());
+        await _commandDispatcher.Received(1)
+            .DispatchAsync(Arg.Any<UnmarkFixedExpenseAsPaidCommand>());
     }
 
     #endregion

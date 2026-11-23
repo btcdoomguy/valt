@@ -1,14 +1,14 @@
 using System;
 using Avalonia.Media;
+using Valt.App.Modules.Budget.FixedExpenses.Queries.GetFixedExpensesOfMonth;
 using Valt.Core.Modules.Budget.FixedExpenses;
 using Valt.Infra.Kernel;
-using Valt.Infra.Modules.Budget.FixedExpenses;
 
 namespace Valt.UI.Views.Main.Tabs.Transactions.Models;
 
-public class FixedExpensesEntryViewModel(FixedExpenseProviderEntry entry, DateOnly currentDate)
+public class FixedExpensesEntryViewModel(FixedExpenseEntryDTO entry, DateOnly currentDate)
 {
-    public FixedExpenseProviderEntry Entry { get; } = entry;
+    public FixedExpenseEntryDTO Entry { get; } = entry;
     public string Id => Entry.Id;
     public string Name => Entry.Name;
     public string? CategoryId => Entry.CategoryId;

@@ -1,6 +1,8 @@
 using System.Reflection;
 using Avalonia.Media;
 using NSubstitute;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Budget.FixedExpenses.Queries.GetFixedExpensesOfMonth;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Kernel.Factories;
@@ -19,7 +21,7 @@ namespace Valt.Tests.UI.Screens;
 [TestFixture]
 public class FixedExpenseOverviewViewModelTests : DatabaseTest
 {
-    private IFixedExpenseProvider _fixedExpenseProvider = null!;
+    private IQueryDispatcher _queryDispatcher = null!;
     private RatesState _ratesState = null!;
     private CurrencySettings _currencySettings = null!;
     private IClock _clock = null!;
@@ -47,7 +49,7 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
     [SetUp]
     public new void SetUp()
     {
-        _fixedExpenseProvider = Substitute.For<IFixedExpenseProvider>();
+        _queryDispatcher = Substitute.For<IQueryDispatcher>();
         _ratesState = new RatesState();
         _ratesState.FiatRates = new Dictionary<string, decimal> { { "BRL", 5.0m }, { "USD", 1.0m } };
         _ratesState.BitcoinPrice = 100000m;
@@ -56,8 +58,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
         _clock.GetCurrentLocalDate().Returns(new DateOnly(2025, 6, 15));
         _secureModeState = new SecureModeState();
 
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(Arg.Any<DateOnly>())
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new List<FixedExpenseProviderEntry>()));
+        _queryDispatcher.DispatchAsync(Arg.Any<GetFixedExpensesOfMonthQuery>())
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(new List<FixedExpenseEntryDTO>()));
     }
 
     [TearDown]
@@ -69,7 +71,7 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
     private FixedExpenseOverviewViewModel CreateViewModel()
     {
         var vm = new FixedExpenseOverviewViewModel(
-            _fixedExpenseProvider,
+            _queryDispatcher,
             _ratesState,
             _currencySettings,
             _clock,
@@ -122,11 +124,11 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
         var vm = CreateViewModel();
         await Task.Delay(200);
 
-        // Assert - should have called GetFixedExpensesOfMonthAsync for all 12 months of 2025
+        // Assert - should have called GetFixedExpensesOfMonthQuery for all 12 months of 2025
         for (var month = 1; month <= 12; month++)
         {
-            await _fixedExpenseProvider.Received().GetFixedExpensesOfMonthAsync(
-                new DateOnly(2025, month, 1));
+            await _queryDispatcher.Received().DispatchAsync(
+                new GetFixedExpensesOfMonthQuery(new DateOnly(2025, month, 1)));
         }
     }
 
@@ -144,8 +146,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
                 null, 1000m, null, null, FiatCurrency.Usd.Code,
                 FixedExpenseRecordState.Paid, new TransactionId())
         };
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(entries));
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 1, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(entries));
 
         // Act
         var vm = CreateViewModel();
@@ -167,8 +169,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
                 null, 200m, null, null, FiatCurrency.Usd.Code,
                 FixedExpenseRecordState.Ignored, null)
         };
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 3, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(entries));
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 3, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(entries));
 
         // Act
         var vm = CreateViewModel();
@@ -190,8 +192,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
                 null, 1000m, null, null, FiatCurrency.Usd.Code,
                 FixedExpenseRecordState.Empty, null)
         };
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 7, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(entries));
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 7, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(entries));
 
         // Act
         var vm = CreateViewModel();
@@ -216,8 +218,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
             null, 1000m, null, null, FiatCurrency.Usd.Code);
         entry.Pay("tx1", -1200m); // Actual is different from fixed amount (negative = outflow)
 
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { entry }));
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 1, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(new[] { entry }));
 
         // Act
         var vm = CreateViewModel();
@@ -238,8 +240,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
             null, 1000m, null, null, FiatCurrency.Usd.Code);
         entry.Pay("tx1", -1000m);
 
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { entry }));
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 1, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(new[] { entry }));
 
         // Act
         var vm = CreateViewModel();
@@ -260,8 +262,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
             null, null, 100m, 200m, FiatCurrency.Usd.Code);
         entry.Pay("tx1", -50m); // Below min
 
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { entry }));
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 1, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(new[] { entry }));
 
         // Act
         var vm = CreateViewModel();
@@ -280,8 +282,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
             null, null, 100m, 200m, FiatCurrency.Usd.Code);
         entry.Pay("tx1", -250m); // Above max
 
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { entry }));
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 1, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(new[] { entry }));
 
         // Act
         var vm = CreateViewModel();
@@ -300,8 +302,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
             null, 250m, null, null, FiatCurrency.Brl.Code);
         entry.Pay("tx1", -50m, FiatCurrency.Usd.Code);
 
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { entry }));
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 1, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(new[] { entry }));
 
         // Act
         var vm = CreateViewModel();
@@ -322,8 +324,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
             null, null, 100m, 200m, FiatCurrency.Usd.Code);
         entry.Pay("tx1", -150m); // Within range
 
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { entry }));
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 1, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(new[] { entry }));
 
         // Act
         var vm = CreateViewModel();
@@ -351,8 +353,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
             null, 80m, null, null, FiatCurrency.Usd.Code);
         entry2.Pay("tx2", -80m);
 
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { entry1, entry2 }));
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 1, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(new[] { entry1, entry2 }));
 
         // Act
         var vm = CreateViewModel();
@@ -373,8 +375,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
             null, 250m, null, null, FiatCurrency.Brl.Code);
         entry.Pay("tx1", -50m, FiatCurrency.Usd.Code);
 
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { entry }));
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 1, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(new[] { entry }));
 
         // Act
         var vm = CreateViewModel();
@@ -399,8 +401,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
             null, 500m, null, null, FiatCurrency.Usd.Code);
         ignoredEntry.Ignore();
 
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { entry1, ignoredEntry }));
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 1, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(new[] { entry1, ignoredEntry }));
 
         // Act
         var vm = CreateViewModel();
@@ -444,8 +446,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
             null, 500m, null, null, FiatCurrency.Usd.Code);
         ignoredFutureEntry.Ignore();
 
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 7, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 7, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(
                 new[] { futureEntry, ignoredFutureEntry }));
 
         // Act
@@ -466,8 +468,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
             null, 1000m, null, null, FiatCurrency.Usd.Code);
         paidEntry.Pay("tx1", 1000m);
 
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { paidEntry }));
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 1, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(new[] { paidEntry }));
 
         // Act
         var vm = CreateViewModel();
@@ -487,8 +489,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
             null, 250m, null, null, FiatCurrency.Brl.Code);
         entry.Pay("tx1", -50m, FiatCurrency.Usd.Code);
 
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { entry }));
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 1, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(new[] { entry }));
 
         // Act
         var vm = CreateViewModel();
@@ -514,8 +516,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
             null, 1000m, null, null, FiatCurrency.Usd.Code);
         entry.Pay("tx1", 1000m);
 
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { entry }));
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 1, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(new[] { entry }));
 
         // Act
         var vm = CreateViewModel();
@@ -537,8 +539,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
             null, 1000m, null, null, FiatCurrency.Usd.Code);
         entry.Pay("tx1", 1000m);
 
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { entry }));
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 1, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(new[] { entry }));
 
         // Act
         var vm = CreateViewModel();
@@ -560,7 +562,7 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
         var vm = CreateViewModel();
         await Task.Delay(200);
 
-        _fixedExpenseProvider.ClearReceivedCalls();
+        _queryDispatcher.ClearReceivedCalls();
 
         // Act
         vm.SelectedYear = 2024;
@@ -569,8 +571,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
         // Assert - should have called provider for all 12 months of 2024
         for (var month = 1; month <= 12; month++)
         {
-            await _fixedExpenseProvider.Received().GetFixedExpensesOfMonthAsync(
-                new DateOnly(2024, month, 1));
+            await _queryDispatcher.Received().DispatchAsync(
+                new GetFixedExpensesOfMonthQuery(new DateOnly(2024, month, 1)));
         }
     }
 
@@ -586,8 +588,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
             new FixedExpenseId().Value, "Rent", new CategoryId(), new DateOnly(2025, 1, 5),
             null, 1000m, null, null, FiatCurrency.Usd.Code);
 
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { entry }));
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 1, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(new[] { entry }));
 
         // Act
         var vm = CreateViewModel();
@@ -606,8 +608,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
             null, 250m, null, null, FiatCurrency.Brl.Code);
         entry.Pay("tx1", -50m, FiatCurrency.Usd.Code);
 
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { entry }));
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 1, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(new[] { entry }));
 
         // Act
         var vm = CreateViewModel();
@@ -627,8 +629,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
             new FixedExpenseId().Value, "Rent", new CategoryId(), new DateOnly(2025, 1, 5),
             null, 1000m, null, null, FiatCurrency.Usd.Code);
 
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { entry }));
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 1, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(new[] { entry }));
 
         // Act
         var vm = CreateViewModel();
@@ -646,8 +648,8 @@ public class FixedExpenseOverviewViewModelTests : DatabaseTest
             new FixedExpenseId().Value, "Electricity", new CategoryId(), new DateOnly(2025, 1, 30),
             null, null, 100m, 200m, FiatCurrency.Usd.Code);
 
-        _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(new DateOnly(2025, 1, 1))
-            .Returns(Task.FromResult<IEnumerable<FixedExpenseProviderEntry>>(new[] { entry }));
+        _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(new DateOnly(2025, 1, 1)))
+            .Returns(Task.FromResult<IReadOnlyList<FixedExpenseEntryDTO>>(new[] { entry }));
 
         // Act
         var vm = CreateViewModel();

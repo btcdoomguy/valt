@@ -8,11 +8,12 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Budget.FixedExpenses.Queries.GetFixedExpensesOfMonth;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Modules.Budget.FixedExpenses;
 using Valt.Infra.Kernel;
-using Valt.Infra.Modules.Budget.FixedExpenses;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
@@ -24,7 +25,7 @@ namespace Valt.UI.Views.Main.Modals.FixedExpenseOverview;
 
 public partial class FixedExpenseOverviewViewModel : ValtModalViewModel
 {
-    private readonly IFixedExpenseProvider _fixedExpenseProvider = null!;
+    private readonly IQueryDispatcher _queryDispatcher = null!;
     private readonly RatesState _ratesState = null!;
     private readonly CurrencySettings _currencySettings = null!;
     private readonly IClock _clock = null!;
@@ -48,13 +49,13 @@ public partial class FixedExpenseOverviewViewModel : ValtModalViewModel
     }
 
     public FixedExpenseOverviewViewModel(
-        IFixedExpenseProvider fixedExpenseProvider,
+        IQueryDispatcher queryDispatcher,
         RatesState ratesState,
         CurrencySettings currencySettings,
         IClock clock,
         SecureModeState secureModeState)
     {
-        _fixedExpenseProvider = fixedExpenseProvider;
+        _queryDispatcher = queryDispatcher;
         _ratesState = ratesState;
         _currencySettings = currencySettings;
         _clock = clock;
@@ -80,12 +81,12 @@ public partial class FixedExpenseOverviewViewModel : ValtModalViewModel
         var fixedExpenseHelper = new FixedExpenseHelper(_ratesState, _currencySettings);
         var mainCurrency = _currencySettings.MainFiatCurrency;
 
-        var allEntries = new List<(int month, IEnumerable<FixedExpenseProviderEntry> entries)>();
+        var allEntries = new List<(int month, IReadOnlyList<FixedExpenseEntryDTO> entries)>();
 
         for (var month = 1; month <= 12; month++)
         {
             var date = new DateOnly(SelectedYear, month, 1);
-            var entries = await _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(date);
+            var entries = await _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(date));
             allEntries.Add((month, entries));
         }
 
@@ -249,7 +250,7 @@ public partial class FixedExpenseOverviewViewModel : ValtModalViewModel
         };
     }
 
-    private static SolidColorBrush GetStatusColor(FixedExpenseProviderEntry entry)
+    private static SolidColorBrush GetStatusColor(FixedExpenseEntryDTO entry)
     {
         if (entry.Paid || entry.MarkedAsPaid)
             return FixedExpenseListResources.PaidForeground;
@@ -260,7 +261,7 @@ public partial class FixedExpenseOverviewViewModel : ValtModalViewModel
         return FixedExpenseListResources.DefaultForeground;
     }
 
-    private static string FormatExpectedAmount(FixedExpenseProviderEntry entry)
+    private static string FormatExpectedAmount(FixedExpenseEntryDTO entry)
     {
         if (entry.FixedAmount.HasValue)
             return CurrencyDisplay.FormatFiat(entry.FixedAmount.Value, entry.Currency);
@@ -271,7 +272,7 @@ public partial class FixedExpenseOverviewViewModel : ValtModalViewModel
         return string.Empty;
     }
 
-    private static bool IsAmountOutOfRange(FixedExpenseProviderEntry entry)
+    private static bool IsAmountOutOfRange(FixedExpenseEntryDTO entry)
     {
         if (!entry.ActualAmount.HasValue)
             return false;

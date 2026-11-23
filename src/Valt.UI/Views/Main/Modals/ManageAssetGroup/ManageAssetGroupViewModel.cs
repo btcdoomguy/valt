@@ -1,9 +1,13 @@
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Valt.Core.Modules.Assets;
-using Valt.Core.Modules.Assets.Contracts;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Assets.Commands.CreateAssetGroup;
+using Valt.App.Modules.Assets.Commands.EditAssetGroup;
+using Valt.App.Modules.Assets.Queries.GetAssetGroups;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
 using Valt.UI.Lang;
@@ -13,9 +17,10 @@ namespace Valt.UI.Views.Main.Modals.ManageAssetGroup;
 
 public partial class ManageAssetGroupViewModel : ValtModalValidatorViewModel
 {
-    private readonly IAssetGroupRepository? _assetGroupRepository;
+    private readonly ICommandDispatcher? _commandDispatcher;
+    private readonly IQueryDispatcher? _queryDispatcher;
 
-    private AssetGroupId? _assetGroupId;
+    private string? _assetGroupId;
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
@@ -35,16 +40,18 @@ public partial class ManageAssetGroupViewModel : ValtModalValidatorViewModel
     {
     }
 
-    public ManageAssetGroupViewModel(IAssetGroupRepository assetGroupRepository)
+    public ManageAssetGroupViewModel(ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
     {
-        _assetGroupRepository = assetGroupRepository;
+        _commandDispatcher = commandDispatcher;
+        _queryDispatcher = queryDispatcher;
     }
 
     public override async Task OnBindParameterAsync()
     {
         if (Parameter is not null && Parameter is string groupId)
         {
-            var group = await _assetGroupRepository!.GetByIdAsync(new AssetGroupId(groupId));
+            var groups = await _queryDispatcher!.DispatchAsync(new GetAssetGroupsQuery());
+            var group = groups.FirstOrDefault(g => g.Id == groupId);
 
             if (group is null)
             {
@@ -65,20 +72,35 @@ public partial class ManageAssetGroupViewModel : ValtModalValidatorViewModel
 
         if (!HasErrors)
         {
-            AssetGroup group;
-
             if (_assetGroupId is null)
             {
-                group = AssetGroup.New(AssetGroupName.New(Name), Description);
+                var result = await _commandDispatcher!.DispatchAsync(new CreateAssetGroupCommand
+                {
+                    Name = Name,
+                    Description = Description
+                });
+
+                if (result.IsFailure)
+                {
+                    await MessageBoxHelper.ShowAlertAsync(language.Error_ValidationError, result.Error!.Message, GetWindow!());
+                    return;
+                }
             }
             else
             {
-                group = (await _assetGroupRepository!.GetByIdAsync(_assetGroupId))!;
-                group.Rename(AssetGroupName.New(Name));
-                group.ChangeDescription(Description);
-            }
+                var result = await _commandDispatcher!.DispatchAsync(new EditAssetGroupCommand
+                {
+                    GroupId = _assetGroupId,
+                    Name = Name,
+                    Description = Description
+                });
 
-            await _assetGroupRepository!.SaveAsync(group);
+                if (result.IsFailure)
+                {
+                    await MessageBoxHelper.ShowAlertAsync(language.Error_ValidationError, result.Error!.Message, GetWindow!());
+                    return;
+                }
+            }
 
             CloseDialog?.Invoke(new Response(true));
         }
