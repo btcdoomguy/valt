@@ -8,6 +8,7 @@ namespace Valt.Infra.Services.Updates;
 internal class GitHubUpdateChecker : IUpdateChecker
 {
     private const string GitHubApiUrl = "https://api.github.com/repos/btcdoomguy/valt/releases?per_page=10";
+    private static readonly JsonSerializerOptions CaseInsensitiveOptions = new() { PropertyNameCaseInsensitive = true };
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<GitHubUpdateChecker> _logger;
 
@@ -28,8 +29,7 @@ internal class GitHubUpdateChecker : IUpdateChecker
 
             var json = await response.Content.ReadAsStringAsync();
 
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var releases = JsonSerializer.Deserialize<List<GitHubReleaseResponse>>(json, options);
+            var releases = JsonSerializer.Deserialize<List<GitHubReleaseResponse>>(json, CaseInsensitiveOptions);
 
             if (releases is null || releases.Count == 0)
             {

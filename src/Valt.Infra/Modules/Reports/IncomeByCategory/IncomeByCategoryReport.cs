@@ -69,6 +69,8 @@ internal class IncomeByCategoryReport : IIncomeByCategoryReport
         public IncomeByCategoryData Calculate()
         {
             var categoryFiatTotals = new Dictionary<ObjectId, decimal>();
+            var accountIdSet = _filter.AccountIds.Select(id => new ObjectId(id.Value)).ToHashSet();
+            var categoryIdSet = _filter.CategoryIds.Select(id => new ObjectId(id.Value)).ToHashSet();
 
             var currentDate = _startDate.AddDays(-1);
             while (currentDate < _endDate)
@@ -88,7 +90,7 @@ internal class IncomeByCategoryReport : IIncomeByCategoryReport
                 foreach (var accountId in accountsForDate)
                 {
                     // If filter has account IDs, only include matching accounts; otherwise include all
-                    if (_filter.AccountIds.Any() && !_filter.AccountIds.Contains(new AccountId(accountId.ToString())))
+                    if (accountIdSet.Count > 0 && !accountIdSet.Contains(accountId))
                         continue;
 
                     var account = _provider.Accounts[accountId];
@@ -102,7 +104,7 @@ internal class IncomeByCategoryReport : IIncomeByCategoryReport
                             continue;
 
                         // If filter has category IDs, only include matching categories; otherwise include all
-                        if (_filter.CategoryIds.Any() && !_filter.CategoryIds.Contains(new CategoryId(transaction.CategoryId.ToString())))
+                        if (categoryIdSet.Count > 0 && !categoryIdSet.Contains(transaction.CategoryId))
                             continue;
 
                         if (account.AccountEntityType == AccountEntityType.Bitcoin)
