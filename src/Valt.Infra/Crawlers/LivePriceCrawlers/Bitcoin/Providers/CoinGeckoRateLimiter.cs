@@ -19,18 +19,17 @@ public sealed class CoinGeckoRateLimiter
         TimeSpan delay;
         lock (_lock)
         {
-            var elapsed = DateTime.UtcNow - _lastCallUtc;
-            delay = elapsed < _minInterval ? _minInterval - elapsed : TimeSpan.Zero;
+            var now = DateTime.UtcNow;
+            var nextAllowedUtc = _lastCallUtc == DateTime.MinValue ? now : _lastCallUtc + _minInterval;
+            var scheduledUtc = now >= nextAllowedUtc ? now : nextAllowedUtc;
+            delay = scheduledUtc - now;
+            _lastCallUtc = scheduledUtc;
+
             if (delay > TimeSpan.Zero)
                 _logger.LogInformation("[CoinGeckoRateLimiter] Delaying CoinGecko call by {DelayMs}ms to respect rate limit", delay.TotalMilliseconds);
         }
 
         if (delay > TimeSpan.Zero)
             await Task.Delay(delay, ct);
-
-        lock (_lock)
-        {
-            _lastCallUtc = DateTime.UtcNow;
-        }
     }
 }
