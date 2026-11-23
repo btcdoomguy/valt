@@ -1,7 +1,4 @@
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
@@ -14,7 +11,7 @@ using Valt.UI.Lang;
 
 namespace Valt.UI.Views.Main.Tabs.Reports;
 
-public class WealthOverviewChartData : IDisposable
+public class WealthOverviewChartData : ReportChartDataBase
 {
     // Color palette - Fiat (Blue shades from Secondary)
     private static readonly SKColor FiatPrimary = SKColor.Parse("#0566e9");      // Secondary500
@@ -28,45 +25,17 @@ public class WealthOverviewChartData : IDisposable
     private static readonly SKColor BtcDark = SKColor.Parse("#e98805");          // Accent500
     private static readonly SKColor BtcFill = SKColor.Parse("#ffa122").WithAlpha(40);
 
-    // Grid and text colors
-    private static readonly SKColor GridColor = SKColor.Parse("#4d4d4d");        // Background700
-    private static readonly SKColor TextColor = SKColor.Parse("#a8a6a4");        // Text400
-
     public FiatCurrency FiatCurrency { get; set; } = null!;
 
-    // Chart styling
-    public SolidColorPaint LegendTextPaint { get; } = new(SKColor.Parse("#eeebe8")) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) };
-    public SolidColorPaint TooltipTextPaint { get; } = new(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) };
-    public SolidColorPaint TooltipBackgroundPaint { get; } = new(SKColor.Parse("#333333"));
     public ObservableCollection<ObservablePoint> FiatValues { get; } = new();
     public ObservableCollection<ObservablePoint> BtcValues { get; } = new();
-    public ObservableCollection<string> PeriodLabels { get; } = new();
-
-    public Axis[] XAxes { get; } = new Axis[1];
-
-    public Axis[] YAxes { get; } = new Axis[2];
-
-    public ObservableCollection<ISeries> Series { get; } = new();
+    public ObservableCollection<string> PeriodLabels => MonthLabels;
 
     private LineSeries<ObservablePoint>? _fiatSeries;
     private LineSeries<ObservablePoint>? _btcSeries;
 
-    public WealthOverviewChartData()
+    public WealthOverviewChartData() : base(yAxisCount: 2)
     {
-        XAxes[0] =
-            new Axis
-            {
-                ForceStepToMin = true,
-                MinStep = 1,
-                SeparatorsPaint = new SolidColorPaint(GridColor.WithAlpha(60)) { StrokeThickness = 1 },
-                LabelsPaint = new SolidColorPaint(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) },
-                TextSize = 12,
-                Position = AxisPosition.End,
-                Labels = PeriodLabels,
-                LabelsRotation = -45,
-                MinZoomDelta = 1
-            };
-
         YAxes[0] = new Axis
         {
             Name = language.Reports_WealthOverview_Chart_Fiat,
@@ -74,7 +43,7 @@ public class WealthOverviewChartData : IDisposable
             NameTextSize = 13,
             NamePadding = new LiveChartsCore.Drawing.Padding(0, 10),
             Labeler = FiatLabeler,
-            LabelsPaint = new SolidColorPaint(FiatLight) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) },
+            LabelsPaint = new SolidColorPaint(FiatLight) { SKTypeface = InterTypeface },
             TextSize = 12,
             SeparatorsPaint = new SolidColorPaint(GridColor.WithAlpha(40)) { StrokeThickness = 1 },
             MinLimit = 0,
@@ -88,14 +57,13 @@ public class WealthOverviewChartData : IDisposable
             NameTextSize = 13,
             NamePadding = new LiveChartsCore.Drawing.Padding(0, 10),
             Labeler = BitcoinLabeler,
-            LabelsPaint = new SolidColorPaint(BtcLight) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) },
+            LabelsPaint = new SolidColorPaint(BtcLight) { SKTypeface = InterTypeface },
             TextSize = 12,
             SeparatorsPaint = null, // Don't duplicate grid lines
             Position = AxisPosition.End,
             MinLimit = 0,
             MinZoomDelta = 1
         };
-
     }
 
     private LineSeries<ObservablePoint> CreateFiatSeries() => new()
@@ -138,23 +106,15 @@ public class WealthOverviewChartData : IDisposable
         FiatCurrency = wealthOverviewData.MainCurrency;
         FiatValues.Clear();
         BtcValues.Clear();
-        PeriodLabels.Clear();
+        MonthLabels.Clear();
 
-        // Reset X-axis zoom to show all data points when period changes
-        XAxes[0].MinLimit = null;
-        XAxes[0].MaxLimit = null;
-
-        // Dispose and detach the previous series so LiveCharts rebuilds the line
-        // path from scratch — reusing the same series instance leaves stale geometry
-        // after a window resize combined with a dropdown change.
-        DisposeSeries();
-        Series.Clear();
+        BeginSeriesRebuild();
 
         for (var index = 0; index < wealthOverviewData.Items.Count; index++)
         {
             var item = wealthOverviewData.Items[index];
 
-            PeriodLabels.Add(item.Label);
+            MonthLabels.Add(item.Label);
             // Total Wealth includes the latest-snapshot Assets total (D-08)
             FiatValues.Add(new ObservablePoint(index, (double)(item.FiatTotal + item.AssetsTotalFiat)));
             BtcValues.Add(new ObservablePoint(index, (double)item.BtcTotal));
@@ -166,43 +126,19 @@ public class WealthOverviewChartData : IDisposable
         Series.Add(_btcSeries);
     }
 
-    private void DisposeSeries()
+    protected override void DisposeSeries()
     {
-        if (_fiatSeries is not null)
-        {
-            (_fiatSeries.Stroke as IDisposable)?.Dispose();
-            (_fiatSeries.GeometryStroke as IDisposable)?.Dispose();
-            (_fiatSeries.GeometryFill as IDisposable)?.Dispose();
-            (_fiatSeries.Fill as IDisposable)?.Dispose();
-            _fiatSeries = null;
-        }
+        DisposePaints(_fiatSeries?.Stroke, _fiatSeries?.GeometryStroke, _fiatSeries?.GeometryFill, _fiatSeries?.Fill);
+        _fiatSeries = null;
 
-        if (_btcSeries is not null)
-        {
-            (_btcSeries.Stroke as IDisposable)?.Dispose();
-            (_btcSeries.GeometryStroke as IDisposable)?.Dispose();
-            (_btcSeries.GeometryFill as IDisposable)?.Dispose();
-            (_btcSeries.Fill as IDisposable)?.Dispose();
-            _btcSeries = null;
-        }
+        DisposePaints(_btcSeries?.Stroke, _btcSeries?.GeometryStroke, _btcSeries?.GeometryFill, _btcSeries?.Fill);
+        _btcSeries = null;
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
-        DisposeSeries();
-        (LegendTextPaint as IDisposable)?.Dispose();
-        (TooltipTextPaint as IDisposable)?.Dispose();
-        (TooltipBackgroundPaint as IDisposable)?.Dispose();
-        foreach (var axis in XAxes.Concat(YAxes))
-        {
-            if (axis is null) continue;
-            (axis.SeparatorsPaint as IDisposable)?.Dispose();
-            (axis.LabelsPaint as IDisposable)?.Dispose();
-            (axis.NamePaint as IDisposable)?.Dispose();
-        }
-        Series.Clear();
+        base.Dispose();
         FiatValues.Clear();
         BtcValues.Clear();
-        PeriodLabels.Clear();
     }
 }
