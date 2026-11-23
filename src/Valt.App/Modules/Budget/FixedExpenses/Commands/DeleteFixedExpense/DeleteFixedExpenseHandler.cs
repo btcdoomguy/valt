@@ -27,17 +27,7 @@ internal sealed class DeleteFixedExpenseHandler : ICommandHandler<DeleteFixedExp
 
         var fixedExpenseId = new FixedExpenseId(command.FixedExpenseId);
 
-        FixedExpense? fixedExpense;
-        try
-        {
-            fixedExpense = await _fixedExpenseRepository.GetFixedExpenseByIdAsync(fixedExpenseId);
-        }
-        catch (Exception) when (true)
-        {
-            // Repository has a bug where it throws an exception when entity is not found
-            // due to accessing properties on null entity in a LiteDB expression
-            fixedExpense = null;
-        }
+        var fixedExpense = await _fixedExpenseRepository.GetFixedExpenseByIdAsync(fixedExpenseId);
 
         if (fixedExpense is null)
             return Result<DeleteFixedExpenseResult>.Failure(

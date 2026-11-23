@@ -219,181 +219,42 @@ public class ConfigurationManager : IConfigurationManager
     /// Gets the list of category IDs excluded from statistics calculations.
     /// Returns an empty list if no exclusions have been configured.
     /// </summary>
-    public List<string> GetStatisticsExcludedCategoryIds()
-    {
-        var config = _localDatabase.GetConfiguration()
-            .FindOne(x => x.Key == ConfigurationKeys.StatisticsExcludedCategories);
-
-        if (config is null || string.IsNullOrWhiteSpace(config.Value))
-            return new List<string>();
-
-        return config.Value.Split(',', StringSplitOptions.RemoveEmptyEntries)
-            .Select(id => id.Trim())
-            .Distinct()
-            .ToList();
-    }
+    public List<string> GetStatisticsExcludedCategoryIds() =>
+        GetCsvList(ConfigurationKeys.StatisticsExcludedCategories);
 
     /// <summary>
     /// Sets the list of category IDs to exclude from statistics calculations.
     /// </summary>
-    public void SetStatisticsExcludedCategoryIds(IEnumerable<string> categoryIds)
-    {
-        var config = _localDatabase.GetConfiguration()
-            .FindOne(x => x.Key == ConfigurationKeys.StatisticsExcludedCategories);
+    public void SetStatisticsExcludedCategoryIds(IEnumerable<string> categoryIds) =>
+        SetCsvList(ConfigurationKeys.StatisticsExcludedCategories, categoryIds);
 
-        if (config is null)
-            config = new ConfigurationEntity { Key = ConfigurationKeys.StatisticsExcludedCategories };
+    public List<string> GetExpensesCategoryFilterExcludedIds() =>
+        GetCsvList(ConfigurationKeys.ExpensesCategoryFilterExcluded);
 
-        var distinctIds = categoryIds
-            .Where(id => !string.IsNullOrWhiteSpace(id))
-            .Select(id => id.Trim())
-            .Distinct();
+    public void SetExpensesCategoryFilterExcludedIds(IEnumerable<string> categoryIds) =>
+        SetCsvList(ConfigurationKeys.ExpensesCategoryFilterExcluded, categoryIds);
 
-        config.Value = string.Join(",", distinctIds);
+    public List<string> GetIncomeCategoryFilterExcludedIds() =>
+        GetCsvList(ConfigurationKeys.IncomeCategoryFilterExcluded);
 
-        _localDatabase.GetConfiguration().Upsert(config);
-    }
+    public void SetIncomeCategoryFilterExcludedIds(IEnumerable<string> categoryIds) =>
+        SetCsvList(ConfigurationKeys.IncomeCategoryFilterExcluded, categoryIds);
 
-    public List<string> GetExpensesCategoryFilterExcludedIds()
-    {
-        var config = _localDatabase.GetConfiguration()
-            .FindOne(x => x.Key == ConfigurationKeys.ExpensesCategoryFilterExcluded);
+    public List<string> GetSpendingEvolutionCategoryFilterExcludedIds() =>
+        GetCsvList(ConfigurationKeys.SpendingEvolutionCategoryFilterExcluded);
 
-        if (config is null || string.IsNullOrWhiteSpace(config.Value))
-            return new List<string>();
+    public void SetSpendingEvolutionCategoryFilterExcludedIds(IEnumerable<string> categoryIds) =>
+        SetCsvList(ConfigurationKeys.SpendingEvolutionCategoryFilterExcluded, categoryIds);
 
-        return config.Value.Split(',', StringSplitOptions.RemoveEmptyEntries)
-            .Select(id => id.Trim())
-            .Distinct()
-            .ToList();
-    }
+    public List<string> GetSpendingEvolutionAccountFilterExcludedIds() =>
+        GetCsvList(ConfigurationKeys.SpendingEvolutionAccountFilterExcluded);
 
-    public void SetExpensesCategoryFilterExcludedIds(IEnumerable<string> categoryIds)
-    {
-        var config = _localDatabase.GetConfiguration()
-            .FindOne(x => x.Key == ConfigurationKeys.ExpensesCategoryFilterExcluded);
-
-        if (config is null)
-            config = new ConfigurationEntity { Key = ConfigurationKeys.ExpensesCategoryFilterExcluded };
-
-        var distinctIds = categoryIds
-            .Where(id => !string.IsNullOrWhiteSpace(id))
-            .Select(id => id.Trim())
-            .Distinct();
-
-        config.Value = string.Join(",", distinctIds);
-
-        _localDatabase.GetConfiguration().Upsert(config);
-    }
-
-    public List<string> GetIncomeCategoryFilterExcludedIds()
-    {
-        var config = _localDatabase.GetConfiguration()
-            .FindOne(x => x.Key == ConfigurationKeys.IncomeCategoryFilterExcluded);
-
-        if (config is null || string.IsNullOrWhiteSpace(config.Value))
-            return new List<string>();
-
-        return config.Value.Split(',', StringSplitOptions.RemoveEmptyEntries)
-            .Select(id => id.Trim())
-            .Distinct()
-            .ToList();
-    }
-
-    public void SetIncomeCategoryFilterExcludedIds(IEnumerable<string> categoryIds)
-    {
-        var config = _localDatabase.GetConfiguration()
-            .FindOne(x => x.Key == ConfigurationKeys.IncomeCategoryFilterExcluded);
-
-        if (config is null)
-            config = new ConfigurationEntity { Key = ConfigurationKeys.IncomeCategoryFilterExcluded };
-
-        var distinctIds = categoryIds
-            .Where(id => !string.IsNullOrWhiteSpace(id))
-            .Select(id => id.Trim())
-            .Distinct();
-
-        config.Value = string.Join(",", distinctIds);
-
-        _localDatabase.GetConfiguration().Upsert(config);
-    }
-
-    public List<string> GetSpendingEvolutionCategoryFilterExcludedIds()
-    {
-        var config = _localDatabase.GetConfiguration()
-            .FindOne(x => x.Key == ConfigurationKeys.SpendingEvolutionCategoryFilterExcluded);
-
-        if (config is null || string.IsNullOrWhiteSpace(config.Value))
-            return new List<string>();
-
-        return config.Value.Split(',', StringSplitOptions.RemoveEmptyEntries)
-            .Select(id => id.Trim())
-            .Distinct()
-            .ToList();
-    }
-
-    public void SetSpendingEvolutionCategoryFilterExcludedIds(IEnumerable<string> categoryIds)
-    {
-        var config = _localDatabase.GetConfiguration()
-            .FindOne(x => x.Key == ConfigurationKeys.SpendingEvolutionCategoryFilterExcluded);
-
-        if (config is null)
-            config = new ConfigurationEntity { Key = ConfigurationKeys.SpendingEvolutionCategoryFilterExcluded };
-
-        var distinctIds = categoryIds
-            .Where(id => !string.IsNullOrWhiteSpace(id))
-            .Select(id => id.Trim())
-            .Distinct();
-
-        config.Value = string.Join(",", distinctIds);
-
-        _localDatabase.GetConfiguration().Upsert(config);
-    }
-
-    public List<string> GetSpendingEvolutionAccountFilterExcludedIds()
-    {
-        var config = _localDatabase.GetConfiguration()
-            .FindOne(x => x.Key == ConfigurationKeys.SpendingEvolutionAccountFilterExcluded);
-
-        if (config is null || string.IsNullOrWhiteSpace(config.Value))
-            return new List<string>();
-
-        return config.Value.Split(',', StringSplitOptions.RemoveEmptyEntries)
-            .Select(id => id.Trim())
-            .Distinct()
-            .ToList();
-    }
-
-    public void SetSpendingEvolutionAccountFilterExcludedIds(IEnumerable<string> accountIds)
-    {
-        var config = _localDatabase.GetConfiguration()
-            .FindOne(x => x.Key == ConfigurationKeys.SpendingEvolutionAccountFilterExcluded);
-
-        if (config is null)
-            config = new ConfigurationEntity { Key = ConfigurationKeys.SpendingEvolutionAccountFilterExcluded };
-
-        var distinctIds = accountIds
-            .Where(id => !string.IsNullOrWhiteSpace(id))
-            .Select(id => id.Trim())
-            .Distinct();
-
-        config.Value = string.Join(",", distinctIds);
-
-        _localDatabase.GetConfiguration().Upsert(config);
-    }
+    public void SetSpendingEvolutionAccountFilterExcludedIds(IEnumerable<string> accountIds) =>
+        SetCsvList(ConfigurationKeys.SpendingEvolutionAccountFilterExcluded, accountIds);
 
     public List<string> GetReportsAnalyticsCategoryFilterExcludedIds()
     {
-        var config = _localDatabase.GetConfiguration()
-            .FindOne(x => x.Key == ConfigurationKeys.ReportsAnalyticsCategoryFilterExcluded);
-
-        var values = config is null || string.IsNullOrWhiteSpace(config.Value)
-            ? new List<string>()
-            : config.Value.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                .Select(id => id.Trim())
-                .Distinct()
-                .ToList();
-
+        var values = GetCsvList(ConfigurationKeys.ReportsAnalyticsCategoryFilterExcluded);
         if (values.Count > 0)
             return values;
 
@@ -409,20 +270,34 @@ public class ConfigurationManager : IConfigurationManager
         return new List<string>();
     }
 
-    public void SetReportsAnalyticsCategoryFilterExcludedIds(IEnumerable<string> categoryIds)
+    public void SetReportsAnalyticsCategoryFilterExcludedIds(IEnumerable<string> categoryIds) =>
+        SetCsvList(ConfigurationKeys.ReportsAnalyticsCategoryFilterExcluded, categoryIds);
+
+    private List<string> GetCsvList(string key)
     {
         var config = _localDatabase.GetConfiguration()
-            .FindOne(x => x.Key == ConfigurationKeys.ReportsAnalyticsCategoryFilterExcluded);
+            .FindOne(x => x.Key == key);
 
-        if (config is null)
-            config = new ConfigurationEntity { Key = ConfigurationKeys.ReportsAnalyticsCategoryFilterExcluded };
+        if (config is null || string.IsNullOrWhiteSpace(config.Value))
+            return new List<string>();
 
-        var distinctIds = categoryIds
-            .Where(id => !string.IsNullOrWhiteSpace(id))
+        return config.Value.Split(',', StringSplitOptions.RemoveEmptyEntries)
             .Select(id => id.Trim())
+            .Distinct()
+            .ToList();
+    }
+
+    private void SetCsvList(string key, IEnumerable<string> values)
+    {
+        var config = _localDatabase.GetConfiguration()
+            .FindOne(x => x.Key == key) ?? new ConfigurationEntity { Key = key };
+
+        var distinctValues = values
+            .Where(v => !string.IsNullOrWhiteSpace(v))
+            .Select(v => v.Trim())
             .Distinct();
 
-        config.Value = string.Join(",", distinctIds);
+        config.Value = string.Join(",", distinctValues);
 
         _localDatabase.GetConfiguration().Upsert(config);
     }

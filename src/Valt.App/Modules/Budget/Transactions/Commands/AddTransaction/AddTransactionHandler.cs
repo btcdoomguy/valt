@@ -1,9 +1,6 @@
 using Valt.App.Kernel;
 using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Validation;
-using Valt.App.Modules.Budget.Transactions.DTOs;
-using Valt.Core.Common;
-using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Accounts.Contracts;
 using Valt.Core.Modules.Budget.Categories;
 using Valt.Core.Modules.Budget.Categories.Contracts;
@@ -11,7 +8,6 @@ using Valt.Core.Modules.Budget.FixedExpenses;
 using Valt.Core.Modules.Budget.FixedExpenses.Contracts;
 using Valt.Core.Modules.Budget.Transactions;
 using Valt.Core.Modules.Budget.Transactions.Contracts;
-using Valt.Core.Modules.Budget.Transactions.Details;
 
 namespace Valt.App.Modules.Budget.Transactions.Commands.AddTransaction;
 
@@ -42,15 +38,14 @@ internal sealed class AddTransactionHandler : ICommandHandler<AddTransactionComm
         var validation = _validator.Validate(command);
         if (!validation.IsValid)
         {
-            return Result<AddTransactionResult>.ValidationFailure(
-                new Dictionary<string, string[]>(validation.Errors));
+            return Result<AddTransactionResult>.ValidationFailure(validation.Errors);
         }
 
         var categoryId = new CategoryId(command.CategoryId);
 
         // Run independent existence checks in parallel
         var categoryTask = _categoryRepository.GetCategoryByIdAsync(categoryId);
-        var accountsTask = ValidateAccountsAsync(command.Details);
+        var accountsTask = TransactionCommandHelper.ValidateAccountsAsync<AddTransactionResult>(_accountRepository, command.Details);
         var fixedExpenseTask = string.IsNullOrEmpty(command.FixedExpenseId)
             ? Task.FromResult<FixedExpense?>(null)
             : _fixedExpenseRepository.GetFixedExpenseByIdAsync(new FixedExpenseId(command.FixedExpenseId));
@@ -83,7 +78,7 @@ internal sealed class AddTransactionHandler : ICommandHandler<AddTransactionComm
         }
 
         // Build transaction details
-        var transactionDetails = BuildTransactionDetails(command.Details);
+        var transactionDetails = TransactionCommandHelper.BuildTransactionDetails(command.Details);
 
         // Create transaction
         var name = TransactionName.New(command.Name);
@@ -106,83 +101,5 @@ internal sealed class AddTransactionHandler : ICommandHandler<AddTransactionComm
 
         return Result<AddTransactionResult>.Success(
             new AddTransactionResult(transaction.Id.Value, transaction.Date));
-    }
-
-    private async Task<Result<AddTransactionResult>?> ValidateAccountsAsync(TransactionDetailsDto details)
-    {
-        var fromAccountId = new AccountId(details.FromAccountId);
-
-        string? toAccountIdString = details switch
-        {
-            FiatToFiatTransferDto f => f.ToAccountId,
-            BitcoinToBitcoinTransferDto b => b.ToAccountId,
-            FiatToBitcoinTransferDto fb => fb.ToAccountId,
-            BitcoinToFiatTransferDto bf => bf.ToAccountId,
-            _ => null
-        };
-
-        var fromAccountTask = _accountRepository.GetAccountByIdAsync(fromAccountId);
-        Task<Account?>? toAccountTask = toAccountIdString is not null
-            ? _accountRepository.GetAccountByIdAsync(new AccountId(toAccountIdString))
-            : null;
-
-        var tasks = new List<Task> { fromAccountTask };
-        if (toAccountTask is not null)
-            tasks.Add(toAccountTask);
-
-        await Task.WhenAll(tasks);
-
-        if (await fromAccountTask is null)
-        {
-            return Result<AddTransactionResult>.NotFound("Account", details.FromAccountId);
-        }
-
-        if (toAccountIdString is not null && toAccountTask is not null && await toAccountTask is null)
-        {
-            return Result<AddTransactionResult>.NotFound("Account", toAccountIdString);
-        }
-
-        return null;
-    }
-
-    private static TransactionDetails BuildTransactionDetails(TransactionDetailsDto dto)
-    {
-        return dto switch
-        {
-            FiatTransactionDto fiat => new FiatDetails(
-                new AccountId(fiat.FromAccountId),
-                FiatValue.New(fiat.Amount),
-                fiat.IsCredit),
-
-            BitcoinTransactionDto btc => new BitcoinDetails(
-                new AccountId(btc.FromAccountId),
-                (BtcValue)btc.AmountSats,
-                btc.IsCredit),
-
-            FiatToFiatTransferDto fiatToFiat => new FiatToFiatDetails(
-                new AccountId(fiatToFiat.FromAccountId),
-                new AccountId(fiatToFiat.ToAccountId),
-                FiatValue.New(fiatToFiat.FromAmount),
-                FiatValue.New(fiatToFiat.ToAmount)),
-
-            BitcoinToBitcoinTransferDto btcToBtc => new BitcoinToBitcoinDetails(
-                new AccountId(btcToBtc.FromAccountId),
-                new AccountId(btcToBtc.ToAccountId),
-                (BtcValue)btcToBtc.AmountSats),
-
-            FiatToBitcoinTransferDto fiatToBtc => new FiatToBitcoinDetails(
-                new AccountId(fiatToBtc.FromAccountId),
-                new AccountId(fiatToBtc.ToAccountId),
-                FiatValue.New(fiatToBtc.FromFiatAmount),
-                (BtcValue)fiatToBtc.ToSatsAmount),
-
-            BitcoinToFiatTransferDto btcToFiat => new BitcoinToFiatDetails(
-                new AccountId(btcToFiat.FromAccountId),
-                new AccountId(btcToFiat.ToAccountId),
-                (BtcValue)btcToFiat.FromSatsAmount,
-                FiatValue.New(btcToFiat.ToFiatAmount)),
-
-            _ => throw new ArgumentException($"Unknown transaction details type: {dto.GetType().Name}")
-        };
     }
 }
