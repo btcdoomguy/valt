@@ -124,10 +124,7 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
             foreach (var entry in GoalEntries)
                 entry.Dispose();
             GoalEntries.Clear();
-            foreach (var goal in sortedGoals)
-            {
-                GoalEntries.Add(new GoalEntryViewModel(goal, _currencySettings.MainFiatCurrency));
-            }
+            GoalEntries.AddRange(sortedGoals.Select(goal => new GoalEntryViewModel(goal, _currencySettings.MainFiatCurrency)));
         }
         catch (Exception ex)
         {

@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using Avalonia.Platform;
 
 namespace Valt.UI.Services.IconMaps;
 
 public static class IconMapLoader
 {
-    private static readonly object _lock = new();
+    private static readonly Lock _lock = new();
     private static Dictionary<string, HashSet<IconMap>> _codeMap = new();
 
     public static void LoadIcons(string source)

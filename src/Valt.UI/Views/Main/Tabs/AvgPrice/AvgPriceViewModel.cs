@@ -487,18 +487,15 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
             {
                 TotalsRows.Clear();
 
-                // Add monthly rows
-                foreach (var monthlyTotal in totals.MonthlyTotals)
-                {
-                    TotalsRows.Add(new AvgPriceTotalsRowViewModel(monthlyTotal.Month, monthlyTotal.Values, currency));
-                }
+                var rows = totals.MonthlyTotals
+                    .Select(monthlyTotal => new AvgPriceTotalsRowViewModel(monthlyTotal.Month, monthlyTotal.Values, currency))
+                    .Append(new AvgPriceTotalsRowViewModel(
+                        new DateTime(year, 1, 1),
+                        totals.YearlyTotals,
+                        currency,
+                        isYearlyTotal: true));
 
-                // Add yearly total row
-                TotalsRows.Add(new AvgPriceTotalsRowViewModel(
-                    new DateTime(year, 1, 1),
-                    totals.YearlyTotals,
-                    currency,
-                    isYearlyTotal: true));
+                TotalsRows.AddRange(rows);
 
                 IsTotalsLoading = false;
             });

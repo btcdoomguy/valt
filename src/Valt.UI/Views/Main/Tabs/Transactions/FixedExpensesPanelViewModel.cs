@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
@@ -130,10 +131,12 @@ public partial class FixedExpensesPanelViewModel : ValtViewModel, IDisposable
 
             var fixedExpenseHelper = new FixedExpenseHelper(_ratesState, _currencySettings);
 
-            FixedExpenseEntries.Clear();
+            var currentLocalDate = _clock.GetCurrentLocalDate();
+            var entries = new List<FixedExpensesEntryViewModel>();
+
             foreach (var fixedExpense in fixedExpenses)
             {
-                FixedExpenseEntries.Add(new FixedExpensesEntryViewModel(fixedExpense, _clock.GetCurrentLocalDate()));
+                entries.Add(new FixedExpensesEntryViewModel(fixedExpense, currentLocalDate));
 
                 if (fixedExpense.State != FixedExpenseRecordState.Empty)
                     continue;
@@ -146,6 +149,9 @@ public partial class FixedExpensesPanelViewModel : ValtViewModel, IDisposable
                 minTotal += fixedAmountMin;
                 maxTotal += fixedAmountMax;
             }
+
+            FixedExpenseEntries.Clear();
+            FixedExpenseEntries.AddRange(entries);
 
             if (minTotal == maxTotal)
             {

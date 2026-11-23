@@ -454,6 +454,7 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
 
         // Build flat list with group headers interspersed
         AccountListItems.Clear();
+        var listItems = new List<IAccountListItem>();
 
         // First, add grouped accounts with their headers
         foreach (var group in groups.OrderBy(g => g.DisplayOrder))
@@ -468,12 +469,8 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
             {
                 var (groupTotal, targetCurrency, isBtc) = CalculateGroupTotal(groupAccounts, group.TotalCurrency);
                 var header = new AccountGroupHeaderViewModel(group.Id, group.Name, groupTotal, targetCurrency, isBtc, _secureModeState.IsEnabled);
-                AccountListItems.Add(header);
-
-                foreach (var account in groupAccounts)
-                {
-                    AccountListItems.Add(account);
-                }
+                listItems.Add(header);
+                listItems.AddRange(groupAccounts);
             }
         }
 
@@ -482,10 +479,8 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
             .Where(a => a.GroupId is null)
             .Select(x => new AccountViewModel(x) { SecureModeEnabled = _secureModeState.IsEnabled });
 
-        foreach (var account in ungrouped)
-        {
-            AccountListItems.Add(account);
-        }
+        listItems.AddRange(ungrouped);
+        AccountListItems.AddRange(listItems);
 
         // Populate available groups for the "Move to Group" context menu
         AvailableGroups.Clear();

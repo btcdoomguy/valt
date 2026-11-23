@@ -913,6 +913,9 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
 
     private void OnRatesStatePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (e.PropertyName is not nameof(RatesState.FiatRates))
+            return;
+
         // Refresh summary when rates change
         LoadAssetsAsync().FireAndForgetSafeAsync(_runner, _logger);
     }
