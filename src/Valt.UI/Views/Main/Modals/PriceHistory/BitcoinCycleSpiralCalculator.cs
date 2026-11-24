@@ -11,7 +11,9 @@ public sealed record SpiralDataPoint(
     double NormalizedRadius,
     int CycleNumber,
     int CycleYearIndex,
-    int? HalvingNumber);
+    int? HalvingNumber,
+    bool IsCycleTop = false,
+    bool IsCycleBottom = false);
 
 public sealed record SpiralScreenPoint(
     Point Position,
@@ -33,6 +35,15 @@ public static class BitcoinCycleSpiralCalculator
         (2, new DateTime(2016, 7, 9)),
         (3, new DateTime(2020, 5, 11)),
         (4, new DateTime(2024, 4, 20))
+    ];
+
+    public static readonly IReadOnlyList<(int Cycle, DateTime PeakWindowStart, DateTime PeakWindowEnd, DateTime CycleEnd)> CycleBullBearWindows =
+    [
+        (1, new DateTime(2009, 1, 1),  new DateTime(2011, 12, 31), new DateTime(2012, 11, 28)),
+        (2, new DateTime(2012, 11, 29), new DateTime(2014, 6, 30),  new DateTime(2016, 7, 9)),
+        (3, new DateTime(2016, 7, 10),  new DateTime(2018, 6, 30),  new DateTime(2020, 5, 11)),
+        (4, new DateTime(2020, 5, 12),  new DateTime(2022, 6, 30),  new DateTime(2024, 4, 20)),
+        (5, new DateTime(2024, 4, 21),  new DateTime(2026, 3, 31),  new DateTime(2028, 4, 20))
     ];
 
     public static readonly IReadOnlyList<(double Log10Value, string Label)> PriceRingDefinitions =
@@ -126,7 +137,88 @@ public static class BitcoinCycleSpiralCalculator
                 cycleYearIdx,
                 halvingNumber));
         }
+
+        MarkCycleTopsAndBottoms(result);
+
         return result;
+    }
+
+    private static (DateTime PeakWindowStart, DateTime PeakWindowEnd, DateTime CycleEnd) GetCycleWindow(int cycleNumber)
+    {
+        for (var i = 0; i < CycleBullBearWindows.Count; i++)
+        {
+            if (CycleBullBearWindows[i].Cycle == cycleNumber)
+            {
+                var w = CycleBullBearWindows[i];
+                return (w.PeakWindowStart, w.PeakWindowEnd, w.CycleEnd);
+            }
+        }
+
+        var startYear = 2009 + (cycleNumber - 1) * 4;
+        return (
+            new DateTime(startYear - 1, 4, 21),
+            new DateTime(startYear + 1, 6, 30),
+            new DateTime(startYear + 3, 4, 20));
+    }
+
+    private static void MarkCycleTopsAndBottoms(List<SpiralDataPoint> points)
+    {
+        if (points.Count < 2)
+            return;
+
+        var maxCycle = 1;
+        for (var i = 0; i < points.Count; i++)
+        {
+            if (points[i].CycleNumber > maxCycle)
+                maxCycle = points[i].CycleNumber;
+        }
+
+        for (var cycle = 1; cycle <= maxCycle; cycle++)
+        {
+            var (peakStart, peakEnd, cycleEnd) = GetCycleWindow(cycle);
+
+            var topIdx = -1;
+            var topPrice = decimal.MinValue;
+            var peakCandidateCount = 0;
+
+            for (var i = 0; i < points.Count; i++)
+            {
+                var pt = points[i];
+                if (pt.Date >= peakStart && pt.Date <= peakEnd)
+                {
+                    peakCandidateCount++;
+                    if (pt.Price > topPrice)
+                    {
+                        topPrice = pt.Price;
+                        topIdx = i;
+                    }
+                }
+            }
+
+            if (topIdx < 0 || peakCandidateCount < 2)
+                continue;
+
+            var topDate = points[topIdx].Date;
+            points[topIdx] = points[topIdx] with { IsCycleTop = true };
+
+            var bottomIdx = -1;
+            var bottomPrice = topPrice;
+
+            for (var i = 0; i < points.Count; i++)
+            {
+                var pt = points[i];
+                if (pt.Date > topDate && pt.Date <= cycleEnd && pt.Price < bottomPrice)
+                {
+                    bottomPrice = pt.Price;
+                    bottomIdx = i;
+                }
+            }
+
+            if (bottomIdx >= 0)
+            {
+                points[bottomIdx] = points[bottomIdx] with { IsCycleBottom = true };
+            }
+        }
     }
 
     public static SpiralScreenPoint? FindNearestPoint(
@@ -151,7 +243,8 @@ public static class BitcoinCycleSpiralCalculator
             if (distSq > maxDistSq)
                 continue;
 
-            var effectiveDistSq = pt.Data.HalvingNumber.HasValue ? distSq * 0.1 : distSq;
+            var isMilestone = pt.Data.HalvingNumber.HasValue || pt.Data.IsCycleTop || pt.Data.IsCycleBottom;
+            var effectiveDistSq = isMilestone ? distSq * 0.1 : distSq;
             if (effectiveDistSq <= bestEffectiveDistSq)
             {
                 bestEffectiveDistSq = effectiveDistSq;

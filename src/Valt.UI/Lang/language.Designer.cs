@@ -5325,6 +5325,30 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string PriceHistory_Spiral_CycleTopLegend {
+            get {
+                return ResourceManager.GetString("PriceHistory.Spiral.CycleTopLegend", resourceCulture);
+            }
+        }
+        
+        public static string PriceHistory_Spiral_CycleBottomLegend {
+            get {
+                return ResourceManager.GetString("PriceHistory.Spiral.CycleBottomLegend", resourceCulture);
+            }
+        }
+        
+        public static string PriceHistory_Spiral_CycleTopMilestone {
+            get {
+                return ResourceManager.GetString("PriceHistory.Spiral.CycleTopMilestone", resourceCulture);
+            }
+        }
+        
+        public static string PriceHistory_Spiral_CycleBottomMilestone {
+            get {
+                return ResourceManager.GetString("PriceHistory.Spiral.CycleBottomMilestone", resourceCulture);
+            }
+        }
+        
         public static string Reports_CategoryFilter_SaveAsDefault {
             get {
                 return ResourceManager.GetString("Reports.CategoryFilter.SaveAsDefault", resourceCulture);

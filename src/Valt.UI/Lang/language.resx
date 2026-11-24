@@ -2683,6 +2683,18 @@
     <data name="PriceHistory.Spiral.LatestPriceLegend" xml:space="preserve">
         <value>Latest Price</value>
     </data>
+    <data name="PriceHistory.Spiral.CycleTopLegend" xml:space="preserve">
+        <value>Cycle Top</value>
+    </data>
+    <data name="PriceHistory.Spiral.CycleBottomLegend" xml:space="preserve">
+        <value>Cycle Bottom</value>
+    </data>
+    <data name="PriceHistory.Spiral.CycleTopMilestone" xml:space="preserve">
+        <value>Cycle Top</value>
+    </data>
+    <data name="PriceHistory.Spiral.CycleBottomMilestone" xml:space="preserve">
+        <value>Cycle Bottom</value>
+    </data>
     <data name="Reports.CategoryFilter.SaveAsDefault" xml:space="preserve">
         <value>Save as default</value>
     </data>

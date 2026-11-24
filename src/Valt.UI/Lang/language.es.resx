@@ -2680,6 +2680,18 @@
     <data name="PriceHistory.Spiral.LatestPriceLegend" xml:space="preserve">
         <value>Precio Más Reciente</value>
     </data>
+    <data name="PriceHistory.Spiral.CycleTopLegend" xml:space="preserve">
+        <value>Techo del Ciclo</value>
+    </data>
+    <data name="PriceHistory.Spiral.CycleBottomLegend" xml:space="preserve">
+        <value>Suelo del Ciclo</value>
+    </data>
+    <data name="PriceHistory.Spiral.CycleTopMilestone" xml:space="preserve">
+        <value>Techo del Ciclo</value>
+    </data>
+    <data name="PriceHistory.Spiral.CycleBottomMilestone" xml:space="preserve">
+        <value>Suelo del Ciclo</value>
+    </data>
     <data name="Reports.CategoryFilter.SaveAsDefault" xml:space="preserve">
         <value>Guardar como predeterminado</value>
     </data>

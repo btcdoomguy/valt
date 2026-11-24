@@ -133,6 +133,10 @@ public class PriceHistoryViewModelTests
                 Assert.That(language.PriceHistory_Spiral_HalvingMilestone, Is.Not.Null.And.Not.Empty);
                 Assert.That(language.PriceHistory_Spiral_HalvingLegend, Is.Not.Null.And.Not.Empty);
                 Assert.That(language.PriceHistory_Spiral_LatestPriceLegend, Is.Not.Null.And.Not.Empty);
+                Assert.That(language.PriceHistory_Spiral_CycleTopLegend, Is.Not.Null.And.Not.Empty);
+                Assert.That(language.PriceHistory_Spiral_CycleBottomLegend, Is.Not.Null.And.Not.Empty);
+                Assert.That(language.PriceHistory_Spiral_CycleTopMilestone, Is.Not.Null.And.Not.Empty);
+                Assert.That(language.PriceHistory_Spiral_CycleBottomMilestone, Is.Not.Null.And.Not.Empty);
             });
         }
         finally
