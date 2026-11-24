@@ -962,11 +962,11 @@
     <data name="Reports.BtcLoans.ClosestDistance.Tooltip" xml:space="preserve">
         <value>Distancia LTV hasta la liquidación para "{0}"</value>
     </data>
-    <data name="Reports.BtcLoans.WorstCaseLiquidationPrice" xml:space="preserve">
-        <value>Precio liq. (peor caso)</value>
+    <data name="Reports.BtcLoans.ClosestLiquidationPrice" xml:space="preserve">
+        <value>Precio de liq. más cercano</value>
     </data>
-    <data name="Reports.BtcLoans.WorstCaseLiquidationPrice.Tooltip" xml:space="preserve">
-        <value>Precio BTC más alto en el cual alguno de sus préstamos seguiría en riesgo</value>
+    <data name="Reports.BtcLoans.ClosestLiquidationPrice.Tooltip" xml:space="preserve">
+        <value>Primer precio estimado de margin call alcanzado cuando cae BTC, entre los préstamos activos</value>
     </data>
     <data name="Reports.BtcLoans.AccruedInterest" xml:space="preserve">
         <value>Intereses acumulados</value>
@@ -2331,6 +2331,9 @@
     <data name="Assets_Card_LTV" xml:space="preserve">
         <value>LTV: </value>
     </data>
+    <data name="Assets_Card_MarginCallPrice" xml:space="preserve">
+        <value>ELP (Margin Call): </value>
+    </data>
     <data name="Assets_Card_BorrowerPlatform" xml:space="preserve">
         <value>Prestatario: </value>
     </data>
@@ -2658,6 +2661,36 @@
     </data>
     <data name="PriceHistory.TotalRecords" xml:space="preserve">
         <value>{0} registros</value>
+    </data>
+    <data name="PriceHistory.Mode.LineChart" xml:space="preserve">
+        <value>Gráfico de Línea (5A)</value>
+    </data>
+    <data name="PriceHistory.Mode.SpiralChart" xml:space="preserve">
+        <value>Espiral del Ciclo de 4 Años</value>
+    </data>
+    <data name="PriceHistory.Spiral.CycleInfo" xml:space="preserve">
+        <value>Ciclo {0} • Año {1} de 4</value>
+    </data>
+    <data name="PriceHistory.Spiral.HalvingMilestone" xml:space="preserve">
+        <value>Halving #{0}</value>
+    </data>
+    <data name="PriceHistory.Spiral.HalvingLegend" xml:space="preserve">
+        <value>Halvings de Bitcoin</value>
+    </data>
+    <data name="PriceHistory.Spiral.LatestPriceLegend" xml:space="preserve">
+        <value>Precio Más Reciente</value>
+    </data>
+    <data name="PriceHistory.Spiral.CycleTopLegend" xml:space="preserve">
+        <value>Techo del Ciclo</value>
+    </data>
+    <data name="PriceHistory.Spiral.CycleBottomLegend" xml:space="preserve">
+        <value>Suelo del Ciclo</value>
+    </data>
+    <data name="PriceHistory.Spiral.CycleTopMilestone" xml:space="preserve">
+        <value>Techo del Ciclo</value>
+    </data>
+    <data name="PriceHistory.Spiral.CycleBottomMilestone" xml:space="preserve">
+        <value>Suelo del Ciclo</value>
     </data>
     <data name="Reports.CategoryFilter.SaveAsDefault" xml:space="preserve">
         <value>Guardar como predeterminado</value>

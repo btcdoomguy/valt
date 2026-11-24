@@ -16,6 +16,7 @@ using Valt.Infra.DataAccess;
 using Valt.Infra.Modules.Assets;
 using Valt.Infra.Modules.Budget.FixedExpenses;
 using Valt.Infra.Modules.Budget.Transactions;
+using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Modules.DataSources.Bitcoin;
 using Valt.Infra.Modules.DataSources.Fiat;
 using Valt.Infra.Mcp.Tools;
@@ -37,6 +38,7 @@ public class ReportToolsTests : IntegrationTest
     private IAllTimeHighReport _allTimeHighReport = null!;
     private IWealthOverviewReport _wealthOverviewReport = null!;
     private IMonthlyTotalsReport _monthlyTotalsReport = null!;
+    private IConfigurationManager _configurationManager = null!;
     private CurrencySettings _currencySettings = null!;
 
     [OneTimeSetUp]
@@ -55,6 +57,7 @@ public class ReportToolsTests : IntegrationTest
         _allTimeHighReport = _serviceProvider.GetRequiredService<IAllTimeHighReport>();
         _wealthOverviewReport = _serviceProvider.GetRequiredService<IWealthOverviewReport>();
         _monthlyTotalsReport = _serviceProvider.GetRequiredService<IMonthlyTotalsReport>();
+        _configurationManager = _serviceProvider.GetRequiredService<IConfigurationManager>();
         _currencySettings = _serviceProvider.GetRequiredService<CurrencySettings>();
         _currencySettings.MainFiatCurrency = FiatCurrency.Usd.Code;
     }
@@ -300,6 +303,7 @@ public class ReportToolsTests : IntegrationTest
         var result = await ReportTools.GetMonthlyTotals(
             _reportDataProviderFactory,
             _monthlyTotalsReport,
+            _configurationManager,
             firstOfMonth.ToString("yyyy-MM-dd"),
             today.ToString("yyyy-MM-dd"),
             FiatCurrency.Usd.Code);

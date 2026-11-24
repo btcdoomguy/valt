@@ -92,6 +92,7 @@ public partial class AssetViewModel : ObservableObject
     public decimal? InitialLtv { get; }
     public decimal? LiquidationLtv { get; }
     public decimal? MarginCallLtv { get; }
+    public decimal? MarginCallPrice { get; }
     public decimal? Fees { get; }
     public DateOnly? LoanStartDate { get; }
     public DateOnly? RepaymentDate { get; }
@@ -119,6 +120,7 @@ public partial class AssetViewModel : ObservableObject
     public string AccruedInterestFormatted { get; }
     public string TotalDebtFormatted { get; }
     public string DistanceToLiquidationLtvFormatted { get; }
+    public string MarginCallPriceFormatted { get; }
     public string DaysUntilRepaymentFormatted { get; }
     public string AmountLentFormatted { get; }
     public string EarnedInterestFormatted { get; }
@@ -221,6 +223,7 @@ public partial class AssetViewModel : ObservableObject
         InitialLtv = dto.InitialLtv;
         LiquidationLtv = dto.LiquidationLtv;
         MarginCallLtv = dto.MarginCallLtv;
+        MarginCallPrice = dto.MarginCallPrice;
         Fees = dto.Fees;
         LoanStartDate = dto.LoanStartDate;
         RepaymentDate = dto.RepaymentDate;
@@ -330,6 +333,10 @@ public partial class AssetViewModel : ObservableObject
 
         DistanceToLiquidationLtvFormatted = DistanceToLiquidationLtv.HasValue
             ? $"{DistanceToLiquidationLtv.Value:N2}pp"
+            : "-";
+
+        MarginCallPriceFormatted = MarginCallPrice.HasValue
+            ? CurrencyDisplay.FormatFiat(MarginCallPrice.Value, CurrencyCode)
             : "-";
 
         DaysUntilRepaymentFormatted = DaysUntilRepayment.HasValue

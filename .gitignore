@@ -47,3 +47,4 @@ ClientBin/
 
 # Test artifacts
 TestResults/
+.gsd-graph/

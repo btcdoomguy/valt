@@ -121,11 +121,10 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
                 .ThenBy(g => g.RefDate)
                 .ToList();
 
+            foreach (var entry in GoalEntries)
+                entry.Dispose();
             GoalEntries.Clear();
-            foreach (var goal in sortedGoals)
-            {
-                GoalEntries.Add(new GoalEntryViewModel(goal, _currencySettings.MainFiatCurrency));
-            }
+            GoalEntries.AddRange(sortedGoals.Select(goal => new GoalEntryViewModel(goal, _currencySettings.MainFiatCurrency)));
         }
         catch (Exception ex)
         {
@@ -340,6 +339,9 @@ public partial class GoalsPanelViewModel : ValtViewModel, IDisposable
 
     public void Dispose()
     {
+        foreach (var entry in GoalEntries)
+            entry.Dispose();
+
         _filterState.PropertyChanged -= FilterStateOnPropertyChanged;
         _secureModeState.PropertyChanged -= SecureModeStateOnPropertyChanged;
 

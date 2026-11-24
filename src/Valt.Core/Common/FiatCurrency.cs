@@ -4,126 +4,69 @@ namespace Valt.Core.Common;
 
 public record FiatCurrency(string Code, int Decimals, string Symbol, bool SymbolOnRight, string CultureName)
 {
-    public static FiatCurrency Brl => new FiatCurrency("BRL", 2, "R$", false, "pt-BR");
-    public static FiatCurrency Usd => new FiatCurrency("USD", 2, "$", false, "en-US");
-    public static FiatCurrency Eur => new FiatCurrency("EUR", 2, "€", false, "de-DE");
-    public static FiatCurrency Aud => new FiatCurrency("AUD", 2, "$", false, "en-AU");
-    public static FiatCurrency Bgn => new FiatCurrency("BGN", 2, "лв", false, "bg-BG");
-    public static FiatCurrency Cad => new FiatCurrency("CAD", 2, "$", false, "en-CA");
-    public static FiatCurrency Chf => new FiatCurrency("CHF", 2, "Fr", false, "de-CH");
-    public static FiatCurrency Cny => new FiatCurrency("CNY", 2, "¥", false, "zh-CN");
-    public static FiatCurrency Czk => new FiatCurrency("CZK", 2, "Kč", false, "cs-CZ");
-    public static FiatCurrency Dkk => new FiatCurrency("DKK", 2, "kr", false, "da-DK");
-    public static FiatCurrency Gbp => new FiatCurrency("GBP", 2, "£", false, "en-GB");
-    public static FiatCurrency Hkd => new FiatCurrency("HKD", 2, "$", false, "zh-HK");
-    public static FiatCurrency Huf => new FiatCurrency("HUF", 2, "Ft", false, "hu-HU");
-    public static FiatCurrency Idr => new FiatCurrency("IDR", 2, "Rp", false, "id-ID");
-    public static FiatCurrency Ils => new FiatCurrency("ILS", 2, "₪", false, "he-IL");
-    public static FiatCurrency Inr => new FiatCurrency("INR", 2, "₹", false, "hi-IN");
-    public static FiatCurrency Isk => new FiatCurrency("ISK", 2, "kr", false, "is-IS");
-    public static FiatCurrency Jpy => new FiatCurrency("JPY", 0, "¥", false, "ja-JP");
-    public static FiatCurrency Krw => new FiatCurrency("KRW", 0, "₩", false, "ko-KR");
-    public static FiatCurrency Mxn => new FiatCurrency("MXN", 2, "$", false, "es-MX");
-    public static FiatCurrency Myr => new FiatCurrency("MYR", 2, "RM", false, "ms-MY");
-    public static FiatCurrency Nok => new FiatCurrency("NOK", 2, "kr", false, "nb-NO");
-    public static FiatCurrency Nzd => new FiatCurrency("NZD", 2, "$", false, "en-NZ");
-    public static FiatCurrency Php => new FiatCurrency("PHP", 2, "₱", false, "fil-PH");
-    public static FiatCurrency Pln => new FiatCurrency("PLN", 2, "zł", false, "pl-PL");
-    public static FiatCurrency Ron => new FiatCurrency("RON", 2, "lei", false, "ro-RO");
-    public static FiatCurrency Sek => new FiatCurrency("SEK", 2, "kr", false, "sv-SE");
-    public static FiatCurrency Sgd => new FiatCurrency("SGD", 2, "$", false, "en-SG");
-    public static FiatCurrency Thb => new FiatCurrency("THB", 2, "฿", false, "th-TH");
-    public static FiatCurrency Try => new FiatCurrency("TRY", 2, "₺", false, "tr-TR");
-    public static FiatCurrency Uyu => new FiatCurrency("UYU", 2, "$U", false, "es-UY");
-    public static FiatCurrency Pyg => new FiatCurrency("PYG", 0, "₲", false, "es-PY");
-    public static FiatCurrency Zar => new FiatCurrency("ZAR", 2, "R", false, "en-ZA");
+    public static readonly FiatCurrency Brl = new("BRL", 2, "R$", false, "pt-BR");
+    public static readonly FiatCurrency Usd = new("USD", 2, "$", false, "en-US");
+    public static readonly FiatCurrency Eur = new("EUR", 2, "€", false, "de-DE");
+    public static readonly FiatCurrency Aud = new("AUD", 2, "$", false, "en-AU");
+    public static readonly FiatCurrency Bgn = new("BGN", 2, "лв", false, "bg-BG");
+    public static readonly FiatCurrency Cad = new("CAD", 2, "$", false, "en-CA");
+    public static readonly FiatCurrency Chf = new("CHF", 2, "Fr", false, "de-CH");
+    public static readonly FiatCurrency Cny = new("CNY", 2, "¥", false, "zh-CN");
+    public static readonly FiatCurrency Czk = new("CZK", 2, "Kč", false, "cs-CZ");
+    public static readonly FiatCurrency Dkk = new("DKK", 2, "kr", false, "da-DK");
+    public static readonly FiatCurrency Gbp = new("GBP", 2, "£", false, "en-GB");
+    public static readonly FiatCurrency Hkd = new("HKD", 2, "$", false, "zh-HK");
+    public static readonly FiatCurrency Huf = new("HUF", 2, "Ft", false, "hu-HU");
+    public static readonly FiatCurrency Idr = new("IDR", 2, "Rp", false, "id-ID");
+    public static readonly FiatCurrency Ils = new("ILS", 2, "₪", false, "he-IL");
+    public static readonly FiatCurrency Inr = new("INR", 2, "₹", false, "hi-IN");
+    public static readonly FiatCurrency Isk = new("ISK", 2, "kr", false, "is-IS");
+    public static readonly FiatCurrency Jpy = new("JPY", 0, "¥", false, "ja-JP");
+    public static readonly FiatCurrency Krw = new("KRW", 0, "₩", false, "ko-KR");
+    public static readonly FiatCurrency Mxn = new("MXN", 2, "$", false, "es-MX");
+    public static readonly FiatCurrency Myr = new("MYR", 2, "RM", false, "ms-MY");
+    public static readonly FiatCurrency Nok = new("NOK", 2, "kr", false, "nb-NO");
+    public static readonly FiatCurrency Nzd = new("NZD", 2, "$", false, "en-NZ");
+    public static readonly FiatCurrency Php = new("PHP", 2, "₱", false, "fil-PH");
+    public static readonly FiatCurrency Pln = new("PLN", 2, "zł", false, "pl-PL");
+    public static readonly FiatCurrency Ron = new("RON", 2, "lei", false, "ro-RO");
+    public static readonly FiatCurrency Sek = new("SEK", 2, "kr", false, "sv-SE");
+    public static readonly FiatCurrency Sgd = new("SGD", 2, "$", false, "en-SG");
+    public static readonly FiatCurrency Thb = new("THB", 2, "฿", false, "th-TH");
+    public static readonly FiatCurrency Try = new("TRY", 2, "₺", false, "tr-TR");
+    public static readonly FiatCurrency Uyu = new("UYU", 2, "$U", false, "es-UY");
+    public static readonly FiatCurrency Pyg = new("PYG", 0, "₲", false, "es-PY");
+    public static readonly FiatCurrency Zar = new("ZAR", 2, "R", false, "en-ZA");
+
+    private static readonly IReadOnlyList<FiatCurrency> AllCurrencies =
+    [
+        Brl, Usd, Eur, Aud, Bgn, Cad, Chf, Cny, Czk, Dkk, Gbp,
+        Hkd, Huf, Idr, Ils, Inr, Isk, Jpy, Krw, Mxn, Myr, Nok,
+        Nzd, Php, Pln, Ron, Sek, Sgd, Thb, Try, Uyu, Pyg, Zar
+    ];
+
+    private static readonly Dictionary<string, FiatCurrency> ByCode =
+        AllCurrencies.ToDictionary(c => c.Code, StringComparer.OrdinalIgnoreCase);
 
     public static FiatCurrency GetFromCode(string code)
     {
         return TryGetFromCode(code, out var currency)
-            ? currency
+            ? currency!
             : throw new InvalidCurrencyCodeException(code);
     }
 
     public static bool TryGetFromCode(string code, out FiatCurrency? currency)
     {
-        currency = code.ToLowerInvariant() switch
+        if (string.IsNullOrWhiteSpace(code))
         {
-            "brl" => Brl,
-            "usd" => Usd,
-            "eur" => Eur,
-            "aud" => Aud,
-            "bgn" => Bgn,
-            "cad" => Cad,
-            "chf" => Chf,
-            "cny" => Cny,
-            "czk" => Czk,
-            "dkk" => Dkk,
-            "gbp" => Gbp,
-            "hkd" => Hkd,
-            "huf" => Huf,
-            "idr" => Idr,
-            "ils" => Ils,
-            "inr" => Inr,
-            "isk" => Isk,
-            "jpy" => Jpy,
-            "krw" => Krw,
-            "mxn" => Mxn,
-            "myr" => Myr,
-            "nok" => Nok,
-            "nzd" => Nzd,
-            "php" => Php,
-            "pln" => Pln,
-            "ron" => Ron,
-            "sek" => Sek,
-            "sgd" => Sgd,
-            "thb" => Thb,
-            "try" => Try,
-            "uyu" => Uyu,
-            "pyg" => Pyg,
-            "zar" => Zar,
-            _ => (FiatCurrency?)null
-        };
+            currency = null;
+            return false;
+        }
 
-        return currency is not null;
+        return ByCode.TryGetValue(code, out currency);
     }
 
-    public static IEnumerable<FiatCurrency> GetAll()
-    {
-        yield return Brl;
-        yield return Usd;
-        yield return Eur;
-        yield return Aud;
-        yield return Bgn;
-        yield return Cad;
-        yield return Chf;
-        yield return Cny;
-        yield return Czk;
-        yield return Dkk;
-        yield return Gbp;
-        yield return Hkd;
-        yield return Huf;
-        yield return Idr;
-        yield return Ils;
-        yield return Inr;
-        yield return Isk;
-        yield return Jpy;
-        yield return Krw;
-        yield return Mxn;
-        yield return Myr;
-        yield return Nok;
-        yield return Nzd;
-        yield return Php;
-        yield return Pln;
-        yield return Ron;
-        yield return Sek;
-        yield return Sgd;
-        yield return Thb;
-        yield return Try;
-        yield return Uyu;
-        yield return Pyg;
-        yield return Zar;
-    }
+    public static IEnumerable<FiatCurrency> GetAll() => AllCurrencies;
 
     public override string ToString()
     {

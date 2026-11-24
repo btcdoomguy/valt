@@ -7,6 +7,10 @@ using NSubstitute;
 using Valt.App.Kernel.Queries;
 using Valt.App.Modules.Assets.DTOs;
 using Valt.App.Modules.Assets.Queries.GetBtcLoansDashboard;
+using Valt.App.Modules.Budget.Accounts.DTOs;
+using Valt.App.Modules.Budget.Accounts.Queries.GetAccounts;
+using Valt.App.Modules.Budget.Categories.DTOs;
+using Valt.App.Modules.Budget.Categories.Queries.GetCategories;
 using Valt.App.Modules.BtcDenominatedMetrics.DTOs;
 using Valt.App.Modules.BtcDenominatedMetrics.Queries;
 using Valt.App.Modules.LoanReports.DTOs;
@@ -150,6 +154,12 @@ public class ReportsViewModelTests
 
     private void ConfigureDefaultQueryDispatcherBehavior()
     {
+        _queryDispatcher.DispatchAsync(Arg.Any<GetAccountsQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<IReadOnlyList<AccountDTO>>([]));
+
+        _queryDispatcher.DispatchAsync(Arg.Any<GetCategoriesQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(new CategoriesDTO([])));
+
         _queryDispatcher.DispatchAsync(Arg.Any<GetFixedVsVariableQuery>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromException<FixedVsVariableDataDto>(new InvalidOperationException("Fixed vs variable fetch triggered")));
 
@@ -216,7 +226,6 @@ public class ReportsViewModelTests
             _wealthOverviewReport,
             _reportDataProviderFactory,
             _currencySettings,
-            _localDatabase,
             _clock,
             _logger,
             _accountsTotalState,
@@ -249,7 +258,6 @@ public class ReportsViewModelTests
             IWealthOverviewReport wealthOverviewReport,
             IReportDataProviderFactory reportDataProviderFactory,
             CurrencySettings currencySettings,
-            ILocalDatabase localDatabase,
             IClock clock,
             ILogger<ReportsViewModel> logger,
             AccountsTotalState accountsTotalState,
@@ -270,7 +278,7 @@ public class ReportsViewModelTests
             BurnRatePanelViewModel burnRatePanel)
             : base(allTimeHighReport, maxBtcStackReport, monthlyTotalsReport, expensesByCategoryReport,
                 incomeByCategoryReport, statisticsReport, wealthOverviewReport, reportDataProviderFactory,
-                currencySettings, localDatabase, clock, logger, accountsTotalState, ratesState,
+                currencySettings, clock, logger, accountsTotalState, ratesState,
                 customBtcPriceState, secureModeState, configurationManager, modalFactory, queryDispatcher,
                 indicatorCache, runner, indicatorsPanel, wealthPanel, btcStackPanel, simulatedPricesPanel,
                 leveragePanel, btcLoansPanel, burnRatePanel)
@@ -369,7 +377,6 @@ public class ReportsViewModelTests
             _wealthOverviewReport,
             _reportDataProviderFactory,
             _currencySettings,
-            _localDatabase,
             _clock,
             _logger,
             _accountsTotalState,
@@ -447,7 +454,6 @@ public class ReportsViewModelTests
             _wealthOverviewReport,
             _reportDataProviderFactory,
             _currencySettings,
-            _localDatabase,
             _clock,
             _logger,
             _accountsTotalState,
@@ -525,16 +531,16 @@ public class ReportsViewModelTests
         _configurationManager.GetReportsAnalyticsCategoryFilterExcludedIds()
             .Returns(new List<string> { excludedId });
 
-        var categories = Substitute.For<ILiteCollection<CategoryEntity>>();
-        categories.FindAll().Returns(new List<CategoryEntity>
-        {
-            new() { Id = new ObjectId("507f1f77bcf86cd799439011"), Name = "Category 1" },
-            new() { Id = new ObjectId(excludedId), Name = "Category 2" },
-            new() { Id = new ObjectId("507f1f77bcf86cd799439013"), Name = "Category 3" }
-        });
-        _localDatabase.GetCategories().Returns(categories);
+        _queryDispatcher.DispatchAsync(Arg.Any<GetCategoriesQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(new CategoriesDTO(
+            [
+                new CategoryDTO { Id = "507f1f77bcf86cd799439011", Name = "Category 1", SimpleName = "Category 1", Unicode = Icon.Empty.Unicode, Color = Icon.Empty.Color },
+                new CategoryDTO { Id = excludedId, Name = "Category 2", SimpleName = "Category 2", Unicode = Icon.Empty.Unicode, Color = Icon.Empty.Color },
+                new CategoryDTO { Id = "507f1f77bcf86cd799439013", Name = "Category 3", SimpleName = "Category 3", Unicode = Icon.Empty.Unicode, Color = Icon.Empty.Color }
+            ])));
 
         var viewModel = CreateViewModel();
+        viewModel.Initialize();
 
         // Act - use reflection to access private helper
         var method = typeof(ReportsViewModel).GetMethod(

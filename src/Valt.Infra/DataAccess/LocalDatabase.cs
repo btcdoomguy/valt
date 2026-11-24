@@ -197,6 +197,7 @@ internal sealed class LocalDatabase : ILocalDatabase
         transactions.EnsureIndex(x => x.SatAmountStateId);
         transactions.EnsureIndex(x => x.Type);
         transactions.EnsureIndex(x => x.GroupId);
+        transactions.EnsureIndex(x => x.IsExcluded);
 
         var configuration = GetOpenDatabase().GetCollection<ConfigurationEntity>("system_config");
         configuration.EnsureIndex(x => x.Key);
@@ -207,12 +208,14 @@ internal sealed class LocalDatabase : ILocalDatabase
         var goals = GetOpenDatabase().GetCollection<GoalEntity>("goals");
         goals.EnsureIndex(x => x.RefDate);
         goals.EnsureIndex(x => x.IsUpToDate);
+        goals.EnsureIndex(x => x.StateId);
 
         var assets = GetOpenDatabase().GetCollection<AssetEntity>("assets");
         assets.EnsureIndex(x => x.Visible);
         assets.EnsureIndex(x => x.IncludeInNetWorth);
         assets.EnsureIndex(x => x.DisplayOrder);
         assets.EnsureIndex(x => x.GroupId);
+        assets.EnsureIndex(x => x.IsSold);
 
         var wealthSnapshots = GetOpenDatabase().GetCollection<WealthSnapshotEntity>("wealth_snapshots");
         wealthSnapshots.EnsureIndex(x => x.SnapshotDay);

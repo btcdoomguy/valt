@@ -49,8 +49,8 @@ public class LoanReportsQueries : ILoanReportsQueries
         var loanTimelines = new List<LoanTimeline>();
         foreach (var loan in loanAssets)
         {
-            var timeline = await _assetQueries.GetLoanStateTimelineAsync(loan.Id);
-            if (timeline.Count == 0)
+            var timeline = loan.Snapshots;
+            if (timeline is null || timeline.Count == 0)
                 continue;
 
             loanTimelines.Add(new LoanTimeline(loan.Name, timeline));

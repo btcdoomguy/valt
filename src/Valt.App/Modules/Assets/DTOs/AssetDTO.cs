@@ -55,6 +55,7 @@ public record AssetDTO
     public decimal? InitialLtv { get; init; }
     public decimal? LiquidationLtv { get; init; }
     public decimal? MarginCallLtv { get; init; }
+    public decimal? MarginCallPrice { get; init; }
     public decimal? Fees { get; init; }
     public DateOnly? LoanStartDate { get; init; }
     public DateOnly? RepaymentDate { get; init; }
@@ -69,6 +70,7 @@ public record AssetDTO
     public int? DaysUntilRepayment { get; init; }
     public decimal? FixedTotalDebt { get; init; }
     public bool HasFixedTotalDebt { get; init; }
+    public IReadOnlyList<LoanStateSnapshotDTO>? Snapshots { get; init; }
 
     // BTC lending specific
     public decimal? AmountLent { get; init; }

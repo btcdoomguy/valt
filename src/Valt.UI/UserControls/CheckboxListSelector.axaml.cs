@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -208,6 +209,12 @@ public partial class CheckboxListSelector : UserControl
         if (selectedItems == null) return;
 
         selectedItems.Clear();
+
+        if (selectedItems is AvaloniaList<object> avaloniaList)
+        {
+            avaloniaList.AddRange(InternalItems.Where(x => x.IsSelected).Select(x => x.Item));
+            return;
+        }
 
         foreach (var item in InternalItems.Where(x => x.IsSelected))
         {

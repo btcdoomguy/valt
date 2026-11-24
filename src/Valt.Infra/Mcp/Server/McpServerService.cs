@@ -10,6 +10,7 @@ using Valt.Infra.Crawlers.LivePriceCrawlers.Bitcoin.Providers;
 using Valt.Infra.Crawlers.LivePriceCrawlers.Fiat.Providers;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel.BackgroundJobs;
+using Valt.Infra.Modules.Assets.PriceProviders;
 using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Modules.Currency.Services;
 using Valt.Infra.Modules.Reports;
@@ -278,5 +279,6 @@ public class McpServerService
         services.AddSingleton(_appServices.GetRequiredService<ILocalHistoricalPriceProvider>());
         services.AddSingleton(_appServices.GetRequiredService<IBitcoinPriceProvider>());
         services.AddSingleton(_appServices.GetRequiredService<IFiatPriceProviderSelector>());
+        services.AddSingleton(_appServices.GetRequiredService<IAssetPriceProviderSelector>());
     }
 }

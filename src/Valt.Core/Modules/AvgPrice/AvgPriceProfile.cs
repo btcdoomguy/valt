@@ -83,19 +83,20 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
         Recalculate(orderedList);
     }
 
-    public void AddLine(DateOnly date, int displayOrder, AvgPriceLineTypes type, decimal quantity, FiatValue amount,
-        string comment)
+    public AvgPriceLine AddLine(DateOnly date, int displayOrder, AvgPriceLineTypes type, decimal quantity, FiatValue amount,
+        string comment, bool preserveDisplayOrder = false)
     {
         var copiedList = _avgPriceLines.ToList();
 
         // Calculate the correct display order for the new line
         // Find the max display order for lines on the same date and increment by 1
-        var linesOnSameDate = _avgPriceLines.Where(x => x.Date == date).ToList();
-        var calculatedDisplayOrder = linesOnSameDate.Count > 0
-            ? linesOnSameDate.Max(x => x.DisplayOrder) + 1
-            : 0;
+        var effectiveDisplayOrder = preserveDisplayOrder
+            ? displayOrder
+            : _avgPriceLines.Where(x => x.Date == date)
+                .Select(x => (int?)x.DisplayOrder)
+                .Max() + 1 ?? 0;
 
-        var newLine = AvgPriceLine.New(date, calculatedDisplayOrder, type, quantity, amount, comment);
+        var newLine = AvgPriceLine.New(date, effectiveDisplayOrder, type, quantity, amount, comment);
         copiedList.Add(newLine);
 
         var orderedList = copiedList.OrderBy(x => x.Date).ThenBy(x => x.DisplayOrder).ToList();
@@ -105,6 +106,8 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
         _avgPriceLines.Add(newLine);
 
         AddEvent(new AvgPriceLineCreatedEvent(newLine));
+
+        return newLine;
     }
 
     public void RemoveLine(AvgPriceLine line)
@@ -123,6 +126,8 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
         var linesFromSameDate = _avgPriceLines.Where(x => x.Date == line.Date).OrderBy(x => x.DisplayOrder).ToList();
 
         var indexOfLine = linesFromSameDate.IndexOf(line);
+        if (indexOfLine <= 0)
+            return;
 
         linesFromSameDate.Remove(line);
         linesFromSameDate.Insert(indexOfLine - 1, line);
@@ -136,6 +141,8 @@ public class AvgPriceProfile : AggregateRoot<AvgPriceProfileId>
         var linesFromSameDate = _avgPriceLines.Where(x => x.Date == line.Date).OrderBy(x => x.DisplayOrder).ToList();
 
         var indexOfLine = linesFromSameDate.IndexOf(line);
+        if (indexOfLine < 0 || indexOfLine >= linesFromSameDate.Count - 1)
+            return;
 
         linesFromSameDate.Remove(line);
         linesFromSameDate.Insert(indexOfLine + 1, line);

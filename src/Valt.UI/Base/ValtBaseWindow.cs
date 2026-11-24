@@ -72,6 +72,12 @@ public abstract class ValtBaseWindow : Window
         }, DispatcherPriority.Render);
     }
     
+    protected override void OnClosed(EventArgs e)
+    {
+        base.OnClosed(e);
+        (DataContext as IDisposable)?.Dispose();
+    }
+
     protected void CustomTitleBarButtonPressed(object? sender, PointerPressedEventArgs e)
     {
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)

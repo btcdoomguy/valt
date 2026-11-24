@@ -1,5 +1,7 @@
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -13,6 +15,7 @@ namespace Valt.UI.Views.Main.Tabs.Transactions;
 public partial class TransactionListView : ValtBaseUserControl
 {
     private DataGridColumn? _sortingRestoreGuard;
+    private CancellationTokenSource? _searchDebounceCts;
 
     public TransactionListView()
     {
@@ -46,6 +49,9 @@ public partial class TransactionListView : ValtBaseUserControl
         MainGrid.RemoveHandler(PointerPressedEvent, MainGrid_OnPointerPressed);
         MainGrid.Sorting -= MainGrid_OnSorting;
         _sortingRestoreGuard = null;
+        _searchDebounceCts?.Cancel();
+        _searchDebounceCts?.Dispose();
+        _searchDebounceCts = null;
     }
 
     private void RestoreDataGridSettings()
@@ -184,17 +190,28 @@ public partial class TransactionListView : ValtBaseUserControl
 
     private void SearchBox_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (DataContext is TransactionListViewModel viewModel)
-        {
-            viewModel.ApplySearchCommand.Execute(null);
-        }
+        // Autocomplete dropdown selection also updates Text, which triggers SearchBox_OnTextChanged.
     }
 
-    private void SearchBox_OnTextChanged(object? sender, TextChangedEventArgs e)
+    private async void SearchBox_OnTextChanged(object? sender, TextChangedEventArgs e)
     {
-        if (DataContext is TransactionListViewModel viewModel)
+        _searchDebounceCts?.Cancel();
+        _searchDebounceCts?.Dispose();
+        var cts = new CancellationTokenSource();
+        _searchDebounceCts = cts;
+
+        try
         {
-            viewModel.ApplySearchCommand.Execute(null);
+            await Task.Delay(250, cts.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        if (!cts.Token.IsCancellationRequested && DataContext is TransactionListViewModel viewModel)
+        {
+            Dispatcher.UIThread.Post(() => viewModel.ApplySearchCommand.Execute(null));
         }
     }
 }

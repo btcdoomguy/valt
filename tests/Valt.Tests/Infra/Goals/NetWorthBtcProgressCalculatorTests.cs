@@ -133,6 +133,7 @@ public class NetWorthBtcProgressCalculatorTests : IDisposable
             : new List<BitcoinDataEntity>();
         var btcCollection = Substitute.For<ILiteCollection<BitcoinDataEntity>>();
         btcCollection.FindAll().Returns(btcData);
+        btcCollection.FindOne(Arg.Any<BsonExpression>()).Returns(btcData.FirstOrDefault());
         _priceDatabase.GetBitcoinData().Returns(btcCollection);
 
         var fiatData = fiatRates.Select(kvp => new FiatDataEntity

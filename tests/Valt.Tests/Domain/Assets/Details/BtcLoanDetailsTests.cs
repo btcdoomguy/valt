@@ -1024,5 +1024,44 @@ public class BtcLoanDetailsTests
         });
     }
 
+    [Test]
+    public void Should_Calculate_MarginCallPrice_Without_Snapshots()
+    {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var loan = CreateDefaultDetails(loanAmount: 25_000m, fees: 0m, marginCallLtv: 70m, loanStartDate: today);
+
+        // Total debt = 25_000 (no fees, no accrued interest starting today).
+        // ELP = 25_000 / (1 BTC * 0.70) = 35_714.29
+        Assert.That(loan.CalculateMarginCallPrice(), Is.EqualTo(35_714.29m));
+    }
+
+    [Test]
+    public void Should_Use_Latest_Snapshot_For_MarginCallPrice()
+    {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var loan = CreateDefaultDetails(loanAmount: 25_000m, fees: 0m, marginCallLtv: 70m, loanStartDate: today);
+
+        var details = loan.WithAddedSnapshot(CreateSnapshot(
+            loan,
+            today,
+            25_000m,
+            collateralSats: 50_000_000,
+            marginCallLtv: 50m));
+
+        // Snapshot collateral = 0.5 BTC, snapshot margin call LTV = 50%, total debt = 25_000.
+        // ELP = 25_000 / (0.5 * 0.50) = 100_000
+        Assert.That(details.CalculateMarginCallPrice(), Is.EqualTo(100_000m));
+    }
+
+    [Test]
+    public void Should_Round_MarginCallPrice_To_Two_Decimals()
+    {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var loan = CreateDefaultDetails(loanAmount: 20_000m, fees: 0m, marginCallLtv: 70m, loanStartDate: today);
+
+        // 20_000 / 0.70 = 28_571.4285... rounded to 28_571.43
+        Assert.That(loan.CalculateMarginCallPrice(), Is.EqualTo(28_571.43m));
+    }
+
     #endregion
 }

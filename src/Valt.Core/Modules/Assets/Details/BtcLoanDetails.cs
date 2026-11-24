@@ -146,13 +146,17 @@ public sealed class BtcLoanDetails : IAssetDetails
         Status = status;
         CurrentBtcPriceInLoanCurrency = currentBtcPriceInLoanCurrency;
         FixedTotalDebt = fixedTotalDebt;
-        Snapshots = snapshots ?? new List<LoanStateSnapshot>().AsReadOnly();
-
-        if (Snapshots.Count > 0)
+        if (snapshots is { Count: > 0 })
         {
-            var distinctEffectiveDates = Snapshots.Select(s => s.EffectiveDate).Distinct().Count();
-            if (distinctEffectiveDates != Snapshots.Count)
+            var distinctEffectiveDates = snapshots.Select(s => s.EffectiveDate).Distinct().Count();
+            if (distinctEffectiveDates != snapshots.Count)
                 throw new ArgumentException("Snapshots cannot contain duplicate effective dates", nameof(snapshots));
+
+            Snapshots = snapshots.OrderBy(s => s.EffectiveDate).ToList().AsReadOnly();
+        }
+        else
+        {
+            Snapshots = Array.Empty<LoanStateSnapshot>();
         }
     }
 
@@ -162,7 +166,7 @@ public sealed class BtcLoanDetails : IAssetDetails
     /// single source of truth, falling back to the immutable setup values when empty.
     /// </summary>
     private LoanStateSnapshot? GetEffectiveSnapshot()
-        => Snapshots.Count == 0 ? null : Snapshots.MaxBy(s => s.EffectiveDate);
+        => Snapshots.Count == 0 ? null : Snapshots[^1];
 
     /// <summary>
     /// Calculates the current LTV ratio given a BTC price.
@@ -208,6 +212,24 @@ public sealed class BtcLoanDetails : IAssetDetails
 
         var currentLtv = CalculateCurrentLtv(btcPrice);
         return Math.Round(Math.Max(0, liquidationLtv - currentLtv), 2);
+    }
+
+    /// <summary>
+    /// Calculates the estimated BTC price (in the loan's currency) at which the loan reaches its
+    /// margin call LTV — the estimated liquidation price (ELP). Snapshot-aware: the effective
+    /// snapshot's collateral sats and margin call LTV win over the setup values; the current
+    /// total debt (including snapshot-based accrual) is used as the debt basis.
+    /// </summary>
+    public decimal CalculateMarginCallPrice()
+    {
+        var snapshot = GetEffectiveSnapshot();
+        var collateralSats = snapshot?.CollateralSats ?? CollateralSats;
+        var marginCallLtv = snapshot?.MarginCallLtv ?? MarginCallLtv;
+
+        var collateralBtc = collateralSats / 100_000_000m;
+        var totalDebt = CalculateTotalDebt();
+
+        return Math.Round(totalDebt / (collateralBtc * marginCallLtv / 100m), 2);
     }
 
     /// <summary>

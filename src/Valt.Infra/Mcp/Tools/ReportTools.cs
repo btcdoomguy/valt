@@ -10,6 +10,7 @@ using Valt.App.Modules.SpendingAnalytics.Queries;
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Categories;
+using Valt.Infra.Modules.Configuration;
 using Valt.Infra.Modules.Reports;
 using Valt.Infra.Modules.Reports.AllTimeHigh;
 using Valt.Infra.Modules.Reports.MaxBtcStack;
@@ -34,6 +35,7 @@ public class ReportTools
     public static async Task<MonthlyTotalsResultDto> GetMonthlyTotals(
         IReportDataProviderFactory providerFactory,
         IMonthlyTotalsReport report,
+        IConfigurationManager configurationManager,
         [Description("Start date of the range (format: yyyy-MM-dd)")] string startDate,
         [Description("End date of the range (format: yyyy-MM-dd)")] string endDate,
         [Description("Currency code (e.g., 'USD', 'BRL')")] string currencyCode)
@@ -45,7 +47,10 @@ public class ReportTools
         var baseDate = end;
         var range = new DateOnlyRange(start, end);
 
-        var data = await report.GetAsync(baseDate, range, currency, provider);
+        var excludedIds = configurationManager.GetReportsAnalyticsCategoryFilterExcludedIds();
+        var excludedSet = excludedIds.Count > 0 ? new HashSet<string>(excludedIds) : null;
+
+        var data = await report.GetAsync(baseDate, range, currency, provider, excludedSet);
 
         return new MonthlyTotalsResultDto
         {
@@ -106,7 +111,8 @@ public class ReportTools
                 PeriodEnd = i.PeriodEnd.ToString("yyyy-MM-dd"),
                 Label = i.Label,
                 FiatTotal = i.FiatTotal,
-                BtcTotal = i.BtcTotal
+                BtcTotal = i.BtcTotal,
+                AssetsTotalFiat = i.AssetsTotalFiat
             }).ToList()
         };
     }
@@ -246,13 +252,17 @@ public class ReportTools
     public static async Task<StatisticsResultDto> GetStatistics(
         IReportDataProviderFactory providerFactory,
         IStatisticsReport report,
+        IConfigurationManager configurationManager,
         [Description("Currency code (e.g., 'USD', 'BRL')")] string currencyCode,
         [Description("Current total wealth in the specified fiat currency")] decimal currentWealthInFiat)
     {
         var provider = await providerFactory.CreateAsync();
         var currency = FiatCurrency.GetFromCode(currencyCode);
 
-        var data = await report.GetAsync(currency, currentWealthInFiat, provider);
+        var excludedIds = configurationManager.GetReportsAnalyticsCategoryFilterExcludedIds();
+        var excludedSet = excludedIds.Count > 0 ? new HashSet<string>(excludedIds) : null;
+
+        var data = await report.GetAsync(currency, currentWealthInFiat, provider, excludedSet);
 
         return new StatisticsResultDto
         {
@@ -478,7 +488,8 @@ public class ReportTools
                     PeriodEnd = i.PeriodEnd.ToString("yyyy-MM-dd"),
                     Label = i.Label,
                     FiatTotal = i.FiatTotal,
-                    BtcTotal = i.BtcTotal
+                    BtcTotal = i.BtcTotal,
+                    AssetsTotalFiat = i.AssetsTotalFiat
                 }).ToList()
             }
         };
@@ -577,6 +588,7 @@ public class WealthOverviewItemDto
     public required string Label { get; init; }
     public required decimal FiatTotal { get; init; }
     public required decimal BtcTotal { get; init; }
+    public required decimal AssetsTotalFiat { get; init; }
 }
 
 public class CategoryBreakdownResultDto
@@ -695,6 +707,7 @@ public class WealthOverviewItemResultDto
     public required string Label { get; init; }
     public required decimal FiatTotal { get; init; }
     public required decimal BtcTotal { get; init; }
+    public required decimal AssetsTotalFiat { get; init; }
 }
 
 #endregion

@@ -16,9 +16,10 @@ public abstract class ReportChartDataBase : IDisposable
     protected static readonly SKColor TextColor = SKColor.Parse("#a8a6a4");        // Text400
     protected static readonly SKColor LegendTextColor = SKColor.Parse("#eeebe8");  // Text200
     protected static readonly SKColor ChartBackground = SKColor.Parse("#333333");  // Background800
+    protected static readonly SKTypeface InterTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal);
 
-    public SolidColorPaint LegendTextPaint { get; } = new(LegendTextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) };
-    public SolidColorPaint TooltipTextPaint { get; } = new(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) };
+    public SolidColorPaint LegendTextPaint { get; } = new(LegendTextColor) { SKTypeface = InterTypeface };
+    public SolidColorPaint TooltipTextPaint { get; } = new(TextColor) { SKTypeface = InterTypeface };
     public SolidColorPaint TooltipBackgroundPaint { get; } = new(ChartBackground);
 
     public ObservableCollection<ISeries> Series { get; } = new();
@@ -38,7 +39,7 @@ public abstract class ReportChartDataBase : IDisposable
         ForceStepToMin = true,
         MinStep = 1,
         SeparatorsPaint = new SolidColorPaint(GridColor.WithAlpha(60)) { StrokeThickness = 1 },
-        LabelsPaint = new SolidColorPaint(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) },
+        LabelsPaint = new SolidColorPaint(TextColor) { SKTypeface = InterTypeface },
         TextSize = 12,
         Position = AxisPosition.End,
         Labels = labels,
@@ -49,7 +50,7 @@ public abstract class ReportChartDataBase : IDisposable
     protected static Axis CreateValueAxis(Func<double, string> labeler, double? minLimit = null) => new()
     {
         Labeler = labeler,
-        LabelsPaint = new SolidColorPaint(TextColor) { SKTypeface = SKTypeface.FromFamilyName("Inter", SKFontStyle.Normal) },
+        LabelsPaint = new SolidColorPaint(TextColor) { SKTypeface = InterTypeface },
         TextSize = 12,
         SeparatorsPaint = new SolidColorPaint(GridColor.WithAlpha(40)) { StrokeThickness = 1 },
         MinLimit = minLimit,

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
@@ -9,16 +10,21 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Budget.FixedExpenses.Commands.IgnoreFixedExpense;
+using Valt.App.Modules.Budget.FixedExpenses.Commands.MarkFixedExpenseAsPaid;
+using Valt.App.Modules.Budget.FixedExpenses.Commands.UndoIgnoreFixedExpense;
+using Valt.App.Modules.Budget.FixedExpenses.Commands.UnmarkFixedExpenseAsPaid;
+using Valt.App.Modules.Budget.FixedExpenses.Queries.GetFixedExpensesOfMonth;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Kernel.Factories;
 using Valt.Core.Modules.Budget.Accounts;
 using Valt.Core.Modules.Budget.Categories;
 using Valt.Core.Modules.Budget.FixedExpenses;
-using Valt.Core.Modules.Budget.FixedExpenses.Contracts;
 using Valt.Core.Modules.Budget.Transactions;
 using Valt.Infra.Kernel;
-using Valt.Infra.Modules.Budget.FixedExpenses;
 using Valt.Infra.Settings;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
@@ -36,8 +42,8 @@ namespace Valt.UI.Views.Main.Tabs.Transactions;
 public partial class FixedExpensesPanelViewModel : ValtViewModel, IDisposable
 {
     private readonly IModalFactory _modalFactory = null!;
-    private readonly IFixedExpenseProvider _fixedExpenseProvider = null!;
-    private readonly IFixedExpenseRecordService _fixedExpenseRecordService = null!;
+    private readonly IQueryDispatcher _queryDispatcher = null!;
+    private readonly ICommandDispatcher _commandDispatcher = null!;
     private readonly RatesState _ratesState = null!;
     private readonly CurrencySettings _currencySettings = null!;
     private readonly FilterState _filterState = null!;
@@ -57,8 +63,8 @@ public partial class FixedExpensesPanelViewModel : ValtViewModel, IDisposable
 
     public FixedExpensesPanelViewModel(
         IModalFactory modalFactory,
-        IFixedExpenseProvider fixedExpenseProvider,
-        IFixedExpenseRecordService fixedExpenseRecordService,
+        IQueryDispatcher queryDispatcher,
+        ICommandDispatcher commandDispatcher,
         RatesState ratesState,
         CurrencySettings currencySettings,
         FilterState filterState,
@@ -67,8 +73,8 @@ public partial class FixedExpensesPanelViewModel : ValtViewModel, IDisposable
         SecureModeState secureModeState)
     {
         _modalFactory = modalFactory;
-        _fixedExpenseProvider = fixedExpenseProvider;
-        _fixedExpenseRecordService = fixedExpenseRecordService;
+        _queryDispatcher = queryDispatcher;
+        _commandDispatcher = commandDispatcher;
         _ratesState = ratesState;
         _currencySettings = currencySettings;
         _filterState = filterState;
@@ -121,19 +127,22 @@ public partial class FixedExpensesPanelViewModel : ValtViewModel, IDisposable
         try
         {
             var value = DateOnly.FromDateTime(_filterState.MainDate);
-            var fixedExpenses = await _fixedExpenseProvider.GetFixedExpensesOfMonthAsync(value);
-
-            fixedExpenses = fixedExpenses.OrderBy(x => x.State).ThenBy(x => x.ReferenceDate).ToList();
+            var fixedExpenses = (await _queryDispatcher.DispatchAsync(new GetFixedExpensesOfMonthQuery(value)))
+                .OrderBy(x => x.State)
+                .ThenBy(x => x.ReferenceDate)
+                .ToList();
 
             var minTotal = 0m;
             var maxTotal = 0m;
 
             var fixedExpenseHelper = new FixedExpenseHelper(_ratesState, _currencySettings);
 
-            FixedExpenseEntries.Clear();
+            var currentLocalDate = _clock.GetCurrentLocalDate();
+            var entries = new List<FixedExpensesEntryViewModel>();
+
             foreach (var fixedExpense in fixedExpenses)
             {
-                FixedExpenseEntries.Add(new FixedExpensesEntryViewModel(fixedExpense, _clock.GetCurrentLocalDate()));
+                entries.Add(new FixedExpensesEntryViewModel(fixedExpense, currentLocalDate));
 
                 if (fixedExpense.State != FixedExpenseRecordState.Empty)
                     continue;
@@ -146,6 +155,9 @@ public partial class FixedExpensesPanelViewModel : ValtViewModel, IDisposable
                 minTotal += fixedAmountMin;
                 maxTotal += fixedAmountMax;
             }
+
+            FixedExpenseEntries.Clear();
+            FixedExpenseEntries.AddRange(entries);
 
             if (minTotal == maxTotal)
             {
@@ -296,8 +308,7 @@ public partial class FixedExpensesPanelViewModel : ValtViewModel, IDisposable
         if (entry is null)
             return;
 
-        await _fixedExpenseRecordService.IgnoreFixedExpenseAsync(
-            new TransactionFixedExpenseReference(entry.Id, entry.ReferenceDate));
+        await _commandDispatcher.DispatchAsync(new IgnoreFixedExpenseCommand(entry.Id, entry.ReferenceDate));
         await FetchFixedExpenses();
     }
 
@@ -310,8 +321,7 @@ public partial class FixedExpensesPanelViewModel : ValtViewModel, IDisposable
         if (entry is null)
             return;
 
-        await _fixedExpenseRecordService.MarkFixedExpenseAsPaidAsync(
-            new TransactionFixedExpenseReference(entry.Id, entry.ReferenceDate));
+        await _commandDispatcher.DispatchAsync(new MarkFixedExpenseAsPaidCommand(entry.Id, entry.ReferenceDate));
         await FetchFixedExpenses();
     }
 
@@ -324,8 +334,7 @@ public partial class FixedExpensesPanelViewModel : ValtViewModel, IDisposable
         if (entry is null)
             return;
 
-        await _fixedExpenseRecordService.UndoIgnoreFixedExpenseAsync(
-            new TransactionFixedExpenseReference(entry.Id, entry.ReferenceDate));
+        await _commandDispatcher.DispatchAsync(new UndoIgnoreFixedExpenseCommand(entry.Id, entry.ReferenceDate));
         await FetchFixedExpenses();
     }
 
@@ -338,8 +347,7 @@ public partial class FixedExpensesPanelViewModel : ValtViewModel, IDisposable
         if (entry is null)
             return;
 
-        await _fixedExpenseRecordService.UnmarkFixedExpenseAsPaidAsync(
-            new TransactionFixedExpenseReference(entry.Id, entry.ReferenceDate));
+        await _commandDispatcher.DispatchAsync(new UnmarkFixedExpenseAsPaidCommand(entry.Id, entry.ReferenceDate));
         await FetchFixedExpenses();
     }
 

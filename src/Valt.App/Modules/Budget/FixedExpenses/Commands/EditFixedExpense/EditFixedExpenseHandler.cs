@@ -1,7 +1,6 @@
 using Valt.App.Kernel;
 using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Validation;
-using Valt.App.Modules.Budget.FixedExpenses.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Common.Exceptions;
 using Valt.Core.Modules.Budget.Accounts;
@@ -42,17 +41,8 @@ internal sealed class EditFixedExpenseHandler : ICommandHandler<EditFixedExpense
                 new Error("VALIDATION_FAILED", "Validation failed", validation.Errors));
 
         // Get existing fixed expense
-        FixedExpense? fixedExpense;
-        try
-        {
-            fixedExpense = await _fixedExpenseRepository.GetFixedExpenseByIdAsync(
-                new FixedExpenseId(command.FixedExpenseId));
-        }
-        catch (Exception) when (true)
-        {
-            // Repository has a bug where it throws an exception when entity is not found
-            fixedExpense = null;
-        }
+        var fixedExpense = await _fixedExpenseRepository.GetFixedExpenseByIdAsync(
+            new FixedExpenseId(command.FixedExpenseId));
 
         if (fixedExpense is null)
             return Result<EditFixedExpenseResult>.Failure(
@@ -100,7 +90,7 @@ internal sealed class EditFixedExpenseHandler : ICommandHandler<EditFixedExpense
         // Add new range if provided
         if (command.NewRange is not null)
         {
-            var range = BuildRange(command.NewRange);
+            var range = FixedExpenseRangeBuilder.BuildRange(command.NewRange);
             if (range is null)
                 return Result<EditFixedExpenseResult>.Failure("INVALID_RANGE", "Invalid range configuration");
 
@@ -118,26 +108,5 @@ internal sealed class EditFixedExpenseHandler : ICommandHandler<EditFixedExpense
         await _fixedExpenseRepository.SaveFixedExpenseAsync(fixedExpense);
 
         return Result<EditFixedExpenseResult>.Success(new EditFixedExpenseResult());
-    }
-
-    private static FixedExpenseRange? BuildRange(FixedExpenseRangeInputDTO dto)
-    {
-        var period = (FixedExpensePeriods)dto.PeriodId;
-
-        if (dto.FixedAmount.HasValue)
-        {
-            var amount = FiatValue.New(dto.FixedAmount.Value);
-            return FixedExpenseRange.CreateFixedAmount(amount, period, dto.PeriodStart, dto.Day);
-        }
-
-        if (dto.RangedAmountMin.HasValue && dto.RangedAmountMax.HasValue)
-        {
-            var min = FiatValue.New(dto.RangedAmountMin.Value);
-            var max = FiatValue.New(dto.RangedAmountMax.Value);
-            var rangedAmount = new RangedFiatValue(min, max);
-            return FixedExpenseRange.CreateRangedAmount(rangedAmount, period, dto.PeriodStart, dto.Day);
-        }
-
-        return null;
     }
 }

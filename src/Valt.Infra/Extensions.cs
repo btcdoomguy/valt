@@ -299,7 +299,7 @@ public static class Extensions
     {
         services.AddSingleton<IFixedExpenseRecordService, FixedExpenseRecordService>();
         services.AddSingleton<IAccountCacheService, AccountCacheService>();
-        services.AddSingleton<ITransactionTermService, TransactionTermService>();
+        services.AddSingleton<ITransactionTermService>(sp => sp.GetRequiredService<TransactionTermService>());
         services.AddSingleton<IAccountTotalsCalculator, AccountTotalsCalculator>();
         services.AddSingleton<ITransactionAutoSatAmountCalculator, TransactionAutoSatAmountCalculator>();
         services.AddSingleton<IAvgPriceTotalizer, AvgPriceTotalizer>();

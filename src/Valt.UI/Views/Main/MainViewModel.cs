@@ -641,16 +641,21 @@ public partial class MainViewModel : ValtViewModel, IDisposable
             _ => null
         };
 
+        var oldImage = PepeMoodImage;
+
         if (assetName is null)
         {
             ShowPepe = false;
             PepeMoodImage = null;
+            oldImage?.Dispose();
             return;
         }
 
         ShowPepe = true;
         var uri = new Uri($"avares://Valt/Assets/Pepe/{assetName}");
-        PepeMoodImage = new Bitmap(AssetLoader.Open(uri));
+        using var stream = AssetLoader.Open(uri);
+        PepeMoodImage = new Bitmap(stream);
+        oldImage?.Dispose();
     }
 
     public void Dispose()

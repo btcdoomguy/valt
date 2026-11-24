@@ -3,4 +3,4 @@ using Valt.App.Modules.Budget.Accounts.DTOs;
 
 namespace Valt.App.Modules.Budget.Accounts.Queries.GetAccounts;
 
-public record GetAccountsQuery(bool ShowHiddenAccounts) : IQuery<IReadOnlyList<AccountDTO>>;
+public record GetAccountsQuery(bool ShowHiddenAccounts = true) : IQuery<IReadOnlyList<AccountDTO>>;

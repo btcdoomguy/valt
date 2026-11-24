@@ -1929,15 +1929,15 @@ namespace Valt.UI.Lang {
             }
         }
         
-        public static string Reports_BtcLoans_WorstCaseLiquidationPrice {
+        public static string Reports_BtcLoans_ClosestLiquidationPrice {
             get {
-                return ResourceManager.GetString("Reports.BtcLoans.WorstCaseLiquidationPrice", resourceCulture);
+                return ResourceManager.GetString("Reports.BtcLoans.ClosestLiquidationPrice", resourceCulture);
             }
         }
         
-        public static string Reports_BtcLoans_WorstCaseLiquidationPrice_Tooltip {
+        public static string Reports_BtcLoans_ClosestLiquidationPrice_Tooltip {
             get {
-                return ResourceManager.GetString("Reports.BtcLoans.WorstCaseLiquidationPrice.Tooltip", resourceCulture);
+                return ResourceManager.GetString("Reports.BtcLoans.ClosestLiquidationPrice.Tooltip", resourceCulture);
             }
         }
         
@@ -4629,6 +4629,12 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string Assets_Card_MarginCallPrice {
+            get {
+                return ResourceManager.GetString("Assets_Card_MarginCallPrice", resourceCulture);
+            }
+        }
+        
         public static string Assets_Card_BorrowerPlatform {
             get {
                 return ResourceManager.GetString("Assets_Card_BorrowerPlatform", resourceCulture);
@@ -5280,6 +5286,66 @@ namespace Valt.UI.Lang {
         public static string PriceHistory_TotalRecords {
             get {
                 return ResourceManager.GetString("PriceHistory.TotalRecords", resourceCulture);
+            }
+        }
+        
+        public static string PriceHistory_Mode_LineChart {
+            get {
+                return ResourceManager.GetString("PriceHistory.Mode.LineChart", resourceCulture);
+            }
+        }
+        
+        public static string PriceHistory_Mode_SpiralChart {
+            get {
+                return ResourceManager.GetString("PriceHistory.Mode.SpiralChart", resourceCulture);
+            }
+        }
+        
+        public static string PriceHistory_Spiral_CycleInfo {
+            get {
+                return ResourceManager.GetString("PriceHistory.Spiral.CycleInfo", resourceCulture);
+            }
+        }
+        
+        public static string PriceHistory_Spiral_HalvingMilestone {
+            get {
+                return ResourceManager.GetString("PriceHistory.Spiral.HalvingMilestone", resourceCulture);
+            }
+        }
+        
+        public static string PriceHistory_Spiral_HalvingLegend {
+            get {
+                return ResourceManager.GetString("PriceHistory.Spiral.HalvingLegend", resourceCulture);
+            }
+        }
+        
+        public static string PriceHistory_Spiral_LatestPriceLegend {
+            get {
+                return ResourceManager.GetString("PriceHistory.Spiral.LatestPriceLegend", resourceCulture);
+            }
+        }
+        
+        public static string PriceHistory_Spiral_CycleTopLegend {
+            get {
+                return ResourceManager.GetString("PriceHistory.Spiral.CycleTopLegend", resourceCulture);
+            }
+        }
+        
+        public static string PriceHistory_Spiral_CycleBottomLegend {
+            get {
+                return ResourceManager.GetString("PriceHistory.Spiral.CycleBottomLegend", resourceCulture);
+            }
+        }
+        
+        public static string PriceHistory_Spiral_CycleTopMilestone {
+            get {
+                return ResourceManager.GetString("PriceHistory.Spiral.CycleTopMilestone", resourceCulture);
+            }
+        }
+        
+        public static string PriceHistory_Spiral_CycleBottomMilestone {
+            get {
+                return ResourceManager.GetString("PriceHistory.Spiral.CycleBottomMilestone", resourceCulture);
             }
         }
         

@@ -1,7 +1,6 @@
 using Valt.App.Kernel;
 using Valt.App.Kernel.Commands;
 using Valt.App.Kernel.Validation;
-using Valt.App.Modules.Budget.FixedExpenses.DTOs;
 using Valt.Core.Common;
 using Valt.Core.Common.Exceptions;
 using Valt.Core.Modules.Budget.Accounts;
@@ -74,7 +73,7 @@ internal sealed class CreateFixedExpenseHandler : ICommandHandler<CreateFixedExp
         var ranges = new List<FixedExpenseRange>();
         foreach (var rangeDto in command.Ranges)
         {
-            var range = BuildRange(rangeDto);
+            var range = FixedExpenseRangeBuilder.BuildRange(rangeDto);
             if (range is null)
                 return Result<CreateFixedExpenseResult>.Failure("INVALID_RANGE", "Invalid range configuration");
             ranges.Add(range);
@@ -92,26 +91,5 @@ internal sealed class CreateFixedExpenseHandler : ICommandHandler<CreateFixedExp
         await _fixedExpenseRepository.SaveFixedExpenseAsync(fixedExpense);
 
         return Result<CreateFixedExpenseResult>.Success(new CreateFixedExpenseResult(fixedExpense.Id.Value));
-    }
-
-    private static FixedExpenseRange? BuildRange(FixedExpenseRangeInputDTO dto)
-    {
-        var period = (FixedExpensePeriods)dto.PeriodId;
-
-        if (dto.FixedAmount.HasValue)
-        {
-            var amount = FiatValue.New(dto.FixedAmount.Value);
-            return FixedExpenseRange.CreateFixedAmount(amount, period, dto.PeriodStart, dto.Day);
-        }
-
-        if (dto.RangedAmountMin.HasValue && dto.RangedAmountMax.HasValue)
-        {
-            var min = FiatValue.New(dto.RangedAmountMin.Value);
-            var max = FiatValue.New(dto.RangedAmountMax.Value);
-            var rangedAmount = new RangedFiatValue(min, max);
-            return FixedExpenseRange.CreateRangedAmount(rangedAmount, period, dto.PeriodStart, dto.Day);
-        }
-
-        return null;
     }
 }

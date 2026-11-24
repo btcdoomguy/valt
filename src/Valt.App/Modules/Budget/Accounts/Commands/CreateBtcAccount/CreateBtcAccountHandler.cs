@@ -28,8 +28,7 @@ internal sealed class CreateBtcAccountHandler : ICommandHandler<CreateBtcAccount
         var validation = _validator.Validate(command);
         if (!validation.IsValid)
         {
-            return Result<CreateBtcAccountResult>.ValidationFailure(
-                new Dictionary<string, string[]>(validation.Errors));
+            return Result<CreateBtcAccountResult>.ValidationFailure(validation.Errors);
         }
 
         // Validate group exists if specified

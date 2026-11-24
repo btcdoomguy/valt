@@ -78,6 +78,27 @@ public class GetBtcLoansDashboardHandlerTests : DatabaseTest
             .Build();
     }
 
+    private async Task SaveEqualDebtLoansWithDivergentStoredPrices()
+    {
+        await _assetRepository.SaveAsync(BuildLoan(
+            name: "Stored50",
+            loanAmount: 25_000m,
+            collateralSats: 100_000_000,
+            initialLtv: 50m,
+            liquidationLtv: 80m,
+            marginCallLtv: 70m,
+            currentBtcPrice: 50_000m));
+
+        await _assetRepository.SaveAsync(BuildLoan(
+            name: "Stored62",
+            loanAmount: 25_000m,
+            collateralSats: 100_000_000,
+            initialLtv: 62.5m,
+            liquidationLtv: 80m,
+            marginCallLtv: 70m,
+            currentBtcPrice: 40_000m));
+    }
+
     [Test]
     public async Task HandleAsync_NoLoans_ReturnsHasActiveLoansFalse()
     {
@@ -228,16 +249,115 @@ public class GetBtcLoansDashboardHandlerTests : DatabaseTest
     }
 
     [Test]
-    public async Task HandleAsync_WorstCaseLiquidationBtcPrice_SingleUsdLoan()
+    public async Task HandleAsync_WithoutCustomPrice_UsesAssetsCurrentLtv()
     {
-        // loan=25k, liqLtv=80, collateral=1 BTC → liqPrice = 25000 / (0.8 * 1) = 31_250
+        await SaveEqualDebtLoansWithDivergentStoredPrices();
+
+        var assetLoans = (await _assetQueries.GetAllAsync())
+            .Where(a => a.AssetTypeId == (int)AssetTypes.BtcLoan)
+            .ToList();
+        var stored50 = assetLoans.Single(l => l.Name == "Stored50");
+        var stored62 = assetLoans.Single(l => l.Name == "Stored62");
+        var expectedHighest = assetLoans.Max(l => l.CurrentLtv!.Value);
+        var expectedWeighted = assetLoans.Sum(l => l.CurrentLtv!.Value * l.TotalDebt!.Value)
+                               / assetLoans.Sum(l => l.TotalDebt!.Value);
+
+        var result = await _handler.HandleAsync(Query());
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(stored50.CurrentLtv, Is.EqualTo(50m));
+            Assert.That(stored62.CurrentLtv, Is.EqualTo(62.5m));
+            Assert.That(expectedWeighted, Is.EqualTo(56.25m));
+            Assert.That(result.HighestLtv, Is.EqualTo(expectedHighest));
+            Assert.That(result.HighestLtv, Is.EqualTo(62.5m));
+            Assert.That(result.DebtWeightedAvgLtv, Is.EqualTo(expectedWeighted));
+            Assert.That(result.ClosestLoanName, Is.EqualTo("Stored62"));
+            Assert.That(result.ClosestDistanceToLiquidationLtv, Is.EqualTo(17.5m));
+        });
+    }
+
+    [Test]
+    public async Task HandleAsync_WithCustomPrice_RecalculatesHighestLtv()
+    {
+        await SaveEqualDebtLoansWithDivergentStoredPrices();
+
+        var result = await _handler.HandleAsync(Query() with { CustomBtcPriceUsd = 25_000m });
+
+        Assert.That(result.HighestLtv, Is.EqualTo(100m));
+    }
+
+    [Test]
+    public async Task HandleAsync_ClosestLiquidationPrice_SingleUsdLoanUsesMarginCallPrice()
+    {
+        // 25k debt, 1 BTC collateral, 70% margin-call LTV → ELP = 25k / 0.7 = 35_714.29
         await _assetRepository.SaveAsync(BuildLoan(
             loanAmount: 25_000m, collateralSats: 100_000_000,
             liquidationLtv: 80m, marginCallLtv: 70m, currencyCode: "USD"));
 
         var result = await _handler.HandleAsync(Query());
 
-        Assert.That(result.WorstCaseLiquidationBtcPriceUsd, Is.EqualTo(31_250m).Within(0.5m));
+        Assert.That(result.WorstCaseLiquidationBtcPriceUsd, Is.EqualTo(35_714.29m));
+    }
+
+    [Test]
+    public async Task HandleAsync_ClosestLiquidationPrice_SelectsHighestElpConvertedToUsd()
+    {
+        await _assetRepository.SaveAsync(BuildLoan(
+            name: "USD",
+            loanAmount: 20_000m,
+            collateralSats: 100_000_000,
+            currencyCode: "USD",
+            initialLtv: 40m,
+            liquidationLtv: 80m,
+            marginCallLtv: 50m,
+            currentBtcPrice: 50_000m));
+
+        await _assetRepository.SaveAsync(BuildLoan(
+            name: "BRL",
+            loanAmount: 150_000m,
+            collateralSats: 100_000_000,
+            currencyCode: "BRL",
+            initialLtv: 60m,
+            liquidationLtv: 80m,
+            marginCallLtv: 70m,
+            currentBtcPrice: 250_000m));
+
+        var result = await _handler.HandleAsync(Query());
+
+        // USD ELP = 20k / 0.5 = 40k USD.
+        // BRL ELP = 150k / 0.7 = 214_285.71 BRL = 42_857.14 USD at 5 BRL/USD.
+        Assert.That(result.WorstCaseLiquidationBtcPriceUsd, Is.EqualTo(42_857.14m));
+    }
+
+    [Test]
+    public async Task HandleAsync_CrossedLiquidationThreshold_RemainsImmediateRisk()
+    {
+        await _assetRepository.SaveAsync(BuildLoan(
+            name: "Crossed",
+            loanAmount: 25_000m,
+            collateralSats: 100_000_000,
+            currentBtcPrice: 30_000m,
+            liquidationLtv: 80m,
+            marginCallLtv: 70m));
+
+        await _assetRepository.SaveAsync(BuildLoan(
+            name: "Healthy",
+            loanAmount: 10_000m,
+            collateralSats: 100_000_000,
+            initialLtv: 20m,
+            currentBtcPrice: 50_000m,
+            liquidationLtv: 80m,
+            marginCallLtv: 70m));
+
+        var result = await _handler.HandleAsync(Query());
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.ClosestDistanceToLiquidationLtv, Is.Zero);
+            Assert.That(result.ClosestLoanName, Is.EqualTo("Crossed"));
+            Assert.That(result.WorstCaseLiquidationBtcPriceUsd, Is.EqualTo(35_714.29m));
+        });
     }
 
     [Test]

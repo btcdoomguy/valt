@@ -15,12 +15,12 @@ using Valt.App.Kernel.Queries;
 using Valt.App.Modules.AvgPrice.Commands.DeleteLine;
 using Valt.App.Modules.AvgPrice.Commands.MoveLine;
 using Valt.App.Modules.AvgPrice.DTOs;
+using Valt.App.Modules.AvgPrice.Queries.GetAvgPriceTotals;
 using Valt.App.Modules.AvgPrice.Queries.GetLinesOfProfile;
 using Valt.App.Modules.AvgPrice.Queries.GetProfiles;
 using Valt.Core.Common;
 using Valt.Core.Kernel.Abstractions.Time;
 using Valt.Core.Modules.AvgPrice;
-using Valt.Core.Modules.AvgPrice.Calculations;
 using Valt.Infra.Modules.AvgPrice.Queries;
 using Avalonia.Platform.Storage;
 using Valt.UI.Base;
@@ -42,7 +42,6 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
 {
     private readonly ICommandDispatcher _commandDispatcher = null!;
     private readonly IQueryDispatcher _queryDispatcher = null!;
-    private readonly IAvgPriceTotalizer _avgPriceTotalizer = null!;
     private readonly IModalFactory _modalFactory = null!;
     private readonly IClock _clock = null!;
     private readonly ICsvExportService _csvExportService = null!;
@@ -110,7 +109,6 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
     public AvgPriceViewModel(
         ICommandDispatcher commandDispatcher,
         IQueryDispatcher queryDispatcher,
-        IAvgPriceTotalizer avgPriceTotalizer,
         IModalFactory modalFactory,
         IClock clock,
         ICsvExportService csvExportService,
@@ -120,7 +118,6 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
     {
         _commandDispatcher = commandDispatcher;
         _queryDispatcher = queryDispatcher;
-        _avgPriceTotalizer = avgPriceTotalizer;
         _modalFactory = modalFactory;
         _clock = clock;
         _csvExportService = csvExportService;
@@ -478,27 +475,24 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
         try
         {
             var year = TotalsFilterDate.Year;
-            var profileId = new AvgPriceProfileId(SelectedProfile.Id);
             var currency = FiatCurrency.GetFromCode(SelectedProfile.CurrencyCode);
 
-            var totals = await _avgPriceTotalizer.GetTotalsAsync(year, new[] { profileId });
+            var totals = await _queryDispatcher.DispatchAsync(
+                new GetAvgPriceTotalsQuery(new AvgPriceProfileId(SelectedProfile.Id), year));
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 TotalsRows.Clear();
 
-                // Add monthly rows
-                foreach (var monthlyTotal in totals.MonthlyTotals)
-                {
-                    TotalsRows.Add(new AvgPriceTotalsRowViewModel(monthlyTotal.Month, monthlyTotal.Values, currency));
-                }
+                var rows = totals.MonthlyTotals
+                    .Select(monthlyTotal => new AvgPriceTotalsRowViewModel(monthlyTotal.Month, monthlyTotal.Values, currency))
+                    .Append(new AvgPriceTotalsRowViewModel(
+                        new DateTime(year, 1, 1),
+                        totals.YearlyTotals,
+                        currency,
+                        isYearlyTotal: true));
 
-                // Add yearly total row
-                TotalsRows.Add(new AvgPriceTotalsRowViewModel(
-                    new DateTime(year, 1, 1),
-                    totals.YearlyTotals,
-                    currency,
-                    isYearlyTotal: true));
+                TotalsRows.AddRange(rows);
 
                 IsTotalsLoading = false;
             });
@@ -528,5 +522,6 @@ public partial class AvgPriceViewModel : ValtTabViewModel, IDisposable
     {
         if (_secureModeState is not null)
             _secureModeState.PropertyChanged -= OnSecureModeStatePropertyChanged;
+        WeakReferenceMessenger.Default.Unregister<AddAvgPriceLineRequested>(this);
     }
 }

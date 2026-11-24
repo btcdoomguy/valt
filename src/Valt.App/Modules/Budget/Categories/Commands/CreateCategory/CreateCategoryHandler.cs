@@ -25,8 +25,7 @@ internal sealed class CreateCategoryHandler : ICommandHandler<CreateCategoryComm
         var validation = _validator.Validate(command);
         if (!validation.IsValid)
         {
-            return Result<CreateCategoryResult>.ValidationFailure(
-                new Dictionary<string, string[]>(validation.Errors));
+            return Result<CreateCategoryResult>.ValidationFailure(validation.Errors);
         }
 
         // Validate parent exists if specified

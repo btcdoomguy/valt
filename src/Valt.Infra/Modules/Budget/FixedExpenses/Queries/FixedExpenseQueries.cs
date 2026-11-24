@@ -1,6 +1,7 @@
 using LiteDB;
 using Valt.App.Modules.Budget.FixedExpenses.Contracts;
 using Valt.App.Modules.Budget.FixedExpenses.DTOs;
+using Valt.App.Modules.Budget.FixedExpenses.Queries.GetFixedExpensesOfMonth;
 using Valt.Core.Modules.Budget.FixedExpenses;
 using Valt.Infra.DataAccess;
 using Valt.Infra.Kernel;
@@ -9,8 +10,16 @@ using Valt.Infra.Modules.Budget.Categories;
 
 namespace Valt.Infra.Modules.Budget.FixedExpenses.Queries;
 
-public class FixedExpenseQueries(ILocalDatabase localDatabase) : IFixedExpenseQueries
+public class FixedExpenseQueries(
+    ILocalDatabase localDatabase,
+    IFixedExpenseProvider? fixedExpenseProvider = null) : IFixedExpenseQueries
 {
+    public async Task<IReadOnlyList<FixedExpenseEntryDTO>> GetFixedExpensesOfMonthAsync(DateOnly date)
+    {
+        var provider = fixedExpenseProvider ?? new FixedExpenseProvider(localDatabase);
+        var entries = await provider.GetFixedExpensesOfMonthAsync(date);
+        return entries.ToList();
+    }
     public Task<FixedExpenseDTO?> GetFixedExpenseAsync(FixedExpenseId id)
     {
         var fixedExpense = localDatabase.GetFixedExpenses().FindById(new ObjectId(id));

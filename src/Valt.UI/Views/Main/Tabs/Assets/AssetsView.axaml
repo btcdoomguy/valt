@@ -36,7 +36,7 @@
         <DataTemplate DataType="models:AssetViewModel">
             <!-- Asset Card -->
             <Border Width="230"
-                    Height="340"
+                    Height="364"
                     Margin="0,0,12,12"
                     CornerRadius="8"
                     BoxShadow="0 4 16 0 #AA000000, 0 1 4 0 #66000000"
@@ -382,6 +382,17 @@
                                                Text="{Binding CurrentLtvFormatted}"
                                                FontSize="{DynamicResource FontSizeXSmall}"
                                                Foreground="{Binding LoanHealthColor, Converter={StaticResource StringToColorBrushConverter}}" />
+                                </Grid>
+                                <Grid ColumnDefinitions="Auto, *">
+                                    <TextBlock Grid.Column="0"
+                                               Text="{x:Static lang:language.Assets_Card_MarginCallPrice}"
+                                               FontSize="{DynamicResource FontSizeXSmall}"
+                                               Foreground="{DynamicResource AssetCardLabelBrush}"
+                                               Margin="0,0,4,0" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding MarginCallPriceFormatted}"
+                                               FontSize="{DynamicResource FontSizeXSmall}"
+                                               Foreground="{DynamicResource AssetCardTextBrush}" />
                                 </Grid>
                                 <Grid ColumnDefinitions="Auto, *">
                                     <TextBlock Grid.Column="0"

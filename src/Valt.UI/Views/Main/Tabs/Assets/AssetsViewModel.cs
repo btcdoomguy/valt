@@ -913,6 +913,9 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
 
     private void OnRatesStatePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (e.PropertyName is not nameof(RatesState.FiatRates))
+            return;
+
         // Refresh summary when rates change
         LoadAssetsAsync().FireAndForgetSafeAsync(_runner, _logger);
     }
@@ -935,6 +938,7 @@ public partial class AssetsViewModel : ValtTabViewModel, IDisposable
         if (_assetPriceUpdaterJobInfo != null)
             _assetPriceUpdaterJobInfo.PropertyChanged -= OnAssetPriceUpdaterJobPropertyChanged;
         WeakReferenceMessenger.Default.Unregister<SettingsChangedMessage>(this);
+        WeakReferenceMessenger.Default.Unregister<AddAssetRequested>(this);
         WeakReferenceMessenger.Default.Unregister<LoanStateUpdatedMessage>(this);
     }
 }

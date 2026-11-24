@@ -72,7 +72,7 @@ public record AccountGroupTotalCurrency
 
         if (Type == TotalCurrencyType.SpecificFiat && CurrencyCode is not null)
         {
-            if (!FiatCurrency.GetAll().Any(c => c.Code == CurrencyCode))
+            if (!FiatCurrency.TryGetFromCode(CurrencyCode, out _))
                 return false;
 
             if (availableCurrencyCodes is not null)

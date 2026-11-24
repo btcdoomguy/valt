@@ -47,19 +47,23 @@ internal sealed class EditLineHandler : ICommandHandler<EditLineCommand, EditLin
 
         // Remove the existing line and add a new one with updated values
         // This approach maintains data integrity through the domain's recalculation logic
+        var preserveDisplayOrder = existingLine.Date == command.Date;
         var displayOrder = existingLine.DisplayOrder;
         profile.RemoveLine(existingLine);
 
         var lineType = (AvgPriceLineTypes)command.LineTypeId;
         var amount = FiatValue.New(command.Amount);
 
-        profile.AddLine(
+        var newLine = profile.AddLine(
             command.Date,
             displayOrder,
             lineType,
             command.Quantity,
             amount,
-            command.Comment ?? string.Empty);
+            command.Comment ?? string.Empty,
+            preserveDisplayOrder);
+        if (preserveDisplayOrder)
+            newLine.SetDisplayOrder(displayOrder);
 
         await _avgPriceRepository.SaveAvgPriceProfileAsync(profile);
 

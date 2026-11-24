@@ -802,8 +802,11 @@ public class AvgPriceProfileTests
 
         profile.ClearEvents();
 
-        // Act - Try to move first line up (should fail gracefully or throw)
-        Assert.Throws<ArgumentOutOfRangeException>(() => profile.MoveLineUp(firstLine));
+        // Act & Assert - Try to move first line up (should be a safe no-op)
+        Assert.DoesNotThrow(() => profile.MoveLineUp(firstLine));
+        Assert.That(profile.Events, Is.Empty);
+        Assert.That(firstLine.DisplayOrder, Is.EqualTo(0));
+        Assert.That(firstLine.Totals, Is.EqualTo(originalTotals));
     }
 
     [Test]
@@ -930,11 +933,15 @@ public class AvgPriceProfileTests
         profile.AddLine(new DateOnly(2024, 1, 1), 1, AvgPriceLineTypes.Buy, 0.5m, FiatValue.New(60000m), "Second");
 
         var lastLine = profile.AvgPriceLines.First(x => x.Comment == "Second");
+        var originalTotals = lastLine.Totals;
 
         profile.ClearEvents();
 
-        // Act - Try to move last line down (should fail)
-        Assert.Throws<ArgumentOutOfRangeException>(() => profile.MoveLineDown(lastLine));
+        // Act & Assert - Try to move last line down (should be a safe no-op)
+        Assert.DoesNotThrow(() => profile.MoveLineDown(lastLine));
+        Assert.That(profile.Events, Is.Empty);
+        Assert.That(lastLine.DisplayOrder, Is.EqualTo(1));
+        Assert.That(lastLine.Totals, Is.EqualTo(originalTotals));
     }
 
     [Test]
@@ -1053,9 +1060,10 @@ public class AvgPriceProfileTests
 
         profile.ClearEvents();
 
-        // Act - Try to move the only line (should throw since no adjacent line)
-        Assert.Throws<ArgumentOutOfRangeException>(() => profile.MoveLineUp(onlyLine));
-        Assert.Throws<ArgumentOutOfRangeException>(() => profile.MoveLineDown(onlyLine));
+        // Act & Assert - Try to move the only line (should be a safe no-op)
+        Assert.DoesNotThrow(() => profile.MoveLineUp(onlyLine));
+        Assert.DoesNotThrow(() => profile.MoveLineDown(onlyLine));
+        Assert.That(profile.Events, Is.Empty);
     }
 
     [Test]

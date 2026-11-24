@@ -24,7 +24,7 @@ public abstract record Result<T>
     public static Result<T> Failure(string code, string message) =>
         new FailureResult<T>(new Error(code, message));
 
-    public static Result<T> ValidationFailure(Dictionary<string, string[]> errors) =>
+    public static Result<T> ValidationFailure(IReadOnlyDictionary<string, string[]> errors) =>
         new FailureResult<T>(Error.Validation("Validation failed", errors));
 
     public static Result<T> NotFound(string entityType, string id) =>

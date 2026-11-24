@@ -78,9 +78,7 @@ internal static class AssetDetailsSerializer
 
     public static BtcLoanDetails DeserializeBtcLoan(string json)
     {
-        using var document = JsonDocument.Parse(json);
-        var root = document.RootElement;
-        var dto = JsonSerializer.Deserialize<BtcLoanDetailsDto>(root.GetRawText())
+        var dto = JsonSerializer.Deserialize<BtcLoanDetailsDto>(json)
                   ?? throw new InvalidOperationException("Failed to deserialize BtcLoanDetails");
 
         var startDate = string.IsNullOrEmpty(dto.LoanStartDate)
@@ -91,14 +89,9 @@ internal static class AssetDetailsSerializer
             ? (DateOnly?)null
             : DateOnly.Parse(dto.RepaymentDate);
 
-        var snapshots = new List<LoanStateSnapshot>();
-        if (root.TryGetProperty("Snapshots", out var snapshotsElement) && snapshotsElement.ValueKind == JsonValueKind.Array)
-        {
-            foreach (var snapshotElement in snapshotsElement.EnumerateArray())
-            {
-                snapshots.Add(MapDtoToSnapshot(snapshotElement));
-            }
-        }
+        var snapshots = dto.Snapshots?
+            .Select(MapDtoToSnapshot)
+            .ToList() ?? new List<LoanStateSnapshot>();
 
         if (snapshots.Count == 0)
         {
@@ -258,11 +251,8 @@ internal static class AssetDetailsSerializer
         return JsonSerializer.Serialize(dto);
     }
 
-    private static LoanStateSnapshot MapDtoToSnapshot(JsonElement element)
+    private static LoanStateSnapshot MapDtoToSnapshot(LoanStateSnapshotDto dto)
     {
-        var dto = JsonSerializer.Deserialize<LoanStateSnapshotDto>(element.GetRawText())
-                  ?? throw new InvalidOperationException("Failed to deserialize LoanStateSnapshot");
-
         if (string.IsNullOrEmpty(dto.EffectiveDate))
             throw new InvalidOperationException("LoanStateSnapshot.EffectiveDate is required");
 
@@ -271,13 +261,14 @@ internal static class AssetDetailsSerializer
 
         var effectiveDate = DateOnly.ParseExact(dto.EffectiveDate, "O", CultureInfo.InvariantCulture, DateTimeStyles.None);
         var loanStartDate = DateOnly.ParseExact(dto.LoanStartDate, "O", CultureInfo.InvariantCulture, DateTimeStyles.None);
+        var repaymentDate = string.IsNullOrEmpty(dto.RepaymentDate)
+            ? (DateOnly?)null
+            : DateOnly.ParseExact(dto.RepaymentDate, "O", CultureInfo.InvariantCulture, DateTimeStyles.None);
 
-        var hasNewFields = element.TryGetProperty("TotalBorrowed", out _)
-                           || element.TryGetProperty("InterestAccruedUntilDate", out _);
+        var hasNewFields = dto.TotalBorrowed.HasValue || dto.InterestAccruedUntilDate.HasValue;
 
-        if (!hasNewFields && element.TryGetProperty("CurrentTotalDebt", out var currentTotalDebtElement))
+        if (!hasNewFields && dto.CurrentTotalDebt.HasValue)
         {
-            var currentTotalDebt = currentTotalDebtElement.GetDecimal();
             return new LoanStateSnapshot(
                 platformName: dto.PlatformName ?? string.Empty,
                 collateralSats: dto.CollateralSats,
@@ -289,11 +280,11 @@ internal static class AssetDetailsSerializer
                 marginCallLtv: dto.MarginCallLtv,
                 fees: dto.Fees,
                 loanStartDate: loanStartDate,
-                repaymentDate: string.IsNullOrEmpty(dto.RepaymentDate) ? (DateOnly?)null : DateOnly.ParseExact(dto.RepaymentDate, "O", CultureInfo.InvariantCulture, DateTimeStyles.None),
+                repaymentDate: repaymentDate,
                 status: (LoanStatus)dto.StatusId,
                 currentBtcPriceInLoanCurrency: dto.CurrentBtcPrice,
                 fixedTotalDebt: dto.FixedTotalDebt,
-                currentTotalDebt: currentTotalDebt,
+                currentTotalDebt: dto.CurrentTotalDebt.Value,
                 effectiveDate: effectiveDate,
                 note: dto.Note);
         }
@@ -309,12 +300,12 @@ internal static class AssetDetailsSerializer
             marginCallLtv: dto.MarginCallLtv,
             fees: dto.Fees,
             loanStartDate: loanStartDate,
-            repaymentDate: string.IsNullOrEmpty(dto.RepaymentDate) ? (DateOnly?)null : DateOnly.ParseExact(dto.RepaymentDate, "O", CultureInfo.InvariantCulture, DateTimeStyles.None),
+            repaymentDate: repaymentDate,
             status: (LoanStatus)dto.StatusId,
             currentBtcPriceInLoanCurrency: dto.CurrentBtcPrice,
             fixedTotalDebt: dto.FixedTotalDebt,
-            totalBorrowed: dto.TotalBorrowed,
-            interestAccruedUntilDate: dto.InterestAccruedUntilDate,
+            totalBorrowed: dto.TotalBorrowed ?? 0m,
+            interestAccruedUntilDate: dto.InterestAccruedUntilDate ?? 0m,
             effectiveDate: effectiveDate,
             note: dto.Note);
     }
@@ -420,8 +411,9 @@ internal class LoanStateSnapshotDto
     public int StatusId { get; set; }
     public decimal CurrentBtcPrice { get; set; }
     public decimal? FixedTotalDebt { get; set; }
-    public decimal TotalBorrowed { get; set; }
-    public decimal InterestAccruedUntilDate { get; set; }
+    public decimal? TotalBorrowed { get; set; }
+    public decimal? InterestAccruedUntilDate { get; set; }
+    public decimal? CurrentTotalDebt { get; set; }
     public string? Note { get; set; }
 }
 

@@ -29,8 +29,7 @@ internal sealed class EditAccountHandler : ICommandHandler<EditAccountCommand, U
         var validation = _validator.Validate(command);
         if (!validation.IsValid)
         {
-            return Result<Unit>.ValidationFailure(
-                new Dictionary<string, string[]>(validation.Errors));
+            return Result<Unit>.ValidationFailure(validation.Errors);
         }
 
         var accountId = new AccountId(command.AccountId);

@@ -19,8 +19,7 @@ internal sealed class AssetQueries : IAssetQueries
     public Task<IReadOnlyList<AssetDTO>> GetAllAsync()
     {
         var entities = _localDatabase.GetAssets()
-            .FindAll()
-            .Where(x => !x.IsSold)
+            .Find(x => !x.IsSold)
             .OrderByDescending(x => x.Visible)
             .ThenBy(x => x.DisplayOrder)
             .ThenBy(x => x.Name)
@@ -324,6 +323,15 @@ internal sealed class AssetQueries : IAssetQueries
             distanceToLiquidationLtv = btcLoan.CalculateDistanceToLiquidation(currentBtcPriceInLoanCurrency);
         }
 
+        var orderedSnapshots = btcLoan.Snapshots
+            .OrderBy(s => s.EffectiveDate)
+            .ToList();
+        var initialEffectiveDate = orderedSnapshots.FirstOrDefault()?.EffectiveDate;
+        var snapshotDtos = orderedSnapshots
+            .Select(s => MapLoanStateSnapshot(s, s.EffectiveDate == initialEffectiveDate))
+            .ToList()
+            .AsReadOnly();
+
         return dto with
         {
             PlatformName = btcLoan.PlatformName,
@@ -334,6 +342,7 @@ internal sealed class AssetQueries : IAssetQueries
             InitialLtv = btcLoan.InitialLtv,
             LiquidationLtv = snapshot?.LiquidationLtv ?? btcLoan.LiquidationLtv,
             MarginCallLtv = snapshot?.MarginCallLtv ?? btcLoan.MarginCallLtv,
+            MarginCallPrice = btcLoan.CalculateMarginCallPrice(),
             Fees = snapshot?.Fees ?? btcLoan.Fees,
             LoanStartDate = btcLoan.LoanStartDate,
             RepaymentDate = snapshot?.RepaymentDate ?? btcLoan.RepaymentDate,
@@ -347,7 +356,8 @@ internal sealed class AssetQueries : IAssetQueries
             DistanceToLiquidationLtv = distanceToLiquidationLtv,
             DaysUntilRepayment = btcLoan.CalculateDaysUntilRepayment(),
             FixedTotalDebt = snapshot?.FixedTotalDebt ?? btcLoan.FixedTotalDebt,
-            HasFixedTotalDebt = (snapshot?.FixedTotalDebt.HasValue).GetValueOrDefault(btcLoan.HasFixedTotalDebt)
+            HasFixedTotalDebt = (snapshot?.FixedTotalDebt.HasValue).GetValueOrDefault(btcLoan.HasFixedTotalDebt),
+            Snapshots = snapshotDtos
         };
     }
 

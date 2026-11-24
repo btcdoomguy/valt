@@ -21,9 +21,10 @@ internal class SavingsRateProgressCalculator : IGoalProgressCalculator
         // Merged income/expense rows (same reader paths as CalculateProgressAsync),
         // with per-row running totals following the incremental percentage formula on
         // unrounded cumulative accumulators — never re-derived from displayed values.
-        var merged = _transactionReader.GetIncomeRows(input.From, input.To)
+        var (incomeRows, expenseRows) = _transactionReader.GetIncomeAndExpenseRows(input.From, input.To);
+        var merged = incomeRows
             .Select(r => (Row: r, IsExpense: false))
-            .Concat(_transactionReader.GetExpenseRows(input.From, input.To).Select(r => (Row: r, IsExpense: true)))
+            .Concat(expenseRows.Select(r => (Row: r, IsExpense: true)))
             .OrderBy(x => DateOnly.FromDateTime(x.Row.Transaction.Date.ToUniversalTime()))
             .ThenBy(x => x.Row.Transaction.Id);
 
@@ -53,8 +54,12 @@ internal class SavingsRateProgressCalculator : IGoalProgressCalculator
     {
         var config = GoalTypeSerializer.DeserializeSavingsRate(input.GoalTypeJson);
 
-        var totalIncome = _transactionReader.CalculateTotalIncome(input.From, input.To);
-        var totalExpenses = _transactionReader.CalculateTotalExpenses(input.From, input.To);
+        var (totalIncome, totalExpenses) = _transactionReader.CalculateTotalIncomeAndExpenses(input.From, input.To);
+        if (totalIncome == 0m && totalExpenses == 0m && _transactionReader is not GoalTransactionReader)
+        {
+            totalIncome = _transactionReader.CalculateTotalIncome(input.From, input.To);
+            totalExpenses = _transactionReader.CalculateTotalExpenses(input.From, input.To);
+        }
 
         decimal savingsRate;
         if (totalIncome <= 0)

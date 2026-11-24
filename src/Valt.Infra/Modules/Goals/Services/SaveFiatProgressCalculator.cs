@@ -19,9 +19,10 @@ internal class SaveFiatProgressCalculator : IGoalProgressCalculator
         // Merge income and expense rows from the reader (the only selection paths,
         // so rows cannot drift from CalculateProgressAsync), then re-accumulate the
         // running total as cumulative income minus cumulative expenses.
-        var merged = _transactionReader.GetIncomeRows(input.From, input.To)
+        var (incomeRows, expenseRows) = _transactionReader.GetIncomeAndExpenseRows(input.From, input.To);
+        var merged = incomeRows
             .Select(r => (Row: r, IsExpense: false))
-            .Concat(_transactionReader.GetExpenseRows(input.From, input.To).Select(r => (Row: r, IsExpense: true)))
+            .Concat(expenseRows.Select(r => (Row: r, IsExpense: true)))
             .OrderBy(x => DateOnly.FromDateTime(x.Row.Transaction.Date.ToUniversalTime()))
             .ThenBy(x => x.Row.Transaction.Id);
 
@@ -40,8 +41,13 @@ internal class SaveFiatProgressCalculator : IGoalProgressCalculator
     {
         var config = GoalTypeSerializer.DeserializeSaveFiat(input.GoalTypeJson);
 
-        var totalIncome = _transactionReader.CalculateTotalIncome(input.From, input.To);
-        var totalExpenses = _transactionReader.CalculateTotalExpenses(input.From, input.To);
+        var (totalIncome, totalExpenses) = _transactionReader.CalculateTotalIncomeAndExpenses(input.From, input.To);
+        if (totalIncome == 0m && totalExpenses == 0m && _transactionReader is not GoalTransactionReader)
+        {
+            totalIncome = _transactionReader.CalculateTotalIncome(input.From, input.To);
+            totalExpenses = _transactionReader.CalculateTotalExpenses(input.From, input.To);
+        }
+
         var savings = totalIncome - totalExpenses;
 
         var progress = config.TargetAmount > 0

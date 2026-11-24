@@ -4,9 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Valt.App.Kernel.Commands;
+using Valt.App.Kernel.Queries;
+using Valt.App.Modules.Budget.Accounts.Commands.CreateAccountGroup;
+using Valt.App.Modules.Budget.Accounts.Commands.EditAccountGroup;
+using Valt.App.Modules.Budget.Accounts.Queries.GetAccountGroups;
 using Valt.Core.Common;
 using Valt.Core.Modules.Budget.Accounts;
-using Valt.Core.Modules.Budget.Accounts.Contracts;
 using Valt.Infra.Modules.Configuration;
 using Valt.UI.Base;
 using Valt.UI.Helpers;
@@ -17,10 +21,11 @@ namespace Valt.UI.Views.Main.Modals.ManageAccountGroup;
 
 public partial class ManageAccountGroupViewModel : ValtModalValidatorViewModel
 {
-    private readonly IAccountGroupRepository? _accountGroupRepository;
+    private readonly ICommandDispatcher? _commandDispatcher;
+    private readonly IQueryDispatcher? _queryDispatcher;
     private readonly IConfigurationManager? _configurationManager;
 
-    private AccountGroupId? _accountGroupId;
+    private string? _accountGroupId;
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
@@ -61,9 +66,13 @@ public partial class ManageAccountGroupViewModel : ValtModalValidatorViewModel
     {
     }
 
-    public ManageAccountGroupViewModel(IAccountGroupRepository accountGroupRepository, IConfigurationManager configurationManager)
+    public ManageAccountGroupViewModel(
+        ICommandDispatcher commandDispatcher,
+        IQueryDispatcher queryDispatcher,
+        IConfigurationManager configurationManager)
     {
-        _accountGroupRepository = accountGroupRepository;
+        _commandDispatcher = commandDispatcher;
+        _queryDispatcher = queryDispatcher;
         _configurationManager = configurationManager;
     }
 
@@ -71,7 +80,8 @@ public partial class ManageAccountGroupViewModel : ValtModalValidatorViewModel
     {
         if (Parameter is not null && Parameter is string groupId)
         {
-            var group = await _accountGroupRepository!.GetByIdAsync(new AccountGroupId(groupId));
+            var groups = await _queryDispatcher!.DispatchAsync(new GetAccountGroupsQuery());
+            var group = groups.FirstOrDefault(g => g.Id == groupId);
 
             if (group is null)
             {
@@ -81,12 +91,13 @@ public partial class ManageAccountGroupViewModel : ValtModalValidatorViewModel
 
             _accountGroupId = group.Id;
             Name = group.Name;
-            SelectedTotalCurrency = group.TotalCurrency.ToStorageString();
+            var totalCurrency = AccountGroupTotalCurrency.FromStorageString(group.TotalCurrency);
+            SelectedTotalCurrency = totalCurrency.ToStorageString();
 
             // Validate that the selected currency is still available; fallback to default if not
             var availableCurrencies = _configurationManager?.GetAvailableFiatCurrencies();
-            var validatedCurrency = group.TotalCurrency.FallbackToDefaultIfUnavailable(availableCurrencies);
-            if (validatedCurrency != group.TotalCurrency)
+            var validatedCurrency = totalCurrency.FallbackToDefaultIfUnavailable(availableCurrencies);
+            if (validatedCurrency != totalCurrency)
             {
                 SelectedTotalCurrency = validatedCurrency.ToStorageString();
             }
@@ -100,7 +111,6 @@ public partial class ManageAccountGroupViewModel : ValtModalValidatorViewModel
 
         if (!HasErrors)
         {
-            AccountGroup group;
             var totalCurrency = AccountGroupTotalCurrency.FromStorageString(SelectedTotalCurrency);
 
             // Validate currency is available; fallback if not
@@ -109,17 +119,33 @@ public partial class ManageAccountGroupViewModel : ValtModalValidatorViewModel
 
             if (_accountGroupId is null)
             {
-                group = AccountGroup.New(AccountGroupName.New(Name));
-                group.ChangeTotalCurrency(totalCurrency);
+                var result = await _commandDispatcher!.DispatchAsync(new CreateAccountGroupCommand
+                {
+                    Name = Name,
+                    TotalCurrency = totalCurrency.ToStorageString()
+                });
+
+                if (result.IsFailure)
+                {
+                    await MessageBoxHelper.ShowAlertAsync(language.Error_ValidationError, result.Error!.Message, GetWindow!());
+                    return;
+                }
             }
             else
             {
-                group = (await _accountGroupRepository!.GetByIdAsync(_accountGroupId))!;
-                group.Rename(AccountGroupName.New(Name));
-                group.ChangeTotalCurrency(totalCurrency);
-            }
+                var result = await _commandDispatcher!.DispatchAsync(new EditAccountGroupCommand
+                {
+                    GroupId = _accountGroupId,
+                    Name = Name,
+                    TotalCurrency = totalCurrency.ToStorageString()
+                });
 
-            await _accountGroupRepository!.SaveAsync(group);
+                if (result.IsFailure)
+                {
+                    await MessageBoxHelper.ShowAlertAsync(language.Error_ValidationError, result.Error!.Message, GetWindow!());
+                    return;
+                }
+            }
 
             CloseDialog?.Invoke(new Response(true));
         }

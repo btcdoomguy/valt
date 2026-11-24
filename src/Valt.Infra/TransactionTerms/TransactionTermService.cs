@@ -50,6 +50,8 @@ internal class TransactionTermService : ITransactionTermService
 
             if (entry.Count == 0)
                 _localDatabase.GetTransactionTerms().Delete(entry.Id);
+            else
+                _localDatabase.GetTransactionTerms().Update(entry);
         }
     }
 

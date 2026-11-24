@@ -1,13 +1,13 @@
 ---
 gsd_state_version: "1.0"
 milestone: v0.9
-current_phase: 54
+current_phase: 56
 status: completed
-stopped_at: Phase 54 complete — all phases complete
-last_updated: "2026-11-03T15:42:49.831Z"
-last_activity: 2026-11-02
-last_activity_desc: Phase 54 complete
-state_head: aa3830bce11dd6aadf2ad9e0e19e564c68c19b62
+stopped_at: Phase 56 complete — all phases complete
+last_updated: "2026-11-24T20:37:51.685Z"
+last_activity: 2026-11-24
+last_activity_desc: Phase 56 complete
+state_head: bea15465b446dcf0d8e3ebf596ce3872819c10bf
 progress:
   total_phases: 0
   completed_phases: 0
@@ -20,23 +20,23 @@ milestone_name: Goal Transparency — Transaction Breakdown
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-08-06)
+See: .planning/PROJECT.md (updated 2026-11-24)
 
 **Core value:** Users can see their entire financial picture — cash flow, investments, and loans — denominated in bitcoin, so they always know where they stand in sats.
-**Current focus:** Phase 54 — Documentation Site Sync — Features Since July 2026
+**Current focus:** Phase 56 — Bitcoin 4-Year Cycle Spiral Chart in Price History (Complete)
 
 ## Current Position
 
-Phase: 54
+Phase: 56
 Plan: Not started
 Status: All phases complete
-Last activity: 2026-11-03 - Completed quick task 261103-hfg: Fix Fixed Expenses Overview showing wrong currency symbol when a fixed expense is paid with a different currency than expected (shows expected currency instead of actual payment currency); check whether totals are also affected
+Last activity: 2026-11-24 - Completed quick task 261124-ocd: the spiral chart is good, but very small. because of that not all days are appearing on the chart, which make some dots innaccurate. let's increase about 15% of this window size, giving more space to the chart
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 34
+- Total plans completed: 41
 - Average duration: 18 min
 - Total execution time: 43 min
 
@@ -62,6 +62,8 @@ Last activity: 2026-11-03 - Completed quick task 261103-hfg: Fix Fixed Expenses 
 | 51 | 5 | - | - |
 | 53 | 6 | - | - |
 | 54 | 6 | - | - |
+| 55 | 6 | - | - |
+| 56 | 1 | - | - |
 
 **Recent Trend:**
 
@@ -169,6 +171,13 @@ Last activity: 2026-11-03 - Completed quick task 261103-hfg: Fix Fixed Expenses 
 | Phase 54 P04 | 6min | 3 tasks | 5 files |
 | Phase 54 P05 | 3min | 2 tasks | 2 files |
 | Phase 54 P06 | 5min | 2 tasks | 0 files |
+| Phase 55 P01 | 4min | 2 tasks | 12 files |
+| Phase 55 P02 | 4min | 2 tasks | 15 files |
+| Phase 55 P03 | 7min | 2 tasks | 24 files |
+| Phase 55 P04 | 4min | 2 tasks | 16 files |
+| Phase 55 P05 | 7min | 2 tasks | 29 files |
+| Phase 55 P06 | 4min | 2 tasks | 20 files |
+| Phase 56 P01 | 6min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -263,6 +272,21 @@ Recent decisions affecting current work:
 - [Phase 54]: [Phase 54-04]: BTC Loan Simulator docs page created bilingual (pt/en) with 3-point mkdocs.yml nav registration per D-02; placed after MCP Server in Features nav
 - [Phase 54]: [Phase 54-05]: Corrected plan/research MCP tool count (107) to actual verified 97 — wrote 'mais de 90 ferramentas'/'over 90 tools' because code is the spec and 'mais de 100' would be misinformation (T-54-10)
 - [Phase 54]: [Phase 54-06]: Phase QA gate green on first run — strict build, 6/6 parity, 36/36 presence anchors, zero stale claims, nav + D-01 verified; human visual + factual sign-off approved 2026-10-30 closing SC-1/SC-5 and Phase 54
+- [Phase 55]: 55-01: Added optional preserveDisplayOrder parameter to AvgPriceProfile.AddLine so existing callers auto-increment DisplayOrder while EditLineHandler preserves DisplayOrder when editing on the same date
+- [Phase 55]: 55-01: Registered ITransactionTermService via factory delegate resolving TransactionTermService so both concrete and interface resolutions share one singleton instance
+- [Phase 55]: 55-02: Cached 33 FiatCurrency instances as static readonly fields with O(1) dictionary lookup and replaced Queue PrependLot in FifoCalculationStrategy with LinkedList and incremental totals
+- [Phase 55]: 55-02: Replaced MethodInfo.Invoke in CommandDispatcher, QueryDispatcher, and NotificationPublisher with cached generic wrappers and widened ValidationFailure to IReadOnlyDictionary
+- [Phase 55]: 55-03: Included Snapshots on AssetDTO in AssetQueries.MapBtcLoan so LoanReportsQueries reads loan state timelines directly without per-loan LiteDB and JSON re-queries
+- [Phase 55]: 55-03: Added GetIncomeAndExpenseRows and CalculateTotalIncomeAndExpenses to IGoalTransactionReader and refactored AssetDetailsSerializer.DeserializeBtcLoan to a single JsonSerializer.Deserialize pass
+- [Phase 55]: 55-04: Disposed DataContext as IDisposable in ValtBaseWindow.OnClosed, GoalEntryViewModel timers on collection clear, previous PepeMoodImage bitmap/stream, and all SkiaSharp chart paints with pre-allocated SolidColorPaint bar palettes
+- [Phase 55]: 55-04: Filtered AssetsViewModel.OnRatesStatePropertyChanged to FiatRates, batched AvaloniaList updates with AddRange, debounced transaction search by 250ms, and switched IconMapLoader to System.Threading.Lock
+- [Phase 55]: 55-05: Defined FixedExpenseEntryDTO in Valt.App and derived FixedExpenseProviderEntry from it so existing provider tests and UI ViewModels share a covariant contract
+- [Phase 55]: 55-05: Replaced direct ILocalDatabase queries in ReportsViewModel and SpendingEvolutionViewModel with GetAccountsQuery and GetCategoriesQuery plus cached report provider transactions
+- [Phase 55]: 55-06: Extracted CategoryBreakdownCalculator, CategoryBarChartDataBase, TransactionCommandHelper, GoalTypeBuilder, FixedExpenseRangeBuilder, and ConfigurationManager CSV list helpers
+- [Phase 55]: 55-06: Fixed FixedExpenseRepository.GetFixedExpenseByIdAsync to return null when entity is missing instead of dereferencing null and catching all exceptions in Edit/Delete handlers
+- [Phase 56]: Anchored 4-year cycle spiral epoch at 2009-01-01 with exact 1461.0-day period so Jan 1 of cardinal cycle years ('09, '13, '17, '21, '25) align at exact 12 o'clock (-pi/2 rad) without leap-year drift
+- [Phase 56]: Mapped 10 price decade labels ($0.001 at center origin r=0 through $1M at outer ring r=R_max) across a 9-decade log10 span with non-positive price guards
+- [Phase 56]: Built custom Avalonia Control (BitcoinCycleSpiralChartControl) with cached StreamGeometry and static ImmutableSolidColorBrush/ImmutablePen instances instead of LiveCharts PolarChart
 
 ### Pending Todos
 
@@ -305,6 +329,12 @@ None — 53-04 checkpoint issues resolved (fix commit acd12f7); plan complete, f
 | 261102-jwn | Reports Monthly Totals: confirm yearly % baseline is end-of-previous-calendar-year (confirmed fixed, not rolling); added regression tests, hardened null guard, documented baseline | 2026-11-02 | 4d258f9 | [261102-jwn-reports-monthly-totals-chart-the-percent](./quick/261102-jwn-reports-monthly-totals-chart-the-percent/) |
 | 261102-ki6 | Reports Monthly Totals: make all % columns asset-inclusive (Total Wealth basis), full grid column audit, tests + docs | 2026-11-02 | 2b46849 | [261102-ki6-reports-monthly-totals-change-the-previo](./quick/261102-ki6-reports-monthly-totals-change-the-previo/) |
 | 261103-hfg | Fix Fixed Expenses Overview showing wrong currency symbol when a fixed expense is paid with a different currency than expected (shows expected currency instead of actual payment currency); check whether totals are also affected | 2026-11-03 | aa3830b | [261103-hfg-fix-fixed-expenses-overview-showing-wron](./quick/261103-hfg-fix-fixed-expenses-overview-showing-wron/) |
+| 261108-qjh | In the assets tab, add to the BTC Loans cards the information about the ELP (Estimated Liquidation Price) based on the LTV Margin Call property of each loan. | 2026-11-08 | 7ac554b | [261108-qjh-in-the-assets-tab-add-to-the-btc-loans-c](./quick/261108-qjh-in-the-assets-tab-add-to-the-btc-loans-c/) |
+| 261109-fd1 | Increase the height of the Assets cards a little since the ELP line was added; content below the separator line is overflowing to the top. Add extra height to compensate. | 2026-11-09 | 63915a5 | [261109-fd1-increase-the-height-of-the-assets-cards-](./quick/261109-fd1-increase-the-height-of-the-assets-cards-/) |
+| 261109-tab | Fix the TabIndex of the Transaction Editor window: the "Exclude from goals and reports" checkbox must come after the Notes textbox | 2026-11-09 | 0a6e251 | [261109-tab-fix-transaction-editor-tabindex](./quick/261109-tab-fix-transaction-editor-tabindex/) |
+| 261110-jxx | in the Reports tab, about the BTC Loans, there are some inconsistent data: the Highest LTV is showing a value but in the Assets tab there are loans with higher ltv values. Change the "Worst-case liq.price" line to show the Closest liq. price value, to show the first loan that will be liquidated so the user can understand better when he should worry about | 2026-11-10 | fd99659 | [261110-jxx-in-the-reports-tab-about-the-btc-loans-t](./quick/261110-jxx-in-the-reports-tab-about-the-btc-loans-t/) |
+| 261124-nur | add to the Spiral chart more points: the top and bottom prices of each halving, like the original chart where the tops are marked as green dots and the bottoms in red: https://www.bitcoinstrategyplatform.com/cheatsheet/ | 2026-11-24 | 400c5ca | [261124-nur-add-to-the-spiral-chart-more-points-the-](./quick/261124-nur-add-to-the-spiral-chart-more-points-the-/) |
+| 261124-ocd | the spiral chart is good, but very small. because of that not all days are appearing on the chart, which make some dots innaccurate. let's increase about 15% of this window size, giving more space to the chart | 2026-11-24 | bea1546 | [261124-ocd-the-spiral-chart-is-good-but-very-small-](./quick/261124-ocd-the-spiral-chart-is-good-but-very-small-/) |
 
 ## Deferred Items
 
@@ -322,14 +352,14 @@ Items acknowledged and deferred at v0.9 milestone close (2026-10-07; all predate
 | Quick Task | 001-copy-modal-perf | Unknown |
 | Quick Task | reports-summary-simulation | Missing |
 | Quick Task | 260616-rcu-fix-stock-asset-edit-modal-not-loading-s | Unknown |
-| Roadmap | v0.8 phases 46–48 (Cost-Over-Time Schedule, Prefill from Existing Loan, Simulator MCP/Localization/Verification) — left pending at v0.9 start; recover in a future milestone | Pending |
+| Roadmap | v0.8 phases 46–48 (Cost-Over-Time Schedule, Prefill from Existing Loan, Simulator MCP/Localization/Verification) — discarded 2026-11-21; superseded by `.planning/research/NEW-FEATURES.md` | Discarded |
 
 _Note: 38-VERIFICATION.md shows `gaps_found` because it was generated before 38-03 executed; the QA-03 gap is closed by 38-QA-CHECKLIST.md._
 
 ## Session Continuity
 
-Last session: 2026-10-30T18:03:49.400Z
-Stopped at: Phase 54 complete — all phases complete
+Last session: 2026-11-24T18:51:48.042Z
+Stopped at: Phase 56 complete — all phases complete
 Resume file: None
 Resume file: None
 
@@ -341,7 +371,7 @@ Resume file: None
 - v0.7 roadmap defined 2026-08-04: Phases 39-43, 12/12 requirements mapped (SPA-01..03, BTC-01..03, WLT-01..04, LON-01..02).
 - Phase 42 (loans-leverage-reports-ui) is now complete: 4/4 plans finished, gap G-42-2 closed.
 - v0.8 roadmap defined 2026-08-13: Phases 44-48, 13/13 requirements mapped (SIM-01..SIM-13), structure follows research/SUMMARY.md dependency order (engine → UI → schedule → prefill → MCP/localization/docs).
-- v0.9 roadmap defined 2026-10-06: Phases 49-51, 8/8 requirements mapped (GOL-03..GOL-10), following the codebase's core → UI → integration pattern (query backend → summary modal → MCP/localization/docs/verification). Note: v0.8 phases 46-48 remain pending.
+- v0.9 roadmap defined 2026-10-06: Phases 49-51, 8/8 requirements mapped (GOL-03..GOL-10), following the codebase's core → UI → integration pattern (query backend → summary modal → MCP/localization/docs/verification). Note: v0.8 phases 46-48 discarded 2026-11-21 (superseded by `.planning/research/NEW-FEATURES.md`).
 
 ## Operator Next Steps
 

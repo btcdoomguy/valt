@@ -21,7 +21,7 @@ public sealed record Error
     public static Error NotFound(string entityType, string id) =>
         new($"{entityType.ToUpperInvariant()}_NOT_FOUND", $"{entityType} with ID '{id}' was not found.");
 
-    public static Error Validation(string message, Dictionary<string, string[]> errors) =>
+    public static Error Validation(string message, IReadOnlyDictionary<string, string[]> errors) =>
         new("VALIDATION_FAILED", message, errors);
 
     public static Error Conflict(string message) =>

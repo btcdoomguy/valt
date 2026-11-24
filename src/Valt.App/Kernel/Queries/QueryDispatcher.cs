@@ -10,38 +10,38 @@ namespace Valt.App.Kernel.Queries;
 internal sealed class QueryDispatcher : IQueryDispatcher
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ConcurrentDictionary<Type, HandlerCacheEntry> _handlerCache = new();
+    private readonly ConcurrentDictionary<Type, object> _handlerCache = new();
 
     public QueryDispatcher(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
     }
 
-    public async Task<TResult> DispatchAsync<TResult>(IQuery<TResult> query, CancellationToken ct = default)
+    public Task<TResult> DispatchAsync<TResult>(IQuery<TResult> query, CancellationToken ct = default)
     {
         var queryType = query.GetType();
-        var cacheEntry = _handlerCache.GetOrAdd(queryType, BuildCacheEntry<TResult>);
+        var wrapper = (IQueryHandlerWrapper<TResult>)_handlerCache.GetOrAdd(
+            queryType,
+            static t => Activator.CreateInstance(typeof(QueryHandlerWrapper<,>).MakeGenericType(t, typeof(TResult)))!);
 
-        var handler = _serviceProvider.GetService(cacheEntry.HandlerType)
-            ?? throw new InvalidOperationException(
-                $"No handler registered for query type '{queryType.Name}'.");
-
-        var result = cacheEntry.HandleMethod.Invoke(handler, [query, ct]);
-        if (result is Task<TResult> task)
-        {
-            return await task;
-        }
-
-        throw new InvalidOperationException(
-            $"Failed to invoke handler for query type '{queryType.Name}'.");
+        return wrapper.HandleAsync(query, _serviceProvider, ct);
     }
 
-    private static HandlerCacheEntry BuildCacheEntry<TResult>(Type queryType)
+    private interface IQueryHandlerWrapper<TResult>
     {
-        var handlerType = typeof(IQueryHandler<,>).MakeGenericType(queryType, typeof(TResult));
-        var handleMethod = handlerType.GetMethod(nameof(IQueryHandler<IQuery<TResult>, TResult>.HandleAsync))!;
-        return new HandlerCacheEntry(handlerType, handleMethod);
+        Task<TResult> HandleAsync(IQuery<TResult> query, IServiceProvider serviceProvider, CancellationToken ct);
     }
 
-    private sealed record HandlerCacheEntry(Type HandlerType, System.Reflection.MethodInfo HandleMethod);
+    private sealed class QueryHandlerWrapper<TQuery, TResult> : IQueryHandlerWrapper<TResult>
+        where TQuery : IQuery<TResult>
+    {
+        public Task<TResult> HandleAsync(IQuery<TResult> query, IServiceProvider serviceProvider, CancellationToken ct)
+        {
+            var handler = serviceProvider.GetService<IQueryHandler<TQuery, TResult>>()
+                ?? throw new InvalidOperationException(
+                    $"No handler registered for query type '{typeof(TQuery).Name}'.");
+
+            return handler.HandleAsync((TQuery)query, ct);
+        }
+    }
 }

@@ -31,6 +31,9 @@ public partial class PriceHistoryViewModel : ValtModalViewModel, IDisposable
     [ObservableProperty] private string _pageInfo = string.Empty;
     [ObservableProperty] private string _totalRecordsText = string.Empty;
     [ObservableProperty] private bool _hasData;
+    [ObservableProperty] private bool _isBtcSelected;
+    [ObservableProperty] private bool _isSpiralChartMode;
+    [ObservableProperty] private IReadOnlyList<SpiralDataPoint> _spiralPoints = Array.Empty<SpiralDataPoint>();
 
     public bool CanGoBack => CurrentPage > 1;
     public bool CanGoForward => CurrentPage < TotalPages;
@@ -74,8 +77,9 @@ public partial class PriceHistoryViewModel : ValtModalViewModel, IDisposable
     private void LoadData(string currency)
     {
         _allData.Clear();
+        IsBtcSelected = currency == "BTC";
 
-        if (currency == "BTC")
+        if (IsBtcSelected)
         {
             var btcData = _priceDatabase.GetBitcoinData().FindAll()
                 .OrderByDescending(x => x.Date)
@@ -105,7 +109,17 @@ public partial class PriceHistoryViewModel : ValtModalViewModel, IDisposable
 
         // Chart uses chronological order (ascending)
         var chartData = _allData.AsEnumerable().Reverse().ToList();
-        ChartData.RefreshChart(chartData, currency == "BTC");
+        ChartData.RefreshChart(chartData, IsBtcSelected);
+
+        if (IsBtcSelected)
+        {
+            SpiralPoints = BitcoinCycleSpiralCalculator.BuildPoints(chartData);
+        }
+        else
+        {
+            IsSpiralChartMode = false;
+            SpiralPoints = Array.Empty<SpiralDataPoint>();
+        }
     }
 
     private void UpdatePage()
@@ -134,6 +148,21 @@ public partial class PriceHistoryViewModel : ValtModalViewModel, IDisposable
         PageInfo = string.Format(language.PriceHistory_PageInfo, CurrentPage, TotalPages);
         OnPropertyChanged(nameof(CanGoBack));
         OnPropertyChanged(nameof(CanGoForward));
+    }
+
+    [RelayCommand]
+    private void SetLineChartMode()
+    {
+        IsSpiralChartMode = false;
+    }
+
+    [RelayCommand]
+    private void SetSpiralChartMode()
+    {
+        if (IsBtcSelected)
+        {
+            IsSpiralChartMode = true;
+        }
     }
 
     [RelayCommand]

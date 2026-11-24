@@ -13,6 +13,7 @@ public class KrakenBitcoinHistoricalDataProvider : IBitcoinHistoricalDataProvide
     public bool RequiresApiKey => false;
 
     private static readonly DateTime UNIX_EPOCH = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    private static readonly JsonSerializerOptions CaseInsensitiveOptions = new() { PropertyNameCaseInsensitive = true };
 
     public KrakenBitcoinHistoricalDataProvider(IHttpClientFactory httpClientFactory, ILogger<KrakenBitcoinHistoricalDataProvider> logger)
     {
@@ -44,8 +45,7 @@ public class KrakenBitcoinHistoricalDataProvider : IBitcoinHistoricalDataProvide
 
             var json = await response.Content.ReadAsStringAsync();
 
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var coinResponse = JsonSerializer.Deserialize<MarketDataDto>(json, options);
+            var coinResponse = JsonSerializer.Deserialize<MarketDataDto>(json, CaseInsensitiveOptions);
 
             if (coinResponse == null)
             {

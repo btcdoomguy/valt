@@ -1,4 +1,4 @@
-using System.Collections;
+using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Valt.App.Kernel.Notifications;
@@ -8,6 +8,8 @@ namespace Valt.Infra.Kernel.Notifications;
 
 public class NotificationPublisher : INotificationPublisher
 {
+    private static readonly ConcurrentDictionary<Type, INotificationHandlerWrapper> WrapperCache = new();
+
     private readonly IContextScope _contextScope;
     private readonly ILogger<NotificationPublisher> _logger;
 
@@ -27,28 +29,39 @@ public class NotificationPublisher : INotificationPublisher
         var scopedProvider = scope.ServiceProvider;
 
         var eventType = @event.GetType();
-        var handlerInterfaceType = typeof(INotificationHandler<>).MakeGenericType(eventType);
+        var wrapper = WrapperCache.GetOrAdd(
+            eventType,
+            static t => (INotificationHandlerWrapper)Activator.CreateInstance(
+                typeof(NotificationHandlerWrapper<>).MakeGenericType(t))!);
 
-        var resolvedHandlers = (IEnumerable)scopedProvider.GetServices(handlerInterfaceType);
-        var handlers = resolvedHandlers.Cast<object>().ToList();
+        await wrapper.PublishAsync(@event, scopedProvider, _logger);
+    }
 
-        foreach (var handler in handlers)
+    private interface INotificationHandlerWrapper
+    {
+        Task PublishAsync(INotification @event, IServiceProvider scopedProvider, ILogger logger);
+    }
+
+    private sealed class NotificationHandlerWrapper<TEvent> : INotificationHandlerWrapper
+        where TEvent : class, INotification
+    {
+        public async Task PublishAsync(INotification @event, IServiceProvider scopedProvider, ILogger logger)
         {
-            try
+            var handlers = scopedProvider.GetServices<INotificationHandler<TEvent>>();
+            var typedEvent = (TEvent)@event;
+
+            foreach (var handler in handlers)
             {
-                var handleMethod = handlerInterfaceType.GetMethod("HandleAsync");
-                if (handleMethod is not null)
+                try
                 {
-                    var task = (Task?)handleMethod.Invoke(handler, new object[] { @event });
-                    if (task is not null)
-                        await task;
+                    await handler.HandleAsync(typedEvent);
                 }
-            }
-            catch (Exception ex)
-            {
-                var handlerTypeName = handler.GetType().Name;
-                _logger.LogError(ex, $"Error during execution of NotificationHandler {handlerTypeName}");
-                throw;
+                catch (Exception ex)
+                {
+                    var handlerTypeName = handler.GetType().Name;
+                    logger.LogError(ex, $"Error during execution of NotificationHandler {handlerTypeName}");
+                    throw;
+                }
             }
         }
     }

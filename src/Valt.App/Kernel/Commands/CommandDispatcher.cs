@@ -10,43 +10,42 @@ namespace Valt.App.Kernel.Commands;
 internal sealed class CommandDispatcher : ICommandDispatcher
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ConcurrentDictionary<Type, HandlerCacheEntry> _handlerCache = new();
+    private readonly ConcurrentDictionary<Type, object> _handlerCache = new();
 
     public CommandDispatcher(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
     }
 
-    public async Task<Result<TResult>> DispatchAsync<TResult>(ICommand<TResult> command, CancellationToken ct = default)
+    public Task<Result<TResult>> DispatchAsync<TResult>(ICommand<TResult> command, CancellationToken ct = default)
     {
         var commandType = command.GetType();
-        var cacheEntry = _handlerCache.GetOrAdd(commandType, BuildCacheEntry<TResult>);
+        var wrapper = (ICommandHandlerWrapper<TResult>)_handlerCache.GetOrAdd(
+            commandType,
+            static t => Activator.CreateInstance(typeof(CommandHandlerWrapper<,>).MakeGenericType(t, typeof(TResult)))!);
 
-        var handler = _serviceProvider.GetService(cacheEntry.HandlerType);
-        if (handler is null)
-        {
-            return Result<TResult>.Failure(
-                "HANDLER_NOT_FOUND",
-                $"No handler registered for command type '{commandType.Name}'.");
-        }
-
-        var result = cacheEntry.HandleMethod.Invoke(handler, [command, ct]);
-        if (result is Task<Result<TResult>> task)
-        {
-            return await task;
-        }
-
-        return Result<TResult>.Failure(
-            "HANDLER_INVOCATION_FAILED",
-            $"Failed to invoke handler for command type '{commandType.Name}'.");
+        return wrapper.HandleAsync(command, _serviceProvider, ct);
     }
 
-    private static HandlerCacheEntry BuildCacheEntry<TResult>(Type commandType)
+    private interface ICommandHandlerWrapper<TResult>
     {
-        var handlerType = typeof(ICommandHandler<,>).MakeGenericType(commandType, typeof(TResult));
-        var handleMethod = handlerType.GetMethod(nameof(ICommandHandler<ICommand<TResult>, TResult>.HandleAsync))!;
-        return new HandlerCacheEntry(handlerType, handleMethod);
+        Task<Result<TResult>> HandleAsync(ICommand<TResult> command, IServiceProvider serviceProvider, CancellationToken ct);
     }
 
-    private sealed record HandlerCacheEntry(Type HandlerType, System.Reflection.MethodInfo HandleMethod);
+    private sealed class CommandHandlerWrapper<TCommand, TResult> : ICommandHandlerWrapper<TResult>
+        where TCommand : ICommand<TResult>
+    {
+        public Task<Result<TResult>> HandleAsync(ICommand<TResult> command, IServiceProvider serviceProvider, CancellationToken ct)
+        {
+            var handler = serviceProvider.GetService<ICommandHandler<TCommand, TResult>>();
+            if (handler is null)
+            {
+                return Task.FromResult(Result<TResult>.Failure(
+                    "HANDLER_NOT_FOUND",
+                    $"No handler registered for command type '{typeof(TCommand).Name}'."));
+            }
+
+            return handler.HandleAsync((TCommand)command, ct);
+        }
+    }
 }

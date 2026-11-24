@@ -15,81 +15,73 @@ internal class FifoCalculationStrategy : IAvgPriceCalculationStrategy
 
     public void CalculateTotals(IEnumerable<AvgPriceLine> orderedLines)
     {
-        // Queue of cost lots: (quantity, unitPrice)
-        var lots = new Queue<CostLot>();
+        // LinkedList of cost lots: (quantity, unitPrice)
+        var lots = new LinkedList<CostLot>();
+        decimal runningTotalCost = 0m;
+        decimal runningQuantity = 0m;
+
+        decimal LotCost(decimal qty, decimal unitPrice) => Math.Round(qty * unitPrice, _profile.Asset.Precision);
 
         foreach (var line in orderedLines)
         {
             if (line.Type == AvgPriceLineTypes.Buy)
             {
-                // Add a new lot at the end of the queue
-                lots.Enqueue(new CostLot(line.Quantity, line.UnitPrice.Value));
+                // Add a new lot at the end of the list
+                var lot = new CostLot(line.Quantity, line.UnitPrice.Value);
+                lots.AddLast(lot);
+                runningTotalCost += LotCost(lot.Quantity, lot.UnitPrice);
+                runningQuantity += lot.Quantity;
             }
             else if (line.Type == AvgPriceLineTypes.Sell)
             {
                 // Remove lots from the front until the sell amount is fulfilled
                 var remainingToSell = line.Quantity;
 
-                while (remainingToSell > 0 && lots.Count > 0)
+                while (remainingToSell > 0 && lots.First is { } firstNode)
                 {
-                    var lot = lots.Peek();
-
-                    if (lot.Quantity <= remainingToSell)
+                    if (firstNode.Value.Quantity <= remainingToSell)
                     {
                         // Consume the entire lot
-                        remainingToSell -= lot.Quantity;
-                        lots.Dequeue();
+                        remainingToSell -= firstNode.Value.Quantity;
+                        runningTotalCost -= LotCost(firstNode.Value.Quantity, firstNode.Value.UnitPrice);
+                        runningQuantity -= firstNode.Value.Quantity;
+                        lots.RemoveFirst();
                     }
                     else
                     {
-                        // Partially consume the lot
-                        lots.Dequeue();
-                        lots = PrependLot(lots, new CostLot(lot.Quantity - remainingToSell, lot.UnitPrice));
+                        // Partially consume the lot in place
+                        var newQty = firstNode.Value.Quantity - remainingToSell;
+                        var oldCost = LotCost(firstNode.Value.Quantity, firstNode.Value.UnitPrice);
+                        var newCost = LotCost(newQty, firstNode.Value.UnitPrice);
+                        firstNode.Value = new CostLot(newQty, firstNode.Value.UnitPrice);
+                        runningTotalCost += newCost - oldCost;
+                        runningQuantity -= remainingToSell;
                         remainingToSell = 0;
                     }
+                }
+
+                if (lots.Count == 0)
+                {
+                    runningTotalCost = 0m;
+                    runningQuantity = 0m;
                 }
             }
             else
             {
-                // Setup: clear the queue and add a single lot with the setup values
+                // Setup: clear the list and add a single lot with the setup values
                 // For Setup, Amount represents the avg cost per unit (not total cost)
                 lots.Clear();
-                lots.Enqueue(new CostLot(line.Quantity, line.Amount.Value));
+                var setupLot = new CostLot(line.Quantity, line.Amount.Value);
+                lots.AddLast(setupLot);
+                runningTotalCost = LotCost(setupLot.Quantity, setupLot.UnitPrice);
+                runningQuantity = setupLot.Quantity;
             }
 
-            // Calculate totals from remaining lots
-            var (totalCost, quantity, avg) = CalculateFromLots(lots);
-            _profile.ChangeLineTotals(line, new LineTotals(FiatValue.New(avg), totalCost, quantity));
+            var avg = runningQuantity > 0
+                ? Math.Round(runningTotalCost / runningQuantity, _profile.Asset.Precision)
+                : 0m;
+            _profile.ChangeLineTotals(line, new LineTotals(FiatValue.New(avg), runningTotalCost, runningQuantity));
         }
-    }
-
-    private (decimal totalCost, decimal quantity, decimal avg) CalculateFromLots(Queue<CostLot> lots)
-    {
-        if (lots.Count == 0)
-            return (0m, 0m, 0m);
-
-        var totalCost = 0m;
-        var quantity = 0m;
-
-        foreach (var lot in lots)
-        {
-            totalCost += Math.Round(lot.Quantity * lot.UnitPrice, _profile.Asset.Precision);
-            quantity += lot.Quantity;
-        }
-
-        var avg = quantity > 0 ? Math.Round(totalCost / quantity, _profile.Asset.Precision) : 0m;
-        return (totalCost, quantity, avg);
-    }
-
-    private Queue<CostLot> PrependLot(Queue<CostLot> existingQueue, CostLot newLot)
-    {
-        var newQueue = new Queue<CostLot>();
-        newQueue.Enqueue(newLot);
-        foreach (var lot in existingQueue)
-        {
-            newQueue.Enqueue(lot);
-        }
-        return newQueue;
     }
 
     private record CostLot(decimal Quantity, decimal UnitPrice);

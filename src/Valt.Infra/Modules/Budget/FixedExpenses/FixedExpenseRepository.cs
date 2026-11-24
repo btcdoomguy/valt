@@ -22,12 +22,14 @@ internal class FixedExpenseRepository : IFixedExpenseRepository
     public Task<FixedExpense?> GetFixedExpenseByIdAsync(FixedExpenseId fixedExpenseId)
     {
         var entity = _localDatabase.GetFixedExpenses().FindById(new ObjectId(fixedExpenseId));
+        if (entity is null)
+            return Task.FromResult<FixedExpense?>(null);
 
         var lastFixedExpenseRecord = _localDatabase.GetFixedExpenseRecords()
             .Find(x => x.FixedExpense != null && x.FixedExpense.Id == entity.Id).OrderByDescending(x => x.ReferenceDate)
             .FirstOrDefault();
 
-        return Task.FromResult(entity?.AsDomainObject(lastFixedExpenseRecord));
+        return Task.FromResult<FixedExpense?>(entity.AsDomainObject(lastFixedExpenseRecord));
     }
 
     public async Task SaveFixedExpenseAsync(FixedExpense fixedExpense)

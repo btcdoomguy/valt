@@ -540,9 +540,6 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
                     continue;
                 }
 
-                _logger.LogInformation("[FiatHistoryUpdater] [{Source}] Adding price {Price} for {Date} for {Currency}",
-                    providerName, currencyData.Price, date.ToString("yyyy-MM-dd"), currencyCode);
-
                 entries.Add(new FiatDataEntity
                 {
                     Date = date,
@@ -556,6 +553,8 @@ internal class FiatHistoryUpdaterJob : IBackgroundJob
         {
             _priceDatabase.GetFiatData().Insert(entries);
             _priceDatabase.Checkpoint();
+            _logger.LogInformation("[FiatHistoryUpdater] [{Source}] Inserted {Count} fiat price records",
+                providerName, entries.Count);
         }
     }
 

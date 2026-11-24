@@ -362,6 +362,30 @@ public class AvgPriceRepositoryTests : DatabaseTest
         Assert.That(allProfiles.First(p => p.Name == "Profile Two").AvgPriceLines.Count, Is.EqualTo(1));
     }
 
+    [Test]
+    public async Task GetAll_Should_Return_Empty_Lines_Profile_Without_KeyNotFoundException()
+    {
+        // Arrange
+        var emptyProfile = AvgPriceProfile.New(
+            "Empty Profile",
+            asset: AvgPriceAsset.Bitcoin,
+            visible: true,
+            Icon.Empty,
+            FiatCurrency.Usd,
+            AvgPriceCalculationMethod.BrazilianRule);
+
+        var repository = new AvgPriceRepository(_localDatabase, _domainEventPublisher);
+        await repository.SaveAvgPriceProfileAsync(emptyProfile);
+
+        // Act
+        var allProfiles = (await repository.GetAvgPriceProfilesAsync()).ToList();
+
+        // Assert
+        var found = allProfiles.FirstOrDefault(p => p.Id == emptyProfile.Id);
+        Assert.That(found, Is.Not.Null);
+        Assert.That(found!.AvgPriceLines, Is.Empty);
+    }
+
     #endregion
 
     #region Delete Tests

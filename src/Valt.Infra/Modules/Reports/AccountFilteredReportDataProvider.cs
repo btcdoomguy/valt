@@ -37,6 +37,10 @@ public class AccountFilteredReportDataProvider : IReportDataProvider
             .Select(kv => (kv.Key, Accounts: kv.Value.Where(id => _accountIds.Contains(id)).ToImmutableList()))
             .Where(x => x.Accounts.Count > 0)
             .ToFrozenDictionary(x => x.Key, x => x.Accounts);
+
+        MinTransactionDate = AllTransactions.Count > 0
+            ? ComputeMinTransactionDate()
+            : _inner.MinTransactionDate;
     }
 
     private bool IsRelevant(TransactionEntity transaction) =>
@@ -63,9 +67,7 @@ public class AccountFilteredReportDataProvider : IReportDataProvider
 
     public ImmutableList<TransactionEntity> AllTransactions { get; }
 
-    public DateOnly MinTransactionDate => AllTransactions.Count > 0
-        ? ComputeMinTransactionDate()
-        : _inner.MinTransactionDate;
+    public DateOnly MinTransactionDate { get; }
 
     public DateOnly MaxTransactionDate => _inner.MaxTransactionDate;
 
