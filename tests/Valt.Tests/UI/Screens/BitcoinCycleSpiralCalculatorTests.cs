@@ -266,4 +266,43 @@ public class BitcoinCycleSpiralCalculatorTests
             Assert.That(foundBottom.Data.Date, Is.EqualTo(new DateTime(2022, 11, 21)));
         });
     }
+
+    [Test]
+    public void FindNearestPoint_ShouldReturnAdjacentDailyPointsOutsideMilestone7PxSnapRadius()
+    {
+        var cycleTop = new SpiralDataPoint(new DateTime(2021, 11, 9), 67617m, 0.0, 0.86, 4, 1, null, IsCycleTop: true);
+        var adjacentDaily = new SpiralDataPoint(new DateTime(2021, 11, 15), 63500m, 0.03, 0.85, 4, 1, null);
+        var halving = new SpiralDataPoint(new DateTime(2024, 4, 20), 63850m, 1.0, 0.85, 4, 4, 4);
+        var adjacentToHalving = new SpiralDataPoint(new DateTime(2024, 4, 26), 64200m, 1.03, 0.85, 4, 4, null);
+
+        var screenPoints = new List<SpiralScreenPoint>
+        {
+            new(new Point(100, 100), cycleTop),
+            new(new Point(112, 100), adjacentDaily),
+            new(new Point(300, 300), halving),
+            new(new Point(310, 300), adjacentToHalving)
+        };
+
+        // Pointer at (110, 100): 10px from milestone (outside 7px dot snap), 2px from adjacent daily point (at 112, 100)
+        // Old logic: milestone effectiveDistSq = 100 * 0.1 = 10, daily effectiveDistSq = 4 -> wait! If pointer is at (108.5, 100), 8.5px from milestone (72.25 * 0.1 = 7.225), 3.5px from daily (12.25) -> old logic snapped to milestone!
+        var foundDailyNearTop = BitcoinCycleSpiralCalculator.FindNearestPoint(screenPoints, new Point(108.5, 100), maxDistancePixels: 20.0);
+        // Pointer at (308, 300): 8px from halving (outside 7px dot snap: 64 * 0.1 = 6.4), 2px from adjacent daily point (distSq = 4) -> at (307.5, 300): 7.5px from halving (56.25 * 0.1 = 5.625) vs 2.5px from daily (6.25)
+        var foundDailyNearHalving = BitcoinCycleSpiralCalculator.FindNearestPoint(screenPoints, new Point(307.5, 300), maxDistancePixels: 20.0);
+        // Pointer at (105, 100): 5px from milestone (inside 7px dot snap), 7px from adjacent daily point -> snaps to milestone
+        var foundDirectTopHover = BitcoinCycleSpiralCalculator.FindNearestPoint(screenPoints, new Point(105, 100), maxDistancePixels: 20.0);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(foundDailyNearTop, Is.Not.Null);
+            Assert.That(foundDailyNearTop!.Data.Date, Is.EqualTo(new DateTime(2021, 11, 15)));
+            Assert.That(foundDailyNearTop.Data.IsCycleTop, Is.False);
+
+            Assert.That(foundDailyNearHalving, Is.Not.Null);
+            Assert.That(foundDailyNearHalving!.Data.Date, Is.EqualTo(new DateTime(2024, 4, 26)));
+            Assert.That(foundDailyNearHalving.Data.HalvingNumber, Is.Null);
+
+            Assert.That(foundDirectTopHover, Is.Not.Null);
+            Assert.That(foundDirectTopHover!.Data.IsCycleTop, Is.True);
+        });
+    }
 }

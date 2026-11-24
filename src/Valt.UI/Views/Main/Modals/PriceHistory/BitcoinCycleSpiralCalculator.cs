@@ -229,6 +229,7 @@ public static class BitcoinCycleSpiralCalculator
         if (screenPoints.Count == 0)
             return null;
 
+        const double milestoneSnapRadiusSq = 7.0 * 7.0;
         var maxDistSq = maxDistancePixels * maxDistancePixels;
         SpiralScreenPoint? nearest = null;
         var bestEffectiveDistSq = maxDistSq;
@@ -244,7 +245,7 @@ public static class BitcoinCycleSpiralCalculator
                 continue;
 
             var isMilestone = pt.Data.HalvingNumber.HasValue || pt.Data.IsCycleTop || pt.Data.IsCycleBottom;
-            var effectiveDistSq = isMilestone ? distSq * 0.1 : distSq;
+            var effectiveDistSq = isMilestone && distSq <= milestoneSnapRadiusSq ? distSq * 0.1 : distSq;
             if (effectiveDistSq <= bestEffectiveDistSq)
             {
                 bestEffectiveDistSq = effectiveDistSq;

@@ -108,7 +108,7 @@ public sealed class BitcoinCycleSpiralChartControl : Control
         context.FillRectangle(Brushes.Transparent, new Rect(Bounds.Size));
 
         var center = new Point(Bounds.Width / 2.0, Bounds.Height / 2.0);
-        var maxRadius = Math.Max(40.0, Math.Min(Bounds.Width, Bounds.Height) / 2.0 - 44.0);
+        var maxRadius = Math.Max(40.0, Math.Min(Bounds.Width, Bounds.Height) / 2.0 - 34.0);
         var typeface = new Typeface(FontFamily.Default, FontStyle.Normal, FontWeight.Medium);
         var boldTypeface = new Typeface(FontFamily.Default, FontStyle.Normal, FontWeight.SemiBold);
 
