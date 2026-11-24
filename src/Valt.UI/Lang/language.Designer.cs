@@ -5289,6 +5289,42 @@ namespace Valt.UI.Lang {
             }
         }
         
+        public static string PriceHistory_Mode_LineChart {
+            get {
+                return ResourceManager.GetString("PriceHistory.Mode.LineChart", resourceCulture);
+            }
+        }
+        
+        public static string PriceHistory_Mode_SpiralChart {
+            get {
+                return ResourceManager.GetString("PriceHistory.Mode.SpiralChart", resourceCulture);
+            }
+        }
+        
+        public static string PriceHistory_Spiral_CycleInfo {
+            get {
+                return ResourceManager.GetString("PriceHistory.Spiral.CycleInfo", resourceCulture);
+            }
+        }
+        
+        public static string PriceHistory_Spiral_HalvingMilestone {
+            get {
+                return ResourceManager.GetString("PriceHistory.Spiral.HalvingMilestone", resourceCulture);
+            }
+        }
+        
+        public static string PriceHistory_Spiral_HalvingLegend {
+            get {
+                return ResourceManager.GetString("PriceHistory.Spiral.HalvingLegend", resourceCulture);
+            }
+        }
+        
+        public static string PriceHistory_Spiral_LatestPriceLegend {
+            get {
+                return ResourceManager.GetString("PriceHistory.Spiral.LatestPriceLegend", resourceCulture);
+            }
+        }
+        
         public static string Reports_CategoryFilter_SaveAsDefault {
             get {
                 return ResourceManager.GetString("Reports.CategoryFilter.SaveAsDefault", resourceCulture);

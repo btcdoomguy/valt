@@ -2665,6 +2665,24 @@
     <data name="PriceHistory.TotalRecords" xml:space="preserve">
         <value>{0} records</value>
     </data>
+    <data name="PriceHistory.Mode.LineChart" xml:space="preserve">
+        <value>Line Chart (5Y)</value>
+    </data>
+    <data name="PriceHistory.Mode.SpiralChart" xml:space="preserve">
+        <value>4-Year Cycle Spiral</value>
+    </data>
+    <data name="PriceHistory.Spiral.CycleInfo" xml:space="preserve">
+        <value>Cycle {0} • Year {1} of 4</value>
+    </data>
+    <data name="PriceHistory.Spiral.HalvingMilestone" xml:space="preserve">
+        <value>Halving #{0}</value>
+    </data>
+    <data name="PriceHistory.Spiral.HalvingLegend" xml:space="preserve">
+        <value>Bitcoin Halvings</value>
+    </data>
+    <data name="PriceHistory.Spiral.LatestPriceLegend" xml:space="preserve">
+        <value>Latest Price</value>
+    </data>
     <data name="Reports.CategoryFilter.SaveAsDefault" xml:space="preserve">
         <value>Save as default</value>
     </data>
