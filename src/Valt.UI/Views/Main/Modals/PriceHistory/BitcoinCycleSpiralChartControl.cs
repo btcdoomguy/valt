@@ -32,6 +32,8 @@ public sealed class BitcoinCycleSpiralChartControl : Control
     private static readonly IImmutableSolidColorBrush MutedTextBrush = new ImmutableSolidColorBrush(Color.Parse("#a8a6a4"));
     private static readonly IImmutableSolidColorBrush HalvingFillBrush = new ImmutableSolidColorBrush(Color.Parse("#0566e9"));
     private static readonly IImmutableSolidColorBrush HalvingStrokeBrush = new ImmutableSolidColorBrush(Color.Parse("#ffffff"));
+    private static readonly IImmutableSolidColorBrush CycleTopFillBrush = new ImmutableSolidColorBrush(Color.Parse("#22c55e"));
+    private static readonly IImmutableSolidColorBrush CycleBottomFillBrush = new ImmutableSolidColorBrush(Color.Parse("#ef4444"));
     private static readonly IImmutableSolidColorBrush TooltipBgBrush = new ImmutableSolidColorBrush(Color.Parse("#1a1a1a"), 0.94);
     private static readonly IImmutableSolidColorBrush TooltipBorderBrush = new ImmutableSolidColorBrush(Color.Parse("#ffa122"), 0.8);
 
@@ -54,6 +56,8 @@ public sealed class BitcoinCycleSpiralChartControl : Control
     private StreamGeometry? _cachedSpiralGeometry;
     private readonly List<SpiralScreenPoint> _screenPoints = new();
     private readonly List<SpiralScreenPoint> _halvingScreenPoints = new();
+    private readonly List<SpiralScreenPoint> _cycleTopScreenPoints = new();
+    private readonly List<SpiralScreenPoint> _cycleBottomScreenPoints = new();
     private SpiralScreenPoint? _hoveredPoint;
 
     static BitcoinCycleSpiralChartControl()
@@ -137,6 +141,8 @@ public sealed class BitcoinCycleSpiralChartControl : Control
         _cachedSource = points;
         _screenPoints.Clear();
         _halvingScreenPoints.Clear();
+        _cycleTopScreenPoints.Clear();
+        _cycleBottomScreenPoints.Clear();
         _cachedSpiralGeometry = null;
 
         if (points is null || points.Count == 0)
@@ -160,6 +166,16 @@ public sealed class BitcoinCycleSpiralChartControl : Control
                 if (pt.HalvingNumber.HasValue)
                 {
                     _halvingScreenPoints.Add(screenPt);
+                }
+
+                if (pt.IsCycleTop)
+                {
+                    _cycleTopScreenPoints.Add(screenPt);
+                }
+
+                if (pt.IsCycleBottom)
+                {
+                    _cycleBottomScreenPoints.Add(screenPt);
                 }
 
                 if (i == 0)
@@ -297,6 +313,20 @@ public sealed class BitcoinCycleSpiralChartControl : Control
             var halvingPt = _halvingScreenPoints[i];
             context.DrawEllipse(HalvingFillBrush, HalvingPen, halvingPt.Position, 4.5, 4.5);
         }
+
+        // Cycle top markers (green dots)
+        for (var i = 0; i < _cycleTopScreenPoints.Count; i++)
+        {
+            var topPt = _cycleTopScreenPoints[i];
+            context.DrawEllipse(CycleTopFillBrush, HalvingPen, topPt.Position, 5.0, 5.0);
+        }
+
+        // Cycle bottom markers (red dots)
+        for (var i = 0; i < _cycleBottomScreenPoints.Count; i++)
+        {
+            var bottomPt = _cycleBottomScreenPoints[i];
+            context.DrawEllipse(CycleBottomFillBrush, HalvingPen, bottomPt.Position, 5.0, 5.0);
+        }
     }
 
     private static void DrawLegend(DrawingContext context, Typeface typeface)
@@ -304,18 +334,34 @@ public sealed class BitcoinCycleSpiralChartControl : Control
         const double startX = 12.0;
         const double startY = 10.0;
 
-        // Halving legend item
+        // 1. Halving legend item
         var halvingDotCenter = new Point(startX + 5.0, startY + 7.0);
         context.DrawEllipse(HalvingFillBrush, HalvingPen, halvingDotCenter, 4.5, 4.5);
         var halvingText = CreateText(language.PriceHistory_Spiral_HalvingLegend, typeface, 11.0, MutedTextBrush);
         context.DrawText(halvingText, new Point(startX + 15.0, startY));
 
-        // Latest price legend item
-        var row2Y = startY + halvingText.Height + 4.0;
-        var latestDotCenter = new Point(startX + 5.0, row2Y + 7.0);
+        var rowStep = halvingText.Height + 4.0;
+
+        // 2. Cycle Top legend item
+        var row2Y = startY + rowStep;
+        var topDotCenter = new Point(startX + 5.0, row2Y + 7.0);
+        context.DrawEllipse(CycleTopFillBrush, HalvingPen, topDotCenter, 4.5, 4.5);
+        var topText = CreateText(language.PriceHistory_Spiral_CycleTopLegend, typeface, 11.0, MutedTextBrush);
+        context.DrawText(topText, new Point(startX + 15.0, row2Y));
+
+        // 3. Cycle Bottom legend item
+        var row3Y = row2Y + rowStep;
+        var bottomDotCenter = new Point(startX + 5.0, row3Y + 7.0);
+        context.DrawEllipse(CycleBottomFillBrush, HalvingPen, bottomDotCenter, 4.5, 4.5);
+        var bottomText = CreateText(language.PriceHistory_Spiral_CycleBottomLegend, typeface, 11.0, MutedTextBrush);
+        context.DrawText(bottomText, new Point(startX + 15.0, row3Y));
+
+        // 4. Latest price legend item
+        var row4Y = row3Y + rowStep;
+        var latestDotCenter = new Point(startX + 5.0, row4Y + 7.0);
         context.DrawEllipse(BtcLightBrush, LatestPointPen, latestDotCenter, 4.0, 4.0);
         var latestText = CreateText(language.PriceHistory_Spiral_LatestPriceLegend, typeface, 11.0, MutedTextBrush);
-        context.DrawText(latestText, new Point(startX + 15.0, row2Y));
+        context.DrawText(latestText, new Point(startX + 15.0, row4Y));
     }
 
     private void DrawHoverOverlayAndTooltip(
@@ -324,7 +370,13 @@ public sealed class BitcoinCycleSpiralChartControl : Control
         Typeface typeface,
         Typeface boldTypeface)
     {
-        var fillBrush = hovered.Data.HalvingNumber.HasValue ? HalvingFillBrush : BtcPrimaryBrush;
+        var fillBrush = hovered.Data.IsCycleTop
+            ? CycleTopFillBrush
+            : hovered.Data.IsCycleBottom
+                ? CycleBottomFillBrush
+                : hovered.Data.HalvingNumber.HasValue
+                    ? HalvingFillBrush
+                    : BtcPrimaryBrush;
         context.DrawEllipse(fillBrush, HoverMarkerPen, hovered.Position, 6.0, 6.0);
 
         var formattedPrice = hovered.Data.Price < 1m
@@ -345,6 +397,16 @@ public sealed class BitcoinCycleSpiralChartControl : Control
                 language.PriceHistory_Spiral_HalvingMilestone,
                 hovered.Data.HalvingNumber.Value);
             line2Str = $"{line2Str} • {halvingStr}";
+        }
+
+        if (hovered.Data.IsCycleTop)
+        {
+            line2Str = $"{line2Str} • {language.PriceHistory_Spiral_CycleTopMilestone}";
+        }
+
+        if (hovered.Data.IsCycleBottom)
+        {
+            line2Str = $"{line2Str} • {language.PriceHistory_Spiral_CycleBottomMilestone}";
         }
 
         var line1Ft = CreateText(line1Str, boldTypeface, 12.0, TextBrush);
