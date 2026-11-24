@@ -7,11 +7,11 @@
         xmlns:vm="clr-namespace:Valt.UI.Views.Main.Modals.PriceHistory"
         xmlns:avalonia="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
         mc:Ignorable="d"
-        d:DesignWidth="900" d:DesignHeight="700"
-        MinWidth="900"
-        MinHeight="700"
-        MaxWidth="900"
-        MaxHeight="700"
+        d:DesignWidth="1040" d:DesignHeight="805"
+        MinWidth="1040"
+        MinHeight="805"
+        MaxWidth="1040"
+        MaxHeight="805"
         x:Class="Valt.UI.Views.Main.Modals.PriceHistory.PriceHistoryView"
         x:DataType="vm:PriceHistoryViewModel"
         Title="{x:Static lang:language.PriceHistory_Title}"
@@ -39,7 +39,7 @@
                                          TitleBarPressed="CustomTitleBarButtonPressed"
                                          CloseClick="CustomTitleBarCloseClicked" />
             <Border Classes="form-fields-area" Padding="0">
-                <Grid ColumnDefinitions="180, *" Height="655">
+                <Grid ColumnDefinitions="180, *" Height="760">
                     <!-- Left panel: Currency selector -->
                     <Border Grid.Column="0"
                             BorderBrush="{DynamicResource Background700Brush}"
@@ -48,7 +48,7 @@
                         <StackPanel Orientation="Vertical" Spacing="10">
                             <ListBox ItemsSource="{Binding AvailableCurrencies}"
                                      SelectedItem="{Binding SelectedCurrency}"
-                                     MaxHeight="620">
+                                     MaxHeight="725">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding}" Padding="4,2" />
@@ -83,7 +83,7 @@
                                 BorderBrush="{DynamicResource Background700Brush}"
                                 BorderThickness="1"
                                 CornerRadius="4"
-                                Padding="10"
+                                Padding="6"
                                 Margin="10,8,10,0"
                                 IsVisible="{Binding HasData}">
                             <Panel>
@@ -95,13 +95,13 @@
                                     YAxes="{Binding ChartData.YAxes}"
                                     TooltipTextSize="12"
                                     ZoomMode="None"
-                                    Height="220"
+                                    Height="250"
                                     Margin="10,5,10,5"
                                     IsVisible="{Binding !IsSpiralChartMode}" />
                                 <vm:BitcoinCycleSpiralChartControl
                                     x:Name="SpiralChart"
                                     Points="{Binding SpiralPoints}"
-                                    Height="400"
+                                    Height="685"
                                     IsVisible="{Binding IsSpiralChartMode}" />
                             </Panel>
                         </Border>
@@ -117,7 +117,10 @@
                                    IsVisible="{Binding !HasData}" />
 
                         <!-- Pagination bar -->
-                        <Border Grid.Row="2" Margin="10,8,10,0" Padding="4">
+                        <Border Grid.Row="2"
+                                Margin="10,8,10,0"
+                                Padding="4"
+                                IsVisible="{Binding !IsSpiralChartMode}">
                             <Grid ColumnDefinitions="Auto, *, Auto, *, Auto">
                                 <Button Grid.Column="0"
                                         Content="{x:Static lang:language.PriceHistory_Previous}"
@@ -146,7 +149,8 @@
                                   Margin="10,5,10,10"
                                   GridLinesVisibility="All"
                                   ItemsSource="{Binding PageItems}"
-                                  IsReadOnly="True">
+                                  IsReadOnly="True"
+                                  IsVisible="{Binding !IsSpiralChartMode}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="{x:Static lang:language.PriceHistory_Column_Date}"
                                                     Binding="{Binding Date}"
