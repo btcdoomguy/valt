@@ -7,8 +7,10 @@
 - ✅ **v0.7 Insights & Metrics Expansion** — Phases 39-43 (completed 2026-08-12)
 - ⏸️ **v0.8 BTC Loan Simulator** — Phases 44-45 (paused 2026-10-26 — remaining phases removed, superseded by v0.10)
 - ✅ **v0.9 Goal Transparency — Transaction Breakdown** — Phases 49-51 (shipped 2026-10-07)
-- 🚧 **v0.10 Wealth Snapshots** — Phase 52 (in progress)
+- ✅ **v0.10 Wealth Snapshots** — Phase 52 (shipped 2026-11-21; UI plan 52-02 dropped)
 - ✅ **v0.11 Documentation Site Sync** — Phase 54 (shipped 2026-10-30)
+- ✅ **v0.12 Codebase Performance, Architecture & Readability Refactoring** — Phase 55 (completed 2026-11-23)
+- ✅ **v0.13 Bitcoin 4-Year Cycle Spiral Chart** — Phase 56 (completed 2026-11-24)
 
 ## Phases
 
@@ -57,14 +59,22 @@ Phases 46-48 (Cost-Over-Time Schedule, Prefill from Existing BTC Loan Asset, MCP
 - [x] **Phase 50: Goal Summary Modal UI** — "View summary" right-click context menu on all goal entries + read-only transaction grid modal (completed 2026-10-06)
 - [x] **Phase 51: MCP, Localization, Documentation & Verification** — Goal contributing-transactions MCP tool, 3-language strings, goals.md docs, end-to-end sign-off (completed 2026-10-07)
 
-### 🚧 v0.10 Wealth Snapshots (Phase 52) — IN PROGRESS
+### ✅ v0.10 Wealth Snapshots (Phase 52) — COMPLETE
 
-- [ ] **Phase 52: Wealth Snapshots & Asset Totals in Monthly Reports** — Persist daily snapshots of Included-in-Wealth-Totals asset values and include asset totals in the Monthly Totals grid and chart using the latest snapshot available per period
-- [ ] **Phase 53: Transaction Exclusion Flag for Reports & Goals** — Per-transaction "excluded" flag (checkbox in Transaction Editor right panel) that removes the transaction from all Reports and Goals calculations
+- [x] **Phase 52: Wealth Snapshots & Asset Totals in Monthly Reports** — Persist daily snapshots of Included-in-Wealth-Totals asset values and include asset totals in the Monthly Totals grid and chart using the latest snapshot available per period (backend + MCP shipped; 52-02 UI plan dropped 2026-11-21)
+- [x] **Phase 53: Transaction Exclusion Flag for Reports & Goals** — Per-transaction "excluded" flag (checkbox in Transaction Editor right panel) that removes the transaction from all Reports and Goals calculations
 
 ### ✅ v0.11 Documentation Site Sync (Phase 54) — SHIPPED 2026-10-30
 
 - [x] **Phase 54: Documentation Site Sync — Features Since July 2026** — Update the `../valt-docs` MkDocs site (pt-BR + en-US) to cover every user-facing feature shipped since the v0.6 docs refresh (2026-07-17): v0.7 reports/metrics, v0.8 BTC Loan Simulator, v0.9 Goal Summary, v0.10 Wealth Snapshots & Transaction Exclusion — completed 2026-10-30
+
+### ✅ v0.12 Codebase Performance, Architecture & Readability Refactoring (Phase 55) — COMPLETED 2026-11-23
+
+- [x] **Phase 55: Codebase Performance, Architecture & Readability Refactoring** — Comprehensive 6-plan optimization and refactoring across Valt.Core, Valt.App, Valt.Infra, and Valt.UI: correctness bug fixes, LiteDB query/index/batching optimizations, Core/App allocation & algorithmic improvements, UI memory leak & responsiveness fixes, CQRS architectural alignment, and code deduplication
+
+### ✅ v0.13 Bitcoin 4-Year Cycle Spiral Chart (Phase 56) — COMPLETED 2026-11-24
+
+- [x] **Phase 56: Bitcoin 4-Year Cycle Spiral Chart in Price History** — Add an interactive 4-year cycle logarithmic spiral chart to the Price History modal for BTC, with a chart mode toggle (Line Chart vs. 4-Year Cycle Spiral), radial year axes, log10 price rings ($0.001 to $1M), halving markers, and hover tooltips — completed 2026-11-24
 
 ## Phase Details
 
@@ -341,7 +351,7 @@ Phases 46-48 (Cost-Over-Time Schedule, Prefill from Existing BTC Loan Asset, MCP
   3. The Monthly Totals grid includes an asset-totals column/row derived from snapshots, and the Monthly Totals chart includes asset totals, each using the latest snapshot available on or before the end of that period (e.g., data only for Oct 10 → all of October uses the Oct 10 snapshot)
   4. Any message on the Monthly Totals panel stating that totals exclude assets is updated to state that totals include assets based on the latest available data for that range
 
-**Plans**: 2/3 plans executed
+**Plans**: 2/2 plans executed (52-02 UI dropped 2026-11-21)
 
 **Wave 1**
 
@@ -349,8 +359,9 @@ Phases 46-48 (Cost-Over-Time Schedule, Prefill from Existing BTC Loan Asset, MCP
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 52-02-PLAN.md — UI: Assets grid column, Monthly Totals chart added to view with assets series, trilingual footnote copy, human visual sign-off (SC-3 UI, SC-4)
 - [x] 52-03-PLAN.md — MCP parity for GetMonthlyTotals asset totals + DI resolution check + full-suite phase gate (SC-3 MCP)
+
+_Note: 52-02 (UI: assets grid column + Monthly Totals chart with assets series) was discarded 2026-11-21 as a future plan — see `.planning/research/NEW-FEATURES.md`._
 
 **UI hint**: yes
 
@@ -378,15 +389,17 @@ Phases 46-48 (Cost-Over-Time Schedule, Prefill from Existing BTC Loan Asset, MCP
 | 49. Goal Contributing-Transactions Query Backend | v0.9 | 3/3 | Complete    | 2026-10-06 |
 | 50. Goal Summary Modal UI | v0.9 | 3/3 | Complete    | 2026-10-06 |
 | 51. MCP, Localization, Documentation & Verification | v0.9 | 5/5 | Complete    | 2026-10-07 |
-| 52. Wealth Snapshots & Asset Totals in Monthly Reports | v0.10 | 2/3 | In Progress|  |
+| 52. Wealth Snapshots & Asset Totals in Monthly Reports | v0.10 | 2/2 | Complete | 2026-11-21 |
 | 54. Documentation Site Sync — Features Since July 2026 | v0.11 | 6/6 | Complete | 2026-10-30 |
+| 55. Codebase Performance, Architecture & Readability Refactoring | v0.12 | 6/6 | Complete | 2026-11-23 |
+| 56. Bitcoin 4-Year Cycle Spiral Chart in Price History | v0.13 | 1/1 | Complete | 2026-11-24 |
 
-**Total phases:** 22 (18 complete, 1 active, 3 removed/paused)  
+**Total phases:** 22 (19 complete, 0 active, 3 removed/paused)  
 **v0.8 plans:** 3/3 executed (phases 46-48 removed 2026-10-26)  
 **v0.8 requirements:** SIM-01..SIM-13 (SIM-10..SIM-13 dropped with phases 46-48)  
 **v0.9 plans:** 11/11 executed (roadmap defined 2026-10-06)  
 **v0.9 requirements:** 8/8 mapped (GOL-03..GOL-10)  
-**v0.10 plans:** 0/3 (roadmap defined 2026-10-26)  
+**v0.10 plans:** 2/2 executed (52-02 UI dropped 2026-11-21; phase 52 complete)  
 **v0.10 requirements:** TBD
 
 ### Phase 53: Transaction Exclusion Flag for Reports & Goals
@@ -442,5 +455,50 @@ Phases 46-48 (Cost-Over-Time Schedule, Prefill from Existing BTC Loan Asset, MCP
 
 - [x] 54-06-PLAN.md — QA gate: full-site automated battery (build/parity/presence/stale/nav/D-01) + human visual & factual sign-off — SC-1, SC-5
 
+### Phase 55: Codebase Performance, Architecture & Readability Refactoring
+
+**Goal**: Eliminate correctness bugs, database full-table scans and N+1 bottlenecks, domain/dispatcher memory allocations, UI resource leaks and redundant refreshes, CQRS layer bypasses, and duplicated report/handler/chart code across Valt.Core, Valt.App, Valt.Infra, and Valt.UI while keeping the full test suite green
+**Depends on**: Phase 54
+**Requirements**: TBD
+**Success Criteria** (what must be TRUE):
+
+  1. **Correctness & Bug Fixes (Plan 55-01)**: `TransactionTermService.RemoveEntry` persists decremented counts (`Update(entry)`); `McpServerService.ForwardServicesFromMainApp` forwards `IAssetPriceProviderSelector`; `AvgPriceProfile.AddLine` honors explicit `displayOrder` and returns the created `AvgPriceLine` (eliminating `HashSet.Last()` reliance in `AddLineHandler` and preserving order in `EditLineHandler`); `AvgPriceRepository.GetAvgPriceProfilesAsync` handles profiles with zero lines without `KeyNotFoundException`; `CoinGeckoRateLimiter.WaitAsync` serializes concurrent callers without race conditions; duplicate `TransactionTermService` singleton registration in `Valt.Infra/Extensions.cs` is consolidated.
+  2. **Core & App Performance & Allocations (Plan 55-02)**: `FiatCurrency` caches all 33 currency instances as `static readonly` and uses a case-insensitive lookup dictionary; `FifoCalculationStrategy` avoids $O(N^2)$ queue reallocations on partial sells and maintains running totals incrementally; `BtcLoanDetails` caches/indexes `GetEffectiveSnapshot()` in $O(1)$; `CommandDispatcher`, `QueryDispatcher`, and `NotificationPublisher` avoid per-call reflection `MethodInfo.Invoke` boxing/array allocations; domain time calculations (`Asset`, `BtcLoanDetails`, `BtcLendingDetails`) support deterministic time or clean clock usage.
+  3. **Database, LiteDB Indexing, Batching & Report Performance (Plan 55-03)**: Price and local database queries (`NetWorthBtcProgressCalculator`, `PriceDatabaseRatesProvider`, `FiatHistoryUpdaterJob`, `CategoryQueries`, `AssetQueries`) use indexed queries instead of full-table `.FindAll()` scans; missing LiteDB indexes (`IsExcluded`, `IsSold`, `StateId`) are added; N+1 loops in `TransactionRepository.GetTransactionsByIdsAsync`, `TransactionAutoSatAmountCalculator`, `AccountQueries`/`AccountTotalsCalculator`, `LoanReportsQueries`, and `GoalTransactionReader` are batched/deduplicated; `AssetDetailsSerializer.DeserializeBtcLoan` parses JSON in a single pass; `ExpensesByCategoryReport` and `IncomeByCategoryReport` pre-materialize filter `HashSet`s outside inner loops; per-row `LogInformation` calls inside historical crawler loops are downgraded or summarized.
+  4. **UI Memory Leaks, Resource Disposal & Responsiveness (Plan 55-04)**: `ValtBaseWindow` disposes `DataContext as IDisposable` on close; `GoalsPanelViewModel` disposes old `GoalEntryViewModel` timers before clearing; `AssetsViewModel` and `AvgPriceViewModel` unregister all `WeakReferenceMessenger` subscriptions on dispose; `MainViewModel.UpdatePepeImage` disposes previous `Bitmap` and asset `Stream`; chart data classes properly dispose SkiaSharp paints and reuse static `SKTypeface` / palette paints in `PointMeasured`; `AssetsViewModel.OnRatesStatePropertyChanged` filters property changes to prevent 4x reload storms every 30s; startup/filter duplicate fetches and un-debounced transaction search are eliminated; synchronous UI-thread DB/file loads and per-item `ObservableCollection.Add` loops in charts/lists are replaced with async loading and batch updates (`AddRange` / collection replacement); `IconMapLoader` uses `System.Threading.Lock`.
+  5. **CQRS Architectural Alignment (Plan 55-05)**: ViewModels (`ManageAccountGroupViewModel`, `ManageAssetGroupViewModel`, `FixedExpensesPanelViewModel`, `FixedExpenseOverviewViewModel`, `AvgPriceViewModel`, `PriceHistoryViewModel`, `SettingsViewModel`, `ChangePasswordViewModel`, `ReportsViewModel`, `SpendingEvolutionViewModel`) dispatch through `Valt.App` (`ICommandDispatcher` / `IQueryDispatcher`) instead of injecting `ILocalDatabase`, `IPriceDatabase`, or repositories directly; `IAvgPriceTotalizer` DTOs move out of `Valt.Core` into `Valt.App`; MCP `ReportTools` honors configured category exclusions for parity with the UI.
+  6. **Code Deduplication & Readability Refactoring (Plan 55-06)**: Near-identical `ExpensesByCategoryReport` / `IncomeByCategoryReport` (Infra) and `ExpensesByCategoryChartData` / `IncomeByCategoryChartData` (UI) share common base/helper implementations; dual-axis line charts (`WealthOverviewChartData`, `SpendingEvolutionChartData`) inherit from `ReportChartDataBase`; duplicated handler/validator logic in `AddTransactionHandler`/`EditTransactionHandler`, `CreateGoalHandler`/`EditGoalHandler`, `CreateFixedExpenseHandler`/`EditFixedExpenseHandler`, and `ConfigurationManager` CSV list helpers is extracted into shared components; full test suite passes (`dotnet test`).
+
+**Plans**: 6/6 plans executed
+**Wave 1**
+- [x] 55-01-PLAN.md — Correctness & subtle bug fixes: TransactionTermService.RemoveEntry update, McpServerService IAssetPriceProviderSelector forwarding, AvgPriceProfile.AddLine order/return value, AvgPriceRepository empty-profile handling, CoinGeckoRateLimiter race condition fix, and duplicate singleton consolidation
+- [x] 55-02-PLAN.md — Core & App layer allocations and algorithmic performance: FiatCurrency static instance caching, FifoCalculationStrategy O(1) lot updates & running totals, BtcLoanDetails O(1) effective snapshot, reflection-free CQRS dispatchers & NotificationPublisher, IReadOnlyDictionary validation results
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [x] 55-03-PLAN.md — LiteDB queries, indexing, N+1 batching & report performance: indexed price/entity queries, missing LiteDB indexes (IsExcluded, IsSold, StateId), batch fixed-expense lookup, single-pass BtcLoan JSON deserialization, pre-materialized report filter HashSets, summary crawler logging
+- [x] 55-04-PLAN.md — UI memory leaks, resource disposal & responsiveness: ValtBaseWindow DataContext disposal, GoalEntryViewModel timer disposal, messenger unregistration, Pepe bitmap/stream disposal, SkiaSharp paint/typeface reuse & disposal, AssetsViewModel rate-change filter, CheckboxListSelector & AvaloniaList.AddRange batching, search debounce, System.Threading.Lock
+
+**Wave 3** *(blocked on Wave 2 completion)*
+- [x] 55-05-PLAN.md — CQRS architectural alignment across UI, App & MCP: migrate ManageAccountGroup, ManageAssetGroup, AvgPrice, FixedExpensesPanel, FixedExpenseOverview, Reports, and SpendingEvolution ViewModels to ICommandDispatcher/IQueryDispatcher, and align MCP ReportTools category exclusions & AssetsTotalFiat
+- [x] 55-06-PLAN.md — Code deduplication & readability refactoring: shared CategoryBreakdownCalculator, CategoryBarChartDataBase, ReportChartDataBase inheritance, TransactionCommandHelper, GoalTypeBuilder, FixedExpenseRangeBuilder, FixedExpenseRepository null-safe lookup, and ConfigurationManager CSV helpers
+
+### Phase 56: Bitcoin 4-Year Cycle Spiral Chart in Price History
+
+**Goal**: Users can visualize Bitcoin's full historical price trajectory on a 4-year halving cycle logarithmic spiral chart inside the Price History window (inspired by Rational Root / BitcoinStrategyPlatform.com), toggling seamlessly between the standard 5-year Cartesian line chart and the 4-year cycle spiral chart when BTC is selected
+**Depends on**: Phase 55
+**Requirements**: TBD
+**Success Criteria** (what must be TRUE):
+
+  1. When BTC is selected in the Price History modal, the user can toggle between the standard Line Chart view and the 4-Year Cycle Spiral Chart view (when a fiat currency is selected, only the standard Line Chart view is shown).
+  2. The 4-Year Cycle Spiral Chart plots the full available BTC historical price dataset in polar coordinates where one full $360^\circ$ clockwise rotation equals 4 years (1461 days): top ($12\text{ o'clock}$) corresponds to `'09, '13, '17, '21, '25`, right ($3\text{ o'clock}$) to `'10, '14, '18, '22, '26`, bottom ($6\text{ o'clock}$) to `'11, '15, '19, '23, '27`, and left ($9\text{ o'clock}$) to `'12, '16, '20, '24, '28`, with 8 radial spoke lines (every $45^\circ$ / 6 months).
+  3. Radial distance maps price on a base-10 logarithmic scale with concentric circular grid rings and labels from `$0.001` (`$0.001, $0.01, $0.1, $1, $10, $100, $1000, $10k, $100k, $1M`), drawing the continuous BTC price spiral trajectory in Bitcoin orange.
+  4. Bitcoin halving dates (2012-11-28, 2016-07-09, 2020-05-11, 2024-04-20) and/or genesis/cycle milestones are visually marked on the spiral, and hovering over the spiral displays a tooltip with the nearest data point's exact date, USD price, and cycle year.
+  5. All new UI labels/tooltips are localized in English (`language.resx`), Portuguese (`language.pt-BR.resx`), and Spanish (`language.es.resx`), unit tests cover the polar/logarithmic coordinate math and ViewModel state, and `dotnet test` passes.
+
+**Plans**: 1/1 plans executed
+- [x] 56-01-PLAN.md — Pure 4-year cycle polar/log10 spiral calculator, custom Avalonia spiral chart control with halving markers & hover tooltips, PriceHistoryView/ViewModel mode toggle, trilingual localization, and NUnit tests (SC-1..SC-5 / D-01..D-05)
+
+**UI hint**: yes
+
 ---
-*Last updated: 2026-10-30 — v0.11 Documentation Site Sync shipped (Phase 54 complete, verification passed 5/5)*
+*Last updated: 2026-11-23 — Phase 56 added for v0.13 Bitcoin 4-Year Cycle Spiral Chart*

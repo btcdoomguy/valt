@@ -76,15 +76,7 @@ Users can see their entire financial picture — cash flow, investments, and loa
 
 ### Active
 
-- ✓ v0.7 Insights & Metrics Expansion — sats earned/month, sats spent (month + per category), stack velocity — Phase 40
-
-### Active
-
-- [ ] v0.7 Insights & Metrics Expansion — savings rate, burn rate, fixed vs variable ratio
-- [ ] v0.7 Insights & Metrics Expansion — net worth CAGR, fiat vs BTC allocation %, best/worst months, days under water
-- [ ] v0.7 Insights & Metrics Expansion — interest/fees paid (total + monthly), liquidation-price distance trend
-- [ ] v0.8 BTC Loan Simulator — cost-over-time schedule until end date
-- [ ] v0.8 BTC Loan Simulator — load existing BTC-backed loan from Assets to prefill fields
+None — all milestones through v0.11 shipped. The next milestone will be scoped from `.planning/research/NEW-FEATURES.md` (5 candidates: realized gains & tax-lot reporting, on-chain watch-only sync, UTXO/coin control, DCA analytics, budget planner & forecasting).
 
 ## Out of Scope
 
@@ -108,6 +100,8 @@ Users can see their entire financial picture — cash flow, investments, and loa
 - **Phase 50 complete** — Goal Summary modal UI: "View summary" context menu (allow-list gating, secure-mode disable), chromeless resizable modal with 7-column read-only grid, per-unit running-total formatting, header strip with focal reconciled total; human visual sign-off approved; 1818 tests green.
 - **Phase 51 complete** — `GetGoalContributingTransactions` MCP tool with typed Supported/Error contract, pt-BR/es localization (1048-key tri-locale parity), `.claude/docs/goals.md` update; end-to-end human sign-off approved; 1822 tests green. **v0.9 milestone complete** (3 phases, 11 plans, 8/8 requirements GOL-03..GOL-10).
 - **Phase 53 complete** (2026-10-27) — per-transaction "Excluded from reports and goals" flag: checkbox in the Transaction Editor right panel, exclusion from all Reports income/expense aggregations and all 9 goal progress strategies (semantic boundary: balances/net-worth/ATH/avg-price/snapshots untouched), report-cache invalidation on toggle, MCP surface (6 `excluded` params + `SetTransactionExcluded`), trilingual localization. Gap closure fixed a LiteDB legacy-document predicate bug (`!x.IsExcluded` → `($.excl = false)` dropped pre-phase-53 documents; rewritten null-safe). 6/6 plans, 1921 tests green; human UAT passed.
+- **Phase 55 complete** (2026-11-23) — Codebase Performance, Architecture & Readability Refactoring: fixed 6 correctness and concurrency bugs across AvgPrice, TransactionTermService, MCP forwarding, and CoinGeckoRateLimiter; optimized Core/App allocations (`FiatCurrency` static dictionary, $O(N)$ `LinkedList<CostLot>` FIFO, $O(1)$ `BtcLoanDetails` effective snapshot, reflection-free generic CQRS/notification dispatchers); added LiteDB indexes (`IsExcluded`, `IsSold`, `StateId`), batched N+1 queries, and single-pass `BtcLoanDetailsDto` JSON deserialization; fixed UI native resource/timer/messenger/DataContext leaks, filtered rate-tick reload storms, and debounced transaction search; aligned ViewModels and MCP `ReportTools` with `Valt.App` CQRS dispatchers and UI analytics exclusions; deduplicated category reports, chart data base classes, CQRS command helpers, and `ConfigurationManager` CSV persistence. 6/6 plans, 1948 tests green.
+- **Phase 56 complete** (2026-11-24) — Bitcoin 4-Year Cycle Spiral Chart in Price History: added `BitcoinCycleSpiralCalculator` (1,461-day polar angle mapping from `2009-01-01`, 10-decade $\log_{10}$ radial scaling from `$0.001` to `$1M`, halving milestone detection, and nearest-point hit-testing), `BitcoinCycleSpiralChartControl` custom Avalonia `Control` (concentric log10 price rings, 8 radial spokes, cardinal year labels, $+90^\circ$ rotated price labels, Bitcoin-orange spiral trajectory, halving markers, legend, and clamped hover tooltip), `PriceHistoryViewModel`/`PriceHistoryView.axaml` segmented mode toggle (`Line Chart (5Y)` vs `4-Year Cycle Spiral`), trilingual localization (`en-US`, `pt-BR`, `es`), and 10 NUnit unit tests. 1/1 plans, 1958 tests green.
 
 ## Current Milestone: v0.9 Goal Transparency — Transaction Breakdown
 
@@ -122,8 +116,14 @@ Users can see their entire financial picture — cash flow, investments, and loa
 
 ## Next Milestone Goals
 
-- Future candidate: address the v0.4 quality/hardening deferred items (async void cleanup, HttpClient factory centralization, background job throttling, LiteDB index centralization, god-VM refactor, live-API test isolation, handler unit tests).
-- Deferred v0.7 candidates (v2): spending patterns heatmap, top-N expenses, category trend lines, hindsight cost, DCA consistency, rolling averages, debt-to-wealth ratio, goal forecasting, cost-basis/profit reports, account analytics.
+The next milestone will be scoped from `.planning/research/NEW-FEATURES.md`, researched 2026-11-21. Five candidates (in recommended order):
+
+1. Realized gains & tax-lot reporting (builds on AvgPrice cost basis)
+2. Budget planner & cash-flow forecasting (recurring income + forward projections)
+3. On-chain watch-only wallet sync + UTXO / coin control & privacy labeling
+4. DCA analytics & backtesting (builds on DcaGoalType + price history)
+
+_Deferred quality backlog (carried, separate from feature work): v0.4 hardening items (async void cleanup, god-VM refactor, live-API test isolation, handler unit tests)._
 
 ## Context
 
@@ -171,6 +171,10 @@ Valt uses a layered architecture: Valt.Core (domain), Valt.App (CQRS), Valt.Infr
 | Amount fields on `ContributingTransactionRow` are non-negative magnitudes; sign lives only in `Contribution`/`RunningTotal` | `BtcValue` core invariant rejects negative sats; magnitude contract matches all existing assertions | `FiatAmount`/`SatsAmount` absolute; sign on Contribution and RunningTotal deltas — Phase 49 |
 | Query awaited before modal opens; `CanViewSummary` is an allow-list of the 9 supported goal-type DTOs | Modal opens fully populated (no loading chrome); a future goal type can't silently fall into a misleading empty state | `ViewSummaryCommand` no-ops on `NotSupported`; NetWorthBtc hidden via allow-list — Phase 50 |
 | MCP tool returns typed `Supported=false` for NetWorthBtc and typed `Error` on query failure | `null` means only "goal not found"; MCP clients can distinguish all three outcomes (code review WR-01) | `GetGoalContributingTransactionsMcpResult.Error` + failure-path test — Phase 51 |
+| Replace per-call reflection `MethodInfo.Invoke` in CQRS dispatchers and `NotificationPublisher` with cached generic wrapper instances | Eliminates `object[]` allocations, value-type boxing, and reflection overhead on every command, query, and notification dispatch | `CommandDispatcher`, `QueryDispatcher`, and `NotificationPublisher` use `ConcurrentDictionary<Type, ...>` wrapper caches — Phase 55 |
+| Use `LinkedList<CostLot>` with running totals in `FifoCalculationStrategy` | Avoids $O(N^2)$ `Queue<T>` array rebuilds on partial sells and repeated LINQ enumerations across lines | Head node updated in $O(1)$ on partial sell; `remainingQty` and `remainingCost` maintained incrementally — Phase 55 |
+| Route ViewModels and MCP `ReportTools` exclusively through `Valt.App` CQRS dispatchers and shared exclusion/wealth filters | Eliminates direct repository / `ILocalDatabase` dependencies in ViewModels and keeps MCP financial reports aligned with UI analytics exclusions and asset wealth snapshots | 5 ViewModels migrated to CQRS commands/queries; `ReportTools` applies `GetReportsAnalyticsCategoryFilterExcludedIds()` and `AssetsTotalFiat` — Phase 55 |
+| Decouple 4-year cycle polar/log10 spiral math (`BitcoinCycleSpiralCalculator`) from custom Avalonia rendering (`BitcoinCycleSpiralChartControl`) | Enables deterministic headless NUnit verification of polar angle mapping, 10-decade $\log_{10}$ scaling, halving detection, and spatial hit-testing without requiring an Avalonia display server | `BitcoinCycleSpiralCalculator` is a pure static class; `BitcoinCycleSpiralChartControl` caches `StreamGeometry` and uses static `IImmutableSolidColorBrush`/`ImmutablePen` instances — Phase 56 |
 
 ## Evolution
 
@@ -190,4 +194,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-10-27 after Phase 53 complete (transaction exclusion flag)*
+*Last updated: 2026-11-24 after Phase 56 complete (Bitcoin 4-Year Cycle Spiral Chart in Price History)*
