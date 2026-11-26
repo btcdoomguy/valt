@@ -32,10 +32,14 @@ public class SpendingEvolutionQueries : ISpendingEvolutionQueries
         // Load accounts
         var allAccountsList = _localDatabase.GetAccounts().FindAll().ToList();
         var selectedAccountIds = query.AccountIds.Length > 0
-            ? query.AccountIds.Select(id => new ObjectId(id)).ToList()
-            : allAccountsList.Select(a => a.Id).ToList();
+            ? query.AccountIds.Select(id => new ObjectId(id)).ToHashSet()
+            : allAccountsList.Select(a => a.Id).ToHashSet();
 
         var accountDict = allAccountsList.Where(a => selectedAccountIds.Contains(a.Id)).ToDictionary(a => a.Id);
+
+        HashSet<ObjectId>? selectedCategoryIds = query.CategoryIds.Length > 0
+            ? query.CategoryIds.Select(id => new ObjectId(id)).ToHashSet()
+            : null;
 
         // Get primary currency
         var primaryCurrency = _currencySettings.MainFiatCurrency;
@@ -57,19 +61,6 @@ public class SpendingEvolutionQueries : ISpendingEvolutionQueries
         // "!=" keeps missing (NULL != true) and explicit-false rows while dropping only excl: true.
         transactionQuery = transactionQuery.Where(x => x.IsExcluded != true);
 
-        // Filter by category IDs if provided
-        if (query.CategoryIds.Length > 0)
-        {
-            var categoryObjectIds = query.CategoryIds.Select(id => new ObjectId(id)).ToList();
-            transactionQuery = transactionQuery.Where(x => categoryObjectIds.Contains(x.CategoryId));
-        }
-
-        // Filter by selected accounts
-        if (selectedAccountIds.Count < allAccountsList.Count)
-        {
-            transactionQuery = transactionQuery.Where(x => selectedAccountIds.Contains(x.FromAccountId));
-        }
-
         // Include all debit transactions (spending): fiat expenses OR bitcoin expenses with auto-calculated sats
         transactionQuery = transactionQuery.Where(x =>
             (x.FromFiatAmount.HasValue && x.FromFiatAmount.Value < 0) ||
@@ -78,8 +69,8 @@ public class SpendingEvolutionQueries : ISpendingEvolutionQueries
         // Execute query - load filtered results into memory
         var transactions = transactionQuery.ToList();
 
-        // Aggregate by month
-        var monthlyData = AggregateBySum(transactions, accountDict, primaryCurrency, provider);
+        // Aggregate by month (filtering by account and category in memory)
+        var monthlyData = AggregateBySum(transactions, accountDict, selectedCategoryIds, primaryCurrency, provider);
 
         // Sort by year and month ascending
         var sortedMonths = monthlyData
@@ -105,6 +96,7 @@ public class SpendingEvolutionQueries : ISpendingEvolutionQueries
     private static Dictionary<(int Year, int Month), (decimal FiatTotal, long SatsTotal, int TransactionCount)> AggregateBySum(
         List<TransactionEntity> transactions,
         Dictionary<ObjectId, AccountEntity> accountDict,
+        HashSet<ObjectId>? selectedCategoryIds,
         string primaryCurrency,
         IReportDataProvider provider)
     {
@@ -113,6 +105,9 @@ public class SpendingEvolutionQueries : ISpendingEvolutionQueries
         foreach (var transaction in transactions)
         {
             if (!accountDict.TryGetValue(transaction.FromAccountId, out var account))
+                continue;
+
+            if (selectedCategoryIds is not null && !selectedCategoryIds.Contains(transaction.CategoryId))
                 continue;
 
             var yearMonth = (transaction.Date.Year, transaction.Date.Month);

@@ -4,10 +4,10 @@ milestone: v0.9
 current_phase: 56
 status: completed
 stopped_at: Phase 56 complete — all phases complete
-last_updated: "2026-11-24T20:37:51.685Z"
+last_updated: "2026-11-25T20:17:34.506Z"
 last_activity: 2026-11-24
 last_activity_desc: Phase 56 complete
-state_head: bea15465b446dcf0d8e3ebf596ce3872819c10bf
+state_head: cbe8b4ddaaf335504a02233b6110e98d1fd36cf2
 progress:
   total_phases: 0
   completed_phases: 0
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-11-24)
 Phase: 56
 Plan: Not started
 Status: All phases complete
-Last activity: 2026-11-24 - Completed quick task 261124-ocd: the spiral chart is good, but very small. because of that not all days are appearing on the chart, which make some dots innaccurate. let's increase about 15% of this window size, giving more space to the chart
+Last activity: 2026-11-25 - Completed quick task 261125-nu2: when the user doesnt have any Assets, the top left area on the Transactions tab that shows the totals appears misaligned with a bottom empty space because the Assets line doesn't appear. Instead of making the line empty, show the Assets line with a total of 0
 
 ## Performance Metrics
 
@@ -335,6 +335,7 @@ None — 53-04 checkpoint issues resolved (fix commit acd12f7); plan complete, f
 | 261110-jxx | in the Reports tab, about the BTC Loans, there are some inconsistent data: the Highest LTV is showing a value but in the Assets tab there are loans with higher ltv values. Change the "Worst-case liq.price" line to show the Closest liq. price value, to show the first loan that will be liquidated so the user can understand better when he should worry about | 2026-11-10 | fd99659 | [261110-jxx-in-the-reports-tab-about-the-btc-loans-t](./quick/261110-jxx-in-the-reports-tab-about-the-btc-loans-t/) |
 | 261124-nur | add to the Spiral chart more points: the top and bottom prices of each halving, like the original chart where the tops are marked as green dots and the bottoms in red: https://www.bitcoinstrategyplatform.com/cheatsheet/ | 2026-11-24 | 400c5ca | [261124-nur-add-to-the-spiral-chart-more-points-the-](./quick/261124-nur-add-to-the-spiral-chart-more-points-the-/) |
 | 261124-ocd | the spiral chart is good, but very small. because of that not all days are appearing on the chart, which make some dots innaccurate. let's increase about 15% of this window size, giving more space to the chart | 2026-11-24 | bea1546 | [261124-ocd-the-spiral-chart-is-good-but-very-small-](./quick/261124-ocd-the-spiral-chart-is-good-but-very-small-/) |
+| 261125-nu2 | when the user doesnt have any Assets, the top left area on the Transactions tab that shows the totals appears misaligned with a bottom empty space because the Assets line doesn't appear. Instead of making the line empty, show the Assets line with a total of 0 | 2026-11-25 | cbe8b4d | [261125-nu2-when-the-user-doesnt-have-any-assets-the](./quick/261125-nu2-when-the-user-doesnt-have-any-assets-the/) |
 
 ## Deferred Items
 
