@@ -193,7 +193,6 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
             OnPropertyChanged(nameof(DisplayAllWealthInFiat));
             OnPropertyChanged(nameof(DisplayAssetsWealth));
             OnPropertyChanged(nameof(DisplayWealthInBtcRatio));
-            OnPropertyChanged(nameof(HasAssets));
 
             // Update account display for secure mode
             foreach (var account in Accounts)
@@ -217,8 +216,6 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
     public string DisplayAllWealthInFiat => _secureModeState.IsEnabled ? "---" : CurrencyDisplay.FormatFiat(_animatedAllWealthInFiat, _currencySettings?.MainFiatCurrency ?? "USD");
     public string DisplayAssetsWealth => _secureModeState.IsEnabled ? "---" : CurrencyDisplay.FormatFiat(_animatedAssetsWealth, _currencySettings?.MainFiatCurrency ?? "USD");
     public string DisplayWealthInBtcRatio => _secureModeState.IsEnabled ? "---" : _animatedWealthInBtcRatio.ToString("F1", CultureInfo.InvariantCulture) + "%";
-    public bool HasAssets => _accountsTotalState?.CurrentWealth.AssetsWealthInMainFiatCurrency != 0 ||
-                             _accountsTotalState?.CurrentWealth.AssetsWealthInSats != 0;
 
     private void AccountsTotalStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -249,8 +246,6 @@ public partial class TransactionsViewModel : ValtTabViewModel, IDisposable
                 _accountsTotalState.CurrentWealth.AssetsWealthInMainFiatCurrency);
 
             IsRatesLive = _ratesState.IsUpToDate;
-
-            OnPropertyChanged(nameof(HasAssets));
         });
     }
 

@@ -87,7 +87,7 @@
                         </Grid>
 
                         <!-- My Assets -->
-                        <Grid ColumnDefinitions="Auto, *" Height="22" IsVisible="{Binding HasAssets}"
+                        <Grid ColumnDefinitions="Auto, *" Height="22"
                               Opacity="{Binding IsRatesLive, Converter={StaticResource BoolToOpacityConverter}}">
                             <TextBlock Grid.Column="0"
                                        Classes="wealth-label"

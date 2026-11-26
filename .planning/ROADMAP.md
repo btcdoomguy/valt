@@ -11,6 +11,7 @@
 - ✅ **v0.11 Documentation Site Sync** — Phase 54 (shipped 2026-10-30)
 - ✅ **v0.12 Codebase Performance, Architecture & Readability Refactoring** — Phase 55 (completed 2026-11-23)
 - ✅ **v0.13 Bitcoin 4-Year Cycle Spiral Chart** — Phase 56 (completed 2026-11-24)
+- 🚧 **v0.14 UI Look & Feel Overhaul** — Phase 57 (in progress)
 
 ## Phases
 
@@ -75,6 +76,10 @@ Phases 46-48 (Cost-Over-Time Schedule, Prefill from Existing BTC Loan Asset, MCP
 ### ✅ v0.13 Bitcoin 4-Year Cycle Spiral Chart (Phase 56) — COMPLETED 2026-11-24
 
 - [x] **Phase 56: Bitcoin 4-Year Cycle Spiral Chart in Price History** — Add an interactive 4-year cycle logarithmic spiral chart to the Price History modal for BTC, with a chart mode toggle (Line Chart vs. 4-Year Cycle Spiral), radial year axes, log10 price rings ($0.001 to $1M), halving markers, and hover tooltips — completed 2026-11-24
+
+### 🚧 v0.14 UI Look & Feel Overhaul (Phase 57) — IN PROGRESS
+
+- [ ] **Phase 57: UI Look & Feel Overhaul — Icons, Typography, Window Borders, Reports & Transactions Layout** — Comprehensive visual and ergonomic upgrade across Valt.UI: elevated window borders and title bar chrome, refined typography/spacing/input/DataGrid styles, Material Design icons on action and dialog buttons across tabs and modals, redesigned Transactions tab layout (wealth card, account list header/items, toolbar, right-hand Fixed Expenses & Goals panels), and elevated Reports tab data presentation (summary bar, KPI dashboard cards, chart framing, and Monthly Totals grid)
 
 ## Phase Details
 
@@ -393,6 +398,7 @@ _Note: 52-02 (UI: assets grid column + Monthly Totals chart with assets series) 
 | 54. Documentation Site Sync — Features Since July 2026 | v0.11 | 6/6 | Complete | 2026-10-30 |
 | 55. Codebase Performance, Architecture & Readability Refactoring | v0.12 | 6/6 | Complete | 2026-11-23 |
 | 56. Bitcoin 4-Year Cycle Spiral Chart in Price History | v0.13 | 1/1 | Complete | 2026-11-24 |
+| 57. UI Look & Feel Overhaul — Icons, Typography, Window Borders, Reports & Transactions Layout | v0.14 | 0/TBD | In Progress | - |
 
 **Total phases:** 22 (19 complete, 0 active, 3 removed/paused)  
 **v0.8 plans:** 3/3 executed (phases 46-48 removed 2026-10-26)  
@@ -500,5 +506,22 @@ _Note: 52-02 (UI: assets grid column + Monthly Totals chart with assets series) 
 
 **UI hint**: yes
 
+### Phase 57: UI Look & Feel Overhaul — Icons, Typography, Window Borders, Reports & Transactions Layout
+
+**Goal**: Elevate the visual polish, hierarchy, and ergonomics of Valt across the desktop application — refining window borders and custom title bars, upgrading global typography/spacing/control styles, adding Material Design icons to action and modal buttons, modernizing the Transactions tab 3-column layout, and improving data presentation and visual hierarchy on the Reports tab
+**Depends on**: Phase 56
+**Requirements**: TBD
+**Success Criteria** (what must be TRUE):
+
+  1. **Window Borders & Custom Title Bar Chrome**: Main window and all chromeless modal windows (`WindowDecorations="None"` / `BorderOnly`) have a crisp, high-contrast outer frame (`Window` and `Border.modal-container` / root `Window > Border`) with subtle accent/surface border distinction, a refined `CustomTitleBar` (32px height, balanced title typography, modern window control buttons with hover states, and clean bottom separator), and all modals preserve their `MinWidth`/`MinHeight` invariants.
+  2. **Global Typography, Spacing, Borders & Controls (`DefaultStyles.axaml` & `CustomResources.axaml`)**: Button styles (primary, secondary, delete, text-and-icon, panel-header-icon, tab), input controls (`TextBox`, `ComboBox`, `AutoCompleteBox`, `NumericUpDown`, `CalendarDatePicker`, `DateCalendarSelector`), `DataGrid` headers/rows/cells, `ListBox` items, `Expander` sections, and card containers (`Border.card`, `Border.form-fields-area`, `Border.form-section`) feature cohesive corner radii (6px cards/containers, 4px inputs/buttons), consistent padding, improved visual contrast, and tabular numeric readability (`Geist` for UI labels/prose, `GeistMono` for amounts, dates, and financial metrics).
+  3. **Action & Dialog Buttons with Material Design Icons**: Primary and secondary action buttons across main tabs (`TransactionsListView`, `ReportsView`, `AvgPriceView`, `AssetsView`) and modal dialog footers/toolbars (`TransactionEditorView`, `ManageAccountView`, `ManageAccountGroupView`, `ManageCategoriesView`, `ManageGoalView`, `FixedExpenseEditorView`, `ManageFixedExpensesView`, `AvgPriceLineEditorView`, `ManageAvgPriceProfilesView`, `ManageAssetView`, `ManageAssetGroupView`, `ManageAssetGroupsListView`, `SettingsView`, `FixedPriceConfigView`, `SimulatedPricesConfigView`, `ReportsCategoryFilterConfigView`, `SpendingEvolutionView`, `BtcLoanSimulatorView`, `LeverageSimulatorView`, `ConversionCalculatorView`, `PriceHistoryView`, `GoalSummaryView`, `SoldAssetHistoryView`, `ImportWizardView`, etc.) pair their localized text labels with valid Material Design icons from `MaterialSymbolsOutlined-map.json` using a consistent icon+label button pattern while preserving all `Command`, `IsDefault`, `IsCancel`, `TabIndex`, and `AutomationProperties` bindings.
+  4. **Transactions Tab Layout & Visual Hierarchy**: The 3-column Transactions view (`TransactionsView`, `TransactionListView`, `AccountItemControl`, `FixedExpensesPanelView`, `GoalsPanelView`) has aligned top spacing, an upgraded Total Wealth summary card with clear visual separation between BTC stack, fiat, assets, total wealth, and BTC ratio, a cleaner Accounts panel header with labeled/icon action bar and refined `AccountItemControl` cards, a balanced center toolbar (search input with search glyph, centered `DateCalendarSelector`, prominent `+ Add Transaction` CTA button) above a cleaner `DataGrid`, and cohesive right-column cards for Current Month header, Fixed Expenses panel, and Goals panel.
+  5. **Reports Tab Data Presentation & Hierarchy**: The Reports tab (`ReportsView`, `DashboardDataUserControl`, `DashboardGridPanel`) presents financial data with stronger hierarchy and scannability: an integrated top toolbar/simulation bar combining the BTC price simulation strip and category filter configuration button, redesigned `DashboardDataUserControl` KPI cards (340px width, distinct header badge/icon, improved row padding, clear typographic contrast between left metric labels in `Geist` and right tabular values in `GeistMono`, subtle hover feedback for clickable/tooltip rows), polished chart containers and filter bars across Wealth Overview, Monthly Totals, Fixed vs Variable, BTC Metrics, Stack Velocity, Loans & Leverage, and By Categories sections, and a cleaner Monthly Totals `DataGrid` with right-aligned numeric columns and clear column header styling.
+
+**Plans**: TBD
+
+**UI hint**: yes
+
 ---
-*Last updated: 2026-11-23 — Phase 56 added for v0.13 Bitcoin 4-Year Cycle Spiral Chart*
+*Last updated: 2026-11-26 — Phase 57 added for v0.14 UI Look & Feel Overhaul*

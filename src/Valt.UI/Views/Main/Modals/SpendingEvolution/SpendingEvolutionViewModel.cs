@@ -34,6 +34,7 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
     private readonly IConfigurationManager _configurationManager;
     private readonly IClock _clock;
     private bool _isDataLoading;
+    private bool _hasPendingReload;
     private CancellationTokenSource? _filterChangeCts;
 
     public SpendingEvolutionViewModel()
@@ -196,23 +197,25 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
     {
         // Debounce: cancel pending reload and schedule a new one
         _filterChangeCts?.Cancel();
+        _filterChangeCts?.Dispose();
         _filterChangeCts = new CancellationTokenSource();
-        var token = _filterChangeCts.Token;
-        _ = Task.Run(async () =>
+        _ = TriggerDebouncedReloadAsync(_filterChangeCts.Token);
+    }
+
+    private async Task TriggerDebouncedReloadAsync(CancellationToken token)
+    {
+        try
         {
-            try
+            await Task.Delay(150, token);
+            if (!token.IsCancellationRequested)
             {
-                await Task.Delay(150, token);
-                if (!token.IsCancellationRequested)
-                {
-                    await Dispatcher.UIThread.InvokeAsync(async () => await LoadDataAsync());
-                }
+                await LoadDataAsync();
             }
-            catch (OperationCanceledException)
-            {
-                // Expected when debounce cancels
-            }
-        });
+        }
+        catch (OperationCanceledException)
+        {
+            // Expected when debounce cancels
+        }
     }
 
     [RelayCommand]
@@ -289,33 +292,58 @@ public partial class SpendingEvolutionViewModel : ValtModalViewModel, IDisposabl
     [RelayCommand]
     private async Task LoadDataAsync()
     {
-        if (_isDataLoading) return;
+        if (_isDataLoading)
+        {
+            _hasPendingReload = true;
+            return;
+        }
+
         _isDataLoading = true;
         IsLoading = true;
         try
         {
-            var months = SelectedTimeRangeOption?.Months ?? 24;
-            var today = _clock.GetCurrentLocalDate();
-            var fromDate = DateOnly.FromDateTime(today.ToDateTime(TimeOnly.MinValue).AddMonths(-months));
-            fromDate = new DateOnly(fromDate.Year, fromDate.Month, 1);
-            var toDate = today;
-
-            var selectedCategoryIds = SelectedCategories.Select(c => c.Id).ToArray();
-            var selectedAccountIds = SelectedAccounts.Select(a => a.Id).ToArray();
-
-            var query = new GetSpendingEvolutionQuery
+            do
             {
-                From = fromDate,
-                To = toDate,
-                CategoryIds = selectedCategoryIds,
-                AccountIds = selectedAccountIds
-            };
+                _hasPendingReload = false;
 
-            CurrentData = await _queryDispatcher.DispatchAsync(query);
-            ChartData.RefreshChart(CurrentData);
+                if ((AvailableCategories.Count > 0 && SelectedCategories.Count == 0) ||
+                    (AvailableAccounts.Count > 0 && SelectedAccounts.Count == 0))
+                {
+                    CurrentData = new SpendingEvolutionDataDto
+                    {
+                        Months = [],
+                        HasMissingPriceInSats = false,
+                        PrimaryCurrency = CurrentData?.PrimaryCurrency ?? "USD"
+                    };
+                    ChartData.RefreshChart(CurrentData);
+                    HasMissingPriceInSats = false;
+                    CalculateIndicators();
+                    continue;
+                }
 
-            HasMissingPriceInSats = CurrentData.HasMissingPriceInSats;
-            CalculateIndicators();
+                var months = SelectedTimeRangeOption?.Months ?? 24;
+                var today = _clock.GetCurrentLocalDate();
+                var fromDate = DateOnly.FromDateTime(today.ToDateTime(TimeOnly.MinValue).AddMonths(-months));
+                fromDate = new DateOnly(fromDate.Year, fromDate.Month, 1);
+                var toDate = today;
+
+                var selectedCategoryIds = SelectedCategories.Select(c => c.Id).ToArray();
+                var selectedAccountIds = SelectedAccounts.Select(a => a.Id).ToArray();
+
+                var query = new GetSpendingEvolutionQuery
+                {
+                    From = fromDate,
+                    To = toDate,
+                    CategoryIds = selectedCategoryIds,
+                    AccountIds = selectedAccountIds
+                };
+
+                CurrentData = await _queryDispatcher.DispatchAsync(query);
+                ChartData.RefreshChart(CurrentData);
+
+                HasMissingPriceInSats = CurrentData.HasMissingPriceInSats;
+                CalculateIndicators();
+            } while (_hasPendingReload);
         }
         finally
         {
