@@ -210,6 +210,12 @@ public partial class CheckboxListSelector : UserControl
 
         selectedItems.Clear();
 
+        if (selectedItems is AvaloniaList<object> avaloniaList)
+        {
+            avaloniaList.AddRange(InternalItems.Where(x => x.IsSelected).Select(x => x.Item));
+            return;
+        }
+
         foreach (var item in InternalItems.Where(x => x.IsSelected))
         {
             selectedItems.Add(item.Item);
